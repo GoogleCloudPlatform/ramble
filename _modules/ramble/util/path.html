@@ -120,16 +120,13 @@
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;substitute_config_variables&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;substitute_path_variables&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;canonicalize_path&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;substitute_config_variables&quot;</span><span class="p">,</span> <span class="s2">&quot;substitute_path_variables&quot;</span><span class="p">,</span> <span class="s2">&quot;canonicalize_path&quot;</span><span class="p">]</span>
 
 <span class="c1"># Substitutions to perform</span>
 <span class="n">replacements</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;ramble&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
-    <span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">(),</span>
-    <span class="s1">&#39;tempdir&#39;</span><span class="p">:</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
+    <span class="s2">&quot;ramble&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span>
+    <span class="s2">&quot;user&quot;</span><span class="p">:</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">(),</span>
+    <span class="s2">&quot;tempdir&quot;</span><span class="p">:</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">gettempdir</span><span class="p">(),</span>
 <span class="p">}</span>
 
 <span class="c1"># This is intended to be longer than the part of the install path</span>
@@ -151,13 +148,13 @@
     <span class="c1"># Choose a conservative default</span>
     <span class="n">sys_max_path_length</span> <span class="o">=</span> <span class="mi">256</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">path_max_proc</span>  <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">([</span><span class="s1">&#39;getconf&#39;</span><span class="p">,</span> <span class="s1">&#39;PATH_MAX&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">],</span>
-                                          <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                                          <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">)</span>
+        <span class="n">path_max_proc</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;getconf&quot;</span><span class="p">,</span> <span class="s2">&quot;PATH_MAX&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">],</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span>
+        <span class="p">)</span>
         <span class="n">proc_output</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">path_max_proc</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span>
         <span class="n">sys_max_path_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">proc_output</span><span class="p">)</span>
     <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unable to find system max path length, using: </span><span class="si">{</span><span class="n">sys_max_path_length</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unable to find system max path length, using: </span><span class="si">{</span><span class="n">sys_max_path_length</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">sys_max_path_length</span>
 
@@ -177,16 +174,15 @@
 <span class="sd">    use either ``$var`` or ``${var}`` syntax for the variables.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="c1"># Look up replacements for re.sub in the replacements dict.</span>
     <span class="k">def</span> <span class="nf">repl</span><span class="p">(</span><span class="n">match</span><span class="p">):</span>
-        <span class="n">m</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;$</span><span class="si">{}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;$</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">lower_key</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">replacements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lower_key</span><span class="p">,</span>
-                                <span class="n">local_replacements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lower_key</span><span class="p">,</span>
-                                                       <span class="k">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="n">replacements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lower_key</span><span class="p">,</span> <span class="n">local_replacements</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lower_key</span><span class="p">,</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">0</span><span class="p">)))</span>
 
     <span class="c1"># Replace $var or ${var}.</span>
-    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(\$\w+\b|\$\{\w+\})&#39;</span><span class="p">,</span> <span class="n">repl</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(\$\w+\b|\$\{\w+\})&quot;</span><span class="p">,</span> <span class="n">repl</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
 
 

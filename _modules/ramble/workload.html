@@ -113,8 +113,15 @@
 <span class="k">class</span> <span class="nc">WorkloadVariable</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a variable definition&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">expandable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">values</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">expandable</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for a new variable</span>
 
 <span class="sd">        Args:</span>
@@ -141,15 +148,15 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (str): Representation of this variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_indent</span>
+        <span class="n">indentation</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">n_indent</span>
 
-        <span class="n">print_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;Default&#39;</span><span class="p">,</span> <span class="s1">&#39;Values&#39;</span><span class="p">]</span>
+        <span class="n">print_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Description&quot;</span><span class="p">,</span> <span class="s2">&quot;Default&quot;</span><span class="p">,</span> <span class="s2">&quot;Values&quot;</span><span class="p">]</span>
 
-        <span class="n">out_str</span>  <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_2</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out_str</span> <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_2</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">print_attr</span> <span class="ow">in</span> <span class="n">print_attrs</span><span class="p">:</span>
             <span class="n">name</span> <span class="o">=</span> <span class="n">print_attr</span>
-            <span class="k">if</span> <span class="n">print_attr</span> <span class="o">==</span> <span class="s1">&#39;Values&#39;</span><span class="p">:</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;Suggested Values&#39;</span>
+            <span class="k">if</span> <span class="n">print_attr</span> <span class="o">==</span> <span class="s2">&quot;Values&quot;</span><span class="p">:</span>
+                <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Suggested Values&quot;</span>
             <span class="n">attr_name</span> <span class="o">=</span> <span class="n">print_attr</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
             <span class="n">attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -188,11 +195,11 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (str): String representing this environment variable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_indent</span>
+        <span class="n">indentation</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">n_indent</span>
 
-        <span class="n">print_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Description&#39;</span><span class="p">,</span> <span class="s1">&#39;Value&#39;</span><span class="p">]</span>
+        <span class="n">print_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Description&quot;</span><span class="p">,</span> <span class="s2">&quot;Value&quot;</span><span class="p">]</span>
 
-        <span class="n">out_str</span>  <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_2</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out_str</span> <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_2</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">print_attrs</span><span class="p">:</span>
             <span class="n">attr_name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
             <span class="n">attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr_name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
@@ -208,8 +215,9 @@
 <span class="k">class</span> <span class="nc">Workload</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class representing a single workload&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">executables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
-                 <span class="n">inputs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">executables</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[],</span> <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for a workload</span>
 
 <span class="sd">        Args:</span>
@@ -222,7 +230,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="n">attr_names</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;executables&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">]</span>
+        <span class="n">attr_names</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;executables&quot;</span><span class="p">,</span> <span class="s2">&quot;inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">]</span>
         <span class="n">attr_vals</span> <span class="o">=</span> <span class="p">[</span><span class="n">executables</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">tags</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">vals</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">attr_names</span><span class="p">,</span> <span class="n">attr_vals</span><span class="p">):</span>
@@ -245,26 +253,24 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            (str): Representation of this workload</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;Executables&#39;</span><span class="p">,</span> <span class="s1">&#39;executables&#39;</span><span class="p">),</span>
-                 <span class="p">(</span><span class="s1">&#39;Inputs&#39;</span><span class="p">,</span> <span class="s1">&#39;inputs&#39;</span><span class="p">),</span>
-                 <span class="p">(</span><span class="s1">&#39;Tags&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">)]</span>
+        <span class="n">attrs</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;Executables&quot;</span><span class="p">,</span> <span class="s2">&quot;executables&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Inputs&quot;</span><span class="p">,</span> <span class="s2">&quot;inputs&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s2">&quot;Tags&quot;</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">)]</span>
 
-        <span class="n">indentation</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="n">n_indent</span>
+        <span class="n">indentation</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">n_indent</span>
 
-        <span class="n">out_str</span>  <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">Workload: &#39;</span><span class="p">)</span>
-        <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">out_str</span> <span class="o">=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s2">Workload: &quot;</span><span class="p">)</span>
+        <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
         <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
-            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">: &#39;</span><span class="p">)</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s2">    </span><span class="si">{</span><span class="n">attr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">: &quot;</span><span class="p">)</span>
             <span class="n">attr_val</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="p">[])</span>
-            <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">attr_val</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">attr_val</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
-            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    Variables:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s2">    Variables:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">out_str</span> <span class="o">+=</span> <span class="n">var</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">n_indent</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="p">:</span>
-            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    Environment Variables:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">out_str</span> <span class="o">+=</span> <span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s2">    Environment Variables:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">env_var</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">environment_variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                 <span class="n">out_str</span> <span class="o">+=</span> <span class="n">env_var</span><span class="o">.</span><span class="n">as_str</span><span class="p">(</span><span class="n">n_indent</span> <span class="o">+</span> <span class="mi">4</span><span class="p">)</span>
 

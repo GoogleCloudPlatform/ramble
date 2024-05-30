@@ -169,13 +169,12 @@
         <span class="n">keyfile</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
         <span class="n">keydir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">keydir</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span> <span class="o">+</span> <span class="n">keyfile</span> <span class="o">+</span> <span class="s1">&#39;.lock&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="n">keydir</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span> <span class="o">+</span> <span class="n">keyfile</span> <span class="o">+</span> <span class="s2">&quot;.lock&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_lock</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a lock for a key, if necessary, and return a lock object.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locks</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_locks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock_path</span><span class="p">(</span><span class="n">key</span><span class="p">),</span>
-                                    <span class="n">default_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_timeout</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_locks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_lock_path</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">default_timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">lock_timeout</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_locks</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
 
 <div class="viewcode-block" id="FileCache.init_entry">
@@ -220,9 +219,7 @@
 <span class="sd">               cache_file.read()</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ReadTransaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">acquire</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">ReadTransaction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">acquire</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">)))</span></div>
 
 
 <div class="viewcode-block" id="FileCache.write_transaction">
@@ -235,6 +232,7 @@
 <span class="sd">        moves the file into place on top of the old file atomically.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
+
         <span class="c1"># TODO: this nested context manager adds a lot of complexity and</span>
         <span class="c1"># TODO: is pretty hard to reason about in llnl.util.lock. At some</span>
         <span class="c1"># TODO: point we should just replace it with functions and simplify</span>
@@ -245,10 +243,10 @@
                 <span class="n">cm</span><span class="o">.</span><span class="n">orig_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
                 <span class="n">cm</span><span class="o">.</span><span class="n">orig_file</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">orig_filename</span><span class="p">):</span>
-                    <span class="n">cm</span><span class="o">.</span><span class="n">orig_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">orig_filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
+                    <span class="n">cm</span><span class="o">.</span><span class="n">orig_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">orig_filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span>
 
-                <span class="n">cm</span><span class="o">.</span><span class="n">tmp_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.tmp&#39;</span>
-                <span class="n">cm</span><span class="o">.</span><span class="n">tmp_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">tmp_filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
+                <span class="n">cm</span><span class="o">.</span><span class="n">tmp_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_path</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;.tmp&quot;</span>
+                <span class="n">cm</span><span class="o">.</span><span class="n">tmp_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">tmp_filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span>
 
                 <span class="k">return</span> <span class="n">cm</span><span class="o">.</span><span class="n">orig_file</span><span class="p">,</span> <span class="n">cm</span><span class="o">.</span><span class="n">tmp_file</span>
 
@@ -264,8 +262,7 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">cm</span><span class="o">.</span><span class="n">tmp_filename</span><span class="p">,</span> <span class="n">cm</span><span class="o">.</span><span class="n">orig_filename</span><span class="p">)</span>
 
-        <span class="k">return</span> <span class="n">WriteTransaction</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">acquire</span><span class="o">=</span><span class="n">WriteContextManager</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">WriteTransaction</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_lock</span><span class="p">(</span><span class="n">key</span><span class="p">),</span> <span class="n">acquire</span><span class="o">=</span><span class="n">WriteContextManager</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="FileCache.mtime">

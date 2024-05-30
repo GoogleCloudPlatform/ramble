@@ -164,36 +164,53 @@
     <span class="c1"># Various types of Spack files that can be edited</span>
     <span class="c1"># Edits package files by default</span>
     <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--application-type&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--application-type&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
         <span class="n">const</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">application_types_path</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Edit the application type with the supplied name.&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Edit the application type with the supplied name.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--command&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;-c&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--command&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
         <span class="n">const</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">command_path</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the command with the supplied name&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the command with the supplied name&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--docs&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
-        <span class="n">const</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">lib_path</span><span class="p">,</span> <span class="s1">&#39;docs&#39;</span><span class="p">),</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the docs with the supplied name&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--docs&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">lib_path</span><span class="p">,</span> <span class="s2">&quot;docs&quot;</span><span class="p">),</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the docs with the supplied name&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--test&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--test&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
         <span class="n">const</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">test_path</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the test with the supplied name&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the test with the supplied name&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--module&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--module&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;path&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
         <span class="n">const</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">module_path</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the main ramble module with the supplied name&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;edit the main ramble module with the supplied name&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># Options for editing applications</span>
     <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-r&#39;</span><span class="p">,</span> <span class="s1">&#39;--repo&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to repo to edit application in&quot;</span><span class="p">)</span>
-    <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-N&#39;</span><span class="p">,</span> <span class="s1">&#39;--namespace&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;namespace of package to edit&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-r&quot;</span><span class="p">,</span> <span class="s2">&quot;--repo&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;path to repo to edit application in&quot;</span>
+    <span class="p">)</span>
+    <span class="n">excl_args</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-N&quot;</span><span class="p">,</span> <span class="s2">&quot;--namespace&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;namespace of package to edit&quot;</span><span class="p">)</span>
 
-    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;application name&quot;</span><span class="p">)</span></div>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;application&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;application name&quot;</span><span class="p">)</span></div>
 
 
 
@@ -215,15 +232,14 @@
 
             <span class="n">path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-                <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
-                <span class="n">blacklist</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.pyc&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">]</span>  <span class="c1"># blacklist binaries and backups</span>
-                <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span>
-                    <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">),</span> <span class="n">files</span><span class="p">))</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">path</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
+                <span class="n">blacklist</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;.pyc&quot;</span><span class="p">,</span> <span class="s2">&quot;~&quot;</span><span class="p">]</span>  <span class="c1"># blacklist binaries and backups</span>
+                <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">all</span><span class="p">(</span><span class="n">s</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">x</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">blacklist</span><span class="p">),</span> <span class="n">files</span><span class="p">))</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">m</span> <span class="o">=</span> <span class="s1">&#39;Multiple files exist with the name </span><span class="si">{0}</span><span class="s1">.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-                    <span class="n">m</span> <span class="o">+=</span> <span class="s1">&#39; Please specify a suffix. Files are:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
+                    <span class="n">m</span> <span class="o">=</span> <span class="s2">&quot;Multiple files exist with the name </span><span class="si">{0}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">m</span> <span class="o">+=</span> <span class="s2">&quot; Please specify a suffix. Files are:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
                     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-                        <span class="n">m</span> <span class="o">+=</span> <span class="s1">&#39;        &#39;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                        <span class="n">m</span> <span class="o">+=</span> <span class="s2">&quot;        &quot;</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">m</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">files</span><span class="p">:</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No file for &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; was found in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

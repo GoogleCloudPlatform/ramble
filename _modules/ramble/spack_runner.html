@@ -125,7 +125,7 @@
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
-<span class="n">spack_namespace</span> <span class="o">=</span> <span class="s1">&#39;spack&#39;</span>
+<span class="n">spack_namespace</span> <span class="o">=</span> <span class="s2">&quot;spack&quot;</span>
 
 <span class="n">package_name_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\s-]*(?P&lt;package_name&gt;[\w][\w-]+).*&quot;</span><span class="p">)</span>
 
@@ -143,44 +143,47 @@
 <span class="sd">    method for generating variables that can be used to ensure a spack env</span>
 <span class="sd">    is loaded within an execution script.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">env_key</span> <span class="o">=</span> <span class="s1">&#39;SPACK_ENV&#39;</span>
 
-    <span class="n">global_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:global&#39;</span>
-    <span class="n">install_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:install&#39;</span>
-    <span class="n">compiler_find_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:compiler_find&#39;</span>
-    <span class="n">buildcache_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:buildcache&#39;</span>
-    <span class="n">concretize_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:concretize&#39;</span>
-    <span class="n">env_create_config_name</span> <span class="o">=</span> <span class="s1">&#39;config:spack:env_create&#39;</span>
+    <span class="n">env_key</span> <span class="o">=</span> <span class="s2">&quot;SPACK_ENV&quot;</span>
 
-    <span class="n">env_create_args</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;env&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;create&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;-d&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;.&#39;</span>
+    <span class="n">global_config_name</span> <span class="o">=</span> <span class="s2">&quot;config:spack:global&quot;</span>
+    <span class="n">install_config_name</span> <span class="o">=</span> <span class="s2">&quot;config:spack:install&quot;</span>
+    <span class="n">compiler_find_config_name</span> <span class="o">=</span> <span class="s2">&quot;config:spack:compiler_find&quot;</span>
+    <span class="n">buildcache_config_name</span> <span class="o">=</span> <span class="s2">&quot;config:spack:buildcache&quot;</span>
+    <span class="n">concretize_config_name</span> <span class="o">=</span> <span class="s2">&quot;config:spack:concretize&quot;</span>
+    <span class="n">env_create_config_name</span> <span class="o">=</span> <span class="s2">&quot;config:spack:env_create&quot;</span>
+
+    <span class="n">env_create_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;env&quot;</span><span class="p">,</span> <span class="s2">&quot;create&quot;</span><span class="p">,</span> <span class="s2">&quot;-d&quot;</span><span class="p">,</span> <span class="s2">&quot;.&quot;</span><span class="p">]</span>
+
+    <span class="n">compiler_find_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">,</span> <span class="s2">&quot;find&quot;</span><span class="p">]</span>
+
+    <span class="n">_allowed_config_files</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;compilers.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;concretizer.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mirrors.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;repos.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;packages.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;modules.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;config.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;upstreams.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;bootstrap.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spack.yaml&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spack_includes.yaml&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
-    <span class="n">compiler_find_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;find&#39;</span><span class="p">]</span>
-
-    <span class="n">_allowed_config_files</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;compilers.yaml&#39;</span><span class="p">,</span> <span class="s1">&#39;concretizer.yaml&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;mirrors.yaml&#39;</span><span class="p">,</span> <span class="s1">&#39;repos.yaml&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;packages.yaml&#39;</span><span class="p">,</span> <span class="s1">&#39;modules.yaml&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;config.yaml&#39;</span><span class="p">,</span> <span class="s1">&#39;upstreams.yaml&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;bootstrap.yaml&#39;</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">,</span>
-                             <span class="s1">&#39;spack_includes.yaml&#39;</span><span class="p">]</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Ensure spack is found in the path, and setup some default variables.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spack</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">CommandNotFoundError</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RunnerError</span><span class="p">(</span><span class="s2">&quot;Spack command is not found in path&quot;</span><span class="p">)</span>
 
         <span class="c1"># Add default arguments to spack command.</span>
         <span class="c1"># This allows us to inject custom config scope dirs</span>
         <span class="c1"># primarily for unit testing.</span>
-        <span class="n">global_args</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">global_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+        <span class="n">global_args</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">global_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">global_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">global_args</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">add_default_arg</span><span class="p">(</span><span class="n">arg</span><span class="p">)</span>
@@ -188,14 +191,13 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">exe</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">=</span> <span class="n">shell</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;bash&#39;</span><span class="p">:</span>
-            <span class="n">script</span> <span class="o">=</span> <span class="s1">&#39;setup-env.sh&#39;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;csh&#39;</span><span class="p">:</span>
-            <span class="n">script</span> <span class="o">=</span> <span class="s1">&#39;setup-env.csh&#39;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;fish&#39;</span><span class="p">:</span>
-            <span class="n">script</span> <span class="o">=</span> <span class="s1">&#39;setup-env.fish&#39;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">source_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">,</span>
-                                          <span class="s1">&#39;share&#39;</span><span class="p">,</span> <span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="n">script</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;bash&quot;</span><span class="p">:</span>
+            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;setup-env.sh&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;csh&quot;</span><span class="p">:</span>
+            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;setup-env.csh&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;fish&quot;</span><span class="p">:</span>
+            <span class="n">script</span> <span class="o">=</span> <span class="s2">&quot;setup-env.fish&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">source_script</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">,</span> <span class="s2">&quot;share&quot;</span><span class="p">,</span> <span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="n">script</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="kc">None</span>
@@ -210,14 +212,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">installer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_prefix</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s1">:prefix&#39;</span><span class="p">))</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_arg</span><span class="p">(</span><span class="s1">&#39;install&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_prefix</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s2">:prefix&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_arg</span><span class="p">(</span><span class="s2">&quot;install&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_prefix</span><span class="p">(</span>
-            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concretize_config_name</span><span class="si">}</span><span class="s1">:prefix&#39;</span><span class="p">)</span>
+            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concretize_config_name</span><span class="si">}</span><span class="s2">:prefix&quot;</span><span class="p">)</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_arg</span><span class="p">(</span><span class="s1">&#39;concretize&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_arg</span><span class="p">(</span><span class="s2">&quot;concretize&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpackRunner.get_version">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_version">[docs]</a>
@@ -227,10 +229,7 @@
         <span class="kn">import</span> <span class="nn">importlib.util</span>
 
         <span class="n">version_spec</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">spec_from_file_location</span><span class="p">(</span>
-            <span class="s1">&#39;spack_version&#39;</span><span class="p">,</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">,</span>
-                         <span class="s1">&#39;lib&#39;</span><span class="p">,</span> <span class="s1">&#39;spack&#39;</span><span class="p">,</span>
-                         <span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="s1">&#39;__init__.py&#39;</span><span class="p">)</span>
+            <span class="s2">&quot;spack_version&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">,</span> <span class="s2">&quot;lib&quot;</span><span class="p">,</span> <span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="s2">&quot;__init__.py&quot;</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="n">version_mod</span> <span class="o">=</span> <span class="n">importlib</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">module_from_spec</span><span class="p">(</span><span class="n">version_spec</span><span class="p">)</span>
         <span class="n">version_spec</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">exec_module</span><span class="p">(</span><span class="n">version_mod</span><span class="p">)</span>
@@ -239,7 +238,7 @@
         <span class="n">spack_hash</span> <span class="o">=</span> <span class="n">get_git_hash</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_dir</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">spack_hash</span><span class="p">:</span>
-            <span class="n">spack_version</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="n">spack_hash</span><span class="si">}</span><span class="s1">)&#39;</span>
+            <span class="n">spack_version</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">spack_hash</span><span class="si">}</span><span class="s2">)&quot;</span>
 
         <span class="k">return</span> <span class="n">spack_version</span></div>
 
@@ -266,42 +265,43 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.set_env">[docs]</a>
     <span class="k">def</span> <span class="nf">set_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_path</span><span class="p">,</span> <span class="n">require_exists</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">require_exists</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span> <span class="ow">or</span> \
-                    <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Path </span><span class="si">{</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is not a spack environment&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;spack.yaml&quot;</span><span class="p">)</span>
+            <span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Path </span><span class="si">{</span><span class="n">env_path</span><span class="si">}</span><span class="s2"> is not a spack environment&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span> <span class="o">=</span> <span class="n">env_path</span></div>
 
 
 <div class="viewcode-block" id="SpackRunner.generate_source_command">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_source_command">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_source_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">generate_source_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s2">&quot;bash&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to source spack into an environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;. </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_script</span><span class="p">]</span>
+        <span class="n">commands</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;. </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_script</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">commands</span></div>
 
 
 <div class="viewcode-block" id="SpackRunner.generate_activate_command">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_activate_command">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_activate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">generate_activate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s2">&quot;bash&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to activate a spack environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="n">commands</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
-            <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;spack env activate </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
+            <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;spack env activate </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">commands</span></div>
 
 
 <div class="viewcode-block" id="SpackRunner.generate_deactivate_command">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.generate_deactivate_command">[docs]</a>
-    <span class="k">def</span> <span class="nf">generate_deactivate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s1">&#39;bash&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">generate_deactivate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="s2">&quot;bash&quot;</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Generate a string to deactivate a spack environment</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -309,7 +309,7 @@
         <span class="n">commands</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
-            <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;spack env deactivate&#39;</span><span class="p">)</span>
+            <span class="n">commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;spack env deactivate&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">commands</span></div>
 
@@ -342,15 +342,15 @@
 <span class="sd">        this runner.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">RunnerError</span><span class="p">(</span><span class="s1">&#39;Unable to create environment </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">RunnerError</span><span class="p">(</span><span class="s2">&quot;Unable to create environment </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
             <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="c1"># Create a spack env</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)):</span>
-                <span class="n">env_create_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_create_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;spack.yaml&quot;</span><span class="p">)):</span>
+                <span class="n">env_create_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_create_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
                 <span class="n">env_create_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_create_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">env_create_flags</span><span class="p">:</span>
                     <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">env_create_flags</span><span class="p">):</span>
@@ -368,52 +368,46 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add commands to load a package to the executable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;bash&#39;</span><span class="p">:</span>
-            <span class="n">regex</span> <span class="o">=</span> \
-                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;\A.*export &#39;</span> <span class="o">+</span>  <span class="c1"># noqa: W605</span>
-                           <span class="s1">&#39;(?P&lt;var&gt;[\S^=]+)=&#39;</span> <span class="o">+</span>  <span class="c1"># noqa: W605</span>
-                           <span class="s1">&#39;(?P&lt;val&gt;[\S]+);\Z&#39;</span><span class="p">)</span>  <span class="c1"># noqa: W605</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;bash&quot;</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                <span class="s2">&quot;\A.*export &quot;</span>  <span class="c1"># noqa: W605</span>
+                <span class="o">+</span> <span class="s2">&quot;(?P&lt;var&gt;[\S^=]+)=&quot;</span>  <span class="c1"># noqa: W605</span>
+                <span class="o">+</span> <span class="s2">&quot;(?P&lt;val&gt;[\S]+);\Z&quot;</span>  <span class="c1"># noqa: W605</span>
+            <span class="p">)</span>
 
-            <span class="n">shell_flag</span> <span class="o">=</span> <span class="s1">&#39;--sh&#39;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;csh&#39;</span><span class="p">:</span>
-            <span class="n">regex</span> <span class="o">=</span> \
-                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;\A.*setenv &#39;</span> <span class="o">+</span>  <span class="c1"># noqa: W605</span>
-                           <span class="s1">&#39;(?P&lt;var&gt;[\S^=]+) &#39;</span> <span class="o">+</span>  <span class="c1"># noqa: W605</span>
-                           <span class="s1">&#39;(?P&lt;val&gt;[\S]+);\Z&#39;</span><span class="p">)</span>  <span class="c1"># noqa: W605</span>
-            <span class="n">shell_flag</span> <span class="o">=</span> <span class="s1">&#39;--csh&#39;</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s1">&#39;fish&#39;</span><span class="p">:</span>
-            <span class="n">regex</span> <span class="o">=</span> \
-                <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;\A.*set -gx &#39;</span> <span class="o">+</span>  <span class="c1"># noqa: W605</span>
-                           <span class="s1">&#39;(?P&lt;var&gt;[\S^=]+) &#39;</span> <span class="o">+</span>  <span class="c1"># noqa: W605</span>
-                           <span class="s1">&#39;(?P&lt;val&gt;[\S]+);\Z&#39;</span><span class="p">)</span>  <span class="c1"># noqa: W605</span>
-            <span class="n">shell_flag</span> <span class="o">=</span> <span class="s1">&#39;--fish&#39;</span>
+            <span class="n">shell_flag</span> <span class="o">=</span> <span class="s2">&quot;--sh&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;csh&quot;</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                <span class="s2">&quot;\A.*setenv &quot;</span>  <span class="c1"># noqa: W605</span>
+                <span class="o">+</span> <span class="s2">&quot;(?P&lt;var&gt;[\S^=]+) &quot;</span>  <span class="c1"># noqa: W605</span>
+                <span class="o">+</span> <span class="s2">&quot;(?P&lt;val&gt;[\S]+);\Z&quot;</span>  <span class="c1"># noqa: W605</span>
+            <span class="p">)</span>
+            <span class="n">shell_flag</span> <span class="o">=</span> <span class="s2">&quot;--csh&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;fish&quot;</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+                <span class="s2">&quot;\A.*set -gx &quot;</span>  <span class="c1"># noqa: W605</span>
+                <span class="o">+</span> <span class="s2">&quot;(?P&lt;var&gt;[\S^=]+) &quot;</span>  <span class="c1"># noqa: W605</span>
+                <span class="o">+</span> <span class="s2">&quot;(?P&lt;val&gt;[\S]+);\Z&quot;</span>  <span class="c1"># noqa: W605</span>
+            <span class="p">)</span>
+            <span class="n">shell_flag</span> <span class="o">=</span> <span class="s2">&quot;--fish&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">RunnerError</span><span class="p">(</span><span class="s1">&#39;Shell </span><span class="si">%s</span><span class="s1"> not supported&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">RunnerError</span><span class="p">(</span><span class="s2">&quot;Shell </span><span class="si">%s</span><span class="s2"> not supported&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_load_compiler_shell</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">shell_flag</span><span class="p">,</span> <span class="n">regex</span><span class="p">)</span></div>
 
 
     <span class="k">def</span> <span class="nf">_load_compiler_shell</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spec</span><span class="p">,</span> <span class="n">shell_flag</span><span class="p">,</span> <span class="n">regex</span><span class="p">):</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;load&#39;</span><span class="p">,</span>
-            <span class="n">shell_flag</span><span class="p">,</span>
-            <span class="n">spec</span>
-        <span class="p">]</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;load&quot;</span><span class="p">,</span> <span class="n">shell_flag</span><span class="p">,</span> <span class="n">spec</span><span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="n">load_cmds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span>
-                                          <span class="n">args</span><span class="p">,</span>
-                                          <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">load_cmds</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="n">load_cmds</span><span class="p">:</span>
                 <span class="n">env_var</span> <span class="o">=</span> <span class="n">regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">env_var</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">),</span>
-                                               <span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">),</span>
-                                                   <span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">))</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;var&#39;</span><span class="p">),</span>
-                                                     <span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;val&#39;</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">),</span> <span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">),</span> <span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">))</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">concretizer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;var&quot;</span><span class="p">),</span> <span class="n">env_var</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;val&quot;</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
@@ -443,10 +437,10 @@
 
         <span class="n">comp_info_args</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler_config_dir</span><span class="p">:</span>
-            <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">])</span>
-        <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;compiler&#39;</span><span class="p">,</span> <span class="s1">&#39;info&#39;</span><span class="p">,</span> <span class="n">spec</span><span class="p">])</span>
+            <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;-C&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">])</span>
+        <span class="n">comp_info_args</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s2">&quot;compiler&quot;</span><span class="p">,</span> <span class="s2">&quot;info&quot;</span><span class="p">,</span> <span class="n">spec</span><span class="p">])</span>
 
-        <span class="n">compiler_find_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+        <span class="n">compiler_find_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
         <span class="n">compiler_find_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compiler_find_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">compiler_find_flags</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">compiler_find_flags</span><span class="p">):</span>
@@ -458,13 +452,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_cmd_start</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">comp_info_args</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">(</span><span class="o">*</span><span class="n">comp_info_args</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">devnull</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_cmd_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">comp_info_args</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s1"> is already an available compiler&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">spec</span><span class="si">}</span><span class="s2"> is already an available compiler&quot;</span><span class="p">)</span>
             <span class="k">return</span>
         <span class="k">except</span> <span class="n">ProcessError</span><span class="p">:</span>
 
             <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
 
-            <span class="n">install_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+            <span class="n">install_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">install_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">flag</span> <span class="ow">in</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">install_flags</span><span class="p">):</span>
                     <span class="n">args</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flag</span><span class="p">)</span>
@@ -498,8 +492,7 @@
 <span class="sd">        Ensure the spack environment is active in subsequent commands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s1">&#39;Environment runner has no &#39;</span> <span class="o">+</span>
-                                    <span class="s1">&#39;path congfigured&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s2">&quot;Environment runner has no &quot;</span> <span class="o">+</span> <span class="s2">&quot;path congfigured&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">installer</span><span class="o">.</span><span class="n">add_default_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
@@ -515,8 +508,7 @@
 <span class="sd">        Ensure the spack environment is not active in subsequent commands.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s1">&#39;Environment runner has no &#39;</span> <span class="o">+</span>
-                                    <span class="s1">&#39;path congfigured&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s2">&quot;Environment runner has no &quot;</span> <span class="o">+</span> <span class="s2">&quot;path congfigured&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">default_env</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">default_env</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">env_key</span><span class="p">]</span>
@@ -527,12 +519,10 @@
 
     <span class="k">def</span> <span class="nf">_check_active</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s1">&#39;Environment runner has no &#39;</span> <span class="o">+</span>
-                                    <span class="s1">&#39;path congfigured&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoPathRunnerError</span><span class="p">(</span><span class="s2">&quot;Environment runner has no &quot;</span> <span class="o">+</span> <span class="s2">&quot;path congfigured&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">active</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">NoActiveEnvironmentError</span><span class="p">(</span><span class="s1">&#39;Runner has no active &#39;</span> <span class="o">+</span>
-                                           <span class="s1">&#39;environment to work with.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">NoActiveEnvironmentError</span><span class="p">(</span><span class="s2">&quot;Runner has no active &quot;</span> <span class="o">+</span> <span class="s2">&quot;environment to work with.&quot;</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpackRunner.add_spec">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.add_spec">[docs]</a>
@@ -556,19 +546,15 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;find&#39;</span>
-        <span class="p">]</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;find&quot;</span><span class="p">]</span>
 
         <span class="n">pkg_names</span> <span class="o">=</span> <span class="p">[]</span>
 
-        <span class="n">all_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span>
-                                         <span class="n">args</span><span class="p">,</span>
-                                         <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">all_packages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">all_packages</span><span class="p">:</span>
             <span class="n">match</span> <span class="o">=</span> <span class="n">package_name_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">pkg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-                <span class="n">pkg_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;package_name&#39;</span><span class="p">))</span>
+                <span class="n">pkg_names</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;package_name&quot;</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">pkg_names</span></div>
 
@@ -600,10 +586,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
-        <span class="n">config_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;config&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;add&#39;</span>
-        <span class="p">]</span>
+        <span class="n">config_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">,</span> <span class="s2">&quot;add&quot;</span><span class="p">]</span>
 
         <span class="k">for</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">config_args</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -634,11 +617,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
-        <span class="n">named_location_args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;location&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;-e&#39;</span><span class="p">,</span>
-            <span class="n">env_name_or_path</span>
-        <span class="p">]</span>
+        <span class="n">named_location_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;-e&quot;</span><span class="p">,</span> <span class="n">env_name_or_path</span><span class="p">]</span>
 
         <span class="c1"># If the path doesn&#39;t exist, check if it&#39;s a named environment</span>
         <span class="n">path</span> <span class="o">=</span> <span class="n">env_name_or_path</span>
@@ -647,20 +626,20 @@
                 <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">named_location_args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="c1"># If a named environment fails, copy directly from the path</span>
             <span class="k">except</span> <span class="n">ProcessError</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">InvalidExternalEnvironment</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1"> is not a spack environment.&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">InvalidExternalEnvironment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> is not a spack environment.&quot;</span><span class="p">)</span>
 
         <span class="n">found_lock</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="n">lock_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;spack.lock&#39;</span><span class="p">)</span>
+        <span class="n">lock_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;spack.lock&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">lock_file</span><span class="p">):</span>
             <span class="n">found_lock</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">lock_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.lock&#39;</span><span class="p">))</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">lock_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;spack.lock&quot;</span><span class="p">))</span>
 
-        <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)</span>
+        <span class="n">conf_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;spack.yaml&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">conf_file</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">InvalidExternalEnvironment</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1"> is not a spack environment.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">InvalidExternalEnvironment</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2"> is not a spack environment.&quot;</span><span class="p">)</span>
 
-        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">conf_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">))</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">conf_file</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;spack.yaml&quot;</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">apply_configs</span><span class="p">()</span>
@@ -672,15 +651,15 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a dictionary with the env file contents in it&quot;&quot;&quot;</span>
         <span class="n">env_file</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
         <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;concretizer&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;concretizer&#39;</span><span class="p">][</span><span class="s1">&#39;unify&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s2">&quot;concretizer&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s2">&quot;concretizer&quot;</span><span class="p">][</span><span class="s2">&quot;unify&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;specs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
+        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s2">&quot;specs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">()</span>
         <span class="c1"># Ensure the specs content are consistently sorted.</span>
         <span class="c1"># Otherwise the hash checking may artificially miss due to ordering.</span>
-        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;specs&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">))</span>
+        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s2">&quot;specs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_contents</span><span class="p">))</span>
 
-        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s1">&#39;include&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">includes</span>
+        <span class="n">env_file</span><span class="p">[</span><span class="n">spack_namespace</span><span class="p">][</span><span class="s2">&quot;include&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">includes</span>
 
         <span class="k">return</span> <span class="n">env_file</span>
 
@@ -694,8 +673,8 @@
 
         <span class="n">env_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_file_dict</span><span class="p">()</span>
 
-        <span class="n">spack_env_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">)</span>
-        <span class="n">spack_lock_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.lock&#39;</span><span class="p">)</span>
+        <span class="n">spack_env_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;spack.yaml&quot;</span><span class="p">)</span>
+        <span class="n">spack_lock_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;spack.lock&quot;</span><span class="p">)</span>
 
         <span class="c1"># Check that a spack.yaml and spack.lock file exist already</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">spack_env_file</span><span class="p">)</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">spack_lock_file</span><span class="p">):</span>
@@ -705,7 +684,7 @@
             <span class="c1"># If the lock file was last modified after the yaml file...</span>
             <span class="k">if</span> <span class="n">existing_lock_mtime</span> <span class="o">&gt;</span> <span class="n">existing_env_mtime</span><span class="p">:</span>
                 <span class="n">env_data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">env_file</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spack_env_file</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spack_env_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">existing_data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
                 <span class="n">gen_env_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="n">env_data</span><span class="p">)</span>
                 <span class="n">existing_env_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="n">existing_data</span><span class="p">)</span>
@@ -713,20 +692,20 @@
                 <span class="c1"># If the yaml hash matches the new generated data hash...</span>
                 <span class="k">if</span> <span class="n">gen_env_hash</span> <span class="o">==</span> <span class="n">existing_env_hash</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> will not be regenerated.&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s2"> will not be regenerated.&quot;</span><span class="p">)</span>
                     <span class="k">return</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removing invalid spack lock file </span><span class="si">{</span><span class="n">spack_lock_file</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">verbose</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Removing invalid spack lock file </span><span class="si">{</span><span class="n">spack_lock_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">fs</span><span class="o">.</span><span class="n">force_remove</span><span class="p">(</span><span class="n">spack_lock_file</span><span class="p">)</span>
 
         <span class="n">spack_hash</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">()</span>
 
         <span class="c1"># Write spack.yaml to environment before concretizing, and its hash</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;spack.yaml&#39;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;spack.yaml&quot;</span><span class="p">),</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">env_file</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s1">&#39;ramble.hash&#39;</span><span class="p">),</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="p">,</span> <span class="s2">&quot;ramble.hash&quot;</span><span class="p">),</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">spack_hash</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">configs</span><span class="p">:</span>
@@ -745,11 +724,11 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">concretized</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s1"> is already concretized. Skipping concretize...&#39;</span>
+                <span class="sa">f</span><span class="s2">&quot;Environment </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">env_path</span><span class="si">}</span><span class="s2"> is already concretized. Skipping concretize...&quot;</span>
             <span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concretize_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+        <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">concretize_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="n">concretize_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -773,8 +752,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
-        <span class="n">env_data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_file_dict</span><span class="p">(),</span>
-                                                       <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
+        <span class="n">env_data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span>
+            <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_env_file_dict</span><span class="p">(),</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="n">env_data</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">hash</span></div>
@@ -790,7 +770,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
-        <span class="n">install_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+        <span class="n">install_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">install_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -807,10 +787,10 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_package_path">[docs]</a>
     <span class="k">def</span> <span class="nf">get_package_path</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">package_spec</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the installation directory for a package&quot;&quot;&quot;</span>
-        <span class="n">loc_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;-i&#39;</span><span class="p">]</span>
+        <span class="n">loc_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;-i&quot;</span><span class="p">]</span>
         <span class="n">loc_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">))</span>
 
-        <span class="n">name_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;find&#39;</span><span class="p">,</span> <span class="s1">&#39;--format=</span><span class="si">{name}</span><span class="s1">&#39;</span><span class="p">]</span>
+        <span class="n">name_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="s2">&quot;--format=</span><span class="si">{name}</span><span class="s2">&quot;</span><span class="p">]</span>
         <span class="n">name_args</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">))</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
@@ -822,7 +802,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">loc_args</span><span class="p">)</span>
 
             <span class="n">name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;dry-run&#39;</span><span class="p">,</span> <span class="s1">&#39;path&#39;</span><span class="p">,</span> <span class="s1">&#39;to&#39;</span><span class="p">,</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;dry-run&quot;</span><span class="p">,</span> <span class="s2">&quot;path&quot;</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">,</span> <span class="n">shlex</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">package_spec</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">location</span><span class="p">)</span></div>
 
 
@@ -838,7 +818,7 @@
             <span class="s2">&quot;--all&quot;</span><span class="p">,</span>  <span class="c1"># All packages in the environment</span>
             <span class="s2">&quot;-D&quot;</span><span class="p">,</span>  <span class="c1"># Include dependencies</span>
             <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
-            <span class="n">mirror_path</span>
+            <span class="n">mirror_path</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
@@ -849,19 +829,19 @@
             <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> already present</span>
 <span class="s2">  </span><span class="si">%-4d</span><span class="s2"> added</span>
-<span class="s2">  </span><span class="si">%-4d</span><span class="s2"> failed to fetch.&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span></div>
+<span class="s2">  </span><span class="si">%-4d</span><span class="s2"> failed to fetch.&quot;&quot;&quot;</span> <span class="o">%</span> <span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="mi">0</span><span class="p">,</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpackRunner.get_env_hash_list">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.get_env_hash_list">[docs]</a>
     <span class="k">def</span> <span class="nf">get_env_hash_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s1">&#39;find&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;--format&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;/</span><span class="si">{hash}</span><span class="s1">&#39;</span>
-        <span class="p">]</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="s2">&quot;--format&quot;</span><span class="p">,</span> <span class="s2">&quot;/</span><span class="si">{hash}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">output</span></div>
 
 
@@ -873,11 +853,8 @@
 
         <span class="n">hash_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_env_hash_list</span><span class="p">()</span>
 
-        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="s2">&quot;buildcache&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;push&quot;</span>
-        <span class="p">]</span>
-        <span class="n">user_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buildcache_config_name</span><span class="si">}</span><span class="s1">:flags&#39;</span><span class="p">)</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;buildcache&quot;</span><span class="p">,</span> <span class="s2">&quot;push&quot;</span><span class="p">]</span>
+        <span class="n">user_flags</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">buildcache_config_name</span><span class="si">}</span><span class="s2">:flags&quot;</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Running with user flags: </span><span class="si">{</span><span class="n">user_flags</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -896,8 +873,8 @@
 
 <div class="viewcode-block" id="SpackRunner.validate_command">
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.validate_command">[docs]</a>
-    <span class="k">def</span> <span class="nf">validate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">validation_type</span><span class="o">=</span><span class="s1">&#39;not_empty&#39;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">regex_validations</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;contains_regex&#39;</span><span class="p">,</span> <span class="s1">&#39;does_not_contain_regex&#39;</span><span class="p">]</span>
+    <span class="k">def</span> <span class="nf">validate_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">command</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">validation_type</span><span class="o">=</span><span class="s2">&quot;not_empty&quot;</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="n">regex_validations</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;contains_regex&quot;</span><span class="p">,</span> <span class="s2">&quot;does_not_contain_regex&quot;</span><span class="p">]</span>
 
         <span class="n">args</span> <span class="o">=</span> <span class="n">command</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
 
@@ -906,26 +883,25 @@
             <span class="n">compiled_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">regex</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span>
-                                       <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39; Validation output:&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot; Validation output:&quot;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;empty&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">output</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s2">&quot;empty&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">output</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;not_empty&#39;</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">output</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s2">&quot;not_empty&quot;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">output</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;contains_regex&#39;</span><span class="p">:</span>
+            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s2">&quot;contains_regex&quot;</span><span class="p">:</span>
                 <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">compiled_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                         <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s1">&#39;does_not_contain_regex&#39;</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">):</span>
+            <span class="k">elif</span> <span class="n">validation_type</span> <span class="o">==</span> <span class="s2">&quot;does_not_contain_regex&quot;</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">output</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">compiled_regex</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">line</span><span class="p">):</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_raise_validation_error</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -936,8 +912,8 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.spack_runner.SpackRunner.package_definitions">[docs]</a>
     <span class="k">def</span> <span class="nf">package_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;For each package in this environment, yield the path to its application.py file&quot;&quot;&quot;</span>
-        <span class="n">package_def_name</span> <span class="o">=</span> <span class="s1">&#39;package.py&#39;</span>
-        <span class="n">location_args</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;location&#39;</span><span class="p">,</span> <span class="s1">&#39;-p&#39;</span><span class="p">]</span>
+        <span class="n">package_def_name</span> <span class="o">=</span> <span class="s2">&quot;package.py&quot;</span>
+        <span class="n">location_args</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;-p&quot;</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_check_active</span><span class="p">()</span>
 
@@ -958,25 +934,25 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_dry_run_print</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;DRY-RUN: would run </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;         with args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DRY-RUN: would run </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;         with args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_cmd_start</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;*******************************************&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;********** Running Spack Command **********&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**     command: </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;*******************************************&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;********** Running Spack Command **********&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**     command: </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;**     with args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;*******************************************&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;**     with args: </span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;*******************************************&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_cmd_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;*******************************************&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;***** Finished Running Spack Command ******&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;*******************************************&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;*******************************************&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;***** Finished Running Spack Command ******&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;*******************************************&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_run_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">return_output</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="n">active_stream</span> <span class="o">=</span> <span class="n">logger</span><span class="o">.</span><span class="n">active_stream</span><span class="p">()</span>
@@ -1001,12 +977,12 @@
             <span class="k">pass</span>
 
         <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
-            <span class="n">err</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;Error running spack command: </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s1"> &#39;</span> <span class="o">+</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+            <span class="n">err</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Error running spack command: </span><span class="si">{</span><span class="n">executable</span><span class="si">}</span><span class="s2"> &quot;</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">active_stream</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">err</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;For more details, see the log file: </span><span class="si">{</span><span class="n">active_log</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;For more details, see the log file: </span><span class="si">{</span><span class="n">active_log</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_cmd_end</span><span class="p">(</span><span class="n">executable</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 

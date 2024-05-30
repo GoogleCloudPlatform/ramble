@@ -112,8 +112,8 @@
 
 <span class="kn">import</span> <span class="nn">ramble.repository</span>
 
-<span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
-<span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
+<span class="n">header_color</span> <span class="o">=</span> <span class="s2">&quot;@*b&quot;</span>
+<span class="n">plain_format</span> <span class="o">=</span> <span class="s2">&quot;@.&quot;</span>
 
 
 <div class="viewcode-block" id="setup_info_parser">
@@ -134,7 +134,7 @@
 <div class="viewcode-block" id="print_text_info">
 <a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.print_text_info">[docs]</a>
 <span class="k">def</span> <span class="nf">print_text_info</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
-    <span class="n">obj</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s1">&#39;long&#39;</span>
+    <span class="n">obj</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
     <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">obj</span><span class="p">))</span></div>
 
 
@@ -143,7 +143,7 @@
 <a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.info.print_info">[docs]</a>
 <span class="k">def</span> <span class="nf">print_info</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
     <span class="n">obj_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
-    <span class="n">obj_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">obj_def</span><span class="p">[</span><span class="s1">&#39;singular&#39;</span><span class="p">])</span>
+    <span class="n">obj_name</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;singular&quot;</span><span class="p">])</span>
     <span class="n">obj</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">obj_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
     <span class="n">print_text_info</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span></div>
 

@@ -110,8 +110,7 @@
 <div class="viewcode-block" id="Repeats">
 <a class="viewcode-back" href="../../ramble.html#ramble.repeats.Repeats">[docs]</a>
 <span class="k">class</span> <span class="nc">Repeats</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent configuration of experiment repeats</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to represent configuration of experiment repeats&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Constructor for a Repeats object</span>
@@ -137,8 +136,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">n_repeats</span> <span class="o">=</span> <span class="n">n_repeats</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">repeat_index</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to set repeats with is_repeats_base = </span><span class="si">{</span><span class="n">is_repeat_base</span><span class="si">}</span><span class="s1">&#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;and n_repeats = </span><span class="si">{</span><span class="n">n_repeats</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to set repeats with is_repeats_base = </span><span class="si">{</span><span class="n">is_repeat_base</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;and n_repeats = </span><span class="si">{</span><span class="n">n_repeats</span><span class="si">}</span><span class="s2">.&quot;</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="Repeats.set_repeat_index">

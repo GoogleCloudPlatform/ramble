@@ -140,12 +140,12 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        (dict): Dictionary representation of the data contained in conf_path</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">base_conf</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Reading config from </span><span class="si">{</span><span class="n">conf_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">conf_path</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">base_conf</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading config from </span><span class="si">{</span><span class="n">conf_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">config_dict</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">safe_load</span><span class="p">(</span><span class="n">base_conf</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;YAML Error: Failed to load data from </span><span class="si">{</span><span class="n">conf_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;YAML Error: Failed to load data from </span><span class="si">{</span><span class="n">conf_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">config_dict</span></div>
 
@@ -173,9 +173,9 @@
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">cur_part</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">dict</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">level</span> <span class="ow">in</span> <span class="n">cur_part</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
-                <span class="n">option_parts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">cur_part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">cur_part</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">level</span><span class="p">]))</span>
+                <span class="n">option_parts</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">cur_part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cur_part</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">level</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">cur_part</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
                 <span class="n">all_configs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">cur_part</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">all_configs</span></div>
@@ -197,7 +197,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        (Any): Value of config option</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">option_parts</span> <span class="o">=</span> <span class="n">option_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">option_parts</span> <span class="o">=</span> <span class="n">option_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
 
     <span class="n">option_scope</span> <span class="o">=</span> <span class="n">config_data</span>
 
@@ -227,7 +227,7 @@
 <span class="sd">        option_name (str): Name of config option to set</span>
 <span class="sd">        option_value (any): Value to set config option to</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">option_parts</span> <span class="o">=</span> <span class="n">option_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+    <span class="n">option_parts</span> <span class="o">=</span> <span class="n">option_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
 
     <span class="n">option_scope</span> <span class="o">=</span> <span class="n">config_data</span>
 
@@ -261,7 +261,7 @@
 
     <span class="c1"># Set all &#39;{default_config_value}&#39; values to value from the base config</span>
     <span class="k">for</span> <span class="n">var_name</span><span class="p">,</span> <span class="n">var_def</span> <span class="ow">in</span> <span class="n">workload</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">var_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">var_val</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">var_name</span><span class="p">))</span>
 
             <span class="k">if</span> <span class="n">var_val</span> <span class="o">==</span> <span class="n">default_config_string</span><span class="p">:</span>

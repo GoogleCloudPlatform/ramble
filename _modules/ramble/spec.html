@@ -119,48 +119,47 @@
 <span class="n">HASH</span><span class="p">,</span> <span class="n">DEP</span><span class="p">,</span> <span class="n">AT</span><span class="p">,</span> <span class="n">COLON</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">,</span> <span class="n">ON</span><span class="p">,</span> <span class="n">OFF</span><span class="p">,</span> <span class="n">PCT</span><span class="p">,</span> <span class="n">EQ</span><span class="p">,</span> <span class="n">ID</span><span class="p">,</span> <span class="n">VAL</span><span class="p">,</span> <span class="n">FILE</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">12</span><span class="p">)</span>
 
 <span class="c1">#: Regex for fully qualified spec names. (e.g., builtin.hdf5)</span>
-<span class="n">spec_id_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\w[\w.-]*&#39;</span>
+<span class="n">spec_id_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;\w[\w.-]*&quot;</span>
 
 <span class="n">color_formats</span> <span class="o">=</span> <span class="p">{}</span>
 
-<span class="n">default_format</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{name}</span><span class="s1">&#39;</span>
+<span class="n">default_format</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{name}</span><span class="s2">&quot;</span>
 
 
 <div class="viewcode-block" id="SpecLexer">
 <a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecLexer">[docs]</a>
 <span class="k">class</span> <span class="nc">SpecLexer</span><span class="p">(</span><span class="n">spack</span><span class="o">.</span><span class="n">parse</span><span class="o">.</span><span class="n">Lexer</span><span class="p">):</span>
-
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Parses tokens that make up spack specs.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">SpecLexer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\^&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">DEP</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\@&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">AT</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\:&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">COLON</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\,&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">COMMA</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\+&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">ON</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\-&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">OFF</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\~&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">OFF</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\%&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">PCT</span><span class="p">,</span>   <span class="n">val</span><span class="p">)),</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\=&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">EQ</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
-
-            <span class="c1"># Filenames match before identifiers, so no initial filename</span>
-            <span class="c1"># component is parsed as a spec (e.g., in subdir/spec.yaml)</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[/\w.-]*/[/\w/-]+\.yaml[^\b]*&#39;</span><span class="p">,</span>
-             <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">FILE</span><span class="p">,</span> <span class="n">v</span><span class="p">)),</span>
-
-            <span class="c1"># Hash match after filename. No valid filename can be a hash</span>
-            <span class="c1"># (files end w/.yaml), but a hash can match a filename prefix.</span>
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">HASH</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
-
-            <span class="c1"># Identifiers match after filenames and hashes.</span>
-            <span class="p">(</span><span class="n">spec_id_re</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
-
-            <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="kc">None</span><span class="p">)],</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">SpecLexer</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\^&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">DEP</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\@&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">AT</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\:&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">COLON</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\,&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">COMMA</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\+&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">ON</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\-&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">OFF</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\~&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">OFF</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\%&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">PCT</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\=&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">EQ</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="c1"># Filenames match before identifiers, so no initial filename</span>
+                <span class="c1"># component is parsed as a spec (e.g., in subdir/spec.yaml)</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[/\w.-]*/[/\w/-]+\.yaml[^\b]*&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">v</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">FILE</span><span class="p">,</span> <span class="n">v</span><span class="p">)),</span>
+                <span class="c1"># Hash match after filename. No valid filename can be a hash</span>
+                <span class="c1"># (files end w/.yaml), but a hash can match a filename prefix.</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">HASH</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="c1"># Identifiers match after filenames and hashes.</span>
+                <span class="p">(</span><span class="n">spec_id_re</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">ID</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="p">],</span>
             <span class="p">[</span><span class="n">EQ</span><span class="p">],</span>
-            <span class="p">[(</span><span class="sa">r</span><span class="s1">&#39;[\S].*&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">VAL</span><span class="p">,</span>    <span class="n">val</span><span class="p">)),</span>
-             <span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="kc">None</span><span class="p">)],</span>
-            <span class="p">[</span><span class="n">VAL</span><span class="p">])</span></div>
+            <span class="p">[</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[\S].*&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">(</span><span class="n">VAL</span><span class="p">,</span> <span class="n">val</span><span class="p">)),</span>
+                <span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">scanner</span><span class="p">,</span> <span class="n">val</span><span class="p">:</span> <span class="kc">None</span><span class="p">),</span>
+            <span class="p">],</span>
+            <span class="p">[</span><span class="n">VAL</span><span class="p">],</span>
+        <span class="p">)</span></div>
 
 
 
@@ -179,7 +178,7 @@
 <span class="sd">                directly into. This is used to avoid construction of a</span>
 <span class="sd">                superfluous Spec object in the Spec constructor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting parser with spec </span><span class="si">{</span><span class="n">initial_spec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting parser with spec </span><span class="si">{</span><span class="n">initial_spec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SpecParser</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">_lexer</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_initial</span> <span class="o">=</span> <span class="n">initial_spec</span>
@@ -222,14 +221,13 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParser.check_identifier">[docs]</a>
     <span class="k">def</span> <span class="nf">check_identifier</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">id</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;The only identifiers that can contain &#39;.&#39; are versions, but version</span>
-<span class="sd">           ids are context-sensitive so we have to check on a case-by-case</span>
-<span class="sd">           basis. Call this if we detect a version id where it shouldn&#39;t be.</span>
+<span class="sd">        ids are context-sensitive so we have to check on a case-by-case</span>
+<span class="sd">        basis. Call this if we detect a version id where it shouldn&#39;t be.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">id</span><span class="p">:</span>
             <span class="nb">id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="o">.</span><span class="n">value</span>
-        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="nb">id</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">last_token_error</span><span class="p">(</span>
-                <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: Identifier cannot contain &#39;.&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span></div>
+        <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="nb">id</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">last_token_error</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">: Identifier cannot contain &#39;.&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">id</span><span class="p">))</span></div>
 </div>
 
 
@@ -260,7 +258,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spec_like</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-            <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">spec_name</span> <span class="o">=</span> <span class="n">spec_like</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+            <span class="n">namespace</span><span class="p">,</span> <span class="n">dot</span><span class="p">,</span> <span class="n">spec_name</span> <span class="o">=</span> <span class="n">spec_like</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">namespace</span><span class="p">:</span>
                 <span class="n">namespace</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">spec_name</span>
@@ -415,8 +413,9 @@
     <span class="k">def</span> <span class="nf">application_class</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span><span class="p">:</span>
             <span class="n">app_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">applications</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span> <span class="o">=</span> \
-                <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">app_type</span><span class="p">]</span><span class="o">.</span><span class="n">get_obj_class</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fullname</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">app_type</span><span class="p">]</span><span class="o">.</span><span class="n">get_obj_class</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fullname</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_application_class</span>
 
     <span class="nd">@property</span>
@@ -431,8 +430,7 @@
 <div class="viewcode-block" id="parse">
 <a class="viewcode-back" href="../../ramble.html#ramble.spec.parse">[docs]</a>
 <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a spec from an input string.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns a spec from an input string.&quot;&quot;&quot;</span>
     <span class="k">return</span> <span class="n">SpecParser</span><span class="p">()</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">string</span><span class="p">)</span></div>
 
 
@@ -441,6 +439,7 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.spec.SpecParseError">[docs]</a>
 <span class="k">class</span> <span class="nc">SpecParseError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">SpecError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Wrapper for ParseError for when we&#39;re parsing specs.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parse_error</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">SpecParseError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parse_error</span><span class="o">.</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">string</span> <span class="o">=</span> <span class="n">parse_error</span><span class="o">.</span><span class="n">string</span></div>

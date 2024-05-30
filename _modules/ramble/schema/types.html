@@ -117,24 +117,14 @@
 
 
 
-<span class="n">string_or_num_list</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;number&#39;</span><span class="p">}]</span>
+<span class="n">string_or_num_list</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">},</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;number&quot;</span><span class="p">}]</span>
 
-<span class="n">string_or_num</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;anyOf&#39;</span><span class="p">:</span> <span class="n">string_or_num_list</span>
-<span class="p">}</span>
+<span class="n">string_or_num</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;anyOf&quot;</span><span class="p">:</span> <span class="n">string_or_num_list</span><span class="p">}</span>
 
-<span class="n">array_of_strings_or_nums</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span>
-    <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">string_or_num</span>
-<span class="p">}</span>
+<span class="n">array_of_strings_or_nums</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="n">string_or_num</span><span class="p">}</span>
 
 <span class="n">array_or_scalar_of_strings_or_nums</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;anyOf&#39;</span><span class="p">:</span>
-        <span class="p">[</span>
-            <span class="o">*</span><span class="n">string_or_num_list</span><span class="p">,</span>
-            <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;array&#39;</span><span class="p">,</span> <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">[],</span> <span class="s1">&#39;items&#39;</span><span class="p">:</span> <span class="n">string_or_num</span><span class="p">}</span>
-        <span class="p">]</span>
+    <span class="s2">&quot;anyOf&quot;</span><span class="p">:</span> <span class="p">[</span><span class="o">*</span><span class="n">string_or_num_list</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;items&quot;</span><span class="p">:</span> <span class="n">string_or_num</span><span class="p">}]</span>
 <span class="p">}</span>
 </pre></div>
 

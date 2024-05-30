@@ -128,20 +128,20 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">_valid_scopes</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;application_definition&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;modifier_definition&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;workspace&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;application&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;workload&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;experiment&#39;</span>
+        <span class="s2">&quot;application_definition&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;modifier_definition&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;workspace&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;application&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;workload&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;experiment&quot;</span><span class="p">,</span>
     <span class="p">]</span>
     <span class="n">_flush_scopes</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;experiment&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;experiment&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;workload&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;workload&#39;</span><span class="p">,</span> <span class="s1">&#39;experiment&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;application&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="s1">&#39;workload&#39;</span><span class="p">,</span> <span class="s1">&#39;experiment&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;workspace&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;workspace&#39;</span><span class="p">,</span> <span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="s1">&#39;workload&#39;</span><span class="p">,</span> <span class="s1">&#39;experiment&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;modifier_definition&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;modifier_definition&#39;</span><span class="p">],</span>
-        <span class="s1">&#39;application_definition&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;application_definition&#39;</span><span class="p">]</span>
+        <span class="s2">&quot;experiment&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;experiment&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;workload&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;workload&quot;</span><span class="p">,</span> <span class="s2">&quot;experiment&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;application&quot;</span><span class="p">,</span> <span class="s2">&quot;workload&quot;</span><span class="p">,</span> <span class="s2">&quot;experiment&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;workspace&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;workspace&quot;</span><span class="p">,</span> <span class="s2">&quot;application&quot;</span><span class="p">,</span> <span class="s2">&quot;workload&quot;</span><span class="p">,</span> <span class="s2">&quot;experiment&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;modifier_definition&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;modifier_definition&quot;</span><span class="p">],</span>
+        <span class="s2">&quot;application_definition&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;application_definition&quot;</span><span class="p">],</span>
     <span class="p">}</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -153,8 +153,10 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.success_criteria.ScopedCriteriaList.validate_scope">[docs]</a>
     <span class="k">def</span> <span class="nf">validate_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">scope</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_scopes</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success scope </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s1"> is not valid. &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;Possible scopes are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_scopes</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Success scope </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2"> is not valid. &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Possible scopes are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_scopes</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ScopedCriteriaList.add_criteria">
@@ -163,7 +165,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="n">exists</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">find_criteria</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">exists</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> is not unique.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Success criteria </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> is not unique.&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">[</span><span class="n">scope</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">SuccessCriteria</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>
 
@@ -178,10 +180,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">validate_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_flush_scopes</span><span class="p">[</span><span class="n">scope</span><span class="p">]:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39; Flushing scope: </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;    It contained:&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Flushing scope: </span><span class="si">{</span><span class="n">scope</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;    It contained:&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">crit</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">[</span><span class="n">scope</span><span class="p">]:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;      </span><span class="si">{</span><span class="n">crit</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;      </span><span class="si">{</span><span class="n">crit</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">[</span><span class="n">scope</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">criteria</span><span class="p">[</span><span class="n">scope</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span></div>
 
@@ -225,16 +227,22 @@
 <span class="sd">    experiment.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">_valid_modes</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;string&#39;</span><span class="p">,</span> <span class="s1">&#39;application_function&#39;</span><span class="p">,</span> <span class="s1">&#39;fom_comparison&#39;</span><span class="p">]</span>
-    <span class="n">_success_function</span> <span class="o">=</span> <span class="s1">&#39;evaluate_success&#39;</span>
+    <span class="n">_valid_modes</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;application_function&quot;</span><span class="p">,</span> <span class="s2">&quot;fom_comparison&quot;</span><span class="p">]</span>
+    <span class="n">_success_function</span> <span class="o">=</span> <span class="s2">&quot;evaluate_success&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">mode</span><span class="p">,</span> <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">{log_file}</span><span class="s1">&#39;</span><span class="p">,</span>
-                 <span class="n">fom_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fom_context</span><span class="o">=</span><span class="s1">&#39;null&#39;</span><span class="p">,</span> <span class="n">formula</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">,</span>
+        <span class="n">mode</span><span class="p">,</span>
+        <span class="n">match</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">file</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{log_file}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">fom_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">fom_context</span><span class="o">=</span><span class="s2">&quot;null&quot;</span><span class="p">,</span>
+        <span class="n">formula</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_valid_modes</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1"> is not valid. Possible modes are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_modes</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2"> is not valid. Possible modes are: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_valid_modes</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="o">=</span> <span class="kc">None</span>
@@ -244,18 +252,19 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">fom_formula</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
 
-        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">match</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria with mode=&quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
-                           <span class="s1">&#39;require a &quot;match&quot; attribute.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria with mode=&quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; &#39;</span> <span class="s1">&#39;require a &quot;match&quot; attribute.&#39;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">match</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">file</span> <span class="o">=</span> <span class="n">file</span>
 
-        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;fom_comparison&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;fom_comparison&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">formula</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">fom_name</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria with mode=&quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
-                           <span class="s1">&#39;require a &quot;fom_name&quot; and &quot;formula&quot; attribute.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Success criteria with mode=&quot;</span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                    <span class="s1">&#39;require a &quot;fom_name&quot; and &quot;formula&quot; attribute.&#39;</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">formula</span> <span class="o">=</span> <span class="n">formula</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fom_name</span> <span class="o">=</span> <span class="n">fom_name</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fom_context</span> <span class="o">=</span> <span class="n">fom_context</span>
@@ -263,29 +272,34 @@
 <div class="viewcode-block" id="SuccessCriteria.passed">
 <a class="viewcode-back" href="../../ramble.html#ramble.success_criteria.SuccessCriteria.passed">[docs]</a>
     <span class="k">def</span> <span class="nf">passed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">fom_values</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Testing criteria </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> mode = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;string&#39;</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Testing criteria </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> mode = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;string&quot;</span><span class="p">:</span>
             <span class="n">match_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">match</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">test</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">match_obj</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">True</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;application_function&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;application_function&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">app_inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_success_function</span><span class="p">):</span>
                 <span class="n">func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">app_inst</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_success_function</span><span class="p">)</span>
                 <span class="k">return</span> <span class="n">func</span><span class="p">()</span>
-        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s1">&#39;fom_comparison&#39;</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;fom_comparison&quot;</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">fom_values</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria of mode=&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; requires &#39;</span>
-                           <span class="s1">&#39;defined fom_values attribute in &quot;passed&quot; function.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Success criteria of mode=&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; requires &#39;</span>
+                    <span class="s1">&#39;defined fom_values attribute in &quot;passed&quot; function.&#39;</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">app_inst</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Success criteria of mode=&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; requires &#39;</span>
-                           <span class="s1">&#39;defined app_inst attribute in &quot;passed&quot; function.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s1">&#39;Success criteria of mode=&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&quot; requires &#39;</span>
+                    <span class="s1">&#39;defined app_inst attribute in &quot;passed&quot; function.&#39;</span>
+                <span class="p">)</span>
 
             <span class="n">comparison_tested</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">result</span> <span class="o">=</span> <span class="kc">True</span>
 
-            <span class="n">contexts</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">fom_values</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-                                      <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fom_context</span><span class="p">))</span>
+            <span class="n">contexts</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                <span class="n">fom_values</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fom_context</span><span class="p">)</span>
+            <span class="p">)</span>
             <span class="c1"># If fom context doesn&#39;t exist, fail the comparison</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">contexts</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -295,17 +309,19 @@
                 <span class="k">return</span> <span class="kc">False</span>
 
             <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
-                <span class="n">fom_names</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">fom_values</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span>
-                                           <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fom_name</span><span class="p">))</span>
+                <span class="n">fom_names</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span>
+                    <span class="n">fom_values</span><span class="p">[</span><span class="n">context</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fom_name</span><span class="p">)</span>
+                <span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">fom_name</span> <span class="ow">in</span> <span class="n">fom_names</span><span class="p">:</span>
                     <span class="n">comparison_vars</span> <span class="o">=</span> <span class="p">{</span>
-                        <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">fom_values</span><span class="p">[</span><span class="n">context</span><span class="p">][</span><span class="n">fom_name</span><span class="p">][</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
+                        <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">fom_values</span><span class="p">[</span><span class="n">context</span><span class="p">][</span><span class="n">fom_name</span><span class="p">][</span><span class="s2">&quot;value&quot;</span><span class="p">],</span>
                     <span class="p">}</span>
 
                     <span class="n">comparison_tested</span> <span class="o">=</span> <span class="kc">True</span>
-                    <span class="n">result</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">evaluate_predicate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span>
-                                                                  <span class="n">extra_vars</span><span class="o">=</span><span class="n">comparison_vars</span><span class="p">)</span>
+                    <span class="n">result</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">evaluate_predicate</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">formula</span><span class="p">,</span> <span class="n">extra_vars</span><span class="o">=</span><span class="n">comparison_vars</span>
+                    <span class="p">)</span>
 
             <span class="c1"># If fom doesn&#39;t match any fom names, fail the comparison</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">comparison_tested</span><span class="p">:</span>
@@ -322,7 +338,7 @@
 <div class="viewcode-block" id="SuccessCriteria.mark_found">
 <a class="viewcode-back" href="../../ramble.html#ramble.success_criteria.SuccessCriteria.mark_found">[docs]</a>
     <span class="k">def</span> <span class="nf">mark_found</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> was matched!&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> was matched!&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">found</span> <span class="o">=</span> <span class="kc">True</span></div>
 
 

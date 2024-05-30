@@ -123,19 +123,16 @@
 <span class="n">definitions</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">conflicts</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">used_by</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">specs</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;spack_spec&#39;</span><span class="p">:</span> <span class="p">{},</span>
-    <span class="s1">&#39;compiler_spec&#39;</span><span class="p">:</span> <span class="p">{}</span>
-<span class="p">}</span>
+<span class="n">specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">:</span> <span class="p">{}}</span>
 <span class="n">spec_headers</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;spack_spec&#39;</span><span class="p">:</span> <span class="s1">&#39;Software Packages&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;compiler_spec&#39;</span><span class="p">:</span> <span class="s1">&#39;Compiler Definitions&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;spack_spec&quot;</span><span class="p">:</span> <span class="s2">&quot;Software Packages&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;compiler_spec&quot;</span><span class="p">:</span> <span class="s2">&quot;Compiler Definitions&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
-<span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
-<span class="n">level1_color</span> <span class="o">=</span> <span class="s1">&#39;@*g&#39;</span>
-<span class="n">level2_color</span> <span class="o">=</span> <span class="s1">&#39;@*r&#39;</span>
-<span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
+<span class="n">header_color</span> <span class="o">=</span> <span class="s2">&quot;@*b&quot;</span>
+<span class="n">level1_color</span> <span class="o">=</span> <span class="s2">&quot;@*g&quot;</span>
+<span class="n">level2_color</span> <span class="o">=</span> <span class="s2">&quot;@*r&quot;</span>
+<span class="n">plain_format</span> <span class="o">=</span> <span class="s2">&quot;@.&quot;</span>
 
 
 <div class="viewcode-block" id="section_title">
@@ -170,18 +167,16 @@
 
 <span class="sd">    The maps are global to this module, and reused in other internal methods.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">top_level_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;compilers&#39;</span><span class="p">,</span> <span class="s1">&#39;software_specs&#39;</span><span class="p">]</span>
+    <span class="n">top_level_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;compilers&quot;</span><span class="p">,</span> <span class="s2">&quot;software_specs&quot;</span><span class="p">]</span>
 
-    <span class="n">types_to_print</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">applications</span>
-    <span class="p">]</span>
+    <span class="n">types_to_print</span> <span class="o">=</span> <span class="p">[</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">applications</span><span class="p">]</span>
 
     <span class="k">for</span> <span class="n">object_type</span> <span class="ow">in</span> <span class="n">types_to_print</span><span class="p">:</span>
         <span class="n">obj_path</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">obj_inst</span> <span class="ow">in</span> <span class="n">obj_path</span><span class="o">.</span><span class="n">all_objects</span><span class="p">():</span>
             <span class="n">obj_repo</span> <span class="o">=</span> <span class="n">obj_path</span><span class="o">.</span><span class="n">repo_for_obj</span><span class="p">(</span><span class="n">obj_inst</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
-            <span class="n">obj_namespace</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj_repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="si">}</span><span class="s1">.</span><span class="si">{</span><span class="n">obj_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">obj_namespace</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">obj_repo</span><span class="o">.</span><span class="n">full_namespace</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">obj_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
 
             <span class="k">for</span> <span class="n">top_level_attr</span> <span class="ow">in</span> <span class="n">top_level_attrs</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="n">top_level_attr</span><span class="p">):</span>
@@ -211,15 +206,15 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.print_summary">[docs]</a>
 <span class="k">def</span> <span class="nf">print_summary</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print a summary of all software definitions&quot;&quot;&quot;</span>
-    <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Summary:&#39;</span><span class="p">))</span>
-    <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Software Summary:&quot;</span><span class="p">))</span>
+    <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">spec_name</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">:</span>
-        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">nested_1</span><span class="p">(</span><span class="n">spec_headers</span><span class="p">[</span><span class="n">spec_name</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">nested_1</span><span class="p">(</span><span class="n">spec_headers</span><span class="p">[</span><span class="n">spec_name</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">spec_def</span> <span class="ow">in</span> <span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]:</span>
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">nested_2</span><span class="p">(</span><span class="s2">&quot;Spec:&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> </span><span class="si">{</span><span class="n">spec_def</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">In object:&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">In object:&quot;</span><span class="p">)</span>
             <span class="n">colify</span><span class="p">(</span><span class="n">specs</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="n">spec_def</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">16</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -239,22 +234,22 @@
 <span class="k">def</span> <span class="nf">print_conflicts</span><span class="p">():</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print conflict information, if any exist&quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">conflicts</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Software Definition Conflicts:&#39;</span><span class="p">))</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Software Definition Conflicts:&quot;</span><span class="p">))</span>
         <span class="k">for</span> <span class="n">pkg_name</span> <span class="ow">in</span> <span class="n">conflicts</span><span class="p">:</span>
 
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nested_1</span><span class="p">(</span><span class="s2">&quot;Package&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
-            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Defined as:&#39;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">]:</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Defined as:&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]:</span>
                     <span class="n">attr_def</span> <span class="o">=</span> <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">attr_def</span><span class="p">:</span>
                         <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t\t</span><span class="si">{</span><span class="n">attr</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">attr_def</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">In objects:&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">In objects:&quot;</span><span class="p">)</span>
             <span class="n">colify</span><span class="p">(</span><span class="n">used_by</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
-            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">Conflicts with objects:&#39;</span><span class="p">)</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Conflicts with objects:&quot;</span><span class="p">)</span>
             <span class="n">colify</span><span class="p">(</span><span class="n">conflicts</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">],</span> <span class="n">indent</span><span class="o">=</span><span class="mi">24</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;No Conflicts Detected&#39;</span><span class="p">))</span></div>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;No Conflicts Detected&quot;</span><span class="p">))</span></div>
 
 
 
@@ -262,14 +257,20 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.software_definitions.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Setup the parser for software-definitions&quot;&quot;&quot;</span>
-    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span> <span class="s1">&#39;--summary&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print summary of software definitions&#39;</span><span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;--summary&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print summary of software definitions&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">,</span> <span class="s1">&#39;--conflicts&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print summary of conflicting definitions&#39;</span><span class="p">)</span>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;--conflicts&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print summary of conflicting definitions&quot;</span>
+    <span class="p">)</span>
 
-    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">,</span> <span class="s1">&#39;--error-on-conflict&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-                           <span class="n">help</span><span class="o">=</span><span class="s1">&#39;if conflicts are found, exit code is number of conflicts&#39;</span><span class="p">)</span></div>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-e&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--error-on-conflict&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;if conflicts are found, exit code is number of conflicts&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -287,7 +288,7 @@
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">error_on_conflict</span><span class="p">:</span>
         <span class="n">num_conflicts</span> <span class="o">=</span> <span class="n">count_conflicts</span><span class="p">()</span>
-        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">num_conflicts</span><span class="si">}</span><span class="s1"> conflicts detected.&#39;</span><span class="p">)</span>
+        <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">num_conflicts</span><span class="si">}</span><span class="s2"> conflicts detected.&quot;</span><span class="p">)</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="n">num_conflicts</span><span class="p">)</span></div>
 
 </pre></div>

@@ -131,9 +131,11 @@
             <span class="c1"># Extract named matrices</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">matrix</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                 <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">matrix</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;While performing </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s1"> with </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> &#39;</span>
-                               <span class="s1">&#39; each list element may only contain &#39;</span>
-                               <span class="s1">&#39;1 matrix in a matrices definition.&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;While performing </span><span class="si">{</span><span class="n">action</span><span class="si">}</span><span class="s2"> with </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="s2">&quot; each list element may only contain &quot;</span>
+                        <span class="s2">&quot;1 matrix in a matrices definition.&quot;</span>
+                    <span class="p">)</span>
 
                 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">matrix</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
                     <span class="n">matrices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>

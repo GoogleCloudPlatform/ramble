@@ -120,8 +120,8 @@
 <span class="n">section</span> <span class="o">=</span> <span class="s2">&quot;developer&quot;</span>
 <span class="n">level</span> <span class="o">=</span> <span class="s2">&quot;long&quot;</span>
 
-<span class="n">all_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;maintainers&#39;</span><span class="p">,</span> <span class="s1">&#39;tags&#39;</span><span class="p">]</span>
-<span class="n">default_attr</span> <span class="o">=</span> <span class="s1">&#39;maintainers&#39;</span>
+<span class="n">all_attrs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;maintainers&quot;</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">]</span>
+<span class="n">default_attr</span> <span class="o">=</span> <span class="s2">&quot;maintainers&quot;</span>
 
 
 <div class="viewcode-block" id="setup_parser">
@@ -143,8 +143,7 @@
     <span class="p">)</span>
 
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;--all&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show attributes for all objects&quot;</span>
+        <span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;--all&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show attributes for all objects&quot;</span>
     <span class="p">)</span>
 
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -190,8 +189,9 @@
 
 <div class="viewcode-block" id="objects_to_attributes">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.attributes.objects_to_attributes">[docs]</a>
-<span class="k">def</span> <span class="nf">objects_to_attributes</span><span class="p">(</span><span class="n">object_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">default_attr</span><span class="p">,</span>
-                          <span class="n">object_type</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">default_type</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">objects_to_attributes</span><span class="p">(</span>
+    <span class="n">object_names</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">default_attr</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">default_type</span>
+<span class="p">):</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">object_names</span><span class="p">:</span>
         <span class="n">object_names</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">()</span>
 
@@ -207,8 +207,9 @@
 
 <div class="viewcode-block" id="attributes_to_objects">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.attributes.attributes_to_objects">[docs]</a>
-<span class="k">def</span> <span class="nf">attributes_to_objects</span><span class="p">(</span><span class="n">users</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">default_attr</span><span class="p">,</span>
-                          <span class="n">object_type</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">default_type</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">attributes_to_objects</span><span class="p">(</span>
+    <span class="n">users</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">default_attr</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">default_type</span>
+<span class="p">):</span>
     <span class="n">user_to_apps</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[])</span>
     <span class="n">object_names</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">object_names</span><span class="p">:</span>
@@ -264,28 +265,27 @@
 
     <span class="n">attr_name</span> <span class="o">=</span> <span class="n">default_attr</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
-        <span class="n">attr_name</span> <span class="o">=</span> <span class="s1">&#39;tags&#39;</span>
+        <span class="n">attr_name</span> <span class="o">=</span> <span class="s2">&quot;tags&quot;</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">defined</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">undefined</span><span class="p">:</span>
-        <span class="n">defined</span><span class="p">,</span> <span class="n">undefined</span> <span class="o">=</span> <span class="n">defined_objects</span><span class="p">(</span><span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span>
-                                             <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
+        <span class="n">defined</span><span class="p">,</span> <span class="n">undefined</span> <span class="o">=</span> <span class="n">defined_objects</span><span class="p">(</span><span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
         <span class="n">apps</span> <span class="o">=</span> <span class="n">defined</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">defined</span> <span class="k">else</span> <span class="n">undefined</span>
         <span class="n">colify</span><span class="p">(</span><span class="n">apps</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">apps</span> <span class="k">else</span> <span class="mi">1</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">all</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">by_attribute</span><span class="p">:</span>
-            <span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes_to_objects</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span>
-                                               <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span>
-                                               <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
+            <span class="n">attributes</span> <span class="o">=</span> <span class="n">attributes_to_objects</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span>
+            <span class="p">)</span>
             <span class="k">for</span> <span class="n">user</span><span class="p">,</span> <span class="n">objects</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">attributes</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
                 <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;@c{</span><span class="si">%s</span><span class="s2">}: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">objects</span><span class="p">))))</span>
             <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">attributes</span> <span class="k">else</span> <span class="mi">1</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">objects</span> <span class="o">=</span> <span class="n">objects_to_attributes</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span>
-                                            <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span>
-                                            <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span>
+            <span class="n">objects</span> <span class="o">=</span> <span class="n">objects_to_attributes</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span>
+            <span class="p">)</span>
             <span class="k">for</span> <span class="n">app</span><span class="p">,</span> <span class="n">attributes</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">objects</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
                 <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;@c{</span><span class="si">%s</span><span class="s2">}: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">app</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">attributes</span><span class="p">))))</span>
             <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">objects</span> <span class="k">else</span> <span class="mi">1</span>
@@ -294,9 +294,11 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;ramble attributes --by-attribute requires an attribute or --all&quot;</span><span class="p">)</span>
 
-        <span class="n">objects</span> <span class="o">=</span> <span class="n">union_values</span><span class="p">(</span><span class="n">attributes_to_objects</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span>
-                                                     <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span>
-                                                     <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">))</span>
+        <span class="n">objects</span> <span class="o">=</span> <span class="n">union_values</span><span class="p">(</span>
+            <span class="n">attributes_to_objects</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">colify</span><span class="p">(</span><span class="n">objects</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">objects</span> <span class="k">else</span> <span class="mi">1</span>
 
@@ -304,9 +306,11 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;ramble attributes requires an object or --all&quot;</span><span class="p">)</span>
 
-        <span class="n">users</span> <span class="o">=</span> <span class="n">union_values</span><span class="p">(</span><span class="n">objects_to_attributes</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span>
-                                                   <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span>
-                                                   <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">))</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="n">union_values</span><span class="p">(</span>
+            <span class="n">objects_to_attributes</span><span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">object_or_attr</span><span class="p">,</span> <span class="n">attr_name</span><span class="o">=</span><span class="n">attr_name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">colify</span><span class="p">(</span><span class="n">users</span><span class="p">)</span>
         <span class="k">return</span> <span class="mi">0</span> <span class="k">if</span> <span class="n">users</span> <span class="k">else</span> <span class="mi">1</span></div>
 

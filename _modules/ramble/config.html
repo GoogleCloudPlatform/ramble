@@ -174,82 +174,75 @@
 
 <span class="c1">#: Dict from section names -&gt; schema for that section</span>
 <span class="n">section_schemas</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;formatted_executables&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">formatted_executables</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;env_vars&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">env_vars</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;repos&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;internals&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;licenses&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">licenses</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;mirrors&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;modifier_repos&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifier_repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;modifiers&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifiers</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;spack&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;success_criteria&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;applications&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;variables&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
-    <span class="s1">&#39;zips&#39;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;formatted_executables&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">formatted_executables</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;env_vars&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">env_vars</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;repos&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;internals&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;licenses&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">licenses</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;mirrors&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">mirrors</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;modifier_repos&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifier_repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;modifiers&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifiers</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;spack&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;success_criteria&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;applications&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;zips&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
 <span class="p">}</span>
 
 <span class="c1"># Same as above, but including keys for workspaces</span>
 <span class="c1"># this allows us to unify config reading between configs and workspaces</span>
 <span class="n">all_schemas</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">section_schemas</span><span class="p">)</span>
-<span class="n">all_schemas</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">dict</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span>
-                        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">keys</span><span class="p">))</span>
+<span class="n">all_schemas</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
+    <span class="nb">dict</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">schema</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
+<span class="p">)</span>
 
 <span class="c1">#: Builtin paths to configuration files in ramble</span>
 <span class="n">configuration_paths</span> <span class="o">=</span> <span class="p">(</span>
     <span class="c1"># Default configuration scope is the lowest-level scope. These are</span>
     <span class="c1"># versioned with ramble and can be overridden by systems, sites or users</span>
-    <span class="p">(</span><span class="s1">&#39;defaults&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">etc_path</span><span class="p">,</span> <span class="s1">&#39;ramble&#39;</span><span class="p">,</span> <span class="s1">&#39;defaults&#39;</span><span class="p">)),</span>
-
+    <span class="p">(</span><span class="s2">&quot;defaults&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">etc_path</span><span class="p">,</span> <span class="s2">&quot;ramble&quot;</span><span class="p">,</span> <span class="s2">&quot;defaults&quot;</span><span class="p">)),</span>
     <span class="c1"># System configuration is per machine.</span>
     <span class="c1"># No system-level configs should be checked into ramble by default</span>
-    <span class="p">(</span><span class="s1">&#39;system&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">system_etc_path</span><span class="p">,</span> <span class="s1">&#39;ramble&#39;</span><span class="p">)),</span>
-
+    <span class="p">(</span><span class="s2">&quot;system&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">system_etc_path</span><span class="p">,</span> <span class="s2">&quot;ramble&quot;</span><span class="p">)),</span>
     <span class="c1"># Site configuration is per ramble instance, for sites or projects</span>
     <span class="c1"># No site-level configs should be checked into ramble by default.</span>
-    <span class="p">(</span><span class="s1">&#39;site&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">etc_path</span><span class="p">,</span> <span class="s1">&#39;ramble&#39;</span><span class="p">)),</span>
-
+    <span class="p">(</span><span class="s2">&quot;site&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">etc_path</span><span class="p">,</span> <span class="s2">&quot;ramble&quot;</span><span class="p">)),</span>
     <span class="c1"># User configuration can override both ramble defaults and site config</span>
-    <span class="p">(</span><span class="s1">&#39;user&#39;</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">user_config_path</span><span class="p">)</span>
+    <span class="p">(</span><span class="s2">&quot;user&quot;</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">user_config_path</span><span class="p">),</span>
 <span class="p">)</span>
 
 <span class="c1">#: Hard-coded default values for some key configuration options.</span>
 <span class="c1">#: This ensures that Ramble will still work even if config.yaml in</span>
 <span class="c1">#: the defaults scope is removed.</span>
 <span class="n">config_defaults</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;debug&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s1">&#39;disable_passthrough&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s1">&#39;disable_progress_bar&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s1">&#39;connect_timeout&#39;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
-        <span class="s1">&#39;n_repeats&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;repeat_success_strict&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s1">&#39;verify_ssl&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s1">&#39;checksum&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="s1">&#39;dirty&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="s1">&#39;build_jobs&#39;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">cpus_available</span><span class="p">()),</span>
-        <span class="s1">&#39;build_stage&#39;</span><span class="p">:</span> <span class="s1">&#39;$tempdir/ramble-stage&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;concretizer&#39;</span><span class="p">:</span> <span class="s1">&#39;clingo&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;license_dir&#39;</span><span class="p">:</span> <span class="n">spack</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">default_license_dir</span><span class="p">,</span>
-        <span class="s1">&#39;shell&#39;</span><span class="p">:</span> <span class="s1">&#39;sh&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;spack&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;install&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;concretize&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span>
-            <span class="p">}</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;input_cache&#39;</span><span class="p">:</span> <span class="s1">&#39;$ramble/var/ramble/cache&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;workspace_dirs&#39;</span><span class="p">:</span> <span class="s1">&#39;$ramble/var/ramble/workspaces&#39;</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;debug&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;disable_passthrough&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;disable_progress_bar&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;connect_timeout&quot;</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span>
+        <span class="s2">&quot;n_repeats&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;repeat_success_strict&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;verify_ssl&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;checksum&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="s2">&quot;dirty&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;build_jobs&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">cpus_available</span><span class="p">()),</span>
+        <span class="s2">&quot;build_stage&quot;</span><span class="p">:</span> <span class="s2">&quot;$tempdir/ramble-stage&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;concretizer&quot;</span><span class="p">:</span> <span class="s2">&quot;clingo&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;license_dir&quot;</span><span class="p">:</span> <span class="n">spack</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">default_license_dir</span><span class="p">,</span>
+        <span class="s2">&quot;shell&quot;</span><span class="p">:</span> <span class="s2">&quot;sh&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;spack&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span> <span class="s2">&quot;concretize&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">}},</span>
+        <span class="s2">&quot;input_cache&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/cache&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;workspace_dirs&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/workspaces&quot;</span><span class="p">,</span>
     <span class="p">}</span>
 <span class="p">}</span>
 
 <span class="c1">#: metavar to use for commands that accept scopes</span>
 <span class="c1">#: this is shorter and more readable than listing all choices</span>
-<span class="n">scopes_metavar</span> <span class="o">=</span> <span class="s1">&#39;{defaults,system,site,user}&#39;</span>
+<span class="n">scopes_metavar</span> <span class="o">=</span> <span class="s2">&quot;{defaults,system,site,user}&quot;</span>
 
 <span class="c1">#: Base name for the (internal) overrides scope.</span>
-<span class="n">overrides_base_name</span> <span class="o">=</span> <span class="s1">&#39;overrides-&#39;</span>
+<span class="n">overrides_base_name</span> <span class="o">=</span> <span class="s2">&quot;overrides-&quot;</span>
 
 
 <div class="viewcode-block" id="first_existing">
@@ -268,13 +261,13 @@
 <span class="k">class</span> <span class="nc">ConfigScope</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class represents a configuration scope.</span>
 
-<span class="sd">       A scope is one directory containing named configuration files.</span>
-<span class="sd">       Each file is a config &quot;section&quot; (e.g., mirrors, compilers, etc).</span>
+<span class="sd">    A scope is one directory containing named configuration files.</span>
+<span class="sd">    Each file is a config &quot;section&quot; (e.g., mirrors, compilers, etc).</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>           <span class="c1"># scope name.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>           <span class="c1"># path to directory containing configs.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># scope name.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>  <span class="c1"># path to directory containing configs.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>  <span class="c1"># sections read from config files.</span>
 
     <span class="nd">@property</span>
@@ -292,9 +285,9 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.get_section">[docs]</a>
     <span class="k">def</span> <span class="nf">get_section</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">:</span>
-            <span class="n">path</span>   <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section_filename</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_section_filename</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
             <span class="n">schema</span> <span class="o">=</span> <span class="n">section_schemas</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
-            <span class="n">data</span>   <span class="o">=</span> <span class="n">read_config_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="n">read_config_file</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">schema</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span></div>
 
@@ -309,11 +302,10 @@
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">mkdirp</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
-                <span class="s2">&quot;Error writing to config file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Error writing to config file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 
 <div class="viewcode-block" id="ConfigScope.clear">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.ConfigScope.clear">[docs]</a>
@@ -323,7 +315,7 @@
 
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;ConfigScope: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;&lt;ConfigScope: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 
 
@@ -331,6 +323,7 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.config.SingleFileScope">[docs]</a>
 <span class="k">class</span> <span class="nc">SingleFileScope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This class represents a configuration scope in a single YAML file.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">schema</span><span class="p">,</span> <span class="n">yaml_path</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Similar to ``ConfigScope`` but can be embedded in another schema.</span>
 
@@ -448,18 +441,16 @@
             <span class="n">parent</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
             <span class="n">mkdirp</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
 
-            <span class="n">tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s1">&#39;.</span><span class="si">%s</span><span class="s1">.tmp&#39;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">data_to_write</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">f</span><span class="p">,</span>
-                                  <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">tmp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="s2">&quot;.</span><span class="si">%s</span><span class="s2">.tmp&quot;</span> <span class="o">%</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">))</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">data_to_write</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
             <span class="n">rename</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
-                <span class="s2">&quot;Error writing to config file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+            <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Error writing to config file: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;SingleFileScope: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;&lt;SingleFileScope: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 
 
@@ -475,7 +466,7 @@
         <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Cannot write to immutable scope </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;ImmutableConfigScope: </span><span class="si">%s</span><span class="s1">: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="s2">&quot;&lt;ImmutableConfigScope: </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span></div>
 
 
 
@@ -488,6 +479,7 @@
 <span class="sd">    config file settings are accessed the same way, and Ramble can easily</span>
 <span class="sd">    override settings from files.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">InternalConfigScope</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
@@ -497,14 +489,12 @@
             <span class="k">for</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
                 <span class="n">dsec</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span>
                 <span class="n">validate</span><span class="p">({</span><span class="n">section</span><span class="p">:</span> <span class="n">dsec</span><span class="p">},</span> <span class="n">section_schemas</span><span class="p">[</span><span class="n">section</span><span class="p">])</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">_mark_internal</span><span class="p">(</span>
-                    <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">({</span><span class="n">section</span><span class="p">:</span> <span class="n">dsec</span><span class="p">}),</span> <span class="n">name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">_mark_internal</span><span class="p">(</span><span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">({</span><span class="n">section</span><span class="p">:</span> <span class="n">dsec</span><span class="p">}),</span> <span class="n">name</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InternalConfigScope.get_section_filename">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.get_section_filename">[docs]</a>
     <span class="k">def</span> <span class="nf">get_section_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s2">&quot;Cannot get filename for InternalConfigScope.&quot;</span><span class="p">)</span></div>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Cannot get filename for InternalConfigScope.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="InternalConfigScope.get_section">
@@ -524,7 +514,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">_mark_internal</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;&lt;InternalConfigScope: </span><span class="si">%s</span><span class="s1">&gt;&#39;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="s2">&quot;&lt;InternalConfigScope: </span><span class="si">%s</span><span class="s2">&gt;&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
 <div class="viewcode-block" id="InternalConfigScope.clear">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.InternalConfigScope.clear">[docs]</a>
@@ -538,15 +528,14 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Turn a trailing `:&#39; in a key name into an override attribute.&quot;&quot;&quot;</span>
         <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">sk</span><span class="p">,</span> <span class="n">sv</span> <span class="ow">in</span> <span class="n">iteritems</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">sk</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">sk</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">):</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_str</span><span class="p">(</span><span class="n">sk</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
                 <span class="n">key</span><span class="o">.</span><span class="n">override</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">key</span> <span class="o">=</span> <span class="n">sk</span>
 
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sv</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>\
-                    <span class="o">=</span> <span class="n">InternalConfigScope</span><span class="o">.</span><span class="n">_process_dict_keyname_overrides</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">InternalConfigScope</span><span class="o">.</span><span class="n">_process_dict_keyname_overrides</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">sv</span><span class="p">)</span>
 
@@ -559,10 +548,12 @@
 <span class="sd">    that mutate the underlying configuration. Used to clear the</span>
 <span class="sd">    memoization cache.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="nd">@functools</span><span class="o">.</span><span class="n">wraps</span><span class="p">(</span><span class="n">method</span><span class="p">)</span>
     <span class="k">def</span> <span class="nf">_method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_config_memoized</span><span class="o">.</span><span class="n">cache</span><span class="o">.</span><span class="n">clear</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">method</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
     <span class="k">return</span> <span class="n">_method</span>
 
 
@@ -595,14 +586,14 @@
         <span class="n">cmd_line_scope</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">:</span>
             <span class="n">highest_precedence_scope</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-            <span class="k">if</span> <span class="n">highest_precedence_scope</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;command_line&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">highest_precedence_scope</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;command_line&quot;</span><span class="p">:</span>
                 <span class="c1"># If the command-line scope is present, it should always</span>
                 <span class="c1"># be the scope of highest precedence</span>
                 <span class="n">cmd_line_scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pop_scope</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="n">scope</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">scope</span>
         <span class="k">if</span> <span class="n">cmd_line_scope</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="s1">&#39;command_line&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd_line_scope</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="s2">&quot;command_line&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd_line_scope</span></div>
 
 
 <div class="viewcode-block" id="Configuration.pop_scope">
@@ -625,9 +616,11 @@
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">file_scopes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;List of writable scopes with an associated file.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
-                <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="n">ConfigScope</span>  <span class="c1"># noqa: E721</span>
-                    <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="n">SingleFileScope</span><span class="p">)]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">s</span>
+            <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="n">ConfigScope</span> <span class="ow">or</span> <span class="nb">type</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="o">==</span> <span class="n">SingleFileScope</span><span class="p">)</span>  <span class="c1"># noqa: E721</span>
+        <span class="p">]</span>
 
 <div class="viewcode-block" id="Configuration.highest_precedence_scope">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.highest_precedence_scope">[docs]</a>
@@ -682,14 +675,14 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">[</span><span class="n">scope</span><span class="p">]</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid config scope: &#39;</span><span class="si">%s</span><span class="s2">&#39;.  Must be one of </span><span class="si">%s</span><span class="s2">&quot;</span>
-                             <span class="o">%</span> <span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Invalid config scope: &#39;</span><span class="si">%s</span><span class="s2">&#39;.  Must be one of </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">scope</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+            <span class="p">)</span>
 
 <div class="viewcode-block" id="Configuration.get_config_filename">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.Configuration.get_config_filename">[docs]</a>
     <span class="k">def</span> <span class="nf">get_config_filename</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">,</span> <span class="n">section</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;For some scope and section, get the name of the configuration file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;For some scope and section, get the name of the configuration file.&quot;&quot;&quot;</span>
         <span class="n">scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_section_filename</span><span class="p">(</span><span class="n">section</span><span class="p">)</span></div>
 
@@ -728,12 +721,14 @@
 <span class="sd">            force (str): force the update</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_updates</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">force</span><span class="p">:</span>
-            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;The &quot;</span><span class="si">{0}</span><span class="s1">&quot; section of the configuration needs to be written&#39;</span>
-                   <span class="s1">&#39; to disk, but is currently using a deprecated format. &#39;</span>
-                   <span class="s1">&#39;Please update it using:</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                   <span class="s1">&#39;</span><span class="se">\t</span><span class="s1">ramble config [--scope=&lt;scope] update </span><span class="si">{0}</span><span class="se">\n\n</span><span class="s1">&#39;</span>
-                   <span class="s1">&#39;Note that previous versions of Ramble will not be able to &#39;</span>
-                   <span class="s1">&#39;use the updated configuration.&#39;</span><span class="p">)</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s1">&#39;The &quot;</span><span class="si">{0}</span><span class="s1">&quot; section of the configuration needs to be written&#39;</span>
+                <span class="s2">&quot; to disk, but is currently using a deprecated format. &quot;</span>
+                <span class="s2">&quot;Please update it using:</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">ramble config [--scope=&lt;scope] update </span><span class="si">{0}</span><span class="se">\n\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Note that previous versions of Ramble will not be able to &quot;</span>
+                <span class="s2">&quot;use the updated configuration.&quot;</span>
+            <span class="p">)</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="n">msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
@@ -741,19 +736,16 @@
         <span class="n">scope</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validate_scope</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>  <span class="c1"># get ConfigScope object</span>
 
         <span class="c1"># manually preserve comments</span>
-        <span class="n">need_comment_copy</span> <span class="o">=</span> <span class="p">(</span><span class="n">section</span> <span class="ow">in</span> <span class="n">scope</span><span class="o">.</span><span class="n">sections</span> <span class="ow">and</span>
-                             <span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">need_comment_copy</span> <span class="o">=</span> <span class="n">section</span> <span class="ow">in</span> <span class="n">scope</span><span class="o">.</span><span class="n">sections</span> <span class="ow">and</span> <span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">need_comment_copy</span><span class="p">:</span>
-            <span class="n">comments</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">section</span><span class="p">],</span>
-                               <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span>
-                               <span class="kc">None</span><span class="p">)</span>
+            <span class="n">comments</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span>
+                <span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">section</span><span class="p">],</span> <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span> <span class="kc">None</span>
+            <span class="p">)</span>
 
         <span class="c1"># read only the requested section&#39;s data.</span>
         <span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">({</span><span class="n">section</span><span class="p">:</span> <span class="n">update_data</span><span class="p">})</span>
         <span class="k">if</span> <span class="n">need_comment_copy</span> <span class="ow">and</span> <span class="n">comments</span><span class="p">:</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">section</span><span class="p">],</span>
-                    <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span>
-                    <span class="n">comments</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="n">scope</span><span class="o">.</span><span class="n">sections</span><span class="p">[</span><span class="n">section</span><span class="p">][</span><span class="n">section</span><span class="p">],</span> <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span> <span class="n">comments</span><span class="p">)</span>
 
         <span class="n">scope</span><span class="o">.</span><span class="n">_write_section</span><span class="p">(</span><span class="n">section</span><span class="p">)</span></div>
 
@@ -842,7 +834,7 @@
 <span class="sd">            ramble.config.get(&#39;config:dirty&#39;)</span>
 
 <span class="sd">        We use ``:`` as the separator, like YAML objects.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: Currently only handles maps. Think about lists if needed.</span>
         <span class="n">parts</span> <span class="o">=</span> <span class="n">process_config_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="n">section</span> <span class="o">=</span> <span class="n">parts</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -868,7 +860,7 @@
 
 <span class="sd">        Accepts the path syntax described in ``get()``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="s1">&#39;:&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;:&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
             <span class="c1"># handle bare section name as path</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
             <span class="k">return</span>
@@ -916,8 +908,7 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">data</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
             <span class="n">data</span><span class="p">[</span><span class="n">section</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">section</span><span class="p">)</span>
-            <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span>
-                <span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">blame</span><span class="o">=</span><span class="n">blame</span><span class="p">)</span>
+            <span class="n">syaml</span><span class="o">.</span><span class="n">dump_config</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="p">,</span> <span class="n">default_flow_style</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">blame</span><span class="o">=</span><span class="n">blame</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">yaml</span><span class="o">.</span><span class="n">YAMLError</span><span class="p">,</span> <span class="ne">IOError</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;Error reading configuration: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">section</span><span class="p">)</span></div>
 </div>
@@ -945,11 +936,10 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">base_name</span> <span class="o">=</span> <span class="n">overrides_base_name</span>
         <span class="c1"># Ensure the new override gets a unique scope name</span>
-        <span class="n">current_overrides</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span>
-                             <span class="n">config</span><span class="o">.</span><span class="n">matching_scopes</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^</span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_name</span><span class="p">))]</span>
+        <span class="n">current_overrides</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">matching_scopes</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^</span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_name</span><span class="p">))]</span>
         <span class="n">num_overrides</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">current_overrides</span><span class="p">)</span>
         <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-            <span class="n">scope_name</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">{0}{1}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">num_overrides</span><span class="p">)</span>
+            <span class="n">scope_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{0}{1}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">base_name</span><span class="p">,</span> <span class="n">num_overrides</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">scope_name</span> <span class="ow">in</span> <span class="n">current_overrides</span><span class="p">:</span>
                 <span class="n">num_overrides</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">else</span><span class="p">:</span>
@@ -994,7 +984,7 @@
             <span class="k">raise</span> <span class="n">ConfigError</span><span class="p">(</span><span class="s2">&quot;config scope is not readable: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span> <span class="o">%</span> <span class="n">path</span><span class="p">)</span>
 
         <span class="c1"># name based on order on the command line</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;cmd_scope_</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">i</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;cmd_scope_</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">i</span>
         <span class="n">cfg</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">ImmutableConfigScope</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">))</span>
         <span class="n">_add_platform_scope</span><span class="p">(</span><span class="n">cfg</span><span class="p">,</span> <span class="n">ImmutableConfigScope</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
@@ -1013,7 +1003,7 @@
     <span class="n">cfg</span> <span class="o">=</span> <span class="n">Configuration</span><span class="p">()</span>
 
     <span class="c1"># first do the builtin, hardcoded defaults</span>
-    <span class="n">defaults</span> <span class="o">=</span> <span class="n">InternalConfigScope</span><span class="p">(</span><span class="s1">&#39;_builtin&#39;</span><span class="p">,</span> <span class="n">config_defaults</span><span class="p">)</span>
+    <span class="n">defaults</span> <span class="o">=</span> <span class="n">InternalConfigScope</span><span class="p">(</span><span class="s2">&quot;_builtin&quot;</span><span class="p">,</span> <span class="n">config_defaults</span><span class="p">)</span>
     <span class="n">cfg</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">defaults</span><span class="p">)</span>
 
     <span class="c1"># TODO: do we need the configuration here from Spack?</span>
@@ -1030,7 +1020,7 @@
 
     <span class="c1"># we make a special scope for ramble commands so that they can</span>
     <span class="c1"># override configuration options.</span>
-    <span class="n">cfg</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">InternalConfigScope</span><span class="p">(</span><span class="s1">&#39;command_line&#39;</span><span class="p">))</span>
+    <span class="n">cfg</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">InternalConfigScope</span><span class="p">(</span><span class="s2">&quot;command_line&quot;</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">cfg</span>
 
@@ -1042,8 +1032,7 @@
 <div class="viewcode-block" id="add_from_file">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.add_from_file">[docs]</a>
 <span class="k">def</span> <span class="nf">add_from_file</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add updates to a config from a filename</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Add updates to a config from a filename&quot;&quot;&quot;</span>
     <span class="c1"># Get file as config dict</span>
     <span class="n">data</span> <span class="o">=</span> <span class="n">read_config_file</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
@@ -1074,13 +1063,13 @@
     <span class="n">components</span> <span class="o">=</span> <span class="n">process_config_path</span><span class="p">(</span><span class="n">fullpath</span><span class="p">)</span>
 
     <span class="n">has_existing_value</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
     <span class="n">override</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">components</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
         <span class="c1"># First handle double colons in constructing path</span>
-        <span class="n">colon</span> <span class="o">=</span> <span class="s1">&#39;::&#39;</span> <span class="k">if</span> <span class="n">override</span> <span class="k">else</span> <span class="s1">&#39;:&#39;</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="n">colon</span> <span class="o">=</span> <span class="s2">&quot;::&quot;</span> <span class="k">if</span> <span class="n">override</span> <span class="k">else</span> <span class="s2">&quot;:&quot;</span> <span class="k">if</span> <span class="n">path</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
         <span class="n">path</span> <span class="o">+=</span> <span class="n">colon</span> <span class="o">+</span> <span class="n">name</span>
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;override&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;override&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">override</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">override</span> <span class="o">=</span> <span class="kc">False</span>
@@ -1097,12 +1086,12 @@
 
             <span class="c1"># construct value from this point down</span>
             <span class="n">value</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="k">for</span> <span class="n">component</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:</span> <span class="o">-</span><span class="mi">1</span><span class="p">]):</span>
                 <span class="n">value</span> <span class="o">=</span> <span class="p">{</span><span class="n">component</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
             <span class="k">break</span>
 
     <span class="k">if</span> <span class="n">has_existing_value</span><span class="p">:</span>
-        <span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">fullpath</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+        <span class="n">path</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">fullpath</span><span class="o">.</span><span class="n">rpartition</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
         <span class="n">value</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">load_config</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="n">existing</span> <span class="o">=</span> <span class="n">get</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">scope</span><span class="p">)</span>
 
@@ -1138,8 +1127,8 @@
 <div class="viewcode-block" id="add_default_platform_scope">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.add_default_platform_scope">[docs]</a>
 <span class="k">def</span> <span class="nf">add_default_platform_scope</span><span class="p">(</span><span class="n">platform</span><span class="p">):</span>
-    <span class="n">plat_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;defaults&#39;</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
-    <span class="n">plat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">configuration_paths</span><span class="p">[</span><span class="s1">&#39;defaults&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">platform</span><span class="p">)</span>
+    <span class="n">plat_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;defaults&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="p">)</span>
+    <span class="n">plat_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">configuration_paths</span><span class="p">[</span><span class="s2">&quot;defaults&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">platform</span><span class="p">)</span>
     <span class="n">config</span><span class="o">.</span><span class="n">push_scope</span><span class="p">(</span><span class="n">ConfigScope</span><span class="p">(</span><span class="n">plat_name</span><span class="p">,</span> <span class="n">plat_path</span><span class="p">))</span></div>
 
 
@@ -1157,7 +1146,8 @@
     <span class="k">if</span> <span class="n">section</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">section_schemas</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">ConfigSectionError</span><span class="p">(</span>
             <span class="s2">&quot;Invalid config section: &#39;</span><span class="si">%s</span><span class="s2">&#39;. Options are: </span><span class="si">%s</span><span class="s2">&quot;</span>
-            <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_schemas</span><span class="o">.</span><span class="n">keys</span><span class="p">())))</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">section_schemas</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+        <span class="p">)</span>
 
 
 <div class="viewcode-block" id="validate">
@@ -1181,16 +1171,16 @@
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">CommentedMap</span><span class="p">):</span>
         <span class="c1"># HACK to fully copy ruamel CommentedMap that doesn&#39;t provide copy</span>
         <span class="c1"># method. Especially necessary for workspaces</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span>
-                <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span>
-                <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span>
-                        <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span>
-                        <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="p">()))</span>
+        <span class="nb">setattr</span><span class="p">(</span>
+            <span class="n">test_data</span><span class="p">,</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="o">.</span><span class="n">attrib</span><span class="p">,</span> <span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">Comment</span><span class="p">()),</span>
+        <span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">Validator</span><span class="p">(</span><span class="n">schema</span><span class="p">)</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">test_data</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">jsonschema</span><span class="o">.</span><span class="n">ValidationError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s1">&#39;lc&#39;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">instance</span><span class="p">,</span> <span class="s2">&quot;lc&quot;</span><span class="p">):</span>
             <span class="n">line_number</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">instance</span><span class="o">.</span><span class="n">lc</span><span class="o">.</span><span class="n">line</span> <span class="o">+</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">line_number</span> <span class="o">=</span> <span class="kc">None</span>
@@ -1218,8 +1208,7 @@
         <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
-            <span class="s2">&quot;Invalid configuration. </span><span class="si">%s</span><span class="s2"> exists but is not a file.&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Invalid configuration. </span><span class="si">%s</span><span class="s2"> exists but is not a file.&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
 
     <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">R_OK</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Config file is not readable: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
@@ -1237,16 +1226,13 @@
         <span class="k">return</span> <span class="n">data</span>
 
     <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
-            <span class="s2">&quot;Config file is empty or is not a valid YAML dict: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Config file is empty or is not a valid YAML dict: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">filename</span><span class="p">)</span>
 
     <span class="k">except</span> <span class="n">MarkedYAMLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
-            <span class="s2">&quot;Error parsing yaml</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">context_mark</span><span class="p">),</span> <span class="n">e</span><span class="o">.</span><span class="n">problem</span><span class="p">))</span>
+        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Error parsing yaml</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">context_mark</span><span class="p">),</span> <span class="n">e</span><span class="o">.</span><span class="n">problem</span><span class="p">))</span>
 
     <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span>
-            <span class="s2">&quot;Error reading configuration file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
+        <span class="k">raise</span> <span class="n">ConfigFileError</span><span class="p">(</span><span class="s2">&quot;Error reading configuration file </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)))</span></div>
 
 
 
@@ -1258,7 +1244,7 @@
 <span class="sd">    configs instead of merging into them.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="s1">&#39;override&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">string</span><span class="o">.</span><span class="n">override</span>
+    <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="s2">&quot;override&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">string</span><span class="o">.</span><span class="n">override</span>
 
 
 <span class="k">def</span> <span class="nf">_mark_internal</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
@@ -1267,8 +1253,9 @@
 <span class="sd">    This is used by `ramble config blame` to show where config lines came from.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="n">d</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">((</span><span class="n">_mark_internal</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">_mark_internal</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
-                             <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">_mark_internal</span><span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span> <span class="n">_mark_internal</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">data</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">)</span>
     <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
         <span class="n">d</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_list</span><span class="p">(</span><span class="n">_mark_internal</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">data</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1292,12 +1279,12 @@
 <span class="sd">    ``int``, ``float``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">types</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;array&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
-        <span class="s1">&#39;object&#39;</span><span class="p">:</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">,</span>
-        <span class="s1">&#39;string&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="s1">&#39;boolean&#39;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
-        <span class="s1">&#39;integer&#39;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="s1">&#39;number&#39;</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="s2">&quot;array&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+        <span class="s2">&quot;object&quot;</span><span class="p">:</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">,</span>
+        <span class="s2">&quot;string&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="s2">&quot;boolean&quot;</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
+        <span class="s2">&quot;integer&quot;</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
     <span class="p">}</span>
 
     <span class="n">components</span> <span class="o">=</span> <span class="n">process_config_path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
@@ -1312,11 +1299,11 @@
         <span class="n">validate</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">section_schemas</span><span class="p">[</span><span class="n">section</span><span class="p">])</span>
     <span class="k">except</span> <span class="p">(</span><span class="n">ConfigFormatError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="n">jsonschema_error</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">validation_error</span>
-        <span class="k">if</span> <span class="n">jsonschema_error</span><span class="o">.</span><span class="n">validator</span> <span class="o">==</span> <span class="s1">&#39;type&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">jsonschema_error</span><span class="o">.</span><span class="n">validator</span> <span class="o">==</span> <span class="s2">&quot;type&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="n">jsonschema_error</span><span class="o">.</span><span class="n">validator_value</span><span class="p">]()</span>
-        <span class="k">elif</span> <span class="n">jsonschema_error</span><span class="o">.</span><span class="n">validator</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;anyOf&#39;</span><span class="p">,</span> <span class="s1">&#39;oneOf&#39;</span><span class="p">):</span>
+        <span class="k">elif</span> <span class="n">jsonschema_error</span><span class="o">.</span><span class="n">validator</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;anyOf&quot;</span><span class="p">,</span> <span class="s2">&quot;oneOf&quot;</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">subschema</span> <span class="ow">in</span> <span class="n">jsonschema_error</span><span class="o">.</span><span class="n">validator_value</span><span class="p">:</span>
-                <span class="n">schema_type</span> <span class="o">=</span> <span class="n">subschema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">)</span>
+                <span class="n">schema_type</span> <span class="o">=</span> <span class="n">subschema</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">schema_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">types</span><span class="p">[</span><span class="n">schema_type</span><span class="p">]()</span>
     <span class="k">else</span><span class="p">:</span>
@@ -1344,6 +1331,7 @@
 <span class="sd">    with `::` instead of `:`, and the key will override that of the</span>
 <span class="sd">    parent instead of merging.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="nf">they_are</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dest</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">t</span><span class="p">)</span>
 
@@ -1381,6 +1369,7 @@
             <span class="n">dest</span><span class="p">[</span><span class="n">dk</span><span class="p">]</span> <span class="o">=</span> <span class="n">dest</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">dk</span><span class="p">)</span>
 
         <span class="kn">import</span> <span class="nn">ruamel.yaml</span>
+
         <span class="k">return</span> <span class="n">ruamel</span><span class="o">.</span><span class="n">yaml</span><span class="o">.</span><span class="n">comments</span><span class="o">.</span><span class="n">CommentedMap</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
 
     <span class="c1"># If we reach here source and dest are either different types or are</span>
@@ -1397,18 +1386,17 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.config.process_config_path">[docs]</a>
 <span class="k">def</span> <span class="nf">process_config_path</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
     <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">syaml</span><span class="o">.</span><span class="n">rambleYAMLError</span><span class="p">(</span><span class="s2">&quot;Illegal leading `:&#39; in path `</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span>
-                                    <span class="nb">format</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">syaml</span><span class="o">.</span><span class="n">rambleYAMLError</span><span class="p">(</span><span class="s2">&quot;Illegal leading `:&#39; in path `</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">seen_override_in_path</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="k">while</span> <span class="n">path</span><span class="p">:</span>
-        <span class="n">front</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">sep</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">):</span>
+        <span class="n">front</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">sep</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">seen_override_in_path</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">syaml</span><span class="o">.</span><span class="n">RambleYAMLError</span><span class="p">(</span><span class="s2">&quot;Meaningless second override&quot;</span>
-                                            <span class="s2">&quot; indicator `::&#39; in path `</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span>
-                                            <span class="nb">format</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;:&#39;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">syaml</span><span class="o">.</span><span class="n">RambleYAMLError</span><span class="p">(</span>
+                    <span class="s2">&quot;Meaningless second override&quot;</span> <span class="s2">&quot; indicator `::&#39; in path `</span><span class="si">{0}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;&quot;</span>
+                <span class="p">)</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;:&quot;</span><span class="p">)</span>
             <span class="n">front</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_str</span><span class="p">(</span><span class="n">front</span><span class="p">)</span>
             <span class="n">front</span><span class="o">.</span><span class="n">override</span> <span class="o">=</span> <span class="kc">True</span>
             <span class="n">seen_override_in_path</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1422,7 +1410,7 @@
 <span class="c1">#</span>
 <div class="viewcode-block" id="default_modify_scope">
 <a class="viewcode-back" href="../../ramble.html#ramble.config.default_modify_scope">[docs]</a>
-<span class="k">def</span> <span class="nf">default_modify_scope</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s1">&#39;config&#39;</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">default_modify_scope</span><span class="p">(</span><span class="n">section</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Return the config scope that commands should modify by default.</span>
 
 <span class="sd">    Commands that modify configuration by default modify the *highest*</span>
@@ -1434,11 +1422,10 @@
 <span class="sd">            used.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># TODO Ensure the correct scoping for different sections.</span>
-    <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s1">&#39;experiments&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">section</span> <span class="o">==</span> <span class="s2">&quot;experiments&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">highest_precedence_scope</span><span class="p">()</span><span class="o">.</span><span class="n">name</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> \
-            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">highest_precedence_non_platform_scope</span><span class="p">()</span><span class="o">.</span><span class="n">name</span></div>
+        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">highest_precedence_non_platform_scope</span><span class="p">()</span><span class="o">.</span><span class="n">name</span></div>
 
 
 
@@ -1486,7 +1473,7 @@
     <span class="c1"># The line below is based on the fact that every module we need</span>
     <span class="c1"># is already imported at the top level</span>
     <span class="n">section_module</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
-    <span class="n">update_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">section_module</span><span class="p">,</span> <span class="s1">&#39;update&#39;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">False</span><span class="p">)</span>
+    <span class="n">update_fn</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">section_module</span><span class="p">,</span> <span class="s2">&quot;update&quot;</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">update_fn</span></div>
 
 
@@ -1582,24 +1569,24 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="n">filename</span>  <span class="c1"># record this for ruamel.yaml</span>
 
         <span class="c1"># construct the location and retrieve the line that caused the error</span>
-        <span class="n">location</span> <span class="o">=</span> <span class="s1">&#39;&lt;unknown file&gt;&#39;</span>
+        <span class="n">location</span> <span class="o">=</span> <span class="s2">&quot;&lt;unknown file&gt;&quot;</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">location</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="n">line</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">location</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;:</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
+            <span class="n">location</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;:</span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">file</span><span class="p">:</span>
                 <span class="n">lines</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-                <span class="n">location</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\n</span><span class="si">{</span><span class="n">lines</span><span class="p">[</span><span class="n">mark</span><span class="o">.</span><span class="n">line</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">location</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="si">{</span><span class="n">lines</span><span class="p">[</span><span class="n">mark</span><span class="o">.</span><span class="n">line</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
 
-        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">validation_error</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">location</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">validation_error</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">ConfigError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_get_mark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validation_error</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the file/line mark for a validation error from a Ramble YAML file.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Get the file/line mark for a validation error from a Ramble YAML file.&quot;&quot;&quot;</span>
+
         <span class="k">def</span> <span class="nf">_get_mark_or_first_member_mark</span><span class="p">(</span><span class="n">obj</span><span class="p">):</span>
             <span class="c1"># mark of object itelf</span>
-            <span class="n">mark</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s1">&#39;_start_mark&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="n">mark</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="s2">&quot;_start_mark&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">mark</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">mark</span>
 
@@ -1607,7 +1594,7 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)):</span>
                 <span class="n">first_member</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">obj</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">first_member</span><span class="p">:</span>
-                    <span class="n">mark</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">first_member</span><span class="p">,</span> <span class="s1">&#39;_start_mark&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                    <span class="n">mark</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">first_member</span><span class="p">,</span> <span class="s2">&quot;_start_mark&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                     <span class="k">if</span> <span class="n">mark</span><span class="p">:</span>
                         <span class="k">return</span> <span class="n">mark</span>
 
@@ -1635,7 +1622,7 @@
                 <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parent</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
                     <span class="n">keylist</span> <span class="o">=</span> <span class="n">parent</span>
                 <span class="n">idx</span> <span class="o">=</span> <span class="n">keylist</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-                <span class="n">mark</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">keylist</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="s1">&#39;_start_mark&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="n">mark</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">keylist</span><span class="p">[</span><span class="n">idx</span><span class="p">],</span> <span class="s2">&quot;_start_mark&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">mark</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">mark</span>
 

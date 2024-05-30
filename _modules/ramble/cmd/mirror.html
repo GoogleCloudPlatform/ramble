@@ -125,73 +125,81 @@
 <div class="viewcode-block" id="setup_parser">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;no_checksum&#39;</span><span class="p">])</span>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;no_checksum&quot;</span><span class="p">])</span>
 
-    <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span>
-        <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;mirror_command&#39;</span><span class="p">)</span>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;SUBCOMMAND&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;mirror_command&quot;</span><span class="p">)</span>
 
     <span class="c1"># Destroy</span>
-    <span class="n">destroy_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_destroy</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                                   <span class="n">description</span><span class="o">=</span><span class="n">mirror_destroy</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">destroy_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;destroy&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_destroy</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">mirror_destroy</span><span class="o">.</span><span class="vm">__doc__</span>
+    <span class="p">)</span>
 
     <span class="n">destroy_target</span> <span class="o">=</span> <span class="n">destroy_parser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">(</span><span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="n">destroy_target</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-m&#39;</span><span class="p">,</span> <span class="s1">&#39;--mirror-name&#39;</span><span class="p">,</span>
-                                <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;mirror_name&#39;</span><span class="p">,</span>
-                                <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-                                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;find mirror to destroy by name&quot;</span><span class="p">)</span>
-    <span class="n">destroy_target</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;-u&#39;</span><span class="p">,</span> <span class="s1">&#39;--mirror-url&#39;</span><span class="p">,</span>
-                                <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;mirror_url&#39;</span><span class="p">,</span>
-                                <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
-                                <span class="n">help</span><span class="o">=</span><span class="s2">&quot;find mirror to destroy by url&quot;</span><span class="p">)</span>
+    <span class="n">destroy_target</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-m&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--mirror-name&quot;</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror_name&quot;</span><span class="p">,</span>
+        <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;find mirror to destroy by name&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">destroy_target</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-u&quot;</span><span class="p">,</span> <span class="s2">&quot;--mirror-url&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror_url&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;find mirror to destroy by url&quot;</span>
+    <span class="p">)</span>
 
     <span class="c1"># used to construct scope arguments below</span>
     <span class="n">scopes</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scopes</span><span class="p">()</span>
     <span class="n">scopes_metavar</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">scopes_metavar</span>
 
     <span class="c1"># Add</span>
-    <span class="n">add_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;add&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                               <span class="n">description</span><span class="o">=</span><span class="n">mirror_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">add_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;add&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">mirror_add</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mnemonic name for mirror&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
+    <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;url of mirror directory from &#39;ramble mirror create&#39;&quot;</span><span class="p">)</span>
     <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mnemonic name for mirror&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
-    <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;url of mirror directory from &#39;ramble mirror create&#39;&quot;</span><span class="p">)</span>
-    <span class="n">add_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--scope&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
+        <span class="s2">&quot;--scope&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_modify_scope</span><span class="p">(),</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to modify&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to modify&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="c1"># Remove</span>
-    <span class="n">remove_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;remove&#39;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;rm&#39;</span><span class="p">],</span>
-                                  <span class="n">help</span><span class="o">=</span><span class="n">mirror_remove</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                                  <span class="n">description</span><span class="o">=</span><span class="n">mirror_remove</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">remove_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;remove&quot;</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;rm&quot;</span><span class="p">],</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_remove</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">mirror_remove</span><span class="o">.</span><span class="vm">__doc__</span>
+    <span class="p">)</span>
+    <span class="n">remove_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mnemonic name for mirror&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
     <span class="n">remove_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mnemonic name for mirror&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
-    <span class="n">remove_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--scope&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
+        <span class="s2">&quot;--scope&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_modify_scope</span><span class="p">(),</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to modify&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to modify&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># Set-Url</span>
-    <span class="n">set_url_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;set-url&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_set_url</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                                   <span class="n">description</span><span class="o">=</span><span class="n">mirror_set_url</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">set_url_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span>
+        <span class="s2">&quot;set-url&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_set_url</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">mirror_set_url</span><span class="o">.</span><span class="vm">__doc__</span>
+    <span class="p">)</span>
+    <span class="n">set_url_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mnemonic name for mirror&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
+    <span class="n">set_url_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;url&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;url of mirror directory from &#39;ramble mirror create&#39;&quot;</span><span class="p">)</span>
     <span class="n">set_url_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;name&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;mnemonic name for mirror&quot;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;--push&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set only the URL used for uploading new resources&quot;</span>
+    <span class="p">)</span>
     <span class="n">set_url_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;url&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;url of mirror directory from &#39;ramble mirror create&#39;&quot;</span><span class="p">)</span>
-    <span class="n">set_url_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--push&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;set only the URL used for uploading new resources&quot;</span><span class="p">)</span>
-    <span class="n">set_url_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--scope&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
+        <span class="s2">&quot;--scope&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_modify_scope</span><span class="p">(),</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to modify&quot;</span><span class="p">)</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to modify&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># List</span>
-    <span class="n">list_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span>
-                                <span class="n">description</span><span class="o">=</span><span class="n">mirror_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+    <span class="n">list_parser</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;list&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="n">mirror_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="n">mirror_list</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
     <span class="n">list_parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--scope&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
+        <span class="s2">&quot;--scope&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">scopes</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="n">scopes_metavar</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">default_list_scope</span><span class="p">(),</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to read from&quot;</span><span class="p">)</span></div>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;configuration scope to read from&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -217,7 +225,7 @@
 <span class="k">def</span> <span class="nf">mirror_set_url</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Change the URL of a mirror.&quot;&quot;&quot;</span>
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mirrors&quot;</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">mirrors</span><span class="p">:</span>
         <span class="n">mirrors</span> <span class="o">=</span> <span class="n">syaml_dict</span><span class="p">()</span>
 
@@ -226,8 +234,8 @@
 
     <span class="n">entry</span> <span class="o">=</span> <span class="n">mirrors</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">fetch_url</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;fetch&#39;</span><span class="p">]</span>
-        <span class="n">push_url</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;push&#39;</span><span class="p">]</span>
+        <span class="n">fetch_url</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;fetch&quot;</span><span class="p">]</span>
+        <span class="n">push_url</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;push&quot;</span><span class="p">]</span>
     <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
         <span class="n">fetch_url</span><span class="p">,</span> <span class="n">push_url</span> <span class="o">=</span> <span class="n">entry</span><span class="p">,</span> <span class="n">entry</span>
 
@@ -243,22 +251,24 @@
     <span class="n">items</span> <span class="o">=</span> <span class="p">[</span>
         <span class="p">(</span>
             <span class="p">(</span><span class="n">mirror_name</span><span class="p">,</span> <span class="n">mirror_url</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">mirror_name</span> <span class="o">!=</span> <span class="n">args</span><span class="o">.</span><span class="n">name</span> <span class="k">else</span> <span class="p">(</span>
+            <span class="k">if</span> <span class="n">mirror_name</span> <span class="o">!=</span> <span class="n">args</span><span class="o">.</span><span class="n">name</span>
+            <span class="k">else</span> <span class="p">(</span>
                 <span class="p">(</span><span class="n">mirror_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;fetch&quot;</span><span class="p">:</span> <span class="n">fetch_url</span><span class="p">,</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span> <span class="n">push_url</span><span class="p">})</span>
-                <span class="k">if</span> <span class="n">fetch_url</span> <span class="o">!=</span> <span class="n">push_url</span> <span class="k">else</span> <span class="p">(</span><span class="n">mirror_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;fetch&quot;</span><span class="p">:</span> <span class="n">fetch_url</span><span class="p">,</span>
-                                                             <span class="s2">&quot;push&quot;</span><span class="p">:</span> <span class="n">fetch_url</span><span class="p">})</span>
+                <span class="k">if</span> <span class="n">fetch_url</span> <span class="o">!=</span> <span class="n">push_url</span>
+                <span class="k">else</span> <span class="p">(</span><span class="n">mirror_name</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;fetch&quot;</span><span class="p">:</span> <span class="n">fetch_url</span><span class="p">,</span> <span class="s2">&quot;push&quot;</span><span class="p">:</span> <span class="n">fetch_url</span><span class="p">})</span>
             <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">for</span> <span class="n">mirror_name</span><span class="p">,</span> <span class="n">mirror_url</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
     <span class="p">]</span>
 
     <span class="n">mirrors</span> <span class="o">=</span> <span class="n">syaml_dict</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
-    <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">,</span> <span class="n">mirrors</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
+    <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;mirrors&quot;</span><span class="p">,</span> <span class="n">mirrors</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">scope</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">changes_made</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span>
-            <span class="s2">&quot;Changed</span><span class="si">%s</span><span class="s2"> url or connection information for mirror </span><span class="si">%s</span><span class="s2">.&quot;</span> <span class="o">%</span>
-            <span class="p">((</span><span class="s2">&quot; (push)&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">push</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">))</span>
+            <span class="s2">&quot;Changed</span><span class="si">%s</span><span class="s2"> url or connection information for mirror </span><span class="si">%s</span><span class="s2">.&quot;</span>
+            <span class="o">%</span> <span class="p">((</span><span class="s2">&quot; (push)&quot;</span> <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">push</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">),</span> <span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No changes made to mirror </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span></div>
 
@@ -288,8 +298,9 @@
                 <span class="n">specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">RambleError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Parse error in </span><span class="si">%s</span><span class="s2">, line </span><span class="si">%d</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span>
-                           <span class="s2">&quot;&gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="s2">&quot;Parse error in </span><span class="si">%s</span><span class="s2">, line </span><span class="si">%d</span><span class="s2">:&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">),</span> <span class="s2">&quot;&gt;&gt;&gt; &quot;</span> <span class="o">+</span> <span class="n">string</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="p">)</span>
     <span class="k">return</span> <span class="n">specs</span>
 
 
@@ -312,15 +323,17 @@
 <div class="viewcode-block" id="mirror">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.mirror.mirror">[docs]</a>
 <span class="k">def</span> <span class="nf">mirror</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
-    <span class="n">action</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;destroy&#39;</span><span class="p">:</span> <span class="n">mirror_destroy</span><span class="p">,</span>
-              <span class="s1">&#39;add&#39;</span><span class="p">:</span> <span class="n">mirror_add</span><span class="p">,</span>
-              <span class="s1">&#39;remove&#39;</span><span class="p">:</span> <span class="n">mirror_remove</span><span class="p">,</span>
-              <span class="s1">&#39;rm&#39;</span><span class="p">:</span> <span class="n">mirror_remove</span><span class="p">,</span>
-              <span class="s1">&#39;set-url&#39;</span><span class="p">:</span> <span class="n">mirror_set_url</span><span class="p">,</span>
-              <span class="s1">&#39;list&#39;</span><span class="p">:</span> <span class="n">mirror_list</span><span class="p">}</span>
+    <span class="n">action</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;destroy&quot;</span><span class="p">:</span> <span class="n">mirror_destroy</span><span class="p">,</span>
+        <span class="s2">&quot;add&quot;</span><span class="p">:</span> <span class="n">mirror_add</span><span class="p">,</span>
+        <span class="s2">&quot;remove&quot;</span><span class="p">:</span> <span class="n">mirror_remove</span><span class="p">,</span>
+        <span class="s2">&quot;rm&quot;</span><span class="p">:</span> <span class="n">mirror_remove</span><span class="p">,</span>
+        <span class="s2">&quot;set-url&quot;</span><span class="p">:</span> <span class="n">mirror_set_url</span><span class="p">,</span>
+        <span class="s2">&quot;list&quot;</span><span class="p">:</span> <span class="n">mirror_list</span><span class="p">,</span>
+    <span class="p">}</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">no_checksum</span><span class="p">:</span>
-        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;config:checksum&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s1">&#39;command_line&#39;</span><span class="p">)</span>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;config:checksum&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s2">&quot;command_line&quot;</span><span class="p">)</span>
 
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">mirror_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
 

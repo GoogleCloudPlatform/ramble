@@ -190,90 +190,75 @@
 <span class="s2">import ramble.schema.zips</span>
 
 
-<span class="s2">matrix_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;}</span>
-<span class="s2">}</span>
+<span class="s2">matrix_def = {&quot;type&quot;: &quot;array&quot;, &quot;default&quot;: [], &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}}</span>
 
 <span class="s2">matrices_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {</span>
-<span class="s2">        &#39;anyOf&#39;: [</span>
+<span class="s2">    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">    &quot;default&quot;: [],</span>
+<span class="s2">    &quot;items&quot;: {</span>
+<span class="s2">        &quot;anyOf&quot;: [</span>
 <span class="s2">            matrix_def,</span>
 <span class="s2">            {</span>
-<span class="s2">                &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                &#39;additionalProperties&#39;: matrix_def</span>
-<span class="s2">            }</span>
+<span class="s2">                &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                &quot;additionalProperties&quot;: matrix_def,</span>
+<span class="s2">            },</span>
 <span class="s2">        ]</span>
-<span class="s2">    }</span>
+<span class="s2">    },</span>
 <span class="s2">}</span>
 
 <span class="s2">variable_list = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">    }</span>
+<span class="s2">    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">    &quot;default&quot;: [],</span>
+<span class="s2">    &quot;items&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;string&quot;,</span>
+<span class="s2">    },</span>
 <span class="s2">}</span>
 
 <span class="s2">chained_experiment_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;properties&#39;: union_dicts(</span>
+<span class="s2">    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">    &quot;default&quot;: [],</span>
+<span class="s2">    &quot;items&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;properties&quot;: union_dicts(</span>
 <span class="s2">            {</span>
-<span class="s2">                &#39;name&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                &#39;command&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                &#39;order&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                &#39;inherit_variables&#39;: variable_list,</span>
+<span class="s2">                &quot;name&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                &quot;command&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                &quot;order&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                &quot;inherit_variables&quot;: variable_list,</span>
 <span class="s2">            },</span>
-<span class="s2">            ramble.schema.variables.properties</span>
+<span class="s2">            ramble.schema.variables.properties,</span>
 <span class="s2">        ),</span>
-<span class="s2">        &#39;additionalProperties&#39;: False</span>
-<span class="s2">    }</span>
+<span class="s2">        &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    },</span>
 <span class="s2">}</span>
 
 <span class="s2">where_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">    &#39;default&#39;: [],</span>
+<span class="s2">    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">    &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">    &quot;default&quot;: [],</span>
 <span class="s2">}</span>
 
 <span class="s2">exclude_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;properties&#39;: union_dicts(</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;properties&quot;: union_dicts(</span>
 <span class="s2">        ramble.schema.variables.properties,</span>
 <span class="s2">        ramble.schema.zips.properties,</span>
 <span class="s2">        {</span>
-<span class="s2">            &#39;matrix&#39;: matrix_def,</span>
-<span class="s2">            &#39;matrices&#39;: matrices_def,</span>
-<span class="s2">            &#39;where&#39;: where_def,</span>
-<span class="s2">        }</span>
+<span class="s2">            &quot;matrix&quot;: matrix_def,</span>
+<span class="s2">            &quot;matrices&quot;: matrices_def,</span>
+<span class="s2">            &quot;where&quot;: where_def,</span>
+<span class="s2">        },</span>
 <span class="s2">    ),</span>
-<span class="s2">    &#39;additionalProperties&#39;: False</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
 <span class="s2">}</span>
 
-<span class="s2">tags_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;string&#39;</span>
-<span class="s2">    }</span>
-<span class="s2">}</span>
+<span class="s2">tags_def = {&quot;type&quot;: &quot;array&quot;, &quot;default&quot;: [], &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}}</span>
 
-<span class="s2">repeats_def = union_dicts(</span>
-<span class="s2">    ramble.schema.types.string_or_num,</span>
-<span class="s2">    {</span>
-<span class="s2">        &#39;default&#39;: 0</span>
-<span class="s2">    }</span>
-<span class="s2">)</span>
+<span class="s2">repeats_def = union_dicts(ramble.schema.types.string_or_num, {&quot;default&quot;: 0})</span>
 
 <span class="s2">sub_props = union_dicts(</span>
 <span class="s2">    ramble.schema.variables.properties,</span>
@@ -284,73 +269,73 @@
 <span class="s2">    ramble.schema.zips.properties,</span>
 <span class="s2">    ramble.schema.formatted_executables.properties,</span>
 <span class="s2">    {</span>
-<span class="s2">        &#39;chained_experiments&#39;: chained_experiment_def,</span>
-<span class="s2">        &#39;template&#39;: {&#39;type&#39;: &#39;boolean&#39;},</span>
-<span class="s2">        &#39;tags&#39;: tags_def,</span>
-<span class="s2">    }</span>
+<span class="s2">        &quot;chained_experiments&quot;: chained_experiment_def,</span>
+<span class="s2">        &quot;template&quot;: {&quot;type&quot;: &quot;boolean&quot;},</span>
+<span class="s2">        &quot;tags&quot;: tags_def,</span>
+<span class="s2">    },</span>
 <span class="s2">)</span>
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;applications&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;additionalProperties&#39;: {</span>
-<span class="s2">            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">            &#39;default&#39;: &#39;</span><span class="si">{}</span><span class="s2">&#39;,</span>
-<span class="s2">            &#39;additionalProperties&#39;: False,</span>
-<span class="s2">            &#39;properties&#39;: union_dicts(</span>
+<span class="s2">    &quot;applications&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;additionalProperties&quot;: {</span>
+<span class="s2">            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">            &quot;default&quot;: &quot;</span><span class="si">{}</span><span class="s2">&quot;,</span>
+<span class="s2">            &quot;additionalProperties&quot;: False,</span>
+<span class="s2">            &quot;properties&quot;: union_dicts(</span>
 <span class="s2">                sub_props,</span>
 <span class="s2">                {</span>
-<span class="s2">                    &#39;workloads&#39;: {</span>
-<span class="s2">                        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                        &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                        &#39;additionalProperties&#39;: {</span>
-<span class="s2">                            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                            &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                            &#39;additionalProperties&#39;: False,</span>
-<span class="s2">                            &#39;properties&#39;: union_dicts(</span>
+<span class="s2">                    &quot;workloads&quot;: {</span>
+<span class="s2">                        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                        &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                        &quot;additionalProperties&quot;: {</span>
+<span class="s2">                            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                            &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                            &quot;additionalProperties&quot;: False,</span>
+<span class="s2">                            &quot;properties&quot;: union_dicts(</span>
 <span class="s2">                                sub_props,</span>
 <span class="s2">                                {</span>
-<span class="s2">                                    &#39;experiments&#39;: {</span>
-<span class="s2">                                        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                                        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                                        &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                                        &#39;additionalProperties&#39;: {</span>
-<span class="s2">                                            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                                            &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                                            &#39;additionalProperties&#39;: False,</span>
-<span class="s2">                                            &#39;properties&#39;: union_dicts(</span>
+<span class="s2">                                    &quot;experiments&quot;: {</span>
+<span class="s2">                                        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                                        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                                        &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                                        &quot;additionalProperties&quot;: {</span>
+<span class="s2">                                            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                                            &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                                            &quot;additionalProperties&quot;: False,</span>
+<span class="s2">                                            &quot;properties&quot;: union_dicts(</span>
 <span class="s2">                                                sub_props,</span>
 <span class="s2">                                                {</span>
-<span class="s2">                                                    &#39;matrix&#39;: matrix_def,</span>
-<span class="s2">                                                    &#39;matrices&#39;: matrices_def,</span>
-<span class="s2">                                                    &#39;success_criteria&#39;: success_list_def,</span>
-<span class="s2">                                                    &#39;exclude&#39;: exclude_def,</span>
-<span class="s2">                                                    &#39;n_repeats&#39;: repeats_def,</span>
-<span class="s2">                                                }</span>
-<span class="s2">                                            )</span>
-<span class="s2">                                        }</span>
+<span class="s2">                                                    &quot;matrix&quot;: matrix_def,</span>
+<span class="s2">                                                    &quot;matrices&quot;: matrices_def,</span>
+<span class="s2">                                                    &quot;success_criteria&quot;: success_list_def,</span>
+<span class="s2">                                                    &quot;exclude&quot;: exclude_def,</span>
+<span class="s2">                                                    &quot;n_repeats&quot;: repeats_def,</span>
+<span class="s2">                                                },</span>
+<span class="s2">                                            ),</span>
+<span class="s2">                                        },</span>
 <span class="s2">                                    }</span>
-<span class="s2">                                }</span>
-<span class="s2">                            )</span>
-<span class="s2">                        }</span>
+<span class="s2">                                },</span>
+<span class="s2">                            ),</span>
+<span class="s2">                        },</span>
 <span class="s2">                    }</span>
-<span class="s2">                }</span>
-<span class="s2">            )</span>
-<span class="s2">        }</span>
+<span class="s2">                },</span>
+<span class="s2">            ),</span>
+<span class="s2">        },</span>
 <span class="s2">    }</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble application configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble application configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -374,193 +359,134 @@
 
 <span class="c1">#: Properties for inclusion in other schemas</span>
 <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="o">**</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]},</span>
+<span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;shell&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="s2">&quot;csh&quot;</span><span class="p">,</span> <span class="s2">&quot;tcsh&quot;</span><span class="p">,</span> <span class="s2">&quot;fish&quot;</span><span class="p">]}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">},</span> <span class="s2">&quot;concretize&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">}},</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;global&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;concretize&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;compiler_find&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;buildcache&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;env_create&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;flags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;input_cache&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/cache&quot;</span><span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;workspace_dirs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/workspaces&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;upload&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;BigQuery&quot;</span><span class="p">},</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;shell&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;bash&#39;</span><span class="p">,</span> <span class="s1">&#39;csh&#39;</span><span class="p">,</span> <span class="s1">&#39;tcsh&#39;</span><span class="p">,</span> <span class="s1">&#39;fish&#39;</span><span class="p">]</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;user&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;spack&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;install&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;concretize&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span>
-        <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;global&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;install&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;concretize&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;compiler_find&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;buildcache&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;env_create&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-    <span class="p">},</span>
-    <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;disable_passthrough&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;disable_progress_bar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;input_cache&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;$ramble/var/ramble/cache&#39;</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;disable_logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;workspace_dirs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;$ramble/var/ramble/workspaces&#39;</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;n_repeats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;upload&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;BigQuery&#39;</span>
-        <span class="p">},</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;disable_passthrough&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;disable_progress_bar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;disable_logger&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;n_repeats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;repeat_success_strict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;repeat_success_strict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
 
 <span class="c1">#: Full schema with metadata</span>
 <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;$schema&#39;</span><span class="p">:</span> <span class="s1">&#39;http://json-schema.org/schema#&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ramble core configuration file schema&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
+    <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://json-schema.org/schema#&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Ramble core configuration file schema&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -581,24 +507,24 @@
 
     <span class="c1"># Convert `spack_flags` to `spack:command_flags`</span>
 
-    <span class="n">spack_flags</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spack_flags&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">spack_flags</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spack_flags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spack_flags</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{}}</span>
 
-        <span class="n">global_args</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;global_args&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">global_args</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;global_args&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">global_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;global&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">global_args</span><span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;global&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">global_args</span><span class="p">}</span>
 
-        <span class="n">install_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">install_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">install_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;install&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">install_flags</span><span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;install&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">install_flags</span><span class="p">}</span>
 
-        <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;concretize&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;concretize&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">concretize_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;concretize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">concretize_flags</span><span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;concretize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">concretize_flags</span><span class="p">}</span>
 
-        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack_flags&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack_flags&quot;</span><span class="p">]</span>
         <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="n">changed</span>
@@ -642,16 +568,16 @@
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;env_vars&#39;: ramble.schema.licenses.env_var_actions,</span>
+<span class="s2">    &quot;env_vars&quot;: ramble.schema.licenses.env_var_actions,</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble environment variable configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble environment variable configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -676,39 +602,30 @@
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;formatted_executables&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;additionalProperties&#39;: {</span>
-<span class="s2">            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">            &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">            &#39;additionalProperties&#39;: False,</span>
-<span class="s2">            &#39;properties&#39;:  {</span>
-<span class="s2">                &#39;prefix&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">                    &#39;default&#39;: &#39;&#39;</span>
-<span class="s2">                },</span>
-<span class="s2">                &#39;indentation&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;number&#39;,</span>
-<span class="s2">                    &#39;default&#39;: 0</span>
-<span class="s2">                },</span>
-<span class="s2">                &#39;join_separator&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">                    &#39;default&#39;: &#39;</span><span class="se">\n</span><span class="s2">&#39;</span>
-<span class="s2">                }</span>
-<span class="s2">            }</span>
-<span class="s2">        }</span>
+<span class="s2">    &quot;formatted_executables&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;additionalProperties&quot;: {</span>
+<span class="s2">            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">            &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">            &quot;additionalProperties&quot;: False,</span>
+<span class="s2">            &quot;properties&quot;: {</span>
+<span class="s2">                &quot;prefix&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: &quot;&quot;},</span>
+<span class="s2">                &quot;indentation&quot;: {&quot;type&quot;: &quot;number&quot;, &quot;default&quot;: 0},</span>
+<span class="s2">                &quot;join_separator&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: &quot;</span><span class="se">\n</span><span class="s2">&quot;},</span>
+<span class="s2">            },</span>
+<span class="s2">        },</span>
 <span class="s2">    }</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble formatted executables configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble formatted executables configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -738,77 +655,69 @@
 
 
 <span class="s2">custom_executables_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;additionalProperties&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: {</span>
-<span class="s2">            &#39;template&#39;: [],</span>
-<span class="s2">            &#39;use_mpi&#39;: False,</span>
-<span class="s2">            &#39;redirect&#39;: &#39;</span><span class="si">{log_file}</span><span class="s2">&#39;,</span>
-<span class="s2">            &#39;variables&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">            &#39;output_capture&#39;: ramble.schema.types.OUTPUT_CAPTURE.DEFAULT</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;additionalProperties&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: {</span>
+<span class="s2">            &quot;template&quot;: [],</span>
+<span class="s2">            &quot;use_mpi&quot;: False,</span>
+<span class="s2">            &quot;redirect&quot;: &quot;</span><span class="si">{log_file}</span><span class="s2">&quot;,</span>
+<span class="s2">            &quot;variables&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">            &quot;output_capture&quot;: ramble.schema.types.OUTPUT_CAPTURE.DEFAULT,</span>
 <span class="s2">        },</span>
-<span class="s2">        &#39;properties&#39;: union_dicts(</span>
+<span class="s2">        &quot;properties&quot;: union_dicts(</span>
 <span class="s2">            {</span>
-<span class="s2">                &#39;template&#39;: ramble.schema.types.array_or_scalar_of_strings_or_nums,</span>
-<span class="s2">                &#39;use_mpi&#39;: {&#39;type&#39;: &#39;boolean&#39;},</span>
-<span class="s2">                &#39;redirect&#39;: ramble.schema.types.string_or_num,</span>
+<span class="s2">                &quot;template&quot;: ramble.schema.types.array_or_scalar_of_strings_or_nums,</span>
+<span class="s2">                &quot;use_mpi&quot;: {&quot;type&quot;: &quot;boolean&quot;},</span>
+<span class="s2">                &quot;redirect&quot;: ramble.schema.types.string_or_num,</span>
 <span class="s2">            },</span>
 <span class="s2">            ramble.schema.variables.properties,</span>
 <span class="s2">        ),</span>
 <span class="s2">    },</span>
-<span class="s2">    &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
 <span class="s2">}</span>
 
 <span class="s2">executables_def = ramble.schema.types.array_of_strings_or_nums</span>
 
 <span class="s2">executable_injection_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;properties&#39;: {</span>
-<span class="s2">            &#39;name&#39;: {</span>
-<span class="s2">                &#39;type&#39;: &#39;string&#39;</span>
+<span class="s2">    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">    &quot;default&quot;: [],</span>
+<span class="s2">    &quot;items&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;properties&quot;: {</span>
+<span class="s2">            &quot;name&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">            &quot;order&quot;: {</span>
+<span class="s2">                &quot;type&quot;: &quot;string&quot;,</span>
+<span class="s2">                &quot;default&quot;: &quot;after&quot;,</span>
 <span class="s2">            },</span>
-<span class="s2">            &#39;order&#39;: {</span>
-<span class="s2">                &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">                &#39;default&#39;: &#39;after&#39;,</span>
-<span class="s2">            }</span>
 <span class="s2">        },</span>
-<span class="s2">        &#39;additionalProperties&#39;: {</span>
-<span class="s2">            &#39;relative_to&#39;: {</span>
-<span class="s2">                &#39;type&#39;: &#39;string&#39;</span>
-<span class="s2">            }</span>
-<span class="s2">        }</span>
-<span class="s2">    }</span>
+<span class="s2">        &quot;additionalProperties&quot;: {&quot;relative_to&quot;: {&quot;type&quot;: &quot;string&quot;}},</span>
+<span class="s2">    },</span>
 <span class="s2">}</span>
 
 <span class="s2">internals_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;properties&#39;: {</span>
-<span class="s2">        &#39;custom_executables&#39;: custom_executables_def,</span>
-<span class="s2">        &#39;executables&#39;: executables_def,</span>
-<span class="s2">        &#39;executable_injection&#39;: executable_injection_def,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;properties&quot;: {</span>
+<span class="s2">        &quot;custom_executables&quot;: custom_executables_def,</span>
+<span class="s2">        &quot;executables&quot;: executables_def,</span>
+<span class="s2">        &quot;executable_injection&quot;: executable_injection_def,</span>
 <span class="s2">    },</span>
-<span class="s2">    &#39;additionalProperties&#39;: False</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
-<span class="s2">properties = {</span>
-<span class="s2">    &#39;internals&#39;: internals_def</span>
-<span class="s2">}</span>
+<span class="s2">properties = {&quot;internals&quot;: internals_def}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble internals configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble internals configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -837,53 +746,53 @@
 <span class="s2">array_of_strings_or_num = spack.schema.environment.array_of_strings_or_num</span>
 
 <span class="s2">env_var_actions = {</span>
-<span class="s2">    &#39;set&#39;: dictionary_of_strings_or_num,</span>
-<span class="s2">    &#39;append&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">        &#39;items&#39;: {</span>
-<span class="s2">            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">            &#39;properties&#39;: {</span>
-<span class="s2">                &#39;var-separator&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                &#39;vars&#39;: dictionary_of_strings_or_num,</span>
-<span class="s2">                &#39;paths&#39;: dictionary_of_strings_or_num,</span>
+<span class="s2">    &quot;set&quot;: dictionary_of_strings_or_num,</span>
+<span class="s2">    &quot;append&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">        &quot;items&quot;: {</span>
+<span class="s2">            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">            &quot;properties&quot;: {</span>
+<span class="s2">                &quot;var-separator&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                &quot;vars&quot;: dictionary_of_strings_or_num,</span>
+<span class="s2">                &quot;paths&quot;: dictionary_of_strings_or_num,</span>
 <span class="s2">            },</span>
-<span class="s2">            &#39;additionalProperties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        }</span>
+<span class="s2">            &quot;additionalProperties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        },</span>
 <span class="s2">    },</span>
-<span class="s2">    &#39;prepend&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">        &#39;items&#39;: {</span>
-<span class="s2">            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">            &#39;properties&#39;: {</span>
-<span class="s2">                &#39;paths&#39;: dictionary_of_strings_or_num,</span>
+<span class="s2">    &quot;prepend&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">        &quot;items&quot;: {</span>
+<span class="s2">            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">            &quot;properties&quot;: {</span>
+<span class="s2">                &quot;paths&quot;: dictionary_of_strings_or_num,</span>
 <span class="s2">            },</span>
-<span class="s2">            &#39;additionalProperties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        }</span>
+<span class="s2">            &quot;additionalProperties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        },</span>
 <span class="s2">    },</span>
-<span class="s2">    &#39;unset&#39;: array_of_strings_or_num,</span>
+<span class="s2">    &quot;unset&quot;: array_of_strings_or_num,</span>
 <span class="s2">}</span>
 
 <span class="s2">licenses_schema = {</span>
-<span class="s2">    &#39;licenses&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;additionalProperties&#39;: {</span>
-<span class="s2">            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">            &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">            &#39;additionalProperties&#39;: False,</span>
-<span class="s2">            &#39;properties&#39;: env_var_actions</span>
-<span class="s2">        }</span>
+<span class="s2">    &quot;licenses&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;additionalProperties&quot;: {</span>
+<span class="s2">            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">            &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">            &quot;additionalProperties&quot;: False,</span>
+<span class="s2">            &quot;properties&quot;: env_var_actions,</span>
+<span class="s2">        },</span>
 <span class="s2">    }</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble licenses configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: licenses_schema</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble licenses configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: licenses_schema,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -923,16 +832,16 @@
     <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">env_vars</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">internals</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
     <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifiers</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
-    <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">properties</span>
+    <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">properties</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1">#: Full schema with metadata</span>
 <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;$schema&#39;</span><span class="p">:</span> <span class="s1">&#39;http://json-schema.org/draft-07/schema#&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ramble merged configuration file schema&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
+    <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://json-schema.org/draft-07/schema#&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Ramble merged configuration file schema&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
 <span class="p">}</span>
 </pre></div>
 </div>
@@ -957,22 +866,22 @@
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;mirrors&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;additionalProperties&#39;: False,</span>
-<span class="s2">        &#39;patternProperties&#39;: {</span>
-<span class="s2">            r&#39;\w[\w-]*&#39;: {</span>
-<span class="s2">                &#39;anyOf&#39;: [</span>
-<span class="s2">                    {&#39;type&#39;: &#39;string&#39;},</span>
+<span class="s2">    &quot;mirrors&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;additionalProperties&quot;: False,</span>
+<span class="s2">        &quot;patternProperties&quot;: {</span>
+<span class="s2">            r&quot;\w[\w-]*&quot;: {</span>
+<span class="s2">                &quot;anyOf&quot;: [</span>
+<span class="s2">                    {&quot;type&quot;: &quot;string&quot;},</span>
 <span class="s2">                    {</span>
-<span class="s2">                        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                        &#39;required&#39;: [&#39;fetch&#39;, &#39;push&#39;],</span>
-<span class="s2">                        &#39;properties&#39;: {</span>
-<span class="s2">                            &#39;fetch&#39;: {&#39;type&#39;: [&#39;string&#39;, &#39;object&#39;]},</span>
-<span class="s2">                            &#39;push&#39;: {&#39;type&#39;: [&#39;string&#39;, &#39;object&#39;]}</span>
-<span class="s2">                        }</span>
-<span class="s2">                    }</span>
+<span class="s2">                        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                        &quot;required&quot;: [&quot;fetch&quot;, &quot;push&quot;],</span>
+<span class="s2">                        &quot;properties&quot;: {</span>
+<span class="s2">                            &quot;fetch&quot;: {&quot;type&quot;: [&quot;string&quot;, &quot;object&quot;]},</span>
+<span class="s2">                            &quot;push&quot;: {&quot;type&quot;: [&quot;string&quot;, &quot;object&quot;]},</span>
+<span class="s2">                        },</span>
+<span class="s2">                    },</span>
 <span class="s2">                ]</span>
 <span class="s2">            },</span>
 <span class="s2">        },</span>
@@ -982,11 +891,11 @@
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/draft-07/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble mirror configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties,</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/draft-07/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble mirror configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1011,21 +920,21 @@
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;modifier_repos&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">        &#39;default&#39;: [],</span>
-<span class="s2">        &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
+<span class="s2">    &quot;modifier_repos&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">        &quot;default&quot;: [],</span>
+<span class="s2">        &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
 <span class="s2">    },</span>
 <span class="s2">}</span>
 
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble modifier repository configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties,</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble modifier repository configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1048,37 +957,33 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>   <span class="p">:</span><span class="n">lines</span><span class="p">:</span> <span class="mi">12</span><span class="o">-</span>
 <span class="s2">&quot;&quot;&quot;  # noqa E501</span>
 
-<span class="s2">section_name = &#39;modifiers&#39;</span>
+<span class="s2">section_name = &quot;modifiers&quot;</span>
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
 <span class="s2">    section_name: {</span>
-<span class="s2">        &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">        &#39;default&#39;: [],</span>
-<span class="s2">        &#39;items&#39;: {</span>
-<span class="s2">            &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">            &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">            &#39;properties&#39;: {</span>
-<span class="s2">                &#39;name&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                &#39;mode&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                &#39;on_executable&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">                    &#39;default&#39;: [],</span>
-<span class="s2">                    &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;}</span>
-<span class="s2">                }</span>
+<span class="s2">        &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">        &quot;default&quot;: [],</span>
+<span class="s2">        &quot;items&quot;: {</span>
+<span class="s2">            &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">            &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">            &quot;properties&quot;: {</span>
+<span class="s2">                &quot;name&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                &quot;mode&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                &quot;on_executable&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;default&quot;: [], &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}},</span>
 <span class="s2">            },</span>
-<span class="s2">            &#39;additionalProperties&#39;: False</span>
-<span class="s2">        }</span>
+<span class="s2">            &quot;additionalProperties&quot;: False,</span>
+<span class="s2">        },</span>
 <span class="s2">    }</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble application configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble application configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1103,21 +1008,21 @@
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;repos&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">        &#39;default&#39;: [],</span>
-<span class="s2">        &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
+<span class="s2">    &quot;repos&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">        &quot;default&quot;: [],</span>
+<span class="s2">        &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
 <span class="s2">    },</span>
 <span class="s2">}</span>
 
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble repository configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties,</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble repository configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1143,63 +1048,59 @@
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;spack&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;properties&#39;: {</span>
-<span class="s2">            &#39;packages&#39;: {</span>
-<span class="s2">                &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                &#39;additionalProperties&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                    &#39;properties&#39;: {</span>
-<span class="s2">                        &#39;spack_spec&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                        &#39;compiler_spec&#39;: {</span>
-<span class="s2">                            &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">                            &#39;default&#39;: None,</span>
+<span class="s2">    &quot;spack&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;properties&quot;: {</span>
+<span class="s2">            &quot;packages&quot;: {</span>
+<span class="s2">                &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                &quot;additionalProperties&quot;: {</span>
+<span class="s2">                    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                    &quot;properties&quot;: {</span>
+<span class="s2">                        &quot;spack_spec&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                        &quot;compiler_spec&quot;: {</span>
+<span class="s2">                            &quot;type&quot;: &quot;string&quot;,</span>
+<span class="s2">                            &quot;default&quot;: None,</span>
 <span class="s2">                        },</span>
-<span class="s2">                        &#39;compiler&#39;: {</span>
-<span class="s2">                            &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">                            &#39;default&#39;: None,</span>
+<span class="s2">                        &quot;compiler&quot;: {</span>
+<span class="s2">                            &quot;type&quot;: &quot;string&quot;,</span>
+<span class="s2">                            &quot;default&quot;: None,</span>
 <span class="s2">                        },</span>
 <span class="s2">                    },</span>
-<span class="s2">                    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">                    &#39;default&#39;: </span><span class="si">{}</span>
+<span class="s2">                    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">                    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
 <span class="s2">                },</span>
 <span class="s2">            },</span>
-<span class="s2">            &#39;environments&#39;: {</span>
-<span class="s2">                &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">                &#39;additionalProperties&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">                    &#39;properties&#39;: {</span>
-<span class="s2">                        &#39;external_spack_env&#39;: {</span>
-<span class="s2">                            &#39;type&#39;: &#39;string&#39;,</span>
-<span class="s2">                            &#39;default&#39;: None,</span>
+<span class="s2">            &quot;environments&quot;: {</span>
+<span class="s2">                &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                &quot;additionalProperties&quot;: {</span>
+<span class="s2">                    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">                    &quot;properties&quot;: {</span>
+<span class="s2">                        &quot;external_spack_env&quot;: {</span>
+<span class="s2">                            &quot;type&quot;: &quot;string&quot;,</span>
+<span class="s2">                            &quot;default&quot;: None,</span>
 <span class="s2">                        },</span>
-<span class="s2">                        &#39;packages&#39;: {</span>
-<span class="s2">                            &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">                            &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">                            &#39;default&#39;: []</span>
-<span class="s2">                        },</span>
+<span class="s2">                        &quot;packages&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}, &quot;default&quot;: []},</span>
 <span class="s2">                    },</span>
-<span class="s2">                    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">                    &#39;default&#39;: </span><span class="si">{}</span>
-<span class="s2">                }</span>
-<span class="s2">            }</span>
+<span class="s2">                    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">                    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">                },</span>
+<span class="s2">            },</span>
 <span class="s2">        },</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;additionalProperties&#39;: False,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;additionalProperties&quot;: False,</span>
 <span class="s2">    }</span>
 <span class="s2">}</span>
 
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Spack software configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties,</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Spack software configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1224,39 +1125,33 @@
 
 
 <span class="s2">success_criteria_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;properties&#39;: {</span>
-<span class="s2">        &#39;name&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">        &#39;mode&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
-<span class="s2">        &#39;match&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;default&#39;: None},</span>
-<span class="s2">        &#39;file&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;default&#39;: None},</span>
-<span class="s2">        &#39;fom_name&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;default&#39;: None},</span>
-<span class="s2">        &#39;fom_context&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;default&#39;: None},</span>
-<span class="s2">        &#39;formula&#39;: {&#39;type&#39;: &#39;string&#39;, &#39;default&#39;: None}</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;properties&quot;: {</span>
+<span class="s2">        &quot;name&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">        &quot;mode&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">        &quot;match&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: None},</span>
+<span class="s2">        &quot;file&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: None},</span>
+<span class="s2">        &quot;fom_name&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: None},</span>
+<span class="s2">        &quot;fom_context&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: None},</span>
+<span class="s2">        &quot;formula&quot;: {&quot;type&quot;: &quot;string&quot;, &quot;default&quot;: None},</span>
 <span class="s2">    },</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
 <span class="s2">}</span>
 
-<span class="s2">success_list_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: success_criteria_def</span>
-<span class="s2">}</span>
+<span class="s2">success_list_def = {&quot;type&quot;: &quot;array&quot;, &quot;default&quot;: [], &quot;items&quot;: success_criteria_def}</span>
 
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
-<span class="s2">properties = {</span>
-<span class="s2">    &#39;success_criteria&#39;: success_list_def</span>
-<span class="s2">}</span>
+<span class="s2">properties = {&quot;success_criteria&quot;: success_list_def}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble success criteria configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble success criteria configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1310,23 +1205,21 @@
 <span class="s2">&quot;&quot;&quot;  # noqa E501</span>
 
 <span class="s2">variables_def = {</span>
-<span class="s2">    &#39;type&#39;: [&#39;object&#39;, &#39;null&#39;],</span>
-<span class="s2">    &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;additionalProperties&#39;: True</span>
+<span class="s2">    &quot;type&quot;: [&quot;object&quot;, &quot;null&quot;],</span>
+<span class="s2">    &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">    &quot;additionalProperties&quot;: True,</span>
 <span class="s2">}</span>
 
-<span class="s2">properties = {</span>
-<span class="s2">    &#39;variables&#39;: variables_def</span>
-<span class="s2">}</span>
+<span class="s2">properties = {&quot;variables&quot;: variables_def}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble variables configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble variables configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1350,48 +1243,46 @@
 <span class="s2">import ramble.schema.merged</span>
 <span class="s2">import ramble.schema.licenses</span>
 
-<span class="s2">env_properties = spack.schema.env.schema[&#39;patternProperties&#39;]</span>
-<span class="s2">spec_properties = env_properties[&#39;^env|spack$&#39;]</span>
+<span class="s2">env_properties = spack.schema.env.schema[&quot;patternProperties&quot;]</span>
+<span class="s2">spec_properties = env_properties[&quot;^env|spack$&quot;]</span>
 
-<span class="s2">applications_properties = ramble.schema.applications.properties[&#39;applications&#39;]</span>
-<span class="s2">app_addProps = applications_properties[&#39;additionalProperties&#39;]</span>
+<span class="s2">applications_properties = ramble.schema.applications.properties[&quot;applications&quot;]</span>
+<span class="s2">app_addProps = applications_properties[&quot;additionalProperties&quot;]</span>
 
-<span class="s2">keys = (&#39;ramble&#39;, &#39;workspace&#39;)</span>
+<span class="s2">keys = (&quot;ramble&quot;, &quot;workspace&quot;)</span>
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;ramble&#39;: {</span>
-<span class="s2">        &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">        &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">        &#39;properties&#39;: union_dicts(</span>
+<span class="s2">    &quot;ramble&quot;: {</span>
+<span class="s2">        &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">        &quot;default&quot;: </span><span class="si">{}</span><span class="s2">,</span>
+<span class="s2">        &quot;properties&quot;: union_dicts(</span>
 <span class="s2">            ramble.schema.merged.properties,</span>
 <span class="s2">            {</span>
-<span class="s2">                &#39;include&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">                    &#39;default&#39;: [],</span>
-<span class="s2">                    &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;},</span>
+<span class="s2">                &quot;include&quot;: {</span>
+<span class="s2">                    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">                    &quot;default&quot;: [],</span>
+<span class="s2">                    &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
 <span class="s2">                },</span>
-<span class="s2">                &#39;application_directories&#39;: {</span>
-<span class="s2">                    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">                    &#39;default&#39;: [],</span>
-<span class="s2">                    &#39;items&#39;: {</span>
-<span class="s2">                        &#39;type&#39;: &#39;string&#39;</span>
-<span class="s2">                    }</span>
-<span class="s2">                }</span>
-<span class="s2">            }</span>
+<span class="s2">                &quot;application_directories&quot;: {</span>
+<span class="s2">                    &quot;type&quot;: &quot;array&quot;,</span>
+<span class="s2">                    &quot;default&quot;: [],</span>
+<span class="s2">                    &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;},</span>
+<span class="s2">                },</span>
+<span class="s2">            },</span>
 <span class="s2">        ),</span>
-<span class="s2">        &#39;additionalProperties&#39;: False,</span>
+<span class="s2">        &quot;additionalProperties&quot;: False,</span>
 <span class="s2">    },</span>
 <span class="s2">}</span>
 
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble workspace configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: ramble.schema.spack.properties,</span>
-<span class="s2">    &#39;properties&#39;: properties,</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble workspace configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: ramble.schema.spack.properties,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>
@@ -1415,31 +1306,22 @@
 <span class="s2">&quot;&quot;&quot;  # noqa E501</span>
 
 
-<span class="s2">zip_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;array&#39;,</span>
-<span class="s2">    &#39;default&#39;: [],</span>
-<span class="s2">    &#39;items&#39;: {&#39;type&#39;: &#39;string&#39;}</span>
-<span class="s2">}</span>
+<span class="s2">zip_def = {&quot;type&quot;: &quot;array&quot;, &quot;default&quot;: [], &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}}</span>
 
-<span class="s2">zips_def = {</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;default&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;properties&#39;: </span><span class="si">{}</span><span class="s2">,</span>
-<span class="s2">    &#39;additionalProperties&#39;: zip_def</span>
-<span class="s2">}</span>
+<span class="s2">zips_def = {&quot;type&quot;: &quot;object&quot;, &quot;default&quot;: </span><span class="si">{}</span><span class="s2">, &quot;properties&quot;: </span><span class="si">{}</span><span class="s2">, &quot;additionalProperties&quot;: zip_def}</span>
 
 <span class="s2">#: Properties for inclusion in other schemas</span>
 <span class="s2">properties = {</span>
-<span class="s2">    &#39;zips&#39;: zips_def,</span>
+<span class="s2">    &quot;zips&quot;: zips_def,</span>
 <span class="s2">}</span>
 
 <span class="s2">#: Full schema with metadata</span>
 <span class="s2">schema = {</span>
-<span class="s2">    &#39;$schema&#39;: &#39;http://json-schema.org/schema#&#39;,</span>
-<span class="s2">    &#39;title&#39;: &#39;Ramble zips configuration file schema&#39;,</span>
-<span class="s2">    &#39;type&#39;: &#39;object&#39;,</span>
-<span class="s2">    &#39;additionalProperties&#39;: False,</span>
-<span class="s2">    &#39;properties&#39;: properties</span>
+<span class="s2">    &quot;$schema&quot;: &quot;http://json-schema.org/schema#&quot;,</span>
+<span class="s2">    &quot;title&quot;: &quot;Ramble zips configuration file schema&quot;,</span>
+<span class="s2">    &quot;type&quot;: &quot;object&quot;,</span>
+<span class="s2">    &quot;additionalProperties&quot;: False,</span>
+<span class="s2">    &quot;properties&quot;: properties,</span>
 <span class="s2">}</span>
 </pre></div>
 </div>

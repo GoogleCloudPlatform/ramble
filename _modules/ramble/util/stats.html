@@ -113,10 +113,10 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the number of decimal places of a value&quot;&quot;&quot;</span>
 
     <span class="n">val_str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val_str</span><span class="p">:</span>
+    <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">val_str</span><span class="p">:</span>
         <span class="k">return</span> <span class="mi">0</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">val_str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">])</span></div>
 
 
 
@@ -153,9 +153,9 @@
 <div class="viewcode-block" id="StatsBase.report">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsBase.report">[docs]</a>
     <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
-        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">label</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;summary::</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_count</span><span class="p">:</span>
-            <span class="k">return</span> <span class="p">(</span><span class="s1">&#39;NA&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;NA&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">label</span><span class="p">)</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">unit</span><span class="p">),</span> <span class="n">label</span><span class="p">)</span></div>
 </div>
 
@@ -164,7 +164,7 @@
 <div class="viewcode-block" id="StatsMin">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMin">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsMin</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;min&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;min&quot;</span>
 
 <div class="viewcode-block" id="StatsMin.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMin.compute">[docs]</a>
@@ -177,7 +177,7 @@
 <div class="viewcode-block" id="StatsMax">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMax">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsMax</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;max&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;max&quot;</span>
 
 <div class="viewcode-block" id="StatsMax.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMax.compute">[docs]</a>
@@ -190,7 +190,7 @@
 <div class="viewcode-block" id="StatsMean">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMean">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsMean</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;mean&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;mean&quot;</span>
 
 <div class="viewcode-block" id="StatsMean.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMean.compute">[docs]</a>
@@ -203,7 +203,7 @@
 <div class="viewcode-block" id="StatsMedian">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMedian">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsMedian</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;median&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;median&quot;</span>
 
 <div class="viewcode-block" id="StatsMedian.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsMedian.compute">[docs]</a>
@@ -216,13 +216,13 @@
 <div class="viewcode-block" id="StatsVar">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsVar">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsVar</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;variance&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;variance&quot;</span>
     <span class="n">min_count</span> <span class="o">=</span> <span class="mi">2</span>
 
 <div class="viewcode-block" id="StatsVar.get_unit">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsVar.get_unit">[docs]</a>
     <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">^2&#39;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s2">^2&quot;</span></div>
 
 
 <div class="viewcode-block" id="StatsVar.compute">
@@ -236,7 +236,7 @@
 <div class="viewcode-block" id="StatsStdev">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsStdev">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsStdev</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;stdev&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;stdev&quot;</span>
     <span class="n">min_count</span> <span class="o">=</span> <span class="mi">2</span>
 
 <div class="viewcode-block" id="StatsStdev.compute">
@@ -250,7 +250,7 @@
 <div class="viewcode-block" id="StatsCountValues">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCountValues">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsCountValues</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="s1">&#39;n_successful_repeats&#39;</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;n_successful_repeats&quot;</span>
 
 <div class="viewcode-block" id="StatsCountValues.compute">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCountValues.compute">[docs]</a>
@@ -261,18 +261,20 @@
 <div class="viewcode-block" id="StatsCountValues.get_unit">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCountValues.get_unit">[docs]</a>
     <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;repeats&#39;</span></div>
+        <span class="k">return</span> <span class="s2">&quot;repeats&quot;</span></div>
 </div>
 
 
 
-<span class="n">all_stats</span> <span class="o">=</span> <span class="p">[</span><span class="n">StatsMin</span><span class="p">(),</span>
-             <span class="n">StatsMax</span><span class="p">(),</span>
-             <span class="n">StatsMean</span><span class="p">(),</span>
-             <span class="n">StatsMedian</span><span class="p">(),</span>
-             <span class="n">StatsVar</span><span class="p">(),</span>
-             <span class="n">StatsStdev</span><span class="p">(),</span>
-             <span class="n">StatsCountValues</span><span class="p">()]</span>
+<span class="n">all_stats</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">StatsMin</span><span class="p">(),</span>
+    <span class="n">StatsMax</span><span class="p">(),</span>
+    <span class="n">StatsMean</span><span class="p">(),</span>
+    <span class="n">StatsMedian</span><span class="p">(),</span>
+    <span class="n">StatsVar</span><span class="p">(),</span>
+    <span class="n">StatsStdev</span><span class="p">(),</span>
+    <span class="n">StatsCountValues</span><span class="p">(),</span>
+<span class="p">]</span>
 </pre></div>
 
            </div>

@@ -117,7 +117,7 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.graphs.AttributeGraph">[docs]</a>
 <span class="k">class</span> <span class="nc">AttributeGraph</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
 
-    <span class="n">node_type</span> <span class="o">=</span> <span class="s1">&#39;object&#39;</span>
+    <span class="n">node_type</span> <span class="o">=</span> <span class="s2">&quot;object&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj_inst</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_obj_inst</span> <span class="o">=</span> <span class="n">obj_inst</span>
@@ -222,9 +222,10 @@
                     <span class="n">exp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">experiment_namespace</span>
                 <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
                     <span class="n">exp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_inst</span><span class="o">.</span><span class="n">name</span>
-                <span class="k">raise</span> <span class="n">GraphCycleError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;In experiment </span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1"> a cycle was detected &#39;</span>
-                                      <span class="sa">f</span><span class="s1">&#39;when processing the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_type</span><span class="si">}</span><span class="s1"> graph.</span><span class="se">\n</span><span class="s1">&#39;</span>
-                                      <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="k">raise</span> <span class="n">GraphCycleError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;In experiment </span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s2"> a cycle was detected &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;when processing the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">node_type</span><span class="si">}</span><span class="s2"> graph.</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_prepared</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sorted</span><span class="p">:</span>
@@ -255,7 +256,7 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.graphs.PhaseGraph">[docs]</a>
 <span class="k">class</span> <span class="nc">PhaseGraph</span><span class="p">(</span><span class="n">AttributeGraph</span><span class="p">):</span>
 
-    <span class="n">node_type</span> <span class="o">=</span> <span class="s1">&#39;phase&#39;</span>
+    <span class="n">node_type</span> <span class="o">=</span> <span class="s2">&quot;phase&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase_definitions</span><span class="p">,</span> <span class="n">obj_inst</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a phase graph for a pipeline</span>
@@ -278,7 +279,7 @@
                 <span class="n">phase_node</span><span class="o">.</span><span class="n">obj_inst</span> <span class="o">=</span> <span class="n">obj_inst</span>
 
             <span class="k">if</span> <span class="n">phase_node</span><span class="o">.</span><span class="n">attribute</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">phase_node</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">obj_inst</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">phase_node</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">phase_node</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="n">phase_func</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">phase_node</span><span class="p">)</span>
@@ -303,7 +304,7 @@
         <span class="k">if</span> <span class="n">func_obj</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">func_obj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_obj_inst</span>
 
-        <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">func_obj</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">phase_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">func_obj</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">node</span><span class="o">.</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">node</span><span class="o">.</span><span class="n">set_attribute</span><span class="p">(</span><span class="n">phase_func</span><span class="p">)</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span><span class="n">node</span><span class="p">)</span></div>
@@ -311,8 +312,7 @@
 
 <div class="viewcode-block" id="PhaseGraph.update_graph">
 <a class="viewcode-back" href="../../ramble.html#ramble.graphs.PhaseGraph.update_graph">[docs]</a>
-    <span class="k">def</span> <span class="nf">update_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase_name</span><span class="p">,</span> <span class="n">dependencies</span><span class="o">=</span><span class="p">[],</span>
-                     <span class="n">internal_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">obj_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">update_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phase_name</span><span class="p">,</span> <span class="n">dependencies</span><span class="o">=</span><span class="p">[],</span> <span class="n">internal_order</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">obj_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the graph with a new phase and / or new dependencies.</span>
 
 <span class="sd">        Given a phase name, and list of dependencies, define new edges in the</span>
@@ -355,8 +355,8 @@
 <span class="k">class</span> <span class="nc">ExecutableGraph</span><span class="p">(</span><span class="n">AttributeGraph</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Graph that handles command executables and builtins&quot;&quot;&quot;</span>
 
-    <span class="n">node_type</span> <span class="o">=</span> <span class="s1">&#39;command executable&#39;</span>
-    <span class="n">supported_injection_orders</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">(</span><span class="s1">&#39;supported_injection_orders&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;before&#39;</span><span class="p">,</span> <span class="s1">&#39;after&#39;</span><span class="p">])</span>
+    <span class="n">node_type</span> <span class="o">=</span> <span class="s2">&quot;command executable&quot;</span>
+    <span class="n">supported_injection_orders</span> <span class="o">=</span> <span class="n">enum</span><span class="o">.</span><span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;supported_injection_orders&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;before&quot;</span><span class="p">,</span> <span class="s2">&quot;after&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exec_order</span><span class="p">,</span> <span class="n">executables</span><span class="p">,</span> <span class="n">builtin_objects</span><span class="p">,</span> <span class="n">builtin_groups</span><span class="p">,</span> <span class="n">obj_inst</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Construct a new ExecutableGraph</span>
@@ -391,11 +391,11 @@
         <span class="c1"># Define nodes for builtins</span>
         <span class="k">for</span> <span class="n">builtin_obj</span><span class="p">,</span> <span class="n">builtins</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">builtin_objects</span><span class="p">,</span> <span class="n">builtin_groups</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">builtin</span><span class="p">,</span> <span class="n">blt_conf</span> <span class="ow">in</span> <span class="n">builtins</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_dependencies</span><span class="p">[</span><span class="n">builtin</span><span class="p">]</span> <span class="o">=</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;depends_on&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-                <span class="n">blt_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">builtin_obj</span><span class="p">,</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">])</span>
-                <span class="n">exec_node</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">GraphNode</span><span class="p">(</span><span class="n">builtin</span><span class="p">,</span>
-                                                        <span class="n">attribute</span><span class="o">=</span><span class="n">blt_func</span><span class="p">,</span>
-                                                        <span class="n">obj_inst</span><span class="o">=</span><span class="n">builtin_obj</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_builtin_dependencies</span><span class="p">[</span><span class="n">builtin</span><span class="p">]</span> <span class="o">=</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;depends_on&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">blt_func</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">builtin_obj</span><span class="p">,</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">])</span>
+                <span class="n">exec_node</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">GraphNode</span><span class="p">(</span>
+                    <span class="n">builtin</span><span class="p">,</span> <span class="n">attribute</span><span class="o">=</span><span class="n">blt_func</span><span class="p">,</span> <span class="n">obj_inst</span><span class="o">=</span><span class="n">builtin_obj</span>
+                <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">node_definitions</span><span class="p">[</span><span class="n">builtin</span><span class="p">]</span> <span class="o">=</span> <span class="n">exec_node</span>
 
         <span class="n">dep_exec</span> <span class="o">=</span> <span class="kc">None</span>
@@ -419,18 +419,18 @@
         <span class="c1"># Add (missing) required builtins</span>
         <span class="k">for</span> <span class="n">builtins</span> <span class="ow">in</span> <span class="n">builtin_groups</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">builtin</span><span class="p">,</span> <span class="n">blt_conf</span> <span class="ow">in</span> <span class="n">builtins</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;required&#39;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">builtin</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;required&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">builtin</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">blt_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_definitions</span><span class="p">[</span><span class="n">builtin</span><span class="p">]</span>
                     <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_graph</span><span class="p">(</span><span class="n">blt_node</span><span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;injection_method&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;prepend&#39;</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;injection_method&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;prepend&quot;</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">head_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_graph</span><span class="p">(</span><span class="n">head_node</span><span class="p">,</span> <span class="p">[</span><span class="n">blt_node</span><span class="p">])</span>
 
                         <span class="k">if</span> <span class="n">tail_prepend_builtin</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_graph</span><span class="p">(</span><span class="n">blt_node</span><span class="p">,</span> <span class="p">[</span><span class="n">tail_prepend_builtin</span><span class="p">])</span>
                         <span class="n">tail_prepend_builtin</span> <span class="o">=</span> <span class="n">blt_node</span>
-                    <span class="k">elif</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;injection_method&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;append&#39;</span><span class="p">:</span>
+                    <span class="k">elif</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;injection_method&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;append&quot;</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">tail_node</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_graph</span><span class="p">(</span><span class="n">blt_node</span><span class="p">,</span> <span class="p">[</span><span class="n">tail_node</span><span class="p">])</span>
 
@@ -438,9 +438,9 @@
                             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_graph</span><span class="p">(</span><span class="n">blt_node</span><span class="p">,</span> <span class="p">[</span><span class="n">tail_append_builtin</span><span class="p">])</span>
                         <span class="n">tail_append_builtin</span> <span class="o">=</span> <span class="n">blt_node</span>
 
-                    <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;depends_on&#39;</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;depends_on&quot;</span><span class="p">]:</span>
                         <span class="n">deps</span> <span class="o">=</span> <span class="p">[]</span>
-                        <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s1">&#39;depends_on&#39;</span><span class="p">]:</span>
+                        <span class="k">for</span> <span class="n">dep</span> <span class="ow">in</span> <span class="n">blt_conf</span><span class="p">[</span><span class="s2">&quot;depends_on&quot;</span><span class="p">]:</span>
                             <span class="n">dep_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_definitions</span><span class="p">[</span><span class="n">dep</span><span class="p">]</span>
                             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">update_graph</span><span class="p">(</span><span class="n">dep_node</span><span class="p">)</span>
                             <span class="n">deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dep_node</span><span class="p">)</span>
@@ -477,17 +477,21 @@
         <span class="n">order</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">supported_injection_orders</span><span class="o">.</span><span class="n">after</span>
         <span class="k">if</span> <span class="n">injection_order</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">supported_injection_orders</span><span class="p">,</span> <span class="n">injection_order</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;In experiment &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;injection order of executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot; is set to an &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;invalid value of &quot;</span><span class="si">{</span><span class="n">injection_order</span><span class="si">}</span><span class="s1">&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;Valid values are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">supported_injection_orders</span><span class="si">}</span><span class="s1">.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="s2">&quot;In experiment &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;injection order of executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot; is set to an &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;invalid value of &quot;</span><span class="si">{</span><span class="n">injection_order</span><span class="si">}</span><span class="s1">&quot;.</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Valid values are </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">supported_injection_orders</span><span class="si">}</span><span class="s2">.&quot;</span>
+                <span class="p">)</span>
             <span class="n">order</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">supported_injection_orders</span><span class="p">,</span> <span class="n">injection_order</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">exec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_definitions</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;In experiment &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
-                       <span class="sa">f</span><span class="s1">&#39;attempting to inject a non existing executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                <span class="s2">&quot;In experiment &quot;</span>
+                <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                <span class="sa">f</span><span class="s1">&#39;attempting to inject a non existing executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot;.&#39;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="n">relative</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">relative_error</span> <span class="o">=</span> <span class="kc">False</span>
@@ -499,10 +503,12 @@
                 <span class="n">relative_error</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="k">if</span> <span class="n">relative_error</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;In experiment &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;attempting to inject executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
-                           <span class="sa">f</span><span class="s1">&#39;relative to a non existing executable &quot;</span><span class="si">{</span><span class="n">relative</span><span class="si">}</span><span class="s1">&quot;.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                    <span class="s2">&quot;In experiment &quot;</span>
+                    <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">exp_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;attempting to inject executable &quot;</span><span class="si">{</span><span class="n">exec_name</span><span class="si">}</span><span class="s1">&quot; &#39;</span>
+                    <span class="sa">f</span><span class="s1">&#39;relative to a non existing executable &quot;</span><span class="si">{</span><span class="n">relative</span><span class="si">}</span><span class="s1">&quot;.&#39;</span>
+                <span class="p">)</span>
 
             <span class="n">relative_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">node_definitions</span><span class="p">[</span><span class="n">relative</span><span class="p">]</span>
             <span class="n">order_index</span> <span class="o">=</span> <span class="n">cur_exec_order</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">relative_node</span><span class="p">)</span>

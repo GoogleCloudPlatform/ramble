@@ -129,7 +129,7 @@
 <span class="n">python_list</span> <span class="o">=</span> <span class="nb">list</span>
 
 <span class="c1"># Patterns to ignore in the commands directory when looking for commands.</span>
-<span class="n">ignore_files</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\.|^__init__.py$|^#&#39;</span>
+<span class="n">ignore_files</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\.|^__init__.py$|^#&quot;</span>
 
 <span class="n">SETUP_PARSER</span> <span class="o">=</span> <span class="s2">&quot;setup_parser&quot;</span>
 <span class="n">DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;description&quot;</span>
@@ -158,7 +158,7 @@
 <a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.cmd_name">[docs]</a>
 <span class="k">def</span> <span class="nf">cmd_name</span><span class="p">(</span><span class="n">python_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert module name (with ``_``) to command name (with ``-``).&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">python_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">python_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span></div>
 
 
 
@@ -194,7 +194,7 @@
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">command_paths</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">file</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.py&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">ignore_files</span><span class="p">,</span> <span class="n">file</span><span class="p">):</span>
-                    <span class="n">cmd</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;.py$&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
+                    <span class="n">cmd</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;.py$&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">file</span><span class="p">)</span>
                     <span class="n">_all_commands</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
 
         <span class="n">_all_commands</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
@@ -209,7 +209,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Remove some options from a parser.&quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">parser</span><span class="o">.</span><span class="n">_actions</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">vars</span><span class="p">(</span><span class="n">action</span><span class="p">)[</span><span class="s1">&#39;option_strings&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">option</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">vars</span><span class="p">(</span><span class="n">action</span><span class="p">)[</span><span class="s2">&quot;option_strings&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">option</span><span class="p">:</span>
                 <span class="n">parser</span><span class="o">.</span><span class="n">_handle_conflict_resolve</span><span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">[(</span><span class="n">option</span><span class="p">,</span> <span class="n">action</span><span class="p">)])</span>
                 <span class="k">break</span></div>
 
@@ -227,21 +227,20 @@
     <span class="n">require_cmd_name</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
     <span class="n">pname</span> <span class="o">=</span> <span class="n">python_name</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Getting module for command </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting module for command </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># Try to import the command from the built-in directory</span>
         <span class="n">module_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">pname</span><span class="p">)</span>
-        <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span>
-                            <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">pname</span><span class="p">,</span> <span class="n">SETUP_PARSER</span><span class="p">,</span> <span class="n">DESCRIPTION</span><span class="p">],</span>
-                            <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Imported </span><span class="si">{</span><span class="n">pname</span><span class="si">}</span><span class="s1"> from built-in commands&#39;</span><span class="p">)</span>
+        <span class="n">module</span> <span class="o">=</span> <span class="nb">__import__</span><span class="p">(</span><span class="n">module_name</span><span class="p">,</span> <span class="n">fromlist</span><span class="o">=</span><span class="p">[</span><span class="n">pname</span><span class="p">,</span> <span class="n">SETUP_PARSER</span><span class="p">,</span> <span class="n">DESCRIPTION</span><span class="p">],</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Imported </span><span class="si">{</span><span class="n">pname</span><span class="si">}</span><span class="s2"> from built-in commands&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">module</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">get_module</span><span class="p">(</span><span class="n">cmd_name</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">ramble.main</span> <span class="kn">import</span> <span class="n">RambleCommandError</span>
-            <span class="k">raise</span> <span class="n">RambleCommandError</span><span class="p">(</span><span class="s1">&#39;Command </span><span class="si">%s</span><span class="s1"> does not exist.&#39;</span> <span class="o">%</span> <span class="n">cmd_name</span><span class="p">)</span>
+
+            <span class="k">raise</span> <span class="n">RambleCommandError</span><span class="p">(</span><span class="s2">&quot;Command </span><span class="si">%s</span><span class="s2"> does not exist.&quot;</span> <span class="o">%</span> <span class="n">cmd_name</span><span class="p">)</span>
 
     <span class="n">attr_setdefault</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">SETUP_PARSER</span><span class="p">,</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># null-op</span>
     <span class="n">attr_setdefault</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">DESCRIPTION</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
@@ -275,16 +274,16 @@
 <a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.elide_list">[docs]</a>
 <span class="k">def</span> <span class="nf">elide_list</span><span class="p">(</span><span class="n">line_list</span><span class="p">,</span> <span class="n">max_num</span><span class="o">=</span><span class="mi">10</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Takes a long list and limits it to a smaller number of elements,</span>
-<span class="sd">       replacing intervening elements with &#39;...&#39;.  For example::</span>
+<span class="sd">    replacing intervening elements with &#39;...&#39;.  For example::</span>
 
-<span class="sd">           elide_list([1,2,3,4,5,6], 4)</span>
+<span class="sd">        elide_list([1,2,3,4,5,6], 4)</span>
 
-<span class="sd">       gives::</span>
+<span class="sd">    gives::</span>
 
-<span class="sd">           [1, 2, 3, &#39;...&#39;, 6]</span>
+<span class="sd">        [1, 2, 3, &#39;...&#39;, 6]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">line_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">max_num</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">line_list</span><span class="p">[:</span><span class="n">max_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;...&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">line_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">return</span> <span class="n">line_list</span><span class="p">[:</span> <span class="n">max_num</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;...&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">line_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">:]</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">line_list</span></div>
 
@@ -301,7 +300,7 @@
 <div class="viewcode-block" id="is_git_repo">
 <a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.is_git_repo">[docs]</a>
 <span class="k">def</span> <span class="nf">is_git_repo</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-    <span class="n">dotgit_path</span> <span class="o">=</span> <span class="n">join_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;.git&#39;</span><span class="p">)</span>
+    <span class="n">dotgit_path</span> <span class="o">=</span> <span class="n">join_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;.git&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">dotgit_path</span><span class="p">):</span>
         <span class="c1"># we are in a regular git repo</span>
         <span class="k">return</span> <span class="kc">True</span>
@@ -321,10 +320,10 @@
 <a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.PythonNameError">[docs]</a>
 <span class="k">class</span> <span class="nc">PythonNameError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception class thrown for impermissible python names&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">PythonNameError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> is not a permissible Python name.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PythonNameError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is not a permissible Python name.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
 
 
 
@@ -332,10 +331,12 @@
 <a class="viewcode-back" href="../../ramble.cmd.html#ramble.cmd.CommandNameError">[docs]</a>
 <span class="k">class</span> <span class="nc">CommandNameError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Exception class thrown for impermissible command names&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">CommandNameError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1"> is not a permissible Ramble command name.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">))</span></div>
+            <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2"> is not a permissible Ramble command name.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 
@@ -349,7 +350,7 @@
 <span class="sd">    Argparse type for files that exist.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1"> does not exist&#39;</span> <span class="o">%</span> <span class="n">f</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentTypeError</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> does not exist&quot;</span> <span class="o">%</span> <span class="n">f</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">f</span></div>
 
 
@@ -374,11 +375,12 @@
         <span class="k">return</span> <span class="n">ws</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;`ramble </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s1">` requires a workspace&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;activate a workspace first:&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;    ramble workspace activate WRKSPC&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;or use:&#39;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s1">&#39;    ramble -w WRKSPC </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s1"> ...&#39;</span><span class="p">)</span></div>
+            <span class="sa">f</span><span class="s2">&quot;`ramble </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s2">` requires a workspace&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;activate a workspace first:&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;    ramble workspace activate WRKSPC&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;or use:&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;    ramble -w WRKSPC </span><span class="si">{</span><span class="n">cmd_name</span><span class="si">}</span><span class="s2"> ...&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 
@@ -421,7 +423,7 @@
             <span class="k">elif</span> <span class="ow">not</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">is_workspace_dir</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
                 <span class="n">env_var</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">ramble_workspace_var</span>
                 <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleActiveWorkspaceError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s1">&#39;The environment variable </span><span class="si">{</span><span class="n">env_var</span><span class="si">}</span><span class="s1"> refers to an invalid ramble workspace.&#39;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The environment variable </span><span class="si">{</span><span class="n">env_var</span><span class="si">}</span><span class="s2"> refers to an invalid ramble workspace.&quot;</span>
                 <span class="p">)</span>
 
     <span class="c1"># if we get here, ws isn&#39;t the name of a ramble workspace; it has</span>
@@ -429,9 +431,7 @@
     <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">is_workspace_dir</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">Workspace</span><span class="p">(</span><span class="n">ws</span><span class="p">)</span>
 
-    <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleWorkspaceError</span><span class="p">(</span>
-        <span class="sa">f</span><span class="s1">&#39;No workspace in </span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s1">&#39;</span>
-    <span class="p">)</span></div>
+    <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleWorkspaceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No workspace in </span><span class="si">{</span><span class="n">ws</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -477,7 +477,7 @@
     <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">is_workspace_dir</span><span class="p">(</span><span class="n">ws</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">ws</span>
 
-    <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleWorkspaceError</span><span class="p">(</span><span class="s1">&#39;no workspace in </span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ws</span><span class="p">)</span></div>
+    <span class="k">raise</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">RambleWorkspaceError</span><span class="p">(</span><span class="s2">&quot;no workspace in </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">ws</span><span class="p">)</span></div>
 
 </pre></div>
 

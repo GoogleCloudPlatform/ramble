@@ -106,13 +106,13 @@
 
 <span class="kn">from</span> <span class="nn">ramble.main</span> <span class="kn">import</span> <span class="n">RambleCommand</span>
 
-<span class="n">debug</span> <span class="o">=</span> <span class="n">RambleCommand</span><span class="p">(</span><span class="s1">&#39;debug&#39;</span><span class="p">)</span>
+<span class="n">debug</span> <span class="o">=</span> <span class="n">RambleCommand</span><span class="p">(</span><span class="s2">&quot;debug&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="test_debug_report">
 <a class="viewcode-back" href="../../../../ramble.test.cmd.html#ramble.test.cmd.debug.test_debug_report">[docs]</a>
 <span class="k">def</span> <span class="nf">test_debug_report</span><span class="p">():</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">debug</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">debug</span><span class="p">(</span><span class="s2">&quot;report&quot;</span><span class="p">)</span>
 
     <span class="k">assert</span> <span class="s2">&quot;* **Ramble:**&quot;</span> <span class="ow">in</span> <span class="n">output</span>
     <span class="k">assert</span> <span class="s2">&quot;* **Python:**&quot;</span> <span class="ow">in</span> <span class="n">output</span>

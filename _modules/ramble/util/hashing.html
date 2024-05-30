@@ -113,7 +113,7 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_file">[docs]</a>
 <span class="k">def</span> <span class="nf">hash_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
     <span class="n">file_hash</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="nb">bytes</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
         <span class="n">file_hash</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">file_hash</span></div>
@@ -123,23 +123,19 @@
 <div class="viewcode-block" id="hash_string">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_string">[docs]</a>
 <span class="k">def</span> <span class="nf">hash_string</span><span class="p">(</span><span class="n">string</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="hash_json">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.hashing.hash_json">[docs]</a>
 <span class="k">def</span> <span class="nf">hash_json</span><span class="p">(</span><span class="n">in_json</span><span class="p">):</span>
-    <span class="n">_json_dump_args</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;indent&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
-        <span class="s1">&#39;separators&#39;</span><span class="p">:</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="s1">&#39;: &#39;</span><span class="p">),</span>
-        <span class="s1">&#39;sort_keys&#39;</span><span class="p">:</span> <span class="kc">True</span>
-    <span class="p">}</span>
+    <span class="n">_json_dump_args</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;indent&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;separators&quot;</span><span class="p">:</span> <span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">,</span> <span class="s2">&quot;: &quot;</span><span class="p">),</span> <span class="s2">&quot;sort_keys&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
     <span class="n">data</span> <span class="o">=</span> <span class="n">sjson</span><span class="o">.</span><span class="n">_strify</span><span class="p">(</span><span class="n">in_json</span><span class="p">)</span>
     <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="o">**</span><span class="n">_json_dump_args</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">json_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">(</span><span class="n">json_data</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span></div>
 
 </pre></div>
 

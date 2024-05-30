@@ -118,18 +118,16 @@
 
 <div class="viewcode-block" id="Uploader">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader">[docs]</a>
-<span class="k">class</span> <span class="nc">Uploader</span><span class="p">():</span>
+<span class="k">class</span> <span class="nc">Uploader</span><span class="p">:</span>
     <span class="c1"># TODO: should the class store the base uri?</span>
 <div class="viewcode-block" id="Uploader.perform_upload">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Uploader.perform_upload">[docs]</a>
     <span class="k">def</span> <span class="nf">perform_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="c1"># TODO: move content checking to __init__ ?</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> requires </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> argument.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> requires </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> argument.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">data</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> requires %</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> argument.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="si">}</span><span class="s2"> requires %</span><span class="si">{</span><span class="n">data</span><span class="si">}</span><span class="s2"> argument.&quot;</span><span class="p">)</span>
         <span class="k">pass</span></div>
 </div>
 
@@ -138,35 +136,37 @@
 <div class="viewcode-block" id="get_user">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.get_user">[docs]</a>
 <span class="k">def</span> <span class="nf">get_user</span><span class="p">():</span>
-    <span class="n">config_user</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:user&#39;</span><span class="p">)</span>
+    <span class="n">config_user</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:user&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">config_user</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">config_user</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">getpass</span>
+
         <span class="k">return</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span></div>
 
 
 
 <div class="viewcode-block" id="Experiment">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.Experiment">[docs]</a>
-<span class="k">class</span> <span class="nc">Experiment</span><span class="p">():</span>
+<span class="k">class</span> <span class="nc">Experiment</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class representation of experiment data</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">workspace_hash</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">timestamp</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">foms</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># This is essentially the hash</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;application_name&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;RAMBLE_VARIABLES&#39;</span><span class="p">][</span><span class="s1">&#39;workspace_name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;application_name&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workspace_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;RAMBLE_VARIABLES&quot;</span><span class="p">][</span><span class="s2">&quot;workspace_name&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="n">workspace_hash</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;workload_name&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;workload_name&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">bulk_hash</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># proxy for workspace or &quot;uploaded with&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;n_nodes&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">processes_per_node</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;processes_per_node&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;n_ranks&#39;</span><span class="p">]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n_threads</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;n_threads&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_nodes</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;n_nodes&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processes_per_node</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;processes_per_node&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_ranks</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;n_ranks&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n_threads</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;n_threads&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">default_node_type_val</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">get_user</span><span class="p">()</span>
 
@@ -175,7 +175,7 @@
             <span class="n">workspace_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workspace_name</span><span class="p">,</span>
             <span class="n">application</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">application_name</span><span class="p">,</span>
             <span class="n">workload</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">workload_name</span><span class="p">,</span>
-            <span class="n">date</span><span class="o">=</span><span class="n">timestamp</span>
+            <span class="n">date</span><span class="o">=</span><span class="n">timestamp</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">bulk_hash</span> <span class="o">=</span> <span class="n">exps_hash</span>
@@ -211,10 +211,11 @@
 
         <span class="c1"># deep copy so the assignment below doesn&#39;t affect the foms array</span>
         <span class="kn">import</span> <span class="nn">copy</span>
+
         <span class="n">j</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__dict__</span><span class="p">)</span>
 
-        <span class="n">j</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foms</span><span class="p">)</span>
-        <span class="n">j</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+        <span class="n">j</span><span class="p">[</span><span class="s2">&quot;foms&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">foms</span><span class="p">)</span>
+        <span class="n">j</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">j</span></div>
 </div>
 
@@ -230,12 +231,12 @@
 <span class="sd">    Second prio is more general data like CPU type</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">contexts</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="s1">&#39;machine-type&#39;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
-                <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;foms&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s2">&quot;machine-type&quot;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]:</span>
+                <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
                 <span class="k">continue</span>
-            <span class="k">elif</span> <span class="s1">&#39;Model name&#39;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]:</span>
-                <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">]</span>
+            <span class="k">elif</span> <span class="s2">&quot;Model name&quot;</span> <span class="ow">in</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]:</span>
+                <span class="n">experiment</span><span class="o">.</span><span class="n">node_type</span> <span class="o">=</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">]</span>
                 <span class="k">continue</span>
 
         <span class="c1"># Termination condition</span>
@@ -247,9 +248,9 @@
 <div class="viewcode-block" id="upload_results">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.upload_results">[docs]</a>
 <span class="k">def</span> <span class="nf">upload_results</span><span class="p">(</span><span class="n">results</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:upload&quot;</span><span class="p">):</span>
         <span class="c1"># Read upload type and push it there</span>
-        <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload:type&#39;</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;BigQuery&#39;</span><span class="p">:</span>  <span class="c1"># TODO: enum?</span>
+        <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:upload:type&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;BigQuery&quot;</span><span class="p">:</span>  <span class="c1"># TODO: enum?</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">formatted_data</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">uploader</span><span class="o">.</span><span class="n">format_data</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -258,14 +259,14 @@
 
             <span class="n">uploader</span> <span class="o">=</span> <span class="n">BigQueryUploader</span><span class="p">()</span>
 
-            <span class="n">uri</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:upload:uri&#39;</span><span class="p">)</span>
+            <span class="n">uri</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:upload:uri&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">uri</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s1">&#39;No upload URI (config:upload:uri) in config.&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;No upload URI (config:upload:uri) in config.&quot;</span><span class="p">)</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Uploading Results to </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Uploading Results to </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">formatted_data</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;No data to upload&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;No data to upload&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">uploader</span><span class="o">.</span><span class="n">perform_upload</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">formatted_data</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -305,30 +306,31 @@
     <span class="c1"># numberic/float and string FOM values</span>
 
     <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
     <span class="n">current_dateTime</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
 
-    <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">data_in</span><span class="p">[</span><span class="s1">&#39;experiments&#39;</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;RAMBLE_STATUS&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;SUCCESS&#39;</span><span class="p">:</span>
-            <span class="n">e</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span> <span class="n">data_in</span><span class="p">[</span><span class="s1">&#39;workspace_hash&#39;</span><span class="p">],</span> <span class="n">exp</span><span class="p">,</span> <span class="n">current_dateTime</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">data_in</span><span class="p">[</span><span class="s2">&quot;experiments&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">exp</span><span class="p">[</span><span class="s2">&quot;RAMBLE_STATUS&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;SUCCESS&quot;</span><span class="p">:</span>
+            <span class="n">e</span> <span class="o">=</span> <span class="n">Experiment</span><span class="p">(</span><span class="n">exp</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span> <span class="n">data_in</span><span class="p">[</span><span class="s2">&quot;workspace_hash&quot;</span><span class="p">],</span> <span class="n">exp</span><span class="p">,</span> <span class="n">current_dateTime</span><span class="p">)</span>
             <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
             <span class="c1"># experiment_id = exp.hash()</span>
             <span class="c1"># &#39;experiment_id&#39;: experiment_id,</span>
-            <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">]:</span>
-                <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;foms&#39;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">exp</span><span class="p">[</span><span class="s2">&quot;CONTEXTS&quot;</span><span class="p">]:</span>
+                <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;foms&quot;</span><span class="p">]:</span>
                     <span class="c1"># TODO: check on value to make sure it&#39;s a number</span>
                     <span class="n">e</span><span class="o">.</span><span class="n">foms</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                         <span class="p">{</span>
-                            <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
-                            <span class="s1">&#39;value&#39;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;value&#39;</span><span class="p">],</span>
-                            <span class="s1">&#39;unit&#39;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;units&#39;</span><span class="p">],</span>
-                            <span class="s1">&#39;origin&#39;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;origin&#39;</span><span class="p">],</span>
-                            <span class="s1">&#39;origin_type&#39;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s1">&#39;origin_type&#39;</span><span class="p">],</span>
-                            <span class="s1">&#39;context&#39;</span><span class="p">:</span> <span class="n">context</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">],</span>
+                            <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;value&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;unit&quot;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;units&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;origin&quot;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;origin&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;origin_type&quot;</span><span class="p">:</span> <span class="n">fom</span><span class="p">[</span><span class="s2">&quot;origin_type&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;context&quot;</span><span class="p">:</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">],</span>
                         <span class="p">}</span>
                     <span class="p">)</span>
 
             <span class="c1"># Explicitly try to pull out node type, if the run provided enough data</span>
-            <span class="n">determine_node_type</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">exp</span><span class="p">[</span><span class="s1">&#39;CONTEXTS&#39;</span><span class="p">])</span>
+            <span class="n">determine_node_type</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">exp</span><span class="p">[</span><span class="s2">&quot;CONTEXTS&quot;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">results</span></div>
 
@@ -337,16 +339,17 @@
 <div class="viewcode-block" id="BigQueryUploader">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader">[docs]</a>
 <span class="k">class</span> <span class="nc">BigQueryUploader</span><span class="p">(</span><span class="n">Uploader</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to handle upload of FOMs to BigQuery</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to handle upload of FOMs to BigQuery&quot;&quot;&quot;</span>
 
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
 <div class="viewcode-block" id="BigQueryUploader.chunked_upload">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.chunked_upload">[docs]</a>
     <span class="k">def</span> <span class="nf">chunked_upload</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">table_id</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
         <span class="kn">from</span> <span class="nn">google.cloud</span> <span class="kn">import</span> <span class="n">bigquery</span>
+
         <span class="n">client</span> <span class="o">=</span> <span class="n">bigquery</span><span class="o">.</span><span class="n">Client</span><span class="p">()</span>
         <span class="n">error</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">approx_max_request</span> <span class="o">=</span> <span class="mf">1000000.0</span>  <span class="c1"># 1MB</span>
@@ -391,8 +394,8 @@
 
             <span class="k">for</span> <span class="n">fom</span> <span class="ow">in</span> <span class="n">experiment</span><span class="o">.</span><span class="n">foms</span><span class="p">:</span>
                 <span class="n">fom_data</span> <span class="o">=</span> <span class="n">fom</span>
-                <span class="n">fom_data</span><span class="p">[</span><span class="s1">&#39;experiment_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">get_hash</span><span class="p">()</span>
-                <span class="n">fom_data</span><span class="p">[</span><span class="s1">&#39;experiment_name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">name</span>
+                <span class="n">fom_data</span><span class="p">[</span><span class="s2">&quot;experiment_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">get_hash</span><span class="p">()</span>
+                <span class="n">fom_data</span><span class="p">[</span><span class="s2">&quot;experiment_name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">experiment</span><span class="o">.</span><span class="n">name</span>
                 <span class="n">foms_to_insert</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fom_data</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Experiments to insert:&quot;</span><span class="p">)</span>
@@ -406,7 +409,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Upload FOMs...&quot;</span><span class="p">)</span>
             <span class="n">errors2</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">chunked_upload</span><span class="p">(</span><span class="n">fom_table_id</span><span class="p">,</span> <span class="n">foms_to_insert</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">errors</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">errors1</span><span class="p">,</span> <span class="n">errors2</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;exp&#39;</span><span class="p">,</span> <span class="s1">&#39;fom&#39;</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">errors</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">([</span><span class="n">errors1</span><span class="p">,</span> <span class="n">errors2</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;exp&quot;</span><span class="p">,</span> <span class="s2">&quot;fom&quot;</span><span class="p">]):</span>
             <span class="k">if</span> <span class="n">errors</span> <span class="o">==</span> <span class="p">[]:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;New rows have been added in </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -425,14 +428,14 @@
 
 
     <span class="c1"># def get_max_current_id(uri, table):</span>
-        <span class="c1"># TODO: Generating an id based on the max in use id is dangerous, and</span>
-        <span class="c1"># technically gives a race condition in parallel, and should be done in</span>
-        <span class="c1"># a more graceful and scalable way..  like hashing the experiment? or</span>
-        <span class="c1"># generating a known unique id for it</span>
-        <span class="c1"># query = &quot;SELECT MAX(id) FROM `{uri}.{table}` LIMIT 1&quot;.format(uri=uri, table=table)</span>
-        <span class="c1"># query_job = client.query(query)</span>
-        <span class="c1"># results = query_job.result()  # Waits for job to complete.</span>
-        <span class="c1"># return results[0]</span>
+    <span class="c1"># TODO: Generating an id based on the max in use id is dangerous, and</span>
+    <span class="c1"># technically gives a race condition in parallel, and should be done in</span>
+    <span class="c1"># a more graceful and scalable way..  like hashing the experiment? or</span>
+    <span class="c1"># generating a known unique id for it</span>
+    <span class="c1"># query = &quot;SELECT MAX(id) FROM `{uri}.{table}` LIMIT 1&quot;.format(uri=uri, table=table)</span>
+    <span class="c1"># query_job = client.query(query)</span>
+    <span class="c1"># results = query_job.result()  # Waits for job to complete.</span>
+    <span class="c1"># return results[0]</span>
 
 <div class="viewcode-block" id="BigQueryUploader.get_experiment_id">
 <a class="viewcode-back" href="../../../ramble.experimental.html#ramble.experimental.uploader.BigQueryUploader.get_experiment_id">[docs]</a>

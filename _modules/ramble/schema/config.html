@@ -114,193 +114,134 @@
 
 <span class="c1">#: Properties for inclusion in other schemas</span>
 <span class="n">properties</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;config&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="o">**</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">]</span>
+    <span class="s2">&quot;config&quot;</span><span class="p">:</span> <span class="p">{</span><span class="o">**</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">]},</span>
+<span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;shell&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;enum&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;sh&quot;</span><span class="p">,</span> <span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="s2">&quot;csh&quot;</span><span class="p">,</span> <span class="s2">&quot;tcsh&quot;</span><span class="p">,</span> <span class="s2">&quot;fish&quot;</span><span class="p">]}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">},</span> <span class="s2">&quot;concretize&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">}},</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;global&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;concretize&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;compiler_find&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;buildcache&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;prefix&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;env_create&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">},</span>
+            <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;flags&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;input_cache&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/cache&quot;</span><span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;workspace_dirs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/workspaces&quot;</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;upload&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;uri&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">},</span>
+        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;BigQuery&quot;</span><span class="p">},</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;shell&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;enum&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;sh&#39;</span><span class="p">,</span> <span class="s1">&#39;bash&#39;</span><span class="p">,</span> <span class="s1">&#39;csh&#39;</span><span class="p">,</span> <span class="s1">&#39;tcsh&#39;</span><span class="p">,</span> <span class="s1">&#39;fish&#39;</span><span class="p">]</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;user&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;spack&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;install&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;concretize&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span>
-        <span class="p">}</span>
-    <span class="p">},</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;global&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;install&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;concretize&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;--reuse&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;compiler_find&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;buildcache&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-                <span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-                <span class="p">}</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;env_create&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-                <span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{</span>
-                    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-                    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
-                <span class="p">},</span>
-            <span class="p">},</span>
-            <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span>
-        <span class="p">},</span>
-    <span class="p">},</span>
-    <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;disable_passthrough&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;flags&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;disable_progress_bar&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;input_cache&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;$ramble/var/ramble/cache&#39;</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;disable_logger&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;workspace_dirs&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;$ramble/var/ramble/workspaces&#39;</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;n_repeats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="s2">&quot;0&quot;</span><span class="p">}</span>
 
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;upload&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="s1">&#39;uri&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-        <span class="p">},</span>
-        <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="p">{</span>
-            <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;BigQuery&#39;</span>
-        <span class="p">},</span>
-    <span class="p">}</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;user&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;&#39;</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;disable_passthrough&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;disable_progress_bar&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;disable_logger&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">False</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;n_repeats&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;string&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="s1">&#39;0&#39;</span>
-<span class="p">}</span>
-
-<span class="n">properties</span><span class="p">[</span><span class="s1">&#39;config&#39;</span><span class="p">][</span><span class="s1">&#39;repeat_success_strict&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;boolean&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;default&#39;</span><span class="p">:</span> <span class="kc">True</span>
-<span class="p">}</span>
+<span class="n">properties</span><span class="p">[</span><span class="s2">&quot;config&quot;</span><span class="p">][</span><span class="s2">&quot;repeat_success_strict&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;boolean&quot;</span><span class="p">,</span> <span class="s2">&quot;default&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
 
 
 <span class="c1">#: Full schema with metadata</span>
 <span class="n">schema</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;$schema&#39;</span><span class="p">:</span> <span class="s1">&#39;http://json-schema.org/schema#&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="s1">&#39;Ramble core configuration file schema&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;type&#39;</span><span class="p">:</span> <span class="s1">&#39;object&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;additionalProperties&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="s1">&#39;properties&#39;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
+    <span class="s2">&quot;$schema&quot;</span><span class="p">:</span> <span class="s2">&quot;http://json-schema.org/schema#&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;Ramble core configuration file schema&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;additionalProperties&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="s2">&quot;properties&quot;</span><span class="p">:</span> <span class="n">properties</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -323,24 +264,24 @@
 
     <span class="c1"># Convert `spack_flags` to `spack:command_flags`</span>
 
-    <span class="n">spack_flags</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spack_flags&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">spack_flags</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spack_flags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">spack_flags</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;spack&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+        <span class="k">if</span> <span class="n">data</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{}}</span>
 
-        <span class="n">global_args</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;global_args&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">global_args</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;global_args&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">global_args</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;global&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">global_args</span><span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;global&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">global_args</span><span class="p">}</span>
 
-        <span class="n">install_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;install&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">install_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;install&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">install_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;install&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">install_flags</span><span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;install&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">install_flags</span><span class="p">}</span>
 
-        <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;concretize&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="n">concretize_flags</span> <span class="o">=</span> <span class="n">spack_flags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;concretize&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">concretize_flags</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack&#39;</span><span class="p">][</span><span class="s1">&#39;concretize&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;flags&#39;</span><span class="p">:</span> <span class="n">concretize_flags</span><span class="p">}</span>
+            <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">][</span><span class="s2">&quot;concretize&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="n">concretize_flags</span><span class="p">}</span>
 
-        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;spack_flags&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;spack_flags&quot;</span><span class="p">]</span>
         <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">return</span> <span class="n">changed</span></div>

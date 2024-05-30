@@ -142,9 +142,14 @@
 
 <div class="viewcode-block" id="require_definition">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.require_definition">[docs]</a>
-<span class="k">def</span> <span class="nf">require_definition</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span> <span class="n">multiple_pattern_match</span><span class="p">,</span>
-                       <span class="n">single_arg_name</span><span class="p">,</span> <span class="n">multiple_arg_name</span><span class="p">,</span>
-                       <span class="n">directive_name</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">require_definition</span><span class="p">(</span>
+    <span class="n">single_type</span><span class="p">,</span>
+    <span class="n">multiple_type</span><span class="p">,</span>
+    <span class="n">multiple_pattern_match</span><span class="p">,</span>
+    <span class="n">single_arg_name</span><span class="p">,</span>
+    <span class="n">multiple_arg_name</span><span class="p">,</span>
+    <span class="n">directive_name</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Require at least one definition for a type in a directive</span>
 
 <span class="sd">    This method will validate that single_type / multiple_type are properly defined.</span>
@@ -165,18 +170,24 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">single_type</span> <span class="ow">or</span> <span class="n">multiple_type</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> requires at least one of &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s1"> or </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s1"> to be defined.&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> requires at least one of &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s2"> to be defined.&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> was given an invalid type &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s1"> argument. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">multiple_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s1"> was given an invalid type &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;for the </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s1"> argument. &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span> <span class="n">multiple_pattern_match</span><span class="p">)</span></div>
 

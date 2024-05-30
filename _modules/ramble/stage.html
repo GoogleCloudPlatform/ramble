@@ -140,7 +140,7 @@
 
 
 <span class="c1"># The well-known stage source subdirectory name.</span>
-<span class="n">_input_subdir</span> <span class="o">=</span> <span class="s1">&#39;input&#39;</span>
+<span class="n">_input_subdir</span> <span class="o">=</span> <span class="s2">&quot;input&quot;</span>
 
 
 <div class="viewcode-block" id="create_stage_root">
@@ -149,14 +149,13 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Create the stage root directory and ensure appropriate access perms.&quot;&quot;&quot;</span>
     <span class="k">assert</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span> <span class="o">&gt;</span> <span class="mi">1</span>
 
-    <span class="n">err_msg</span> <span class="o">=</span> <span class="s1">&#39;Cannot create stage root </span><span class="si">{0}</span><span class="s1">: Access to </span><span class="si">{1}</span><span class="s1"> is denied&#39;</span>
+    <span class="n">err_msg</span> <span class="o">=</span> <span class="s2">&quot;Cannot create stage root </span><span class="si">{0}</span><span class="s2">: Access to </span><span class="si">{1}</span><span class="s2"> is denied&quot;</span>
 
     <span class="c1"># TODO: (dwjacobsen) Remove when owner_uid is removed below</span>
     <span class="c1"># user_uid = os.getuid()</span>
 
     <span class="c1"># Obtain lists of ancestor and descendant paths of the $user node, if any.</span>
-    <span class="n">group_paths</span><span class="p">,</span> <span class="n">user_node</span><span class="p">,</span> <span class="n">user_paths</span> <span class="o">=</span> <span class="n">partition_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span>
-                                                        <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
+    <span class="n">group_paths</span><span class="p">,</span> <span class="n">user_node</span><span class="p">,</span> <span class="n">user_paths</span> <span class="o">=</span> <span class="n">partition_path</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">())</span>
 
     <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">group_paths</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
@@ -167,12 +166,15 @@
 
             <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span> <span class="o">!=</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to have group &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to have group &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_gid</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">!=</span> <span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to support mode &quot;</span>
-                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to support mode &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">par_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">can_access</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
@@ -190,8 +192,9 @@
 
             <span class="n">p_stat</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span> <span class="o">&amp;</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span> <span class="o">!=</span> <span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to support mode &quot;</span>
-                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2"> to support mode &quot;</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">stat</span><span class="o">.</span><span class="n">S_IRWXU</span><span class="si">}</span><span class="s2">, but it is </span><span class="si">{</span><span class="n">p_stat</span><span class="o">.</span><span class="n">st_mode</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
 
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">errno</span><span class="o">.</span><span class="n">EACCES</span><span class="p">,</span> <span class="n">err_msg</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
@@ -225,7 +228,7 @@
                 <span class="k">return</span> <span class="n">path</span>
 
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;OSError while checking stage path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;OSError while checking stage path </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">None</span>
 
@@ -237,7 +240,7 @@
 <span class="sd">    Adjustments involve removing extra $user from $tempdir if $tempdir includes</span>
 <span class="sd">    $user and appending $user if it is not present in the path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">temp_path</span> <span class="o">=</span> <span class="n">sup</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="s1">&#39;$tempdir&#39;</span><span class="p">)</span>
+    <span class="n">temp_path</span> <span class="o">=</span> <span class="n">sup</span><span class="o">.</span><span class="n">canonicalize_path</span><span class="p">(</span><span class="s2">&quot;$tempdir&quot;</span><span class="p">)</span>
     <span class="n">user</span> <span class="o">=</span> <span class="n">getpass</span><span class="o">.</span><span class="n">getuser</span><span class="p">()</span>
     <span class="n">tmp_has_usr</span> <span class="o">=</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">temp_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
 
@@ -245,7 +248,7 @@
     <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">candidates</span><span class="p">:</span>
         <span class="c1"># Remove the extra `$user` node from a `$tempdir/$user` entry for</span>
         <span class="c1"># hosts that automatically append `$user` to `$tempdir`.</span>
-        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s1">&#39;$tempdir&#39;</span><span class="p">,</span> <span class="s1">&#39;$user&#39;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">tmp_has_usr</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;$tempdir&quot;</span><span class="p">,</span> <span class="s2">&quot;$user&quot;</span><span class="p">))</span> <span class="ow">and</span> <span class="n">tmp_has_usr</span><span class="p">:</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;/$user&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
         <span class="c1"># Ensure the path is unique per user.</span>
@@ -265,11 +268,15 @@
 <span class="c1"># TODO (dwj): If we want to support multiple mirrors, we&#39;ll need to</span>
 <span class="c1">#             figure out how to pass them to the stage.</span>
 <span class="k">def</span> <span class="nf">_mirror_roots</span><span class="p">():</span>
-    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;mirrors&#39;</span><span class="p">)</span>
+    <span class="n">mirrors</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;mirrors&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="p">[</span>
-        <span class="n">sup</span><span class="o">.</span><span class="n">substitute_path_variables</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
-        <span class="k">else</span> <span class="n">sup</span><span class="o">.</span><span class="n">substitute_path_variables</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
-        <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">()]</span>
+        <span class="p">(</span>
+            <span class="n">sup</span><span class="o">.</span><span class="n">substitute_path_variables</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">root</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">sep</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">sup</span><span class="o">.</span><span class="n">substitute_path_variables</span><span class="p">(</span><span class="n">root</span><span class="p">)</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">root</span> <span class="ow">in</span> <span class="n">mirrors</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+    <span class="p">]</span>
 
 
 <div class="viewcode-block" id="InputStage">
@@ -315,42 +322,48 @@
     <span class="n">managed_by_ramble</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-            <span class="bp">self</span><span class="p">,</span> <span class="n">url_or_fetch_strategy</span><span class="p">,</span>
-            <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">mirror_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lock</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">search_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">url_or_fetch_strategy</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mirror_paths</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">keep</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">lock</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">search_fn</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a stage object.</span>
-<span class="sd">           Parameters:</span>
-<span class="sd">             url_or_fetch_strategy</span>
-<span class="sd">                 URL of the archive to be downloaded into this stage, OR</span>
-<span class="sd">                 a valid FetchStrategy.</span>
+<span class="sd">        Parameters:</span>
+<span class="sd">          url_or_fetch_strategy</span>
+<span class="sd">              URL of the archive to be downloaded into this stage, OR</span>
+<span class="sd">              a valid FetchStrategy.</span>
 
-<span class="sd">             name</span>
-<span class="sd">                 If a name is provided, then this stage is a named stage</span>
-<span class="sd">                 and will persist between runs (or if you construct another</span>
-<span class="sd">                 stage object later).  If name is not provided, then this</span>
-<span class="sd">                 stage will be given a unique name automatically.</span>
+<span class="sd">          name</span>
+<span class="sd">              If a name is provided, then this stage is a named stage</span>
+<span class="sd">              and will persist between runs (or if you construct another</span>
+<span class="sd">              stage object later).  If name is not provided, then this</span>
+<span class="sd">              stage will be given a unique name automatically.</span>
 
-<span class="sd">             mirror_paths</span>
-<span class="sd">                 If provided, Stage will search Rambles&#39;s mirrors for</span>
-<span class="sd">                 this archive at each of the provided relative mirror paths</span>
-<span class="sd">                 before using the default fetch strategy.</span>
+<span class="sd">          mirror_paths</span>
+<span class="sd">              If provided, Stage will search Rambles&#39;s mirrors for</span>
+<span class="sd">              this archive at each of the provided relative mirror paths</span>
+<span class="sd">              before using the default fetch strategy.</span>
 
-<span class="sd">             keep</span>
-<span class="sd">                 By default, when used as a context manager, the Stage</span>
-<span class="sd">                 is deleted on exit when no exceptions are raised.</span>
-<span class="sd">                 Pass True to keep the stage intact even if no</span>
-<span class="sd">                 exceptions are raised.</span>
+<span class="sd">          keep</span>
+<span class="sd">              By default, when used as a context manager, the Stage</span>
+<span class="sd">              is deleted on exit when no exceptions are raised.</span>
+<span class="sd">              Pass True to keep the stage intact even if no</span>
+<span class="sd">              exceptions are raised.</span>
 
-<span class="sd">            path</span>
-<span class="sd">                 If provided, the stage path to use for associated builds.</span>
+<span class="sd">         path</span>
+<span class="sd">              If provided, the stage path to use for associated builds.</span>
 
-<span class="sd">            lock</span>
-<span class="sd">                 True if the stage directory file lock is to be used, False</span>
-<span class="sd">                 otherwise.</span>
+<span class="sd">         lock</span>
+<span class="sd">              True if the stage directory file lock is to be used, False</span>
+<span class="sd">              otherwise.</span>
 
-<span class="sd">            search_fn</span>
-<span class="sd">                 The search function that provides the fetch strategy</span>
-<span class="sd">                 instance.</span>
+<span class="sd">         search_fn</span>
+<span class="sd">              The search function that provides the fetch strategy</span>
+<span class="sd">              instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO: fetch/stage coupling needs to be reworked -- the logic</span>
         <span class="c1"># TODO: here is convoluted and not modular enough.</span>
@@ -359,8 +372,7 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">url_or_fetch_strategy</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">FetchStrategy</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="o">=</span> <span class="n">url_or_fetch_strategy</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Can&#39;t construct Stage without url or fetch strategy&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Can&#39;t construct Stage without url or fetch strategy&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">stage</span> <span class="o">=</span> <span class="bp">self</span>
         <span class="c1"># self.fetcher can change with mirrors.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span>
@@ -389,13 +401,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">lock</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">:</span>
-                <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
+                <span class="n">sha1</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha1</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">digest</span><span class="p">()</span>
                 <span class="n">lock_id</span> <span class="o">=</span> <span class="n">prefix_bits</span><span class="p">(</span><span class="n">sha1</span><span class="p">,</span> <span class="n">bit_length</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">maxsize</span><span class="p">))</span>
-                <span class="n">stage_lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s1">&#39;.lock&#39;</span><span class="p">)</span>
+                <span class="n">stage_lock_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;.lock&quot;</span><span class="p">)</span>
 
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Creating stage lock </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lock</span><span class="o">.</span><span class="n">Lock</span><span class="p">(</span>
-                    <span class="n">stage_lock_path</span><span class="p">,</span> <span class="n">lock_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+                    <span class="n">stage_lock_path</span><span class="p">,</span> <span class="n">lock_id</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+                <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_lock</span> <span class="o">=</span> <span class="n">InputStage</span><span class="o">.</span><span class="n">stage_locks</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
 
@@ -515,8 +528,7 @@
             <span class="n">mirror_urls</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">mirror</span> <span class="ow">in</span> <span class="n">ramble</span><span class="o">.</span><span class="n">mirror</span><span class="o">.</span><span class="n">MirrorCollection</span><span class="p">()</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
                 <span class="k">for</span> <span class="n">rel_path</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">:</span>
-                    <span class="n">mirror_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                        <span class="n">url_util</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">))</span>
+                    <span class="n">mirror_urls</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url_util</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">fetch_url</span><span class="p">,</span> <span class="n">rel_path</span><span class="p">))</span>
 
             <span class="c1"># If this archive is normally fetched from a tarball URL,</span>
             <span class="c1"># then use the same digest.  `spack mirror` ensures that</span>
@@ -537,14 +549,14 @@
             <span class="c1"># Insert fetchers in the order that the URLs are provided.</span>
             <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">mirror_urls</span><span class="p">):</span>
                 <span class="n">fetchers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
-                    <span class="mi">0</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">from_url_scheme</span><span class="p">(</span>
-                        <span class="n">url</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">))</span>
+                    <span class="mi">0</span><span class="p">,</span> <span class="n">fs</span><span class="o">.</span><span class="n">from_url_scheme</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="o">.</span><span class="n">cachable</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">rel_path</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="p">)):</span>
                     <span class="n">cache_fetcher</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">fetch_cache</span><span class="o">.</span><span class="n">fetcher</span><span class="p">(</span>
-                        <span class="n">rel_path</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span>
-                        <span class="n">extension</span><span class="o">=</span><span class="n">extension</span><span class="p">)</span>
+                        <span class="n">rel_path</span><span class="p">,</span> <span class="n">digest</span><span class="p">,</span> <span class="n">expand</span><span class="o">=</span><span class="n">expand</span><span class="p">,</span> <span class="n">extension</span><span class="o">=</span><span class="n">extension</span>
+                    <span class="p">)</span>
                     <span class="n">fetchers</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">cache_fetcher</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">generate_fetchers</span><span class="p">():</span>
@@ -572,11 +584,11 @@
                 <span class="c1"># Don&#39;t bother reporting when something is not cached.</span>
                 <span class="k">continue</span>
             <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Fetching from </span><span class="si">{0}</span><span class="s1"> failed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Fetching from </span><span class="si">{0}</span><span class="s2"> failed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                 <span class="k">continue</span>
             <span class="k">except</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">web</span><span class="o">.</span><span class="n">SpackWebError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Fetching from </span><span class="si">{0}</span><span class="s1"> failed.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
+                <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Fetching from </span><span class="si">{0}</span><span class="s2"> failed.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">fetcher</span><span class="p">))</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
                 <span class="k">continue</span>
 
@@ -584,7 +596,7 @@
             <span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span>
-            <span class="k">raise</span> <span class="n">fs</span><span class="o">.</span><span class="n">FetchError</span><span class="p">(</span><span class="n">err_msg</span> <span class="ow">or</span> <span class="s1">&#39;All fetchers failed&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">fs</span><span class="o">.</span><span class="n">FetchError</span><span class="p">(</span><span class="n">err_msg</span> <span class="ow">or</span> <span class="s2">&quot;All fetchers failed&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
         <span class="n">print_errors</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span></div>
 
@@ -607,8 +619,8 @@
             <span class="n">mkdirp</span><span class="p">(</span><span class="n">dest</span><span class="p">)</span>
 
         <span class="c1"># glob all files and directories in the source path</span>
-        <span class="n">hidden_entries</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="s1">&#39;.*&#39;</span><span class="p">))</span>
-        <span class="n">entries</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="s1">&#39;*&#39;</span><span class="p">))</span>
+        <span class="n">hidden_entries</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="s2">&quot;.*&quot;</span><span class="p">))</span>
+        <span class="n">entries</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="s2">&quot;*&quot;</span><span class="p">))</span>
 
         <span class="c1"># Move all files from stage to destination directory</span>
         <span class="c1"># Include hidden files for VCS repo history</span>
@@ -631,24 +643,24 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.check">[docs]</a>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Check the downloaded archive against a checksum digest.</span>
-<span class="sd">           No-op if this stage checks code out of a repository.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="ow">and</span> \
-           <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Fetching from mirror without a checksum!&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;This input is normally checked out from a version &quot;</span>
-                        <span class="s2">&quot;control system, but it has been archived on a &quot;</span>
-                        <span class="s2">&quot;mirror.  This means we cannot know a checksum for the &quot;</span>
-                        <span class="s2">&quot;tarball in advance. Be sure that your connection to &quot;</span>
-                        <span class="s2">&quot;this mirror is secure!&quot;</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:checksum&#39;</span><span class="p">):</span>
+<span class="sd">        No-op if this stage checks code out of a repository.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip_checksum_for_mirror</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Fetching from mirror without a checksum!&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;This input is normally checked out from a version &quot;</span>
+                <span class="s2">&quot;control system, but it has been archived on a &quot;</span>
+                <span class="s2">&quot;mirror.  This means we cannot know a checksum for the &quot;</span>
+                <span class="s2">&quot;tarball in advance. Be sure that your connection to &quot;</span>
+                <span class="s2">&quot;this mirror is secure!&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:checksum&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">check</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="InputStage.cache_local">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.cache_local">[docs]</a>
     <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">fetch_cache</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span></div>
+        <span class="n">ramble</span><span class="o">.</span><span class="n">caches</span><span class="o">.</span><span class="n">fetch_cache</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="InputStage.cache_mirror">
@@ -674,19 +686,17 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="n">fs</span><span class="o">.</span><span class="n">stable_target</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_fetcher</span><span class="p">):</span>
             <span class="k">return</span>
 
-        <span class="n">absolute_storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">mirror</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
+        <span class="n">absolute_storage_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">mirror</span><span class="o">.</span><span class="n">root</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Already existed: </span><span class="si">{</span><span class="n">absolute_storage_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Already existed: </span><span class="si">{</span><span class="n">absolute_storage_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">already_existed</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;   Stats? </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">present</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;   Stats? </span><span class="si">{</span><span class="n">stats</span><span class="o">.</span><span class="n">present</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
-            <span class="n">mirror</span><span class="o">.</span><span class="n">store</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Added: </span><span class="si">{</span><span class="n">absolute_storage_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">mirror</span><span class="o">.</span><span class="n">store</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">mirror_paths</span><span class="o">.</span><span class="n">storage_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Added: </span><span class="si">{</span><span class="n">absolute_storage_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">stats</span><span class="o">.</span><span class="n">added</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">absolute_storage_path</span><span class="p">):</span>
@@ -703,16 +713,16 @@
 <span class="sd">        downloaded.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">expanded</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">expand</span><span class="p">()</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Created stage in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Created stage in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Already staged </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Already staged </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="InputStage.restage">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.InputStage.restage">[docs]</a>
     <span class="k">def</span> <span class="nf">restage</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Removes the expanded archive path if it exists, then re-expands</span>
-<span class="sd">           the archive.</span>
+<span class="sd">        the archive.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fetcher</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span></div>
 
@@ -792,10 +802,9 @@
             <span class="n">placement</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">source_path</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">placement</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="n">placement</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;&#39;</span><span class="p">:</span> <span class="n">placement</span><span class="p">}</span>
+            <span class="n">placement</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="n">placement</span><span class="p">}</span>
 
-        <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">root_stage</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
+        <span class="n">target_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root_stage</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">resource</span><span class="o">.</span><span class="n">destination</span><span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">target_path</span><span class="p">)</span>
@@ -811,10 +820,12 @@
             <span class="n">source_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">destination_path</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Moving resource stage</span><span class="se">\n\t</span><span class="s1">source : &#39;</span>
-                            <span class="s1">&#39;</span><span class="si">{stage}</span><span class="se">\n\t</span><span class="s1">destination : </span><span class="si">{destination}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                                <span class="n">stage</span><span class="o">=</span><span class="n">source_path</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">destination_path</span><span class="p">)</span>
-                            <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Moving resource stage</span><span class="se">\n\t</span><span class="s2">source : &quot;</span>
+                    <span class="s2">&quot;</span><span class="si">{stage}</span><span class="se">\n\t</span><span class="s2">destination : </span><span class="si">{destination}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                        <span class="n">stage</span><span class="o">=</span><span class="n">source_path</span><span class="p">,</span> <span class="n">destination</span><span class="o">=</span><span class="n">destination_path</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
 
                 <span class="n">src</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="n">source_path</span><span class="p">)</span>
 
@@ -831,15 +842,27 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Composite for Stage type objects. The first item in this composite is</span>
 <span class="sd">    considered to be the root workload, and operations that return a value are</span>
 <span class="sd">    forwarded to it.&quot;&quot;&quot;</span>
+
     <span class="c1">#</span>
     <span class="c1"># __enter__ and __exit__ delegate to all stages in the composite.</span>
     <span class="c1">#</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">StageComposite</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">([</span>
-            <span class="s1">&#39;fetch&#39;</span><span class="p">,</span> <span class="s1">&#39;create&#39;</span><span class="p">,</span> <span class="s1">&#39;created&#39;</span><span class="p">,</span> <span class="s1">&#39;check&#39;</span><span class="p">,</span> <span class="s1">&#39;expand_archive&#39;</span><span class="p">,</span> <span class="s1">&#39;restage&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;destroy&#39;</span><span class="p">,</span> <span class="s1">&#39;cache_local&#39;</span><span class="p">,</span> <span class="s1">&#39;cache_mirror&#39;</span><span class="p">,</span> <span class="s1">&#39;steal_source&#39;</span><span class="p">,</span>
-            <span class="s1">&#39;managed_by_ramble&#39;</span><span class="p">])</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StageComposite</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="p">[</span>
+                <span class="s2">&quot;fetch&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;create&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;created&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;check&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;expand_archive&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;restage&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;destroy&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cache_local&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cache_mirror&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;steal_source&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;managed_by_ramble&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="p">:</span>
@@ -848,7 +871,7 @@
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="n">item</span><span class="o">.</span><span class="n">keep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;keep&#39;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">item</span><span class="o">.</span><span class="n">keep</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;keep&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
             <span class="n">item</span><span class="o">.</span><span class="fm">__exit__</span><span class="p">(</span><span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span>
 
     <span class="c1">#</span>
@@ -888,8 +911,7 @@
         <span class="k">if</span> <span class="n">path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot construct DIYStage without a path.&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">StagePathError</span><span class="p">(</span><span class="s2">&quot;The stage path directory does not exist:&quot;</span><span class="p">,</span>
-                                 <span class="n">path</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">StagePathError</span><span class="p">(</span><span class="s2">&quot;The stage path directory does not exist:&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">archive_file</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
@@ -906,19 +928,19 @@
 <div class="viewcode-block" id="DIYStage.fetch">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.fetch">[docs]</a>
     <span class="k">def</span> <span class="nf">fetch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No need to fetch for DIY.&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No need to fetch for DIY.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DIYStage.check">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.check">[docs]</a>
     <span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;No checksum needed for DIY.&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No checksum needed for DIY.&quot;</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="DIYStage.expand_archive">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.expand_archive">[docs]</a>
     <span class="k">def</span> <span class="nf">expand_archive</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using source directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using source directory: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">source_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
     <span class="nd">@property</span>
@@ -948,7 +970,7 @@
 <div class="viewcode-block" id="DIYStage.cache_local">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.DIYStage.cache_local">[docs]</a>
     <span class="k">def</span> <span class="nf">cache_local</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Sources for DIY stages are not cached&#39;</span><span class="p">)</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Sources for DIY stages are not cached&quot;</span><span class="p">)</span></div>
 </div>
 
 
@@ -966,8 +988,8 @@
 <div class="viewcode-block" id="get_checksums_for_versions">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.get_checksums_for_versions">[docs]</a>
 <span class="k">def</span> <span class="nf">get_checksums_for_versions</span><span class="p">(</span>
-        <span class="n">url_dict</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">first_stage_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_stage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">fetch_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">url_dict</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">first_stage_function</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">keep_stage</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">fetch_options</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">batch</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Fetches and checksums archives from URLs.</span>
 
 <span class="sd">    This function is called by both ``ramble checksum`` and ``ramble</span>
@@ -996,19 +1018,21 @@
     <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">)</span>
     <span class="n">num_ver</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_versions</span><span class="p">)</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Found </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-               <span class="n">num_ver</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_ver</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
-               <span class="s1">&#39;&#39;</span><span class="p">,</span>
-               <span class="o">*</span><span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">elide_list</span><span class="p">(</span>
-                   <span class="p">[</span><span class="s1">&#39;{0:</span><span class="si">{1}</span><span class="s1">}  </span><span class="si">{2}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">])</span>
-                    <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">]))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span>
+        <span class="s2">&quot;Found </span><span class="si">{0}</span><span class="s2"> version</span><span class="si">{1}</span><span class="s2"> of </span><span class="si">{2}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_ver</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">num_ver</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">),</span>
+        <span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">elide_list</span><span class="p">(</span>
+            <span class="p">[</span><span class="s2">&quot;{0:</span><span class="si">{1}</span><span class="s2">}  </span><span class="si">{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">),</span> <span class="n">max_len</span><span class="p">,</span> <span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">])</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sorted_versions</span><span class="p">]</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
     <span class="nb">print</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">batch</span><span class="p">:</span>
         <span class="n">archives_to_fetch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sorted_versions</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">archives_to_fetch</span> <span class="o">=</span> <span class="n">tty</span><span class="o">.</span><span class="n">get_number</span><span class="p">(</span>
-            <span class="s2">&quot;How many would you like to checksum?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="s1">&#39;q&#39;</span><span class="p">)</span>
+            <span class="s2">&quot;How many would you like to checksum?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">abort</span><span class="o">=</span><span class="s2">&quot;q&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">archives_to_fetch</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Aborted.&quot;</span><span class="p">)</span>
@@ -1016,15 +1040,14 @@
     <span class="n">versions</span> <span class="o">=</span> <span class="n">sorted_versions</span><span class="p">[:</span><span class="n">archives_to_fetch</span><span class="p">]</span>
     <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">url_dict</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">versions</span><span class="p">]</span>
 
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Downloading...&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Downloading...&quot;</span><span class="p">)</span>
     <span class="n">version_hashes</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">url</span><span class="p">,</span> <span class="n">version</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">versions</span><span class="p">):</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">fetch_options</span><span class="p">:</span>
-                <span class="n">url_or_fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">URLFetchStrategy</span><span class="p">(</span>
-                    <span class="n">url</span><span class="p">,</span> <span class="n">fetch_options</span><span class="o">=</span><span class="n">fetch_options</span><span class="p">)</span>
+                <span class="n">url_or_fs</span> <span class="o">=</span> <span class="n">fs</span><span class="o">.</span><span class="n">URLFetchStrategy</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">fetch_options</span><span class="o">=</span><span class="n">fetch_options</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">url_or_fs</span> <span class="o">=</span> <span class="n">url</span>
             <span class="k">with</span> <span class="n">InputStage</span><span class="p">(</span><span class="n">url_or_fs</span><span class="p">,</span> <span class="n">keep</span><span class="o">=</span><span class="n">keep_stage</span><span class="p">)</span> <span class="k">as</span> <span class="n">stage</span><span class="p">:</span>
@@ -1036,13 +1059,14 @@
                     <span class="n">first_stage_function</span><span class="p">(</span><span class="n">stage</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
                 <span class="c1"># Checksum the archive and add it to the list</span>
-                <span class="n">version_hashes</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">version</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">crypto</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span>
-                    <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">,</span> <span class="n">stage</span><span class="o">.</span><span class="n">archive_file</span><span class="p">)))</span>
+                <span class="n">version_hashes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">version</span><span class="p">,</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">crypto</span><span class="o">.</span><span class="n">checksum</span><span class="p">(</span><span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">,</span> <span class="n">stage</span><span class="o">.</span><span class="n">archive_file</span><span class="p">))</span>
+                <span class="p">)</span>
                 <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">except</span> <span class="n">FailedDownloadError</span><span class="p">:</span>
-            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Failed to fetch </span><span class="si">{0}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;Failed to fetch </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Something failed on </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s1">, skipping.  (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Something failed on </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">, skipping.  (</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
 
     <span class="k">for</span> <span class="n">msg</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
@@ -1054,14 +1078,17 @@
     <span class="n">max_len</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">version_hashes</span><span class="p">)</span>
 
     <span class="c1"># Generate the version directives to put in a package.py</span>
-    <span class="n">version_lines</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-        <span class="s2">&quot;    version(&#39;</span><span class="si">{0}</span><span class="s2">&#39;, </span><span class="si">{1}</span><span class="s2">sha256=&#39;</span><span class="si">{2}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">v</span><span class="p">,</span> <span class="s1">&#39; &#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))),</span> <span class="n">h</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">version_hashes</span>
-    <span class="p">])</span>
+    <span class="n">version_lines</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s2">&quot;    version(&#39;</span><span class="si">{0}</span><span class="s2">&#39;, </span><span class="si">{1}</span><span class="s2">sha256=&#39;</span><span class="si">{2}</span><span class="s2">&#39;)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">max_len</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">v</span><span class="p">))),</span> <span class="n">h</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">h</span> <span class="ow">in</span> <span class="n">version_hashes</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="n">num_hash</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">version_hashes</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Checksummed </span><span class="si">{0}</span><span class="s1"> version</span><span class="si">{1}</span><span class="s1"> of </span><span class="si">{2}</span><span class="s1">:&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                 <span class="n">num_hash</span><span class="p">,</span> <span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">num_hash</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;s&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+        <span class="s2">&quot;Checksummed </span><span class="si">{0}</span><span class="s2"> version</span><span class="si">{1}</span><span class="s2"> of </span><span class="si">{2}</span><span class="s2">:&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">num_hash</span><span class="p">,</span> <span class="s2">&quot;&quot;</span> <span class="k">if</span> <span class="n">num_hash</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;s&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">version_lines</span></div>
 
@@ -1070,21 +1097,21 @@
 <div class="viewcode-block" id="StageError">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.StageError">[docs]</a>
 <span class="k">class</span> <span class="nc">StageError</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">RambleError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Superclass for all errors encountered during staging.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;Superclass for all errors encountered during staging.&quot;&quot;&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="StagePathError">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.StagePathError">[docs]</a>
 <span class="k">class</span> <span class="nc">StagePathError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Error encountered with stage path.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;Error encountered with stage path.&quot;&quot;&quot;</span></div>
 
 
 
 <div class="viewcode-block" id="RestageError">
 <a class="viewcode-back" href="../../ramble.html#ramble.stage.RestageError">[docs]</a>
 <span class="k">class</span> <span class="nc">RestageError</span><span class="p">(</span><span class="n">StageError</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;&quot;Error encountered during restaging.&quot;&quot;&quot;</span></div>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot; &quot;Error encountered during restaging.&quot;&quot;&quot;</span></div>
 
 
 

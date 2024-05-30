@@ -124,14 +124,14 @@
     <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Sequence</span>
 
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;DirectiveMeta&#39;</span><span class="p">,</span> <span class="s1">&#39;DirectiveError&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;DirectiveMeta&quot;</span><span class="p">,</span> <span class="s2">&quot;DirectiveError&quot;</span><span class="p">]</span>
 
 
 <span class="c1">#: These are variant names used by ramble internally; applications can&#39;t use</span>
 <span class="c1">#: them</span>
 <span class="n">reserved_names</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="n">namespaces</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ramble.app&#39;</span><span class="p">,</span> <span class="s1">&#39;ramble.mod&#39;</span><span class="p">]</span>
+<span class="n">namespaces</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;ramble.app&quot;</span><span class="p">,</span> <span class="s2">&quot;ramble.mod&quot;</span><span class="p">]</span>
 
 
 <div class="viewcode-block" id="DirectiveMeta">
@@ -194,9 +194,9 @@
                 <span class="nb">setattr</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">d</span><span class="p">,</span> <span class="p">{})</span>
 
             <span class="n">directive_attrs</span> <span class="o">=</span> <span class="p">{</span>
-                <span class="s1">&#39;_directive_functions&#39;</span><span class="p">:</span> <span class="p">{},</span>
-                <span class="s1">&#39;_directive_classes&#39;</span><span class="p">:</span> <span class="p">{},</span>
-                <span class="s1">&#39;_directive_names&#39;</span><span class="p">:</span> <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directive_names</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="s2">&quot;_directive_functions&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">&quot;_directive_classes&quot;</span><span class="p">:</span> <span class="p">{},</span>
+                <span class="s2">&quot;_directive_names&quot;</span><span class="p">:</span> <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directive_names</span><span class="o">.</span><span class="n">copy</span><span class="p">(),</span>
             <span class="p">}</span>
 
             <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">directive_attrs</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -263,7 +263,7 @@
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dicts</span><span class="p">,</span> <span class="n">string_types</span><span class="p">):</span>
-            <span class="n">dicts</span> <span class="o">=</span> <span class="p">(</span><span class="n">dicts</span><span class="p">,</span> <span class="p">)</span>
+            <span class="n">dicts</span> <span class="o">=</span> <span class="p">(</span><span class="n">dicts</span><span class="p">,)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dicts</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
             <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;dicts arg must be list, tuple, or string. Found </span><span class="si">{0}</span><span class="s2">&quot;</span>
@@ -289,8 +289,7 @@
                             <span class="n">remove_directives</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="c1"># Remove directives args from the exec queue</span>
-                        <span class="n">remove</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
-                            <span class="p">(</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">directives</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="n">arg</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                        <span class="n">remove</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">directives</span> <span class="k">if</span> <span class="n">d</span> <span class="ow">is</span> <span class="n">arg</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
                         <span class="k">if</span> <span class="n">remove</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                             <span class="n">directives</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">remove</span><span class="p">)</span>
 
@@ -306,7 +305,7 @@
                 <span class="c1"># ...so if it is not a sequence make it so</span>
                 <span class="n">values</span> <span class="o">=</span> <span class="n">result</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">):</span>
-                    <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span><span class="p">,</span> <span class="p">)</span>
+                    <span class="n">values</span> <span class="o">=</span> <span class="p">(</span><span class="n">values</span><span class="p">,)</span>
 
                 <span class="n">DirectiveMeta</span><span class="o">.</span><span class="n">_directives_to_be_executed</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
 

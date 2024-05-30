@@ -134,7 +134,7 @@
 
 
 <span class="n">guides</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="n">spec_guide</span><span class="p">,</span>
+    <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="n">spec_guide</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -142,18 +142,29 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.help.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">help_cmd_group</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
-    <span class="n">help_cmd_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;help_command&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;?&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                                <span class="n">help</span><span class="o">=</span><span class="s1">&#39;command to get help on&#39;</span><span class="p">)</span>
+    <span class="n">help_cmd_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;help_command&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;?&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;command to get help on&quot;</span>
+    <span class="p">)</span>
 
     <span class="n">help_all_group</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
     <span class="n">help_all_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--all&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;short&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;list all available commands and options&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;-a&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--all&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;short&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list all available commands and options&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">help_spec_group</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
     <span class="n">help_spec_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--spec&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;guide&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s1">&#39;spec&#39;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;help on the package specification syntax&#39;</span><span class="p">)</span></div>
+        <span class="s2">&quot;--spec&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;guide&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;spec&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;help on the package specification syntax&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -166,7 +177,7 @@
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">help_command</span><span class="p">:</span>
         <span class="n">parser</span><span class="o">.</span><span class="n">add_command</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">help_command</span><span class="p">)</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="n">args</span><span class="o">.</span><span class="n">help_command</span><span class="p">,</span> <span class="s1">&#39;-h&#39;</span><span class="p">])</span>
+        <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">([</span><span class="n">args</span><span class="o">.</span><span class="n">help_command</span><span class="p">,</span> <span class="s2">&quot;-h&quot;</span><span class="p">])</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">format_help</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">all</span><span class="p">))</span></div>
 

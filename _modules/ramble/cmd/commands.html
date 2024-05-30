@@ -114,9 +114,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
-<span class="kn">from</span> <span class="nn">llnl.util.argparsewriter</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">ArgparseWriter</span><span class="p">,</span> <span class="n">ArgparseRstWriter</span><span class="p">,</span> <span class="n">ArgparseCompletionWriter</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">llnl.util.argparsewriter</span> <span class="kn">import</span> <span class="n">ArgparseWriter</span><span class="p">,</span> <span class="n">ArgparseRstWriter</span><span class="p">,</span> <span class="n">ArgparseCompletionWriter</span>
 <span class="kn">from</span> <span class="nn">llnl.util.tty.colify</span> <span class="kn">import</span> <span class="n">colify</span>
 
 <span class="kn">import</span> <span class="nn">ramble.cmd</span>
@@ -138,13 +136,11 @@
 <span class="c1">#: standard arguments for updating completion scripts</span>
 <span class="c1">#: we iterate through these when called with --update-completion</span>
 <span class="n">update_completion_args</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;bash&quot;</span><span class="p">:</span>  <span class="p">{</span>
+    <span class="s2">&quot;bash&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;aliases&quot;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
         <span class="s2">&quot;format&quot;</span><span class="p">:</span> <span class="s2">&quot;bash&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">share_path</span><span class="p">,</span> <span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="s2">&quot;ramble-completion.in&quot;</span><span class="p">),</span>
-        <span class="s2">&quot;update&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-            <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">share_path</span><span class="p">,</span> <span class="s2">&quot;ramble-completion.bash&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;header&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">share_path</span><span class="p">,</span> <span class="s2">&quot;bash&quot;</span><span class="p">,</span> <span class="s2">&quot;ramble-completion.in&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;update&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">share_path</span><span class="p">,</span> <span class="s2">&quot;ramble-completion.bash&quot;</span><span class="p">),</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
@@ -162,24 +158,40 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;--update-completion&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;regenerate ramble&#39;s tab completion scripts&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;--update-completion&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;regenerate ramble&#39;s tab completion scripts&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-a&#39;</span><span class="p">,</span> <span class="s1">&#39;--aliases&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;include command aliases&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;-a&quot;</span><span class="p">,</span> <span class="s2">&quot;--aliases&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;include command aliases&quot;</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--format&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;format to be used to print the output (default: names)&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;--format&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;names&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;format to be used to print the output (default: names)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--header&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;prepend contents of FILE to the output (useful for rst format)&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;--header&quot;</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;FILE&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;prepend contents of FILE to the output (useful for rst format)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--update&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;write output to the specified file, if any command is newer&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;--update&quot;</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;FILE&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;write output to the specified file, if any command is newer&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;rst_files&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;list of rst files to search for `_cmd-ramble-&lt;cmd&gt;` cross-refs&#39;</span><span class="p">)</span></div>
+        <span class="s2">&quot;rst_files&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list of rst files to search for `_cmd-ramble-&lt;cmd&gt;` cross-refs&quot;</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -188,12 +200,16 @@
 <span class="k">class</span> <span class="nc">RambleArgparseRstWriter</span><span class="p">(</span><span class="n">ArgparseRstWriter</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;RST writer tailored for ramble documentation.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">aliases</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                 <span class="n">documented_commands</span><span class="o">=</span><span class="p">[],</span>
-                 <span class="n">rst_levels</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;^&#39;</span><span class="p">,</span> <span class="s1">&#39;~&#39;</span><span class="p">,</span> <span class="s1">&#39;:&#39;</span><span class="p">,</span> <span class="s1">&#39;`&#39;</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">prog</span><span class="p">,</span>
+        <span class="n">out</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">aliases</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">documented_commands</span><span class="o">=</span><span class="p">[],</span>
+        <span class="n">rst_levels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;^&quot;</span><span class="p">,</span> <span class="s2">&quot;~&quot;</span><span class="p">,</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="s2">&quot;`&quot;</span><span class="p">],</span>
+    <span class="p">):</span>
         <span class="n">out</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="k">if</span> <span class="n">out</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">out</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">RambleArgparseRstWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">aliases</span><span class="p">,</span> <span class="n">rst_levels</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RambleArgparseRstWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">aliases</span><span class="p">,</span> <span class="n">rst_levels</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">documented</span> <span class="o">=</span> <span class="n">documented_commands</span>
 
 <div class="viewcode-block" id="RambleArgparseRstWriter.usage">
@@ -201,9 +217,9 @@
     <span class="k">def</span> <span class="nf">usage</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
         <span class="n">string</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">RambleArgparseRstWriter</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">usage</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">)</span>
 
-        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">prog</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">prog</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">documented</span><span class="p">:</span>
-            <span class="n">string</span> <span class="o">+=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">:ref:`More documentation &lt;cmd-</span><span class="si">{0}</span><span class="s1">&gt;`</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+            <span class="n">string</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">:ref:`More documentation &lt;cmd-</span><span class="si">{0}</span><span class="s2">&gt;`</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">string</span></div>
 </div>
@@ -216,21 +232,21 @@
 <div class="viewcode-block" id="SubcommandWriter.format">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.SubcommandWriter.format">[docs]</a>
     <span class="k">def</span> <span class="nf">format</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cmd</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;    &#39;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">+</span> <span class="n">cmd</span><span class="o">.</span><span class="n">prog</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span></div>
+        <span class="k">return</span> <span class="s2">&quot;    &quot;</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">level</span> <span class="o">+</span> <span class="n">cmd</span><span class="o">.</span><span class="n">prog</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span></div>
 </div>
 
 
 
 <span class="n">_positional_to_subroutine</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">&#39;application&#39;</span><span class="p">:</span> <span class="s1">&#39;_all_applications&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;spec&#39;</span><span class="p">:</span> <span class="s1">&#39;_all_applications&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;filter&#39;</span><span class="p">:</span> <span class="s1">&#39;_all_applications&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;section&#39;</span><span class="p">:</span> <span class="s1">&#39;_config_sections&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;workspace&#39;</span><span class="p">:</span> <span class="s1">&#39;_workspaces&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;keys&#39;</span><span class="p">:</span> <span class="s1">&#39;_keys&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;help_command&#39;</span><span class="p">:</span> <span class="s1">&#39;_subcommands&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;namespace&#39;</span><span class="p">:</span> <span class="s1">&#39;_repos&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;pytest&#39;</span><span class="p">:</span> <span class="s1">&#39;_tests&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;application&quot;</span><span class="p">:</span> <span class="s2">&quot;_all_applications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;spec&quot;</span><span class="p">:</span> <span class="s2">&quot;_all_applications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;filter&quot;</span><span class="p">:</span> <span class="s2">&quot;_all_applications&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;section&quot;</span><span class="p">:</span> <span class="s2">&quot;_config_sections&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;workspace&quot;</span><span class="p">:</span> <span class="s2">&quot;_workspaces&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;keys&quot;</span><span class="p">:</span> <span class="s2">&quot;_keys&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;help_command&quot;</span><span class="p">:</span> <span class="s2">&quot;_subcommands&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;namespace&quot;</span><span class="p">:</span> <span class="s2">&quot;_repos&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pytest&quot;</span><span class="p">:</span> <span class="s2">&quot;_tests&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
 
@@ -250,7 +266,9 @@
 <span class="s2">    else</span>
 <span class="s2">        </span><span class="si">{1}</span>
 <span class="s2">    fi</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">positionals</span><span class="p">(</span><span class="n">positionals</span><span class="p">))</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">positionals</span><span class="p">(</span><span class="n">positionals</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">elif</span> <span class="n">subcommands</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    if $list_options</span>
@@ -259,11 +277,15 @@
 <span class="s2">    else</span>
 <span class="s2">        </span><span class="si">{1}</span>
 <span class="s2">    fi</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcommands</span><span class="p">(</span><span class="n">subcommands</span><span class="p">))</span>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">subcommands</span><span class="p">(</span><span class="n">subcommands</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;&quot;&quot;</span>
 <span class="s2">    </span><span class="si">{0}</span>
-<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">))</span></div>
+<span class="s2">&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">optionals</span><span class="p">(</span><span class="n">optionals</span><span class="p">)</span>
+            <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="BashCompletionWriter.positionals">
@@ -282,13 +304,13 @@
 <div class="viewcode-block" id="BashCompletionWriter.optionals">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.optionals">[docs]</a>
     <span class="k">def</span> <span class="nf">optionals</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">optionals</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">optionals</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">optionals</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="BashCompletionWriter.subcommands">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.BashCompletionWriter.subcommands">[docs]</a>
     <span class="k">def</span> <span class="nf">subcommands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">subcommands</span><span class="p">):</span>
-        <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subcommands</span><span class="p">))</span></div>
+        <span class="k">return</span> <span class="s1">&#39;RAMBLE_COMPREPLY=&quot;</span><span class="si">{0}</span><span class="s1">&quot;&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">subcommands</span><span class="p">))</span></div>
 </div>
 
 
@@ -307,16 +329,16 @@
 <div class="viewcode-block" id="rst_index">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.rst_index">[docs]</a>
 <span class="k">def</span> <span class="nf">rst_index</span><span class="p">(</span><span class="n">out</span><span class="p">):</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="n">index</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">index_commands</span><span class="p">()</span>
-    <span class="n">sections</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s1">&#39;long&#39;</span><span class="p">]</span>
+    <span class="n">sections</span> <span class="o">=</span> <span class="n">index</span><span class="p">[</span><span class="s2">&quot;long&quot;</span><span class="p">]</span>
 
     <span class="n">dmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">section_descriptions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sections</span><span class="p">)</span> <span class="o">+</span> <span class="mi">2</span>
     <span class="n">cmax</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">sections</span><span class="o">.</span><span class="n">items</span><span class="p">())</span> <span class="o">+</span> <span class="mi">60</span>
 
-    <span class="n">row</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="n">dmax</span><span class="p">,</span> <span class="s1">&#39;=&#39;</span> <span class="o">*</span> <span class="n">cmax</span><span class="p">)</span>
-    <span class="n">line</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%%</span><span class="s1">-</span><span class="si">%d</span><span class="s1">s  </span><span class="si">%%</span><span class="s1">s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">dmax</span>
+    <span class="n">row</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">  </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="n">dmax</span><span class="p">,</span> <span class="s2">&quot;=&quot;</span> <span class="o">*</span> <span class="n">cmax</span><span class="p">)</span>
+    <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%%</span><span class="s2">-</span><span class="si">%d</span><span class="s2">s  </span><span class="si">%%</span><span class="s2">s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">dmax</span>
 
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot; Category &quot;</span><span class="p">,</span> <span class="s2">&quot; Commands &quot;</span><span class="p">))</span>
@@ -325,10 +347,10 @@
         <span class="n">description</span> <span class="o">=</span> <span class="n">section_descriptions</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">section</span><span class="p">,</span> <span class="n">section</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">cmd</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">commands</span><span class="p">)):</span>
-            <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
-            <span class="n">ref</span> <span class="o">=</span> <span class="s1">&#39;:ref:`</span><span class="si">%s</span><span class="s1"> &lt;ramble-</span><span class="si">%s</span><span class="s1">&gt;`&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
-            <span class="n">comma</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
-            <span class="n">bar</span> <span class="o">=</span> <span class="s1">&#39;| &#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;  &#39;</span>
+            <span class="n">description</span> <span class="o">=</span> <span class="n">description</span><span class="o">.</span><span class="n">capitalize</span><span class="p">()</span> <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">ref</span> <span class="o">=</span> <span class="s2">&quot;:ref:`</span><span class="si">%s</span><span class="s2"> &lt;ramble-</span><span class="si">%s</span><span class="s2">&gt;`&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+            <span class="n">comma</span> <span class="o">=</span> <span class="s2">&quot;,&quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">commands</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span>
+            <span class="n">bar</span> <span class="o">=</span> <span class="s2">&quot;| &quot;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">8</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s2">&quot;  &quot;</span>
             <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">line</span> <span class="o">%</span> <span class="p">(</span><span class="n">description</span><span class="p">,</span> <span class="n">bar</span> <span class="o">+</span> <span class="n">ref</span> <span class="o">+</span> <span class="n">comma</span><span class="p">))</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
 
@@ -347,17 +369,16 @@
     <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">rst_files</span><span class="p">:</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\.\. _cmd-(ramble-.*):&#39;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+                <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\.\. _cmd-(ramble-.*):&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
                     <span class="n">documented_commands</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
 
     <span class="c1"># print an index to each command</span>
     <span class="n">rst_index</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># print sections for each command and subcommand</span>
-    <span class="n">writer</span> <span class="o">=</span> <span class="n">RambleArgparseRstWriter</span><span class="p">(</span>
-        <span class="n">parser</span><span class="o">.</span><span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">aliases</span><span class="p">,</span> <span class="n">documented_commands</span><span class="p">)</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">RambleArgparseRstWriter</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">prog</span><span class="p">,</span> <span class="n">out</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">aliases</span><span class="p">,</span> <span class="n">documented_commands</span><span class="p">)</span>
     <span class="n">writer</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
 
 
@@ -412,8 +433,8 @@
     <span class="c1"># if we&#39;re updating an existing file, only write output if a command</span>
     <span class="c1"># or the header is newer than the file.</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Generating file: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generating file: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">prepend_header</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
             <span class="n">formatter</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
@@ -445,9 +466,7 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.commands.commands">[docs]</a>
 <span class="k">def</span> <span class="nf">commands</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">update_completion</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s1">&#39;names&#39;</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([</span>
-                <span class="n">args</span><span class="o">.</span><span class="n">aliases</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">header</span>
-        <span class="p">]):</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">format</span> <span class="o">!=</span> <span class="s2">&quot;names&quot;</span> <span class="ow">or</span> <span class="nb">any</span><span class="p">([</span><span class="n">args</span><span class="o">.</span><span class="n">aliases</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">header</span><span class="p">]):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;--update-completion can only be specified alone.&quot;</span><span class="p">)</span>
 
         <span class="c1"># this runs the command multiple times with different arguments</span>

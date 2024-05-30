@@ -158,7 +158,7 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.LinkParser">[docs]</a>
 <span class="k">class</span> <span class="nc">LinkParser</span><span class="p">(</span><span class="n">HTMLParser</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This parser just takes an HTML page and strips out the hrefs on the</span>
-<span class="sd">       links.  Good enough for a really simple spider. &quot;&quot;&quot;</span>
+<span class="sd">    links.  Good enough for a really simple spider.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">HTMLParser</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
@@ -167,9 +167,9 @@
 <div class="viewcode-block" id="LinkParser.handle_starttag">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.LinkParser.handle_starttag">[docs]</a>
     <span class="k">def</span> <span class="nf">handle_starttag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tag</span><span class="p">,</span> <span class="n">attrs</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s1">&#39;a&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">tag</span> <span class="o">==</span> <span class="s2">&quot;a&quot;</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">attr</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">attrs</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s1">&#39;href&#39;</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">attr</span> <span class="o">==</span> <span class="s2">&quot;href&quot;</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span></div>
 </div>
 
@@ -178,18 +178,18 @@
 <div class="viewcode-block" id="uses_ssl">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.uses_ssl">[docs]</a>
 <span class="k">def</span> <span class="nf">uses_ssl</span><span class="p">(</span><span class="n">parsed_url</span><span class="p">):</span>
-    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;https&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;https&quot;</span><span class="p">:</span>
         <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
-        <span class="n">endpoint_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;S3_ENDPOINT_URL&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
+        <span class="n">endpoint_url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;S3_ENDPOINT_URL&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">endpoint_url</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-        <span class="k">if</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s1">&#39;https&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;https&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">endpoint_url</span><span class="p">,</span> <span class="n">scheme</span><span class="o">=</span><span class="s2">&quot;https&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;https&quot;</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
 
-    <span class="k">elif</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;gs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">parsed_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;gs&quot;</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;(uses_ssl) GCS Blob is https&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="kc">True</span>
 
@@ -197,11 +197,9 @@
 
 
 
-<span class="n">__UNABLE_TO_VERIFY_SSL</span> <span class="o">=</span> <span class="p">(</span>
-    <span class="k">lambda</span> <span class="n">pyver</span><span class="p">:</span> <span class="p">(</span>
-        <span class="p">(</span><span class="n">pyver</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="ow">or</span>
-        <span class="p">((</span><span class="mi">3</span><span class="p">,)</span> <span class="o">&lt;</span> <span class="n">pyver</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
-    <span class="p">))(</span><span class="n">sys</span><span class="o">.</span><span class="n">version_info</span><span class="p">)</span>
+<span class="n">__UNABLE_TO_VERIFY_SSL</span> <span class="o">=</span> <span class="p">(</span><span class="k">lambda</span> <span class="n">pyver</span><span class="p">:</span> <span class="p">((</span><span class="n">pyver</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span> <span class="ow">or</span> <span class="p">((</span><span class="mi">3</span><span class="p">,)</span> <span class="o">&lt;</span> <span class="n">pyver</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">))))(</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span>
+<span class="p">)</span>
 
 
 <div class="viewcode-block" id="read_from_url">
@@ -210,10 +208,10 @@
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="n">context</span> <span class="o">=</span> <span class="kc">None</span>
 
-    <span class="n">verify_ssl</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:verify_ssl&#39;</span><span class="p">)</span>
+    <span class="n">verify_ssl</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:verify_ssl&quot;</span><span class="p">)</span>
 
     <span class="c1"># Timeout in seconds for web requests</span>
-    <span class="n">timeout</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:connect_timeout&#39;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">timeout</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:connect_timeout&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
 
     <span class="c1"># Don&#39;t even bother with a context unless the URL scheme is one that uses</span>
     <span class="c1"># SSL certs.</span>
@@ -235,10 +233,10 @@
     <span class="n">url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span> <span class="ow">and</span> <span class="n">url_scheme</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
         <span class="n">url</span> <span class="o">=</span> <span class="n">convert_to_posix_path</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
-    <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="n">SPACK_USER_AGENT</span><span class="p">})</span>
+    <span class="n">req</span> <span class="o">=</span> <span class="n">Request</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;User-Agent&quot;</span><span class="p">:</span> <span class="n">SPACK_USER_AGENT</span><span class="p">})</span>
 
     <span class="n">content_type</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">is_web_url</span> <span class="o">=</span> <span class="n">url_scheme</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;http&#39;</span><span class="p">,</span> <span class="s1">&#39;https&#39;</span><span class="p">)</span>
+    <span class="n">is_web_url</span> <span class="o">=</span> <span class="n">url_scheme</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;http&quot;</span><span class="p">,</span> <span class="s2">&quot;https&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">accept_content_type</span> <span class="ow">and</span> <span class="n">is_web_url</span><span class="p">:</span>
         <span class="c1"># Make a HEAD request first to check the content type.  This lets</span>
         <span class="c1"># us ignore tarballs and gigantic files.</span>
@@ -248,7 +246,7 @@
         <span class="n">req</span><span class="o">.</span><span class="n">get_method</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="s2">&quot;HEAD&quot;</span>
         <span class="n">resp</span> <span class="o">=</span> <span class="n">_urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
 
-        <span class="n">content_type</span> <span class="o">=</span> <span class="n">get_header</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="s1">&#39;Content-type&#39;</span><span class="p">)</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">get_header</span><span class="p">(</span><span class="n">resp</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="s2">&quot;Content-type&quot;</span><span class="p">)</span>
 
     <span class="c1"># Do the real GET request when we know it&#39;s just HTML.</span>
     <span class="n">req</span><span class="o">.</span><span class="n">get_method</span> <span class="o">=</span> <span class="k">lambda</span><span class="p">:</span> <span class="s2">&quot;GET&quot;</span>
@@ -256,22 +254,21 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">response</span> <span class="o">=</span> <span class="n">_urlopen</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">URLError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">SpackWebError</span><span class="p">(</span><span class="s1">&#39;Download failed: </span><span class="si">{ERROR}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">ERROR</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)))</span>
+        <span class="k">raise</span> <span class="n">SpackWebError</span><span class="p">(</span><span class="s2">&quot;Download failed: </span><span class="si">{ERROR}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">ERROR</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">)))</span>
 
     <span class="k">if</span> <span class="n">accept_content_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_web_url</span><span class="p">:</span>
-        <span class="n">content_type</span> <span class="o">=</span> <span class="n">get_header</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="s1">&#39;Content-type&#39;</span><span class="p">)</span>
+        <span class="n">content_type</span> <span class="o">=</span> <span class="n">get_header</span><span class="p">(</span><span class="n">response</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="s2">&quot;Content-type&quot;</span><span class="p">)</span>
 
-    <span class="n">reject_content_type</span> <span class="o">=</span> <span class="p">(</span>
-        <span class="n">accept_content_type</span> <span class="ow">and</span> <span class="p">(</span>
-            <span class="n">content_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span>
-            <span class="ow">not</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">accept_content_type</span><span class="p">)))</span>
+    <span class="n">reject_content_type</span> <span class="o">=</span> <span class="n">accept_content_type</span> <span class="ow">and</span> <span class="p">(</span>
+        <span class="n">content_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">content_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">accept_content_type</span><span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="k">if</span> <span class="n">reject_content_type</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;ignoring page </span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">url</span><span class="p">,</span>
-            <span class="s2">&quot; with content type &quot;</span> <span class="k">if</span> <span class="n">content_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-            <span class="n">content_type</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;ignoring page </span><span class="si">{0}{1}{2}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">url</span><span class="p">,</span> <span class="s2">&quot; with content type &quot;</span> <span class="k">if</span> <span class="n">content_type</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">content_type</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
         <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
@@ -282,26 +279,27 @@
 <div class="viewcode-block" id="warn_no_ssl_cert_checking">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.warn_no_ssl_cert_checking">[docs]</a>
 <span class="k">def</span> <span class="nf">warn_no_ssl_cert_checking</span><span class="p">():</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Ramble will not check SSL certificates. You need to update &quot;</span>
-                <span class="s2">&quot;your Python to enable certificate verification.&quot;</span><span class="p">)</span></div>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;Ramble will not check SSL certificates. You need to update &quot;</span>
+        <span class="s2">&quot;your Python to enable certificate verification.&quot;</span>
+    <span class="p">)</span></div>
 
 
 
 <div class="viewcode-block" id="push_to_url">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.push_to_url">[docs]</a>
-<span class="k">def</span> <span class="nf">push_to_url</span><span class="p">(</span>
-        <span class="n">local_file_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">keep_original</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">push_to_url</span><span class="p">(</span><span class="n">local_file_path</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">keep_original</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">extra_args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;win32&quot;</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">remote_path</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;:&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">remote_path</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;:&quot;</span><span class="p">:</span>
             <span class="n">remote_path</span> <span class="o">=</span> <span class="s2">&quot;file://&quot;</span> <span class="o">+</span> <span class="n">remote_path</span>
     <span class="n">remote_url</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">remote_path</span><span class="p">)</span>
-    <span class="n">verify_ssl</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:verify_ssl&#39;</span><span class="p">)</span>
+    <span class="n">verify_ssl</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:verify_ssl&quot;</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">__UNABLE_TO_VERIFY_SSL</span> <span class="ow">and</span> <span class="n">verify_ssl</span> <span class="ow">and</span> <span class="n">uses_ssl</span><span class="p">(</span><span class="n">remote_url</span><span class="p">):</span>
         <span class="n">warn_no_ssl_cert_checking</span><span class="p">()</span>
 
     <span class="n">remote_file_path</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">local_file_path</span><span class="p">(</span><span class="n">remote_url</span><span class="p">)</span>
-    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Trying to backup file to: </span><span class="si">{</span><span class="n">remote_file_path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trying to backup file to: </span><span class="si">{</span><span class="n">remote_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">remote_file_path</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">mkdirp</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">remote_file_path</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">keep_original</span><span class="p">:</span>
@@ -320,23 +318,23 @@
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span>
 
-    <span class="k">elif</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">extra_args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">extra_args</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="n">remote_path</span> <span class="o">=</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">path</span>
-        <span class="k">while</span> <span class="n">remote_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
+        <span class="k">while</span> <span class="n">remote_path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
             <span class="n">remote_path</span> <span class="o">=</span> <span class="n">remote_path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
 
-        <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span><span class="n">remote_url</span><span class="p">,</span>
-                                       <span class="n">connection</span><span class="o">=</span><span class="n">s3_util</span><span class="o">.</span><span class="n">get_mirror_connection</span><span class="p">(</span><span class="n">remote_url</span><span class="p">))</span>   <span class="c1"># noqa: E501</span>
-        <span class="n">s3</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">local_file_path</span><span class="p">,</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span>
-                       <span class="n">remote_path</span><span class="p">,</span> <span class="n">ExtraArgs</span><span class="o">=</span><span class="n">extra_args</span><span class="p">)</span>
+        <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span>
+            <span class="n">remote_url</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">s3_util</span><span class="o">.</span><span class="n">get_mirror_connection</span><span class="p">(</span><span class="n">remote_url</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># noqa: E501</span>
+        <span class="n">s3</span><span class="o">.</span><span class="n">upload_file</span><span class="p">(</span><span class="n">local_file_path</span><span class="p">,</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">remote_path</span><span class="p">,</span> <span class="n">ExtraArgs</span><span class="o">=</span><span class="n">extra_args</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_original</span><span class="p">:</span>
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_file_path</span><span class="p">)</span>
 
-    <span class="k">elif</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;gs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;gs&quot;</span><span class="p">:</span>
         <span class="n">gcs</span> <span class="o">=</span> <span class="n">gcs_util</span><span class="o">.</span><span class="n">GCSBlob</span><span class="p">(</span><span class="n">remote_url</span><span class="p">)</span>
         <span class="n">gcs</span><span class="o">.</span><span class="n">upload_to_blob</span><span class="p">(</span><span class="n">local_file_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">keep_original</span><span class="p">:</span>
@@ -344,8 +342,8 @@
 
     <span class="k">else</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-            <span class="s1">&#39;Unrecognized URL scheme: </span><span class="si">{SCHEME}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-                <span class="n">SCHEME</span><span class="o">=</span><span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">))</span></div>
+            <span class="s2">&quot;Unrecognized URL scheme: </span><span class="si">{SCHEME}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">SCHEME</span><span class="o">=</span><span class="n">remote_url</span><span class="o">.</span><span class="n">scheme</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
 
 
@@ -357,19 +355,21 @@
     <span class="k">if</span> <span class="n">local_path</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
         <span class="c1"># Check for URL specific connection information</span>
-        <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">s3_util</span><span class="o">.</span><span class="n">get_mirror_connection</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>  <span class="c1"># noqa: E501</span>
+        <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">s3_util</span><span class="o">.</span><span class="n">get_mirror_connection</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># noqa: E501</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">s3</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+            <span class="n">s3</span><span class="o">.</span><span class="n">get_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">netloc</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
             <span class="k">return</span> <span class="kc">True</span>
         <span class="k">except</span> <span class="n">s3</span><span class="o">.</span><span class="n">ClientError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="p">[</span><span class="s1">&#39;Error&#39;</span><span class="p">][</span><span class="s1">&#39;Code&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;NoSuchKey&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">err</span><span class="o">.</span><span class="n">response</span><span class="p">[</span><span class="s2">&quot;Error&quot;</span><span class="p">][</span><span class="s2">&quot;Code&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;NoSuchKey&quot;</span><span class="p">:</span>
                 <span class="k">return</span> <span class="kc">False</span>
             <span class="k">raise</span> <span class="n">err</span>
 
-    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;gs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;gs&quot;</span><span class="p">:</span>
         <span class="n">gcs</span> <span class="o">=</span> <span class="n">gcs_util</span><span class="o">.</span><span class="n">GCSBlob</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">gcs</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
 
@@ -384,11 +384,11 @@
 
 
 <span class="k">def</span> <span class="nf">_debug_print_delete_results</span><span class="p">(</span><span class="n">result</span><span class="p">):</span>
-    <span class="k">if</span> <span class="s1">&#39;Deleted&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;Deleted&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s2">&quot;Deleted&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Deleted&quot;</span><span class="p">]:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Deleted </span><span class="si">{</span><span class="n">d</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="s1">&#39;Errors&#39;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;Errors&#39;</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s2">&quot;Errors&quot;</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Errors&quot;</span><span class="p">]:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Failed to delete </span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> (</span><span class="si">{</span><span class="n">e</span><span class="p">[</span><span class="s2">&quot;Message&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
 
 
@@ -405,40 +405,42 @@
             <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
         <span class="k">return</span>
 
-    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
         <span class="c1"># Try to find a mirror for potential connection information</span>
-        <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">s3_util</span><span class="o">.</span><span class="n">get_mirror_connection</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>  <span class="c1"># noqa: E501</span>
+        <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span>
+            <span class="n">url</span><span class="p">,</span> <span class="n">connection</span><span class="o">=</span><span class="n">s3_util</span><span class="o">.</span><span class="n">get_mirror_connection</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="p">)</span>  <span class="c1"># noqa: E501</span>
         <span class="n">bucket</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">netloc</span>
         <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
             <span class="c1"># Because list_objects_v2 can only return up to 1000 items</span>
             <span class="c1"># at a time, we have to paginate to make sure we get it all</span>
-            <span class="n">prefix</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)</span>
-            <span class="n">paginator</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">get_paginator</span><span class="p">(</span><span class="s1">&#39;list_objects_v2&#39;</span><span class="p">)</span>
+            <span class="n">prefix</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+            <span class="n">paginator</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">get_paginator</span><span class="p">(</span><span class="s2">&quot;list_objects_v2&quot;</span><span class="p">)</span>
             <span class="n">pages</span> <span class="o">=</span> <span class="n">paginator</span><span class="o">.</span><span class="n">paginate</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">)</span>
 
-            <span class="n">delete_request</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Objects&#39;</span><span class="p">:</span> <span class="p">[]}</span>
-            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pages</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;Contents&#39;</span><span class="p">):</span>
+            <span class="n">delete_request</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Objects&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+            <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">pages</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;Contents&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">item</span><span class="p">:</span>
                     <span class="k">continue</span>
 
-                <span class="n">delete_request</span><span class="p">[</span><span class="s1">&#39;Objects&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;Key&#39;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]})</span>
+                <span class="n">delete_request</span><span class="p">[</span><span class="s2">&quot;Objects&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;Key&quot;</span><span class="p">:</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]})</span>
 
                 <span class="c1"># Make sure we do not try to hit S3 with a list of more</span>
                 <span class="c1"># than 1000 items</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete_request</span><span class="p">[</span><span class="s1">&#39;Objects&#39;</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">1000</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete_request</span><span class="p">[</span><span class="s2">&quot;Objects&quot;</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="mi">1000</span><span class="p">:</span>
                     <span class="n">r</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">delete_objects</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Delete</span><span class="o">=</span><span class="n">delete_request</span><span class="p">)</span>
                     <span class="n">_debug_print_delete_results</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
-                    <span class="n">delete_request</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Objects&#39;</span><span class="p">:</span> <span class="p">[]}</span>
+                    <span class="n">delete_request</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Objects&quot;</span><span class="p">:</span> <span class="p">[]}</span>
 
             <span class="c1"># Delete any items that remain</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete_request</span><span class="p">[</span><span class="s1">&#39;Objects&#39;</span><span class="p">]):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">delete_request</span><span class="p">[</span><span class="s2">&quot;Objects&quot;</span><span class="p">]):</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">s3</span><span class="o">.</span><span class="n">delete_objects</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Delete</span><span class="o">=</span><span class="n">delete_request</span><span class="p">)</span>
                 <span class="n">_debug_print_delete_results</span><span class="p">(</span><span class="n">r</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">s3</span><span class="o">.</span><span class="n">delete_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">))</span>
+            <span class="n">s3</span><span class="o">.</span><span class="n">delete_object</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Key</span><span class="o">=</span><span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">lstrip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span>
         <span class="k">return</span>
 
-    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;gs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;gs&quot;</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
             <span class="n">bucket</span> <span class="o">=</span> <span class="n">gcs_util</span><span class="o">.</span><span class="n">GCSBucket</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
             <span class="n">bucket</span><span class="o">.</span><span class="n">destroy</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">)</span>
@@ -453,35 +455,32 @@
 
 <span class="k">def</span> <span class="nf">_iter_s3_contents</span><span class="p">(</span><span class="n">contents</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
     <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
-        <span class="n">key</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">entry</span><span class="p">[</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
-            <span class="n">key</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">key</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">key</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="n">key</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">key</span>
 
         <span class="n">key</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">prefix</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s1">&#39;.&#39;</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span><span class="p">:</span>
             <span class="k">continue</span>
 
         <span class="k">yield</span> <span class="n">key</span>
 
 
 <span class="k">def</span> <span class="nf">_list_s3_objects</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">num_entries</span><span class="p">,</span> <span class="n">start_after</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">list_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
-        <span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span>
-        <span class="n">Prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
-        <span class="n">MaxKeys</span><span class="o">=</span><span class="n">num_entries</span><span class="p">)</span>
+    <span class="n">list_args</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">Bucket</span><span class="o">=</span><span class="n">bucket</span><span class="p">,</span> <span class="n">Prefix</span><span class="o">=</span><span class="n">prefix</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">MaxKeys</span><span class="o">=</span><span class="n">num_entries</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">start_after</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">list_args</span><span class="p">[</span><span class="s1">&#39;StartAfter&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_after</span>
+        <span class="n">list_args</span><span class="p">[</span><span class="s2">&quot;StartAfter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">start_after</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">list_objects_v2</span><span class="p">(</span><span class="o">**</span><span class="n">list_args</span><span class="p">)</span>
 
     <span class="n">last_key</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;IsTruncated&#39;</span><span class="p">]:</span>
-        <span class="n">last_key</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s1">&#39;Contents&#39;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s1">&#39;Key&#39;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;IsTruncated&quot;</span><span class="p">]:</span>
+        <span class="n">last_key</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;Contents&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;Key&quot;</span><span class="p">]</span>
 
-    <span class="nb">iter</span> <span class="o">=</span> <span class="n">_iter_s3_contents</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s1">&#39;Contents&#39;</span><span class="p">],</span> <span class="n">prefix</span><span class="p">)</span>
+    <span class="nb">iter</span> <span class="o">=</span> <span class="n">_iter_s3_contents</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;Contents&quot;</span><span class="p">],</span> <span class="n">prefix</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="nb">iter</span><span class="p">,</span> <span class="n">last_key</span>
 
@@ -489,11 +488,10 @@
 <span class="k">def</span> <span class="nf">_iter_s3_prefix</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">num_entries</span><span class="o">=</span><span class="mi">1024</span><span class="p">):</span>
     <span class="n">key</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">bucket</span> <span class="o">=</span> <span class="n">url</span><span class="o">.</span><span class="n">netloc</span>
-    <span class="n">prefix</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^/*&#39;</span><span class="p">,</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">prefix</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^/*&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="n">url</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
 
     <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
-        <span class="n">contents</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">_list_s3_objects</span><span class="p">(</span>
-            <span class="n">client</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">num_entries</span><span class="p">,</span> <span class="n">start_after</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">contents</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">_list_s3_objects</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">bucket</span><span class="p">,</span> <span class="n">prefix</span><span class="p">,</span> <span class="n">num_entries</span><span class="p">,</span> <span class="n">start_after</span><span class="o">=</span><span class="n">key</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">contents</span><span class="p">:</span>
             <span class="k">yield</span> <span class="n">x</span>
@@ -517,19 +515,20 @@
     <span class="k">if</span> <span class="n">local_path</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_iter_local_prefix</span><span class="p">(</span><span class="n">local_path</span><span class="p">))</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">subpath</span> <span class="k">for</span> <span class="n">subpath</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">subpath</span><span class="p">))]</span>
+        <span class="k">return</span> <span class="p">[</span>
+            <span class="n">subpath</span>
+            <span class="k">for</span> <span class="n">subpath</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">local_path</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="n">subpath</span><span class="p">))</span>
+        <span class="p">]</span>
 
-    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
         <span class="n">s3</span> <span class="o">=</span> <span class="n">s3_util</span><span class="o">.</span><span class="n">create_s3_session</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">recursive</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_iter_s3_prefix</span><span class="p">(</span><span class="n">s3</span><span class="p">,</span> <span class="n">url</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span>
-            <span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_iter_s3_prefix</span><span class="p">(</span><span class="n">s3</span><span class="p">,</span> <span class="n">url</span><span class="p">)))</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">_iter_s3_prefix</span><span class="p">(</span><span class="n">s3</span><span class="p">,</span> <span class="n">url</span><span class="p">)))</span>
 
-    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;gs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;gs&quot;</span><span class="p">:</span>
         <span class="n">gcs</span> <span class="o">=</span> <span class="n">gcs_util</span><span class="o">.</span><span class="n">GCSBucket</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">gcs</span><span class="o">.</span><span class="n">get_all_blobs</span><span class="p">(</span><span class="n">recursive</span><span class="o">=</span><span class="n">recursive</span><span class="p">)</span></div>
 
@@ -578,11 +577,11 @@
         <span class="n">subcalls</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">response_url</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s1">&#39;text/html&#39;</span><span class="p">)</span>
+            <span class="n">response_url</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">read_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="s2">&quot;text/html&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">response_url</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">response</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">pages</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">subcalls</span>
 
-            <span class="n">page</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getreader</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)(</span><span class="n">response</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">codecs</span><span class="o">.</span><span class="n">getreader</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)(</span><span class="n">response</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="n">pages</span><span class="p">[</span><span class="n">response_url</span><span class="p">]</span> <span class="o">=</span> <span class="n">page</span>
 
             <span class="c1"># Parse out the links in the page</span>
@@ -591,10 +590,7 @@
 
             <span class="k">while</span> <span class="n">link_parser</span><span class="o">.</span><span class="n">links</span><span class="p">:</span>
                 <span class="n">raw_link</span> <span class="o">=</span> <span class="n">link_parser</span><span class="o">.</span><span class="n">links</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
-                <span class="n">abs_link</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">response_url</span><span class="p">,</span>
-                    <span class="n">raw_link</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span>
-                    <span class="n">resolve_href</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">abs_link</span> <span class="o">=</span> <span class="n">url_util</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">response_url</span><span class="p">,</span> <span class="n">raw_link</span><span class="o">.</span><span class="n">strip</span><span class="p">(),</span> <span class="n">resolve_href</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="n">links</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">abs_link</span><span class="p">)</span>
 
                 <span class="c1"># Skip stuff that looks like an archive</span>
@@ -613,11 +609,13 @@
         <span class="k">except</span> <span class="n">URLError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
 
-            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s1">&#39;reason&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLError</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Ramble was unable to fetch url list due to a &quot;</span>
-                            <span class="s2">&quot;certificate verification problem. You can try &quot;</span>
-                            <span class="s2">&quot;running ramble -k, which will not check SSL &quot;</span>
-                            <span class="s2">&quot;certificates. Use this at your own risk.&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="s2">&quot;reason&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">reason</span><span class="p">,</span> <span class="n">ssl</span><span class="o">.</span><span class="n">SSLError</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;Ramble was unable to fetch url list due to a &quot;</span>
+                    <span class="s2">&quot;certificate verification problem. You can try &quot;</span>
+                    <span class="s2">&quot;running ramble -k, which will not check SSL &quot;</span>
+                    <span class="s2">&quot;certificates. Use this at your own risk.&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">except</span> <span class="n">HTMLParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># This error indicates that Python&#39;s HTML parser sucks.</span>
@@ -632,8 +630,7 @@
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Other types of errors are completely ignored,</span>
             <span class="c1"># except in debug mode</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in _spider: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                         <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error in _spider: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">traceback</span><span class="o">.</span><span class="n">format_exc</span><span class="p">())</span>
 
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;SPIDER: [url=</span><span class="si">{0}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
@@ -691,22 +688,24 @@
     <span class="c1"># Note: &#39;context&#39; parameter was only introduced starting</span>
     <span class="c1"># with versions 2.7.9 and 3.4.3 of Python.</span>
     <span class="k">if</span> <span class="n">__UNABLE_TO_VERIFY_SSL</span><span class="p">:</span>
-        <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span>
+        <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">]</span>
 
     <span class="n">opener</span> <span class="o">=</span> <span class="n">urlopen</span>
-    <span class="k">if</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;s3&#39;</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;s3&quot;</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">spack.s3_handler</span>
+
         <span class="n">opener</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">s3_handler</span><span class="o">.</span><span class="n">open</span>
-    <span class="k">elif</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s1">&#39;gs&#39;</span><span class="p">:</span>
+    <span class="k">elif</span> <span class="n">url_util</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;gs&quot;</span><span class="p">:</span>
         <span class="kn">import</span> <span class="nn">spack.gcs_handler</span>
+
         <span class="n">opener</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">gcs_handler</span><span class="o">.</span><span class="n">gcs_open</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">opener</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
         <span class="c1"># If the above fails because of &#39;context&#39;, call without &#39;context&#39;.</span>
-        <span class="k">if</span> <span class="s1">&#39;context&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s1">&#39;context&#39;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
-            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;context&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s2">&quot;context&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span> <span class="ow">and</span> <span class="s2">&quot;context&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">):</span>
+            <span class="k">del</span> <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;context&quot;</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">opener</span><span class="p">(</span><span class="n">req</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
 
@@ -751,8 +750,8 @@
     <span class="c1"># Add &#39;/&#39; to the end of the URL. Some web servers require this.</span>
     <span class="n">additional_list_urls</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">lurl</span> <span class="ow">in</span> <span class="n">list_urls</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">lurl</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">):</span>
-            <span class="n">additional_list_urls</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lurl</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">lurl</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">):</span>
+            <span class="n">additional_list_urls</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">lurl</span> <span class="o">+</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
     <span class="n">list_urls</span> <span class="o">|=</span> <span class="n">additional_list_urls</span>
 
     <span class="c1"># Grab some web pages to scrape.</span>
@@ -777,7 +776,7 @@
         <span class="c1">#   https://cran.r-project.org/src/contrib/enpls_5.7.tar.gz</span>
         <span class="c1">#   https://cran.r-project.org/src/contrib/autopls_1.3.tar.gz</span>
         <span class="c1">#   https://cran.r-project.org/src/contrib/matrixpls_1.0.4.tar.gz</span>
-        <span class="n">url_regex</span> <span class="o">=</span> <span class="s1">&#39;/&#39;</span> <span class="o">+</span> <span class="n">url_regex</span>
+        <span class="n">url_regex</span> <span class="o">=</span> <span class="s2">&quot;/&quot;</span> <span class="o">+</span> <span class="n">url_regex</span>
 
         <span class="c1"># We need to add a $ anchor to the end of the regex to prevent</span>
         <span class="c1"># Spack from picking up signature files like:</span>
@@ -786,10 +785,10 @@
         <span class="c1">#   .sha256</span>
         <span class="c1">#   .sig</span>
         <span class="c1"># However, SourceForge downloads still need to end in &#39;/download&#39;.</span>
-        <span class="n">url_regex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s1">&#39;(\/download)?&#39;</span>
+        <span class="n">url_regex</span> <span class="o">+=</span> <span class="sa">r</span><span class="s2">&quot;(\/download)?&quot;</span>
         <span class="c1"># PyPI adds #sha256=... to the end of the URL</span>
-        <span class="n">url_regex</span> <span class="o">+=</span> <span class="s1">&#39;(#sha256=.*)?&#39;</span>
-        <span class="n">url_regex</span> <span class="o">+=</span> <span class="s1">&#39;$&#39;</span>
+        <span class="n">url_regex</span> <span class="o">+=</span> <span class="s2">&quot;(#sha256=.*)?&quot;</span>
+        <span class="n">url_regex</span> <span class="o">+=</span> <span class="s2">&quot;$&quot;</span>
 
         <span class="n">regexes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url_regex</span><span class="p">)</span>
 
@@ -849,7 +848,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">unfuzz</span><span class="p">(</span><span class="n">header</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[ _-]&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[ _-]&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">header</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
 
     <span class="k">try</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">headers</span><span class="p">[</span><span class="n">header_name</span><span class="p">]</span>
@@ -873,10 +872,11 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.web.NoNetworkConnectionError">[docs]</a>
 <span class="k">class</span> <span class="nc">NoNetworkConnectionError</span><span class="p">(</span><span class="n">SpackWebError</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when an operation can&#39;t get an internet connection.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">,</span> <span class="n">url</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">NoNetworkConnectionError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s2">&quot;No network connection: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">),</span>
-            <span class="s2">&quot;URL was: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">))</span>
+            <span class="s2">&quot;No network connection: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">),</span> <span class="s2">&quot;URL was: &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span></div>
 
 </pre></div>

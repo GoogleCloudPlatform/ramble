@@ -129,31 +129,29 @@
 <div class="viewcode-block" id="setup_parser">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
-    <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;SUBCOMMAND&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;debug_command&#39;</span><span class="p">)</span>
-    <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s1">&#39;report&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;print information useful for bug reports&#39;</span><span class="p">)</span></div>
+    <span class="n">sp</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_subparsers</span><span class="p">(</span><span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;SUBCOMMAND&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;debug_command&quot;</span><span class="p">)</span>
+    <span class="n">sp</span><span class="o">.</span><span class="n">add_parser</span><span class="p">(</span><span class="s2">&quot;report&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print information useful for bug reports&quot;</span><span class="p">)</span></div>
 
 
 
 <span class="k">def</span> <span class="nf">_debug_tarball_suffix</span><span class="p">():</span>
     <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-    <span class="n">suffix</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%Y-%m-</span><span class="si">%d</span><span class="s1">-%H%M%S&#39;</span><span class="p">)</span>
+    <span class="n">suffix</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">-%H%M%S&quot;</span><span class="p">)</span>
 
-    <span class="n">git</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s1">&#39;git&#39;</span><span class="p">)</span>
+    <span class="n">git</span> <span class="o">=</span> <span class="n">which</span><span class="p">(</span><span class="s2">&quot;git&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">git</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;nobranch-nogit-</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">suffix</span>
+        <span class="k">return</span> <span class="s2">&quot;nobranch-nogit-</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">suffix</span>
 
     <span class="k">with</span> <span class="n">working_dir</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s1">&#39;.git&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s1">&#39;nobranch.nogit.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">suffix</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="s2">&quot;.git&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;nobranch.nogit.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">suffix</span>
 
         <span class="c1"># Get symbolic branch name and strip any special chars (mainly &#39;/&#39;)</span>
-        <span class="n">symbolic</span> <span class="o">=</span> <span class="n">git</span><span class="p">(</span>
-            <span class="s1">&#39;rev-parse&#39;</span><span class="p">,</span> <span class="s1">&#39;--abbrev-ref&#39;</span><span class="p">,</span> <span class="s1">&#39;--short&#39;</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-        <span class="n">symbolic</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[^\w.-]&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">symbolic</span><span class="p">)</span>
+        <span class="n">symbolic</span> <span class="o">=</span> <span class="n">git</span><span class="p">(</span><span class="s2">&quot;rev-parse&quot;</span><span class="p">,</span> <span class="s2">&quot;--abbrev-ref&quot;</span><span class="p">,</span> <span class="s2">&quot;--short&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">symbolic</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[^\w.-]&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">symbolic</span><span class="p">)</span>
 
         <span class="c1"># Get the commit hash too.</span>
-        <span class="n">commit</span> <span class="o">=</span> <span class="n">git</span><span class="p">(</span>
-            <span class="s1">&#39;rev-parse&#39;</span><span class="p">,</span> <span class="s1">&#39;--short&#39;</span><span class="p">,</span> <span class="s1">&#39;HEAD&#39;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="n">commit</span> <span class="o">=</span> <span class="n">git</span><span class="p">(</span><span class="s2">&quot;rev-parse&quot;</span><span class="p">,</span> <span class="s2">&quot;--short&quot;</span><span class="p">,</span> <span class="s2">&quot;HEAD&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">symbolic</span> <span class="o">==</span> <span class="n">commit</span><span class="p">:</span>
             <span class="k">return</span> <span class="s2">&quot;nobranch.</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">commit</span><span class="p">,</span> <span class="n">suffix</span><span class="p">)</span>
@@ -165,14 +163,12 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.report">[docs]</a>
 <span class="k">def</span> <span class="nf">report</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="n">host_platform</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">platforms</span><span class="o">.</span><span class="n">host</span><span class="p">()</span>
-    <span class="n">host_os</span> <span class="o">=</span> <span class="n">host_platform</span><span class="o">.</span><span class="n">operating_system</span><span class="p">(</span><span class="s1">&#39;frontend&#39;</span><span class="p">)</span>
-    <span class="n">host_target</span> <span class="o">=</span> <span class="n">host_platform</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="s1">&#39;frontend&#39;</span><span class="p">)</span>
-    <span class="n">architecture</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">ArchSpec</span><span class="p">(</span>
-        <span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">host_platform</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">host_os</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">host_target</span><span class="p">))</span>
-    <span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* **Ramble:**&#39;</span><span class="p">,</span> <span class="n">get_version</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* **Python:**&#39;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">())</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;* **Platform:**&#39;</span><span class="p">,</span> <span class="n">architecture</span><span class="p">)</span></div>
+    <span class="n">host_os</span> <span class="o">=</span> <span class="n">host_platform</span><span class="o">.</span><span class="n">operating_system</span><span class="p">(</span><span class="s2">&quot;frontend&quot;</span><span class="p">)</span>
+    <span class="n">host_target</span> <span class="o">=</span> <span class="n">host_platform</span><span class="o">.</span><span class="n">target</span><span class="p">(</span><span class="s2">&quot;frontend&quot;</span><span class="p">)</span>
+    <span class="n">architecture</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">ArchSpec</span><span class="p">((</span><span class="nb">str</span><span class="p">(</span><span class="n">host_platform</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">host_os</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">host_target</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* **Ramble:**&quot;</span><span class="p">,</span> <span class="n">get_version</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* **Python:**&quot;</span><span class="p">,</span> <span class="n">platform</span><span class="o">.</span><span class="n">python_version</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;* **Platform:**&quot;</span><span class="p">,</span> <span class="n">architecture</span><span class="p">)</span></div>
 
 
 
@@ -180,7 +176,7 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.debug.debug">[docs]</a>
 <span class="k">def</span> <span class="nf">debug</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">action</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;report&#39;</span><span class="p">:</span> <span class="n">report</span><span class="p">,</span>
+        <span class="s2">&quot;report&quot;</span><span class="p">:</span> <span class="n">report</span><span class="p">,</span>
     <span class="p">}</span>
     <span class="n">action</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">debug_command</span><span class="p">](</span><span class="n">args</span><span class="p">)</span></div>
 

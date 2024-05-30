@@ -114,53 +114,54 @@
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 
 <span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">&#39;mod_to_class&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;ramble_module_to_python_module&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;valid_module_name&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;valid_fully_qualified_module_name&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;validate_fully_qualified_module_name&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;validate_module_name&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;possible_ramble_module_names&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;simplify_name&#39;</span><span class="p">,</span>
-    <span class="s1">&#39;NamespaceTrie&#39;</span><span class="p">]</span>
+    <span class="s2">&quot;mod_to_class&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ramble_module_to_python_module&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;valid_module_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;valid_fully_qualified_module_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;validate_fully_qualified_module_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;validate_module_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;possible_ramble_module_names&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;simplify_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NamespaceTrie&quot;</span><span class="p">,</span>
+<span class="p">]</span>
 
 <span class="c1"># Valid module names can contain &#39;-&#39; but can&#39;t start with it.</span>
-<span class="n">_valid_module_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^\w[\w-]*$&#39;</span>
+<span class="n">_valid_module_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^\w[\w-]*$&quot;</span>
 
 <span class="c1"># Valid module names can contain &#39;-&#39; but can&#39;t start with it.</span>
-<span class="n">_valid_fully_qualified_module_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;^(\w[\w-]*)(\.\w[\w-]*)*$&#39;</span>
+<span class="n">_valid_fully_qualified_module_re</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;^(\w[\w-]*)(\.\w[\w-]*)*$&quot;</span>
 
 
 <div class="viewcode-block" id="mod_to_class">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.naming.mod_to_class">[docs]</a>
 <span class="k">def</span> <span class="nf">mod_to_class</span><span class="p">(</span><span class="n">mod_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Convert a name from module style to class name style.  Ramble mostly</span>
-<span class="sd">       follows `PEP-8 &lt;http://legacy.python.org/dev/peps/pep-0008/&gt;`_:</span>
+<span class="sd">    follows `PEP-8 &lt;http://legacy.python.org/dev/peps/pep-0008/&gt;`_:</span>
 
-<span class="sd">          * Module and package names use lowercase_with_underscores.</span>
-<span class="sd">          * Class names use the CapWords convention.</span>
+<span class="sd">       * Module and package names use lowercase_with_underscores.</span>
+<span class="sd">       * Class names use the CapWords convention.</span>
 
-<span class="sd">       Regular source code follows these conventions.  Ramble is a bit</span>
-<span class="sd">       more liberal with its Application names:</span>
+<span class="sd">    Regular source code follows these conventions.  Ramble is a bit</span>
+<span class="sd">    more liberal with its Application names:</span>
 
-<span class="sd">          * They can contain &#39;-&#39; as well as &#39;_&#39;, but cannot start with &#39;-&#39;.</span>
-<span class="sd">          * They can start with numbers, e.g. &quot;3proxy&quot;.</span>
+<span class="sd">       * They can contain &#39;-&#39; as well as &#39;_&#39;, but cannot start with &#39;-&#39;.</span>
+<span class="sd">       * They can start with numbers, e.g. &quot;3proxy&quot;.</span>
 
-<span class="sd">       This function converts from the module convention to the class</span>
-<span class="sd">       convention by removing _ and - and converting surrounding</span>
-<span class="sd">       lowercase text to CapWords.  If mod_name starts with a number,</span>
-<span class="sd">       the class name returned will be prepended with &#39;_&#39; to make a</span>
-<span class="sd">       valid Python identifier.</span>
+<span class="sd">    This function converts from the module convention to the class</span>
+<span class="sd">    convention by removing _ and - and converting surrounding</span>
+<span class="sd">    lowercase text to CapWords.  If mod_name starts with a number,</span>
+<span class="sd">    the class name returned will be prepended with &#39;_&#39; to make a</span>
+<span class="sd">    valid Python identifier.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">validate_module_name</span><span class="p">(</span><span class="n">mod_name</span><span class="p">)</span>
 
-    <span class="n">class_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[-_]+&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span>
-    <span class="n">class_name</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">capwords</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
-    <span class="n">class_name</span> <span class="o">=</span> <span class="n">class_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+    <span class="n">class_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[-_]+&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span>
+    <span class="n">class_name</span> <span class="o">=</span> <span class="n">string</span><span class="o">.</span><span class="n">capwords</span><span class="p">(</span><span class="n">class_name</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="n">class_name</span> <span class="o">=</span> <span class="n">class_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
 
     <span class="c1"># If a class starts with a number, prefix it with Number_ to make it</span>
     <span class="c1"># a valid Python class name.</span>
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^[0-9]&#39;</span><span class="p">,</span> <span class="n">class_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^[0-9]&quot;</span><span class="p">,</span> <span class="n">class_name</span><span class="p">):</span>
         <span class="n">class_name</span> <span class="o">=</span> <span class="s2">&quot;_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">class_name</span>
 
     <span class="k">return</span> <span class="n">class_name</span></div>
@@ -171,12 +172,12 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.naming.ramble_module_to_python_module">[docs]</a>
 <span class="k">def</span> <span class="nf">ramble_module_to_python_module</span><span class="p">(</span><span class="n">mod_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a Ramble module name, returns the name by which it can be</span>
-<span class="sd">       imported in Python.</span>
+<span class="sd">    imported in Python.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;[0-9]&#39;</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">):</span>
-        <span class="n">mod_name</span> <span class="o">=</span> <span class="s1">&#39;num&#39;</span> <span class="o">+</span> <span class="n">mod_name</span>
+    <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;[0-9]&quot;</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">):</span>
+        <span class="n">mod_name</span> <span class="o">=</span> <span class="s2">&quot;num&quot;</span> <span class="o">+</span> <span class="n">mod_name</span>
 
-    <span class="k">return</span> <span class="n">mod_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;-&#39;</span><span class="p">,</span> <span class="s1">&#39;_&#39;</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">mod_name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="p">)</span></div>
 
 
 
@@ -184,17 +185,17 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.naming.possible_ramble_module_names">[docs]</a>
 <span class="k">def</span> <span class="nf">possible_ramble_module_names</span><span class="p">(</span><span class="n">python_mod_name</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Given a Python module name, return a list of all possible ramble module</span>
-<span class="sd">       names that could correspond to it.&quot;&quot;&quot;</span>
-    <span class="n">mod_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;^num(\d)&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1&#39;</span><span class="p">,</span> <span class="n">python_mod_name</span><span class="p">)</span>
+<span class="sd">    names that could correspond to it.&quot;&quot;&quot;</span>
+    <span class="n">mod_name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;^num(\d)&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1&quot;</span><span class="p">,</span> <span class="n">python_mod_name</span><span class="p">)</span>
 
-    <span class="n">parts</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;(_)&#39;</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span>
-    <span class="n">options</span> <span class="o">=</span> <span class="p">[[</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">]]</span> <span class="o">*</span> <span class="n">mod_name</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
+    <span class="n">parts</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;(_)&quot;</span><span class="p">,</span> <span class="n">mod_name</span><span class="p">)</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]]</span> <span class="o">*</span> <span class="n">mod_name</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)</span>
 
     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">subs</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">product</span><span class="p">(</span><span class="o">*</span><span class="n">options</span><span class="p">):</span>
         <span class="n">s</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">parts</span><span class="p">)</span>
         <span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">subs</span>
-        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">s</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">results</span></div>
 
@@ -222,7 +223,7 @@
 
     <span class="c1"># Rename Intel downloads</span>
     <span class="c1"># e.g. l_daal, l_ipp, l_mkl -&gt; daal, ipp, mkl</span>
-    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;l_&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;l_&quot;</span><span class="p">):</span>
         <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span>
 
     <span class="c1"># Convert UPPERCASE to lowercase</span>
@@ -231,21 +232,21 @@
 
     <span class="c1"># Replace &#39;_&#39; and &#39;.&#39; with &#39;-&#39;</span>
     <span class="c1"># e.g. backports.ssl_match_hostname -&gt; backports-ssl-match-hostname</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">,</span> <span class="s1">&#39;-&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
 
     <span class="c1"># Replace &quot;++&quot; with &quot;pp&quot; and &quot;+&quot; with &quot;-plus&quot;</span>
     <span class="c1"># e.g. gtk+   -&gt; gtk-plus</span>
     <span class="c1"># e.g. voro++ -&gt; voropp</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;++&#39;</span><span class="p">,</span> <span class="s1">&#39;pp&#39;</span><span class="p">)</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;+&#39;</span><span class="p">,</span> <span class="s1">&#39;-plus&#39;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;++&quot;</span><span class="p">,</span> <span class="s2">&quot;pp&quot;</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;+&quot;</span><span class="p">,</span> <span class="s2">&quot;-plus&quot;</span><span class="p">)</span>
 
     <span class="c1"># Simplify Lua package names</span>
     <span class="c1"># We don&#39;t want &quot;lua&quot; to occur multiple times in the name</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;^(lua)([^-])&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1-\2&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;^(lua)([^-])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1-\2&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="c1"># Simplify Bio++ package names</span>
-    <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s1">&#39;^(bpp)([^-])&#39;</span><span class="p">,</span> <span class="sa">r</span><span class="s1">&#39;\1-\2&#39;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="s2">&quot;^(bpp)([^-])&quot;</span><span class="p">,</span> <span class="sa">r</span><span class="s2">&quot;\1-\2&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">name</span></div>
 
@@ -289,8 +290,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Raised when we encounter a bad module name.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidModuleNameError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s2">&quot;Invalid module name: &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InvalidModuleNameError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="s2">&quot;Invalid module name: &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
 
@@ -299,7 +299,8 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">InvalidFullyQualifiedModuleNameError</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s2">&quot;Invalid fully qualified package name: &quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+            <span class="s2">&quot;Invalid fully qualified package name: &quot;</span> <span class="o">+</span> <span class="n">name</span>
+        <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
 
@@ -315,7 +316,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">value</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39;.&#39;</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s2">&quot;.&quot;</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_subspaces</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_value</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_sep</span> <span class="o">=</span> <span class="n">separator</span>
@@ -350,7 +351,7 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.naming.NamespaceTrie.is_prefix">[docs]</a>
     <span class="k">def</span> <span class="nf">is_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">namespace</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;True if the namespace has a value, or if it&#39;s the prefix of one that</span>
-<span class="sd">           does.&quot;&quot;&quot;</span>
+<span class="sd">        does.&quot;&quot;&quot;</span>
         <span class="n">first</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">rest</span> <span class="o">=</span> <span class="n">namespace</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_sep</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">first</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">True</span>
@@ -391,11 +392,11 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_value</span><span class="p">(</span><span class="n">namespace</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_str_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">0</span><span class="p">):</span>
-        <span class="n">indent</span> <span class="o">=</span> <span class="p">(</span><span class="n">level</span> <span class="o">*</span> <span class="s1">&#39;    &#39;</span><span class="p">)</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">level</span> <span class="o">*</span> <span class="s2">&quot;    &quot;</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subspaces</span><span class="p">):</span>
-            <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="p">:</span>
-                <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s1">&#39;  &#39;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+                <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">indent</span> <span class="o">+</span> <span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_value</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
             <span class="n">stream</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_subspaces</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">_str_helper</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">level</span> <span class="o">+</span> <span class="mi">1</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

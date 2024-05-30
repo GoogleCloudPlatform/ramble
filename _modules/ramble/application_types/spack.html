@@ -117,9 +117,9 @@
 <span class="kn">import</span> <span class="nn">ramble.keywords</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 
-<span class="n">header_color</span> <span class="o">=</span> <span class="s1">&#39;@*b&#39;</span>
-<span class="n">level1_color</span> <span class="o">=</span> <span class="s1">&#39;@*g&#39;</span>
-<span class="n">plain_format</span> <span class="o">=</span> <span class="s1">&#39;@.&#39;</span>
+<span class="n">header_color</span> <span class="o">=</span> <span class="s2">&quot;@*b&quot;</span>
+<span class="n">level1_color</span> <span class="o">=</span> <span class="s2">&quot;@*g&quot;</span>
+<span class="n">plain_format</span> <span class="o">=</span> <span class="s2">&quot;@.&quot;</span>
 
 
 <div class="viewcode-block" id="section_title">
@@ -148,13 +148,14 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">uses_spack</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="n">_spec_groups</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;compilers&#39;</span><span class="p">,</span> <span class="s1">&#39;Compilers&#39;</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s1">&#39;mpi_libraries&#39;</span><span class="p">,</span> <span class="s1">&#39;MPI Libraries&#39;</span><span class="p">),</span>
-                    <span class="p">(</span><span class="s1">&#39;software_specs&#39;</span><span class="p">,</span> <span class="s1">&#39;Software Specs&#39;</span><span class="p">)]</span>
-    <span class="n">_spec_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;spack_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler_spec&#39;</span><span class="p">,</span> <span class="s1">&#39;compiler&#39;</span><span class="p">]</span>
+    <span class="n">_spec_groups</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;compilers&quot;</span><span class="p">,</span> <span class="s2">&quot;Compilers&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;mpi_libraries&quot;</span><span class="p">,</span> <span class="s2">&quot;MPI Libraries&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;software_specs&quot;</span><span class="p">,</span> <span class="s2">&quot;Software Specs&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="n">_spec_keys</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler&quot;</span><span class="p">]</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;make_experiments&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;make_experiments&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;define_package_paths&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">file_path</span><span class="p">)</span>
@@ -162,29 +163,28 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">SpackRunner</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">application_class</span> <span class="o">=</span> <span class="s1">&#39;SpackApplication&#39;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">application_class</span> <span class="o">=</span> <span class="s2">&quot;SpackApplication&quot;</span>
 
     <span class="k">def</span> <span class="nf">_long_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">out_str</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_long_print</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;package_manager_configs&#39;</span><span class="p">):</span>
-            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;Package Manager Configs:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;package_manager_configs&quot;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Package Manager Configs:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\t</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_groups</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
-                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">%s</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
                 <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subsection_title</span><span class="p">(</span><span class="s1">&#39;  </span><span class="si">%s</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span>
+                    <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subsection_title</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span>
                     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_keys</span><span class="p">:</span>
                         <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
-                            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;    </span><span class="si">%s</span><span class="s1"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span>
-                                                              <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;@&#39;</span><span class="p">,</span> <span class="s1">&#39;@@&#39;</span><span class="p">)))</span>
+                            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;@@&quot;</span><span class="p">)))</span>
 
-        <span class="k">return</span> <span class="s1">&#39;&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_str</span><span class="p">)</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">out_str</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpackApplication.build_used_variables">
 <a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.build_used_variables">[docs]</a>
@@ -209,27 +209,26 @@
         <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
 
         <span class="n">software_environments</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span>
-        <span class="n">software_environments</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span><span class="n">app_context</span><span class="p">,</span>
-                                                 <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="p">,</span>
-                                                 <span class="n">require</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+        <span class="n">software_environments</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span><span class="n">app_context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_used_variables</span></div>
 
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span>
+        <span class="s2">&quot;software_install_requested_compilers&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_software_install_requested_compilers</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install compilers an application uses&quot;&quot;&quot;</span>
         <span class="c1"># See if we cached this already, and if so return</span>
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">env_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s1">&#39;Ramble env_path is set to None.&#39;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Installing compilers&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s2">&quot;Ramble env_path is set to None.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Installing compilers&quot;</span><span class="p">)</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;spack-compilers&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;spack-compilers&quot;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> already in cache.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
@@ -244,15 +243,15 @@
             <span class="n">software_env</span> <span class="o">=</span> <span class="n">software_envs</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span><span class="n">app_context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">compiler_spec</span> <span class="ow">in</span> <span class="n">software_envs</span><span class="o">.</span><span class="n">compiler_specs_for_environment</span><span class="p">(</span><span class="n">software_env</span><span class="p">):</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Installing compiler: </span><span class="si">{</span><span class="n">compiler_spec</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Installing compiler: </span><span class="si">{</span><span class="n">compiler_spec</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">install_compiler</span><span class="p">(</span><span class="n">compiler_spec</span><span class="p">)</span>
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">)</span>
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">)</span>
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;pushdeployment&#39;</span><span class="p">)</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">)</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">)</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;pushdeployment&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_software_create_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Create the spack environment for this experiment</span>
@@ -261,16 +260,16 @@
 <span class="sd">        file for it.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Creating Spack environment&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Creating Spack environment&quot;</span><span class="p">)</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">env_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s1">&#39;Ramble env_path is set to None.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s2">&quot;Ramble env_path is set to None.&quot;</span><span class="p">)</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;spack-env&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;spack-env&quot;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> already in cache.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
@@ -291,13 +290,10 @@
             <span class="c1"># Write auxiliary software files into created spack env.</span>
             <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">contents</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_auxiliary_software_files</span><span class="p">():</span>
                 <span class="n">aux_file_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span>
-                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">),</span>
-                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span>
-                    <span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">add_include_file</span><span class="p">(</span><span class="n">aux_file_path</span><span class="p">)</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">aux_file_path</span><span class="p">,</span> <span class="s1">&#39;w+&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">aux_file_path</span><span class="p">,</span> <span class="s2">&quot;w+&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                     <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">contents</span><span class="p">))</span>
 
             <span class="n">env_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
@@ -314,26 +310,33 @@
             <span class="n">added_packages</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">added_packages</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_packages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">pkg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">added_packages</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Software spec </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s1"> is not defined &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;in environment </span><span class="si">{</span><span class="n">env_context</span><span class="si">}</span><span class="s1">, but is &#39;</span>
-                               <span class="sa">f</span><span class="s1">&#39;required by the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> application &#39;</span>
-                               <span class="s1">&#39;definition&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Software spec </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s2"> is not defined &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;in environment </span><span class="si">{</span><span class="n">env_context</span><span class="si">}</span><span class="s2">, but is &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;required by the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> application &quot;</span>
+                        <span class="s2">&quot;definition&quot;</span>
+                    <span class="p">)</span>
 
             <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">required_packages</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">pkg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">added_packages</span><span class="p">:</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Software spec </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s1"> is not defined &#39;</span>
-                                   <span class="sa">f</span><span class="s1">&#39;in environment </span><span class="si">{</span><span class="n">env_context</span><span class="si">}</span><span class="s1">, but is &#39;</span>
-                                   <span class="sa">f</span><span class="s1">&#39;required by the </span><span class="si">{</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> modifier &#39;</span>
-                                   <span class="s1">&#39;definition&#39;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Software spec </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s2"> is not defined &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;in environment </span><span class="si">{</span><span class="n">env_context</span><span class="si">}</span><span class="s2">, but is &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;required by the </span><span class="si">{</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> modifier &quot;</span>
+                            <span class="s2">&quot;definition&quot;</span>
+                        <span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_configure&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">,</span> <span class="s1">&#39;software_install_requested_compilers&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span>
+        <span class="s2">&quot;software_configure&quot;</span><span class="p">,</span>
+        <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">,</span>
+        <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">,</span> <span class="s2">&quot;software_install_requested_compilers&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_software_configure</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Concretize the spack environment for this experiment</span>
@@ -342,14 +345,14 @@
 <span class="sd">        for  this experiment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Concretizing Spack environment&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Concretizing Spack environment&quot;</span><span class="p">)</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;concretize-env&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;concretize-env&quot;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> already in cache.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
@@ -367,8 +370,7 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_configure&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;software_install&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_configure&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_software_install</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Install application&#39;s software using spack&quot;&quot;&quot;</span>
@@ -376,9 +378,9 @@
         <span class="c1"># See if we cached this already, and if so return</span>
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;spack-install&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;spack-install&quot;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> already in cache.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
@@ -387,15 +389,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span>
 
-            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Installing software&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Installing software&quot;</span><span class="p">)</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;evaluate_requirements&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_install&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_evaluate_requirements</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Evaluate all requirements for this experiment&quot;&quot;&quot;</span>
@@ -407,8 +408,11 @@
                     <span class="n">expanded_req</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">validate_command</span><span class="p">(</span><span class="o">**</span><span class="n">expanded_req</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;define_package_paths&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;setup&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_install&#39;</span><span class="p">,</span> <span class="s1">&#39;evaluate_requirements&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span>
+        <span class="s2">&quot;define_package_paths&quot;</span><span class="p">,</span>
+        <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;setup&quot;</span><span class="p">,</span>
+        <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_install&quot;</span><span class="p">,</span> <span class="s2">&quot;evaluate_requirements&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_define_package_paths</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Define variables containing the path to all spack packages</span>
@@ -429,33 +433,30 @@
 <span class="sd">        wrf@4.2.2</span>
 <span class="sd">        &quot;&quot;&quot;</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Defining Spack variables&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Defining Spack variables&quot;</span><span class="p">)</span>
 
         <span class="n">cache</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">pkg_path_cache</span>
         <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
         <span class="n">software_environments</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span>
-        <span class="n">software_environment</span> <span class="o">=</span> <span class="n">software_environments</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span>
-            <span class="n">app_context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span>
-        <span class="p">)</span>
+        <span class="n">software_environment</span> <span class="o">=</span> <span class="n">software_environments</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span><span class="n">app_context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="p">)</span>
         <span class="c1"># Try to resolve using local cache first</span>
         <span class="n">unresolved_specs</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="n">software_environments</span><span class="o">.</span><span class="n">package_specs_for_environment</span><span class="p">(</span>
-            <span class="n">software_environment</span>
-        <span class="p">):</span>
+        <span class="k">for</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="n">software_environments</span><span class="o">.</span><span class="n">package_specs_for_environment</span><span class="p">(</span><span class="n">software_environment</span><span class="p">):</span>
             <span class="k">if</span> <span class="n">pkg_spec</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
                 <span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">pkg_path</span> <span class="o">=</span> <span class="n">cache</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkg_spec</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">spack_pkg_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_path</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">spack_pkg_name</span><span class="si">}</span><span class="s1"> defined. &#39;</span> <span class="o">+</span>
-                               <span class="s1">&#39;Skipping extraction from spack&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">spack_pkg_name</span><span class="si">}</span><span class="s2"> defined. &quot;</span> <span class="o">+</span> <span class="s2">&quot;Skipping extraction from spack&quot;</span>
+                    <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">unresolved_specs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pkg_spec</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">unresolved_specs</span><span class="p">:</span>
             <span class="k">return</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Resolving package paths using Spack&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Resolving package paths using Spack&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span><span class="p">)</span>
 
@@ -467,28 +468,29 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">[</span><span class="n">spack_pkg_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">pkg_path</span>
                     <span class="n">cache</span><span class="p">[</span><span class="n">pkg_spec</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">spack_pkg_name</span><span class="p">,</span> <span class="n">pkg_path</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Variable </span><span class="si">{</span><span class="n">spack_pkg_name</span><span class="si">}</span><span class="s1"> defined. &#39;</span> <span class="o">+</span>
-                               <span class="s1">&#39;Skipping extraction from spack&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Variable </span><span class="si">{</span><span class="n">spack_pkg_name</span><span class="si">}</span><span class="s2"> defined. &quot;</span> <span class="o">+</span> <span class="s2">&quot;Skipping extraction from spack&quot;</span>
+                    <span class="p">)</span>
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;mirror_software&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;mirror&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;mirror_software&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;mirror&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">])</span>
 
     <span class="k">def</span> <span class="nf">_mirror_software</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Mirror software source for this experiment using spack&quot;&quot;&quot;</span>
         <span class="kn">import</span> <span class="nn">re</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s1">&#39;Mirroring software&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="s2">&quot;Mirroring software&quot;</span><span class="p">)</span>
 
         <span class="c1"># See if we cached this already, and if so return</span>
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">env_path</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s1">&#39;Ramble env_path is set to None.&#39;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">ApplicationError</span><span class="p">(</span><span class="s2">&quot;Ramble env_path is set to None.&quot;</span><span class="p">)</span>
 
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;spack-mirror&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;spack-mirror&quot;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already in cache.&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> already in cache.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
@@ -505,20 +507,20 @@
             <span class="n">added</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">failed</span> <span class="o">=</span> <span class="mi">0</span>
 
-            <span class="n">present_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+(?P&lt;num&gt;[0-9]+)\s+already present&#39;</span><span class="p">)</span>
+            <span class="n">present_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+(?P&lt;num&gt;[0-9]+)\s+already present&quot;</span><span class="p">)</span>
             <span class="n">present_match</span> <span class="o">=</span> <span class="n">present_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">mirror_output</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">present_match</span><span class="p">:</span>
-                <span class="n">present</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">present_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">))</span>
+                <span class="n">present</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">present_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;num&quot;</span><span class="p">))</span>
 
-            <span class="n">added_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+(?P&lt;num&gt;[0-9]+)\s+added&#39;</span><span class="p">)</span>
+            <span class="n">added_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+(?P&lt;num&gt;[0-9]+)\s+added&quot;</span><span class="p">)</span>
             <span class="n">added_match</span> <span class="o">=</span> <span class="n">added_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">mirror_output</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">added_match</span><span class="p">:</span>
-                <span class="n">added</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">added_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">))</span>
+                <span class="n">added</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">added_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;num&quot;</span><span class="p">))</span>
 
-            <span class="n">failed_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\s+(?P&lt;num&gt;[0-9]+)\s+failed to fetch.&#39;</span><span class="p">)</span>
+            <span class="n">failed_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+(?P&lt;num&gt;[0-9]+)\s+failed to fetch.&quot;</span><span class="p">)</span>
             <span class="n">failed_match</span> <span class="o">=</span> <span class="n">failed_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">mirror_output</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">failed_match</span><span class="p">:</span>
-                <span class="n">failed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">failed_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s1">&#39;num&#39;</span><span class="p">))</span>
+                <span class="n">failed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">failed_match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;num&quot;</span><span class="p">))</span>
 
             <span class="n">added_start</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">software_mirror_stats</span><span class="o">.</span><span class="n">new</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">added_start</span><span class="p">,</span> <span class="n">added_start</span> <span class="o">+</span> <span class="n">added</span><span class="p">):</span>
@@ -535,14 +537,14 @@
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;push_to_spack_cache&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;pushtocache&#39;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[])</span>
+    <span class="n">register_phase</span><span class="p">(</span><span class="s2">&quot;push_to_spack_cache&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;pushtocache&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[])</span>
 
     <span class="k">def</span> <span class="nf">_push_to_spack_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
         <span class="n">env_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">env_path</span>
-        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s1">&#39;push-to-cache&#39;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
+        <span class="n">cache_tupl</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;push-to-cache&quot;</span><span class="p">,</span> <span class="n">env_path</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{}</span><span class="s1"> already pushed, skipping&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> already pushed, skipping&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">))</span>
             <span class="k">return</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">workspace</span><span class="o">.</span><span class="n">add_to_cache</span><span class="p">(</span><span class="n">cache_tupl</span><span class="p">)</span>
@@ -567,10 +569,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_dry_run</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">dry_run</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="n">env_path</span><span class="p">,</span> <span class="n">require_exists</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s1">&#39;software&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s2">&quot;software&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
             <span class="p">{</span>
-                <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">env_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">),</span>
-                <span class="s1">&#39;digest&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">()</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">env_path</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">root</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">sep</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;digest&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">inventory_hash</span><span class="p">(),</span>
             <span class="p">}</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
@@ -587,20 +589,19 @@
         <span class="k">for</span> <span class="n">var</span> <span class="ow">in</span> <span class="n">variables</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">],</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
                 <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                    <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_source_command</span><span class="p">()),</span>
-                    <span class="s1">&#39;spack_source&#39;</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_source_command</span><span class="p">()),</span> <span class="s2">&quot;spack_source&quot;</span>
                 <span class="p">)</span>
                 <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
-                    <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_activate_command</span><span class="p">()),</span>
-                    <span class="s1">&#39;spack_activate&#39;</span>
+                    <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">generate_activate_command</span><span class="p">()),</span> <span class="s2">&quot;spack_activate&quot;</span>
                 <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_clean_hash_variables</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
 
-    <span class="n">register_phase</span><span class="p">(</span><span class="s1">&#39;deploy_artifacts&#39;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s1">&#39;pushdeployment&#39;</span><span class="p">,</span>
-                   <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;software_create_env&#39;</span><span class="p">])</span>
+    <span class="n">register_phase</span><span class="p">(</span>
+        <span class="s2">&quot;deploy_artifacts&quot;</span><span class="p">,</span> <span class="n">pipeline</span><span class="o">=</span><span class="s2">&quot;pushdeployment&quot;</span><span class="p">,</span> <span class="n">run_after</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;software_create_env&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_deploy_artifacts</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">_deploy_artifacts</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">app_inst</span><span class="o">=</span><span class="n">app_inst</span><span class="p">)</span>
@@ -611,22 +612,22 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">set_env</span><span class="p">(</span><span class="n">env_path</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">activate</span><span class="p">()</span>
 
-            <span class="n">repo_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">named_deployment</span><span class="p">,</span> <span class="s1">&#39;object_repo&#39;</span><span class="p">)</span>
+            <span class="n">repo_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workspace</span><span class="o">.</span><span class="n">named_deployment</span><span class="p">,</span> <span class="s2">&quot;object_repo&quot;</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">pkg_def</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">package_definitions</span><span class="p">():</span>
                 <span class="n">pkg_dir_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">pkg_def</span><span class="p">))</span>
-                <span class="n">pkg_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_path</span><span class="p">,</span> <span class="s1">&#39;packages&#39;</span><span class="p">,</span> <span class="n">pkg_dir_name</span><span class="p">)</span>
+                <span class="n">pkg_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">repo_path</span><span class="p">,</span> <span class="s2">&quot;packages&quot;</span><span class="p">,</span> <span class="n">pkg_dir_name</span><span class="p">)</span>
                 <span class="n">fs</span><span class="o">.</span><span class="n">mkdirp</span><span class="p">(</span><span class="n">pkg_dir</span><span class="p">)</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">pkg_def</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_dir</span><span class="p">,</span> <span class="s1">&#39;package.py&#39;</span><span class="p">))</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">pkg_def</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pkg_dir</span><span class="p">,</span> <span class="s2">&quot;package.py&quot;</span><span class="p">))</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">deactivate</span><span class="p">()</span>
 
         <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">spack_runner</span><span class="o">.</span><span class="n">RunnerError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
 
-    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_source&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;builtin::env_vars&#39;</span><span class="p">])</span>
-    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_activate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;builtin::spack_source&#39;</span><span class="p">])</span>
-    <span class="n">register_builtin</span><span class="p">(</span><span class="s1">&#39;spack_deactivate&#39;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;builtin::spack_source&#39;</span><span class="p">])</span>
+    <span class="n">register_builtin</span><span class="p">(</span><span class="s2">&quot;spack_source&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;builtin::env_vars&quot;</span><span class="p">])</span>
+    <span class="n">register_builtin</span><span class="p">(</span><span class="s2">&quot;spack_activate&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;builtin::spack_source&quot;</span><span class="p">])</span>
+    <span class="n">register_builtin</span><span class="p">(</span><span class="s2">&quot;spack_deactivate&quot;</span><span class="p">,</span> <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">depends_on</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;builtin::spack_source&quot;</span><span class="p">])</span>
 
 <div class="viewcode-block" id="SpackApplication.spack_source">
 <a class="viewcode-back" href="../../../ramble.application_types.html#ramble.application_types.spack.SpackApplication.spack_source">[docs]</a>

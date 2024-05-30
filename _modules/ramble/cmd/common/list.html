@@ -156,8 +156,8 @@
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">filter</span><span class="p">:</span>
         <span class="n">res</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">filter</span><span class="p">:</span>
-            <span class="k">if</span> <span class="s1">&#39;*&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">and</span> <span class="s1">&#39;?&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">r</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s1">&#39;*&#39;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s1">&#39;*&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;*&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span> <span class="ow">and</span> <span class="s2">&quot;?&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">r</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="s2">&quot;*&quot;</span> <span class="o">+</span> <span class="n">f</span> <span class="o">+</span> <span class="s2">&quot;*&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">r</span> <span class="o">=</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
 
@@ -165,6 +165,7 @@
             <span class="n">res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rc</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">search_description</span><span class="p">:</span>
+
             <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
                 <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">p</span><span class="p">):</span>
                     <span class="k">return</span> <span class="kc">True</span>
@@ -173,9 +174,12 @@
                 <span class="k">if</span> <span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
                 <span class="k">return</span> <span class="kc">False</span>
+
         <span class="k">else</span><span class="p">:</span>
+
             <span class="k">def</span> <span class="nf">match</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">p</span><span class="p">)</span>
+
         <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">match</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">res</span><span class="p">)]</span>
 
     <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">s</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span></div>
@@ -199,10 +203,12 @@
 <span class="k">def</span> <span class="nf">github_url</span><span class="p">(</span><span class="n">objs</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Link to an object file on github.&quot;&quot;&quot;</span>
     <span class="n">obj_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/&#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">/&#39;</span> <span class="o">+</span> \
-          <span class="s1">&#39;</span><span class="si">{0}</span><span class="s1">&#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="s2">&quot;https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">/&#39;</span>
+        <span class="o">+</span> <span class="s2">&quot;</span><span class="si">{0}</span><span class="s2">&quot;</span>
+        <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;/</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="p">)</span>
     <span class="k">return</span> <span class="n">url</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">objs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
 
 
@@ -228,18 +234,21 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Print all objects with their latest versions.&quot;&quot;&quot;</span>
     <span class="n">objs</span> <span class="o">=</span> <span class="p">[</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">object_type</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">obj_names</span><span class="p">]</span>
 
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;[</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;[</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># output name and latest version for each object</span>
-    <span class="n">obj_latest</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span>
-        <span class="s1">&#39;  {{&quot;name&quot;: &quot;</span><span class="si">{0}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
-        <span class="s1">&#39;}}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
-            <span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-        <span class="p">)</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span>
-    <span class="p">])</span>
+    <span class="n">obj_latest</span> <span class="o">=</span> <span class="s2">&quot;,</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s1">&#39;  {{&quot;name&quot;: &quot;</span><span class="si">{0}</span><span class="s1">&quot;</span><span class="se">\n</span><span class="s1">&#39;</span>
+            <span class="s2">&quot;}}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">objs</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">obj_latest</span><span class="p">)</span>
     <span class="c1"># important: no trailing comma in JSON arrays</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">]</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">]</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -267,31 +276,34 @@
     <span class="k">def</span> <span class="nf">head</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">span_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">anchor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">anchor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">anchor</span> <span class="o">=</span> <span class="n">title</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s1">&#39;&lt;span id=&quot;id</span><span class="si">%d</span><span class="s1">&quot;&gt;&lt;/span&gt;&#39;</span>
-                   <span class="s1">&#39;&lt;h1&gt;</span><span class="si">%s</span><span class="s1">&lt;a class=&quot;headerlink&quot; href=&quot;#</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
-                   <span class="s1">&#39;title=&quot;Permalink to this headline&quot;&gt;&amp;para;&lt;/a&gt;&#39;</span>
-                   <span class="s1">&#39;&lt;/h1&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">%</span> <span class="p">(</span><span class="n">span_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">anchor</span><span class="p">))</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="s1">&#39;&lt;span id=&quot;id</span><span class="si">%d</span><span class="s1">&quot;&gt;&lt;/span&gt;&#39;</span>
+                <span class="s1">&#39;&lt;h1&gt;</span><span class="si">%s</span><span class="s1">&lt;a class=&quot;headerlink&quot; href=&quot;#</span><span class="si">%s</span><span class="s1">&quot; &#39;</span>
+                <span class="s1">&#39;title=&quot;Permalink to this headline&quot;&gt;&amp;para;&lt;/a&gt;&#39;</span>
+                <span class="s2">&quot;&lt;/h1&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="o">%</span> <span class="p">(</span><span class="n">span_id</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">anchor</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="c1"># Start with the number of objects, skipping the title and intro</span>
     <span class="c1"># blurb, which we maintain in the RST file.</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;p&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;p&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Ramble currently has </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">objs</span><span class="p">)</span><span class="si">}</span><span class="s1"> mainline </span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;dir_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/p&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/p&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Table of links to all objects</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;table border=&quot;1&quot; class=&quot;docutils&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;tbody valign=&quot;top&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">rows_for_ncols</span><span class="p">(</span><span class="n">obj_names</span><span class="p">,</span> <span class="mi">3</span><span class="p">)):</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;tr class=&quot;row-odd&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span>
-                  <span class="s1">&#39;&lt;tr class=&quot;row-even&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;tr class=&quot;row-odd&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;&lt;tr class=&quot;row-even&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">row</span><span class="p">:</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;a class=&quot;reference internal&quot; href=&quot;#</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/a&gt;&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
-                      <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
-            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/tr&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/tbody&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/table&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;td&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;a class=&quot;reference internal&quot; href=&quot;#</span><span class="si">%s</span><span class="s1">&quot;&gt;</span><span class="si">%s</span><span class="s1">&lt;/a&gt;&lt;/td&gt;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">name</span><span class="p">))</span>
+            <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/td&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/tr&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/tbody&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/table&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;hr class=&quot;docutils&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
     <span class="c1"># Output some text for each objects.</span>
@@ -313,14 +325,14 @@
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dd&gt;&lt;ul class=&quot;first last simple&quot;&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
             <span class="p">(</span>
-                <span class="s1">&#39;&lt;li&gt;&#39;</span>
+                <span class="s2">&quot;&lt;li&gt;&quot;</span>
                 <span class="s1">&#39;&lt;a class=&quot;reference external&quot; &#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;href=&quot;</span><span class="si">{</span><span class="n">github_url</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span><span class="w"> </span><span class="n">object_type</span><span class="p">)</span><span class="si">}</span><span class="s1">&quot;&gt;&#39;</span>
                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">obj_def</span><span class="p">[</span><span class="s2">&quot;file_name&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&lt;/a&gt;&#39;</span>  <span class="c1"># noqa: E501</span>
-                <span class="s1">&#39;&lt;/li&gt;</span><span class="se">\n</span><span class="s1">&#39;</span>
+                <span class="s2">&quot;&lt;/li&gt;</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="p">)</span>
         <span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/ul&gt;&lt;/dd&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/ul&gt;&lt;/dd&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># if obj.versions:</span>
         <span class="c1">#     out.write(&#39;&lt;dt&gt;Versions:&lt;/dt&gt;\n&#39;)</span>
@@ -330,15 +342,15 @@
         <span class="c1">#     out.write(&#39;\n&#39;)</span>
         <span class="c1">#     out.write(&#39;&lt;/dd&gt;\n&#39;)</span>
 
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dt&gt;Description:&lt;/dt&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;dd&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;dt&gt;Description:&lt;/dt&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;dd&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">escape</span><span class="p">(</span><span class="n">obj</span><span class="o">.</span><span class="n">format_doc</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span> <span class="kc">True</span><span class="p">))</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/dd&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/dl&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/dd&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/dl&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;hr class=&quot;docutils&quot;/&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;&lt;/div&gt;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span></div>
+        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;&lt;/div&gt;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
 
 
@@ -348,19 +360,32 @@
     <span class="n">object_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
 
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;filter&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;optional case-insensitive glob patterns to filter results&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;filter&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;optional case-insensitive glob patterns to filter results&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-d&#39;</span><span class="p">,</span> <span class="s1">&#39;--search-description&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;filtering will also search the description for a match&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;-d&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--search-description&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filtering will also search the description for a match&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--format&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;name_only&#39;</span><span class="p">,</span> <span class="n">choices</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;format to be used to print the output [default: name_only]&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;--format&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;name_only&quot;</span><span class="p">,</span>
+        <span class="n">choices</span><span class="o">=</span><span class="n">formatters</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;format to be used to print the output [default: name_only]&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--update&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s1">&#39;FILE&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;write output to the specified file, if any </span><span class="si">{</span><span class="n">object_def</span><span class="p">[</span><span class="s2">&quot;singular&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> is newer&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;--update&quot;</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;FILE&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;write output to the specified file, if any </span><span class="si">{</span><span class="n">object_def</span><span class="p">[</span><span class="s2">&quot;singular&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> is newer&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;tags&#39;</span><span class="p">])</span></div>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">])</span></div>
 
 
 
@@ -377,21 +402,19 @@
 
     <span class="c1"># Filter by tags</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">:</span>
-        <span class="n">objects_with_tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
-            <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">objects_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
+        <span class="n">objects_with_tags</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">objects_with_tags</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="o">.</span><span class="n">tags</span><span class="p">))</span>
         <span class="n">sorted_objects</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sorted_objects</span><span class="p">)</span> <span class="o">&amp;</span> <span class="n">objects_with_tags</span>
         <span class="n">sorted_objects</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">sorted_objects</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">:</span>
         <span class="c1"># change output stream if user asked for update</span>
         <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">):</span>
-            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span> <span class="o">&gt;</span> \
-                    <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">():</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;File is up to date: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">paths</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span><span class="o">.</span><span class="n">last_mtime</span><span class="p">():</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File is up to date: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
                 <span class="k">return</span>
 
-        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Updating file: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Updating file: </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">update</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">formatter</span><span class="p">(</span><span class="n">sorted_objects</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">object_type</span><span class="p">)</span>
 
     <span class="k">else</span><span class="p">:</span>

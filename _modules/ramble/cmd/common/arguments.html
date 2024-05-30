@@ -111,7 +111,7 @@
 
 <span class="kn">from</span> <span class="nn">spack.util.pattern</span> <span class="kn">import</span> <span class="n">Args</span>
 
-<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;add_common_arguments&#39;</span><span class="p">]</span>
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;add_common_arguments&quot;</span><span class="p">]</span>
 
 <span class="c1">#: dictionary of argument-generating functions, keyed by name</span>
 <span class="n">_arguments</span> <span class="o">=</span> <span class="p">{}</span>
@@ -151,38 +151,42 @@
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">yes_to_all</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;-y&#39;</span><span class="p">,</span> <span class="s1">&#39;--yes-to-all&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;yes_to_all&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;assume &quot;yes&quot; is the answer to every confirmation request&#39;</span><span class="p">)</span>
+        <span class="s2">&quot;-y&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--yes-to-all&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;yes_to_all&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;assume &quot;yes&quot; is the answer to every confirmation request&#39;</span><span class="p">,</span>
+    <span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">tags</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--tags&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;filter a package query by tags&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span><span class="s2">&quot;-t&quot;</span><span class="p">,</span> <span class="s2">&quot;--tags&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filter a package query by tags&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">application</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span><span class="s1">&#39;application&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;application name&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span><span class="s2">&quot;application&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;application name&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">workspace</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span><span class="s1">&#39;workspace&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;workspace name&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span><span class="s2">&quot;workspace&quot;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;workspace name&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">specs</span><span class="p">():</span>
-    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;specs&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s1">&#39;one or more workload specs&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span><span class="s2">&quot;specs&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;one or more workload specs&quot;</span><span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">repo_type</span><span class="p">():</span>
     <span class="kn">from</span> <span class="nn">ramble.repository</span> <span class="kn">import</span> <span class="n">default_type</span><span class="p">,</span> <span class="n">OBJECT_NAMES</span>
+
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;-t&#39;</span><span class="p">,</span> <span class="s1">&#39;--type&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s1">&#39;any&#39;</span><span class="p">,</span>
+        <span class="s2">&quot;-t&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--type&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="s2">&quot;any&quot;</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;type of repositories to manage. Defaults to &#39;</span><span class="si">{</span><span class="n">default_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
         <span class="sa">f</span><span class="s2">&quot;Allowed types are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OBJECT_NAMES</span><span class="p">)</span><span class="si">}</span><span class="s2">, or any&quot;</span><span class="p">,</span>
     <span class="p">)</span>
@@ -191,64 +195,71 @@
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">phases</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;--phases&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;phases&#39;</span><span class="p">,</span>
-        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
-        <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;*&#39;</span><span class="p">],</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;select phases to execute when performing setup. &#39;</span> <span class="o">+</span>
-             <span class="s1">&#39;Phase names support globbing&#39;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span>
+        <span class="s2">&quot;--phases&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;phases&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;*&quot;</span><span class="p">],</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;select phases to execute when performing setup. &quot;</span> <span class="o">+</span> <span class="s2">&quot;Phase names support globbing&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">include_phase_dependencies</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;--include-phase-dependencies&#39;</span><span class="p">,</span>
-        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;include_phase_dependencies&#39;</span><span class="p">,</span>
-        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;if set, phase dependencies are automatically added to &#39;</span>
-             <span class="s1">&#39;the list of executed phases&#39;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span>
+        <span class="s2">&quot;--include-phase-dependencies&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;include_phase_dependencies&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;if set, phase dependencies are automatically added to &quot;</span>
+        <span class="s2">&quot;the list of executed phases&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">where</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;--where&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;where&#39;</span><span class="p">,</span>
-        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
-        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;inclusive filter on experiments where the provided logical statement is True&#39;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span>
+        <span class="s2">&quot;--where&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;where&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;inclusive filter on experiments where the provided logical statement is True&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">exclude_where</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;--exclude-where&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;exclude_where&#39;</span><span class="p">,</span>
-        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
-        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;exclusive filter experiments where the provided logical statement is True&#39;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span>
+        <span class="s2">&quot;--exclude-where&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;exclude_where&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;exclusive filter experiments where the provided logical statement is True&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">filter_tags</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;--filter-tags&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append&#39;</span><span class="p">,</span>
-        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;+&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;filter experiments to only those that include the provided tags&#39;</span><span class="p">,</span>
-        <span class="n">required</span><span class="o">=</span><span class="kc">False</span>
+        <span class="s2">&quot;--filter-tags&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;+&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filter experiments to only those that include the provided tags&quot;</span><span class="p">,</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span>
 
 
 <span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">no_checksum</span><span class="p">():</span>
     <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
-        <span class="s1">&#39;-n&#39;</span><span class="p">,</span> <span class="s1">&#39;--no-checksum&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;do not use checksums to verify downloaded files (unsafe)&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--no-checksum&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;do not use checksums to verify downloaded files (unsafe)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 </pre></div>
 
            </div>

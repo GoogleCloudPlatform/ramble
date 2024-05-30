@@ -122,7 +122,7 @@
 
 
 <span class="c1">#: editors to try if VISUAL and EDITOR are not set</span>
-<span class="n">_default_editors</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;vim&#39;</span><span class="p">,</span> <span class="s1">&#39;vi&#39;</span><span class="p">,</span> <span class="s1">&#39;emacs&#39;</span><span class="p">,</span> <span class="s1">&#39;nano&#39;</span><span class="p">]</span>
+<span class="n">_default_editors</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;vim&quot;</span><span class="p">,</span> <span class="s2">&quot;vi&quot;</span><span class="p">,</span> <span class="s2">&quot;emacs&quot;</span><span class="p">,</span> <span class="s2">&quot;nano&quot;</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_find_exe_from_env_var</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
@@ -174,7 +174,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># allow this to be customized for testing</span>
-    <span class="n">_exec_func</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;_exec_func&#39;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">execv</span><span class="p">)</span>
+    <span class="n">_exec_func</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_exec_func&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">execv</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">try_exec</span><span class="p">(</span><span class="n">exe</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Try to execute an editor with execv, and warn if it fails.</span>
@@ -188,13 +188,13 @@
             <span class="k">return</span> <span class="kc">True</span>
 
         <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:debug&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:debug&quot;</span><span class="p">):</span>
                 <span class="k">raise</span>
 
             <span class="c1"># Show variable we were trying to use, if it&#39;s from one</span>
             <span class="k">if</span> <span class="n">var</span><span class="p">:</span>
-                <span class="n">exe</span> <span class="o">=</span> <span class="s1">&#39;$</span><span class="si">%s</span><span class="s1"> (</span><span class="si">%s</span><span class="s1">)&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">exe</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not execute </span><span class="si">{</span><span class="n">exe</span><span class="si">}</span><span class="s1"> due to error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">exe</span> <span class="o">=</span> <span class="s2">&quot;$</span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">var</span><span class="p">,</span> <span class="n">exe</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not execute </span><span class="si">{</span><span class="n">exe</span><span class="si">}</span><span class="s2"> due to error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
     <span class="k">def</span> <span class="nf">try_env_var</span><span class="p">(</span><span class="n">var</span><span class="p">):</span>
@@ -208,16 +208,16 @@
 
         <span class="n">exe</span><span class="p">,</span> <span class="n">editor_args</span> <span class="o">=</span> <span class="n">_find_exe_from_env_var</span><span class="p">(</span><span class="n">var</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">exe</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;$</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s1"> is not an executable: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$</span><span class="si">{</span><span class="n">var</span><span class="si">}</span><span class="s2"> is not an executable: </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="n">var</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="n">full_args</span> <span class="o">=</span> <span class="n">editor_args</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">try_exec</span><span class="p">(</span><span class="n">exe</span><span class="p">,</span> <span class="n">full_args</span><span class="p">,</span> <span class="n">var</span><span class="p">)</span>
 
     <span class="c1"># try standard environment variables</span>
-    <span class="k">if</span> <span class="n">try_env_var</span><span class="p">(</span><span class="s1">&#39;VISUAL&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">try_env_var</span><span class="p">(</span><span class="s2">&quot;VISUAL&quot;</span><span class="p">):</span>
         <span class="k">return</span>
-    <span class="k">if</span> <span class="n">try_env_var</span><span class="p">(</span><span class="s1">&#39;EDITOR&#39;</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">try_env_var</span><span class="p">(</span><span class="s2">&quot;EDITOR&quot;</span><span class="p">):</span>
         <span class="k">return</span>
 
     <span class="c1"># nothing worked -- try the first default we can find don&#39;t bother</span>
@@ -229,8 +229,9 @@
 
     <span class="c1"># Fail if nothing could be found</span>
     <span class="k">raise</span> <span class="ne">EnvironmentError</span><span class="p">(</span>
-        <span class="s1">&#39;No text editor found! Please set the VISUAL and/or EDITOR &#39;</span>
-        <span class="s1">&#39;environment variable(s) to your preferred text editor.&#39;</span><span class="p">)</span></div>
+        <span class="s2">&quot;No text editor found! Please set the VISUAL and/or EDITOR &quot;</span>
+        <span class="s2">&quot;environment variable(s) to your preferred text editor.&quot;</span>
+    <span class="p">)</span></div>
 
 </pre></div>
 

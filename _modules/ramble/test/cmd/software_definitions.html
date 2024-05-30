@@ -106,7 +106,7 @@
 
 <span class="kn">from</span> <span class="nn">ramble.main</span> <span class="kn">import</span> <span class="n">RambleCommand</span><span class="p">,</span> <span class="n">RambleCommandError</span>
 
-<span class="n">software_defs</span> <span class="o">=</span> <span class="n">RambleCommand</span><span class="p">(</span><span class="s1">&#39;software-definitions&#39;</span><span class="p">)</span>
+<span class="n">software_defs</span> <span class="o">=</span> <span class="n">RambleCommand</span><span class="p">(</span><span class="s2">&quot;software-definitions&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="test_software_definitions_runs">
@@ -119,18 +119,13 @@
 <div class="viewcode-block" id="test_software_definitions_summary">
 <a class="viewcode-back" href="../../../../ramble.test.cmd.html#ramble.test.cmd.software_definitions.test_software_definitions_summary">[docs]</a>
 <span class="k">def</span> <span class="nf">test_software_definitions_summary</span><span class="p">():</span>
-    <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;Software Summary&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Software Packages&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Compiler Definitions&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Spec:&#39;</span>
-    <span class="p">]</span>
+    <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Software Summary&quot;</span><span class="p">,</span> <span class="s2">&quot;Software Packages&quot;</span><span class="p">,</span> <span class="s2">&quot;Compiler Definitions&quot;</span><span class="p">,</span> <span class="s2">&quot;Spec:&quot;</span><span class="p">]</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">software_defs</span><span class="p">(</span><span class="s1">&#39;--summary&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">software_defs</span><span class="p">(</span><span class="s2">&quot;--summary&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">expected_str</span> <span class="ow">in</span> <span class="n">expected_strs</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">expected_str</span> <span class="ow">in</span> <span class="n">out</span>
 
-    <span class="n">out</span> <span class="o">=</span> <span class="n">software_defs</span><span class="p">(</span><span class="s1">&#39;-s&#39;</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">software_defs</span><span class="p">(</span><span class="s2">&quot;-s&quot;</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">expected_str</span> <span class="ow">in</span> <span class="n">expected_strs</span><span class="p">:</span>
         <span class="k">assert</span> <span class="n">expected_str</span> <span class="ow">in</span> <span class="n">out</span></div>
 
@@ -139,7 +134,7 @@
 <div class="viewcode-block" id="test_software_definitions_conflicts_runs">
 <a class="viewcode-back" href="../../../../ramble.test.cmd.html#ramble.test.cmd.software_definitions.test_software_definitions_conflicts_runs">[docs]</a>
 <span class="k">def</span> <span class="nf">test_software_definitions_conflicts_runs</span><span class="p">():</span>
-    <span class="n">software_defs</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">)</span></div>
+    <span class="n">software_defs</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">)</span></div>
 
 
 
@@ -147,18 +142,18 @@
 <a class="viewcode-back" href="../../../../ramble.test.cmd.html#ramble.test.cmd.software_definitions.test_software_definitions_error_on_conflicts">[docs]</a>
 <span class="k">def</span> <span class="nf">test_software_definitions_error_on_conflicts</span><span class="p">():</span>
     <span class="n">expected_strs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="s1">&#39;Software Definition Conflicts:&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Package:&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Defined as:&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;In objects:&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;Conflicts with objects:&#39;</span>
+        <span class="s2">&quot;Software Definition Conflicts:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Package:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Defined as:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;In objects:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Conflicts with objects:&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">software_defs</span><span class="p">(</span><span class="s1">&#39;-e&#39;</span><span class="p">)</span>
+        <span class="n">software_defs</span><span class="p">(</span><span class="s2">&quot;-e&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">RambleCommandError</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">software_defs</span><span class="o">.</span><span class="n">returncode</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">out</span> <span class="o">=</span> <span class="n">software_defs</span><span class="p">(</span><span class="s1">&#39;-c&#39;</span><span class="p">)</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">software_defs</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">expected_str</span> <span class="ow">in</span> <span class="n">expected_strs</span><span class="p">:</span>
                 <span class="k">assert</span> <span class="n">expected_str</span> <span class="ow">in</span> <span class="n">out</span></div>
 

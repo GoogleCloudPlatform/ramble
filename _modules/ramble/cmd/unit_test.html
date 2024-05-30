@@ -131,43 +131,77 @@
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.unit_test.setup_parser">[docs]</a>
 <span class="k">def</span> <span class="nf">setup_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-H&#39;</span><span class="p">,</span> <span class="s1">&#39;--pytest-help&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show full pytest help, with advanced options&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-H&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--pytest-help&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show full pytest help, with advanced options&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># extra ramble arguments to list tests</span>
     <span class="n">list_group</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span><span class="s2">&quot;listing tests&quot;</span><span class="p">)</span>
     <span class="n">list_mutex</span> <span class="o">=</span> <span class="n">list_group</span><span class="o">.</span><span class="n">add_mutually_exclusive_group</span><span class="p">()</span>
     <span class="n">list_mutex</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-l&#39;</span><span class="p">,</span> <span class="s1">&#39;--list&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list test filenames&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-l&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--list&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list test filenames&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">list_mutex</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-L&#39;</span><span class="p">,</span> <span class="s1">&#39;--list-long&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s1">&#39;long&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list all test functions&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-L&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--list-long&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;long&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list all test functions&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">list_mutex</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;-N&#39;</span><span class="p">,</span> <span class="s1">&#39;--list-names&#39;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_const&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;list&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s1">&#39;names&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list full names of all tests&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-N&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--list-names&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_const&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;list&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;names&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;list full names of all tests&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># use tests for extension</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;--extension&#39;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run test for a given ramble extension&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;--extension&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;run test for a given ramble extension&quot;</span>
+    <span class="p">)</span>
 
     <span class="c1"># spell out some common pytest arguments, so they&#39;ll show up in help</span>
     <span class="n">pytest_group</span> <span class="o">=</span> <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument_group</span><span class="p">(</span>
-        <span class="s2">&quot;common pytest arguments (ramble unit-test --pytest-help for more)&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;common pytest arguments (ramble unit-test --pytest-help for more)&quot;</span>
+    <span class="p">)</span>
     <span class="n">pytest_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append_const&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;parsed_args&#39;</span><span class="p">,</span> <span class="n">const</span><span class="o">=</span><span class="s1">&#39;-s&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print output while tests run (disable capture)&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append_const&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;parsed_args&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;print output while tests run (disable capture)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">pytest_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;-k&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store&#39;</span><span class="p">,</span> <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;EXPRESSION&quot;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;expression&#39;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filter tests by keyword (can also use w/list options)&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;-k&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
+        <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;EXPRESSION&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;expression&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;filter tests by keyword (can also use w/list options)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">pytest_group</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s2">&quot;--showlocals&quot;</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s1">&#39;append_const&#39;</span><span class="p">,</span> <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;parsed_args&#39;</span><span class="p">,</span>
-        <span class="n">const</span><span class="o">=</span><span class="s1">&#39;--showlocals&#39;</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show local variable values in tracebacks&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;--showlocals&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;append_const&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;parsed_args&quot;</span><span class="p">,</span>
+        <span class="n">const</span><span class="o">=</span><span class="s2">&quot;--showlocals&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;show local variable values in tracebacks&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># remainder is just passed to pytest</span>
-    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
-        <span class="s1">&#39;pytest_args&#39;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;arguments for pytest&quot;</span><span class="p">)</span></div>
+    <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;pytest_args&quot;</span><span class="p">,</span> <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span> <span class="n">help</span><span class="o">=</span><span class="s2">&quot;arguments for pytest&quot;</span><span class="p">)</span></div>
 
 
 
@@ -181,15 +215,14 @@
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">output</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">pytest</span>
-            <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s1">&#39;--collect-only&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">extra_args</span><span class="p">)</span>
+
+            <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s2">&quot;--collect-only&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">extra_args</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-                <span class="s1">&#39;Pytest python module not found. Ensure requirements.txt are installed.&#39;</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Pytest python module not found. Ensure requirements.txt are installed.&quot;</span><span class="p">)</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">sys</span><span class="o">.</span><span class="n">stdout</span> <span class="o">=</span> <span class="n">old_output</span>
 
-    <span class="n">lines</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">output</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">tests</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="k">lambda</span><span class="p">:</span> <span class="nb">set</span><span class="p">())</span>
     <span class="n">prefix</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -205,7 +238,7 @@
 
         <span class="c1"># strip parametrized tests</span>
         <span class="k">if</span> <span class="s2">&quot;[&quot;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span><span class="n">name</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)]</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">name</span><span class="p">[:</span> <span class="n">name</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="s2">&quot;[&quot;</span><span class="p">)]</span>
 
         <span class="n">depth</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">indent</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
 
@@ -220,10 +253,7 @@
 
     <span class="k">def</span> <span class="nf">colorize</span><span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">prefix</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prefix</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="k">return</span> <span class="s2">&quot;::&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="n">color</span><span class="o">.</span><span class="n">colorize</span><span class="p">(</span><span class="s2">&quot;@</span><span class="si">%s</span><span class="s2">{</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span>
-                <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prefix</span> <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s2">&quot;()&quot;</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="s2">&quot;::&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">color</span><span class="o">.</span><span class="n">colorize</span><span class="p">(</span><span class="s2">&quot;@</span><span class="si">%s</span><span class="s2">{</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">p</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">prefix</span> <span class="k">if</span> <span class="n">p</span> <span class="o">!=</span> <span class="s2">&quot;()&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">color</span><span class="o">.</span><span class="n">colorize</span><span class="p">(</span><span class="s2">&quot;@</span><span class="si">%s</span><span class="s2">{</span><span class="si">%s</span><span class="s2">}&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">c</span><span class="p">,</span> <span class="n">prefix</span><span class="p">))</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">list</span> <span class="o">==</span> <span class="s2">&quot;list&quot;</span><span class="p">:</span>
@@ -271,14 +301,13 @@
 <span class="k">def</span> <span class="nf">unit_test</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">pytest_help</span><span class="p">:</span>
         <span class="c1"># make the pytest.main help output more accurate</span>
-        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;ramble test&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ramble test&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">pytest</span>
-            <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s1">&#39;-h&#39;</span><span class="p">])</span>
+
+            <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="s2">&quot;-h&quot;</span><span class="p">])</span>
         <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-                <span class="s1">&#39;Pytest python module not found. Ensure requirements.txt are installed.&#39;</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span><span class="s2">&quot;Pytest python module not found. Ensure requirements.txt are installed.&quot;</span><span class="p">)</span>
 
     <span class="c1"># add back any parsed pytest args we need to pass to pytest</span>
     <span class="n">pytest_args</span> <span class="o">=</span> <span class="n">add_back_pytest_args</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">unknown_args</span><span class="p">)</span>
@@ -288,7 +317,7 @@
     <span class="n">pytest_root</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">ramble_root</span>
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">extension</span><span class="p">:</span>
         <span class="n">target</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">extension</span>
-        <span class="n">extensions</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;config:extensions&#39;</span><span class="p">)</span>
+        <span class="n">extensions</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:extensions&quot;</span><span class="p">)</span>
         <span class="n">pytest_root</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">extensions</span><span class="o">.</span><span class="n">path_for_extension</span><span class="p">(</span><span class="n">target</span><span class="p">,</span> <span class="o">*</span><span class="n">extensions</span><span class="p">)</span>
 
     <span class="c1"># pytest.ini lives in the root of the ramble repository.</span>
@@ -300,10 +329,11 @@
         <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">no_active_workspace</span><span class="p">():</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="kn">import</span> <span class="nn">pytest</span>
+
                 <span class="k">return</span> <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">(</span><span class="n">pytest_args</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
-                    <span class="s1">&#39;Pytest python module not found. Ensure requirements.txt are installed.&#39;</span>
+                    <span class="s2">&quot;Pytest python module not found. Ensure requirements.txt are installed.&quot;</span>
                 <span class="p">)</span></div>
 
 </pre></div>

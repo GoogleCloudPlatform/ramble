@@ -136,8 +136,9 @@
         <span class="n">color</span><span class="o">.</span><span class="n">colorize</span><span class="p">(</span><span class="s2">&quot;@*c{For csh/tcsh:}&quot;</span><span class="p">),</span>
         <span class="s2">&quot;  source </span><span class="si">%s</span><span class="s2">/setup-env.csh&quot;</span> <span class="o">%</span> <span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">share_path</span><span class="p">,</span>
         <span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="s2">&quot;Or, if you do not want to use shell support, run &quot;</span> <span class="o">+</span> <span class="p">(</span>
-            <span class="s2">&quot;one of these&quot;</span> <span class="k">if</span> <span class="n">shell_specific</span> <span class="k">else</span> <span class="s2">&quot;this&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot; instead:&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Or, if you do not want to use shell support, run &quot;</span>
+        <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;one of these&quot;</span> <span class="k">if</span> <span class="n">shell_specific</span> <span class="k">else</span> <span class="s2">&quot;this&quot;</span><span class="p">)</span>
+        <span class="o">+</span> <span class="s2">&quot; instead:&quot;</span><span class="p">,</span>
         <span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">]</span>
 
@@ -149,7 +150,7 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="n">msg</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;  &quot;</span> <span class="o">+</span> <span class="n">equivalent</span><span class="p">]</span>
 
-    <span class="n">msg</span> <span class="o">+=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span>
+    <span class="n">msg</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
     <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="o">*</span><span class="n">msg</span><span class="p">)</span></div>
 
 </pre></div>
