@@ -39,7 +39,7 @@ import collections
 import itertools
 import re
 
-from six.moves.urllib.request import urlopen
+from urllib.request import urlopen
 
 import llnl.util.lang
 from llnl.util.compat import Sequence

@@ -12,8 +12,6 @@ import multiprocessing.pool
 import os
 from typing import Dict  # novm
 
-import six
-
 import archspec.cpu
 
 import llnl.util.filesystem as fs
@@ -640,7 +638,7 @@ def detect_version(detect_version_args):
 
         try:
             version = callback(path)
-            if version and six.text_type(version).strip() \
+            if version and str(version).strip() \
                     and version != 'unknown':
                 value = fn_args._replace(
                     id=compiler_id._replace(version=version)
@@ -650,13 +648,13 @@ def detect_version(detect_version_args):
             error = "Couldn't get version for compiler {0}".format(path)
         except spack.util.executable.ProcessError as e:
             error = "Couldn't get version for compiler {0}\n".format(path) + \
-                    six.text_type(e)
+                    str(e)
         except Exception as e:
             # Catching "Exception" here is fine because it just
             # means something went wrong running a candidate executable.
             error = "Error while executing candidate compiler {0}" \
                     "\n{1}: {2}".format(path, e.__class__.__name__,
-                                        six.text_type(e))
+                                        str(e))
         return None, error
 
     operating_system = detect_version_args.id.os

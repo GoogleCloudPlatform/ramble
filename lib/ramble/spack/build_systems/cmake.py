@@ -11,8 +11,6 @@ import re
 import sys
 from typing import List
 
-import six
-
 from llnl.util.compat import Sequence
 from llnl.util.filesystem import working_dir
 
@@ -234,7 +232,7 @@ class CMakePackage(PackageBase):
             value = "ON" if value else "OFF"
         else:
             kind = 'STRING'
-            if isinstance(value, Sequence) and not isinstance(value, six.string_types):
+            if isinstance(value, Sequence) and not isinstance(value, str):
                 value = ";".join(str(v) for v in value)
             else:
                 value = str(value)

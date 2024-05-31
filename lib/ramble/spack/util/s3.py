@@ -5,7 +5,7 @@
 
 import os
 
-import six.moves.urllib.parse as urllib_parse
+import urllib.parse
 
 import spack
 import spack.util.url as url_util
@@ -21,7 +21,7 @@ def get_mirror_connection(url, url_type="push"):
 
 
 def _parse_s3_endpoint_url(endpoint_url):
-    if not urllib_parse.urlparse(endpoint_url, scheme='').scheme:
+    if not urllib.parse.urlparse(endpoint_url, scheme='').scheme:
         endpoint_url = '://'.join(('https', endpoint_url))
 
     return endpoint_url

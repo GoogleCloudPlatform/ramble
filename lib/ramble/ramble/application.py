@@ -7,10 +7,10 @@
 # except according to those terms.
 """Define base classes for application definitions"""
 
+import io
 import os
 import stat
 import re
-import six
 import textwrap
 import string
 import shutil
@@ -498,7 +498,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         doc = re.sub(r"\s+", " ", self.__doc__)
         lines = textwrap.wrap(doc, 72)
-        results = six.StringIO()
+        results = io.StringIO()
         for line in lines:
             results.write((" " * indent) + line + "\n")
         return results.getvalue()
@@ -1250,7 +1250,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # Remove the workspace path from variable definitions before hashing
         for var in variables:
-            if isinstance(variables[var], six.string_types):
+            if isinstance(variables[var], str):
                 variables[var] = variables[var].replace(workspace.root + os.path.sep, "")
 
     def populate_inventory(self, workspace, force_compute=False, require_exist=False):
@@ -1444,7 +1444,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         def format_context(context_match, context_format):
 
             context_val = {}
-            if isinstance(context_format, six.string_types):
+            if isinstance(context_format, str):
                 for group in string.Formatter().parse(context_format):
                     if group[1]:
                         context_val[group[1]] = context_match[group[1]]

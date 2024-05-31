@@ -9,8 +9,6 @@ import re
 import shutil
 import sys
 
-import six
-
 import llnl.util.filesystem as fs
 
 import spack.error
@@ -315,10 +313,7 @@ class TestSuite(object):
                 test_suite._hash = content_hash
                 return test_suite
         except Exception as e:
-            raise six.raise_from(
-                sjson.SpackJSONError("error parsing JSON TestSuite:", str(e)),
-                e,
-            )
+            raise sjson.SpackJSONError("error parsing JSON TestSuite:", str(e)) from e
 
 
 def _add_msg_to_file(filename, msg):

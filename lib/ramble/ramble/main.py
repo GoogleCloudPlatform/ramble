@@ -15,6 +15,7 @@ from __future__ import print_function
 
 import argparse
 import inspect
+import io
 import operator
 import os
 import os.path
@@ -26,8 +27,6 @@ import traceback
 import warnings
 import jsonschema
 import ruamel
-
-from six import StringIO
 
 import llnl.util.lang
 import llnl.util.tty as tty
@@ -706,7 +705,7 @@ class RambleCommand(object):
         else:
             ramble.workspace.shell.deactivate()
 
-        out = StringIO()
+        out = io.StringIO()
         try:
             with log_output(out):
                 self.returncode = _invoke_command(self.command, self.parser, args, unknown)

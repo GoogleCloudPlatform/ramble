@@ -29,8 +29,6 @@ import types
 import warnings
 from typing import Any, Callable, Dict, List, Optional  # novm
 
-import six
-
 import llnl.util.filesystem as fsys
 import llnl.util.tty as tty
 from llnl.util.lang import memoized, nullcontext
@@ -249,7 +247,7 @@ class DetectablePackageMeta(object):
                         variants = [variants]
 
                     for variant in variants:
-                        if isinstance(variant, six.string_types):
+                        if isinstance(variant, str):
                             variant = (variant, {})
                         variant_str, extra_attributes = variant
                         spec_str = '{0}@{1} {2}'.format(
@@ -555,7 +553,7 @@ def test_log_pathname(test_stage, spec):
                         'test-{0}-out.txt'.format(TestSuite.test_pkg_id(spec)))
 
 
-class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
+class PackageBase(PackageViewMixin, metaclass=PackageMeta):
     """This is the superclass for all spack packages.
 
     ***The Package class***
@@ -1948,7 +1946,7 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
                 be copied to the corresponding location(s) under the install
                 testing directory.
         """
-        paths = [srcs] if isinstance(srcs, six.string_types) else srcs
+        paths = [srcs] if isinstance(srcs, str) else srcs
 
         for path in paths:
             src_path = os.path.join(self.stage.source_path, path)
@@ -2075,7 +2073,7 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
                     print(line.rstrip('\n'))
 
                 if exc_type is spack.util.executable.ProcessError:
-                    out = six.StringIO()
+                    out = io.StringIO()
                     spack.build_environment.write_log_summary(
                         out, 'test', self.test_log_file, last=1)
                     m = out.getvalue()
@@ -2099,10 +2097,10 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
 
     def _run_test_helper(self, runner, options, expected, status, installed,
                          purpose):
-        status = [status] if isinstance(status, six.integer_types) else status
-        expected = [expected] if isinstance(expected, six.string_types) else \
+        status = [status] if isinstance(status, int) else status
+        expected = [expected] if isinstance(expected, str) else \
             expected
-        options = [options] if isinstance(options, six.string_types) else \
+        options = [options] if isinstance(options, str) else \
             options
 
         if purpose:
@@ -2154,7 +2152,7 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
         """This function checks whether install succeeded."""
 
         def check_paths(path_list, filetype, predicate):
-            if isinstance(path_list, six.string_types):
+            if isinstance(path_list, str):
                 path_list = [path_list]
 
             for path in path_list:
@@ -2685,7 +2683,7 @@ class PackageBase(six.with_metaclass(PackageMeta, PackageViewMixin, object)):
 
         doc = re.sub(r'\s+', ' ', self.__doc__)
         lines = textwrap.wrap(doc, 72)
-        results = six.StringIO()
+        results = io.StringIO()
         for line in lines:
             results.write((" " * indent) + line + "\n")
         return results.getvalue()

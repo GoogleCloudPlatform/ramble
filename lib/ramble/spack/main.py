@@ -12,6 +12,7 @@ from __future__ import print_function
 
 import argparse
 import inspect
+import io
 import operator
 import os
 import os.path
@@ -21,8 +22,6 @@ import signal
 import sys
 import traceback
 import warnings
-
-from six import StringIO
 
 import archspec.cpu
 
@@ -586,7 +585,7 @@ class SpackCommand(object):
 
         fail_on_error = kwargs.get('fail_on_error', True)
 
-        out = StringIO()
+        out = io.StringIO()
         try:
             with log_output(out):
                 self.returncode = _invoke_command(

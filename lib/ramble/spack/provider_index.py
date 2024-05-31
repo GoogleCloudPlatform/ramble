@@ -5,8 +5,6 @@
 """Classes and functions to manage providers of virtual dependencies"""
 import itertools
 
-import six
-
 import spack.error
 import spack.util.spack_json as sjson
 
@@ -66,7 +64,7 @@ class _IndexBase(object):
         """
         result = set()
         # Allow string names to be passed as input, as well as specs
-        if isinstance(virtual_spec, six.string_types):
+        if isinstance(virtual_spec, str):
             virtual_spec = spack.spec.Spec(virtual_spec)
 
         # Add all the providers that satisfy the vpkg spec.
@@ -176,7 +174,7 @@ class ProviderIndex(_IndexBase):
         assert not spec.virtual, "cannot update an index using a virtual spec"
 
         pkg_provided = spec.package_class.provided
-        for provided_spec, provider_specs in six.iteritems(pkg_provided):
+        for provided_spec, provider_specs in pkg_provided.items():
             for provider_spec in provider_specs:
                 # TODO: fix this comment.
                 # We want satisfaction other than flags
@@ -312,7 +310,7 @@ def _transform(providers, transform_fun, out_mapping_type=dict):
     """
     def mapiter(mappings):
         if isinstance(mappings, dict):
-            return six.iteritems(mappings)
+            return mappings.items()
         else:
             return iter(mappings)
 

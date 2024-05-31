@@ -6,7 +6,6 @@
 import json
 
 import jsonschema
-import six
 
 import llnl.util.tty as tty
 
@@ -101,7 +100,7 @@ def spec_from_entry(entry):
                 continue
 
             # Value could be a list (of strings), boolean, or string
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 variant_strs.append('{0}={1}'.format(name, value))
             else:
                 try:

@@ -10,10 +10,10 @@ from __future__ import print_function
 from __future__ import division
 
 import collections
+import io
 import sys
 import re
 import argparse
-from six import StringIO
 
 import llnl.util.tty.color as color
 from llnl.util.filesystem import working_dir
@@ -108,7 +108,7 @@ def do_list(args, extra_args):
     # Run test collection and get the tree out.
     old_output = sys.stdout
     try:
-        sys.stdout = output = StringIO()
+        sys.stdout = output = io.StringIO()
         try:
             import pytest
 

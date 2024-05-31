@@ -32,8 +32,6 @@ import os.path
 import re
 from typing import List, Set  # novm
 
-import six
-
 import llnl.util.lang
 import llnl.util.tty.color
 from llnl.util.compat import Sequence
@@ -222,7 +220,7 @@ class DirectiveMeta(type):
         """
         global directive_names
 
-        if isinstance(dicts, six.string_types):
+        if isinstance(dicts, str):
             dicts = (dicts, )
 
         if not isinstance(dicts, Sequence):
@@ -369,7 +367,7 @@ def _depends_on(pkg, spec, when=None, type=default_deptype, patches=None):
         patches = [patches]
 
     # auto-call patch() directive on any strings in patch list
-    patches = [patch(p) if isinstance(p, six.string_types) else p
+    patches = [patch(p) if isinstance(p, str) else p
                for p in patches]
     assert all(callable(p) for p in patches)
 

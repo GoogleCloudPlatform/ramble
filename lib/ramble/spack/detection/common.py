@@ -20,8 +20,6 @@ import os.path
 import re
 import sys
 
-import six
-
 import llnl.util.tty
 
 import spack.config
@@ -118,7 +116,7 @@ def _convert_to_iterable(single_val_or_multiple):
     x = single_val_or_multiple
     if x is None:
         return []
-    elif isinstance(x, six.string_types):
+    elif isinstance(x, str):
         return [x]
     elif isinstance(x, spack.spec.Spec):
         # Specs are iterable, but a single spec should be converted to a list

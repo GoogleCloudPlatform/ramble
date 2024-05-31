@@ -3,12 +3,11 @@
 #
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
+import io
 import os
 import shutil
 import sys
 import tempfile
-
-import six
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -591,7 +590,7 @@ def env_depfile(args):
     # Fetch targets for all packages in the environment, not just roots.
     all_fetch_targets = [get_fetch_target(h) for h in hash_to_spec.keys()]
 
-    buf = six.StringIO()
+    buf = io.StringIO()
 
     buf.write("""SPACK ?= spack
 

@@ -4,8 +4,9 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 """Tests for tag index cache files."""
 
+import io
+
 import pytest
-from six import StringIO
 
 import spack.cmd.install
 import spack.tag
@@ -42,7 +43,7 @@ more_tags_json = \
 
 
 def test_tag_copy(mock_packages):
-    index = spack.tag.TagIndex.from_json(StringIO(tags_json))
+    index = spack.tag.TagIndex.from_json(io.StringIO(tags_json))
     new_index = index.copy()
 
     assert index.tags == new_index.tags
@@ -100,25 +101,25 @@ def test_tag_index_round_trip(mock_packages):
     mock_index = spack.repo.path.tag_index
     assert mock_index.tags
 
-    ostream = StringIO()
+    ostream = io.StringIO()
     mock_index.to_json(ostream)
 
-    istream = StringIO(ostream.getvalue())
+    istream = io.StringIO(ostream.getvalue())
     new_index = spack.tag.TagIndex.from_json(istream)
 
     assert mock_index == new_index
 
 
 def test_tag_equal():
-    first_index = spack.tag.TagIndex.from_json(StringIO(tags_json))
-    second_index = spack.tag.TagIndex.from_json(StringIO(tags_json))
+    first_index = spack.tag.TagIndex.from_json(io.StringIO(tags_json))
+    second_index = spack.tag.TagIndex.from_json(io.StringIO(tags_json))
 
     assert first_index == second_index
 
 
 def test_tag_merge():
-    first_index = spack.tag.TagIndex.from_json(StringIO(tags_json))
-    second_index = spack.tag.TagIndex.from_json(StringIO(more_tags_json))
+    first_index = spack.tag.TagIndex.from_json(io.StringIO(tags_json))
+    second_index = spack.tag.TagIndex.from_json(io.StringIO(more_tags_json))
 
     assert first_index != second_index
 
@@ -139,14 +140,14 @@ def test_tag_merge():
 def test_tag_not_dict():
     list_json = "[]"
     with pytest.raises(spack.tag.TagIndexError) as e:
-        spack.tag.TagIndex.from_json(StringIO(list_json))
+        spack.tag.TagIndex.from_json(io.StringIO(list_json))
         assert "not a dict" in str(e)
 
 
 def test_tag_no_tags():
     pkg_json = "{\"packages\": []}"
     with pytest.raises(spack.tag.TagIndexError) as e:
-        spack.tag.TagIndex.from_json(StringIO(pkg_json))
+        spack.tag.TagIndex.from_json(io.StringIO(pkg_json))
         assert "does not start with" in str(e)
 
 

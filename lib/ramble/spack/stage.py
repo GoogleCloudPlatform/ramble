@@ -16,8 +16,6 @@ import sys
 import tempfile
 from typing import Dict  # novm
 
-from six import iteritems, string_types
-
 import llnl.util.lang
 import llnl.util.tty as tty
 from llnl.util.filesystem import (
@@ -163,7 +161,7 @@ def get_stage_root():
 
     if _stage_root is None:
         candidates = spack.config.get('config:build_stage')
-        if isinstance(candidates, string_types):
+        if isinstance(candidates, str):
             candidates = [candidates]
 
         resolved_candidates = _resolve_paths(candidates)
@@ -273,7 +271,7 @@ class Stage(object):
         """
         # TODO: fetch/stage coupling needs to be reworked -- the logic
         # TODO: here is convoluted and not modular enough.
-        if isinstance(url_or_fetch_strategy, string_types):
+        if isinstance(url_or_fetch_strategy, str):
             self.fetcher = fs.from_url_scheme(url_or_fetch_strategy)
         elif isinstance(url_or_fetch_strategy, fs.FetchStrategy):
             self.fetcher = url_or_fetch_strategy
@@ -691,7 +689,7 @@ class ResourceStage(Stage):
             else:
                 raise
 
-        for key, value in iteritems(placement):
+        for key, value in placement.items():
             destination_path = os.path.join(target_path, value)
             source_path = os.path.join(self.source_path, key)
 

@@ -18,9 +18,6 @@ import traceback
 from datetime import datetime, timedelta
 from typing import List, Tuple
 
-import six
-from six import string_types
-
 from llnl.util.compat import MutableMapping, MutableSequence, zip_longest
 
 # Ignore emacs backups when listing modules
@@ -202,12 +199,9 @@ def memoized(func):
             return ret
         except TypeError as e:
             # TypeError is raised when indexing into a dict if the key is unhashable.
-            raise six.raise_from(
-                UnhashableArguments(
-                    "args + kwargs '{}' was not hashable for function '{}'"
-                    .format(key, func.__name__),
-                ),
-                e)
+            raise UnhashableArguments(
+                "args + kwargs '{}' was not hashable for function '{}'".format(key, func.__name__),
+            ) from e
 
     return _memoized_function
 

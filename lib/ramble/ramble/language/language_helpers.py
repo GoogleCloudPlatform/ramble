@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import fnmatch
-import six
 
 from ramble.language.language_base import DirectiveError
 
@@ -29,7 +28,7 @@ def check_definition(
     Returns:
         List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
-    if single_type and not isinstance(single_type, six.string_types):
+    if single_type and not isinstance(single_type, str):
         raise DirectiveError(
             f"Directive {directive_name} was given an invalid type "
             f"for the {single_arg_name} argument. "
