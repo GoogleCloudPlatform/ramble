@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import six
 import shlex
 
 import ramble.error
@@ -88,7 +87,7 @@ class CommandExecutable(object):
         - output_capture: Operator to use when capturing output
         """
 
-        if isinstance(template, six.string_types):
+        if isinstance(template, str):
             self.template = [template]
         elif isinstance(template, list):
             self.template = template.copy()

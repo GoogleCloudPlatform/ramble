@@ -15,8 +15,6 @@ import re
 import socket
 import sys
 
-import six
-
 import llnl.util.tty as tty
 from llnl.util.lang import dedupe
 
@@ -1067,7 +1065,7 @@ def environment_after_sourcing_files(*files, **kwargs):
     current_environment = kwargs.get('env', dict(os.environ))
     for f in files:
         # Normalize the input to the helper function
-        if isinstance(f, six.string_types):
+        if isinstance(f, str):
             f = [f]
 
         current_environment = _source_single_file(

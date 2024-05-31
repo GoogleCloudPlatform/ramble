@@ -9,7 +9,6 @@ import sys
 from copy import copy
 
 import pytest
-from six import iteritems
 
 import llnl.util.filesystem as fs
 
@@ -77,7 +76,7 @@ def test_get_compiler_duplicates(config):
         'gcc@4.5.0', spack.spec.ArchSpec('cray-CNL-xeon'))
 
     assert len(cfg_file_to_duplicates) == 1
-    cfg_file, duplicates = next(iteritems(cfg_file_to_duplicates))
+    cfg_file, duplicates = next(iter(cfg_file_to_duplicates.items()))
     assert len(duplicates) == 1
 
 

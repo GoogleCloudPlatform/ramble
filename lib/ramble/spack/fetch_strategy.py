@@ -31,7 +31,6 @@ import shutil
 import sys
 from typing import List, Optional  # novm
 
-import six
 import urllib.parse
 
 import llnl.util
@@ -705,7 +704,7 @@ class VCSFetchStrategy(FetchStrategy):
 
         patterns = kwargs.get('exclude', None)
         if patterns is not None:
-            if isinstance(patterns, six.string_types):
+            if isinstance(patterns, str):
                 patterns = [patterns]
             for p in patterns:
                 tar.add_default_arg('--exclude=%s' % p)

@@ -13,8 +13,6 @@ import re
 import types
 import warnings
 
-from six import string_types
-
 import archspec.cpu
 
 from llnl.util.compat import Sequence
@@ -185,7 +183,7 @@ def build_criteria_names(costs, tuples):
 
 
 def issequence(obj):
-    if isinstance(obj, string_types):
+    if isinstance(obj, str):
         return False
     return isinstance(obj, (Sequence, types.GeneratorType))
 
@@ -197,7 +195,7 @@ def listify(args):
 
 
 def packagize(pkg):
-    if isinstance(pkg, string_types):
+    if isinstance(pkg, str):
         return spack.repo.path.get_pkg_class(pkg)
     else:
         return pkg

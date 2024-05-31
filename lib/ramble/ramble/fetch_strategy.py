@@ -34,7 +34,6 @@ import sys
 
 
 import llnl.util.tty as tty
-import six
 import urllib.parse
 import spack.error
 import spack.util.crypto as crypto
@@ -712,7 +711,7 @@ class VCSFetchStrategy(FetchStrategy):
 
         patterns = kwargs.get("exclude", None)
         if patterns is not None:
-            if isinstance(patterns, six.string_types):
+            if isinstance(patterns, str):
                 patterns = [patterns]
             for p in patterns:
                 tar.add_default_arg("--exclude=%s" % p)

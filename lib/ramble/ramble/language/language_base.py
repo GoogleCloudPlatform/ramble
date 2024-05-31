@@ -13,8 +13,6 @@ directives, which are to allow functions to be invoked at class level
 import functools
 import sys
 
-from six import string_types
-
 import llnl.util.lang
 import llnl.util.tty.color
 
@@ -160,7 +158,7 @@ class DirectiveMeta(type):
         the core.
 
         """
-        if isinstance(dicts, string_types):
+        if isinstance(dicts, str):
             dicts = (dicts,)
 
         if not isinstance(dicts, Sequence):

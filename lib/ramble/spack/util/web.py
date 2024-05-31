@@ -16,7 +16,6 @@ import ssl
 import sys
 import traceback
 
-import six
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
@@ -507,7 +506,7 @@ def spider(root_urls, depth=0, concurrency=32):
 
         return pages, links, subcalls
 
-    if isinstance(root_urls, six.string_types):
+    if isinstance(root_urls, str):
         root_urls = [root_urls]
 
     # Clear the local cache of visited pages before starting the search

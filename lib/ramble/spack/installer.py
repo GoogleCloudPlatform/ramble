@@ -31,13 +31,12 @@ import copy
 import glob
 import heapq
 import itertools
+import io
 import os
 import shutil
 import sys
 import time
 from collections import defaultdict
-
-import six
 
 import llnl.util.filesystem as fs
 import llnl.util.lock as lk
@@ -564,7 +563,7 @@ def log(pkg):
 
     # Finally, archive files that are specific to each package
     with fs.working_dir(pkg.stage.path):
-        errors = six.StringIO()
+        errors = io.StringIO()
         target_dir = os.path.join(
             spack.store.layout.metadata_path(pkg.spec), 'archived-files')
 

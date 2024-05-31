@@ -5,7 +5,6 @@
 
 """Data structures that represent Spack's dependency relationships.
 """
-from six import string_types
 
 import spack.spec
 
@@ -48,7 +47,7 @@ def canonical_deptype(deptype):
     if deptype in ('all', all):
         return all_deptypes
 
-    elif isinstance(deptype, string_types):
+    elif isinstance(deptype, str):
         if deptype not in all_deptypes:
             raise ValueError('Invalid dependency type: %s' % deptype)
         return (deptype,)

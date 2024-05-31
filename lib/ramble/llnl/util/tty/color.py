@@ -68,8 +68,6 @@ import re
 import sys
 from contextlib import contextmanager
 
-import six
-
 
 class ColorParseError(Exception):
     """Raised when a color format fails to parse."""
@@ -253,7 +251,7 @@ def cescape(string):
     Returns:
         (str): the string with color codes escaped
     """
-    string = six.text_type(string)
+    string = str(string)
     string = string.replace('@', '@@')
     string = string.replace('}', '}}')
     return string

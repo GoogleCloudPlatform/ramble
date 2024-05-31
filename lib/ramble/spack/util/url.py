@@ -13,7 +13,6 @@ import re
 import sys
 
 import urllib.parse
-from six import string_types
 
 from spack.util.path import (
     canonicalize_path,
@@ -50,7 +49,7 @@ def local_file_path(url):
     If url is a file:// URL, return the absolute path to the local
     file or directory referenced by it.  Otherwise, return None.
     """
-    if isinstance(url, string_types):
+    if isinstance(url, str):
         url = parse(url)
 
     if url.scheme == 'file':
@@ -75,12 +74,12 @@ def parse(url, scheme='file'):
     """
     # guarantee a value passed in is of proper url format. Guarantee
     # allows for easier string manipulation accross platforms
-    if isinstance(url, string_types):
+    if isinstance(url, str):
         require_url_format(url)
         url = escape_file_url(url)
     url_obj = (
         urllib.parse.urlparse(url, scheme=scheme, allow_fragments=False)
-        if isinstance(url, string_types) else url)
+        if isinstance(url, str) else url)
 
     (scheme, netloc, path, params, query, _) = url_obj
 
@@ -119,7 +118,7 @@ def format(parsed_url):
 
     Returns a canonicalized format of the given URL as a string.
     """
-    if isinstance(parsed_url, string_types):
+    if isinstance(parsed_url, str):
         parsed_url = parse(parsed_url)
 
     return parsed_url.geturl()
@@ -180,7 +179,7 @@ def join(base_url, path, *extra, **kwargs):
       'file:///opt/spack'
     """
     paths = [
-        (x) if isinstance(x, string_types)
+        (x) if isinstance(x, str)
         else x.geturl()
         for x in itertools.chain((base_url, path), extra)]
 

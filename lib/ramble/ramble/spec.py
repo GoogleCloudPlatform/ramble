@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import io
 import os
-import six
 
 import llnl.util.tty.color as clr
 
@@ -142,7 +142,7 @@ class Spec(object):
         self._application_class = None
         self.workloads = {}
 
-        if isinstance(spec_like, six.string_types):
+        if isinstance(spec_like, str):
             namespace, dot, spec_name = spec_like.rpartition(".")
             if not namespace:
                 namespace = None
@@ -183,7 +183,7 @@ class Spec(object):
         color = kwargs.get("color", False)
         transform = kwargs.get("transform", {})
 
-        out = six.StringIO()
+        out = io.StringIO()
 
         def write(s, c=None):
             f = clr.cescape(s)

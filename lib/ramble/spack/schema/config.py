@@ -8,8 +8,6 @@
 .. literalinclude:: _spack_root/lib/spack/spack/schema/config.py
    :lines: 13-
 """
-import six
-
 from llnl.util.lang import union_dicts
 
 import spack.schema.projections
@@ -131,7 +129,7 @@ def update(data):
     changed = False
 
     install_tree = data.get('install_tree', None)
-    if isinstance(install_tree, six.string_types):
+    if isinstance(install_tree, str):
         # deprecated short-form install tree
         # add value as `root` in updated install_tree
         data['install_tree'] = {'root': install_tree}
