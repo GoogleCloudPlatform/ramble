@@ -117,9 +117,8 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">traceback</span>
 
-<span class="kn">import</span> <span class="nn">six</span>
-<span class="kn">from</span> <span class="nn">six.moves.urllib.error</span> <span class="kn">import</span> <span class="n">URLError</span>
-<span class="kn">from</span> <span class="nn">six.moves.urllib.request</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
+<span class="kn">from</span> <span class="nn">urllib.error</span> <span class="kn">import</span> <span class="n">URLError</span>
+<span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">Request</span><span class="p">,</span> <span class="n">urlopen</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.lang</span>
 <span class="kn">from</span> <span class="nn">llnl.util.filesystem</span> <span class="kn">import</span> <span class="n">mkdirp</span><span class="p">,</span> <span class="n">rename</span>
@@ -637,7 +636,7 @@
 
         <span class="k">return</span> <span class="n">pages</span><span class="p">,</span> <span class="n">links</span><span class="p">,</span> <span class="n">subcalls</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_urls</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">root_urls</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="n">root_urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">root_urls</span><span class="p">]</span>
 
     <span class="c1"># Clear the local cache of visited pages before starting the search</span>

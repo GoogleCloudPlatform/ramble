@@ -105,7 +105,6 @@
 <span class="c1"># except according to those terms.</span>
 
 <span class="kn">import</span> <span class="nn">fnmatch</span>
-<span class="kn">import</span> <span class="nn">six</span>
 
 <span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
 
@@ -129,7 +128,7 @@
 <span class="sd">    Returns:</span>
 <span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
         <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
