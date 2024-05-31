@@ -12,7 +12,7 @@ import posixpath
 import re
 import sys
 
-import six.moves.urllib.parse as urllib_parse
+import urllib.parse
 from six import string_types
 
 from spack.util.path import (
@@ -79,7 +79,7 @@ def parse(url, scheme='file'):
         require_url_format(url)
         url = escape_file_url(url)
     url_obj = (
-        urllib_parse.urlparse(url, scheme=scheme, allow_fragments=False)
+        urllib.parse.urlparse(url, scheme=scheme, allow_fragments=False)
         if isinstance(url, string_types) else url)
 
     (scheme, netloc, path, params, query, _) = url_obj
@@ -106,7 +106,7 @@ def parse(url, scheme='file'):
     if sys.platform == "win32":
         path = convert_to_posix_path(path)
 
-    return urllib_parse.ParseResult(scheme=scheme,
+    return urllib.parse.ParseResult(scheme=scheme,
                                     netloc=netloc,
                                     path=path,
                                     params=params,
@@ -189,7 +189,7 @@ def join(base_url, path, *extra, **kwargs):
     last_abs_component = None
     scheme = ''
     for i in range(n - 1, -1, -1):
-        obj = urllib_parse.urlparse(
+        obj = urllib.parse.urlparse(
             paths[i], scheme='', allow_fragments=False)
 
         scheme = obj.scheme
@@ -200,7 +200,7 @@ def join(base_url, path, *extra, **kwargs):
                 # Without a scheme, we have to go back looking for the
                 # next-last component that specifies a scheme.
                 for j in range(i - 1, -1, -1):
-                    obj = urllib_parse.urlparse(
+                    obj = urllib.parse.urlparse(
                         paths[j], scheme='', allow_fragments=False)
 
                     if obj.scheme:
@@ -218,14 +218,14 @@ def join(base_url, path, *extra, **kwargs):
     if last_abs_component is not None:
         paths = paths[last_abs_component:]
         if len(paths) == 1:
-            result = urllib_parse.urlparse(
+            result = urllib.parse.urlparse(
                 paths[0], scheme='file', allow_fragments=False)
 
             # another subtlety: If the last argument to join() is an absolute
             # file:// URL component with a relative path, the relative path
             # needs to be resolved.
             if result.scheme == 'file' and result.netloc:
-                result = urllib_parse.ParseResult(
+                result = urllib.parse.ParseResult(
                     scheme=result.scheme,
                     netloc='',
                     path=posixpath.abspath(result.netloc + result.path),
@@ -281,7 +281,7 @@ def _join(base_url, path, *extra, **kwargs):
     if sys.platform == "win32":
         base_path = convert_to_posix_path(base_path)
 
-    return format(urllib_parse.ParseResult(scheme=scheme,
+    return format(urllib.parse.ParseResult(scheme=scheme,
                                            netloc=netloc,
                                            path=base_path,
                                            params=params,

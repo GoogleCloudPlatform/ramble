@@ -9,13 +9,13 @@ import inspect
 import json
 import os
 import os.path
+import pickle
 import platform
 import re
 import socket
 import sys
 
 import six
-from six.moves import cPickle
 
 import llnl.util.tty as tty
 from llnl.util.lang import dedupe
@@ -170,7 +170,7 @@ def dump_environment(path, environment=None):
 @system_path_filter(arg_slice=slice(1))
 def pickle_environment(path, environment=None):
     """Pickle an environment dictionary to a file."""
-    cPickle.dump(dict(environment if environment else os.environ),
+    pickle.dump(dict(environment if environment else os.environ),
                  open(path, 'wb'), protocol=2)
 
 

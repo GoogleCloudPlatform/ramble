@@ -19,7 +19,6 @@ from sys import platform as _platform
 
 import six
 from six import StringIO
-from six.moves import input
 
 if _platform != "win32":
     import fcntl
@@ -295,7 +294,6 @@ def get_number(prompt, **kwargs):
     number = None
     while number is None:
         msg(prompt, newline=False)
-        ans = input()
         if ans == six.text_type(abort):
             return None
 
@@ -328,7 +326,6 @@ def get_yes_or_no(prompt, **kwargs):
     result = None
     while result is None:
         msg(prompt, newline=False)
-        ans = input().lower()
         if not ans:
             result = default_value
             if result is None:

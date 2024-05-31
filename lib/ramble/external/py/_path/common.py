@@ -1,11 +1,20 @@
 """
 """
-import os, sys, posixpath
+import warnings
+import os
+import sys
+import posixpath
 import fnmatch
 import py
 
 # Moved from local.py.
 iswin32 = sys.platform == "win32" or (getattr(os, '_name', False) == 'nt')
+
+try:
+    # FileNotFoundError might happen in py34, and is not available with py27.
+    import_errors = (ImportError, FileNotFoundError)
+except NameError:
+    import_errors = (ImportError,)
 
 try:
     from os import fspath
@@ -32,7 +41,7 @@ except ImportError:
                 raise
             try:
                 import pathlib
-            except ImportError:
+            except import_errors:
                 pass
             else:
                 if isinstance(path, pathlib.PurePath):
@@ -189,14 +198,16 @@ newline will be removed from the end of each line. """
         """ (deprecated) return object unpickled from self.read() """
         f = self.open('rb')
         try:
-            return py.error.checked_call(py.std.pickle.load, f)
+            import pickle
+            return py.error.checked_call(pickle.load, f)
         finally:
             f.close()
 
     def move(self, target):
         """ move this path to target. """
         if target.relto(self):
-            raise py.error.EINVAL(target,
+            raise py.error.EINVAL(
+                target,
                 "cannot move path into a subdirectory of itself")
         try:
             self.rename(target)
@@ -226,7 +237,7 @@ newline will be removed from the end of each line. """
                 path.check(file=1, link=1)  # a link pointing to a file
         """
         if not kw:
-            kw = {'exists' : 1}
+            kw = {'exists': 1}
         return self.Checkers(self)._evaluate(kw)
 
     def fnmatch(self, pattern):
@@ -375,6 +386,9 @@ newline will be removed from the end of each line. """
     def _sortlist(self, res, sort):
         if sort:
             if hasattr(sort, '__call__'):
+                warnings.warn(DeprecationWarning(
+                    "listdir(sort=callable) is deprecated and breaks on python3"
+                ), stacklevel=3)
                 res.sort(sort)
             else:
                 res.sort()

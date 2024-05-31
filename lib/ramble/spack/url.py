@@ -29,7 +29,7 @@ import os
 import re
 
 from six import StringIO
-from six.moves.urllib.parse import urlsplit, urlunsplit
+from urllib.parse import urlsplit, urlunsplit
 
 import llnl.util.tty as tty
 from llnl.util.tty.color import cescape, colorize

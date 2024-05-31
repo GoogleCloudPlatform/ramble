@@ -20,8 +20,8 @@ import sys
 import traceback
 
 import six
-from six.moves.urllib.error import URLError
-from six.moves.urllib.request import Request, urlopen
+from urllib.error import URLError
+from urllib.request import Request, urlopen
 
 import llnl.util.lang
 from llnl.util.filesystem import mkdirp, rename
