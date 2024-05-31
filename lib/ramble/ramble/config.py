@@ -55,6 +55,7 @@ import ramble.schema.env_vars
 import ramble.schema.formatted_executables
 import ramble.schema.repos
 import ramble.schema.modifier_repos
+import ramble.schema.package_manager_repos
 import ramble.schema.workspace
 import ramble.schema.applications
 import ramble.schema.internals
@@ -87,6 +88,7 @@ section_schemas = {
     "spack": ramble.schema.spack.schema,
     "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
+    "package_manager_repos": ramble.schema.package_manager_repos.schema,
     "applications": ramble.schema.applications.schema,
     "variables": ramble.schema.variables.schema,
     "zips": ramble.schema.zips.schema,

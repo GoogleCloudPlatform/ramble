@@ -502,8 +502,21 @@ def make_argument_parser(**kwargs):
         help="do not use filesystem locking (unsafe)",
     )
     parser.add_argument(
-        "-m", "--mock", action="store_true", help="use mock applications instead of real ones"
+        "-m",
+        "--mock",
+        action="store_true",
+        help="use the builtin.mock repository instead of builtin",
     )
+
+    for obj in ramble.repository.ObjectTypes:
+        objname = obj.name.replace("_", "-")
+        print_name = obj.name.replace("_", " ")
+        parser.add_argument(
+            f"--mock-{objname}",
+            action="store_true",
+            help=f"use mock {print_name} instead of real ones",
+        )
+
     # TODO (dwj): Do we need this?
     # parser.add_argument(
     #   # '-b', '--bootstrap', action='store_true',
@@ -552,6 +565,23 @@ def send_warning_to_tty(message, *args):
     logger.warn(message)
 
 
+def mock_repositories(objects):
+    import spack.util.spack_yaml as syaml
+
+    for obj in objects:
+        obj_section = ramble.repository.type_definitions[obj]["config_section"]
+        key = syaml.syaml_str(obj_section)
+        key.override = True
+
+        ramble.config.config.scopes["command_line"].sections[obj_section] = syaml.syaml_dict(
+            [(key, [ramble.paths.mock_builtin_path])]
+        )
+
+        ramble.repository.paths[obj] = ramble.repository.create(
+            ramble.config.config, object_type=obj
+        )
+
+
 def setup_main_options(args):
     """Configure ramble globals based on the basic options."""
     # Assign a custom function to show warnings
@@ -592,21 +622,16 @@ def setup_main_options(args):
     if args.disable_progress_bar:
         ramble.config.set("config:disable_progress_bar", True, scope="command_line")
 
+    objects_to_mock = set()
     if args.mock:
-        import spack.util.spack_yaml as syaml
-
         for obj in ramble.repository.ObjectTypes:
-            obj_section = ramble.repository.type_definitions[obj]["config_section"]
-            key = syaml.syaml_str(obj_section)
-            key.override = True
+            objects_to_mock.add(obj)
 
-            ramble.config.config.scopes["command_line"].sections[obj_section] = syaml.syaml_dict(
-                [(key, [ramble.paths.mock_builtin_path])]
-            )
+    for obj in ramble.repository.ObjectTypes:
+        if hasattr(args, f"mock_{obj.name}") and getattr(args, f"mock_{obj.name}"):
+            objects_to_mock.add(obj)
 
-            ramble.repository.paths[obj] = ramble.repository.create(
-                ramble.config.config, object_type=obj
-            )
+    mock_repositories(objects_to_mock)
 
     # If the user asked for it, don't check ssl certs.
     if args.insecure:
