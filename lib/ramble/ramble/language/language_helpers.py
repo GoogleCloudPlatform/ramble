@@ -12,7 +12,46 @@ import six
 from ramble.language.language_base import DirectiveError
 
 
-def merge_definitions(single_type, multiple_type, multiple_pattern_match):
+def check_definition(
+    single_type, multiple_type, single_arg_name, multiple_arg_name, directive_name
+):
+    """
+    Sanity check definitions before merging or require
+
+    Args:
+        single_type: Single string for type name
+        multiple_type: List of strings for type names, may contain wildcards
+        multiple_pattern_match: List of strings to match against patterns in multiple_type
+        single_arg_name: String name of the single_type argument in the directive
+        multiple_arg_name: String name of the multiple_type argument in the directive
+        directive_name: Name of the directive requiring a type
+
+    Returns:
+        List of all type names (Merged if both single_type and multiple_type definitions are valid)
+    """
+    if single_type and not isinstance(single_type, six.string_types):
+        raise DirectiveError(
+            f"Directive {directive_name} was given an invalid type "
+            f"for the {single_arg_name} argument. "
+            f"Type was {type(single_type)}"
+        )
+
+    if multiple_type and not isinstance(multiple_type, list):
+        raise DirectiveError(
+            f"Directive {directive_name} was given an invalid type "
+            f"for the {multiple_arg_name} argument. "
+            f"Type was {type(multiple_type)}"
+        )
+
+
+def merge_definitions(
+    single_type,
+    multiple_type,
+    multiple_pattern_match,
+    single_arg_name,
+    multiple_arg_name,
+    directive_name,
+):
     """Merge definitions of a type
 
     This method will merge two optional definitions of single_type and
@@ -22,10 +61,17 @@ def merge_definitions(single_type, multiple_type, multiple_pattern_match):
         single_type: Single string for type name
         multiple_type: List of strings for type names, may contain wildcards
         multiple_pattern_match: List of strings to match against patterns in multiple_type
+        single_arg_name: String name of the single_type argument in the directive
+        multiple_arg_name: String name of the multiple_type argument in the directive
+        directive_name: Name of the directive requiring a type
 
     Returns:
         List of all type names (Merged if both single_type and multiple_type definitions are valid)
     """
+
+    check_definition(
+        single_type, multiple_type, single_arg_name, multiple_arg_name, directive_name
+    )
 
     all_types = []
 
@@ -72,21 +118,14 @@ def require_definition(
             f"{single_arg_name} or {multiple_arg_name} to be defined."
         )
 
-    if single_type and not isinstance(single_type, six.string_types):
-        raise DirectiveError(
-            f"Directive {directive_name} was given an invalid type "
-            f"for the {single_arg_name} argument. "
-            f"Type was {type(single_type)}"
-        )
-
-    if multiple_type and not isinstance(multiple_type, list):
-        raise DirectiveError(
-            f"Directive {directive_name} was given an invalid type "
-            f"for the {multiple_arg_name} argument. "
-            f"Type was {type(multiple_type)}"
-        )
-
-    return merge_definitions(single_type, multiple_type, multiple_pattern_match)
+    return merge_definitions(
+        single_type,
+        multiple_type,
+        multiple_pattern_match,
+        single_arg_name,
+        multiple_arg_name,
+        directive_name,
+    )
 
 
 def expand_patterns(multiple_type: list, multiple_pattern_match: list):

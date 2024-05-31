@@ -75,11 +75,40 @@ def workload(
             executable, executables, app.executables, "executable", "executables", "workload"
         )
 
-        all_inputs = ramble.language.language_helpers.merge_definitions(input, inputs, app.inputs)
+        all_inputs = ramble.language.language_helpers.merge_definitions(
+            input, inputs, app.inputs, "input", "inputs", "workload"
+        )
 
         app.workloads[name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
 
     return _execute_workload
+
+
+@application_directive("workload_groups")
+def workload_group(name, workloads=[], mode=None, **kwargs):
+    """Adds a workload group to this application
+
+    Defines a new workload group that can be used within the context of its
+    application.
+
+    Args:
+        name: The name of the group
+        workloads: A list of workloads to be grouped
+    """
+
+    def _execute_workload_groups(app):
+        if mode == "append":
+            app.workload_groups[name].update(set(workloads))
+        else:
+            app.workload_groups[name] = set(workloads)
+
+        # Apply any existing variables in the group to the workload
+        for workload in workloads:
+            if name in app.workload_group_vars:
+                for var in app.workload_group_vars[name]:
+                    app.workloads[workload].add_variable(var)
+
+    return _execute_workload_groups
 
 
 @application_directive("executables")
@@ -156,7 +185,7 @@ def input_file(
     return _execute_input_file
 
 
-@application_directive(dicts=())
+@application_directive("workload_group_vars")
 def workload_variable(
     name,
     default,
@@ -164,6 +193,7 @@ def workload_variable(
     values=None,
     workload=None,
     workloads=None,
+    workload_group=None,
     expandable=True,
     **kwargs,
 ):
@@ -177,20 +207,33 @@ def workload_variable(
     """
 
     def _execute_workload_variable(app):
-        all_workloads = ramble.language.language_helpers.require_definition(
+        # Always apply passes workload/workloads
+        all_workloads = ramble.language.language_helpers.merge_definitions(
             workload, workloads, app.workloads, "workload", "workloads", "workload_variable"
         )
 
+        workload_var = ramble.workload.WorkloadVariable(
+            name, default=default, description=description, values=values, expandable=expandable
+        )
+
         for wl_name in all_workloads:
-            app.workloads[wl_name].add_variable(
-                ramble.workload.WorkloadVariable(
-                    name,
-                    default=default,
-                    description=description,
-                    values=values,
-                    expandable=expandable,
-                )
-            )
+            app.workloads[wl_name].add_variable(workload_var.copy())
+
+        if workload_group is not None:
+            workload_group_list = app.workload_groups[workload_group]
+
+            if workload_group not in app.workload_group_vars:
+                app.workload_group_vars[workload_group] = []
+
+            # Track which vars we add to, to allow us to re-apply during inheritance
+            app.workload_group_vars[workload_group].append(workload_var.copy())
+
+            for wl_name in workload_group_list:
+                # Apply the variable
+                app.workloads[wl_name].add_variable(workload_var.copy())
+
+        if not all_workloads and workload_group is None:
+            raise DirectiveError("A workload or workload group is required")
 
     return _execute_workload_variable
 
