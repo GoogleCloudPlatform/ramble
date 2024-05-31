@@ -105,6 +105,8 @@
 <span class="c1"># except according to those terms.</span>
 
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+<span class="kn">import</span> <span class="nn">copy</span>
+
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 
 
@@ -163,6 +165,12 @@
             <span class="k">if</span> <span class="n">attr_val</span><span class="p">:</span>
                 <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">attr_val</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="n">out_str</span></div>
+
+
+<div class="viewcode-block" id="WorkloadVariable.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadVariable.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </div>
 
 
@@ -206,6 +214,12 @@
             <span class="k">if</span> <span class="n">attr_val</span><span class="p">:</span>
                 <span class="n">out_str</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">indentation</span><span class="si">}</span><span class="s1">    </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">attr_val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;@@&quot;</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
         <span class="k">return</span> <span class="n">out_str</span></div>
+
+
+<div class="viewcode-block" id="WorkloadEnvironmentVariable.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.workload.WorkloadEnvironmentVariable.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 </div>
 
 
@@ -425,7 +439,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 30, 2024.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

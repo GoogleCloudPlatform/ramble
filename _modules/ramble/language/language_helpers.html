@@ -110,9 +110,51 @@
 <span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
 
 
+<div class="viewcode-block" id="check_definition">
+<a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.check_definition">[docs]</a>
+<span class="k">def</span> <span class="nf">check_definition</span><span class="p">(</span>
+    <span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span> <span class="n">single_arg_name</span><span class="p">,</span> <span class="n">multiple_arg_name</span><span class="p">,</span> <span class="n">directive_name</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Sanity check definitions before merging or require</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        single_type: Single string for type name</span>
+<span class="sd">        multiple_type: List of strings for type names, may contain wildcards</span>
+<span class="sd">        multiple_pattern_match: List of strings to match against patterns in multiple_type</span>
+<span class="sd">        single_arg_name: String name of the single_type argument in the directive</span>
+<span class="sd">        multiple_arg_name: String name of the multiple_type argument in the directive</span>
+<span class="sd">        directive_name: Name of the directive requiring a type</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">multiple_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span></div>
+
+
+
 <div class="viewcode-block" id="merge_definitions">
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.language_helpers.merge_definitions">[docs]</a>
-<span class="k">def</span> <span class="nf">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span> <span class="n">multiple_pattern_match</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">merge_definitions</span><span class="p">(</span>
+    <span class="n">single_type</span><span class="p">,</span>
+    <span class="n">multiple_type</span><span class="p">,</span>
+    <span class="n">multiple_pattern_match</span><span class="p">,</span>
+    <span class="n">single_arg_name</span><span class="p">,</span>
+    <span class="n">multiple_arg_name</span><span class="p">,</span>
+    <span class="n">directive_name</span><span class="p">,</span>
+<span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Merge definitions of a type</span>
 
 <span class="sd">    This method will merge two optional definitions of single_type and</span>
@@ -122,10 +164,17 @@
 <span class="sd">        single_type: Single string for type name</span>
 <span class="sd">        multiple_type: List of strings for type names, may contain wildcards</span>
 <span class="sd">        multiple_pattern_match: List of strings to match against patterns in multiple_type</span>
+<span class="sd">        single_arg_name: String name of the single_type argument in the directive</span>
+<span class="sd">        multiple_arg_name: String name of the multiple_type argument in the directive</span>
+<span class="sd">        directive_name: Name of the directive requiring a type</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        List of all type names (Merged if both single_type and multiple_type definitions are valid)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">check_definition</span><span class="p">(</span>
+        <span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span> <span class="n">single_arg_name</span><span class="p">,</span> <span class="n">multiple_arg_name</span><span class="p">,</span> <span class="n">directive_name</span>
+    <span class="p">)</span>
 
     <span class="n">all_types</span> <span class="o">=</span> <span class="p">[]</span>
 
@@ -175,21 +224,14 @@
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s2"> or </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s2"> to be defined.&quot;</span>
         <span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">single_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">six</span><span class="o">.</span><span class="n">string_types</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">single_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">single_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">multiple_type</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="n">DirectiveError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Directive </span><span class="si">{</span><span class="n">directive_name</span><span class="si">}</span><span class="s2"> was given an invalid type &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;for the </span><span class="si">{</span><span class="n">multiple_arg_name</span><span class="si">}</span><span class="s2"> argument. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Type was </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">multiple_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">merge_definitions</span><span class="p">(</span><span class="n">single_type</span><span class="p">,</span> <span class="n">multiple_type</span><span class="p">,</span> <span class="n">multiple_pattern_match</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="n">merge_definitions</span><span class="p">(</span>
+        <span class="n">single_type</span><span class="p">,</span>
+        <span class="n">multiple_type</span><span class="p">,</span>
+        <span class="n">multiple_pattern_match</span><span class="p">,</span>
+        <span class="n">single_arg_name</span><span class="p">,</span>
+        <span class="n">multiple_arg_name</span><span class="p">,</span>
+        <span class="n">directive_name</span><span class="p">,</span>
+    <span class="p">)</span></div>
 
 
 
@@ -232,7 +274,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 30, 2024.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

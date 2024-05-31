@@ -133,6 +133,8 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.tags"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.tags</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.uses_spack"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.variable_modifications"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.workload_group_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.workload_group_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.workload_groups"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.workload_groups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.workloads"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.workloads</span></code></a></li>
 </ul>
 </li>
@@ -1086,10 +1088,12 @@
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable"><code class="docutils literal notranslate"><span class="pre">WorkloadEnvironmentVariable</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable.as_str"><code class="docutils literal notranslate"><span class="pre">WorkloadEnvironmentVariable.as_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadEnvironmentVariable.copy"><code class="docutils literal notranslate"><span class="pre">WorkloadEnvironmentVariable.copy()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.workload.WorkloadVariable"><code class="docutils literal notranslate"><span class="pre">WorkloadVariable</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadVariable.as_str"><code class="docutils literal notranslate"><span class="pre">WorkloadVariable.as_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workload.WorkloadVariable.copy"><code class="docutils literal notranslate"><span class="pre">WorkloadVariable.copy()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1177,6 +1181,8 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.software_specs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.success_criteria"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.variable_modifications"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.workload_group_vars"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.workload_group_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.workload_groups"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.workload_groups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.workloads"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.workloads</span></code></a></li>
 </ul>
 </li>
@@ -1209,6 +1215,8 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.success_criteria"><code class="docutils literal notranslate"><span class="pre">SpackApplication.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.uses_spack"><code class="docutils literal notranslate"><span class="pre">SpackApplication.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.variable_modifications"><code class="docutils literal notranslate"><span class="pre">SpackApplication.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workload_group_vars"><code class="docutils literal notranslate"><span class="pre">SpackApplication.workload_group_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workload_groups"><code class="docutils literal notranslate"><span class="pre">SpackApplication.workload_groups</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.spack.SpackApplication.workloads"><code class="docutils literal notranslate"><span class="pre">SpackApplication.workloads</span></code></a></li>
 </ul>
 </li>
@@ -1477,6 +1485,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.input_file"><code class="docutils literal notranslate"><span class="pre">input_file()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.register_phase"><code class="docutils literal notranslate"><span class="pre">register_phase()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload"><code class="docutils literal notranslate"><span class="pre">workload()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload_group"><code class="docutils literal notranslate"><span class="pre">workload_group()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.application_language.workload_variable"><code class="docutils literal notranslate"><span class="pre">workload_variable()</span></code></a></li>
 </ul>
 </li>
@@ -1489,6 +1498,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.language.html#module-ramble.language.language_helpers">ramble.language.language_helpers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.language_helpers.check_definition"><code class="docutils literal notranslate"><span class="pre">check_definition()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.language_helpers.expand_patterns"><code class="docutils literal notranslate"><span class="pre">expand_patterns()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.language_helpers.merge_definitions"><code class="docutils literal notranslate"><span class="pre">merge_definitions()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.language_helpers.require_definition"><code class="docutils literal notranslate"><span class="pre">require_definition()</span></code></a></li>
@@ -1533,10 +1543,8 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.compilers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.executables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">BasicModifier.figures_of_merit</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.inputs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modes"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_variables</span></code></a></li>
@@ -1548,7 +1556,6 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.software_specs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">BasicModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">BasicModifier.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.workloads"><code class="docutils literal notranslate"><span class="pre">BasicModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1560,10 +1567,8 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.compilers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executable_modifiers</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.executables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">SpackModifier.figures_of_merit</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.inputs"><code class="docutils literal notranslate"><span class="pre">SpackModifier.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modes"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modes</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_class"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_class</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">SpackModifier.modifier_variables</span></code></a></li>
@@ -1576,7 +1581,6 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.success_criteria"><code class="docutils literal notranslate"><span class="pre">SpackModifier.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.uses_spack"><code class="docutils literal notranslate"><span class="pre">SpackModifier.uses_spack</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.variable_modifications"><code class="docutils literal notranslate"><span class="pre">SpackModifier.variable_modifications</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.spack.SpackModifier.workloads"><code class="docutils literal notranslate"><span class="pre">SpackModifier.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -2709,6 +2713,16 @@ experiment_status.UNKNOWN</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.variable_modifications">
 <span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.variable_modifications" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.workload_group_vars">
+<span class="sig-name descname"><span class="pre">workload_group_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.workload_group_vars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.workload_groups">
+<span class="sig-name descname"><span class="pre">workload_groups</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.workload_groups" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -8768,6 +8782,11 @@ experiment.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadEnvironmentVariable.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadEnvironmentVariable.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadEnvironmentVariable.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -8792,6 +8811,11 @@ experiment.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt class="sig sig-object py" id="ramble.workload.WorkloadVariable.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workload.html#WorkloadVariable.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workload.WorkloadVariable.copy" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 </section>
@@ -8809,7 +8833,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 30, 2024.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 

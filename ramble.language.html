@@ -260,8 +260,24 @@ its application.</p>
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.application_language.workload_group">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">workload_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workloads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#workload_group"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.workload_group" title="Link to this definition"></a></dt>
+<dd><p>Adds a workload group to this application</p>
+<p>Defines a new workload group that can be used within the context of its
+application.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> – The name of the group</p></li>
+<li><p><strong>workloads</strong> – A list of workloads to be grouped</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.application_language.workload_variable">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">workload_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workloads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#workload_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.workload_variable" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.application_language.</span></span><span class="sig-name descname"><span class="pre">workload_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">description</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">values</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workload</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workloads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">workload_group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expandable</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/application_language.html#workload_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.application_language.workload_variable" title="Link to this definition"></a></dt>
 <dd><p>Define a new variable to be used in experiments</p>
 <p>Defines a new variable that can be defined within the
 experiments.yaml config file, to control various aspects of
@@ -332,6 +348,27 @@ the core.</p>
 <section id="module-ramble.language.language_helpers">
 <span id="ramble-language-language-helpers-module"></span><h2>ramble.language.language_helpers module<a class="headerlink" href="#module-ramble.language.language_helpers" title="Link to this heading"></a></h2>
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.language.language_helpers.check_definition">
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">check_definition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directive_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#check_definition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.check_definition" title="Link to this definition"></a></dt>
+<dd><p>Sanity check definitions before merging or require</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>single_type</strong> – Single string for type name</p></li>
+<li><p><strong>multiple_type</strong> – List of strings for type names, may contain wildcards</p></li>
+<li><p><strong>multiple_pattern_match</strong> – List of strings to match against patterns in multiple_type</p></li>
+<li><p><strong>single_arg_name</strong> – String name of the single_type argument in the directive</p></li>
+<li><p><strong>multiple_arg_name</strong> – String name of the multiple_type argument in the directive</p></li>
+<li><p><strong>directive_name</strong> – Name of the directive requiring a type</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>List of all type names (Merged if both single_type and multiple_type definitions are valid)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.language_helpers.expand_patterns">
 <span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">expand_patterns</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_pattern_match</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#expand_patterns"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.expand_patterns" title="Link to this definition"></a></dt>
 <dd><p>Expand wildcard patterns within a list of names</p>
@@ -354,7 +391,7 @@ not found in the names list.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.language_helpers.merge_definitions">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">merge_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_pattern_match</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#merge_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.merge_definitions" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.language_helpers.</span></span><span class="sig-name descname"><span class="pre">merge_definitions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">single_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_pattern_match</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">single_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multiple_arg_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">directive_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/language_helpers.html#merge_definitions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.language_helpers.merge_definitions" title="Link to this definition"></a></dt>
 <dd><p>Merge definitions of a type</p>
 <p>This method will merge two optional definitions of single_type and
 multiple_type.</p>
@@ -364,6 +401,9 @@ multiple_type.</p>
 <li><p><strong>single_type</strong> – Single string for type name</p></li>
 <li><p><strong>multiple_type</strong> – List of strings for type names, may contain wildcards</p></li>
 <li><p><strong>multiple_pattern_match</strong> – List of strings to match against patterns in multiple_type</p></li>
+<li><p><strong>single_arg_name</strong> – String name of the single_type argument in the directive</p></li>
+<li><p><strong>multiple_arg_name</strong> – String name of the multiple_type argument in the directive</p></li>
+<li><p><strong>directive_name</strong> – Name of the directive requiring a type</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -770,7 +810,7 @@ in. Accepts globbing.</p></li>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 30, 2024.
+      <span class="lastupdated">Last updated on May 31, 2024.
       </span></p>
   </div>
 
