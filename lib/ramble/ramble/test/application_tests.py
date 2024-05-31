@@ -23,15 +23,15 @@ pytestmark = pytest.mark.usefixtures(
 def test_app_features(mutable_mock_apps_repo, app):
     app_inst = mutable_mock_apps_repo.get(app)
 
-    assert hasattr(app_inst, 'workloads')
-    assert hasattr(app_inst, 'workload_groups')
-    assert hasattr(app_inst, 'executables')
-    assert hasattr(app_inst, 'figures_of_merit')
-    assert hasattr(app_inst, 'inputs')
-    assert hasattr(app_inst, 'compilers')
-    assert hasattr(app_inst, 'software_specs')
-    assert hasattr(app_inst, 'required_packages')
-    assert hasattr(app_inst, 'builtins')
+    assert hasattr(app_inst, "workloads")
+    assert hasattr(app_inst, "workload_groups")
+    assert hasattr(app_inst, "executables")
+    assert hasattr(app_inst, "figures_of_merit")
+    assert hasattr(app_inst, "inputs")
+    assert hasattr(app_inst, "compilers")
+    assert hasattr(app_inst, "software_specs")
+    assert hasattr(app_inst, "required_packages")
+    assert hasattr(app_inst, "builtins")
 
 
 def test_basic_app(mutable_mock_apps_repo):
@@ -501,62 +501,45 @@ def test_class_attributes(mutable_mock_apps_repo):
     assert "added_workload" in basic_copy.workloads
     assert "added_workload" not in basic_inst.workloads
 
-    assert executable_application_instance.variables['execute_experiment'] == test_answer
-
-
-def test_class_attributes(mutable_mock_apps_repo):
-    basic_inst = mutable_mock_apps_repo.get('basic')
-    basic_copy = basic_inst.copy()
-
-    instances = [basic_inst, basic_copy]
-    for inst in instances:
-        assert hasattr(inst, 'workloads')
-        assert 'test_wl' in inst.workloads
-
-    basic_copy.workload('added_workload', executables=['foo'])
-
-    assert 'added_workload' in basic_copy.workloads
-    assert 'added_workload' not in basic_inst.workloads
-
 
 def test_workload_groups(mutable_mock_apps_repo):
-    workload_group_inst = mutable_mock_apps_repo.get('workload-groups')
+    workload_group_inst = mutable_mock_apps_repo.get("workload-groups")
 
-    assert 'test_wl' in workload_group_inst.workloads
+    assert "test_wl" in workload_group_inst.workloads
 
-    assert 'empty' in workload_group_inst.workload_groups
-    assert 'test_wlg' in workload_group_inst.workload_groups
+    assert "empty" in workload_group_inst.workload_groups
+    assert "test_wlg" in workload_group_inst.workload_groups
 
-    my_var = workload_group_inst.workloads['test_wl'].find_variable('test_var')
+    my_var = workload_group_inst.workloads["test_wl"].find_variable("test_var")
     assert my_var is not None
-    assert my_var.default == '2.0'
-    assert my_var.description == 'Test workload vars and groups'
+    assert my_var.default == "2.0"
+    assert my_var.description == "Test workload vars and groups"
 
-    my_mixed_var_wl = workload_group_inst.workloads['test_wl'].find_variable('test_var_mixed')
+    my_mixed_var_wl = workload_group_inst.workloads["test_wl"].find_variable("test_var_mixed")
     assert my_mixed_var_wl is not None
-    assert my_mixed_var_wl.default == '3.0'
-    assert my_mixed_var_wl.description == 'Test vars for workload and groups'
+    assert my_mixed_var_wl.default == "3.0"
+    assert my_mixed_var_wl.description == "Test vars for workload and groups"
 
 
 def test_workload_groups_inherited(mutable_mock_apps_repo):
-    wlgi_inst = mutable_mock_apps_repo.get('workload-groups-inherited')
+    wlgi_inst = mutable_mock_apps_repo.get("workload-groups-inherited")
 
-    assert 'test_wl' in wlgi_inst.workloads
-    assert 'test_wl3' in wlgi_inst.workloads
+    assert "test_wl" in wlgi_inst.workloads
+    assert "test_wl3" in wlgi_inst.workloads
 
     # check we inherit groups we don't touch
-    assert 'empty' in wlgi_inst.workload_groups
-    assert 'test_wlg' in wlgi_inst.workload_groups
+    assert "empty" in wlgi_inst.workload_groups
+    assert "test_wlg" in wlgi_inst.workload_groups
 
-    assert 'test_wl' in wlgi_inst.workload_groups['test_wlg']
+    assert "test_wl" in wlgi_inst.workload_groups["test_wlg"]
 
     # Ensure a new workload can obtain the parent level vars via groups
-    my_var = wlgi_inst.workloads['test_wl3'].find_variable('test_var')
+    my_var = wlgi_inst.workloads["test_wl3"].find_variable("test_var")
     assert my_var is not None
-    assert my_var.default == '2.0'
-    assert my_var.description == 'Test workload vars and groups'
+    assert my_var.default == "2.0"
+    assert my_var.description == "Test workload vars and groups"
 
-    for wl in ['test_wl', 'test_wl3']:
-        my_mixed_var_wl = wlgi_inst.workloads[wl].find_variable('test_var_mixed')
+    for wl in ["test_wl", "test_wl3"]:
+        my_mixed_var_wl = wlgi_inst.workloads[wl].find_variable("test_var_mixed")
         assert my_mixed_var_wl is not None
-        assert my_mixed_var_wl.default == '3.0'
+        assert my_mixed_var_wl.default == "3.0"
