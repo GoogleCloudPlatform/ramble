@@ -142,6 +142,7 @@
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
 <span class="kn">import</span> <span class="nn">spack.util.debug</span>
 <span class="kn">import</span> <span class="nn">spack.util.environment</span>
+<span class="kn">from</span> <span class="nn">spack.util.executable</span> <span class="kn">import</span> <span class="n">CommandNotFoundError</span>
 <span class="kn">import</span> <span class="nn">spack.util.path</span>
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 
@@ -1136,6 +1137,10 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
         <span class="n">e</span><span class="o">.</span><span class="n">die</span><span class="p">()</span>  <span class="c1"># gracefully die on any RambleErrors</span>
 
+    <span class="k">except</span> <span class="n">CommandNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="n">e</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">e</span><span class="o">.</span><span class="n">message</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;spack requires&quot;</span><span class="p">,</span> <span class="s2">&quot;ramble requires&quot;</span><span class="p">)</span>
+        <span class="k">raise</span>
+
     <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:debug&quot;</span><span class="p">):</span>
             <span class="k">raise</span>
@@ -1174,7 +1179,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on May 31, 2024.
+      <span class="lastupdated">Last updated on Jun 01, 2024.
       </span></p>
   </div>
 
