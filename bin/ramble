@@ -30,9 +30,9 @@ from __future__ import print_function
 import os
 import sys
 
-if sys.version_info[:2] < (2, 6):
+if sys.version_info[:2] < (3, 6):
     v_info = sys.version_info[:3]
-    sys.exit("Ramble requires Python 2.6 or higher." "This is Python %d.%d.%d." % v_info)
+    sys.exit("Ramble requires Python 3.6 or higher." "This is Python %d.%d.%d." % v_info)
 
 # Find ramble's location and its prefix.
 ramble_file = os.path.realpath(os.path.expanduser(__file__))
@@ -44,9 +44,6 @@ sys.path.insert(0, ramble_lib_path)
 
 # Add external libs
 ramble_external_libs = os.path.join(ramble_lib_path, "external")
-
-if sys.version_info[:2] == (2, 6):
-    sys.path.insert(0, os.path.join(ramble_external_libs, "py26"))
 
 sys.path.insert(0, ramble_external_libs)
 
