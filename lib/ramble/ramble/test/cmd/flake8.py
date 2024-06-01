@@ -16,4 +16,8 @@ flake8 = RambleCommand("flake8")
 @deprecation.fail_if_not_removed
 def test_flake8_deprecation():
     # Call `ramble flake8` to trigger the deprecation assertion.
-    flake8("-U")
+    # Do not test on actual sources, since we don't actually want
+    # to verify styles using this command, which may diverge from
+    # `ramble style`. One such divergence is on modifiers, where
+    # the style command has additional flake8 exemptions.
+    flake8("-U", "/dev/null")
