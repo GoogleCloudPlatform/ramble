@@ -44,6 +44,7 @@ import ramble.repository
 from ramble.util.logger import logger
 import spack.util.debug
 import spack.util.environment
+from spack.util.executable import CommandNotFoundError
 import spack.util.path
 from ramble.error import RambleError
 
@@ -978,6 +979,10 @@ def main(argv=None):
     except RambleError as e:
         logger.debug(e)
         e.die()  # gracefully die on any RambleErrors
+
+    except CommandNotFoundError as e:
+        e.message = e.message.replace("spack requires", "ramble requires")
+        raise
 
     except KeyboardInterrupt:
         if ramble.config.get("config:debug"):

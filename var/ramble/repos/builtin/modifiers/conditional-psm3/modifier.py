@@ -8,7 +8,7 @@
 
 import re
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class ConditionalPsm3(BasicModifier):
