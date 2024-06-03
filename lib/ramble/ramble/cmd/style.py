@@ -503,6 +503,7 @@ def style(parser, args):
             try:
                 base, untracked, list_all = arg_flags.pop(0)
                 file_list = changed_files(base, untracked, list_all)
+                break
             except ProcessError as e:
                 file_list = None
                 if not arg_flags:
