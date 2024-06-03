@@ -344,6 +344,11 @@ def filter_file(source, dest, output=False):
                     sys.stdout.write(line)
 
 
+def _split_file_list(file_list):
+    """Return a tuple of (primary_files, obj_files)"""
+    return [f for f in file_list if not is_object(f)], [f for f in file_list if is_object(f)]
+
+
 @tool("flake8")
 def run_flake8(flake8_cmd, file_list, args):
     temp = tempfile.mkdtemp()
@@ -352,8 +357,7 @@ def run_flake8(flake8_cmd, file_list, args):
         print_tool_header("flake8", file_list)
 
         # run flake8 on the temporary tree, once for core, once for apps
-        application_file_list = [f for f in file_list if is_object(f)]
-        primary_file_list = [f for f in file_list if not is_object(f)]
+        primary_file_list, application_file_list = _split_file_list(file_list)
 
         # filter files into a temporary directory with exemptions added.
         # TODO: DRY this duplication
@@ -424,13 +428,29 @@ def run_flake8(flake8_cmd, file_list, args):
 @tool("black")
 def run_black(black_cmd, file_list, args):
     print_tool_header("black", file_list)
-    black_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
+    common_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
-        black_args += ("--check", "--diff")
-    black_args += tuple(file_list)
+        common_args += ("--check", "--diff")
+    primary_files, obj_files = _split_file_list(file_list)
+    output = ""
+    returncode = 0
 
-    output = black_cmd(*black_args, fail_on_error=False, output=str, error=str)
-    returncode = black_cmd.returncode
+    # Operate on primary and object (apps and mods) files spearately with varying configs.
+    if primary_files:
+        output += black_cmd(
+            *(common_args + tuple(primary_files)), fail_on_error=False, output=str, error=str
+        )
+        returncode |= black_cmd.returncode
+
+    if obj_files:
+        output += black_cmd(
+            *(common_args + ("--config", "pyproject_objects.toml") + tuple(obj_files)),
+            fail_on_error=False,
+            output=str,
+            error=str,
+        )
+        returncode |= black_cmd.returncode
+
     print_output(output, args)
     print_tool_result("black", returncode)
     return returncode
