@@ -21,6 +21,7 @@ import ramble.schema.spack  # DEPRECATED: Remove when spack is removed
 import ramble.schema.software
 import ramble.schema.success_criteria
 import ramble.schema.variables
+import ramble.schema.variants
 import ramble.schema.env_vars
 import ramble.schema.internals
 import ramble.schema.modifiers
@@ -36,6 +37,7 @@ properties = union_dicts(
     ramble.schema.software.properties,
     ramble.schema.success_criteria.properties,
     ramble.schema.variables.properties,
+    ramble.schema.variants.properties,
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,

@@ -1472,6 +1472,10 @@ class Workspace(object):
         """Return a dict of workspace zips"""
         return ramble.config.config.get_config("zips")
 
+    def get_workspace_variants(self):
+        """Return a dict of workspace variants"""
+        return ramble.config.config.get_config("variants")
+
     def get_software_dict(self):
         """Return the software dictionary for this workspace"""
         # DEPRECATED: Remove once the spack config section is completely removed

@@ -66,6 +66,7 @@ import ramble.schema.spack
 import ramble.schema.software
 import ramble.schema.success_criteria
 import ramble.schema.variables
+import ramble.schema.variants
 
 from ramble.error import RambleError
 from ramble.util.logger import logger
@@ -91,6 +92,7 @@ section_schemas = {
     "package_manager_repos": ramble.schema.package_manager_repos.schema,
     "applications": ramble.schema.applications.schema,
     "variables": ramble.schema.variables.schema,
+    "variants": ramble.schema.variants.schema,
     "zips": ramble.schema.zips.schema,
 }
 

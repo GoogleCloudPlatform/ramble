@@ -105,6 +105,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.expander = None
         self._formatted_executables = {}
         self.variables = None
+        self.variants = None
         self.no_expand_vars = None
         self.experiment_set = None
         self.internals = {}
@@ -126,6 +127,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.results = {}
         self._phase_times = {}
         self._pipeline_graphs = None
+        self.package_manager = None
         self.custom_executables = {}
 
         self.hash_inventory = {
@@ -181,6 +183,33 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         return True
 
+    def set_variants(self, variants):
+        """Set variants within an experiment instance, and process their
+        contents.
+
+        Args:
+            variants (dict): Dictionary of variant controls for this
+                             experiment.
+        """
+        self.variants = variants.copy()
+
+        if namespace.package_manager in self.variants:
+            pkgman_name = self.expander.expand_var(
+                self.variants[namespace.package_manager], typed=True
+            )
+
+            if pkgman_name is not None:
+                try:
+                    pkgman_type = ramble.repository.ObjectTypes.package_managers
+                    self.package_manager = ramble.repository.get(pkgman_name, pkgman_type).copy()
+                    self.package_manager.set_application(self)
+                except ramble.repository.UnknownObjectError:
+                    logger.die(
+                        f"{pkgman_name} is not a valid package manager. "
+                        "Valid package managers can be listed via:\n"
+                        "\tramble list --type package_managers"
+                    )
+
     def build_phase_order(self):
         if self._pipeline_graphs is not None:
             return
@@ -201,6 +230,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                 # Define phase edges
                 for phase, phase_node in mod_inst.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
+
+            if self.package_manager:
+                # Define phase nodes
+                for phase, phase_node in self.package_manager.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].add_node(
+                        phase_node, obj_inst=self.package_manager
+                    )
+
+                # Define phase edges
+                for phase, phase_node in self.package_manager.all_pipeline_phases(pipeline):
                     self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
 
     def _long_print(self):
@@ -810,6 +850,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for mod_inst in self._modifier_instances:
             builtin_objects.append(mod_inst)
             all_builtins.append(mod_inst.builtins)
+
+        if self.package_manager is not None:
+            builtin_objects.append(self.package_manager)
+            all_builtins.append(self.package_manager.builtins)
 
         all_executables = self.executables.copy()
         all_executables.update(self.custom_executables)
