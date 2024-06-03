@@ -293,9 +293,15 @@ def modifier_variable(
 
 @modifier_directive("package_manager_requirements")
 def package_manager_requirement(
-    command: str, validation_type: str, modes: list, regex=None, **kwargs
+    command: str,
+    validation_type: str,
+    modes: list,
+    regex=None,
+    package_manager: str = "*",
+    **kwargs,
 ):
-    """Define a requirement for the modifier's package manager
+    """Define a requirement when this modifier is used in an experiment with a
+    package manager.
 
     Args:
         command: Package manager command to execute, when evaluating the requirement
@@ -305,6 +311,7 @@ def package_manager_requirement(
         modes: List of usage modes this requirement should apply to
         regex: Regular expression to use when validation_type is either 'contains_regex'
                or 'does_no_contain_regex'
+        package_manager: Name of the package manager this requirement applies to
     """
 
     def _new_package_manager_requirement(mod):
@@ -338,6 +345,7 @@ def package_manager_requirement(
                     "command": command,
                     "validation_type": validation_type,
                     "regex": regex,
+                    "package_manager": package_manager,
                 }
             )
 

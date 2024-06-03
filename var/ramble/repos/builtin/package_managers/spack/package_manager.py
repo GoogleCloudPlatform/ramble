@@ -8,6 +8,7 @@
 
 from ramble.pkgmankit import *  # noqa: F403
 
+import fnmatch
 import ramble.spack_runner
 
 
@@ -88,8 +89,9 @@ class Spack(PackageManagerBase):
             package_manager_config_dicts.append(mod_inst.package_manager_configs)
 
         for config_dict in package_manager_config_dicts:
-            for _, config in config_dict.items():
-                self.runner.add_config(config)
+            for _, config_def in config_dict.items():
+                if fnmatch.fnmatch(self.name, config_def['package_manager']):
+                    self.runner.add_config(config_def['config'])
 
         try:
             self.runner.set_dry_run(workspace.dry_run)
@@ -121,16 +123,18 @@ class Spack(PackageManagerBase):
 
             added_packages = set(self.runner.added_packages())
             logger.debug(f' All added packages: {added_packages}')
-            for pkg in app_inst.required_packages.keys():
-                if pkg not in added_packages:
+            for pkg, pkg_def in app_inst.required_packages.items():
+                if fnmatch.fnmatch(self.name, pkg_def["package_manager"]) \
+                        and pkg not in added_packages:
                     logger.die(f'Software spec {pkg} is not defined '
                                f'in environment {env_context}, but is '
                                f'required by the {self.name} application '
                                'definition')
 
             for mod_inst in app_inst._modifier_instances:
-                for pkg in mod_inst.required_packages.keys():
-                    if pkg not in added_packages:
+                for pkg, pkg_def in mod_inst.required_packages.items():
+                    if fnmatch.fnmatch(self.name, pkg_def["package_manager"]) \
+                            and pkg not in added_packages:
                         logger.die(f'Software spec {pkg} is not defined '
                                    f'in environment {env_context}, but is '
                                    f'required by the {mod_inst.name} modifier '

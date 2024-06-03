@@ -19,11 +19,11 @@ definition to modify the object, for example:
 
     .. code-block:: python
 
-      class Gromacs(SpackApplication):
+      class Gromacs(ExecutableApplication):
           # Required package directive
-          required_package('zlib')
+          required_package("zlib", package_manager="spack")
 
-In the above example, 'required_package' is a ramble directive
+In the above example, "required_package" is a ramble directive
 
 Directives defined in this module are used by multiple object types, which
 inherit from the SharedMeta class.
@@ -150,28 +150,38 @@ def software_spec(name, pkg_spec, compiler_spec=None, compiler=None):
 
 
 @shared_directive("package_manager_configs")
-def package_manager_config(name, config, **kwargs):
+def package_manager_config(name, config, package_manager="*", **kwargs):
     """Defines a config option to set within a package manager
 
     Define a new config which will be passed to a package manager. The
     resulting experiment instance will pass the config to the package manager,
     which will control the logic of applying it.
+
+    Args:
+        name (str): Name of this configuration
+        config (str): Configuration option to set
+        package_manager (str): Name of the package manager this config should be used with
     """
 
     def _execute_package_manager_config(obj):
-        obj.package_manager_configs[name] = config
+        obj.package_manager_configs[name] = {
+            "config": config,
+            "package_manager": package_manager,
+        }
 
     return _execute_package_manager_config
 
 
 @shared_directive("required_packages")
-def required_package(name):
+def required_package(name, package_manager="*"):
     """Defines a new spack package that is required for this object
     to function properly.
     """
 
     def _execute_required_package(obj):
-        obj.required_packages[name] = True
+        obj.required_packages[name] = {
+            "package_manager": package_manager,
+        }
 
     return _execute_required_package
 
