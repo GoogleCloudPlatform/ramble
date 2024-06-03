@@ -12,8 +12,11 @@ from ramble.appkit import *
 class Maintained1(ExecutableApplication):
     name = "maintained-1"
 
-    maintainers('maintainer-1')
+    maintainers("maintainer-1")
 
-    executable('foo', 'bar', use_mpi=False)
+    executable("foo", "bar", use_mpi=False)
 
-    workload('test_wl', executable='foo',)
+    workload(
+        "test_wl",
+        executable="foo",
+    )

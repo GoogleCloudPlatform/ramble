@@ -11,10 +11,11 @@ from ramble.modkit import *
 
 class MultipleModesNoDefault(BasicModifier):
     """Define modifier with multiple modes and no default mode"""
+
     name = "multiple-modes-no-default"
 
-    tags('test')
+    tags("test")
 
-    mode('test_mode1', description='This is the first test mode')
+    mode("test_mode1", description="This is the first test mode")
 
-    mode('test_mode2', description='This is the second test mode')
+    mode("test_mode2", description="This is the second test mode")

@@ -12,8 +12,8 @@ from ramble.appkit import *
 class Tagged1(ExecutableApplication):
     name = "tagged-1"
 
-    tags('tag-1')
+    tags("tag-1")
 
-    executable('foo', 'bar', use_mpi=False)
+    executable("foo", "bar", use_mpi=False)
 
-    workload('test_wl', executable='foo')
+    workload("test_wl", executable="foo")

@@ -12,6 +12,9 @@ from ramble.appkit import *
 class Unmaintained1(ExecutableApplication):
     name = "unmaintained-1"
 
-    executable('foo', 'bar', use_mpi=False)
+    executable("foo", "bar", use_mpi=False)
 
-    workload('test_wl', executable='foo',)
+    workload(
+        "test_wl",
+        executable="foo",
+    )

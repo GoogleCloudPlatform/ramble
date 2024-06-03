@@ -12,18 +12,23 @@ from ramble.util.logger import logger
 
 class ModPhase(BasicModifier):
     """Define a modifier that defines a new phase with register_phase"""
+
     name = "mod-phase"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
 
-    register_phase('first_phase', pipeline='setup', run_before=['get_inputs'])
+    register_phase("first_phase", pipeline="setup", run_before=["get_inputs"])
 
     def _first_phase(self, workspace, app_inst=None):
-        logger.all_msg('Inside a phase: first_phase')
+        logger.all_msg("Inside a phase: first_phase")
 
-    register_phase('after_make_experiments', pipeline='setup', run_after=['make_experiments'])
+    register_phase(
+        "after_make_experiments",
+        pipeline="setup",
+        run_after=["make_experiments"],
+    )
 
     def _after_make_experiments(self, workspace, app_inst=None):
-        logger.all_msg('Inside a phase: after_make_experiments')
+        logger.all_msg("Inside a phase: after_make_experiments")

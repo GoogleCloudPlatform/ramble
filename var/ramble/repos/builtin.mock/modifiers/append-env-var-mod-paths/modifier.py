@@ -12,11 +12,13 @@ from ramble.modkit import *
 class AppendEnvVarModPaths(BasicModifier):
     """Define a modifier with only an environment variable modification using
     the append method and a colon separator"""
+
     name = "append-env-var-mod-paths"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
 
-    env_var_modification('test_var', modification='test_val', method='append',
-                         mode='test')
+    env_var_modification(
+        "test_var", modification="test_val", method="append", mode="test"
+    )

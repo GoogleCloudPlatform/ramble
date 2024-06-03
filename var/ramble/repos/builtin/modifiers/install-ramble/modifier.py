@@ -11,26 +11,43 @@ from ramble.modkit import *
 
 class InstallRamble(BasicModifier):
     """Modifier to define commands to install ramble"""
+
     name = "install-ramble"
 
-    tags('tool-installation')
+    tags("tool-installation")
 
-    maintainers('douglasjacobsen')
+    maintainers("douglasjacobsen")
 
-    mode('standard', description='Standard execution mode for ramble')
-    default_mode('standard')
+    mode("standard", description="Standard execution mode for ramble")
+    default_mode("standard")
 
-    modifier_variable('ramble_url', default='https://github.com/GoogleCloudPlatform/ramble',
-                      description='URL to clone ramble from', mode='standard')
+    modifier_variable(
+        "ramble_url",
+        default="https://github.com/GoogleCloudPlatform/ramble",
+        description="URL to clone ramble from",
+        mode="standard",
+    )
 
-    modifier_variable('ramble_ref', default='develop',
-                      description='Ref to checkout for ramble', mode='standard')
+    modifier_variable(
+        "ramble_ref",
+        default="develop",
+        description="Ref to checkout for ramble",
+        mode="standard",
+    )
 
-    modifier_variable('ramble_install_dir', default='${HOME}/.ramble/ramble',
-                      description='Directory to install ramble into', mode='standard')
+    modifier_variable(
+        "ramble_install_dir",
+        default="${HOME}/.ramble/ramble",
+        description="Directory to install ramble into",
+        mode="standard",
+    )
 
-    modifier_variable('ramble_venv_path', default='${HOME}/.ramble/ramble-venv',
-                      description='Virtual environment path for ramble', mode='standard')
+    modifier_variable(
+        "ramble_venv_path",
+        default="${HOME}/.ramble/ramble-venv",
+        description="Virtual environment path for ramble",
+        mode="standard",
+    )
 
     create_ramble_venv = """
 if [ ! -d {ramble_venv_path} ]; then
@@ -60,25 +77,38 @@ git checkout FETCH_HEAD
 cd -
 fi
 """
-    modifier_variable('install_ramble_full', default=install_ramble_full + create_ramble_venv, description='Install script for full ramble history',
-                      mode='standard')
+    modifier_variable(
+        "install_ramble_full",
+        default=install_ramble_full + create_ramble_venv,
+        description="Install script for full ramble history",
+        mode="standard",
+    )
 
-    modifier_variable('install_ramble_shallow', default=install_ramble_shallow + create_ramble_venv, description='Install script for shallow ramble history',
-                      mode='standard')
+    modifier_variable(
+        "install_ramble_shallow",
+        default=install_ramble_shallow + create_ramble_venv,
+        description="Install script for shallow ramble history",
+        mode="standard",
+    )
 
-    executable_modifier('source_installed_ramble')
+    executable_modifier("source_installed_ramble")
 
-    def source_installed_ramble(self, executable_name, executable, app_inst=None):
+    def source_installed_ramble(
+        self, executable_name, executable, app_inst=None
+    ):
         from ramble.util.executable import CommandExecutable
 
         pre_exec = []
         post_exec = []
 
-        if not hasattr(self, '_already_applied'):
+        if not hasattr(self, "_already_applied"):
             pre_exec.append(
-                CommandExecutable('source-installed-ramble',
-                                  template=['. {ramble_install_dir}/share/ramble/setup-env.sh']
-                                  )
+                CommandExecutable(
+                    "source-installed-ramble",
+                    template=[
+                        ". {ramble_install_dir}/share/ramble/setup-env.sh"
+                    ],
+                )
             )
 
             self._already_applied = True

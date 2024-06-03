@@ -11,10 +11,11 @@ from ramble.modkit import *
 
 class Maintained1(BasicModifier):
     """Define a maintained modifier"""
+
     name = "maintained-1"
 
-    tags('test')
+    tags("test")
 
-    maintainers('maintainer-1')
+    maintainers("maintainer-1")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

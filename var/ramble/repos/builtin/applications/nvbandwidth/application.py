@@ -10,26 +10,32 @@ from ramble.appkit import *
 
 
 class Nvbandwidth(SpackApplication):
-    '''Define the nvbandwidth benchmark'''
-    name = 'nvbandwidth'
+    """Define the nvbandwidth benchmark"""
 
-    maintainers('rfbgo')
+    name = "nvbandwidth"
 
-    tags('synthetic-benchmarks')
+    maintainers("rfbgo")
 
-    software_spec('nvbandwidth', spack_spec='nvbandwidth')
+    tags("synthetic-benchmarks")
 
-    required_package('nvbandwidth')
+    software_spec("nvbandwidth", spack_spec="nvbandwidth")
 
-    workload('all_benchmarks', executable='nvbandwidth')
+    required_package("nvbandwidth")
 
-    workload_variable('transfer-size', default='1m',
-                      description='Transfer Size',
-                      workloads=['all_benchmarks'])
+    workload("all_benchmarks", executable="nvbandwidth")
 
-    executable(name='nvbandwidth', template='nvbandwidth', use_mpi=False)
+    workload_variable(
+        "transfer-size",
+        default="1m",
+        description="Transfer Size",
+        workloads=["all_benchmarks"],
+    )
 
-    figure_of_merit('SUM {metric}',
-                    fom_regex=r'SUM\s+(?P<metric>\w+)\s+(?P<value>\d+\.\d+)',
-                    group_name='value',
-                    units='GB/s')
+    executable(name="nvbandwidth", template="nvbandwidth", use_mpi=False)
+
+    figure_of_merit(
+        "SUM {metric}",
+        fom_regex=r"SUM\s+(?P<metric>\w+)\s+(?P<value>\d+\.\d+)",
+        group_name="value",
+        units="GB/s",
+    )

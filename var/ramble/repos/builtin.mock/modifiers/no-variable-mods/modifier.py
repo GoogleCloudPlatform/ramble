@@ -11,8 +11,9 @@ from ramble.modkit import *
 
 class NoVariableMods(BasicModifier):
     """Define modifier with no variable modifications"""
+
     name = "no-variable-mods"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

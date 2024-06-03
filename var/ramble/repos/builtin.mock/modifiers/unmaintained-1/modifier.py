@@ -11,8 +11,9 @@ from ramble.modkit import *
 
 class Unmaintained1(BasicModifier):
     """Define an unmaintained modifier"""
+
     name = "test-mod"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
