@@ -59,15 +59,15 @@ ramble:
                 n_threads: '1'
                 size: '0003'
                 type: 'pme'
-  spack:
+  software:
     packages:
       gcc:
-        spack_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.0
       intel-mpi:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       gromacs:
-        spack_spec: gromacs@2021.6
+        pkg_spec: gromacs@2021.6
         compiler: gcc
     environments:
       gromacs:

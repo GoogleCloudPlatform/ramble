@@ -6,16 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-"""Schema for spack.yaml configuration file.
+"""Schema for software.yaml configuration file.
 
-.. literalinclude:: _ramble_root/lib/ramble/ramble/schema/spack.py
+.. literalinclude:: _ramble_root/lib/ramble/ramble/schema/software.py
    :lines: 12-
 """  # noqa E501
 
 
 #: Properties for inclusion in other schemas
 properties = {
-    "spack": {
+    "software": {
         "type": "object",
         "properties": {
             "packages": {
@@ -33,7 +33,11 @@ properties = {
                             "default": None,
                         },
                     },
-                    "additionalProperties": False,
+                    # Additional properties are of the form:
+                    #    <pkg_manager_name>_pkg_spec:
+                    #    <pkg_manager_name>_compiler_spec:
+                    #    <pkg_manager_name>_compiler:
+                    "additionalProperties": True,
                     "default": {},
                 },
             },
@@ -44,13 +48,9 @@ properties = {
                 "additionalProperties": {
                     "type": "object",
                     "properties": {
-                        "external_spack_env": {
-                            "type": "string",
-                            "default": None,
-                        },
                         "packages": {"type": "array", "items": {"type": "string"}, "default": []},
                     },
-                    "additionalProperties": False,
+                    "additionalProperties": {"type": "string"},
                     "default": {},
                 },
             },
@@ -64,32 +64,8 @@ properties = {
 #: Full schema with metadata
 schema = {
     "$schema": "http://json-schema.org/schema#",
-    "title": "Spack software configuration file schema",
+    "title": "Software configuration file schema",
     "type": "object",
     "additionalProperties": False,
     "properties": properties,
 }
-
-
-def update(data):
-
-    changed = False
-
-    """
-    This entire section is deprecated.
-    Replicate this into a `software` section instead.
-    """
-
-    pkg_keymap = {
-        "spack_spec": "pkg_spec",
-    }
-
-    if "packages" in data:
-        for pkg_name in data["packages"]:
-
-            for key, newkey in pkg_keymap.items():
-                if key in data["packages"][pkg_name] and newkey not in data["packages"][pkg_name]:
-                    changed = True
-                    data["packages"][pkg_name][newkey] = data["packages"][pkg_name][key]
-
-    return changed

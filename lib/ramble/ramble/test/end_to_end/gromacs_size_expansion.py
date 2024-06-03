@@ -40,15 +40,15 @@ ramble:
               variables:
                 n_nodes: '1'
                 size: '0000.96'
-  spack:
+  software:
     packages:
       gcc:
-        spack_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.0
       intel-mpi:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
         compiler: gcc
     environments:
       gromacs:

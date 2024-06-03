@@ -104,7 +104,7 @@ def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units=""
 
 
 @shared_directive("compilers")
-def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
+def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None):
     """Defines the compiler that will be used with this object
 
     Adds a new compiler spec to this object. Software specs should
@@ -114,7 +114,7 @@ def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
     def _execute_define_compiler(obj):
         if hasattr(obj, "uses_spack") and getattr(obj, "uses_spack"):
             obj.compilers[name] = {
-                "spack_spec": spack_spec,
+                "pkg_spec": pkg_spec,
                 "compiler_spec": compiler_spec,
                 "compiler": compiler,
             }
@@ -123,7 +123,7 @@ def define_compiler(name, spack_spec, compiler_spec=None, compiler=None):
 
 
 @shared_directive("software_specs")
-def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
+def software_spec(name, pkg_spec, compiler_spec=None, compiler=None):
     """Defines a new software spec needed for this object.
 
     Adds a new software spec (for spack to use) that this object
@@ -141,7 +141,7 @@ def software_spec(name, spack_spec, compiler_spec=None, compiler=None):
 
             # Define the spec
             obj.software_specs[name] = {
-                "spack_spec": spack_spec,
+                "pkg_spec": pkg_spec,
                 "compiler_spec": compiler_spec,
                 "compiler": compiler,
             }

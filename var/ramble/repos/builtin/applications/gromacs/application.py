@@ -19,9 +19,9 @@ class Gromacs(SpackApplication):
 
     tags('molecular-dynamics')
 
-    define_compiler('gcc9', spack_spec='gcc@9.3.0')
-    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
-    software_spec('gromacs', spack_spec='gromacs@2020.5', compiler='gcc9')
+    define_compiler('gcc9', pkg_spec='gcc@9.3.0')
+    software_spec('impi2018', pkg_spec='intel-mpi@2018.4.274')
+    software_spec('gromacs', pkg_spec='gromacs@2020.5', compiler='gcc9')
 
     executable('pre-process', '{grompp} ' +
                '-f {input_path}/{type}.mdp ' +

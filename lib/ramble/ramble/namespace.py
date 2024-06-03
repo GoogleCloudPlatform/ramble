@@ -44,13 +44,13 @@ class namespace:
     where = "where"
 
     # For software definitions
-    spack = "spack"
+    software = "software"
     external_env = "external_spack_env"
 
     # v2 configs
     packages = "packages"
     environments = "environments"
-    spack_spec = "spack_spec"
+    pkg_spec = "pkg_spec"
     compiler_spec = "compiler_spec"
     compiler = "compiler"
 

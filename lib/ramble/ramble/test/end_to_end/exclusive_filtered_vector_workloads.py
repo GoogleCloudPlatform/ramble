@@ -40,7 +40,7 @@ ramble:
               variables:
                 application_workload: ['parallel' ,'serial', 'local']
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """

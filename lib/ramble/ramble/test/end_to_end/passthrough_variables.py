@@ -44,7 +44,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -92,7 +92,7 @@ ramble:
               variables:
                 mpi_command: '{undefined_var}'
                 n_ranks: '1'
-  spack:
+  software:
     packages: {}
     environments: {}
 """

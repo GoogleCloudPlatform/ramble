@@ -119,15 +119,15 @@ configuration file might look like the following:
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -193,15 +193,15 @@ resulting configuration file might look like the following:
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:

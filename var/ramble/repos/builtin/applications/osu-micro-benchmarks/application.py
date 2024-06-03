@@ -23,9 +23,9 @@ class OsuMicroBenchmarks(SpackApplication):
 
     tags('synthetic-benchmarks')
 
-    define_compiler('gcc', spack_spec='gcc')
-    software_spec('openmpi', spack_spec='openmpi')
-    software_spec('osu-micro-benchmarks', spack_spec='osu-micro-benchmarks',
+    define_compiler('gcc', pkg_spec='gcc')
+    software_spec('openmpi', pkg_spec='openmpi')
+    software_spec('osu-micro-benchmarks', pkg_spec='osu-micro-benchmarks',
                   compiler='gcc')
 
     required_package('osu-micro-benchmarks')

@@ -72,7 +72,7 @@ def test_known_applications(application, capsys):
                 processes_per_node: '1'\n"""
                 )
             f.write(
-                """  spack:
+                """  software:
     packages: {}
     environments: {}\n"""
             )

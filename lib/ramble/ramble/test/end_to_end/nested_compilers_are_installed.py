@@ -43,21 +43,21 @@ ramble:
             test{n_nodes}_{env_name}:
               variables:
                 n_nodes: '1'
-  spack:
+  software:
     packages:
       gcc8:
-        spack_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.0
       gcc9:
-        spack_spec: gcc@9.3.0
+        pkg_spec: gcc@9.3.0
         compiler: gcc8
       gcc10:
-        spack_spec: gcc@10.1.0
+        pkg_spec: gcc@10.1.0
         compiler: gcc9
       intel:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc10
       wrf:
-        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
         compiler: gcc10
     environments:
       wrfv4:

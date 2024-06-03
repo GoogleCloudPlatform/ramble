@@ -94,15 +94,15 @@ final configuration from the previous tutorial.
                   matrix:
                   - platform_config
                   - n_nodes
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -123,9 +123,9 @@ Define Additional MPI and Parameterize Software Environments
 
 To begin with, you will parameterize the software stack definitions to generate
 experiments using both IntelMPI and OpenMPI. For this section, you can focus on
-the ``spack`` portion of the ``ramble.yaml`` configuration file. For more
-information on how this section is constructed, see the :ref:`Spack config
-section<spack-config>` documentation.
+the ``software`` portion of the ``ramble.yaml`` configuration file. For more
+information on how this section is constructed, see the :ref:`Software config
+section<software-config>` documentation.
 
 To start with, you will create an OpenMPI package definition. This might look
 like the following:
@@ -134,12 +134,12 @@ like the following:
 
     packages:
       openmpi:
-        spack_spec: openmpi@3.1.6 +orterunprefix
+        pkg_spec: openmpi@3.1.6 +orterunprefix
 
 In the definition of the Intel MPI package above, you'll see we originally
 specified a ``compiler`` attribute (with the value of ``gcc9``). This can be
-explicitly selected if you like, however Ramble generates Spack environments
-with ``unify: true``
+explicitly selected if you like, however when using Spack, Ramble generates
+Spack environments with ``unify: true``
 (See `Spack's environment documentation <https://spack.readthedocs.io/en/latest/environments.html#spec-concretization>`_
 for more details). As a result, OpenMPI should be compiled with the same
 compiler used for WRF.
@@ -190,17 +190,17 @@ generation as well. The result might look like the following:
                   matrix:
                   - platform_config
                   - n_nodes
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -260,17 +260,17 @@ into the matrix. The result might look like the following:
                   - platform_config
                   - n_nodes
                   - mpi_name
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -369,17 +369,17 @@ resulting configuration might look like the following:
                   - platform_config
                   - n_nodes
                   - mpi_name
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:
@@ -458,17 +458,17 @@ The resulting configuration file might look like the following:
                   - platform_config
                   - n_nodes
                   - mpi_name
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           openmpi:
-            spack_spec: openmpi@3.1.6 +orterunprefix
+            pkg_spec: openmpi@3.1.6 +orterunprefix
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:

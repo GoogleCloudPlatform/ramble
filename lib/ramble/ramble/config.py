@@ -64,6 +64,7 @@ import ramble.schema.licenses
 import ramble.schema.mirrors
 import ramble.schema.modifiers
 import ramble.schema.spack
+import ramble.schema.software
 import ramble.schema.success_criteria
 import ramble.schema.variables
 
@@ -86,6 +87,7 @@ section_schemas = {
     "modifier_repos": ramble.schema.modifier_repos.schema,
     "modifiers": ramble.schema.modifiers.schema,
     "spack": ramble.schema.spack.schema,
+    "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
     "applications": ramble.schema.applications.schema,
     "variables": ramble.schema.variables.schema,

@@ -17,17 +17,14 @@ workspace has a configuration file stored at ``$workspace/configs/ramble.yaml``.
 
 This document will describe the syntax for writing a workspace configuration file.
 
-Within the ``ramble.yaml`` file, there are two top level dictionairies.
+Within the ``ramble.yaml`` file, all content lives under the top level ``ramble`` dictionary:
 
 .. code-block:: console
 
    ramble:
      ...
-   spack:
-     ...
 
-Each of these dictionaries is used to control different aspects of the Ramble
-workspace.
+This dictionary is used to control all of the aspects of the Ramble workspace.
 
 -----------------
 Ramble Dictionary
@@ -875,7 +872,7 @@ Ramble automatically generates definitions for the following variables:
 * ``workload_name`` - Set to the name of the workload within the application
 * ``experiment_name`` - Set to the name of the experiment
 * ``env_name`` - By default defined as ``{application_name}``. Can be
-  overridden to control the spack definition to use.
+  overridden to control the software environment to use.
 * ``application_run_dir`` - Absolute path to
   ``$workspace_root/experiments/{application_name}``
 * ``workload_run_dir`` - Absolute path to
@@ -911,17 +908,17 @@ When using spack applications, Ramble also generates the following variables:
 * ``<software_spec_name>`` - Set to the equivalent of ``spack location -i
   <spec>`` for packages defined in a ramble ``spec_name`` package set.
   ``<software_spec_name>`` is set to the name of the package as defined in the
-  ``spack:packages`` dictionary.
+  ``software:packages`` dictionary.
 
 As an example:
 
 .. code-block:: yaml
 
     ramble:
-      spack:
+      software:
         packages:
           grm:
-            spack_spec: gromacs@2023.1
+            pkg_spec: gromacs@2023.1
         environments:
           grm_env:
             packages:
@@ -930,7 +927,7 @@ As an example:
 Defines a software environment named ``grm_env``. The default environment used
 has the same name as the application the experiment is generated from. In
 experiments which use this ``grm_env`` environment, a variable is defined
-named: ``gromacs``, as that is the package named defined by the ``spack_spec``
+named: ``gromacs``, as that is the package named defined by the ``pkg_spec``
 attribute of the ``grm`` package definition. This variable contains the path to
 the installation location for the ``gromacs`` package.
 
@@ -939,24 +936,24 @@ actually performing the setup of a workspace. When a ``--dry-run`` is
 performed, these paths are not populated.
 
 
-----------------
-Spack Dictionary
-----------------
+-------------------
+Software Dictionary
+-------------------
 
-Within a ramble.yaml file, the ``spack:`` dictionary controls the software
+Within a ramble.yaml file, the ``software:`` dictionary controls the software
 stack installation that ramble performs. This configuration section is defined
-in the :ref:`Spack section<spack-config>` documentation.
+in the :ref:`Software section<software-config>` documentation.
 a packages dictionary, and an environments dictionary.
 
 The ``ramble workspace concretize`` command can help construct a functional
-spack dictionary based on the experiments listed.
+software dictionary based on the experiments listed.
 
 It is important to note that packages and environments that are not used by an
 experiment are not installed.
 
 Application definition files can define one or more ``software_spec``
 directives, which are packages the application might need to run properly.
-Additionally, spack packages can be marked as required through the
+Additionally, packages can be marked as required through the
 ``required_package`` directive.
 
 -------------------------------------------
@@ -1002,18 +999,18 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
                     n_ranks: '1'
                     n_nodes: '1'
                     env_name: ['gromacs-mpich', 'gromacs-ompi']
-    spack:
+    software:
       packages:
         gcc9:
-          spack_spec: gcc@9.3.0 target=x86_64
+          pkg_spec: gcc@9.3.0 target=x86_64
         mpich:
-          spack_spec: mpich@4.0.2 target=x86_64
+          pkg_spec: mpich@4.0.2 target=x86_64
           compiler: gcc9
         ompi:
-          spack_spec: openmpi@4.1.4 target=x86_64
+          pkg_spec: openmpi@4.1.4 target=x86_64
           compiler: gcc9
         gromacs:
-          spack_spec: gromacs@2022.4
+          pkg_spec: gromacs@2022.4
           compiler: gcc9
       environments:
         gromacs-{mpi}:
@@ -1065,15 +1062,15 @@ variable can be used to submit the same experiment to multiple batch systems.
                   variables:
                     n_ranks: '1'
                     n_nodes: '1'
-    spack:
+    software:
       packages:
         gcc9:
-          spack_spec: gcc@9.3.0 target=x86_64
+          pkg_spec: gcc@9.3.0 target=x86_64
         impi2021:
-          spack_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
+          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9
         gromacs:
-          spack_spec: gromacs@2022.4
+          pkg_spec: gromacs@2022.4
           compiler: gcc9
       environments:
         gromacs:

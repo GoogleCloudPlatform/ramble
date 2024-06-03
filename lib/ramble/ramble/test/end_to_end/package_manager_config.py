@@ -36,10 +36,10 @@ ramble:
           experiments:
             test:
               variables: {}
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: 'zlib'
+        pkg_spec: 'zlib'
     environments:
       zlib-configs:
         packages:

@@ -39,7 +39,7 @@ ramble:
           experiments:
             test:
               variables: {}
-  spack:
+  software:
     packages: {}
     environments:
       zlib-configs:
@@ -90,7 +90,7 @@ ramble:
           experiments:
             test:
               variables: {}
-  spack:
+  software:
     packages: {}
     environments:
       zlib-configs:

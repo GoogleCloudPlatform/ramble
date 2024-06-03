@@ -47,12 +47,12 @@ ramble:
             test2:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
       intel-mpi:
-        spack_spec: intel-oneapi-mpi@2021.11.0
+        pkg_spec: intel-oneapi-mpi@2021.11.0
     environments:
       gromacs:
         packages:
@@ -114,12 +114,12 @@ ramble:
             test2:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
       intel-mpi:
-        spack_spec: intel-oneapi-mpi@2021.11.0
+        pkg_spec: intel-oneapi-mpi@2021.11.0
     environments:
       gromacs:
         packages:

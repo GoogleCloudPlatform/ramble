@@ -19,10 +19,10 @@ class QuantumEspresso(SpackApplication):
 
     tags('electronic-structure', 'materials', 'dft', 'density-functional-theory', 'plane-waves', 'pseudopotentials')
 
-    define_compiler('gcc13', spack_spec='gcc@13.1.0')
+    define_compiler('gcc13', pkg_spec='gcc@13.1.0')
 
-    software_spec('impi2021p8', spack_spec='intel-oneapi-mpi@2021.8.0')
-    software_spec('quantum-espresso', spack_spec='quantum-espresso@7.1', compiler='gcc13')
+    software_spec('impi2021p8', pkg_spec='intel-oneapi-mpi@2021.8.0')
+    software_spec('quantum-espresso', pkg_spec='quantum-espresso@7.1', compiler='gcc13')
 
     required_package('quantum-espresso')
 

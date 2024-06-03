@@ -58,7 +58,7 @@ ramble:
               env_vars:
                 set:
                   MY_VAR: 'TEST'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -143,7 +143,7 @@ ramble:
             simple_test:
               variables:
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """

@@ -44,10 +44,10 @@ ramble:
               variables:
                 n_nodes: '1'
                 test_id: [1, 2]
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: zlib
+        pkg_spec: zlib
     environments:
       zlib:
         packages:

@@ -29,10 +29,10 @@ class IntelMpiBenchmarks(SpackApplication):
 
     tags('micro-benchmark', 'benchmark', 'mpi')
 
-    define_compiler('gcc9', spack_spec='gcc@9.3.0')
-    software_spec('impi2018', spack_spec='intel-mpi@2018.4.274')
+    define_compiler('gcc9', pkg_spec='gcc@9.3.0')
+    software_spec('impi2018', pkg_spec='intel-mpi@2018.4.274')
     software_spec('intel-mpi-benchmarks',
-                  spack_spec='intel-mpi-benchmarks@2019.6',
+                  pkg_spec='intel-mpi-benchmarks@2019.6',
                   compiler='gcc9')
 
     required_package('intel-mpi-benchmarks')

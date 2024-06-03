@@ -174,7 +174,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
                 out_str.append(rucolor.nested_2(f"\t{comp_name}:\n"))
                 out_str.append(
                     rucolor.nested_3("\t\tSpack Spec:")
-                    + f'{comp_def["spack_spec"].replace("@", "@@")}\n'
+                    + f'{comp_def["pkg_spec"].replace("@", "@@")}\n'
                 )
 
                 if "compiler_spec" in comp_def and comp_def["compiler_spec"]:
@@ -192,10 +192,11 @@ class ModifierBase(object, metaclass=ModifierMeta):
         if hasattr(self, "software_specs"):
             out_str.append(rucolor.section_title("Software Specs:\n"))
             for spec_name, spec_def in self.software_specs.items():
+
                 out_str.append(rucolor.nested_2(f"\t{spec_name}:\n"))
                 out_str.append(
                     rucolor.nested_3("\t\tSpack Spec:")
-                    + f'{spec_def["spack_spec"].replace("@", "@@")}\n'
+                    + f'{spec_def["pkg_spec"].replace("@", "@@")}\n'
                 )
 
                 if "compiler_spec" in spec_def and spec_def["compiler_spec"]:
