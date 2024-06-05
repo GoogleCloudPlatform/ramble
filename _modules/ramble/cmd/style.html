@@ -470,6 +470,11 @@
 
 
 
+<span class="k">def</span> <span class="nf">_split_file_list</span><span class="p">(</span><span class="n">file_list</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return a tuple of (primary_files, obj_files)&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_object</span><span class="p">(</span><span class="n">f</span><span class="p">)],</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="n">is_object</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
+
+
 <div class="viewcode-block" id="run_flake8">
 <a class="viewcode-back" href="../../../ramble.cmd.html#ramble.cmd.style.run_flake8">[docs]</a>
 <span class="nd">@tool</span><span class="p">(</span><span class="s2">&quot;flake8&quot;</span><span class="p">)</span>
@@ -480,8 +485,7 @@
         <span class="n">print_tool_header</span><span class="p">(</span><span class="s2">&quot;flake8&quot;</span><span class="p">,</span> <span class="n">file_list</span><span class="p">)</span>
 
         <span class="c1"># run flake8 on the temporary tree, once for core, once for apps</span>
-        <span class="n">application_file_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="n">is_object</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
-        <span class="n">primary_file_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">file_list</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">is_object</span><span class="p">(</span><span class="n">f</span><span class="p">)]</span>
+        <span class="n">primary_file_list</span><span class="p">,</span> <span class="n">application_file_list</span> <span class="o">=</span> <span class="n">_split_file_list</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span>
 
         <span class="c1"># filter files into a temporary directory with exemptions added.</span>
         <span class="c1"># TODO: DRY this duplication</span>
@@ -555,13 +559,29 @@
 <span class="nd">@tool</span><span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">run_black</span><span class="p">(</span><span class="n">black_cmd</span><span class="p">,</span> <span class="n">file_list</span><span class="p">,</span> <span class="n">args</span><span class="p">):</span>
     <span class="n">print_tool_header</span><span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">file_list</span><span class="p">)</span>
-    <span class="n">black_args</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">))</span>
+    <span class="n">common_args</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">prefix</span><span class="p">,</span> <span class="s2">&quot;pyproject.toml&quot;</span><span class="p">))</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">fix</span><span class="p">:</span>
-        <span class="n">black_args</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;--check&quot;</span><span class="p">,</span> <span class="s2">&quot;--diff&quot;</span><span class="p">)</span>
-    <span class="n">black_args</span> <span class="o">+=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span>
+        <span class="n">common_args</span> <span class="o">+=</span> <span class="p">(</span><span class="s2">&quot;--check&quot;</span><span class="p">,</span> <span class="s2">&quot;--diff&quot;</span><span class="p">)</span>
+    <span class="n">primary_files</span><span class="p">,</span> <span class="n">obj_files</span> <span class="o">=</span> <span class="n">_split_file_list</span><span class="p">(</span><span class="n">file_list</span><span class="p">)</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">returncode</span> <span class="o">=</span> <span class="mi">0</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="n">black_cmd</span><span class="p">(</span><span class="o">*</span><span class="n">black_args</span><span class="p">,</span> <span class="n">fail_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span>
-    <span class="n">returncode</span> <span class="o">=</span> <span class="n">black_cmd</span><span class="o">.</span><span class="n">returncode</span>
+    <span class="c1"># Operate on primary and object (apps and mods) files spearately with varying configs.</span>
+    <span class="k">if</span> <span class="n">primary_files</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="n">black_cmd</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">(</span><span class="n">common_args</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">primary_files</span><span class="p">)),</span> <span class="n">fail_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span>
+        <span class="p">)</span>
+        <span class="n">returncode</span> <span class="o">|=</span> <span class="n">black_cmd</span><span class="o">.</span><span class="n">returncode</span>
+
+    <span class="k">if</span> <span class="n">obj_files</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">+=</span> <span class="n">black_cmd</span><span class="p">(</span>
+            <span class="o">*</span><span class="p">(</span><span class="n">common_args</span> <span class="o">+</span> <span class="p">(</span><span class="s2">&quot;--config&quot;</span><span class="p">,</span> <span class="s2">&quot;pyproject_objects.toml&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">obj_files</span><span class="p">)),</span>
+            <span class="n">fail_on_error</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">output</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">returncode</span> <span class="o">|=</span> <span class="n">black_cmd</span><span class="o">.</span><span class="n">returncode</span>
+
     <span class="n">print_output</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
     <span class="n">print_tool_result</span><span class="p">(</span><span class="s2">&quot;black&quot;</span><span class="p">,</span> <span class="n">returncode</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">returncode</span></div>
@@ -620,6 +640,7 @@
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">base</span><span class="p">,</span> <span class="n">untracked</span><span class="p">,</span> <span class="n">list_all</span> <span class="o">=</span> <span class="n">arg_flags</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
                 <span class="n">file_list</span> <span class="o">=</span> <span class="n">changed_files</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">untracked</span><span class="p">,</span> <span class="n">list_all</span><span class="p">)</span>
+                <span class="k">break</span>
             <span class="k">except</span> <span class="n">ProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">file_list</span> <span class="o">=</span> <span class="kc">None</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="n">arg_flags</span><span class="p">:</span>
@@ -645,7 +666,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 01, 2024.
+      <span class="lastupdated">Last updated on Jun 05, 2024.
       </span></p>
   </div>
 
