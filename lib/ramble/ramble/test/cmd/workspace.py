@@ -248,6 +248,8 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
@@ -450,6 +452,8 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
@@ -521,6 +525,8 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
@@ -575,6 +581,8 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
@@ -1888,6 +1896,8 @@ ramble:
 def test_workspace_simplify():
     test_ws_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
@@ -1972,8 +1982,6 @@ software:
     assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
 
     workspace("concretize", "--simplify", global_args=["-w", workspace_name])
-
-    print(ws_config_path)
 
     assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True  # keep used pkg
     assert search_files_for_string([ws_config_path], "unused-pkg") is False  # remove unused pkg

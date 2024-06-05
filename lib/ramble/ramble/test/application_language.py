@@ -397,20 +397,14 @@ def test_input_file_directive(app_class, func_type):
 def test_define_compiler_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
     test_defs = {}
-    if app_inst.uses_spack:
-        test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
-        test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
+    test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
+    test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
 
-        assert hasattr(app_inst, "compilers")
-        for name, info in test_defs.items():
-            assert name in app_inst.compilers
-            for key, value in info.items():
-                assert app_inst.compilers[name][key] == value
-    else:
-        test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
-
-        assert hasattr(app_inst, "compilers")
-        assert not app_inst.compilers
+    assert hasattr(app_inst, "compilers")
+    for name, info in test_defs.items():
+        assert name in app_inst.compilers
+        for key, value in info.items():
+            assert app_inst.compilers[name][key] == value
 
 
 @pytest.mark.parametrize("func_type", func_types)
@@ -418,17 +412,11 @@ def test_define_compiler_directive(app_class, func_type):
 def test_software_spec_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
     test_defs = {}
-    if app_inst.uses_spack:
-        test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
-        test_defs.update(add_software_spec(app_inst, 2, func_type=func_type))
+    test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
+    test_defs.update(add_software_spec(app_inst, 2, func_type=func_type))
 
-        assert hasattr(app_inst, "software_specs")
-        for name, info in test_defs.items():
-            assert name in app_inst.software_specs
-            for key, value in info.items():
-                assert app_inst.software_specs[name][key] == value
-    else:
-        test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
-
-        assert hasattr(app_inst, "software_specs")
-        assert not app_inst.software_specs
+    assert hasattr(app_inst, "software_specs")
+    for name, info in test_defs.items():
+        assert name in app_inst.software_specs
+        for key, value in info.items():
+            assert app_inst.software_specs[name][key] == value

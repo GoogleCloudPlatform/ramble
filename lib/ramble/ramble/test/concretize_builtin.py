@@ -27,6 +27,8 @@ def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace
 
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun'
     batch_submit: '{execute_experiment}'

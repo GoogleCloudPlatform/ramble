@@ -25,6 +25,8 @@ workspace = RambleCommand("workspace")
 def test_package_manager_requirements_zlib(mock_applications, mock_modifiers):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'
@@ -76,6 +78,8 @@ ramble:
 def test_package_manager_requirements_error(mock_applications, mock_modifiers):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'

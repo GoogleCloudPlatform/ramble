@@ -24,6 +24,8 @@ workspace = RambleCommand("workspace")
 def test_package_manager_config_zlib(mock_applications):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'

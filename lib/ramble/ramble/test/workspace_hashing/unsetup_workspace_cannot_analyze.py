@@ -28,6 +28,8 @@ def test_unsetup_workspace_cannot_analyze(
 ):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'

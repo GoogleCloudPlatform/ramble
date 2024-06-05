@@ -218,16 +218,15 @@ def test_software_spec_directive(mod_class, func_type):
 
     expected_attrs = ["pkg_spec", "compiler_spec", "compiler"]
 
-    if mod_inst.uses_spack:
-        assert hasattr(mod_inst, "software_specs")
+    assert hasattr(mod_inst, "software_specs")
 
-        for test_def in test_defs:
-            spec_name = test_def["name"]
+    for test_def in test_defs:
+        spec_name = test_def["name"]
 
-            assert spec_name in mod_inst.software_specs
-            for attr in expected_attrs:
-                assert attr in mod_inst.software_specs[spec_name]
-                assert test_def[attr] == mod_inst.software_specs[spec_name][attr]
+        assert spec_name in mod_inst.software_specs
+        for attr in expected_attrs:
+            assert attr in mod_inst.software_specs[spec_name]
+            assert test_def[attr] == mod_inst.software_specs[spec_name][attr]
 
 
 def add_compiler(mod_inst, spec_num=1, func_type=func_types.directive):
@@ -263,16 +262,15 @@ def test_define_compiler_directive(mod_class, func_type):
 
     expected_attrs = ["pkg_spec", "compiler_spec", "compiler"]
 
-    if mod_inst.uses_spack:
-        assert hasattr(mod_inst, "compilers")
+    assert hasattr(mod_inst, "compilers")
 
-        for test_def in test_defs:
-            spec_name = test_def["name"]
+    for test_def in test_defs:
+        spec_name = test_def["name"]
 
-            assert spec_name in mod_inst.compilers
-            for attr in expected_attrs:
-                assert attr in mod_inst.compilers[spec_name]
-                assert test_def[attr] == mod_inst.compilers[spec_name][attr]
+        assert spec_name in mod_inst.compilers
+        for attr in expected_attrs:
+            assert attr in mod_inst.compilers[spec_name]
+            assert test_def[attr] == mod_inst.compilers[spec_name][attr]
 
 
 def add_required_package(mod_inst, pkg_num=1, func_type=func_types.directive):
@@ -300,13 +298,12 @@ def test_required_package_directive(mod_class, func_type):
     test_defs = []
     test_defs.append(add_required_package(mod_inst, func_type=func_type).copy())
 
-    if mod_inst.uses_spack:
-        assert hasattr(mod_inst, "required_packages")
+    assert hasattr(mod_inst, "required_packages")
 
-        for test_def in test_defs:
-            pkg_name = test_def["name"]
+    for test_def in test_defs:
+        pkg_name = test_def["name"]
 
-            assert pkg_name in mod_inst.required_packages
+        assert pkg_name in mod_inst.required_packages
 
 
 def add_figure_of_merit_context(mod_inst, context_num=1, func_type=func_types.directive):

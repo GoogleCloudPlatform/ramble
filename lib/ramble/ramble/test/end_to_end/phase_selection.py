@@ -37,6 +37,8 @@ def enable_verbose():
 def test_workspace_phase_selection(mutable_config, mutable_mock_workspace_path, enable_verbose):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'

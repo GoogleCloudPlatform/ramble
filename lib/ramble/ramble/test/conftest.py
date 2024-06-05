@@ -566,10 +566,10 @@ def pytest_generate_tests(metafunc):
     if "modifier" in metafunc.fixturenames:
         from ramble.main import RambleCommand
 
-        mods_cmd = RambleCommand("mods")
+        list_cmd = RambleCommand("list")
 
         all_modifiers = []
-        repo_mods = mods_cmd("list").split("\n")
+        repo_mods = list_cmd("--type", "modifiers").split("\n")
 
         for mod_str in repo_mods:
             if mod_str != "":

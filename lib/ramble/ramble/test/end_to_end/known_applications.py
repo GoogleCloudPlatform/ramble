@@ -41,6 +41,8 @@ def test_known_applications(application, capsys):
     ws_name = f"test_all_apps_{application}"
 
     base_config = """ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks}'
     batch_submit: '{execute_experiment}'
