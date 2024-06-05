@@ -82,7 +82,7 @@ def obj_type():
 
     return Args(
         "--type",
-        default="any",
+        default=f"{default_type.name}",
         help=f"type of objects. Defaults to '{default_type.name}'. "
         f"Allowed types are {', '.join(OBJECT_NAMES)}",
     )

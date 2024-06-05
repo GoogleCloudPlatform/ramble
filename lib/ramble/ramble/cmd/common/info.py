@@ -10,15 +10,17 @@ from __future__ import print_function
 
 import llnl.util.tty.color as color
 
+import ramble.cmd.common.arguments as arguments
 import ramble.repository
 
 header_color = "@*b"
 plain_format = "@."
 
 
-def setup_info_parser(subparser, object_type):
-    obj_def = ramble.repository.type_definitions[object_type]
-    subparser.add_argument(f'{obj_def["singular"]}', help=f'{obj_def["singular"]} name')
+def setup_info_parser(subparser):
+    subparser.add_argument("object", help="Name of object to print info for")
+
+    arguments.add_common_arguments(subparser, ["obj_type"])
 
 
 def section_title(s):
@@ -30,8 +32,8 @@ def print_text_info(obj):
     color.cprint(str(obj))
 
 
-def print_info(args, object_type):
-    obj_def = ramble.repository.type_definitions[object_type]
-    obj_name = getattr(args, obj_def["singular"])
+def print_info(args):
+    object_type = ramble.repository.ObjectTypes[args.type]
+    obj_name = args.object
     obj = ramble.repository.get(obj_name, object_type=object_type)
     print_text_info(obj)

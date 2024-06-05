@@ -10,16 +10,14 @@ import ramble.cmd.common.info
 import ramble.repository
 
 
-description = "get detailed information on a particular application"
+description = "get detailed information on a particular object"
 section = "basic"
 level = "short"
 
-app_type = ramble.repository.ObjectTypes.applications
-
 
 def setup_parser(subparser):
-    ramble.cmd.common.info.setup_info_parser(subparser, app_type)
+    ramble.cmd.common.info.setup_info_parser(subparser)
 
 
 def info(parser, args):
-    ramble.cmd.common.info.print_info(args, app_type)
+    ramble.cmd.common.info.print_info(args)
