@@ -21,6 +21,8 @@ import ramble.util.colors as rucolor
 import ramble.util.directives
 import ramble.util.class_attributes
 
+import spack.util.naming
+
 
 class PackageManagerBase(object, metaclass=PackageManagerMeta):
     name = None
@@ -35,6 +37,11 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
         "pushdeployment",
         "pushtocache",
         "execute",
+    ]
+
+    _spec_groups = [
+        ("compilers", "Compilers"),
+        ("software_specs", "Software Specs"),
     ]
 
     package_manager_class = "PackageManagerBase"
@@ -69,6 +76,10 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
     def _long_print(self):
         out_str = []
         out_str.append(rucolor.section_title("Package Manager: ") + f"{self.name}\n")
+        out_str.append("\n")
+
+        simplified_name = spack.util.naming.spack_module_to_python_module(self.name)
+        out_str.append(rucolor.section_title("Spec prefix: ") + f"{simplified_name}\n")
         out_str.append("\n")
 
         out_str.append(rucolor.section_title("Description:\n"))
