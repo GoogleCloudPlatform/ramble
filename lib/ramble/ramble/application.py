@@ -209,6 +209,29 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         "\tramble list --type package_managers"
                     )
 
+        # Mark required package variables appropriately
+        if self.package_manager is None:
+            for pkgname, _ in self.required_packages.items():
+                self.keywords.update_keys(
+                    {
+                        f"{pkgname}_path": {
+                            "type": ramble.keywords.key_type.required,
+                            "level": ramble.keywords.output_level.variable,
+                        }
+                    }
+                )
+        else:
+            for pkgname, config in self.required_packages.items():
+                if fnmatch.fnmatch(self.package_manager.name, config["package_manager"]):
+                    self.keywords.update_keys(
+                        {
+                            f"{pkgname}_path": {
+                                "type": ramble.keywords.key_type.reserved,
+                                "level": ramble.keywords.output_level.variable,
+                            }
+                        }
+                    )
+
     def build_phase_order(self):
         if self._pipeline_graphs is not None:
             return
