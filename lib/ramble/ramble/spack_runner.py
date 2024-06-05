@@ -439,6 +439,7 @@ class SpackRunner(object):
             args = config_args.copy()
             args.append(config)
 
+            logger.all_msg(f" trying to run spack with {args}")
             self._run_command(self.spack, args)
             if self.dry_run:
                 self._dry_run_print(self.spack, args)
@@ -690,7 +691,9 @@ class SpackRunner(object):
             self._dry_run_print(self.spack, args)
             return
 
-    def validate_command(self, command="", validation_type="not_empty", regex=None):
+    def validate_command(
+        self, command="", validation_type="not_empty", package_manager="spack", regex=None
+    ):
         regex_validations = ["contains_regex", "does_not_contain_regex"]
 
         args = command.split()

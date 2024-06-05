@@ -18,7 +18,6 @@ class SpackModifier(ModifierBase):
     """
 
     modifier_class = "SpackModifier"
-    uses_spack = True
 
     def __init__(self, file_path):
         super().__init__(file_path)

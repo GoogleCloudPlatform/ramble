@@ -33,8 +33,6 @@ class SpackApplication(ApplicationBase):
     It currently only utilizes phases defined in the base class.
     """
 
-    uses_spack = True
-
     _spec_groups = [
         ("compilers", "Compilers"),
         ("mpi_libraries", "MPI Libraries"),

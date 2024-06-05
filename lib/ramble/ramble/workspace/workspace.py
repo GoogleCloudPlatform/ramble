@@ -1173,6 +1173,8 @@ class Workspace(object):
         # Build experiment sets to determine which templates never get used
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
         experiment_set = self.build_experiment_set()
+        logger.debug("Software environments:")
+        logger.debug(str(self.software_environments))
 
         for _, app_inst in experiment_set.template_experiments():
             if app_inst.is_template and not app_inst.generated_experiments:

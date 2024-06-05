@@ -71,7 +71,6 @@ def _get_context_display_name(context):
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
-    uses_spack = False
     _builtin_name = "builtin::{name}"
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
@@ -300,6 +299,27 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if hasattr(self, "builtins"):
             out_str.append(rucolor.section_title("Builtin Executables:\n"))
             out_str.append("\t" + colified(self.builtins.keys(), tty=True) + "\n")
+
+        if hasattr(self, "package_manager_configs"):
+            out_str.append("\n")
+            out_str.append(rucolor.section_title("Package Manager Configs:\n"))
+            for name, config in self.package_manager_configs.items():
+                out_str.append(f"\t{name} = {config}\n")
+
+        spec_groups = [
+            ("compilers", "Compilers"),
+            ("software_specs", "Software Specs"),
+        ]
+        for group in spec_groups:
+            if hasattr(self, group[0]):
+                out_str.append("\n")
+                out_str.append(rucolor.section_title("%s:\n" % group[1]))
+                for name, info in getattr(self, group[0]).items():
+                    out_str.append(rucolor.nested_1("  %s:\n" % name))
+                    for key in self._spec_keys:
+                        if key in info and info[key]:
+                            out_str.append("    %s = %s\n" % (key, info[key].replace("@", "@@")))
+
         return out_str
 
     def set_env_variable_sets(self, env_variable_sets):
@@ -397,28 +417,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             )
 
         phases = set()
+        final_added_index = None
         if pipeline in self._pipeline_graphs:
-            for phase in self._pipeline_graphs[pipeline].walk():
+            for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
                 for phase_filter in phase_filters:
                     if fnmatch.fnmatch(phase.key, phase_filter):
                         phases.add(phase)
+                        final_added_index = idx
 
         include_phase_deps = ramble.config.get("config:include_phase_dependencies")
         if include_phase_deps:
-            phases_for_deps = list(phases)
-            while phases_for_deps:
-                cur_phase = phases_for_deps.pop(0)
-                for phase in phases:
-                    if phase is not cur_phase and phase not in phases:
-                        if cur_phase.key in phase._order_before:
-                            phases_for_deps.append(phase)
-                            phases.add(phase)
-
-                for dep_phase_name in cur_phase._order_after:
-                    dep_node = self._pipeline_graphs[pipeline].get_node(dep_phase_name)
-                    if dep_node not in phases:
-                        phases_for_deps.append(dep_node)
-                        phases.add(dep_node)
+            for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
+                if idx < final_added_index and phase not in phases:
+                    phases.add(phase)
 
         phase_order = []
         for node in self._pipeline_graphs[pipeline].walk():
@@ -496,6 +507,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for template_name, template_conf in workspace.all_templates():
             self.expander._used_variables.add(template_name)
             self.expander.expand_var(template_conf["contents"])
+
+        if self.package_manager is not None:
+            self.package_manager.build_used_variables(workspace)
 
         return self.expander._used_variables
 

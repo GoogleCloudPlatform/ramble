@@ -112,12 +112,11 @@ def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None):
     """
 
     def _execute_define_compiler(obj):
-        if hasattr(obj, "uses_spack") and getattr(obj, "uses_spack"):
-            obj.compilers[name] = {
-                "pkg_spec": pkg_spec,
-                "compiler_spec": compiler_spec,
-                "compiler": compiler,
-            }
+        obj.compilers[name] = {
+            "pkg_spec": pkg_spec,
+            "compiler_spec": compiler_spec,
+            "compiler": compiler,
+        }
 
     return _execute_define_compiler
 
@@ -137,14 +136,12 @@ def software_spec(name, pkg_spec, compiler_spec=None, compiler=None):
     """
 
     def _execute_software_spec(obj):
-        if hasattr(obj, "uses_spack") and getattr(obj, "uses_spack"):
-
-            # Define the spec
-            obj.software_specs[name] = {
-                "pkg_spec": pkg_spec,
-                "compiler_spec": compiler_spec,
-                "compiler": compiler,
-            }
+        # Define the spec
+        obj.software_specs[name] = {
+            "pkg_spec": pkg_spec,
+            "compiler_spec": compiler_spec,
+            "compiler": compiler,
+        }
 
     return _execute_software_spec
 

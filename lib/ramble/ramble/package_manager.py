@@ -53,7 +53,9 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         self._verbosity = "short"
 
-        self.runner_class = None
+        self.runner = None
+        self.app_inst = None
+        self.keywords = None
 
         ramble.util.directives.define_directive_methods(self)
 
@@ -84,6 +86,22 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
         if hasattr(self, "builtins"):
             out_str.append(rucolor.section_title("Builtin Executables:\n"))
             out_str.append("\t" + colified(self.builtins.keys(), tty=True) + "\n")
+
+        if hasattr(self, "package_manager_configs"):
+            out_str.append("\n")
+            out_str.append(rucolor.section_title("Package Manager Configs:\n"))
+            for name, config in self.package_manager_configs.items():
+                out_str.append(f"\t{name} = {config}\n")
+
+        for group in self._spec_groups:
+            if hasattr(self, group[0]):
+                out_str.append("\n")
+                out_str.append(rucolor.section_title("%s:\n" % group[1]))
+                for name, info in getattr(self, group[0]).items():
+                    out_str.append(rucolor.nested_1("  %s:\n" % name))
+                    for key in self._spec_keys:
+                        if key in info and info[key]:
+                            out_str.append("    %s = %s\n" % (key, info[key].replace("@", "@@")))
 
         return out_str
 
@@ -136,6 +154,32 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
                                         manager will act on.
         """
         self.app_inst = app_inst
+        self.keywords = app_inst.keywords
+
+    def build_used_variables(self, workspace):
+        """Build a set of all used variables
+
+        By expanding all necessary portions of this experiment (required /
+        reserved keywords, templates, commands, etc...), determine which
+        variables are used throughout the experiment definition.
+
+        Variables can have list definitions. These are iterated over to ensure
+        variables referenced by any of them are tracked properly.
+
+        Args:
+            workspace (Workspace): Workspace to extract templates from
+
+        Returns:
+            (set): All variable names used by this experiment.
+        """
+        app_context = self.app_inst.expander.expand_var_name(self.keywords.env_name)
+
+        software_environments = workspace.software_environments
+        software_environments.render_environment(
+            app_context, self.app_inst.expander, require=False
+        )
+
+        return self.app_inst.expander._used_variables
 
 
 class PackageManagerError(RambleError):
