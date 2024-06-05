@@ -24,7 +24,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-@pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
+@pytest.mark.filterwarnings("ignore:invalid decimal literal")
 def test_chained_experiment_variable_inheritance(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:

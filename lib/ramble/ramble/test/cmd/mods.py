@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import pytest
-
 from ramble.main import RambleCommand
 
 mods = RambleCommand("mods")
@@ -52,7 +50,6 @@ def test_mods_info(mutable_mock_mods_repo, mock_modifier):
     check_info(out)
 
 
-@pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
 def test_mods_info_all_real_modifiers(modifier):
     mod_info = mods("info", modifier)
 
