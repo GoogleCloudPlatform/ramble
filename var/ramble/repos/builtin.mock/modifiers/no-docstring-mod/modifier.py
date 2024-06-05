@@ -12,6 +12,6 @@ from ramble.modkit import *
 class NoDocstringMod(BasicModifier):
     name = "no-docstring-mod"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

@@ -11,6 +11,7 @@ from ramble.modkit import *
 
 class Untagged1(BasicModifier):
     """Define an untagged modifier"""
+
     name = "untagged-1"
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

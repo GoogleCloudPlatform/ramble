@@ -11,8 +11,9 @@ from ramble.modkit import *
 
 class Tagged1(BasicModifier):
     """Define a tagged modifier"""
+
     name = "tagged-1"
 
-    tags('tag-1')
+    tags("tag-1")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

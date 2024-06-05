@@ -12,13 +12,16 @@ from ramble.appkit import *
 class SuccessFunction(ExecutableApplication):
     name = "success-function"
 
-    executable('foo', 'echo "0.9 seconds"', use_mpi=False)
+    executable("foo", 'echo "0.9 seconds"', use_mpi=False)
 
-    workload('test_wl', executable='foo')
+    workload("test_wl", executable="foo")
 
-    figure_of_merit('test_fom',
-                    fom_regex=r'(?P<test>[0-9]+\.[0-9]+).*seconds.*',
-                    group_name='test', units='s')
+    figure_of_merit(
+        "test_fom",
+        fom_regex=r"(?P<test>[0-9]+\.[0-9]+).*seconds.*",
+        group_name="test",
+        units="s",
+    )
 
     def evaluate_success(self):
         """Always fail, to help testing success functions"""

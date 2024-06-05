@@ -14,11 +14,18 @@ from ramble.app.builtin.mock.basic import Basic as BaseBasic
 class BasicInherited(BaseBasic):
     name = "basic-inherited"
 
-    input_file('inherited_input', url='file:///tmp/inherited_file.log',
-               description='Again, not a file', extension='.log')
+    input_file(
+        "inherited_input",
+        url="file:///tmp/inherited_file.log",
+        description="Again, not a file",
+        extension=".log",
+    )
 
-    workload('test_wl3', executable='foo', input='inherited_input')
+    workload("test_wl3", executable="foo", input="inherited_input")
 
-    workload_variable('my_var', default='1.0',
-                      description='Shadowed Example var',
-                      workload='test_wl')
+    workload_variable(
+        "my_var",
+        default="1.0",
+        description="Shadowed Example var",
+        workload="test_wl",
+    )
