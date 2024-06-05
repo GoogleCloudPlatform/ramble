@@ -82,6 +82,12 @@ class Keywords(object):
         self.keys = default_keys.copy()
         self.update_keys(extra_keys)
 
+    def copy(self):
+        new_inst = type(self)()
+        new_inst.keys = self.keys.copy()
+        new_inst.update_keys({})
+        return new_inst
+
     def update_keys(self, extra_keys):
         self.keys.update(extra_keys)
         # Define class attributes for all of the keys

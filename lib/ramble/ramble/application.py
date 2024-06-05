@@ -98,7 +98,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
-        self.keywords = ramble.keywords.keywords
+        self.keywords = ramble.keywords.keywords.copy()
 
         self._vars_are_expanded = False
         self.expander = None
@@ -164,6 +164,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if self._formatted_executables:
             new_copy.set_formatted_executables(self._formatted_executables.copy())
 
+        new_copy.keywords = ramble.keywords.keywords.copy()
         new_copy.set_template(False)
         new_copy.repeats.set_repeats(False, 0)
         new_copy.set_chained_experiments(None)
