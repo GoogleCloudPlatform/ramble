@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import deprecation
+
 from ramble.pkgmankit import *  # noqa: F403
 
 import ramble.spack_runner
@@ -97,7 +99,10 @@ class Spack(SpackLightweight):
             if pkg_spec in cache:
                 spack_pkg_name, pkg_path = cache.get(pkg_spec)
                 if spack_pkg_name not in self.app_inst.variables:
-                    self.app_inst.variables[spack_pkg_name] = pkg_path
+                    self.app_inst.define_variable(spack_pkg_name, pkg_path)
+                    self.app_inst.define_variable(
+                        f"{spack_pkg_name}_path", pkg_path
+                    )
                 else:
                     logger.msg(
                         f"Variable {spack_pkg_name} defined. "
@@ -119,17 +124,60 @@ class Spack(SpackLightweight):
                 spack_pkg_name, pkg_path = self.runner.get_package_path(
                     pkg_spec
                 )
-                if spack_pkg_name not in self.app_inst.variables:
-                    self.app_inst.variables[spack_pkg_name] = pkg_path
+                if f"{spack_pkg_name}_path" not in self.app_inst.variables:
+                    self.app_inst.define_variable(spack_pkg_name, pkg_path)
+                    self.app_inst.define_variable(
+                        f"{spack_pkg_name}_path", pkg_path
+                    )
                     cache[pkg_spec] = (spack_pkg_name, pkg_path)
                 else:
                     logger.msg(
                         f"Variable {spack_pkg_name} defined. "
                         + "Skipping extraction from spack"
                     )
+                    logger.msg(
+                        f"Variable {spack_pkg_name}_path defined. "
+                        + "Skipping extraction from spack"
+                    )
 
         except ramble.spack_runner.RunnerError as e:
             logger.die(e)
+
+    @deprecation.deprecated(
+        deprecated_in="0.5.0",
+        removed_in="0.6.0",
+        current_version=str(ramble.ramble_version),
+        details="Package name variables are deprecated. Transition to the {package_name_path} syntax",
+    )
+    def __print_deprecated_warning(self, package_name):
+        logger.warn(
+            f'The package path variable "{package_name}" is deprecated'
+        )
+        logger.warn(f'Please transition to "{package_name}_path" instead.')
+
+    register_phase(
+        "warn_deprecated_variables",
+        pipeline="setup",
+        run_after=["make_experiments"],
+    )
+
+    def _warn_deprecated_variables(self, workspace, app_inst=None):
+        cache = workspace.pkg_path_cache
+
+        app_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
+        software_environments = workspace.software_environments
+        software_environment = software_environments.render_environment(
+            app_context, self.app_inst.expander
+        )
+
+        for pkg_spec in software_environments.package_specs_for_environment(
+            software_environment
+        ):
+            spack_pkg_name, pkg_path = cache.get(pkg_spec)
+            if spack_pkg_name in self.app_inst.expander._used_variables:
+                self.__print_deprecated_warning(spack_pkg_name)
 
     register_builtin(
         "spack_activate",

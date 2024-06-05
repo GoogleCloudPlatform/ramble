@@ -617,6 +617,7 @@ class SpackRunner(object):
 
     def get_package_path(self, package_spec):
         """Return the installation directory for a package"""
+        name_regex = re.compile(r"(?P<name>[a-zA-Z0-9\-_]+).*")
         loc_args = ["location", "-i"]
         loc_args.extend(shlex.split(package_spec))
 
@@ -631,7 +632,10 @@ class SpackRunner(object):
             self._dry_run_print(self.spack, name_args)
             self._dry_run_print(self.spack, loc_args)
 
-            name = os.path.join(shlex.split(package_spec)[0])
+            name = shlex.split(package_spec)[0]
+            name_match = name_regex.match(name)
+            if name_match:
+                name = name_match.group("name")
             location = os.path.join("dry-run", "path", "to", shlex.split(package_spec)[0])
             return (name, location)
 

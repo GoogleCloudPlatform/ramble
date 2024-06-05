@@ -56,10 +56,7 @@ class SpackStack(SpackApplication):
     workload(
         "remove",
         executables=[
-            "builtin::spack_source",
-            "builtin::spack_activate",
             "uninstall",
-            "builtin::spack_deactivate",
         ],
     )
 

@@ -8,6 +8,7 @@
 
 import os
 import re
+import deprecation
 
 import pytest
 
@@ -26,6 +27,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
+@deprecation.fail_if_not_removed
 def test_known_applications(application, package_manager, capsys):
     info_cmd = RambleCommand("info")
 
