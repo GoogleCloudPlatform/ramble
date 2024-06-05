@@ -26,7 +26,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_known_applications(application, capsys):
+def test_known_applications(application, package_manager, capsys):
     info_cmd = RambleCommand("info")
 
     setup_type = ramble.pipeline.pipelines.setup
@@ -41,8 +41,6 @@ def test_known_applications(application, capsys):
     ws_name = f"test_all_apps_{application}"
 
     base_config = """ramble:
-  variants:
-    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks}'
     batch_submit: '{execute_experiment}'
@@ -77,6 +75,10 @@ def test_known_applications(application, capsys):
                 """  software:
     packages: {}
     environments: {}\n"""
+            )
+            f.write(
+                f"""  variants:
+    package_manager: {package_manager}\n"""
             )
 
         ws._re_read()

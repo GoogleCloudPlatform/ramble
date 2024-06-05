@@ -6,12 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 from ramble.appkit import *
 import spack.util.executable
 
 
 class SpackStack(SpackApplication):
-    '''Application definition for creating a spack software stack
+    """Application definition for creating a spack software stack
 
     This application definition is used solely to create spack software stacks.
 
@@ -25,7 +27,7 @@ class SpackStack(SpackApplication):
     The experiments are considered successful if the installation completed.
 
     This application should be used with the `spack-lightweight` package manager.
-    '''
+    """
 
     name = "spack-stack"
 
@@ -42,13 +44,14 @@ class SpackStack(SpackApplication):
     )
 
     executable("install", "spack install {install_flags}", use_mpi=True)
-    workload('create', executables=['builtin::remove_env_files',
-                                    'configure',
-                                    'install'])
+    workload(
+        "create",
+        executables=["builtin::remove_env_files", "configure", "install"],
+    )
 
     executable("uninstall", "spack uninstall {uninstall_flags}", use_mpi=True)
 
-    workload('remove', executables=['uninstall'])
+    workload("remove", executables=["uninstall"])
 
     workload(
         "remove",
@@ -138,6 +141,10 @@ class SpackStack(SpackApplication):
 
         spack_file = self.expander.expand_var("{env_path}/spack.yaml")
         spec_list = []
+
+        if not os.path.isfile(spack_file):
+            return False
+
         with open(spack_file, "r") as f:
             spack_data = syaml.load_config(f)
 
