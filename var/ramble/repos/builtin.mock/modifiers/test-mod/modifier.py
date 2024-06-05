@@ -46,7 +46,7 @@ class TestMod(BasicModifier):
         modes=["test"],
     )
 
-    software_spec("analysis_spec", pkg_spec="analysis_pkg@1.1", compiler="gcc")
+    software_spec("analysis_spec", pkg_spec="analysis_pkg@1.1")
 
     fom_regex = r"(?P<context>fom_context)(?P<fom>.*)"
 

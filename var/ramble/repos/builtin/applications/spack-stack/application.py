@@ -40,20 +40,13 @@ class SpackStack(SpackApplication):
     )
 
     executable("install", "spack install {install_flags}", use_mpi=True)
-
-    workload(
-        "create",
-        executables=[
-            "builtin::remove_env_files",
-            "builtin::spack_source",
-            "builtin::spack_activate",
-            "configure",
-            "install",
-            "builtin::spack_deactivate",
-        ],
-    )
+    workload('create', executables=['builtin::remove_env_files',
+                                    'configure',
+                                    'install'])
 
     executable("uninstall", "spack uninstall {uninstall_flags}", use_mpi=True)
+
+    workload('remove', executables=['uninstall'])
 
     workload(
         "remove",
@@ -137,13 +130,6 @@ class SpackStack(SpackApplication):
     def remove_env_files(self):
         cmds = ["rm -f {env_path}/spack.lock", "rm -rf {env_path}/.spack-env"]
         return cmds
-
-    def _software_install(self, workspace, app_inst=None):
-        """This application never installs software during setup."""
-        pass
-
-    def _define_package_paths(self, workspace, app_inst=None):
-        pass
 
     def evaluate_success(self):
         import spack.util.spack_yaml as syaml
