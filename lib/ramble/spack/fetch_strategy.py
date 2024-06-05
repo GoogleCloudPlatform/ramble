@@ -31,8 +31,7 @@ import shutil
 import sys
 from typing import List, Optional  # novm
 
-import six
-import six.moves.urllib.parse as urllib_parse
+import urllib.parse
 
 import llnl.util
 import llnl.util.tty as tty
@@ -308,7 +307,7 @@ class URLFetchStrategy(FetchStrategy):
             # This must be skipped on Windows due to URL encoding
             # of ':' characters on filepaths on Windows
             if sys.platform != "win32" and url.startswith('file://'):
-                path = urllib_parse.quote(url[len('file://'):])
+                path = urllib.parse.quote(url[len('file://'):])
                 url = 'file://' + path
             urls.append(url)
 
@@ -705,7 +704,7 @@ class VCSFetchStrategy(FetchStrategy):
 
         patterns = kwargs.get('exclude', None)
         if patterns is not None:
-            if isinstance(patterns, six.string_types):
+            if isinstance(patterns, str):
                 patterns = [patterns]
             for p in patterns:
                 tar.add_default_arg('--exclude=%s' % p)
@@ -1650,7 +1649,7 @@ def from_url_scheme(url, *args, **kwargs):
        in the given url."""
 
     url = kwargs.get('url', url)
-    parsed_url = urllib_parse.urlparse(url, scheme='file')
+    parsed_url = urllib.parse.urlparse(url, scheme='file')
 
     scheme_mapping = (
         kwargs.get('scheme_mapping') or

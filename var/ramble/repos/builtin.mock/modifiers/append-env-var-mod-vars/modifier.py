@@ -6,17 +6,23 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class AppendEnvVarModVars(BasicModifier):
     """Define a modifier with only an environment variable modification using
     the append method and a non-colon separator"""
+
     name = "append-env-var-mod-vars"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
 
-    env_var_modification('test_var', modification='test_val', method='append',
-                         mode='test', separator=',')
+    env_var_modification(
+        "test_var",
+        modification="test_val",
+        method="append",
+        mode="test",
+        separator=",",
+    )

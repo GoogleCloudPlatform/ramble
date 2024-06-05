@@ -23,7 +23,6 @@ import sys
 import traceback
 
 import ruamel.yaml.error as yaml_error
-import six
 
 from llnl.util.compat import Mapping
 from llnl.util.filesystem import mkdirp
@@ -41,7 +40,7 @@ from spack.util.spack_yaml import syaml_dict
 
 
 def _is_string(url):
-    return isinstance(url, six.string_types)
+    return isinstance(url, str)
 
 
 def _display_mirror_entry(size, name, url, type_=None):
@@ -81,10 +80,7 @@ class Mirror(object):
             data = spack.util.spack_yaml.load(stream)
             return Mirror.from_dict(data, name)
         except yaml_error.MarkedYAMLError as e:
-            raise six.raise_from(
-                spack.util.spack_yaml.SpackYAMLError("error parsing YAML mirror:", str(e)),
-                e,
-            )
+            raise spack.util.spack_yaml.SpackYAMLError("error parsing YAML mirror:", str(e)) from e
 
     @staticmethod
     def from_json(stream, name=None):
@@ -92,10 +88,7 @@ class Mirror(object):
             d = spack.util.spack_json.load(stream)
             return Mirror.from_dict(d, name)
         except Exception as e:
-            raise six.raise_from(
-                spack.util.spack_json.SpackJSONError("error parsing JSON mirror:", str(e)),
-                e,
-            )
+            raise spack.util.spack_json.SpackJSONError("error parsing JSON mirror:", str(e)) from e
 
     def to_dict(self):
         return syaml_dict(
@@ -104,7 +97,7 @@ class Mirror(object):
 
     @staticmethod
     def from_dict(d, name=None):
-        if isinstance(d, six.string_types):
+        if isinstance(d, str):
             return Mirror(d, name=name)
         else:
             return Mirror(d["fetch"], d["push"], name=name)

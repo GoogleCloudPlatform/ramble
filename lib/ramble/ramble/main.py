@@ -15,6 +15,7 @@ from __future__ import print_function
 
 import argparse
 import inspect
+import io
 import operator
 import os
 import os.path
@@ -26,8 +27,6 @@ import traceback
 import warnings
 import jsonschema
 import ruamel
-
-from six import StringIO
 
 import llnl.util.lang
 import llnl.util.tty as tty
@@ -45,6 +44,7 @@ import ramble.repository
 from ramble.util.logger import logger
 import spack.util.debug
 import spack.util.environment
+from spack.util.executable import CommandNotFoundError
 import spack.util.path
 from ramble.error import RambleError
 
@@ -706,7 +706,7 @@ class RambleCommand(object):
         else:
             ramble.workspace.shell.deactivate()
 
-        out = StringIO()
+        out = io.StringIO()
         try:
             with log_output(out):
                 self.returncode = _invoke_command(self.command, self.parser, args, unknown)
@@ -979,6 +979,10 @@ def main(argv=None):
     except RambleError as e:
         logger.debug(e)
         e.die()  # gracefully die on any RambleErrors
+
+    except CommandNotFoundError as e:
+        e.message = e.message.replace("spack requires", "ramble requires")
+        raise
 
     except KeyboardInterrupt:
         if ramble.config.get("config:debug"):

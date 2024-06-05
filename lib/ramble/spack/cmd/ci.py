@@ -11,7 +11,7 @@ import subprocess
 import sys
 import tempfile
 
-from six.moves.urllib.parse import urlencode
+from urllib.parse import urlencode
 
 import llnl.util.tty as tty
 

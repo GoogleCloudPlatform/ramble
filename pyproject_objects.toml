@@ -1,0 +1,8 @@
+# Config file for Ramble's object files (apps and mods)
+
+[tool.black]
+line-length = 79
+target-version = ["py36", "py37", "py38", "py39", "py310", "py311", "py312"]
+include = '''
+    \.pyi?$
+'''

@@ -14,7 +14,6 @@ import tempfile
 from contextlib import contextmanager
 
 import ruamel.yaml as yaml
-import six
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -344,12 +343,12 @@ class DirectoryLayout(object):
                     os.unlink(path)
                     os.remove(metapath)
                 except OSError as e:
-                    raise six.raise_from(RemoveFailedError(spec, path, e), e)
+                    raise RemoveFailedError(spec, path, e) from e
         elif os.path.exists(path):
             try:
                 shutil.rmtree(path, **kwargs)
             except OSError as e:
-                raise six.raise_from(RemoveFailedError(spec, path, e), e)
+                raise RemoveFailedError(spec, path, e) from e
 
         path = os.path.dirname(path)
         while path != self.root:

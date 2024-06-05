@@ -6,20 +6,31 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class SuccessCriteria(BasicModifier):
     """Define a modifier with a success criteria"""
+
     name = "success-criteria"
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
 
-    success_criteria('status', mode='string', match='.*Experiment status: SUCCESS', file='{log_file}')
+    success_criteria(
+        "status",
+        mode="string",
+        match=".*Experiment status: SUCCESS",
+        file="{log_file}",
+    )
 
-    variable_modification('experiment_status', modification='Experiment status: SUCCESS', method='set', mode='test')
+    variable_modification(
+        "experiment_status",
+        modification="Experiment status: SUCCESS",
+        method="set",
+        mode="test",
+    )
 
-    register_builtin('echo_status', required=True)
+    register_builtin("echo_status", required=True)
 
     def echo_status(self):
         return ['echo "Experiment status: {experiment_status}" >> {log_file}']

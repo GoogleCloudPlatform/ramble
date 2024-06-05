@@ -8,7 +8,6 @@
 
 import string
 import ast
-import six
 import operator
 import math
 import random
@@ -226,7 +225,7 @@ class ExpansionNode(object):
                     self.value = replaced_contents
 
                 # Replace escaped curly braces with curly braces
-                if isinstance(self.value, six.string_types):
+                if isinstance(self.value, str):
                     self.value = self.value.replace("\\{", "{").replace("\\}", "}")
 
 
@@ -572,7 +571,7 @@ class Expander(object):
 
         evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
 
-        if not isinstance(evaluated, six.string_types):
+        if not isinstance(evaluated, str):
             logger.die("Logical compute failed to return a string")
 
         if evaluated == "True":
@@ -602,7 +601,7 @@ class Expander(object):
           in_str (str): Expanded version of input string
         """
 
-        if isinstance(in_str, six.string_types):
+        if isinstance(in_str, str):
             str_graph = ExpansionGraph(in_str)
             for node in str_graph.walk():
                 node.define_value(
@@ -830,7 +829,7 @@ class Expander(object):
             left_eval = self.eval_math(node.left)
             right_eval = self.eval_math(node.right)
             op = supported_math_operators[type(node.op)]
-            if isinstance(left_eval, six.string_types) or isinstance(right_eval, six.string_types):
+            if isinstance(left_eval, str) or isinstance(right_eval, str):
                 raise SyntaxError("Unsupported operand type in binary operator")
             return op(left_eval, right_eval)
         except TypeError:
@@ -845,7 +844,7 @@ class Expander(object):
         """
         try:
             operand = self.eval_math(node.operand)
-            if isinstance(operand, six.string_types):
+            if isinstance(operand, str):
                 raise SyntaxError("Unsupported operand type in unary operator")
             op = supported_math_operators[type(node.op)]
             return op(operand)

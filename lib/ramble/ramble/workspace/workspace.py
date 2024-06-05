@@ -13,8 +13,6 @@ import re
 import shutil
 import datetime
 
-import six
-
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 import llnl.util.tty.log as log
@@ -1543,7 +1541,7 @@ def yaml_equivalent(first, second):
     elif isinstance(first, list):
         return isinstance(second, list) and _equiv_list(first, second)
     else:  # it's a string
-        return isinstance(second, six.string_types) and first == second
+        return isinstance(second, str) and first == second
 
 
 def _equiv_list(first, second):

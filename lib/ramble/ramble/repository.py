@@ -30,7 +30,6 @@ except ImportError:
 
 
 from enum import Enum
-import six
 
 import ruamel.yaml as yaml
 
@@ -373,8 +372,7 @@ class TagIndex(Mapping):
             self._tag_dict[tag].append(obj.name)
 
 
-@six.add_metaclass(abc.ABCMeta)
-class Indexer(object):
+class Indexer(metaclass=abc.ABCMeta):
     """Adaptor for indexes that need to be generated when repos are updated."""
 
     def __init__(self, object_type=default_type):
@@ -550,7 +548,7 @@ class RepoPath(object):
         # Add each repo to this path.
         for repo in repos:
             try:
-                if isinstance(repo, six.string_types):
+                if isinstance(repo, str):
                     repo = Repo(repo, object_type=object_type)
                 self.put_last(repo)
             except RepoError as e:

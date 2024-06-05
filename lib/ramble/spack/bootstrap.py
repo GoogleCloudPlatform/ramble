@@ -16,8 +16,6 @@ import re
 import sys
 import sysconfig
 
-import six
-
 import archspec.cpu
 
 import llnl.util.filesystem as fs
@@ -72,7 +70,7 @@ def _try_import_from_store(module, query_spec, query_info=None):
             command found and the concrete spec providing it
     """
     # If it is a string assume it's one of the root specs by this module
-    if isinstance(query_spec, six.string_types):
+    if isinstance(query_spec, str):
         # We have to run as part of this python interpreter
         query_spec += ' ^' + spec_for_current_python()
 
@@ -877,7 +875,7 @@ def _missing(name, purpose, system_only=True):
 
 def _required_system_executable(exes, msg):
     """Search for an executable is the system path only."""
-    if isinstance(exes, six.string_types):
+    if isinstance(exes, str):
         exes = (exes,)
     if spack.util.executable.which_string(*exes):
         return True, None
@@ -895,7 +893,7 @@ def _required_python_module(module, query_spec, msg):
 
 def _required_executable(exes, query_spec, msg):
     """Search for an executable in the system path or in the bootstrap store."""
-    if isinstance(exes, six.string_types):
+    if isinstance(exes, str):
         exes = (exes,)
     if (spack.util.executable.which_string(*exes) or
             _executables_in_store(exes, query_spec)):

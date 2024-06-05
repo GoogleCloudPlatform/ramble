@@ -20,8 +20,6 @@ import tempfile
 from contextlib import contextmanager
 from sys import platform as _platform
 
-import six
-
 from llnl.util import tty
 from llnl.util.compat import Sequence
 from llnl.util.lang import dedupe, memoized
@@ -375,7 +373,7 @@ def chgrp(path, group, follow_symlinks=True):
     if is_windows:
         raise OSError("Function 'chgrp' is not supported on Windows")
 
-    if isinstance(group, six.string_types):
+    if isinstance(group, str):
         gid = grp.getgrnam(group).gr_gid
     else:
         gid = group
@@ -870,7 +868,7 @@ def open_if_filename(str_or_file, mode='r'):
 
     If it's a file object, just yields the file object.
     """
-    if isinstance(str_or_file, six.string_types):
+    if isinstance(str_or_file, str):
         with open(str_or_file, mode) as f:
             yield f
     else:
@@ -1392,7 +1390,7 @@ def find(root, files, recursive=True):
     Returns:
         list: The files that have been found
     """
-    if isinstance(files, six.string_types):
+    if isinstance(files, str):
         files = [files]
 
     if recursive:
@@ -1456,7 +1454,7 @@ class FileList(Sequence):
     """
 
     def __init__(self, files):
-        if isinstance(files, six.string_types):
+        if isinstance(files, str):
             files = [files]
 
         self.files = list(dedupe(files))
@@ -1554,7 +1552,7 @@ class HeaderList(FileList):
     def directories(self, value):
         value = value or []
         # Accept a single directory as input
-        if isinstance(value, six.string_types):
+        if isinstance(value, str):
             value = [value]
 
         self._directories = [path_to_os_path(os.path.normpath(x))[0] for x in value]
@@ -1690,7 +1688,7 @@ def find_headers(headers, root, recursive=False):
     Returns:
         HeaderList: The headers that have been found
     """
-    if isinstance(headers, six.string_types):
+    if isinstance(headers, str):
         headers = [headers]
     elif not isinstance(headers, Sequence):
         message = '{0} expects a string or sequence of strings as the '
@@ -1846,7 +1844,7 @@ def find_system_libraries(libraries, shared=True):
     Returns:
         LibraryList: The libraries that have been found
     """
-    if isinstance(libraries, six.string_types):
+    if isinstance(libraries, str):
         libraries = [libraries]
     elif not isinstance(libraries, Sequence):
         message = '{0} expects a string or sequence of strings as the '
@@ -1900,7 +1898,7 @@ def find_libraries(libraries, root, shared=True, recursive=False):
     Returns:
         LibraryList: The libraries that have been found
     """
-    if isinstance(libraries, six.string_types):
+    if isinstance(libraries, str):
         libraries = [libraries]
     elif not isinstance(libraries, Sequence):
         message = '{0} expects a string or sequence of strings as the '

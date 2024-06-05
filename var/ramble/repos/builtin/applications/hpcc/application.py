@@ -11,7 +11,7 @@ from ramble.expander import Expander
 
 
 class Hpcc(SpackApplication):
-    '''Define the HPCC application
+    """Define the HPCC application
 
     HPCC is a collection of multiple benchmarks, which include:
       - HPL
@@ -21,89 +21,121 @@ class Hpcc(SpackApplication):
       - MPIRandomAccess
       - FFT
       - LatencyBandwidth
-    '''
-    name = 'hpcc'
+    """
 
-    maintainers('rfbgo')
+    name = "hpcc"
 
-    tags('benchmark-app', 'mini-app', 'benchmark', 'DGEMM')
+    maintainers("rfbgo")
 
-    define_compiler('gcc9', pkg_spec='gcc@9.3.0')
+    tags("benchmark-app", "mini-app", "benchmark", "DGEMM")
 
-    software_spec('impi2018',
-                  pkg_spec='intel-mpi@2018.4.274')
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec('hpcc',
-                  pkg_spec='hpcc@1.5.0',
-                  compiler='gcc9')
+    software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
 
-    required_package('hpcc')
+    software_spec("hpcc", pkg_spec="hpcc@1.5.0", compiler="gcc9")
 
-    input_file('hpccinf', url='{config_file}', expand=False,
-               sha256='fe9e5f4118c1b40980e162dc3c52d224fd6287e9706b95bb40ae7dfc96b38622',
-               description='Input/Config file for HPCC benchmark')
+    required_package("hpcc")
 
-    executable('copy-config', template='cp -R {workload_input_dir}/* {experiment_run_dir}/.', use_mpi=False)
+    input_file(
+        "hpccinf",
+        url="{config_file}",
+        expand=False,
+        sha256="fe9e5f4118c1b40980e162dc3c52d224fd6287e9706b95bb40ae7dfc96b38622",
+        description="Input/Config file for HPCC benchmark",
+    )
 
-    executable('execute', 'hpcc', use_mpi=True)
+    executable(
+        "copy-config",
+        template="cp -R {workload_input_dir}/* {experiment_run_dir}/.",
+        use_mpi=False,
+    )
 
-    workload('standard', executables=['copy-config', 'execute'], input='hpccinf')
+    executable("execute", "hpcc", use_mpi=True)
 
-    workload_variable('config_file', default='https://raw.githubusercontent.com/icl-utk-edu/hpcc/1.5.0/_hpccinf.txt',
-                      description='Default config file',
-                      workloads=['standard'])
+    workload(
+        "standard", executables=["copy-config", "execute"], input="hpccinf"
+    )
 
-    workload_variable('out_file', default='{experiment_run_dir}/hpccoutf.txt',
-                      description='Output file for results',
-                      workloads=['standard'])
+    workload_variable(
+        "config_file",
+        default="https://raw.githubusercontent.com/icl-utk-edu/hpcc/1.5.0/_hpccinf.txt",
+        description="Default config file",
+        workloads=["standard"],
+    )
 
-    output_sections = ['HPL', 'LatencyBandwidth', 'MPIFFT', 'MPIRandomAccess_LCG',
-                       'MPIRandomAccess', 'PTRANS', 'SingleDGEMM', 'SingleFFT',
-                       'SingleRandomAccess_LCG', 'SingleRandomAccess', 'SingleSTREAM',
-                       'StarDGEMM', 'StarFFT', 'StarRandomAccess_LCG', 'StarRandomAccess',
-                       'StarSTREAM', 'Summary']
+    workload_variable(
+        "out_file",
+        default="{experiment_run_dir}/hpccoutf.txt",
+        description="Output file for results",
+        workloads=["standard"],
+    )
 
-    context_regex = 'Begin of Summary section'
-    figure_of_merit_context('Summary', regex=context_regex, output_format='Summary')
-
-    summary_metrics = [
-        ('HPL_Tflops', 'Tflops'),
-        ('StarDGEMM_Gflops', 'Gflops'),
-        ('SingleDGEMM_Gflops', 'Gflops'),
-        ('PTRANS_GBs', 'GB/s'),
-        ('MPIRandomAccess_GUPs', 'GUP/s'),
-        ('MPIRandomAccess_LCG_GUPs', 'GUP/s'),
-        ('StarRandomAccess_GUPs', 'GUP/s'),
-        ('SingleRandomAccess_GUPs', 'GUP/s'),
-        ('StarSTREAM_Copy', 'GB/s'),
-        ('StarSTREAM_Scale', 'GB/s'),
-        ('StarSTREAM_Add', 'GB/s'),
-        ('StarSTREAM_Triad', 'GB/s'),
-        ('SingleSTREAM_Copy', 'GB/s'),
-        ('SingleSTREAM_Scale', 'GB/s'),
-        ('SingleSTREAM_Add', 'GB/s'),
-        ('SingleSTREAM_Triad', 'GB/s'),
-        ('StarFFT_Gflops', 'Gflops'),
-        ('SingleFFT_Gflops', 'Gflops'),
-        ('MPIFFT_Gflops', 'Gflops'),
-        ('MaxPingPongLatency_usec', 'usec'),
-        ('RandomlyOrderedRingLatency_usec', 'usec'),
-        ('MinPingPongBandwidth_GBytes', 'GB/s'),
-        ('NaturallyOrderedRingBandwidth_GBytes', 'GB/s'),
-        ('RandomlyOrderedRingBandwidth_GBytes', 'GB/s')
+    output_sections = [
+        "HPL",
+        "LatencyBandwidth",
+        "MPIFFT",
+        "MPIRandomAccess_LCG",
+        "MPIRandomAccess",
+        "PTRANS",
+        "SingleDGEMM",
+        "SingleFFT",
+        "SingleRandomAccess_LCG",
+        "SingleRandomAccess",
+        "SingleSTREAM",
+        "StarDGEMM",
+        "StarFFT",
+        "StarRandomAccess_LCG",
+        "StarRandomAccess",
+        "StarSTREAM",
+        "Summary",
     ]
 
-    log_str = Expander.expansion_str('out_file')
+    context_regex = "Begin of Summary section"
+    figure_of_merit_context(
+        "Summary", regex=context_regex, output_format="Summary"
+    )
+
+    summary_metrics = [
+        ("HPL_Tflops", "Tflops"),
+        ("StarDGEMM_Gflops", "Gflops"),
+        ("SingleDGEMM_Gflops", "Gflops"),
+        ("PTRANS_GBs", "GB/s"),
+        ("MPIRandomAccess_GUPs", "GUP/s"),
+        ("MPIRandomAccess_LCG_GUPs", "GUP/s"),
+        ("StarRandomAccess_GUPs", "GUP/s"),
+        ("SingleRandomAccess_GUPs", "GUP/s"),
+        ("StarSTREAM_Copy", "GB/s"),
+        ("StarSTREAM_Scale", "GB/s"),
+        ("StarSTREAM_Add", "GB/s"),
+        ("StarSTREAM_Triad", "GB/s"),
+        ("SingleSTREAM_Copy", "GB/s"),
+        ("SingleSTREAM_Scale", "GB/s"),
+        ("SingleSTREAM_Add", "GB/s"),
+        ("SingleSTREAM_Triad", "GB/s"),
+        ("StarFFT_Gflops", "Gflops"),
+        ("SingleFFT_Gflops", "Gflops"),
+        ("MPIFFT_Gflops", "Gflops"),
+        ("MaxPingPongLatency_usec", "usec"),
+        ("RandomlyOrderedRingLatency_usec", "usec"),
+        ("MinPingPongBandwidth_GBytes", "GB/s"),
+        ("NaturallyOrderedRingBandwidth_GBytes", "GB/s"),
+        ("RandomlyOrderedRingBandwidth_GBytes", "GB/s"),
+    ]
+
+    log_str = Expander.expansion_str("out_file")
 
     for metric, unit in summary_metrics:
-        summary_regex = metric + r'=(?P<val>[0-9]+\.[0-9]+)'
-        figure_of_merit(metric,
-                        log_file=log_str,
-                        fom_regex=summary_regex,
-                        group_name='val', units=unit,
-                        contexts=['Summary']
-                        )
-    '''
+        summary_regex = metric + r"=(?P<val>[0-9]+\.[0-9]+)"
+        figure_of_merit(
+            metric,
+            log_file=log_str,
+            fom_regex=summary_regex,
+            group_name="val",
+            units=unit,
+            contexts=["Summary"],
+        )
+    """
     # Below is a list of the full metrics available in the output. The current
     # implementation captures the summary metrics, which is sufficient,  but it
     # is possible a feature user wants to expand the FOM capture to include the
@@ -168,4 +200,4 @@ class Hpcc(SpackApplication):
             # Min Ping Pong Bandwidth:           10958.338341 MB/s
             # Naturally Ordered Ring Bandwidth:  13421.772800 MB/s
             # Randomly  Ordered Ring Bandwidth:  12860.856132 MB/s
-    '''
+    """

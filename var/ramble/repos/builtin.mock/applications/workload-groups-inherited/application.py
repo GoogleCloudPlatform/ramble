@@ -14,9 +14,7 @@ from ramble.app.builtin.mock.workload_groups import WorkloadGroups
 class WorkloadGroupsInherited(WorkloadGroups):
     name = "workload-groups-inherited"
 
-    workload('test_wl3', executable='baz')
+    workload("test_wl3", executable="baz")
 
     # Test populated group applies existing vars to new workload
-    workload_group('test_wlg',
-                   workloads=['test_wl3'],
-                   mode='append')
+    workload_group("test_wlg", workloads=["test_wl3"], mode="append")

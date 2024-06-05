@@ -4,6 +4,7 @@
 # SPDX-License-Identifier: (Apache-2.0 OR MIT)
 
 import argparse
+import builtins
 import filecmp
 import os
 import re
@@ -11,7 +12,6 @@ import sys
 import time
 
 import pytest
-from six.moves import builtins
 
 import llnl.util.filesystem as fs
 

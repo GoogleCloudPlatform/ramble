@@ -11,8 +11,6 @@ import platform
 import re
 import warnings
 
-import six
-
 import archspec
 import archspec.cpu.alias
 import archspec.cpu.schema
@@ -27,7 +25,7 @@ def coerce_target_names(func):
 
     @functools.wraps(func)
     def _impl(self, other):
-        if isinstance(other, six.string_types):
+        if isinstance(other, str):
             if other not in TARGETS:
                 msg = '"{0}" is not a valid target name'
                 raise ValueError(msg.format(other))
@@ -150,7 +148,7 @@ class Microarchitecture(object):
 
     def __contains__(self, feature):
         # Feature must be of a string type, so be defensive about that
-        if not isinstance(feature, six.string_types):
+        if not isinstance(feature, str):
             msg = "only objects of string types are accepted [got {0}]"
             raise TypeError(msg.format(str(type(feature))))
 

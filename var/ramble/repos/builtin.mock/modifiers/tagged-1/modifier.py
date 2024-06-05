@@ -6,13 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class Tagged1(BasicModifier):
     """Define a tagged modifier"""
+
     name = "tagged-1"
 
-    tags('tag-1')
+    tags("tag-1")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

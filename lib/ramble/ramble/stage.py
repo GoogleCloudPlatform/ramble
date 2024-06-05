@@ -17,8 +17,6 @@ import os
 import shutil
 import stat
 import sys
-from six import string_types
-from six import iteritems
 
 import llnl.util.lang
 import llnl.util.tty as tty
@@ -264,7 +262,7 @@ class InputStage(object):
         """
         # TODO: fetch/stage coupling needs to be reworked -- the logic
         # TODO: here is convoluted and not modular enough.
-        if isinstance(url_or_fetch_strategy, string_types):
+        if isinstance(url_or_fetch_strategy, str):
             self.fetcher = fs.from_url_scheme(url_or_fetch_strategy)
         elif isinstance(url_or_fetch_strategy, fs.FetchStrategy):
             self.fetcher = url_or_fetch_strategy
@@ -673,7 +671,7 @@ class ResourceStage(InputStage):
             else:
                 raise
 
-        for key, value in iteritems(placement):
+        for key, value in placement.items():
             destination_path = os.path.join(target_path, value)
             source_path = os.path.join(self.source_path, key)
 

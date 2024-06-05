@@ -6,20 +6,30 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class SetEnvVarMod(BasicModifier):
     """Define a modifier with only an environment variable modification using
     the set method"""
+
     name = "set-env-var-mod"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
 
-    modifier_variable('mask_test', default='0x0', description='Test mask var',
-                      modes=['test'], expandable=False)
+    modifier_variable(
+        "mask_test",
+        default="0x0",
+        description="Test mask var",
+        modes=["test"],
+        expandable=False,
+    )
 
-    env_var_modification('test_var', modification='test_val', method='set', mode='test')
-    env_var_modification('mask_env_var', modification='{mask_test}', method='set', mode='test')
+    env_var_modification(
+        "test_var", modification="test_val", method="set", mode="test"
+    )
+    env_var_modification(
+        "mask_env_var", modification="{mask_test}", method="set", mode="test"
+    )

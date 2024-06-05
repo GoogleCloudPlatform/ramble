@@ -6,16 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class UnsetEnvVarMod(BasicModifier):
     """Define a modifier with only an environment variable modification using
     the unset method"""
+
     name = "unset-env-var-mod"
 
-    tags('test')
+    tags("test")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")
 
-    env_var_modification('test_var', method='unset', mode='test')
+    env_var_modification("test_var", method="unset", mode="test")

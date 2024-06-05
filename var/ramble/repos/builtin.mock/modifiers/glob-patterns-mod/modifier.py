@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class GlobPatternsMod(BasicModifier):
@@ -14,17 +14,24 @@ class GlobPatternsMod(BasicModifier):
 
     This modifier tests globbing in the modifier language.
     """
+
     name = "glob-patterns-mod"
 
-    tags('test')
+    tags("test")
 
-    mode('base', description='This is a base mode with no modifications')
-    mode('test-glob', description='This test mode turns on mods using globbing')
-    default_mode('base')
+    mode("base", description="This is a base mode with no modifications")
+    mode(
+        "test-glob", description="This test mode turns on mods using globbing"
+    )
+    default_mode("base")
 
-    variable_modification('var_mod', '{mod_var}', modes=['test*'])
+    variable_modification("var_mod", "{mod_var}", modes=["test*"])
 
-    env_var_modification('env_var_mod', 'modded', modes=['test*'])
+    env_var_modification("env_var_mod", "modded", modes=["test*"])
 
-    modifier_variable('mod_var', default='var_mod_modified',
-                      description='This is a modifier variable', modes=['test*'])
+    modifier_variable(
+        "mod_var",
+        default="var_mod_modified",
+        description="This is a modifier variable",
+        modes=["test*"],
+    )

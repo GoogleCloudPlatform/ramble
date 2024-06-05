@@ -6,15 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class Maintained2(BasicModifier):
     """Define a maintained modifier"""
+
     name = "maintained-2"
 
-    tags('test')
+    tags("test")
 
-    maintainers('maintainer-1')
+    maintainers("maintainer-1")
 
-    mode('test', description='This is a test mode')
+    mode("test", description="This is a test mode")

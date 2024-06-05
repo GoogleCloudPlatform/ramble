@@ -6,17 +6,18 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class MultipleModesWithDefault(BasicModifier):
     """Define modifier with multiple modes and a default mode"""
+
     name = "multiple-modes-with-default"
 
-    tags('test')
+    tags("test")
 
-    mode('test_mode1', description='This is the first test mode')
+    mode("test_mode1", description="This is the first test mode")
 
-    mode('test_mode2', description='This is the second test mode')
+    mode("test_mode2", description="This is the second test mode")
 
-    default_mode('test_mode2')
+    default_mode("test_mode2")

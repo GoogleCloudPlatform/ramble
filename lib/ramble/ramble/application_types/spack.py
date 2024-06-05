@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import os
-import six
 import shutil
 
 import llnl.util.filesystem as fs
@@ -474,7 +473,7 @@ class SpackApplication(ApplicationBase):
         self.spack_runner.activate()
 
         for var in variables:
-            if isinstance(variables[var], six.string_types):
+            if isinstance(variables[var], str):
                 variables[var] = variables[var].replace(
                     "\n".join(self.spack_runner.generate_source_command()), "spack_source"
                 )

@@ -7,8 +7,8 @@
 # except according to those terms.
 """Define base classes for modifier definitions"""
 
+import io
 import re
-import six
 import textwrap
 import fnmatch
 from typing import List
@@ -230,7 +230,7 @@ class ModifierBase(object, metaclass=ModifierMeta):
 
         doc = re.sub(r"\s+", " ", self.__doc__)
         lines = textwrap.wrap(doc, 72)
-        results = six.StringIO()
+        results = io.StringIO()
         for line in lines:
             results.write((" " * indent) + line + "\n")
         return results.getvalue()
