@@ -11,7 +11,7 @@ import spack.util.executable
 
 
 class SpackStack(SpackApplication):
-    """Application definition for creating a spack software stack
+    '''Application definition for creating a spack software stack
 
     This application definition is used solely to create spack software stacks.
 
@@ -23,7 +23,9 @@ class SpackStack(SpackApplication):
     accelerate package installation.
 
     The experiments are considered successful if the installation completed.
-    """
+
+    This application should be used with the `spack-lightweight` package manager.
+    '''
 
     name = "spack-stack"
 
