@@ -679,7 +679,9 @@ def workspace_info(args):
                     app_inst = experiment_set.get_experiment(exp_name)
                     if app_inst.package_manager is not None:
                         software_environments.render_environment(
-                            app_inst.expander.expand_var("{env_name}"), app_inst.expander
+                            app_inst.expander.expand_var("{env_name}"),
+                            app_inst.expander,
+                            app_inst.package_manager,
                         )
 
                     if print_header:

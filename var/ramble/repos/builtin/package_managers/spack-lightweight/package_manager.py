@@ -76,7 +76,7 @@ class SpackLightweight(PackageManagerBase):
 
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
-                app_context, self.app_inst.expander
+                app_context, self.app_inst.expander, self
             )
 
             for compiler_spec in software_envs.compiler_specs_for_environment(
@@ -150,7 +150,7 @@ class SpackLightweight(PackageManagerBase):
             )
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
-                env_context, self.app_inst.expander
+                env_context, self.app_inst.expander, self
             )
             if isinstance(software_env, ExternalEnvironment):
                 self.runner.copy_from_external_env(software_env.external_env)

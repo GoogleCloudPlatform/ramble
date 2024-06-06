@@ -28,6 +28,15 @@ def _get_spec(pkg_info: dict, spec_name: str, prefix: str, default=None) -> str:
     return pkg_info.get(f"{prefix}_{spec_name}", pkg_info.get(spec_name, default))
 
 
+def _is_dict_empty(rendered: defaultdict):
+    if not rendered:
+        return True
+    for k in rendered:
+        if rendered[k]:
+            return False
+    return True
+
+
 class SoftwarePackage(object):
     """Class to represent a single software package"""
 
@@ -47,11 +56,11 @@ class SoftwarePackage(object):
         self.pkg_info = pkg_info
         self._package_type = "Base"
 
-    def spec_str(self, all_packages: dict = {}, compiler=False):
+    def spec_str(self, all_packages: dict | None = None, compiler=False):
         """Return a spec string for this software package
 
         Args:
-            all_packages (dict): Dictionary of all package definitions.
+            all_packages (optional dict): Dictionary of all package definitions.
                                  Used to look up compiler packages.
             compiler (boolean): True of this package is used as a compiler for
                                 another package. False if this is just a primary package.
@@ -78,11 +87,6 @@ class SoftwarePackage(object):
         indentation = " " * indent
         color = rucolor.level_func(color_level)
         out_str = color(f"{indentation}{self._package_type} package: {self.name}\n")
-        out_str += f'{indentation}    Spec: {self.spec.replace("@", "@@")}\n'
-        if self.compiler:
-            out_str += f"{indentation}    Compiler: {self.compiler}\n"
-        if self.compiler_spec:
-            out_str += f'{indentation}    Compiler Spec: {self.compiler_spec.replace("@", "@@")}\n'
         return out_str
 
     def __str__(self):
@@ -144,7 +148,7 @@ class RenderedPackage(SoftwarePackage):
         self.compiler_spec = compiler_spec
         self._package_type = "Rendered"
 
-    def spec_str(self, all_packages: dict = {}, compiler=False):
+    def spec_str(self, all_packages: dict | None = None, compiler=False):
         """Return a spec string for this software package
 
         Args:
@@ -158,10 +162,12 @@ class RenderedPackage(SoftwarePackage):
         Returns:
             (str): String representation of the spec for this package definition
         """
-
+        if not all_packages:
+            all_packages = defaultdict(dict)
         out_str = ""
+        pm_name = self.package_manager.name
         # TODO: This should probably be something provided by the package manager
-        if self.package_manager == "spack":
+        if pm_name.startswith("spack"):
             if compiler and self.compiler_spec:
                 out_str = self.compiler_spec
             else:
@@ -170,7 +176,6 @@ class RenderedPackage(SoftwarePackage):
             if compiler:
                 return out_str
 
-            pm_name = self.package_manager.name
             if self.compiler in all_packages[pm_name]:
                 out_str += " %" + all_packages[pm_name][self.compiler].spec_str(
                     all_packages, compiler=True
@@ -182,6 +187,26 @@ class RenderedPackage(SoftwarePackage):
                 f"Package {self.name} uses an unknown " f"package manager {self.package_manager}"
             )
 
+        return out_str
+
+    def info(self, indent: int = 0, verbosity: int = 0, color_level: int = 0):
+        """String representation of package information
+
+        Args:
+            indent (int): Number of spaces to indent lines with
+            verbosity (int): Verbosity level
+
+        Returns:
+            (str): String representation of this package
+        """
+
+        indentation = " " * indent
+        out_str = super().info(indent, verbosity, color_level)
+        out_str += f'{indentation}    Spec: {self.spec.replace("@", "@@")}\n'
+        if self.compiler:
+            out_str += f"{indentation}    Compiler: {self.compiler}\n"
+        if self.compiler_spec:
+            out_str += f'{indentation}    Compiler Spec: {self.compiler_spec.replace("@", "@@")}\n'
         return out_str
 
     def __eq__(self, other):
@@ -220,8 +245,8 @@ class TemplatePackage(SoftwarePackage):
 
         out_str = super().info(indent, verbosity, color_level)
         new_indent = indent + 4
-        for pm, pkgs in self._rendered_packages.items():
-            for pkg in pkgs:
+        for pkgs in self._rendered_packages.values():
+            for pkg in pkgs.values():
                 out_str += pkg.info(
                     indent=new_indent, verbosity=verbosity, color_level=color_level + 1
                 )
@@ -359,6 +384,10 @@ class ExternalEnvironment(SoftwareEnvironment):
         super().__init__(name)
         self.external_env = name_or_path
 
+    @property
+    def package_manager_name(self):
+        return "spack"
+
 
 class RenderedEnvironment(SoftwareEnvironment):
     """Class representing an already rendered software environment"""
@@ -367,6 +396,10 @@ class RenderedEnvironment(SoftwareEnvironment):
         """Constructor for rendered software environment"""
         super().__init__(name)
         self.package_manager = package_manager
+
+    @property
+    def package_manager_name(self):
+        return self.package_manager.name
 
     def __eq__(self, other):
         return self.package_manager.name == other.package_manager.name and super().__eq__(other)
@@ -401,8 +434,8 @@ class TemplateEnvironment(SoftwareEnvironment):
         """
         out_str = super().info(indent, verbosity, color_level=color_level)
         new_indent = indent + 4
-        for pm, envs in self._rendered_environments.items():
-            for env in envs:
+        for envs in self._rendered_environments.values():
+            for env in envs.values():
                 out_str += env.info(new_indent, verbosity, color_level=color_level + 1)
         return out_str
 
@@ -533,12 +566,7 @@ class SoftwareEnvironments(object):
             (TemplateEnvironment) Each unused template environment in this group
         """
         for env in self._environment_templates.values():
-            found = False
-            for _, pm_rendered_envs in env._rendered_environments:
-                if env in pm_rendered_envs:
-                    found = True
-                    break
-            if not found:
+            if _is_dict_empty(env._rendered_environments):
                 yield env
 
     def unused_packages(self):
@@ -548,12 +576,7 @@ class SoftwareEnvironments(object):
             (TemplatePackage) Each unused template package in this group
         """
         for pkg in self._package_templates.values():
-            found = False
-            for _, pm_rendered_pkgs in pkg._rendered_packages:
-                if pkg in pm_rendered_pkgs:
-                    found = True
-                    break
-            if not found:
+            if _is_dict_empty(pkg._rendered_packages):
                 yield pkg
 
     def __str__(self):
@@ -599,7 +622,7 @@ class SoftwareEnvironments(object):
             expander (Expander): Expander object to use when constructing
                                  compiler package names
         """
-        pm_name = environment.package_manager.name
+        pm_name = environment.package_manager_name
         for pkg in environment._packages:
             if pkg.compiler:
                 cur_compiler = pkg.compiler
@@ -650,7 +673,7 @@ class SoftwareEnvironments(object):
         """
 
         root_compilers = []
-        pm_name = environment.package_manager.name
+        pm_name = environment.package_manager_name
         for pkg in environment._packages:
             if pkg.compiler:
                 if pkg.compiler not in self._rendered_packages[pm_name]:
