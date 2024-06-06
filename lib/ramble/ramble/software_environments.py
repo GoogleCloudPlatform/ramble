@@ -164,28 +164,7 @@ class RenderedPackage(SoftwarePackage):
         """
         if not all_packages:
             all_packages = defaultdict(dict)
-        out_str = ""
-        pm_name = self.package_manager.name
-        # TODO: This should probably be something provided by the package manager
-        if pm_name.startswith("spack"):
-            if compiler and self.compiler_spec:
-                out_str = self.compiler_spec
-            else:
-                out_str = self.spec
-
-            if compiler:
-                return out_str
-
-            if self.compiler in all_packages[pm_name]:
-                out_str += " %" + all_packages[pm_name][self.compiler].spec_str(
-                    all_packages, compiler=True
-                )
-            elif self.compiler:
-                out_str += f" (built with {self.compiler})"
-        else:
-            raise RambleSoftwareEnvironmentError(
-                f"Package {self.name} uses an unknown " f"package manager {self.package_manager}"
-            )
+        out_str = self.package_manager.get_spec_str(self, all_packages, compiler)
 
         return out_str
 

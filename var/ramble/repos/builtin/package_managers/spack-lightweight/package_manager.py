@@ -449,6 +449,30 @@ class SpackLightweight(PackageManagerBase):
     def spack_deactivate(self):
         return self.runner.generate_deactivate_command()
 
+    def get_spec_str(self, pkg, all_pkgs, compiler):
+        """Return a spec string for the given pkg
+
+        Args:
+            pkg (RenderedPackage): Reference to a rendered package
+            all_pkgs (dict): All related packages
+            compiler (boolean): True if this pkg is used as a compiler
+        """
+        if compiler and pkg.compiler_spec:
+            out_str = pkg.compiler_spec
+        else:
+            out_str = pkg.spec
+
+        if compiler:
+            return out_str
+
+        if pkg.compiler in all_pkgs[self.name]:
+            out_str += " %" + all_pkgs[self.name][pkg.compiler].spec_str(
+                all_pkgs, compiler=True
+            )
+        elif pkg.compiler:
+            out_str += f" (built with {pkg.compiler})"
+        return out_str
+
 
 spack_namespace = "spack"
 

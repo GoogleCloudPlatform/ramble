@@ -73,6 +73,16 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         return new_copy
 
+    def get_spec_str(self, pkg, all_pkgs, compiler):
+        """Return a spec string for the given pkg
+
+        Args:
+            pkg (RenderedPackage): Reference to a rendered package
+            all_pkgs (dict): All related packages
+            compiler (boolean): True if this pkg is used as a compiler
+        """
+        return ""
+
     def _long_print(self):
         out_str = []
         out_str.append(rucolor.section_title("Package Manager: ") + f"{self.name}\n")
