@@ -373,6 +373,8 @@ class OpenfoamOrg(SpackApplication):
         Expander.expansion_str("experiment_run_dir"), "log."
     )
 
+    config_file = "{experiment_run_dir}/openfoam_config"
+
     figure_of_merit(
         "Number of cells",
         log_file=(log_prefix + "snappyHexMesh"),
@@ -382,7 +384,7 @@ class OpenfoamOrg(SpackApplication):
     )
 
     figure_of_merit(
-        "snappyHexMesh Time ({n_ranks_hex} ranks)",
+        "snappyHexMesh Time",
         log_file=(log_prefix + "snappyHexMesh"),
         fom_regex=r"Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*",
         group_name="mesh_time",
@@ -390,7 +392,15 @@ class OpenfoamOrg(SpackApplication):
     )
 
     figure_of_merit(
-        "simpleFoam Time ({n_ranks} ranks)",
+        "snappyHexMesh Ranks",
+        log_file=config_file,
+        fom_regex=r"snappyHexMesh ranks: (?P<ranks>[0-9]+)",
+        group_name="ranks",
+        units="",
+    )
+
+    figure_of_merit(
+        "simpleFoam Time",
         log_file=(log_prefix + "simpleFoam"),
         fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
         group_name="foam_time",
@@ -398,11 +408,35 @@ class OpenfoamOrg(SpackApplication):
     )
 
     figure_of_merit(
-        "potentialFoam Time ({n_ranks} ranks)",
+        "simpleFoam Time",
+        log_file=(log_prefix + "simpleFoam"),
+        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
+        group_name="foam_time",
+        units="s",
+    )
+
+    figure_of_merit(
+        "simpleFoam Ranks",
+        log_file=config_file,
+        fom_regex=r"simpleFoam ranks: (?P<ranks>[0-9]+)",
+        group_name="ranks",
+        units="",
+    )
+
+    figure_of_merit(
+        "potentialFoam Time",
         log_file=(log_prefix + "potentialFoam"),
         fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
         group_name="foam_time",
         units="s",
+    )
+
+    figure_of_merit(
+        "potentialFoam Ranks",
+        log_file=config_file,
+        fom_regex=r"potentialFoam ranks: (?P<ranks>[0-9]+)",
+        group_name="ranks",
+        units="",
     )
 
     success_criteria(
@@ -418,6 +452,16 @@ class OpenfoamOrg(SpackApplication):
         match="Finalising parallel run",
         file="{experiment_run_dir}/log.simpleFoam",
     )
+
+    def _prepare_analysis(self, workspace, app_inst=None):
+        conf_path = self.expander.expand_var(self.config_file)
+
+        with open(conf_path, "w+") as f:
+            hex_ranks = self.expander.expand_var("{n_ranks_hex}")
+            simple_ranks = self.expander.expand_var("{n_ranks}")
+            f.write(f"snappyHexMesh ranks: {hex_ranks}\n")
+            f.write(f"simpleFoam ranks: {simple_ranks}\n")
+            f.write(f"potentialFoam ranks: {simple_ranks}\n")
 
     def _define_commands(self, exec_graph):
         export_prefix = self.expander.expand_var_name("export_prefix")
