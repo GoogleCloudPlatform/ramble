@@ -1453,9 +1453,10 @@ class ReposFinder(object):
         return None
 
 
-# Add the finder to sys.meta_path
-REPOS_FINDER = ReposFinder()
-sys.meta_path.append(REPOS_FINDER)
+# Add the finders to sys.meta_path
+for obj in ObjectTypes:
+    obj_finder = ReposFinder(object_type=obj)
+    sys.meta_path.append(obj_finder)
 
 
 class RepoError(ramble.error.RambleError):
