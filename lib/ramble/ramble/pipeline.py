@@ -150,12 +150,15 @@ class Pipeline(object):
                 or self.suppress_per_experiment_prints
             )
             if not disable_progress:
-                progress = tqdm.tqdm(
-                    total=len(phase_list),
-                    leave=True,
-                    ascii=" >=",
-                    bar_format="{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}",
-                )
+                try:
+                    progress = tqdm.tqdm(
+                        total=len(phase_list),
+                        leave=True,
+                        ascii=" >=",
+                        bar_format="{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}",
+                    )
+                except AttributeError:
+                    logger.die("tdqm.tdqm is not found. Ensure requirements.txt are installed.")
             for phase_idx, phase in enumerate(phase_list):
                 if not disable_progress:
                     progress.set_description(

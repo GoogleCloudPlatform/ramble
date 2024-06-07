@@ -103,7 +103,14 @@ class AttributeGraph(object):
             node (GraphNode): Each node in the graph
         """
         if not self._prepared:
-            sorter = graphlib.TopologicalSorter(self.adj_list)
+            try:
+                sorter = graphlib.TopologicalSorter(self.adj_list)
+            except AttributeError:
+                logger.die(
+                    "graphlib.TopologicalSorter is not found."
+                    "Ensure requirements.txt are installed (including backports, where needed)."
+                )
+
             try:
                 self._sorted = tuple(sorter.static_order())
             except graphlib.CycleError as e:
