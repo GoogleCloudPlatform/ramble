@@ -22,7 +22,6 @@ import ramble.paths
 import ramble.util.path
 import ramble.error
 import ramble.repository
-import ramble.spack_runner
 import ramble.experiment_set
 import ramble.context
 import ramble.util.web
@@ -485,20 +484,6 @@ class Workspace(object):
             }
         )
 
-        from ramble.spack_runner import SpackRunner, RunnerError
-
-        try:
-            runner = SpackRunner()
-            spack_version = runner.get_version()
-            self.hash_inventory["versions"].append(
-                {
-                    "name": "spack",
-                    "version": spack_version,
-                    "digest": ramble.util.hashing.hash_string(spack_version),
-                }
-            )
-        except RunnerError:
-            pass
         self.workspace_hash = None
 
         self.specs = []

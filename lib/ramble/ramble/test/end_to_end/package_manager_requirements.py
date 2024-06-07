@@ -14,7 +14,12 @@ import ramble.workspace
 import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
-import ramble.spack_runner
+
+from ramble.pkg_man.builtin.spack_lightweight import (
+    SpackRunner,
+    RunnerError,
+    ValidationFailedError,
+)
 
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -49,8 +54,8 @@ ramble:
 """
 
     try:
-        ramble.spack_runner.SpackRunner()
-    except ramble.spack_runner.RunnerError as e:
+        SpackRunner()
+    except RunnerError as e:
         pytest.skip(e)
 
     workspace_name = "test_package_manager_requirements_zlib"
@@ -102,8 +107,8 @@ ramble:
 """
 
     try:
-        ramble.spack_runner.SpackRunner()
-    except ramble.spack_runner.RunnerError as e:
+        SpackRunner()
+    except RunnerError as e:
         pytest.skip(e)
 
     workspace_name = "test_package_manager_requirements_error"
@@ -116,7 +121,7 @@ ramble:
             f.write(test_config)
         ws._re_read()
 
-        with pytest.raises(ramble.spack_runner.ValidationFailedError) as e:
+        with pytest.raises(ValidationFailedError) as e:
             workspace("setup", global_args=["-w", workspace_name])
 
             assert 'Validation of: "spack list not-a-package" failed' in e

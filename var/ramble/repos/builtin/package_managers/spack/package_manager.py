@@ -10,9 +10,10 @@ import deprecation
 
 from ramble.pkgmankit import *  # noqa: F403
 
-import ramble.spack_runner
-
-from ramble.pkg_man.builtin.spack_lightweight import SpackLightweight
+from ramble.pkg_man.builtin.spack_lightweight import (
+    SpackLightweight,
+    RunnerError,
+)
 
 
 class Spack(SpackLightweight):
@@ -52,7 +53,7 @@ class Spack(SpackLightweight):
 
             self.runner.activate()
             self.runner.install()
-        except ramble.spack_runner.RunnerError as e:
+        except RunnerError as e:
             logger.die(e)
 
     register_phase(
@@ -140,7 +141,7 @@ class Spack(SpackLightweight):
                         + "Skipping extraction from spack"
                     )
 
-        except ramble.spack_runner.RunnerError as e:
+        except RunnerError as e:
             logger.die(e)
 
     @deprecation.deprecated(
@@ -175,9 +176,10 @@ class Spack(SpackLightweight):
         for pkg_spec in software_environments.package_specs_for_environment(
             software_environment
         ):
-            spack_pkg_name, pkg_path = cache.get(pkg_spec)
-            if spack_pkg_name in self.app_inst.expander._used_variables:
-                self.__print_deprecated_warning(spack_pkg_name)
+            if pkg_spec in cache:
+                spack_pkg_name, pkg_path = cache.get(pkg_spec)
+                if spack_pkg_name in self.app_inst.expander._used_variables:
+                    self.__print_deprecated_warning(spack_pkg_name)
 
     register_builtin(
         "spack_activate",

@@ -8,7 +8,6 @@
 
 
 from ramble.application import ApplicationBase
-import ramble.spack_runner
 import ramble.keywords
 
 header_color = "@*b"
@@ -45,5 +44,4 @@ class SpackApplication(ApplicationBase):
 
         self.keywords = ramble.keywords.keywords
 
-        self.spack_runner = ramble.spack_runner.SpackRunner()
         self.application_class = "SpackApplication"

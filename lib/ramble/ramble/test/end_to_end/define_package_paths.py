@@ -113,7 +113,7 @@ ramble:
           experiments:
             test1:
               variables:
-                gromacs: '/test/path'
+                gromacs_path: '/test/path'
                 n_nodes: '1'
             test2:
               variables:

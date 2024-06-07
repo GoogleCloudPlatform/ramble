@@ -139,6 +139,13 @@ class SpackStack(SpackApplication):
         spack_file = self.expander.expand_var("{env_path}/spack.yaml")
         spec_list = []
 
+        # Only evaluate if this is a spack package manager
+        if (
+            self.package_manager is None
+            or "spack" not in self.package_manager.name
+        ):
+            return True
+
         if not os.path.isfile(spack_file):
             return False
 
@@ -150,13 +157,13 @@ class SpackStack(SpackApplication):
         for spec in spack_data["spack"]["specs"]:
             spec_list.append(spec)
 
-        self.spack_runner.set_env(self.expander.env_path)
-        self.spack_runner.activate()
+        self.package_manager.runner.set_env(self.expander.env_path)
+        self.package_manager.runner.activate()
 
         # Spack find errors if a spec is provided that is not installed.
         for spec in spec_list:
             try:
-                self.spack_runner.spack("find", spec, output=str)
+                self.package_manager.runner.spack("find", spec, output=str)
             except spack.util.executable.ProcessError:
                 return False
         return True
