@@ -369,26 +369,13 @@
 <span class="sd">        Add commands to load a package to the executable</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;bash&quot;</span><span class="p">:</span>
-            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-                <span class="s2">&quot;\A.*export &quot;</span>  <span class="c1"># noqa: W605</span>
-                <span class="o">+</span> <span class="s2">&quot;(?P&lt;var&gt;[\S^=]+)=&quot;</span>  <span class="c1"># noqa: W605</span>
-                <span class="o">+</span> <span class="s2">&quot;(?P&lt;val&gt;[\S]+);\Z&quot;</span>  <span class="c1"># noqa: W605</span>
-            <span class="p">)</span>
-
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\A.*export (?P&lt;var&gt;[\S^=]+)=(?P&lt;val&gt;[\S]+);\Z&quot;</span><span class="p">)</span>
             <span class="n">shell_flag</span> <span class="o">=</span> <span class="s2">&quot;--sh&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;csh&quot;</span><span class="p">:</span>
-            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-                <span class="s2">&quot;\A.*setenv &quot;</span>  <span class="c1"># noqa: W605</span>
-                <span class="o">+</span> <span class="s2">&quot;(?P&lt;var&gt;[\S^=]+) &quot;</span>  <span class="c1"># noqa: W605</span>
-                <span class="o">+</span> <span class="s2">&quot;(?P&lt;val&gt;[\S]+);\Z&quot;</span>  <span class="c1"># noqa: W605</span>
-            <span class="p">)</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\A.*setenv (?P&lt;var&gt;[\S^=]+) (?P&lt;val&gt;[\S]+);\Z&quot;</span><span class="p">)</span>
             <span class="n">shell_flag</span> <span class="o">=</span> <span class="s2">&quot;--csh&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;fish&quot;</span><span class="p">:</span>
-            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
-                <span class="s2">&quot;\A.*set -gx &quot;</span>  <span class="c1"># noqa: W605</span>
-                <span class="o">+</span> <span class="s2">&quot;(?P&lt;var&gt;[\S^=]+) &quot;</span>  <span class="c1"># noqa: W605</span>
-                <span class="o">+</span> <span class="s2">&quot;(?P&lt;val&gt;[\S]+);\Z&quot;</span>  <span class="c1"># noqa: W605</span>
-            <span class="p">)</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\A.*set -gx (?P&lt;var&gt;[\S^=]+) (?P&lt;val&gt;[\S]+);\Z&quot;</span><span class="p">)</span>
             <span class="n">shell_flag</span> <span class="o">=</span> <span class="s2">&quot;--fish&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">RunnerError</span><span class="p">(</span><span class="s2">&quot;Shell </span><span class="si">%s</span><span class="s2"> not supported&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">shell</span><span class="p">)</span>
