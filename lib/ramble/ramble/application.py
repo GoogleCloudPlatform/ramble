@@ -1803,6 +1803,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         ]
 
         logger.debug(f" Number of modifiers are: {len(self._modifier_instances)}")
+        if self._modifier_instances:
+            criteria_list.flush_scope("modifier_definition")
         for mod in self._modifier_instances:
             success_lists.append(("modifier_definition", mod.success_criteria))
 

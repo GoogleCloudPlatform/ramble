@@ -79,3 +79,58 @@ def test_success_modifier(
         with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
             data = f.read()
             assert result in data
+
+
+def test_success_criteria_with_multiple_experiments(mock_applications, mock_modifiers):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: ''
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '1'
+  applications:
+    basic:
+      workloads:
+        working_wl:
+          experiments:
+            test1:
+              variables:
+                n_nodes: '1'
+            test2:
+              variables:
+                n_nodes: '1'
+  spack:
+    packages: {}
+    environments: {}
+  modifiers:
+  - name: success-criteria
+"""
+    workspace_name = "test-modifier-success-criteria"
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+
+    ws._re_read()
+
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+    exp1_out = os.path.join(ws.experiment_dir, "basic", "working_wl", "test1", "test1.out")
+    with open(exp1_out, "w+") as f:
+        f.write("0.25 seconds\nExperiment status: SUCCESS\n")
+    exp2_out = os.path.join(ws.experiment_dir, "basic", "working_wl", "test2", "test2.out")
+    with open(exp2_out, "w+") as f:
+        f.write("0.35 seconds\nExperiment status: SUCCESS\n")
+
+    workspace("analyze", global_args=["-w", workspace_name])
+    result_file = os.path.join(ws.root, "results.latest.txt")
+
+    with open(result_file, "r") as f:
+        content = f.read()
+        assert "FAILED" not in content
+        assert "default (null) context figures of merit" in content
+        assert "test_fom = 0.25 s" in content
+        assert "test_fom = 0.35 s" in content
