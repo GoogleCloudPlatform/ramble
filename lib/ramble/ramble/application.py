@@ -136,6 +136,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             "inputs": [],
             "software": [],
             "templates": [],
+            "package_manager": [],
         }
         self.experiment_hash = None
 
@@ -1417,6 +1418,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             "digest": ramble.util.hashing.hash_string(input_conf["fetcher"].url),
                         }
                     )
+
+        if self.package_manager is not None:
+            self.package_manager.populate_inventory(workspace, force_compute, require_exist)
 
         self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
 

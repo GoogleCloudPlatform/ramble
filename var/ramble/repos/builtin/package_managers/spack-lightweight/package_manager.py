@@ -348,14 +348,14 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError:
             pkgman_version = "unknown"
 
-        self.hash_inventory["package_manager"].append(
+        self.app_inst.hash_inventory["package_manager"].append(
             {
                 "name": self.name,
-                version: pkgman_version,
-                digest: ramble.util.hashing.hash_string(pkgman_version),
+                "version": pkgman_version,
+                "digest": ramble.util.hashing.hash_string(pkgman_version),
             }
         )
-        self.hash_inventory["software"].append(
+        self.app_inst.hash_inventory["software"].append(
             {
                 "name": self.runner.env_path.replace(
                     workspace.root + os.path.sep, ""
@@ -364,8 +364,6 @@ class SpackLightweight(PackageManagerBase):
             }
         )
         self.runner.deactivate()
-
-        super().populate_inventory(workspace, force_compute, require_exist)
 
     def _clean_hash_variables(self, workspace, variables):
         """Perform spack specific cleanup of variables before hashing"""
