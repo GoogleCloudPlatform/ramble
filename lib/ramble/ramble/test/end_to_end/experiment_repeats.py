@@ -27,6 +27,8 @@ workspace = RambleCommand("workspace")
 def test_gromacs_repeats(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   config:
     n_repeats: '2'
   variables:

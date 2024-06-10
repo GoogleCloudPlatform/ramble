@@ -6,18 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.cmd.common.info
-import ramble.repository
+import ramble.language.language_helpers
+import ramble.language.language_base
+import ramble.language.shared_language
 
 
-description = "get detailed information on a particular object"
-section = "basic"
-level = "short"
+class PackageManagerMeta(ramble.language.shared_language.SharedMeta):
+    _directive_names = set()
+    _directives_to_be_executed = []
 
 
-def setup_parser(subparser):
-    ramble.cmd.common.info.setup_info_parser(subparser)
-
-
-def info(parser, args):
-    ramble.cmd.common.info.print_info(args)
+package_manager_directive = PackageManagerMeta.directive

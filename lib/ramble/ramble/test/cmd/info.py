@@ -70,8 +70,6 @@ def test_spack_info_software(app_query):
         'Pipeline "setup" Phases:',
         'Pipeline "analyze" Phases:',
         "Tags:",
-        "pkg_spec =",
-        "compiler =",
     )
 
     out = info(app_query)
@@ -93,7 +91,7 @@ def test_mock_spack_info_software(mock_applications, app_query):
         'Pipeline "analyze" Phases:',
         "Tags:",
         "Package Manager Configs:",
-        "pkg_spec =",
+        "Software Specs:",
     )
 
     out = info(app_query)

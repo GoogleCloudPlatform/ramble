@@ -26,7 +26,6 @@ from ramble.util.logger import logger
 
 class ModifierBase(object, metaclass=ModifierMeta):
     name = None
-    uses_spack = False
     _builtin_name = "modifier_builtin::{obj_name}::{name}"
     _mod_prefix_builtin = r"modifier_builtin::"
     _language_classes = [ModifierMeta, SharedMeta]

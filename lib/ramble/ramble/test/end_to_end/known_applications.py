@@ -8,6 +8,7 @@
 
 import os
 import re
+import deprecation
 
 import pytest
 
@@ -16,6 +17,7 @@ import ramble.pipeline
 import ramble.workspace
 import ramble.config
 import ramble.software_environments
+import ramble.repository
 from ramble.main import RambleCommand
 
 
@@ -26,7 +28,8 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_known_applications(application, capsys):
+@deprecation.fail_if_not_removed
+def test_known_applications(application, package_manager, capsys):
     info_cmd = RambleCommand("info")
 
     setup_type = ramble.pipeline.pipelines.setup
@@ -71,10 +74,18 @@ def test_known_applications(application, capsys):
                 n_nodes: '1'
                 processes_per_node: '1'\n"""
                 )
+                if package_manager == "None":
+                    app_inst = ramble.repository.get(application)
+                    for pkg in app_inst.required_packages.keys():
+                        f.write(f"                {pkg}_path: '/not/real/path'\n")
             f.write(
                 """  software:
     packages: {}
     environments: {}\n"""
+            )
+            f.write(
+                f"""  variants:
+    package_manager: {package_manager}\n"""
             )
 
         ws._re_read()

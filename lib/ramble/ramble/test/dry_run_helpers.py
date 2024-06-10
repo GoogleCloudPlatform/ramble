@@ -32,14 +32,18 @@ def dry_run_config(
     ramble_dict["ramble"] = syaml.syaml_dict()
     test_dict = ramble_dict["ramble"]
 
+    test_dict["variants"] = syaml.syaml_dict()
     test_dict["variables"] = syaml.syaml_dict()
     test_dict["applications"] = syaml.syaml_dict()
     test_dict["applications"][app_name] = syaml.syaml_dict()
-    test_dict["spack"] = syaml.syaml_dict()
+    test_dict["software"] = syaml.syaml_dict()
 
-    spack_dict = test_dict["spack"]
-    spack_dict["packages"] = syaml.syaml_dict()
-    spack_dict["environments"] = syaml.syaml_dict()
+    variants_dict = test_dict["variants"]
+    variants_dict["package_manager"] = "spack"
+
+    software_dict = test_dict["software"]
+    software_dict["packages"] = syaml.syaml_dict()
+    software_dict["environments"] = syaml.syaml_dict()
 
     ws_var_dict = test_dict["variables"]
     ws_var_dict["mpi_command"] = "mpirun -n {n_ranks} -ppn {processes_per_node}"

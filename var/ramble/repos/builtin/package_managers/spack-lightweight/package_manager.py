@@ -5,17 +5,14 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-"""
-Spack environments house software stacks.
 
-This module contains classes and methods that will help manage a spack
-environment by calling an externally available spack.
-"""
+from ramble.pkgmankit import *  # noqa: F403
 
 import os
 import re
 import shutil
 import shlex
+import fnmatch
 
 import llnl.util.filesystem as fs
 from spack.util.executable import CommandNotFoundError, ProcessError
@@ -26,6 +23,432 @@ import ramble.config
 import ramble.error
 import ramble.util.hashing
 from ramble.util.logger import logger
+
+
+class SpackLightweight(PackageManagerBase):
+    """Lightweight version of Spack package manager class definition
+
+    This implements most of the logic for the spack package manager. The
+    primary difference is the software_install and define_package_paths are not
+    executed during setup, as they should be deferred to installation time.
+
+    The installation portion is not defined in this class, as applications that
+    require this should add this on separately.
+    """
+
+    name = "spack-lightweight"
+
+    def __init__(self, file_path):
+        super().__init__(file_path)
+
+        self.runner = SpackRunner()
+
+    register_phase(
+        "software_install_requested_compilers",
+        pipeline="setup",
+        run_after=["software_create_env"],
+    )
+
+    def _software_install_requested_compilers(self, workspace, app_inst=None):
+        """Install compilers an application uses"""
+        # See if we cached this already, and if so return
+        env_path = self.app_inst.expander.env_path
+        if not env_path:
+            raise ApplicationError("Ramble env_path is set to None.")
+        logger.msg("Installing compilers")
+
+        cache_tupl = ("spack-compilers", env_path)
+        if workspace.check_cache(cache_tupl):
+            logger.debug("{} already in cache.".format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.runner.set_compiler_config_dir(
+                workspace.auxiliary_software_dir
+            )
+            self.runner.set_dry_run(workspace.dry_run)
+
+            app_context = self.app_inst.expander.expand_var_name(
+                self.keywords.env_name
+            )
+
+            software_envs = workspace.software_environments
+            software_env = software_envs.render_environment(
+                app_context, self.app_inst.expander
+            )
+
+            for compiler_spec in software_envs.compiler_specs_for_environment(
+                software_env
+            ):
+                logger.debug(f"Installing compiler: {compiler_spec}")
+                self.runner.install_compiler(compiler_spec)
+
+        except RunnerError as e:
+            logger.die(e)
+
+    register_phase("software_create_env", pipeline="mirror")
+    register_phase("software_create_env", pipeline="setup")
+    register_phase("software_create_env", pipeline="pushdeployment")
+
+    def _software_create_env(self, workspace, app_inst=None):
+        """Create the spack environment for this experiment
+
+        Extract all specs this experiment uses, and write the spack environment
+        file for it.
+        """
+
+        logger.msg("Creating Spack environment")
+
+        # See if we cached this already, and if so return
+        env_path = self.app_inst.expander.env_path
+        if not env_path:
+            raise ApplicationError("Ramble env_path is set to None.")
+
+        cache_tupl = ("spack-env", env_path)
+        if workspace.check_cache(cache_tupl):
+            logger.debug("{} already in cache.".format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        package_manager_config_dicts = [self.app_inst.package_manager_configs]
+        for mod_inst in self.app_inst._modifier_instances:
+            package_manager_config_dicts.append(
+                mod_inst.package_manager_configs
+            )
+
+        for config_dict in package_manager_config_dicts:
+            for _, config in config_dict.items():
+                if fnmatch.fnmatch(self.name, config["package_manager"]):
+                    self.runner.add_config(config["config"])
+
+        try:
+            self.runner.set_dry_run(workspace.dry_run)
+            self.runner.create_env(
+                self.app_inst.expander.expand_var_name(self.keywords.env_path)
+            )
+            self.runner.activate()
+
+            # Write auxiliary software files into created spack env.
+            for name, contents in workspace.all_auxiliary_software_files():
+                aux_file_path = self.app_inst.expander.expand_var(
+                    os.path.join(
+                        self.app_inst.expander.expansion_str(
+                            self.keywords.env_path
+                        ),
+                        f"{name}",
+                    )
+                )
+                self.runner.add_include_file(aux_file_path)
+                with open(aux_file_path, "w+") as f:
+                    f.write(self.app_inst.expander.expand_var(contents))
+
+            env_context = self.app_inst.expander.expand_var_name(
+                self.keywords.env_name
+            )
+            software_envs = workspace.software_environments
+            software_env = software_envs.render_environment(
+                env_context, self.app_inst.expander
+            )
+            if isinstance(software_env, ExternalEnvironment):
+                self.runner.copy_from_external_env(software_env.external_env)
+            else:
+                for pkg_spec in software_envs.package_specs_for_environment(
+                    software_env
+                ):
+                    self.runner.add_spec(pkg_spec)
+
+                self.runner.generate_env_file()
+
+            added_packages = set(self.runner.added_packages())
+            for pkg in self.app_inst.required_packages.keys():
+                if pkg not in added_packages:
+                    logger.die(
+                        f"Software spec {pkg} is not defined "
+                        f"in environment {env_context}, but is "
+                        f"required by the {self.name} application "
+                        "definition"
+                    )
+
+            for mod_inst in self.app_inst._modifier_instances:
+                for pkg in mod_inst.required_packages.keys():
+                    if pkg not in added_packages:
+                        logger.die(
+                            f"Software spec {pkg} is not defined "
+                            f"in environment {env_context}, but is "
+                            f"required by the {mod_inst.name} modifier "
+                            "definition"
+                        )
+
+            self.runner.deactivate()
+
+        except RunnerError as e:
+            logger.die(e)
+
+    register_phase(
+        "software_configure",
+        pipeline="setup",
+        run_after=[
+            "software_create_env",
+            "software_install_requested_compilers",
+        ],
+    )
+
+    def _software_configure(self, workspace, app_inst=None):
+        """Concretize the spack environment for this experiment
+
+        Perform spack's concretize step on the software environment generated
+        for  this experiment.
+        """
+
+        logger.msg("Concretizing Spack environment")
+
+        # See if we cached this already, and if so return
+        env_path = self.app_inst.expander.env_path
+
+        cache_tupl = ("concretize-env", env_path)
+        if workspace.check_cache(cache_tupl):
+            logger.debug("{} already in cache.".format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.runner.set_dry_run(workspace.dry_run)
+
+            self.runner.activate()
+
+            env_concretized = self.runner.concretized
+
+            if not env_concretized:
+                self.runner.concretize()
+
+        except ramble.runner.RunnerError as e:
+            logger.die(e)
+
+    register_phase(
+        "evaluate_requirements",
+        pipeline="setup",
+        run_before=["make_experiments"],
+    )
+
+    def _evaluate_requirements(self, workspace, app_inst=None):
+        """Evaluate all requirements for this experiment"""
+
+        for mod_inst in self.app_inst._modifier_instances:
+            for req in mod_inst.all_package_manager_requirements():
+                expanded_req = {}
+                for key, val in req.items():
+                    expanded_req[key] = self.app_inst.expander.expand_var(val)
+                self.runner.validate_command(**expanded_req)
+
+    register_phase(
+        "mirror_software", pipeline="mirror", run_after=["software_create_env"]
+    )
+
+    def _mirror_software(self, workspace, app_inst=None):
+        """Mirror software source for this experiment using spack"""
+        import re
+
+        logger.msg("Mirroring software")
+
+        # See if we cached this already, and if so return
+        env_path = self.app_inst.expander.env_path
+        if not env_path:
+            raise ApplicationError("Ramble env_path is set to None.")
+
+        cache_tupl = ("spack-mirror", env_path)
+        if workspace.check_cache(cache_tupl):
+            logger.debug("{} already in cache.".format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.runner.set_dry_run(workspace.dry_run)
+            self.runner.set_env(env_path)
+
+            self.runner.activate()
+
+            mirror_output = self.runner.mirror_environment(
+                workspace.software_mirror_path
+            )
+
+            present = 0
+            added = 0
+            failed = 0
+
+            present_regex = re.compile(r"\s+(?P<num>[0-9]+)\s+already present")
+            present_match = present_regex.search(mirror_output)
+            if present_match:
+                present = int(present_match.group("num"))
+
+            added_regex = re.compile(r"\s+(?P<num>[0-9]+)\s+added")
+            added_match = added_regex.search(mirror_output)
+            if added_match:
+                added = int(added_match.group("num"))
+
+            failed_regex = re.compile(r"\s+(?P<num>[0-9]+)\s+failed to fetch.")
+            failed_match = failed_regex.search(mirror_output)
+            if failed_match:
+                failed = int(failed_match.group("num"))
+
+            added_start = len(workspace.software_mirror_stats.new)
+            for i in range(added_start, added_start + added):
+                workspace.software_mirror_stats.new[i] = i
+
+            present_start = len(workspace.software_mirror_stats.present)
+            for i in range(present_start, present_start + present):
+                workspace.software_mirror_stats.present[i] = i
+
+            error_start = len(workspace.software_mirror_stats.errors)
+            for i in range(error_start, error_start + failed):
+                workspace.software_mirror_stats.errors.add(i)
+
+        except RunnerError as e:
+            logger.die(e)
+
+    register_phase("push_to_spack_cache", pipeline="pushtocache", run_after=[])
+
+    def _push_to_spack_cache(self, workspace, app_inst=None):
+
+        env_path = self.app_inst.expander.env_path
+        cache_tupl = ("push-to-cache", env_path)
+        if workspace.check_cache(cache_tupl):
+            logger.debug("{} already pushed, skipping".format(cache_tupl))
+            return
+        else:
+            workspace.add_to_cache(cache_tupl)
+
+        try:
+            self.runner.set_dry_run(workspace.dry_run)
+            self.runner.set_env(env_path)
+            self.runner.activate()
+
+            self.runner.push_to_spack_cache(workspace.spack_cache_path)
+
+            self.runner.deactivate()
+        except RunnerError as e:
+            logger.die(e)
+
+    def populate_inventory(
+        self, workspace, force_compute=False, require_exist=False
+    ):
+        """Add software environment information to hash inventory"""
+
+        env_path = self.app_inst.expander.env_path
+        self.runner.set_dry_run(workspace.dry_run)
+        self.runner.set_env(env_path, require_exists=False)
+        self.runner.activate()
+
+        try:
+            pkgman_version = self.runner.get_version()
+        except RunnerError:
+            pkgman_version = "unknown"
+
+        self.app_inst.hash_inventory["package_manager"].append(
+            {
+                "name": self.name,
+                "version": pkgman_version,
+                "digest": ramble.util.hashing.hash_string(pkgman_version),
+            }
+        )
+        self.app_inst.hash_inventory["software"].append(
+            {
+                "name": self.runner.env_path.replace(
+                    workspace.root + os.path.sep, ""
+                ),
+                "digest": self.runner.inventory_hash(),
+            }
+        )
+        self.runner.deactivate()
+
+    def _clean_hash_variables(self, workspace, variables):
+        """Perform spack specific cleanup of variables before hashing"""
+
+        self.runner.configure_env(
+            self.app_inst.expander.expand_var_name(self.keywords.env_path)
+        )
+        self.runner.activate()
+
+        for var in variables:
+            if isinstance(variables[var], str):
+                variables[var] = variables[var].replace(
+                    "\n".join(self.runner.generate_source_command()),
+                    "spack_source",
+                )
+                variables[var] = variables[var].replace(
+                    "\n".join(self.runner.generate_activate_command()),
+                    "spack_activate",
+                )
+
+        self.runner.deactivate()
+
+        super()._clean_hash_variables(workspace, variables)
+
+    register_phase(
+        "deploy_artifacts",
+        pipeline="pushdeployment",
+        run_after=["software_create_env"],
+    )
+
+    def _deploy_artifacts(self, workspace, app_inst=None):
+        super()._deploy_artifacts(workspace, app_inst=app_inst)
+        env_path = self.app_inst.expander.env_path
+
+        try:
+            self.runner.set_dry_run(workspace.dry_run)
+            self.runner.set_env(env_path)
+            self.runner.activate()
+
+            repo_path = os.path.join(workspace.named_deployment, "object_repo")
+
+            for pkg, pkg_def in self.runner.package_definitions():
+                pkg_dir_name = os.path.basename(os.path.dirname(pkg_def))
+                pkg_dir = os.path.join(repo_path, "packages", pkg_dir_name)
+                fs.mkdirp(pkg_dir)
+                shutil.copyfile(pkg_def, os.path.join(pkg_dir, "package.py"))
+
+            self.runner.deactivate()
+
+        except RunnerError as e:
+            logger.die(e)
+
+    register_builtin(
+        "spack_source", required=True, depends_on=["builtin::env_vars"]
+    )
+    register_builtin(
+        "spack_activate",
+        required=True,
+        depends_on=[
+            "package_manager_builtin::spack-lightweight::spack_source"
+        ],
+    )
+    register_builtin(
+        "spack_deactivate",
+        required=False,
+        depends_on=[
+            "package_manager_builtin::spack-lightweight::spack_source"
+        ],
+    )
+
+    def spack_source(self):
+        return self.runner.generate_source_command()
+
+    def spack_activate(self):
+        self.runner.configure_env(
+            self.app_inst.expander.expand_var_name(self.keywords.env_path)
+        )
+        self.runner.activate()
+        cmds = self.runner.generate_activate_command()
+        self.runner.deactivate()
+        return cmds
+
+    def spack_deactivate(self):
+        return self.runner.generate_deactivate_command()
+
 
 spack_namespace = "spack"
 
@@ -97,7 +520,9 @@ class SpackRunner(object):
             script = "setup-env.csh"
         elif self.shell == "fish":
             script = "setup-env.fish"
-        self.source_script = os.path.join(self.spack_dir, "share", "spack", script)
+        self.source_script = os.path.join(
+            self.spack_dir, "share", "spack", script
+        )
 
         self.concretized = False
         self.hash = None
@@ -112,7 +537,9 @@ class SpackRunner(object):
         self.env_contents = []
 
         self.installer = self.spack.copy()
-        self.installer.add_default_prefix(ramble.config.get(f"{self.install_config_name}:prefix"))
+        self.installer.add_default_prefix(
+            ramble.config.get(f"{self.install_config_name}:prefix")
+        )
         self.installer.add_default_arg("install")
 
         self.concretizer = self.spack.copy()
@@ -127,7 +554,10 @@ class SpackRunner(object):
         import importlib.util
 
         version_spec = importlib.util.spec_from_file_location(
-            "spack_version", os.path.join(self.spack_dir, "lib", "spack", "spack", "__init__.py")
+            "spack_version",
+            os.path.join(
+                self.spack_dir, "lib", "spack", "spack", "__init__.py"
+            ),
         )
         version_mod = importlib.util.module_from_spec(version_spec)
         version_spec.loader.exec_module(version_mod)
@@ -221,7 +651,9 @@ class SpackRunner(object):
         # Create a spack env
         if not self.dry_run:
             if not os.path.exists(os.path.join(path, "spack.yaml")):
-                env_create_flags = ramble.config.get(f"{self.env_create_config_name}:flags")
+                env_create_flags = ramble.config.get(
+                    f"{self.env_create_config_name}:flags"
+                )
                 env_create_args = self.env_create_args.copy()
                 if env_create_flags:
                     for flag in shlex.split(env_create_flags):
@@ -267,14 +699,22 @@ class SpackRunner(object):
         args = ["load", shell_flag, spec]
 
         if not self.dry_run:
-            load_cmds = self._run_command(self.spack, args, return_output=True).split("\n")
+            load_cmds = self._run_command(
+                self.spack, args, return_output=True
+            ).split("\n")
 
             for cmd in load_cmds:
                 env_var = regex.match(cmd)
                 if env_var:
-                    self.spack.add_default_env(env_var.group("var"), env_var.group("val"))
-                    self.installer.add_default_env(env_var.group("var"), env_var.group("val"))
-                    self.concretizer.add_default_env(env_var.group("var"), env_var.group("val"))
+                    self.spack.add_default_env(
+                        env_var.group("var"), env_var.group("val")
+                    )
+                    self.installer.add_default_env(
+                        env_var.group("var"), env_var.group("val")
+                    )
+                    self.concretizer.add_default_env(
+                        env_var.group("var"), env_var.group("val")
+                    )
         else:
             self._dry_run_print(self.spack, args)
 
@@ -305,7 +745,9 @@ class SpackRunner(object):
             comp_info_args.extend(["-C", self.env_path])
         comp_info_args.extend(["compiler", "info", spec])
 
-        compiler_find_flags = ramble.config.get(f"{self.compiler_find_config_name}:flags")
+        compiler_find_flags = ramble.config.get(
+            f"{self.compiler_find_config_name}:flags"
+        )
         compiler_find_args = self.compiler_find_args.copy()
         if compiler_find_flags:
             for flag in shlex.split(compiler_find_flags):
@@ -323,7 +765,9 @@ class SpackRunner(object):
 
             args = []
 
-            install_flags = ramble.config.get(f"{self.install_config_name}:flags")
+            install_flags = ramble.config.get(
+                f"{self.install_config_name}:flags"
+            )
             if install_flags is not None:
                 for flag in shlex.split(install_flags):
                     args.append(flag)
@@ -354,7 +798,9 @@ class SpackRunner(object):
         Ensure the spack environment is active in subsequent commands.
         """
         if not self.env_path:
-            raise NoPathRunnerError("Environment runner has no " + "path congfigured")
+            raise NoPathRunnerError(
+                "Environment runner has no " + "path congfigured"
+            )
 
         self.spack.add_default_env(self.env_key, self.env_path)
         self.installer.add_default_env(self.env_key, self.env_path)
@@ -367,7 +813,9 @@ class SpackRunner(object):
         Ensure the spack environment is not active in subsequent commands.
         """
         if not self.env_path:
-            raise NoPathRunnerError("Environment runner has no " + "path congfigured")
+            raise NoPathRunnerError(
+                "Environment runner has no " + "path congfigured"
+            )
 
         if self.active and self.env_key in self.spack.default_env.keys():
             del self.spack.default_env[self.env_key]
@@ -377,10 +825,14 @@ class SpackRunner(object):
 
     def _check_active(self):
         if not self.env_path:
-            raise NoPathRunnerError("Environment runner has no " + "path congfigured")
+            raise NoPathRunnerError(
+                "Environment runner has no " + "path congfigured"
+            )
 
         if not self.active:
-            raise NoActiveEnvironmentError("Runner has no active " + "environment to work with.")
+            raise NoActiveEnvironmentError(
+                "Runner has no active " + "environment to work with."
+            )
 
     def add_spec(self, spec):
         """
@@ -403,7 +855,9 @@ class SpackRunner(object):
 
         pkg_names = []
 
-        all_packages = self._run_command(self.spack, args, return_output=True).split("\n")
+        all_packages = self._run_command(
+            self.spack, args, return_output=True
+        ).split("\n")
         for pkg in all_packages:
             match = package_name_regex.match(pkg)
             if match:
@@ -439,6 +893,7 @@ class SpackRunner(object):
             args = config_args.copy()
             args.append(config)
 
+            logger.all_msg(f" trying to run spack with {args}")
             self._run_command(self.spack, args)
             if self.dry_run:
                 self._dry_run_print(self.spack, args)
@@ -467,21 +922,29 @@ class SpackRunner(object):
         path = env_name_or_path
         if not os.path.exists(path):
             try:
-                path = self._run_command(self.spack, named_location_args, return_output=True)
+                path = self._run_command(
+                    self.spack, named_location_args, return_output=True
+                )
             # If a named environment fails, copy directly from the path
             except ProcessError:
-                raise InvalidExternalEnvironment(f"{path} is not a spack environment.")
+                raise InvalidExternalEnvironment(
+                    f"{path} is not a spack environment."
+                )
 
         found_lock = False
 
         lock_file = os.path.join(path, "spack.lock")
         if os.path.exists(lock_file):
             found_lock = True
-            shutil.copyfile(lock_file, os.path.join(self.env_path, "spack.lock"))
+            shutil.copyfile(
+                lock_file, os.path.join(self.env_path, "spack.lock")
+            )
 
         conf_file = os.path.join(path, "spack.yaml")
         if not os.path.exists(conf_file):
-            raise InvalidExternalEnvironment(f"{path} is not a spack environment.")
+            raise InvalidExternalEnvironment(
+                f"{path} is not a spack environment."
+            )
 
         shutil.copyfile(conf_file, os.path.join(self.env_path, "spack.yaml"))
 
@@ -524,20 +987,28 @@ class SpackRunner(object):
 
             # If the lock file was last modified after the yaml file...
             if existing_lock_mtime > existing_env_mtime:
-                env_data = syaml.load_config(syaml.dump_config(env_file, default_flow_style=False))
+                env_data = syaml.load_config(
+                    syaml.dump_config(env_file, default_flow_style=False)
+                )
                 with open(spack_env_file, "r") as f:
                     existing_data = syaml.load_config(f)
                 gen_env_hash = ramble.util.hashing.hash_json(env_data)
-                existing_env_hash = ramble.util.hashing.hash_json(existing_data)
+                existing_env_hash = ramble.util.hashing.hash_json(
+                    existing_data
+                )
 
                 # If the yaml hash matches the new generated data hash...
                 if gen_env_hash == existing_env_hash:
                     self.concretized = True
-                    logger.msg(f"Environment {self.env_path} will not be regenerated.")
+                    logger.msg(
+                        f"Environment {self.env_path} will not be regenerated."
+                    )
                     return
 
             if not self.concretized:
-                logger.verbose(f"Removing invalid spack lock file {spack_lock_file}")
+                logger.verbose(
+                    f"Removing invalid spack lock file {spack_lock_file}"
+                )
                 fs.force_remove(spack_lock_file)
 
         spack_hash = self.inventory_hash()
@@ -566,7 +1037,9 @@ class SpackRunner(object):
             )
             return
 
-        concretize_flags = ramble.config.get(f"{self.concretize_config_name}:flags")
+        concretize_flags = ramble.config.get(
+            f"{self.concretize_config_name}:flags"
+        )
 
         args = []
         if concretize_flags is not None:
@@ -616,6 +1089,7 @@ class SpackRunner(object):
 
     def get_package_path(self, package_spec):
         """Return the installation directory for a package"""
+        name_regex = re.compile(r"(?P<name>[a-zA-Z0-9\-_]+).*")
         loc_args = ["location", "-i"]
         loc_args.extend(shlex.split(package_spec))
 
@@ -623,15 +1097,24 @@ class SpackRunner(object):
         name_args.extend(shlex.split(package_spec))
 
         if not self.dry_run:
-            name = self._run_command(self.spack, name_args, return_output=True).strip()
-            location = self._run_command(self.spack, loc_args, return_output=True).strip()
+            name = self._run_command(
+                self.spack, name_args, return_output=True
+            ).strip()
+            location = self._run_command(
+                self.spack, loc_args, return_output=True
+            ).strip()
             return (name, location)
         else:
             self._dry_run_print(self.spack, name_args)
             self._dry_run_print(self.spack, loc_args)
 
-            name = os.path.join(shlex.split(package_spec)[0])
-            location = os.path.join("dry-run", "path", "to", shlex.split(package_spec)[0])
+            name = shlex.split(package_spec)[0]
+            name_match = name_regex.match(name)
+            if name_match:
+                name = name_match.group("name")
+            location = os.path.join(
+                "dry-run", "path", "to", shlex.split(package_spec)[0]
+            )
             return (name, location)
 
     def mirror_environment(self, mirror_path):
@@ -648,7 +1131,9 @@ class SpackRunner(object):
         ]
 
         if not self.dry_run:
-            out_str = self._run_command(self.spack, args, return_output=True).strip()
+            out_str = self._run_command(
+                self.spack, args, return_output=True
+            ).strip()
             return out_str
         else:
             self._dry_run_print(self.spack, args)
@@ -664,7 +1149,11 @@ class SpackRunner(object):
     def get_env_hash_list(self):
         self._check_active()
         args = ["find", "--format", "/{hash}"]
-        output = self._run_command(self.spack, args, return_output=True).strip().replace("\n", " ")
+        output = (
+            self._run_command(self.spack, args, return_output=True)
+            .strip()
+            .replace("\n", " ")
+        )
         return output
 
     def push_to_spack_cache(self, spack_cache_path):
@@ -684,13 +1173,21 @@ class SpackRunner(object):
         args.extend([spack_cache_path, hash_list])
 
         if not self.dry_run:
-            out_str = self._run_command(self.spack, args, return_output=True).strip()
+            out_str = self._run_command(
+                self.spack, args, return_output=True
+            ).strip()
             return out_str
         else:
             self._dry_run_print(self.spack, args)
             return
 
-    def validate_command(self, command="", validation_type="not_empty", regex=None):
+    def validate_command(
+        self,
+        command="",
+        validation_type="not_empty",
+        package_manager="spack",
+        regex=None,
+    ):
         regex_validations = ["contains_regex", "does_not_contain_regex"]
 
         args = command.split()
@@ -735,7 +1232,9 @@ class SpackRunner(object):
             for pkg in self.env_contents:
                 args = location_args.copy()
                 args.append(pkg)
-                path = self._run_command(self.spack, args, return_output=True).strip()
+                path = self._run_command(
+                    self.spack, args, return_output=True
+                ).strip()
                 yield pkg, os.path.join(path, package_def_name)
         else:
             self._dry_run_print(self.spack, location_args)
@@ -781,16 +1280,22 @@ class SpackRunner(object):
                     executable(*args)
             else:
                 if return_output:
-                    out_str = executable(*args, output=str, error=active_stream)
+                    out_str = executable(
+                        *args, output=str, error=active_stream
+                    )
                 else:
-                    executable(*args, output=active_stream, error=active_stream)
+                    executable(
+                        *args, output=active_stream, error=active_stream
+                    )
         except ProcessError as e:
             logger.error(e)
             error = True
             pass
 
         if error:
-            err = f"Error running spack command: {executable} " + " ".join(args)
+            err = f"Error running spack command: {executable} " + " ".join(
+                args
+            )
             if active_stream is None:
                 logger.die(err)
             else:

@@ -28,6 +28,8 @@ workspace = RambleCommand("workspace")
 def test_spack_env_cache():
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: '{execute_experiment}'

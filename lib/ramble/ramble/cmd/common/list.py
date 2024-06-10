@@ -233,9 +233,7 @@ def html(obj_names, out, object_type):
         out.write("</div>\n")
 
 
-def setup_list_parser(subparser, object_type):
-    object_def = ramble.repository.type_definitions[object_type]
-
+def setup_list_parser(subparser):
     subparser.add_argument(
         "filter",
         nargs=argparse.REMAINDER,
@@ -259,15 +257,17 @@ def setup_list_parser(subparser, object_type):
         metavar="FILE",
         default=None,
         action="store",
-        help=f'write output to the specified file, if any {object_def["singular"]} is newer',
+        help="write output to the specified file, if any object is newer",
     )
 
-    arguments.add_common_arguments(subparser, ["tags"])
+    arguments.add_common_arguments(subparser, ["tags", "obj_type"])
 
 
-def perform_list(args, object_type):
+def perform_list(args):
     # retrieve the formatter to use from args
     formatter = formatters[args.format]
+
+    object_type = ramble.repository.ObjectTypes[args.type]
 
     # Retrieve the names of all the objects
     objs = set(ramble.repository.all_object_names(object_type))

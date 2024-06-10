@@ -7,17 +7,16 @@
 # except according to those terms.
 
 
-from ramble.modifier import ModifierBase
+from ramble.package_manager import PackageManagerBase
 
 
-class SpackModifier(ModifierBase):
-    """Specialized class for modifiers that use spack.
+class RunnerPackageManager(PackageManagerBase):
+    """Specialized class for package managers that use a runner
 
-    This class can be used to set up a modifier that uses spack to install
-    software for the modifier to work.
+    This class can be used to set up a package manager that will use a runner to perform actions
     """
 
-    modifier_class = "SpackModifier"
+    package_manager_class = "RunnerPackageManager"
 
     def __init__(self, file_path):
         super().__init__(file_path)

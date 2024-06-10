@@ -37,6 +37,7 @@ class namespace:
 
     # For rendering objects
     variables = "variables"
+    variants = "variants"
     zips = "zips"
     matrices = "matrices"
     matrix = "matrix"
@@ -58,3 +59,6 @@ class namespace:
     indentation = "indentation"
     prefix = "prefix"
     join_separator = "join_separator"
+
+    # For variants
+    package_manager = "package_manager"

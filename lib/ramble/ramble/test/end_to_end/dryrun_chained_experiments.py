@@ -32,6 +32,8 @@ workspace = RambleCommand("workspace")
 def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'

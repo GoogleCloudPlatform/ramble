@@ -22,7 +22,6 @@ import ramble.paths
 import ramble.util.path
 import ramble.error
 import ramble.repository
-import ramble.spack_runner
 import ramble.experiment_set
 import ramble.context
 import ramble.util.web
@@ -485,20 +484,6 @@ class Workspace(object):
             }
         )
 
-        from ramble.spack_runner import SpackRunner, RunnerError
-
-        try:
-            runner = SpackRunner()
-            spack_version = runner.get_version()
-            self.hash_inventory["versions"].append(
-                {
-                    "name": "spack",
-                    "version": spack_version,
-                    "digest": ramble.util.hashing.hash_string(spack_version),
-                }
-            )
-        except RunnerError:
-            pass
         self.workspace_hash = None
 
         self.specs = []
@@ -1173,6 +1158,8 @@ class Workspace(object):
         # Build experiment sets to determine which templates never get used
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
         experiment_set = self.build_experiment_set()
+        logger.debug("Software environments:")
+        logger.debug(str(self.software_environments))
 
         for _, app_inst in experiment_set.template_experiments():
             if app_inst.is_template and not app_inst.generated_experiments:
@@ -1471,6 +1458,10 @@ class Workspace(object):
     def get_workspace_zips(self):
         """Return a dict of workspace zips"""
         return ramble.config.config.get_config("zips")
+
+    def get_workspace_variants(self):
+        """Return a dict of workspace variants"""
+        return ramble.config.config.get_config("variants")
 
     def get_software_dict(self):
         """Return the software dictionary for this workspace"""

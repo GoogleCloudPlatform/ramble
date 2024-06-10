@@ -26,6 +26,8 @@ def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
     """Tests tty.die at end of ramble.application_types.spack._create_software_env"""
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'

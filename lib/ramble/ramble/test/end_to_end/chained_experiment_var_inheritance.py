@@ -28,6 +28,8 @@ workspace = RambleCommand("workspace")
 def test_chained_experiment_variable_inheritance(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:
+  variants:
+    package_manager: spack
   formatted_executables:
     command:
       join_separator: '\n'
