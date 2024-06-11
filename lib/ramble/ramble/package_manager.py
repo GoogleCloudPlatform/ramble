@@ -197,7 +197,7 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         software_environments = workspace.software_environments
         software_environments.render_environment(
-            app_context, self.app_inst.expander, self.app_inst.package_manager, require=False
+            app_context, self.app_inst.expander, self, require=False
         )
 
         return self.app_inst.expander._used_variables
