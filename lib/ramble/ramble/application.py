@@ -945,7 +945,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 for cmd_conf in command_configs:
                     mpi_cmd = ""
                     if cmd_conf.mpi:
-                        mpi_cmd = " " + self.expander.expand_var("{mpi_command}", exec_vars) + " "
+                        raw_mpi_cmd = self.expander.expand_var("{mpi_command}", exec_vars).strip()
+                        if (
+                            not raw_mpi_cmd
+                            and int(self.expander.expand_var_name(self.keywords.n_nodes)) > 1
+                        ):
+                            logger.warn(
+                                f"Command {cmd_conf} requires a non-empty `mpi_cmd` "
+                                "variable in a multi-node experiment"
+                            )
+                        mpi_cmd = " " + raw_mpi_cmd + " "
 
                     redirect = ""
                     if cmd_conf.redirect:
