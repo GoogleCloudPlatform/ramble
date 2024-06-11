@@ -694,24 +694,17 @@ class SpackRunner(object):
         """
         if self.shell == "bash":
             regex = re.compile(
-                "\A.*export "  # noqa: W605
-                + "(?P<var>[\S^=]+)="  # noqa: W605
-                + "(?P<val>[\S]+);\Z"  # noqa: W605
+                r"\A.*export (?P<var>[\S^=]+)=(?P<val>[\S]+);\Z"
             )
-
             shell_flag = "--sh"
         elif self.shell == "csh":
             regex = re.compile(
-                "\A.*setenv "  # noqa: W605
-                + "(?P<var>[\S^=]+) "  # noqa: W605
-                + "(?P<val>[\S]+);\Z"  # noqa: W605
+                r"\A.*setenv (?P<var>[\S^=]+) (?P<val>[\S]+);\Z"
             )
             shell_flag = "--csh"
         elif self.shell == "fish":
             regex = re.compile(
-                "\A.*set -gx "  # noqa: W605
-                + "(?P<var>[\S^=]+) "  # noqa: W605
-                + "(?P<val>[\S]+);\Z"  # noqa: W605
+                r"\A.*set -gx (?P<var>[\S^=]+) (?P<val>[\S]+);\Z"
             )
             shell_flag = "--fish"
         else:

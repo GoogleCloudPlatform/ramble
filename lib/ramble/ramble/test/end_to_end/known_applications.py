@@ -29,6 +29,7 @@ workspace = RambleCommand("workspace")
 
 @pytest.mark.long
 @deprecation.fail_if_not_removed
+@pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
 def test_known_applications(application, package_manager, capsys):
     info_cmd = RambleCommand("info")
 

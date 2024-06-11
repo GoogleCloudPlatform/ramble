@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import deprecation
-import pytest
 
 from ramble.main import RambleCommand
 
@@ -54,7 +53,6 @@ def test_mods_info(mutable_mock_mods_repo, mock_modifier):
     check_info(out)
 
 
-@pytest.mark.filterwarnings("ignore:invalid decimal literal:DeprecationWarning")
 def test_mods_info_all_real_modifiers(modifier):
     out = info_cmd("--type", "modifiers", modifier)
 

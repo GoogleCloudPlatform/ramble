@@ -61,7 +61,7 @@ ramble:
         pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       openfoam:
-        pkg_spec: openfoam-org
+        pkg_spec: openfoam
         compiler: gcc
     environments:
       openfoam:
