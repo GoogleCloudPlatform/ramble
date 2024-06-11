@@ -73,6 +73,16 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         return new_copy
 
+    def get_spec_str(self, pkg, all_pkgs, compiler):
+        """Return a spec string for the given pkg
+
+        Args:
+            pkg (RenderedPackage): Reference to a rendered package
+            all_pkgs (dict): All related packages
+            compiler (boolean): True if this pkg is used as a compiler
+        """
+        return ""
+
     def _long_print(self):
         out_str = []
         out_str.append(rucolor.section_title("Package Manager: ") + f"{self.name}\n")
@@ -187,7 +197,7 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         software_environments = workspace.software_environments
         software_environments.render_environment(
-            app_context, self.app_inst.expander, require=False
+            app_context, self.app_inst.expander, self, require=False
         )
 
         return self.app_inst.expander._used_variables

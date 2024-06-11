@@ -76,7 +76,7 @@ class SpackLightweight(PackageManagerBase):
 
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
-                app_context, self.app_inst.expander
+                app_context, self.app_inst.expander, self
             )
 
             for compiler_spec in software_envs.compiler_specs_for_environment(
@@ -150,7 +150,7 @@ class SpackLightweight(PackageManagerBase):
             )
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
-                env_context, self.app_inst.expander
+                env_context, self.app_inst.expander, self
             )
             if isinstance(software_env, ExternalEnvironment):
                 self.runner.copy_from_external_env(software_env.external_env)
@@ -448,6 +448,30 @@ class SpackLightweight(PackageManagerBase):
 
     def spack_deactivate(self):
         return self.runner.generate_deactivate_command()
+
+    def get_spec_str(self, pkg, all_pkgs, compiler):
+        """Return a spec string for the given pkg
+
+        Args:
+            pkg (RenderedPackage): Reference to a rendered package
+            all_pkgs (dict): All related packages
+            compiler (boolean): True if this pkg is used as a compiler
+        """
+        if compiler and pkg.compiler_spec:
+            out_str = pkg.compiler_spec
+        else:
+            out_str = pkg.spec
+
+        if compiler:
+            return out_str
+
+        if pkg.compiler in all_pkgs[self.name]:
+            out_str += " %" + all_pkgs[self.name][pkg.compiler].spec_str(
+                all_pkgs, compiler=True
+            )
+        elif pkg.compiler:
+            out_str += f" (built with {pkg.compiler})"
+        return out_str
 
 
 spack_namespace = "spack"
