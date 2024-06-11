@@ -6,10 +6,19 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble
+import deprecation
 
 from ramble.modifier import ModifierBase
 
 
+@deprecation.deprecated(
+    deprecated_in="0.5.0",
+    removed_in="0.6.0",
+    current_version=str(ramble.ramble_version),
+    details="The SpackModifier class is deprecated. "
+    + "Convert instances to BasicModifier instead",
+)
 class SpackModifier(ModifierBase):
     """Specialized class for modifiers that use spack.
 
