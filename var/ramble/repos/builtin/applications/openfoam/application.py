@@ -20,7 +20,7 @@ class Openfoam(OpenfoamOrg):
 
     software_spec("openfoam", pkg_spec="openfoam@2312", compiler="gcc9")
 
-    required_package("openfoam")
+    required_package("openfoam", package_manager="spack*")
 
     executable(
         "surfaceFeatures",

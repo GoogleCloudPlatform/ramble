@@ -9,7 +9,7 @@
 from ramble.appkit import *
 
 
-class ZlibConfigs(SpackApplication):
+class ZlibConfigs(ExecutableApplication):
     name = "zlib-configs"
 
     software_spec("zlib", pkg_spec="zlib")
@@ -18,7 +18,9 @@ class ZlibConfigs(SpackApplication):
 
     workload("ensure_installed", executable="list_lib")
 
-    package_manager_config("enable_debug", "config:debug:true")
+    package_manager_config(
+        "enable_debug", "config:debug:true", package_manager="spack*"
+    )
 
     figure_of_merit(
         "zlib_installed",

@@ -17,7 +17,7 @@ def pad_value(val, desc):
     return "{:<14}".format(val) + desc
 
 
-class IntelHpl(SpackApplication):
+class IntelHpl(ExecutableApplication):
     """Define HPL application using Intel MKL optimized binary from intel-oneapi-mpi package"""
 
     name = "intel-hpl"
@@ -34,7 +34,7 @@ class IntelHpl(SpackApplication):
     )
     software_spec("impi_2018", pkg_spec="intel-mpi@2018.4.274")
 
-    required_package("intel-oneapi-mkl")
+    required_package("intel-oneapi-mkl", package_manager="spack*")
 
     executable(
         "execute",

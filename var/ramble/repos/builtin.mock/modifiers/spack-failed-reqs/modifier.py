@@ -9,7 +9,7 @@
 from ramble.modkit import *  # noqa: F403
 
 
-class SpackFailedReqs(SpackModifier):
+class SpackFailedReqs(BasicModifier):
     """Define spack modifier requirements that will fail"""
 
     name = "spack-mod"

@@ -13,7 +13,7 @@ from ramble.expander import Expander
 from ramble.keywords import keywords
 
 
-class Namd(SpackApplication):
+class Namd(ExecutableApplication):
     """Define NAMD application"""
 
     name = "namd"
@@ -34,7 +34,7 @@ class Namd(SpackApplication):
 
     software_spec("namd", pkg_spec="namd@2.14 interface=tcl", compiler="gcc12")
 
-    required_package("namd")
+    required_package("namd", package_manager="spack*")
 
     input_file(
         "stmv",

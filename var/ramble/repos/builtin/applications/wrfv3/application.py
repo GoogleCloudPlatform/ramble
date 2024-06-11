@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Wrfv3(SpackApplication):
+class Wrfv3(ExecutableApplication):
     """Define Wrf version 3 application"""
 
     name = "wrfv3"
@@ -30,7 +30,7 @@ class Wrfv3(SpackApplication):
         compiler="gcc8",
     )
 
-    required_package("wrf")
+    required_package("wrf", package_manager="spack*")
 
     input_file(
         "CONUS_2p5km",

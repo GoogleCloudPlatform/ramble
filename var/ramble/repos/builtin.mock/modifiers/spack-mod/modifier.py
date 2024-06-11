@@ -9,7 +9,7 @@
 from ramble.modkit import *  # noqa: F403
 
 
-class SpackMod(SpackModifier):
+class SpackMod(BasicModifier):
     """Define spack modifier with various software aspects"""
 
     name = "spack-mod"
@@ -18,7 +18,9 @@ class SpackMod(SpackModifier):
 
     mode("default", description="This is the default mode for the spack-mod")
 
-    package_manager_config("enable_debug", "config:debug:true")
+    package_manager_config(
+        "enable_debug", "config:debug:true", package_manager="spack*"
+    )
 
     define_compiler(
         "mod_compiler",

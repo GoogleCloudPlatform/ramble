@@ -12,7 +12,7 @@ from ramble.appkit import *
 import spack.util.executable
 
 
-class SpackStack(SpackApplication):
+class SpackStack(ExecutableApplication):
     """Application definition for creating a spack software stack
 
     This application definition is used solely to create spack software stacks.

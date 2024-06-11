@@ -17,7 +17,7 @@ def pad_value(val, desc):
     return "{:<14}".format(val) + desc
 
 
-class Hpl(SpackApplication):
+class Hpl(ExecutableApplication):
     """Define HPL application"""
 
     name = "hpl"
@@ -32,7 +32,7 @@ class Hpl(SpackApplication):
 
     software_spec("hpl", pkg_spec="hpl@2.3 +openmp", compiler="gcc9")
 
-    required_package("hpl")
+    required_package("hpl", package_manager="spack*")
 
     executable("execute", "xhpl", use_mpi=True)
 

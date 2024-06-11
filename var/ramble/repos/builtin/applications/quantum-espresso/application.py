@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class QuantumEspresso(SpackApplication):
+class QuantumEspresso(ExecutableApplication):
     """Define Quantum-Espresso application."""
 
     name = "quantum-espresso"
@@ -34,7 +34,7 @@ class QuantumEspresso(SpackApplication):
         "quantum-espresso", pkg_spec="quantum-espresso@7.1", compiler="gcc13"
     )
 
-    required_package("quantum-espresso")
+    required_package("quantum-espresso", package_manager="spack*")
 
     input_file(
         "AUSURF112",

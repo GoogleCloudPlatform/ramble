@@ -12,7 +12,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Cloverleaf(SpackApplication):
+class Cloverleaf(ExecutableApplication):
     """Define CLOVERLEAF application"""
 
     name = "cloverleaf"
@@ -40,7 +40,7 @@ class Cloverleaf(SpackApplication):
         "cloverleaf", pkg_spec="cloverleaf@1.1 build=ref", compiler="gcc12"
     )
 
-    required_package("cloverleaf")
+    required_package("cloverleaf", package_manager="spack*")
 
     executable("execute", "clover_leaf", use_mpi=True)
 

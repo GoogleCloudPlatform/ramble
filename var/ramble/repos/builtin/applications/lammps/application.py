@@ -10,7 +10,7 @@ import os
 from ramble.appkit import *
 
 
-class Lammps(SpackApplication):
+class Lammps(ExecutableApplication):
     """Define LAMMPS application"""
 
     name = "lammps"
@@ -29,7 +29,7 @@ class Lammps(SpackApplication):
         compiler="gcc9",
     )
 
-    required_package("lammps")
+    required_package("lammps", package_manager="spack*")
 
     input_file(
         "leonard-jones",

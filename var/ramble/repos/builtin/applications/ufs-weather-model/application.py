@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class UfsWeatherModel(SpackApplication):
+class UfsWeatherModel(ExecutableApplication):
     """Define FV3 application via ufs-weather-model"""
 
     name = "ufs-weather-model"
@@ -33,7 +33,7 @@ class UfsWeatherModel(SpackApplication):
         compiler="gcc9",
     )
 
-    required_package("ufs-weather-model")
+    required_package("ufs-weather-model", package_manager="spack*")
 
     input_file(
         "simple_test_case",
