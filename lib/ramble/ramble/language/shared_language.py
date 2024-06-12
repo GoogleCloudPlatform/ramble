@@ -104,11 +104,19 @@ def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units=""
 
 
 @shared_directive("compilers")
-def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None):
+def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None, package_manager="*"):
     """Defines the compiler that will be used with this object
 
     Adds a new compiler spec to this object. Software specs should
     reference a compiler that has been added.
+
+    Args:
+        name (str): Name of compiler package
+        pkg_spec (str): Package spec to install compiler
+        compiler_spec (str): Compiler spec (if different from pkg_spec)
+        compiler (str): Package name to use for compilation
+        package_manager (str): Glob supported pattern to match package managers
+                               this compiler applies to
     """
 
     def _execute_define_compiler(obj):
@@ -116,13 +124,14 @@ def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None):
             "pkg_spec": pkg_spec,
             "compiler_spec": compiler_spec,
             "compiler": compiler,
+            "package_manager": package_manager,
         }
 
     return _execute_define_compiler
 
 
 @shared_directive("software_specs")
-def software_spec(name, pkg_spec, compiler_spec=None, compiler=None):
+def software_spec(name, pkg_spec, compiler_spec=None, compiler=None, package_manager="*"):
     """Defines a new software spec needed for this object.
 
     Adds a new software spec (for spack to use) that this object
@@ -133,6 +142,15 @@ def software_spec(name, pkg_spec, compiler_spec=None, compiler=None):
     Specs can be described as an mpi spec, which means they
     will depend on the MPI library within the resulting spack
     environment.
+
+    Args:
+        name (str): Name of package
+        pkg_spec (str): Package spec to install package
+        compiler_spec (str): Spec to use if this package will be used as a
+                             compiler for another package
+        compiler (str): Package name to use as compiler for compiling this package
+        package_manager (str): Glob supported pattern to match package managers
+                               this package applies to
     """
 
     def _execute_software_spec(obj):
@@ -141,6 +159,7 @@ def software_spec(name, pkg_spec, compiler_spec=None, compiler=None):
             "pkg_spec": pkg_spec,
             "compiler_spec": compiler_spec,
             "compiler": compiler,
+            "package_manager": package_manager,
         }
 
     return _execute_software_spec
@@ -173,6 +192,10 @@ def package_manager_config(name, config, package_manager="*", **kwargs):
 def required_package(name, package_manager="*"):
     """Defines a new spack package that is required for this object
     to function properly.
+
+    Args:
+        name (str): Name of required package
+        package_manager (str): Glob package manager name to apply this required package to
     """
 
     def _execute_required_package(obj):

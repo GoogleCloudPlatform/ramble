@@ -12,6 +12,7 @@ import copy
 import re
 import shutil
 import datetime
+import fnmatch
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -889,45 +890,55 @@ class Workspace(object):
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
 
+            if app_inst.package_manager is None:
+                continue
+
             compiler_dicts = [app_inst.compilers]
             for mod_inst in app_inst._modifier_instances:
                 compiler_dicts.append(mod_inst.compilers)
 
             for compiler_dict in compiler_dicts:
                 for comp, info in compiler_dict.items():
-                    if comp not in packages_dict:
-                        packages_dict[comp] = syaml.syaml_dict()
-                        packages_dict[comp]["pkg_spec"] = info["pkg_spec"]
-                        ramble.config.add(
-                            f'software:packages:{comp}:pkg_spec:{info["pkg_spec"]}',
-                            scope=self.ws_file_config_scope_name(),
-                        )
-                        if "compiler_spec" in info and info["compiler_spec"]:
-                            packages_dict[comp]["compiler_spec"] = info["compiler_spec"]
-                            config_path = (
-                                f"software:packages:{comp}:"
-                                + f'compiler_spec:{info["compiler_spec"]}'
+                    logger.all_msg(f" Comp info: {info}")
+                    if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
+                        if comp not in packages_dict:
+                            packages_dict[comp] = syaml.syaml_dict()
+                            packages_dict[comp]["pkg_spec"] = info["pkg_spec"]
+                            ramble.config.add(
+                                f'software:packages:{comp}:pkg_spec:{info["pkg_spec"]}',
+                                scope=self.ws_file_config_scope_name(),
                             )
-                            ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
-                        if "compiler" in info and info["compiler"]:
-                            packages_dict[comp]["compiler"] = info["compiler"]
-                            config_path = (
-                                f"software:packages:{comp}:" + f'compiler:{info["compiler"]}'
+                            if "compiler_spec" in info and info["compiler_spec"]:
+                                packages_dict[comp]["compiler_spec"] = info["compiler_spec"]
+                                config_path = (
+                                    f"software:packages:{comp}:"
+                                    + f'compiler_spec:{info["compiler_spec"]}'
+                                )
+                                ramble.config.add(
+                                    config_path, scope=self.ws_file_config_scope_name()
+                                )
+                            if "compiler" in info and info["compiler"]:
+                                packages_dict[comp]["compiler"] = info["compiler"]
+                                config_path = (
+                                    f"software:packages:{comp}:" + f'compiler:{info["compiler"]}'
+                                )
+                                ramble.config.add(
+                                    config_path, scope=self.ws_file_config_scope_name()
+                                )
+                        elif not specs_equiv(info, packages_dict[comp]):
+                            logger.debug(f"  Spec 1: {str(info)}")
+                            logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
+                            raise RambleConflictingDefinitionError(
+                                f"Compiler {comp} defined in multiple conflicting ways"
                             )
-                            ramble.config.add(config_path, scope=self.ws_file_config_scope_name())
-                    elif not specs_equiv(info, packages_dict[comp]):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
-                        raise RambleConflictingDefinitionError(
-                            f"Compiler {comp} defined in multiple conflicting ways"
-                        )
 
+            add_env = False
             if env_name not in environments_dict:
-                environments_dict[env_name] = syaml.syaml_dict()
-                environments_dict[env_name][namespace.packages] = []
+                new_env = syaml.syaml_dict()
+                new_env[namespace.packages] = []
 
             logger.debug(f"Trying to define packages for {env_name}")
-            app_packages = environments_dict[env_name][namespace.packages]
+            app_packages = new_env[namespace.packages]
 
             software_dicts = [app_inst.software_specs]
             for mod_inst in app_inst._modifier_instances:
@@ -935,24 +946,29 @@ class Workspace(object):
 
             for software_dict in software_dicts:
                 for spec_name, info in software_dict.items():
-                    logger.debug(f"    Found spec: {spec_name}")
-                    if spec_name not in packages_dict:
-                        packages_dict[spec_name] = syaml.syaml_dict()
-                        packages_dict[spec_name]["pkg_spec"] = info["pkg_spec"]
-                        if "compiler_spec" in info and info["compiler_spec"]:
-                            packages_dict[spec_name]["compiler_spec"] = info["compiler_spec"]
-                        if "compiler" in info and info["compiler"]:
-                            packages_dict[spec_name]["compiler"] = info["compiler"]
+                    if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
+                        logger.debug(f"    Found spec: {spec_name}")
+                        if spec_name not in packages_dict:
+                            add_env = True
+                            packages_dict[spec_name] = syaml.syaml_dict()
+                            packages_dict[spec_name]["pkg_spec"] = info["pkg_spec"]
+                            if "compiler_spec" in info and info["compiler_spec"]:
+                                packages_dict[spec_name]["compiler_spec"] = info["compiler_spec"]
+                            if "compiler" in info and info["compiler"]:
+                                packages_dict[spec_name]["compiler"] = info["compiler"]
 
-                    elif not specs_equiv(info, packages_dict[spec_name]):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
-                        raise RambleConflictingDefinitionError(
-                            f"Package {spec_name} defined in multiple conflicting ways"
-                        )
+                        elif not specs_equiv(info, packages_dict[spec_name]):
+                            logger.debug(f"  Spec 1: {str(info)}")
+                            logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
+                            raise RambleConflictingDefinitionError(
+                                f"Package {spec_name} defined in multiple conflicting ways"
+                            )
 
-                    if spec_name not in app_packages:
-                        app_packages.append(spec_name)
+                        if spec_name not in app_packages:
+                            app_packages.append(spec_name)
+
+            if add_env:
+                environments_dict[env_name] = new_env.copy()
 
         ramble.config.config.update_config(
             "software", full_software_dict, scope=self.ws_file_config_scope_name()
