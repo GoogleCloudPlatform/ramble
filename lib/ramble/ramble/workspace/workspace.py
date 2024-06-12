@@ -1478,12 +1478,23 @@ class Workspace(object):
                 logger.warn("Both a spack and software configuration section are defined.")
                 logger.warn("The spack configuration section is deprecated.")
                 logger.warn("The software configuration section will be used.")
-            return software_dict
         elif spack_dict:
             if print_warnings:
                 logger.warn("The spack configuration section is deprecated")
                 logger.warn("Please update to the software dict.")
+
+            if namespace.packages in spack_dict:
+                for pkg, config in spack_dict[namespace.packages].items():
+                    if "spack_spec" in config:
+                        logger.warn(f'Package {pkg} defines "spack_spec" which is deprecated')
+                        logger.warn('Convert this to "pkg_spec" or "spack_pkg_spec" instead.')
             return spack_dict
+
+        if namespace.packages in software_dict:
+            for pkg, config in software_dict[namespace.packages].items():
+                if "spack_spec" in config:
+                    logger.warn(f'Package {pkg} defines "spack_spec" which is deprecated')
+                    logger.warn('Convert this to "pkg_spec" or "spack_pkg_spec" instead.')
 
         return software_dict
 
