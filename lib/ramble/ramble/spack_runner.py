@@ -617,8 +617,8 @@ class SpackRunner(object):
             self._dry_run_print(self.spack, name_args)
             self._dry_run_print(self.spack, loc_args)
 
-            name = os.path.join(shlex.split(package_spec)[0])
-            location = os.path.join("dry-run", "path", "to", shlex.split(package_spec)[0])
+            name = shlex.split(package_spec)[0].split("@")[0]
+            location = os.path.join("dry-run", "path", "to", name)
             return (name, location)
 
     def mirror_environment(self, mirror_path):
