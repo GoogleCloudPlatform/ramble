@@ -10,7 +10,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Hpcc(SpackApplication):
+class Hpcc(ExecutableApplication):
     """Define the HPCC application
 
     HPCC is a collection of multiple benchmarks, which include:
@@ -35,7 +35,7 @@ class Hpcc(SpackApplication):
 
     software_spec("hpcc", pkg_spec="hpcc@1.5.0", compiler="gcc9")
 
-    required_package("hpcc")
+    required_package("hpcc", package_manager="spack*")
 
     input_file(
         "hpccinf",

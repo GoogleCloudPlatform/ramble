@@ -23,6 +23,7 @@ app_types = [
 func_types = enum.Enum("func_types", ["method", "directive"])
 
 
+@deprecation.fail_if_not_removed
 @pytest.mark.parametrize("app_class", app_types)
 def test_application_type_features(app_class):
     app_path = "/path/to/app"

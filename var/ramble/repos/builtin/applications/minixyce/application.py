@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Minixyce(SpackApplication):
+class Minixyce(ExecutableApplication):
     """Define miniXyce application"""
 
     name = "minixyce"
@@ -36,7 +36,7 @@ class Minixyce(SpackApplication):
 
     software_spec("minixyce", pkg_spec="minixyce@1.0 +mpi", compiler="gcc12")
 
-    required_package("minixyce")
+    required_package("minixyce", package_manager="spack*")
 
     executable(
         "execute",

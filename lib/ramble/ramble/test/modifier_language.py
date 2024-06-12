@@ -7,6 +7,7 @@
 # except according to those terms.
 """Perform tests of the Application class"""
 
+import deprecation
 import pytest
 import enum
 
@@ -30,6 +31,7 @@ def generate_mod_class(base_class):
     return GeneratedClass
 
 
+@deprecation.fail_if_not_removed
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_modifier_type_features(mod_class):
     test_class = generate_mod_class(mod_class)

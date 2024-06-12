@@ -9,7 +9,7 @@
 from ramble.appkit import *
 
 
-class Zlib(SpackApplication):
+class Zlib(ExecutableApplication):
     name = "zlib"
 
     software_spec("zlib", pkg_spec="zlib")

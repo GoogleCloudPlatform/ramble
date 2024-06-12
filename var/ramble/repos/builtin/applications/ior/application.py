@@ -10,7 +10,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Ior(SpackApplication):
+class Ior(ExecutableApplication):
     """Define the IOR parallel IO benchmark. Also includes"""
 
     name = "ior"
@@ -23,7 +23,7 @@ class Ior(SpackApplication):
     software_spec("openmpi", pkg_spec="openmpi")
     software_spec("ior", pkg_spec="ior", compiler="gcc")
 
-    required_package("ior")
+    required_package("ior", package_manager="spack*")
 
     workload("multi-file", executable="ior")
 

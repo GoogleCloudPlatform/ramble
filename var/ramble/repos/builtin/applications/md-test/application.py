@@ -10,7 +10,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class MdTest(SpackApplication):
+class MdTest(ExecutableApplication):
     """Define the MDTest parallel IO benchmark"""
 
     name = "md-test"
@@ -26,7 +26,7 @@ class MdTest(SpackApplication):
     # separate application in ramble
     software_spec("ior", pkg_spec="ior", compiler="gcc")
 
-    required_package("ior")
+    required_package("ior", package_manager="spack*")
 
     workload("multi-file", executable="ior")
 

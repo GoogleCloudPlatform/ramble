@@ -9,7 +9,7 @@
 from ramble.appkit import *
 
 
-class Nvbandwidth(SpackApplication):
+class Nvbandwidth(ExecutableApplication):
     """Define the nvbandwidth benchmark"""
 
     name = "nvbandwidth"
@@ -20,7 +20,7 @@ class Nvbandwidth(SpackApplication):
 
     software_spec("nvbandwidth", pkg_spec="nvbandwidth")
 
-    required_package("nvbandwidth")
+    required_package("nvbandwidth", package_manager="spack*")
 
     workload("all_benchmarks", executable="nvbandwidth")
 
