@@ -9,6 +9,7 @@
 
 import re
 import six
+import fnmatch
 import textwrap
 from typing import List
 
@@ -74,6 +75,15 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
         new_copy._verbosity = self._verbosity
 
         return new_copy
+
+    def environment_required(self):
+        app_inst = self.app_inst
+        if hasattr(app_inst, "software_specs"):
+            for pkg, info in app_inst.software_specs.items():
+                if fnmatch.fnmatch(self.name, info["package_manager"]):
+                    return True
+
+        return False
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg

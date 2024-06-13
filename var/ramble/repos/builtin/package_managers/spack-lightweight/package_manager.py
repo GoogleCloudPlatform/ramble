@@ -53,6 +53,7 @@ class SpackLightweight(PackageManagerBase):
 
     def _software_install_requested_compilers(self, workspace, app_inst=None):
         """Install compilers an application uses"""
+
         # See if we cached this already, and if so return
         env_path = self.app_inst.expander.env_path
         if not env_path:
@@ -76,16 +77,20 @@ class SpackLightweight(PackageManagerBase):
                 self.keywords.env_name
             )
 
+            require_env = self.environment_required()
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
-                app_context, self.app_inst.expander, self
+                app_context, self.app_inst.expander, self, require=require_env
             )
 
-            for compiler_spec in software_envs.compiler_specs_for_environment(
-                software_env
-            ):
-                logger.debug(f"Installing compiler: {compiler_spec}")
-                self.runner.install_compiler(compiler_spec)
+            if software_env is not None:
+                for (
+                    compiler_spec
+                ) in software_envs.compiler_specs_for_environment(
+                    software_env
+                ):
+                    logger.debug(f"Installing compiler: {compiler_spec}")
+                    self.runner.install_compiler(compiler_spec)
 
         except RunnerError as e:
             logger.die(e)
@@ -150,41 +155,47 @@ class SpackLightweight(PackageManagerBase):
             env_context = self.app_inst.expander.expand_var_name(
                 self.keywords.env_name
             )
+            require_env = self.environment_required()
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
-                env_context, self.app_inst.expander, self
+                env_context, self.app_inst.expander, self, require=require_env
             )
-            if isinstance(software_env, ExternalEnvironment):
-                self.runner.copy_from_external_env(software_env.external_env)
-            else:
-                for pkg_spec in software_envs.package_specs_for_environment(
-                    software_env
-                ):
-                    self.runner.add_spec(pkg_spec)
-
-                self.runner.generate_env_file()
-
-            added_packages = set(self.runner.added_packages())
-            for pkg in self.app_inst.required_packages.keys():
-                if pkg not in added_packages:
-                    logger.die(
-                        f"Software spec {pkg} is not defined "
-                        f"in environment {env_context}, but is "
-                        f"required by the {self.name} application "
-                        "definition"
+            if software_env is not None:
+                if isinstance(software_env, ExternalEnvironment):
+                    self.runner.copy_from_external_env(
+                        software_env.external_env
                     )
+                else:
+                    for (
+                        pkg_spec
+                    ) in software_envs.package_specs_for_environment(
+                        software_env
+                    ):
+                        self.runner.add_spec(pkg_spec)
 
-            for mod_inst in self.app_inst._modifier_instances:
-                for pkg in mod_inst.required_packages.keys():
+                    self.runner.generate_env_file()
+
+                added_packages = set(self.runner.added_packages())
+                for pkg in self.app_inst.required_packages.keys():
                     if pkg not in added_packages:
                         logger.die(
                             f"Software spec {pkg} is not defined "
                             f"in environment {env_context}, but is "
-                            f"required by the {mod_inst.name} modifier "
+                            f"required by the {self.name} application "
                             "definition"
                         )
 
-            self.runner.deactivate()
+                for mod_inst in self.app_inst._modifier_instances:
+                    for pkg in mod_inst.required_packages.keys():
+                        if pkg not in added_packages:
+                            logger.die(
+                                f"Software spec {pkg} is not defined "
+                                f"in environment {env_context}, but is "
+                                f"required by the {mod_inst.name} modifier "
+                                "definition"
+                            )
+
+                self.runner.deactivate()
 
         except RunnerError as e:
             logger.die(e)
@@ -310,11 +321,17 @@ class SpackLightweight(PackageManagerBase):
                 workspace.software_mirror_stats.errors.add(i)
 
         except RunnerError as e:
-            logger.die(e)
+            if self.environment_required():
+                logger.die(e)
+            pass
 
     register_phase("push_to_spack_cache", pipeline="pushtocache", run_after=[])
 
     def _push_to_spack_cache(self, workspace, app_inst=None):
+
+        # Test if experiment requires an environment
+        if not self.environment_required():
+            return
 
         env_path = self.app_inst.expander.env_path
         cache_tupl = ("push-to-cache", env_path)
@@ -333,7 +350,9 @@ class SpackLightweight(PackageManagerBase):
 
             self.runner.deactivate()
         except RunnerError as e:
-            logger.die(e)
+            if self.environment_required():
+                logger.die(e)
+            pass
 
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
@@ -416,7 +435,9 @@ class SpackLightweight(PackageManagerBase):
             self.runner.deactivate()
 
         except RunnerError as e:
-            logger.die(e)
+            if self.environment_required():
+                logger.die(e)
+            pass
 
     register_builtin(
         "spack_source", required=True, depends_on=["builtin::env_vars"]

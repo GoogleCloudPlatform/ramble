@@ -785,6 +785,7 @@ class SoftwareEnvironments(object):
             raise RambleSoftwareEnvironmentError(
                 f"No defined environment matches required name {env_name}"
             )
+        return None
 
 
 class RambleSoftwareEnvironmentError(ramble.error.RambleError):

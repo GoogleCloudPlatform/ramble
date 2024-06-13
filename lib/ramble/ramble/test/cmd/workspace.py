@@ -1226,14 +1226,14 @@ ramble:
 
         with ramble.workspace.Workspace(ws_path) as ws:
             software_dict = ws.get_software_dict()
-            assert software_dict[namespace.environments]
+            assert namespace.environments in software_dict
 
         write_config(ws_path, test_config)
 
         workspace("concretize", global_args=workspace_flags)
         with ramble.workspace.Workspace(ws_path) as ws:
             software_dict = ws.get_software_dict()
-            assert software_dict[namespace.environments]
+            assert namespace.environments in software_dict
 
 
 def test_workspace_archive():

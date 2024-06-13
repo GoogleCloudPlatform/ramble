@@ -45,16 +45,17 @@ class Spack(SpackLightweight):
         else:
             workspace.add_to_cache(cache_tupl)
 
-        try:
-            self.runner.set_dry_run(workspace.dry_run)
-            self.runner.set_env(env_path)
+        if self.environment_required():
+            try:
+                self.runner.set_dry_run(workspace.dry_run)
+                self.runner.set_env(env_path)
 
-            logger.msg("Installing software")
+                logger.msg("Installing software")
 
-            self.runner.activate()
-            self.runner.install()
-        except RunnerError as e:
-            logger.die(e)
+                self.runner.activate()
+                self.runner.install()
+            except RunnerError as e:
+                logger.die(e)
 
     register_phase(
         "define_package_paths",
@@ -88,61 +89,65 @@ class Spack(SpackLightweight):
         app_context = self.app_inst.expander.expand_var_name(
             self.keywords.env_name
         )
+        require_env = self.environment_required()
         software_environments = workspace.software_environments
         software_environment = software_environments.render_environment(
-            app_context, self.app_inst.expander, self
+            app_context, self.app_inst.expander, self, require=require_env
         )
-        # Try to resolve using local cache first
-        unresolved_specs = []
-        for pkg_spec in software_environments.package_specs_for_environment(
-            software_environment
-        ):
-            if pkg_spec in cache:
-                spack_pkg_name, pkg_path = cache.get(pkg_spec)
-                if spack_pkg_name not in self.app_inst.variables:
-                    self.app_inst.define_variable(spack_pkg_name, pkg_path)
-                    self.app_inst.define_variable(
-                        f"{spack_pkg_name}_path", pkg_path
-                    )
+        if software_environment is not None:
+            # Try to resolve using local cache first
+            unresolved_specs = []
+            for (
+                pkg_spec
+            ) in software_environments.package_specs_for_environment(
+                software_environment
+            ):
+                if pkg_spec in cache:
+                    spack_pkg_name, pkg_path = cache.get(pkg_spec)
+                    if spack_pkg_name not in self.app_inst.variables:
+                        self.app_inst.define_variable(spack_pkg_name, pkg_path)
+                        self.app_inst.define_variable(
+                            f"{spack_pkg_name}_path", pkg_path
+                        )
+                    else:
+                        logger.msg(
+                            f"Variable {spack_pkg_name} defined. "
+                            + "Skipping extraction from spack"
+                        )
                 else:
-                    logger.msg(
-                        f"Variable {spack_pkg_name} defined. "
-                        + "Skipping extraction from spack"
-                    )
-            else:
-                unresolved_specs.append(pkg_spec)
-        if not unresolved_specs:
-            return
+                    unresolved_specs.append(pkg_spec)
+            if not unresolved_specs:
+                return
 
-        try:
-            logger.debug("Resolving package paths using Spack")
-            self.runner.set_dry_run(workspace.dry_run)
-            self.runner.set_env(self.app_inst.expander.env_path)
+            try:
+                logger.debug("Resolving package paths using Spack")
+                self.runner.set_dry_run(workspace.dry_run)
+                self.runner.set_env(self.app_inst.expander.env_path)
 
-            self.runner.activate()
+                self.runner.activate()
 
-            for pkg_spec in unresolved_specs:
-                spack_pkg_name, pkg_path = self.runner.get_package_path(
-                    pkg_spec
-                )
-                if f"{spack_pkg_name}_path" not in self.app_inst.variables:
-                    self.app_inst.define_variable(spack_pkg_name, pkg_path)
-                    self.app_inst.define_variable(
-                        f"{spack_pkg_name}_path", pkg_path
+                for pkg_spec in unresolved_specs:
+                    spack_pkg_name, pkg_path = self.runner.get_package_path(
+                        pkg_spec
                     )
-                    cache[pkg_spec] = (spack_pkg_name, pkg_path)
-                else:
-                    logger.msg(
-                        f"Variable {spack_pkg_name} defined. "
-                        + "Skipping extraction from spack"
-                    )
-                    logger.msg(
-                        f"Variable {spack_pkg_name}_path defined. "
-                        + "Skipping extraction from spack"
-                    )
+                    if f"{spack_pkg_name}_path" not in self.app_inst.variables:
+                        self.app_inst.define_variable(spack_pkg_name, pkg_path)
+                        self.app_inst.define_variable(
+                            f"{spack_pkg_name}_path", pkg_path
+                        )
+                        cache[pkg_spec] = (spack_pkg_name, pkg_path)
+                    else:
+                        logger.msg(
+                            f"Variable {spack_pkg_name} defined. "
+                            + "Skipping extraction from spack"
+                        )
+                        logger.msg(
+                            f"Variable {spack_pkg_name}_path defined. "
+                            + "Skipping extraction from spack"
+                        )
 
-        except RunnerError as e:
-            logger.die(e)
+            except RunnerError as e:
+                logger.die(e)
 
     @deprecation.deprecated(
         deprecated_in="0.5.0",
@@ -168,18 +173,26 @@ class Spack(SpackLightweight):
         app_context = self.app_inst.expander.expand_var_name(
             self.keywords.env_name
         )
+
+        require_env = self.environment_required()
         software_environments = workspace.software_environments
         software_environment = software_environments.render_environment(
-            app_context, self.app_inst.expander, self
+            app_context, self.app_inst.expander, self, require=require_env
         )
 
-        for pkg_spec in software_environments.package_specs_for_environment(
-            software_environment
-        ):
-            if pkg_spec in cache:
-                spack_pkg_name, pkg_path = cache.get(pkg_spec)
-                if spack_pkg_name in self.app_inst.expander._used_variables:
-                    self.__print_deprecated_warning(spack_pkg_name)
+        if software_environment is not None:
+            for (
+                pkg_spec
+            ) in software_environments.package_specs_for_environment(
+                software_environment
+            ):
+                if pkg_spec in cache:
+                    spack_pkg_name, pkg_path = cache.get(pkg_spec)
+                    if (
+                        spack_pkg_name
+                        in self.app_inst.expander._used_variables
+                    ):
+                        self.__print_deprecated_warning(spack_pkg_name)
 
     register_builtin(
         "spack_activate",
