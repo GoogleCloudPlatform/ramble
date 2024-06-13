@@ -71,7 +71,9 @@ class GcpMetadata(BasicModifier):
         if os.path.isfile(file_name):
             with open(file_name, "r") as f:
                 for cur_id in f.readlines():
-                    ids.add(cur_id.strip())
+                    cur_id = cur_id.strip()
+                    if cur_id.isnumeric():
+                        ids.add(cur_id)
 
             with open(
                 self.expander.expand_var(
