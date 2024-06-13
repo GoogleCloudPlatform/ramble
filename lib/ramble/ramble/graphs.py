@@ -107,8 +107,7 @@ class AttributeGraph(object):
                 sorter = graphlib.TopologicalSorter(self.adj_list)
             except AttributeError:
                 logger.die(
-                    "graphlib.TopologicalSorter is not found."
-                    "Ensure requirements.txt are installed (including backports, where needed)."
+                    "graphlib.TopologicalSorter is not found. Ensure requirements.txt are installed (including backports, where needed)."
                 )
 
             try:
