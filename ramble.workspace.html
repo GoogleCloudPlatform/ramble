@@ -93,6 +93,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.exists"><code class="docutils literal notranslate"><span class="pre">exists()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.get_workspace_path"><code class="docutils literal notranslate"><span class="pre">get_workspace_path()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.is_workspace_dir"><code class="docutils literal notranslate"><span class="pre">is_workspace_dir()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.licenses_file"><code class="docutils literal notranslate"><span class="pre">licenses_file()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.namespace"><code class="docutils literal notranslate"><span class="pre">namespace</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.no_active_workspace"><code class="docutils literal notranslate"><span class="pre">no_active_workspace()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.workspace.read"><code class="docutils literal notranslate"><span class="pre">read()</span></code></a></li>
@@ -714,6 +715,12 @@ workspace.</p>
 <dt class="sig sig-object py" id="ramble.workspace.is_workspace_dir">
 <span class="sig-prename descclassname"><span class="pre">ramble.workspace.</span></span><span class="sig-name descname"><span class="pre">is_workspace_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#is_workspace_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.is_workspace_dir" title="Link to this definition"></a></dt>
 <dd><p>Whether a directory contains a ramble workspace.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.workspace.licenses_file">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.</span></span><span class="sig-name descname"><span class="pre">licenses_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#licenses_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.licenses_file" title="Link to this definition"></a></dt>
+<dd><p>Returns the path to a workspace’s licenses.yaml</p>
 </dd></dl>
 
 <dl class="py class">
@@ -1576,6 +1583,11 @@ is found; if <code class="docutils literal notranslate"><span class="pre">False<
 </dd></dl>
 
 <dl class="py function">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.get_yaml_filepath">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">get_yaml_filepath</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">file_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#get_yaml_filepath"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.get_yaml_filepath" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.is_workspace_dir">
 <span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">is_workspace_dir</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#is_workspace_dir"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.is_workspace_dir" title="Link to this definition"></a></dt>
 <dd><p>Whether a directory contains a ramble workspace.</p>
@@ -1584,7 +1596,13 @@ is found; if <code class="docutils literal notranslate"><span class="pre">False<
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.workspace.workspace.license_path">
 <span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">license_path</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#license_path"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.license_path" title="Link to this definition"></a></dt>
-<dd><p>Get the root directory for a workspace by name.</p>
+<dd><p>Get the path to the shared license include for a workspace by name.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="ramble.workspace.workspace.licenses_file">
+<span class="sig-prename descclassname"><span class="pre">ramble.workspace.workspace.</span></span><span class="sig-name descname"><span class="pre">licenses_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/workspace/workspace.html#licenses_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.workspace.workspace.licenses_file" title="Link to this definition"></a></dt>
+<dd><p>Returns the path to a workspace’s licenses.yaml</p>
 </dd></dl>
 
 <dl class="py data">

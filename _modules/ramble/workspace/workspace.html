@@ -200,6 +200,7 @@
 <span class="n">config_schema</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">schema</span>
 <span class="n">config_section</span> <span class="o">=</span> <span class="s2">&quot;workspace&quot;</span>
 <span class="n">config_file_name</span> <span class="o">=</span> <span class="s2">&quot;ramble.yaml&quot;</span>
+<span class="n">licenses_file_name</span> <span class="o">=</span> <span class="s2">&quot;licenses.yaml&quot;</span>
 
 
 <div class="viewcode-block" id="default_config_yaml">
@@ -435,7 +436,7 @@
 <div class="viewcode-block" id="license_path">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.license_path">[docs]</a>
 <span class="k">def</span> <span class="nf">license_path</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the root directory for a workspace by name.&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the path to the shared license include for a workspace by name.&quot;&quot;&quot;</span>
     <span class="n">shared_license_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workspace_shared_path</span><span class="p">,</span> <span class="n">workspace_shared_license_path</span><span class="p">)</span>
     <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">root</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">shared_license_path</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">_root</span><span class="p">(</span><span class="n">name</span><span class="p">)</span></div>
@@ -460,13 +461,28 @@
 
 
 
+<div class="viewcode-block" id="get_yaml_filepath">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.get_yaml_filepath">[docs]</a>
+<span class="k">def</span> <span class="nf">get_yaml_filepath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">is_workspace_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">workspace_config_path</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
 <div class="viewcode-block" id="config_file">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.config_file">[docs]</a>
 <span class="k">def</span> <span class="nf">config_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the path to a workspace&#39;s ramble.yaml&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="n">is_workspace_dir</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">workspace_config_path</span><span class="p">,</span> <span class="n">config_file_name</span><span class="p">)</span>
-    <span class="k">return</span> <span class="kc">None</span></div>
+    <span class="k">return</span> <span class="n">get_yaml_filepath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">config_file_name</span><span class="p">)</span></div>
+
+
+
+<div class="viewcode-block" id="licenses_file">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.licenses_file">[docs]</a>
+<span class="k">def</span> <span class="nf">licenses_file</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Returns the path to a workspace&#39;s licenses.yaml&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">get_yaml_filepath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">licenses_file_name</span><span class="p">)</span></div>
 
 
 
