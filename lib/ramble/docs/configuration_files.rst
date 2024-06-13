@@ -650,3 +650,6 @@ The format of this section is as follows:
 
 Variants are expanded following the same logic to expand variables (so a
 variant could be lazily expanded based on an experiment's variable definitions).
+
+The default value for ``package_manager`` is ``null`` which disables the use of
+a package manager.
