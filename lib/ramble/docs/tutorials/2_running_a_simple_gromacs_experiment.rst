@@ -40,7 +40,7 @@ Searching the output for the sections marked ``Workload: water_bare`` and
 .. code-block:: console
 
     Workload: water_gmx50
-        Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'pre-process', 'execute-gen']
+        Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_gmx50_bare']
         Variables:
             size:
@@ -55,7 +55,7 @@ Searching the output for the sections marked ``Workload: water_bare`` and
                 Description: Input path for water GMX50
                 Default: {water_gmx50_bare}/{size}
     Workload: water_bare
-        Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'pre-process', 'execute-gen']
+        Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
         Variables:
             size:

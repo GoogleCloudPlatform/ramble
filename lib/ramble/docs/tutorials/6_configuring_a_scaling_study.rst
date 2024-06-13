@@ -159,12 +159,14 @@ MPI implementation you wish to use, but good default might be
 ``mpirun -n {n_ranks}``. If you would like to add ``hostfile`` and ``ppn``
 flags, feel free to do so here.
 
-Your configuration file might look like the
-following after adding this information:
+Your configuration file might look like the following after adding this
+information:
 
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -206,6 +208,8 @@ look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'

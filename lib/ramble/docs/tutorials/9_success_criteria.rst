@@ -101,6 +101,8 @@ configuration file might look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       variables:
         processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'
@@ -170,6 +172,8 @@ resulting configuration file might look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       variables:
         processes_per_node: 16
         n_ranks: '{processes_per_node}*{n_nodes}'

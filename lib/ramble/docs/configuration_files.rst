@@ -39,6 +39,7 @@ Currently, Ramble supports the following configuration sections:
 * :ref:`software <software-config>`
 * :ref:`success_criteria <success-criteria-config>`
 * :ref:`variables <variables-config>`
+* :ref:`variants <variants-config>`
 
 Each of these config sections has a defined schema contained in
 ``lib/ramble/ramble/schemas``.
@@ -131,6 +132,7 @@ In the above ``[optional_definitions]`` can include any of:
 * :ref:`modifiers <modifiers-config>`
 * :ref:`success_criteria <success-criteria-config>`
 * :ref:`variables <variables-config>`
+* :ref:`variants <variants-config>`
 
 Each of these will be described in their own section below.
 
@@ -624,4 +626,27 @@ format is as follows:
       cross_reference_var: 'var in <app>.<workload>.<exp>'
 
 Variables can be defined as lists, scalars, or can refer to a variable defined in
-another fully qualified experiment (through the ``cross_ref_var`` syntax).
+another fully qualified experiment (through the syntax shown in ``cross_reference_var``).
+
+For more information on variable expansion rules, see:
+:ref:`workspace variable dictionary definitions<variable-dictionaries>`.
+
+.. _variants-config:
+
+----------------
+Variants Section
+----------------
+
+The variants config section is used to customize variants to the experiment creation.
+These can include application defined variants, or higher level Ramble provided
+variants. Currently, the only supported variants is ``package_manager`` which
+allows an experiment to define the package manager it should use.
+The format of this section is as follows:
+
+.. code-block:: yaml
+
+    variants:
+      package_manager: <pkg_man_name> or null or None
+
+Variants are expanded following the same logic to expand variables (so a
+variant could be lazily expanded based on an experiment's variable definitions).
