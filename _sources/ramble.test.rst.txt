@@ -107,6 +107,14 @@ ramble.test.gcs\_fetch module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.get\_file\_path module
+----------------------------------
+
+.. automodule:: ramble.test.get_file_path
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.mirror\_tests module
 --------------------------------
 
