@@ -23,13 +23,6 @@ def subsection_title(s):
     return level1_color + s + plain_format
 
 
-@deprecation.deprecated(
-    deprecated_in="0.5.0",
-    removed_in="0.6.0",
-    current_version=str(ramble.ramble_version),
-    details="The SpackApplication class is deprecated. "
-    + "Convert instances to ExecutableApplication instead",
-)
 class SpackApplication(ApplicationBase):
     """Specialized class for applications that are installed from spack.
 
@@ -46,6 +39,13 @@ class SpackApplication(ApplicationBase):
     ]
     _spec_keys = ["pkg_spec", "compiler_spec", "compiler"]
 
+    @deprecation.deprecated(
+        deprecated_in="0.5.0",
+        removed_in="0.6.0",
+        current_version=str(ramble.ramble_version),
+        details="The SpackApplication class is deprecated. "
+        + "Convert instances to ExecutableApplication instead",
+    )
     def __init__(self, file_path):
         super().__init__(file_path)
 
