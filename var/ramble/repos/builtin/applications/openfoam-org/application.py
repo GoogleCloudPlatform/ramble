@@ -20,15 +20,21 @@ class OpenfoamOrg(SpackApplication):
 
     tags("cfd", "fluid", "dynamics")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
 
     software_spec(
         "ompi412",
         pkg_spec="openmpi@4.1.2 +legacylaunchers +cxx",
         compiler="gcc9",
+        package_manager="spack*",
     )
 
-    software_spec("openfoam-org", pkg_spec="openfoam-org@10", compiler="gcc9")
+    software_spec(
+        "openfoam-org",
+        pkg_spec="openfoam-org@10",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
     required_package("openfoam-org")
 

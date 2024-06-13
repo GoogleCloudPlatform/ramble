@@ -20,11 +20,18 @@ class Hpcg(ExecutableApplication):
 
     tags("benchmark-app", "mini-app", "benchmark")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
 
-    software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
-    software_spec("hpcg", pkg_spec="hpcg@3.1 +openmp", compiler="gcc9")
+    software_spec(
+        "hpcg",
+        pkg_spec="hpcg@3.1 +openmp",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
     required_package("hpcg", package_manager="spack*")
 

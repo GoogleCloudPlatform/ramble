@@ -26,14 +26,21 @@ class SpackMod(BasicModifier):
         "mod_compiler",
         pkg_spec="mod_compiler@1.1 target=x86_64",
         compiler_spec="mod_compiler@1.1",
+        package_manager="spack*",
     )
 
     software_spec(
-        "mod_package1", pkg_spec="mod_package1@1.1", compiler="mod_compiler"
+        "mod_package1",
+        pkg_spec="mod_package1@1.1",
+        compiler="mod_compiler",
+        package_manager="spack*",
     )
 
     software_spec(
-        "mod_package2", pkg_spec="mod_package2@1.1", compiler="mod_compiler"
+        "mod_package2",
+        pkg_spec="mod_package2@1.1",
+        compiler="mod_compiler",
+        package_manager="spack*",
     )
 
     package_manager_requirement(

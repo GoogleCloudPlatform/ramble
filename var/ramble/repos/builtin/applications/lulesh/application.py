@@ -20,11 +20,18 @@ class Lulesh(ExecutableApplication):
 
     tags("proxy-app", "mini-app")
 
-    define_compiler("gcc13", pkg_spec="gcc@13.1.0")
+    define_compiler("gcc13", pkg_spec="gcc@13.1.0", package_manager="spack*")
 
-    software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
-    software_spec("lulesh", pkg_spec="lulesh@2.0.3 +openmp", compiler="gcc13")
+    software_spec(
+        "lulesh",
+        pkg_spec="lulesh@2.0.3 +openmp",
+        compiler="gcc13",
+        package_manager="spack*",
+    )
 
     required_package("lulesh", package_manager="spack*")
 

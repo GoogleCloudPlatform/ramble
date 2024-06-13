@@ -20,7 +20,12 @@ class Iperf2(ExecutableApplication):
 
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec("iperf2", pkg_spec="iperf2@2.0.12", compiler="gcc9")
+    software_spec(
+        "iperf2",
+        pkg_spec="iperf2@2.0.12",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
     required_package("iperf2", package_manager="spack*")
 

@@ -12,7 +12,7 @@ from ramble.appkit import *
 class ZlibConfigs(ExecutableApplication):
     name = "zlib-configs"
 
-    software_spec("zlib", pkg_spec="zlib")
+    software_spec("zlib", pkg_spec="zlib", package_manager="spack*")
 
     executable("list_lib", "ls {zlib}/lib", use_mpi=False)
 
