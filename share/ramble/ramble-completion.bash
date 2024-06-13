@@ -717,7 +717,7 @@ _ramble_workspace_info() {
 }
 
 _ramble_workspace_edit() {
-    RAMBLE_COMPREPLY="-h --help -c --config_only -t --template_only -p --print-file"
+    RAMBLE_COMPREPLY="-h --help -c --config_only -t --template_only -l --license_only -p --print-file"
 }
 
 _ramble_workspace_mirror() {
