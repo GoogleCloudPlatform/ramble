@@ -25,9 +25,16 @@ Alternatively, the files can be edited directly with:
 Within the ``ramble.yaml`` file, write the following contents, which is the
 final configuration from a previous tutorial.
 
+
+**NOTE**: This workspace utilizes the ``spack`` package manager. As a result, it
+requires ``spack`` is installed and available in your path. Modifications to
+the ``package_manager`` variant will change this behavior.
+
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'

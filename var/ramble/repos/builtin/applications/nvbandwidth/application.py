@@ -18,7 +18,9 @@ class Nvbandwidth(ExecutableApplication):
 
     tags("synthetic-benchmarks")
 
-    software_spec("nvbandwidth", pkg_spec="nvbandwidth")
+    software_spec(
+        "nvbandwidth", pkg_spec="nvbandwidth", package_manager="spack*"
+    )
 
     required_package("nvbandwidth", package_manager="spack*")
 

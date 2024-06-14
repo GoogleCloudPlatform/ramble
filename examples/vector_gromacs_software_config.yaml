@@ -1,4 +1,6 @@
 ramble:
+  variants:
+    package_manager: spack
   env_vars:
     set:
       OMP_NUM_THREADS: '{n_threads}'

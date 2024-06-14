@@ -33,7 +33,7 @@ properties = {
                             "default": None,
                         },
                     },
-                    "additionalProperties": False,
+                    "additionalProperties": {"type": "string"},
                     "default": {},
                 },
             },

@@ -341,9 +341,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 out_str.append(rucolor.section_title("%s:\n" % group[1]))
                 for name, info in getattr(self, group[0]).items():
                     out_str.append(rucolor.nested_1("  %s:\n" % name))
-                    for key in self._spec_keys:
-                        if key in info and info[key]:
-                            out_str.append("    %s = %s\n" % (key, info[key].replace("@", "@@")))
+                    for key, val in info.items():
+                        if val:
+                            out_str.append("    %s = %s\n" % (key, val.replace("@", "@@")))
 
         return out_str
 

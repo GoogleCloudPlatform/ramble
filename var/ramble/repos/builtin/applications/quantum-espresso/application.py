@@ -27,11 +27,18 @@ class QuantumEspresso(ExecutableApplication):
         "pseudopotentials",
     )
 
-    define_compiler("gcc13", pkg_spec="gcc@13.1.0")
+    define_compiler("gcc13", pkg_spec="gcc@13.1.0", package_manager="spack*")
 
-    software_spec("impi2021p8", pkg_spec="intel-oneapi-mpi@2021.8.0")
     software_spec(
-        "quantum-espresso", pkg_spec="quantum-espresso@7.1", compiler="gcc13"
+        "impi2021p8",
+        pkg_spec="intel-oneapi-mpi@2021.8.0",
+        package_manager="spack*",
+    )
+    software_spec(
+        "quantum-espresso",
+        pkg_spec="quantum-espresso@7.1",
+        compiler="gcc13",
+        package_manager="spack*",
     )
 
     required_package("quantum-espresso", package_manager="spack*")

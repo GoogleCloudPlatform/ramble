@@ -20,9 +20,16 @@ class Gromacs(ExecutableApplication):
 
     tags("molecular-dynamics")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
-    software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
-    software_spec("gromacs", pkg_spec="gromacs@2020.5", compiler="gcc9")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
+    software_spec(
+        "gromacs",
+        pkg_spec="gromacs@2020.5",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
     executable(
         "pre-process",

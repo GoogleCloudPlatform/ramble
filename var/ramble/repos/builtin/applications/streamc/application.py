@@ -25,12 +25,13 @@ class Streamc(ExecutableApplication):
         "micro-benchmark",
     )
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
 
     software_spec(
         "streamc",
         pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
         compiler="gcc12",
+        package_manager="spack*",
     )
 
     required_package("stream", package_manager="spack*")

@@ -8,8 +8,6 @@
 
 from collections import defaultdict
 
-from spack.util.naming import spack_module_to_python_module
-
 import ramble.repository
 import ramble.workspace
 import ramble.keywords
@@ -243,10 +241,18 @@ class TemplatePackage(SoftwarePackage):
         name = expander.expand_var(self.name)
         pm_name = package_manager.name
         pkg_info = self.pkg_info
-        pm_prefix = spack_module_to_python_module(pm_name)
-        raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix) or pkg_info["spec"]
+        pm_prefix = package_manager.spec_prefix()
+
+        raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix)
         raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix)
         raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix)
+
+        if raw_spec is None:
+            logger.die(
+                f"When rendering package {self.name} "
+                + f"no spec was found for package manager {pm_name}.\n"
+            )
+
         spec = expander.expand_var(raw_spec)
         compiler = expander.expand_var(raw_compiler) if raw_compiler else None
         compiler_spec = expander.expand_var(raw_compiler_spec) if raw_compiler_spec else None
@@ -779,6 +785,7 @@ class SoftwareEnvironments(object):
             raise RambleSoftwareEnvironmentError(
                 f"No defined environment matches required name {env_name}"
             )
+        return None
 
 
 class RambleSoftwareEnvironmentError(ramble.error.RambleError):

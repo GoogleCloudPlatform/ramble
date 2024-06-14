@@ -22,17 +22,27 @@ class Namd(ExecutableApplication):
 
     tags("molecular-dynamics", "charm++", "task-parallelism")
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
 
-    software_spec("impi2021p8", pkg_spec="intel-oneapi-mpi@2021.8.0")
+    software_spec(
+        "impi2021p8",
+        pkg_spec="intel-oneapi-mpi@2021.8.0",
+        package_manager="spack*",
+    )
 
     software_spec(
         "charmpp",
         pkg_spec="charmpp backend=mpi build-target=charm++",
         compiler="gcc12",
+        package_manager="spack*",
     )
 
-    software_spec("namd", pkg_spec="namd@2.14 interface=tcl", compiler="gcc12")
+    software_spec(
+        "namd",
+        pkg_spec="namd@2.14 interface=tcl",
+        compiler="gcc12",
+        package_manager="spack*",
+    )
 
     required_package("namd", package_manager="spack*")
 

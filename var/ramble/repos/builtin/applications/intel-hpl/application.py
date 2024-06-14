@@ -26,13 +26,16 @@ class IntelHpl(ExecutableApplication):
 
     tags("benchmark-app", "benchmark", "linpack", "optimized", "intel", "mkl")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
     software_spec(
         "imkl_2023p1",
         pkg_spec="intel-oneapi-mkl@2023.1.0 threads=openmp",
         compiler="gcc9",
+        package_manager="spack*",
     )
-    software_spec("impi_2018", pkg_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi_2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
     required_package("intel-oneapi-mkl", package_manager="spack*")
 

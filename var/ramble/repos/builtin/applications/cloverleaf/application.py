@@ -29,15 +29,19 @@ class Cloverleaf(ExecutableApplication):
         "mini-benchmark",
     )
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
 
     software_spec(
         "ompi414",
         pkg_spec="openmpi@4.1.4 +legacylaunchers +cxx",
         compiler="gcc12",
+        package_manager="spack*",
     )
     software_spec(
-        "cloverleaf", pkg_spec="cloverleaf@1.1 build=ref", compiler="gcc12"
+        "cloverleaf",
+        pkg_spec="cloverleaf@1.1 build=ref",
+        compiler="gcc12",
+        package_manager="spack*",
     )
 
     required_package("cloverleaf", package_manager="spack*")

@@ -28,11 +28,18 @@ class Hmmer(ExecutableApplication):
 
     tags("molecular-dynamics", "hidden-markov-models", "bio-molecule")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
 
-    software_spec("impi_2018", pkg_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi_2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
-    software_spec("hmmer", pkg_spec="hmmer@3.3.2", compiler="gcc9")
+    software_spec(
+        "hmmer",
+        pkg_spec="hmmer@3.3.2",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
     # This would ideally not use the current_release, as the package will need to be manually updated per release
     # Here current_release == 'Pfam36.0'

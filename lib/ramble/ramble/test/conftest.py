@@ -6,7 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import builtins
 import collections
+import io
 import os
 import os.path
 import shutil
@@ -21,6 +23,7 @@ import ramble.paths
 import ramble.repository
 import ramble.stage
 from ramble.fetch_strategy import FetchError, FetchStrategyComposite, URLFetchStrategy
+from ramble.util.file_util import is_dry_run_path
 
 import spack.platforms
 import spack.util.spack_yaml as syaml
@@ -587,6 +590,23 @@ def mock_fetch(mock_archive, monkeypatch):
     mock_fetcher.append(URLFetchStrategy(mock_archive.url))
 
     yield mock_fetcher
+
+
+@pytest.fixture()
+def mock_file_auto_create(monkeypatch):
+    builtin_open = builtins.open
+
+    def open_or_create_inmem(path, *args, **kwargs):
+        if not os.path.exists(path) and is_dry_run_path(path):
+            if path.endswith(".yaml") or path.endswith(".yml"):
+                content = "{}"
+            else:
+                content = ""
+            inmem = io.StringIO(content)
+            return inmem
+        return builtin_open(path, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "open", open_or_create_inmem)
 
 
 def pytest_generate_tests(metafunc):

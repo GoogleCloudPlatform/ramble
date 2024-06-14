@@ -70,6 +70,8 @@ final configuration from the previous tutorial.
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -165,6 +167,8 @@ generation as well. The result might look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -234,6 +238,8 @@ into the matrix. The result might look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -337,6 +343,8 @@ resulting configuration might look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -425,6 +433,8 @@ The resulting configuration file might look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'

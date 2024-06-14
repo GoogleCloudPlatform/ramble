@@ -9,6 +9,7 @@
 
 import re
 import six
+import fnmatch
 import textwrap
 from typing import List
 
@@ -44,6 +45,8 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
         ("software_specs", "Software Specs"),
     ]
 
+    _spec_prefix = ""
+
     package_manager_class = "PackageManagerBase"
 
     #: Lists of strings which contains GitHub usernames of attributes.
@@ -73,6 +76,15 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         return new_copy
 
+    def environment_required(self):
+        app_inst = self.app_inst
+        if hasattr(app_inst, "software_specs"):
+            for pkg, info in app_inst.software_specs.items():
+                if fnmatch.fnmatch(self.name, info["package_manager"]):
+                    return True
+
+        return False
+
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
 
@@ -82,6 +94,14 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
             compiler (boolean): True if this pkg is used as a compiler
         """
         return ""
+
+    def spec_prefix(self):
+        """Return this package manager's spec prefix
+
+        Returns:
+            self._spec_prefix (str): Prefix for this package manager's specs
+        """
+        return spack.util.naming.spack_module_to_python_module(self._spec_prefix)
 
     def _long_print(self):
         out_str = []

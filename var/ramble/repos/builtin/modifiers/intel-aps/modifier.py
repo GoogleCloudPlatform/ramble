@@ -41,7 +41,11 @@ class IntelAps(BasicModifier):
 
     archive_pattern("aps_*_results_dir/*")
 
-    software_spec("intel-oneapi-vtune", pkg_spec="intel-oneapi-vtune")
+    software_spec(
+        "intel-oneapi-vtune",
+        pkg_spec="intel-oneapi-vtune",
+        package_manager="spack*",
+    )
 
     required_package("intel-oneapi-vtune", package_manager="spack*")
 

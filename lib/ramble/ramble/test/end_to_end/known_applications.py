@@ -30,7 +30,7 @@ workspace = RambleCommand("workspace")
 @pytest.mark.long
 @deprecation.fail_if_not_removed
 @pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
-def test_known_applications(application, package_manager, capsys):
+def test_known_applications(application, package_manager, capsys, mock_file_auto_create):
     info_cmd = RambleCommand("info")
 
     setup_type = ramble.pipeline.pipelines.setup

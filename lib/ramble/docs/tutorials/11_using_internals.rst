@@ -109,6 +109,8 @@ the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -205,6 +207,8 @@ configuration file should look like the following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -302,6 +306,8 @@ following:
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       variables:
         processes_per_node: 4
         n_ranks: '{processes_per_node}*{n_nodes}'
