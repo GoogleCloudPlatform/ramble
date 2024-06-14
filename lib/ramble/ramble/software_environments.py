@@ -54,7 +54,7 @@ class SoftwarePackage(object):
         self.pkg_info = pkg_info
         self._package_type = "Base"
 
-    def spec_str(self, all_packages: dict | None = None, compiler=False):
+    def spec_str(self, all_packages: dict = {}, compiler=False):
         """Return a spec string for this software package
 
         Args:
@@ -123,8 +123,8 @@ class RenderedPackage(SoftwarePackage):
         pkg_info: dict,
         package_manager: PackageManagerBase,
         spec: str,
-        compiler: str | None = None,
-        compiler_spec: str | None = None,
+        compiler: str = "",
+        compiler_spec: str = "",
     ):
         """Software package constructor
 
@@ -146,7 +146,7 @@ class RenderedPackage(SoftwarePackage):
         self.compiler_spec = compiler_spec
         self._package_type = "Rendered"
 
-    def spec_str(self, all_packages: dict | None = None, compiler=False):
+    def spec_str(self, all_packages: dict = {}, compiler=False):
         """Return a spec string for this software package
 
         Args:
@@ -404,7 +404,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         self._rendered_environments = defaultdict(dict)
         self._environment_type = "Template"
 
-    def add_package_name(self, package: str = None):
+    def add_package_name(self, package: str = ""):
         self._package_names.add(package)
 
     def info(self, indent: int = 0, verbosity: int = 0, color_level: int = 0):
