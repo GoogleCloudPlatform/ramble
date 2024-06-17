@@ -13,6 +13,9 @@ import llnl.util.filesystem as fs
 
 import ramble.util.hashing
 
+import ramble.config
+from ramble.util.sourcing import source_str
+
 
 class EnvironmentModules(PackageManagerBase):
     """Definition for using environment-modules as a package manager
@@ -25,9 +28,6 @@ class EnvironmentModules(PackageManagerBase):
     name = "environment-modules"
 
     maintainers("douglasjacobsen")
-
-    def get_spec_str(self, pkg, all_pkgs, compiler):
-        return pkg.spec
 
     register_phase(
         "write_module_commands",
@@ -88,4 +88,5 @@ class EnvironmentModules(PackageManagerBase):
     register_builtin("module_load", required=True)
 
     def module_load(self):
-        return [" . {env_path}/module_loads"]
+        shell = ramble.config.get("config:shell")
+        return [f"{source_str(shell)} " + "{env_path}/module_loads"]

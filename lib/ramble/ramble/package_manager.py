@@ -88,12 +88,16 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
 
+        Can be overridden by individual package managers to provide a more
+        specific package spec string. Default is to just return the detected
+        package spec.
+
         Args:
             pkg (RenderedPackage): Reference to a rendered package
             all_pkgs (dict): All related packages
             compiler (boolean): True if this pkg is used as a compiler
         """
-        return ""
+        return pkg.spec
 
     def spec_prefix(self):
         """Return this package manager's spec prefix

@@ -47,6 +47,7 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 from ramble.util.logger import logger
+from ramble.util.sourcing import source_str
 
 from ramble.workspace import namespace
 
@@ -2066,7 +2067,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     app_licenses = license_conf[self.name]
                     if app_licenses:
                         # Append logic to source file which contains the exports
-                        command.append(f". {{license_input_dir}}/{self.license_inc_name}")
+                        shell = ramble.config.get("config:shell")
+                        command.append(
+                            f"{source_str(shell)} {{license_input_dir}}/{self.license_inc_name}"
+                        )
 
         # Process environment variable actions
         for env_var_set in self._env_variable_sets:
