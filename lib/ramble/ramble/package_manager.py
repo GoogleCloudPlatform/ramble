@@ -222,6 +222,20 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
 
         return self.app_inst.expander._used_variables
 
+    def populate_inventory(self, workspace, force_compute=False, require_exist=False):
+        """Stub class method for populating an experiment inventory.
+        Specific package managers should implement this to convey inventory
+        information to the workspace / experiment.
+
+        Args:
+            workspace (Workspace): Reference to the workspace that is currently
+                                   being acted on.
+            force_compute (boolean): Whether to force computation of hashes or not
+            require_exist (boolean): Whether to require environment hashes exist or not.
+        """
+
+        pass
+
 
 class PackageManagerError(RambleError):
     """
