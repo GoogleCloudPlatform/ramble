@@ -1827,6 +1827,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         re.compile(self.expander.expand_var(conf["match"])),
                         conf["file"],
                     )
+                elif conf["mode"] == "fom_comparison":
+                    criteria_list.add_criteria(
+                        success_scope,
+                        criteria,
+                        conf["mode"],
+                        fom_name=conf["fom_name"],
+                        fom_context=conf["fom_context"],
+                        formula=conf["formula"],
+                    )
 
         criteria_list.add_criteria(
             scope="application_definition",
