@@ -105,7 +105,8 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
         Returns:
             self._spec_prefix (str): Prefix for this package manager's specs
         """
-        return spack.util.naming.spack_module_to_python_module(self._spec_prefix)
+        prefix = self._spec_prefix or self.name
+        return spack.util.naming.spack_module_to_python_module(prefix)
 
     def _long_print(self):
         out_str = []
