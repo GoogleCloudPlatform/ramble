@@ -749,7 +749,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 mod_inst.set_on_executables(None)
 
             if "mode" in mod:
-                mod_inst.set_usage_mode(mod["mode"])
+                mode_name = self.expander.expand_var(mod["mode"])
+                mod_inst.set_usage_mode(mode_name)
             else:
                 mod_inst.set_usage_mode(None)
 
