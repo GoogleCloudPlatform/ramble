@@ -6,6 +6,14 @@ ramble.test.modifier\_functionality namespace
 Submodules
 ----------
 
+ramble.test.modifier\_functionality.experiment\_modification module
+-------------------------------------------------------------------
+
+.. automodule:: ramble.test.modifier_functionality.experiment_modification
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.modifier\_functionality.mock\_env\_var\_modifiers module
 --------------------------------------------------------------------
 
