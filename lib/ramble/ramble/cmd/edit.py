@@ -21,22 +21,23 @@ section = "application dev"
 level = "short"
 
 
-def edit_application(name, repo_path, namespace):
+def edit_object(name, obj_type_name, repo_path, namespace):
     """Opens the requested application file in your favorite $EDITOR.
 
     Args:
         name (str): The name of the application
+        obj_type_name (str): Name of the object type to edit
         repo_path (str): The path to the repository containing this application
         namespace (str): A valid namespace registered with Ramble
     """
-    app_type = ramble.repository.ObjectTypes.applications
+    obj_type = ramble.repository.ObjectTypes[obj_type_name]
     # Find the location of the package
     if repo_path:
-        repo = ramble.repository.Repo(repo_path)
+        repo = ramble.repository.Repo(repo_path, object_type=obj_type)
     elif namespace:
-        repo = ramble.repository.paths[app_type].get_repo(namespace)
+        repo = ramble.repository.paths[obj_type].get_repo(namespace)
     else:
-        repo = ramble.repository.paths[app_type]
+        repo = ramble.repository.paths[obj_type]
     path = repo.filename_for_object_name(name)
 
     if os.path.exists(path):
@@ -55,18 +56,17 @@ def edit_application(name, repo_path, namespace):
 
 
 def setup_parser(subparser):
+    # Edits object (application) files by default
+    subparser.add_argument(
+        "--type",
+        default=f"{ramble.repository.default_type.name}",
+        help=f"Type of object to edit. Defaults to '{ramble.repository.default_type.name}'. "
+        f"Allowed types are {', '.join(ramble.repository.OBJECT_NAMES)}",
+    )
+
     excl_args = subparser.add_mutually_exclusive_group()
 
-    # Various types of Spack files that can be edited
-    # Edits package files by default
-    excl_args.add_argument(
-        "-a",
-        "--application-type",
-        dest="path",
-        action="store_const",
-        const=ramble.paths.application_types_path,
-        help="Edit the application type with the supplied name.",
-    )
+    # Various types of Ramble files that can be edited
     excl_args.add_argument(
         "-c",
         "--command",
@@ -101,18 +101,16 @@ def setup_parser(subparser):
     )
 
     # Options for editing applications
-    excl_args.add_argument(
-        "-r", "--repo", default=None, help="path to repo to edit application in"
-    )
-    excl_args.add_argument("-N", "--namespace", default=None, help="namespace of package to edit")
+    excl_args.add_argument("-r", "--repo", default=None, help="path to repo to edit object in")
+    excl_args.add_argument("-N", "--namespace", default=None, help="namespace of object to edit")
 
-    subparser.add_argument("application", nargs="?", default=None, help="application name")
+    subparser.add_argument("object_name", nargs="?", default=None, help="object name")
 
 
 def edit(parser, args):
-    name = args.application
+    name = args.object_name
 
-    # By default, edit application files
+    # By default, edit object files
     path = ramble.paths.builtin_path
 
     # If `--command`, `--test`, or `--module` is chosen, edit those instead
@@ -140,7 +138,7 @@ def edit(parser, args):
 
         editor(path)
     elif name:
-        edit_application(name, args.repo, args.namespace)
+        edit_object(name, args.type, args.repo, args.namespace)
     else:
         # By default open the directory where applications live
         editor(path)
