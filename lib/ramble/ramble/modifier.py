@@ -112,6 +112,15 @@ class ModifierBase(object, metaclass=ModifierMeta):
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
 
+    def modify_experiment(self, app):
+        """Stubbed method to allow modification of experiment variables before
+        an experiment is completely defined.
+
+        This can be used to define things like n_ranks and have it influence
+        the name of the resulting experiment.
+        """
+        pass
+
     def _long_print(self):
         out_str = []
         out_str.append(rucolor.section_title("Modifier: ") + f"{self.name}\n")
