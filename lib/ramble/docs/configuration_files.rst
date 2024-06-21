@@ -497,7 +497,7 @@ environments created from those packages. Its format is as follows:
           [matrix:]
           [matrices:]
         <external_env_name>:
-          external_spack_env: 'name_or_path_to_spack_env'
+          external_env: 'name_or_path_to_spack_env'
 
 The packages dictionary houses ramble descriptions of software packages that
 can be used to construct environments with. A package is defined as software
@@ -570,9 +570,9 @@ This section shows how this feature can be used.
     software:
       environments:
         gromacs:
-          external_spack_env: name_or_path_to_spack_env
+          external_env: name_or_path_to_spack_env
 
-In the above example, the ``external_spack_env`` keyword refers an external
+In the above example, the ``external_env`` keyword refers an external
 Spack environment. This can be the name of a named Spack environment, or the
 path to a directory which contains a Spack environment. Ramble will copy the
 ``spack.yaml`` file from this environment, instead of generating its own.

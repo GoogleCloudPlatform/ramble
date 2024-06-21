@@ -46,7 +46,7 @@ class namespace:
 
     # For software definitions
     software = "software"
-    external_env = "external_spack_env"
+    external_env = "external_env"
 
     # v2 configs
     packages = "packages"

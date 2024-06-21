@@ -840,13 +840,6 @@ class Workspace(object):
 
             yield contents, experiment_context
 
-    def external_spack_env(self, env_name):
-        env_context = self.software_environments.get_env(env_name)
-
-        if namespace.external_env not in env_context:
-            return None
-        return env_context[namespace.external_env]
-
     def concretize(self):
         full_software_dict = self.get_software_dict()
 

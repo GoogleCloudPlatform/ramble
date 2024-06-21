@@ -12,6 +12,10 @@
    :lines: 12-
 """  # noqa E501
 
+import ramble.namespace
+
+namespace = ramble.namespace.namespace()
+
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -45,6 +49,10 @@ properties = {
                     "type": "object",
                     "properties": {
                         "external_spack_env": {
+                            "type": "string",
+                            "default": None,
+                        },
+                        namespace.external_env: {
                             "type": "string",
                             "default": None,
                         },
@@ -91,5 +99,15 @@ def update(data):
                 if key in data["packages"][pkg_name] and newkey not in data["packages"][pkg_name]:
                     changed = True
                     data["packages"][pkg_name][newkey] = data["packages"][pkg_name][key]
+                    del data["packages"][pkg_name][key]
+
+    if "environments" in data:
+        for env_name in data["environments"]:
+            if "external_spack_env" in data["environments"][env_name]:
+                changed = True
+                data["environments"][env_name][namespace.external_env] = data["environments"][
+                    env_name
+                ]["external_spack_env"]
+                del data["environments"][env_name]["external_spack_env"]
 
     return changed
