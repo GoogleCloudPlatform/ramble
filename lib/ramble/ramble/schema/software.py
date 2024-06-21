@@ -12,6 +12,10 @@
    :lines: 12-
 """  # noqa E501
 
+import ramble.namespace
+
+namespace = ramble.namespace.namespace()
+
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -48,6 +52,10 @@ properties = {
                 "additionalProperties": {
                     "type": "object",
                     "properties": {
+                        namespace.external_env: {
+                            "type": "string",
+                            "default": None,
+                        },
                         "packages": {"type": "array", "items": {"type": "string"}, "default": []},
                     },
                     "additionalProperties": {"type": "string"},

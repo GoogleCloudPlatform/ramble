@@ -56,7 +56,7 @@ ramble:
     packages: {{}}
     environments:
       wrfv4:
-        external_spack_env: {env_path}
+        external_env: {env_path}
 """
 
     setup_type = ramble.pipeline.pipelines.setup

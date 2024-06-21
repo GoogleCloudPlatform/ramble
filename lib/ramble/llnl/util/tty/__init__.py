@@ -324,6 +324,7 @@ def get_yes_or_no(prompt, **kwargs):
     result = None
     while result is None:
         msg(prompt, newline=False)
+        ans = input().lower()
         if not ans:
             result = default_value
             if result is None:
