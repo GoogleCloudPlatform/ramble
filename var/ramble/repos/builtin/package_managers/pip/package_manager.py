@@ -134,6 +134,29 @@ class Pip(PackageManagerBase):
                             "definition"
                         )
 
+    register_phase(
+        "define_package_paths",
+        pipeline="setup",
+        run_after=["software_install"],
+        run_before=["make_experiments"],
+    )
+
+    def _define_package_paths(self, workspace, app_inst=None):
+        """Define variables containing the path to pip packages"""
+
+        logger.msg("Defining pip package path variables")
+
+        env_path = self.app_inst.expander.env_path
+        if not env_path:
+            raise ApplicationError("Ramble env_path is set to None")
+
+        if self.environment_required():
+            self.runner.set_dry_run(workspace.dry_run)
+            self.runner.configure_env(env_path)
+            self.runner.define_path_vars(
+                self.app_inst, workspace.pkg_path_cache[self.name]
+            )
+
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
 
@@ -335,6 +358,67 @@ class PipRunner:
             os.path.join(self.env_path, self._requirement_file_name), "w"
         ) as f:
             ext_python("-m", "pip", "freeze", output=f)
+
+    def define_path_vars(self, app_inst, cache):
+        """Define path variables"""
+        self._check_env_configured()
+        if self.dry_run:
+            return
+        lock_file = os.path.join(self.env_path, self._lock_file_name)
+        if not lock_file:
+            raise RunnerError(f"Lock file {lock_file} is missing")
+        pkgs = []
+        with open(lock_file, "r") as f:
+            for line in f.readlines():
+                # pip freeze generates such a comment, which serves as a divider
+                # for packages that are added as deps of the ones defined directly.
+                # This is a crude way to avoid defining path vars for
+                # packages that are not defined in ramble config.
+                if "added by pip freeze" in line:
+                    break
+                if "==" in line:
+                    pkgs.append(line.split("==")[0].strip())
+        unresolved_pkgs = []
+        for pkg in pkgs:
+            if pkg in cache:
+                pkg_path = cache.get(pkg)
+                if f"{pkg}_path" not in app_inst.variables:
+                    # Intentionally not define the deprecated `pkg` variable
+                    app_inst.define_variable(f"{pkg}_path", pkg_path)
+                else:
+                    logger.msg(
+                        f"Variable {pkg}_path defined. "
+                        + "Skipping extraction from pip"
+                    )
+            else:
+                unresolved_pkgs.append(pkg)
+        if not unresolved_pkgs:
+            return
+
+        logger.debug("Resolving package paths using pip")
+        exe = self._get_venv_python()
+        exe.add_default_arg("-m")
+        exe.add_default_arg("pip")
+        exe.add_default_arg("show")
+        for pkg in unresolved_pkgs:
+            pkg_info_raw = exe(pkg, output=str)
+            pkg_path = None
+            for line in pkg_info_raw.split(os.linesep):
+                info = line.split(":")
+                if info[0].strip() == "Location":
+                    pkg_path = info[1].strip()
+            if not pkg_path:
+                raise RunnerError(
+                    f"Failed to find installed path for package {pkg}"
+                )
+            cache[pkg] = pkg_path
+            if f"{pkg}_path" not in app_inst.variables:
+                app_inst.define_variable(f"{pkg}_path", pkg_path)
+            else:
+                logger.msg(
+                    f"Variable {pkg}_path defined. "
+                    + "Skipping extraction from pip"
+                )
 
     def add_spec(self, spec):
         """Add a package spec to the pip environment"""

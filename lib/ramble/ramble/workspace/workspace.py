@@ -13,6 +13,7 @@ import re
 import shutil
 import datetime
 import fnmatch
+from collections import defaultdict
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -493,9 +494,9 @@ class Workspace(object):
 
         self.install_cache = ramble.util.install_cache.SetCache()
 
-        # A dict mapping (concretized) package spec to its install prefix.
+        # A per-package_manager dict mapping package spec to its install prefix.
         # This can be re-used by all experiments of the workspace.
-        self.pkg_path_cache = {}
+        self.pkg_path_cache = defaultdict(dict)
 
         self.results = self.default_results()
 
