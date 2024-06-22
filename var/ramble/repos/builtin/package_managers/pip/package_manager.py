@@ -78,11 +78,14 @@ class Pip(PackageManagerBase):
             env_context, self.app_inst.expander, self, require=require_env
         )
         if software_env:
-            for pkg_spec in software_envs.package_specs_for_environment(
-                software_env
-            ):
-                self.runner.add_spec(pkg_spec)
-            self.runner.generate_requirement_file()
+            if isinstance(software_env, ExternalEnvironment):
+                self.runner.copy_from_external_env(software_env.external_env)
+            else:
+                for pkg_spec in software_envs.package_specs_for_environment(
+                    software_env
+                ):
+                    self.runner.add_spec(pkg_spec)
+                self.runner.generate_requirement_file()
 
     register_phase(
         "software_install", pipeline="setup", run_after=["software_create_env"]
@@ -306,6 +309,32 @@ class PipRunner:
                         return
         with open(req_file, "w") as f:
             f.write(contents)
+
+    def copy_from_external_env(self, external_env_path):
+        """Copy requirements from an external env
+
+        This will attempt `pip freeze` from the given external env_path
+        and writes the output requirements.txt to the current env_path.
+        """
+        self._check_env_configured()
+        # Assume the given external_env_path already points to a venv path,
+        # If not, also attempt path/.venv/.
+        maybe_paths = ["", self._venv_name]
+        ext_python_path = None
+        for p in maybe_paths:
+            exe_path = os.path.join(external_env_path, p, "bin", "python")
+            if os.path.exists(exe_path):
+                ext_python_path = exe_path
+                break
+        if not ext_python_path:
+            raise RunnerError(
+                f"The given external env path {external_env_path} does not point to a valid venv"
+            )
+        ext_python = Executable(ext_python_path)
+        with open(
+            os.path.join(self.env_path, self._requirement_file_name), "w"
+        ) as f:
+            ext_python("-m", "pip", "freeze", output=f)
 
     def add_spec(self, spec):
         """Add a package spec to the pip environment"""
