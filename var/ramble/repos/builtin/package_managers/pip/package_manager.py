@@ -17,6 +17,7 @@ from ramble.error import RambleError
 from ramble.util.executable import which
 from ramble.util.hashing import hash_file, hash_string
 from ramble.util.logger import logger
+from ramble.util.sourcing import source_str
 
 from spack.util.executable import Executable
 import llnl.util.filesystem as fs
@@ -310,7 +311,8 @@ class PipRunner:
 
     def generate_activate_command(self):
         """Generate a command to activate a virtual env"""
-        return [f"source {self._get_activate_script_path()}"]
+        shell = ramble.config.get("config:shell")
+        return [f"{source_str(shell)} {self._get_activate_script_path()}"]
 
     def generate_deactivate_command(self):
         """Generate a command to deactivate a virtual env"""
