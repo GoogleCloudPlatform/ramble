@@ -103,10 +103,33 @@ class Pip(PackageManagerBase):
         else:
             workspace.add_to_cache(cache_tupl)
 
+        env_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
         if self.environment_required():
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.install()
+
+            installed_pkgs = self.runner.installed_packages()
+            for pkg in self.app_inst.required_packages.keys():
+                if pkg not in installed_pkgs:
+                    logger.die(
+                        f"Package {pkg} is not installed "
+                        f"in environment {env_context}, but is "
+                        f"required by the {self.name} application "
+                        "definition"
+                    )
+
+            for mod_inst in self.app_inst._modifier_instances:
+                for pkg in mod_inst.required_packages.keys():
+                    if pkg not in installed_pkgs:
+                        logger.die(
+                            f"Package {pkg} is not installed "
+                            f"in environment {env_context}, but is "
+                            f"required by the {mod_inst.name} modifier "
+                            "definition"
+                        )
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
@@ -144,6 +167,22 @@ class Pip(PackageManagerBase):
                 "digest": self.runner.inventory_hash(),
             }
         )
+
+
+package_name_regex = re.compile(
+    r"\s*(?P<pkg_name>[A-Z0-9][A-Z0-9._-]*[A-Z0-9]|[A-Z0-9]).*", re.IGNORECASE
+)
+
+
+def _extract_pkg_name(pkg_spec):
+    """Best-effort to extract pkg name from spec
+
+    This is only used by the runner for dry-run cases.
+    It only handles name-based specifier.
+    """
+
+    match = package_name_regex.match(pkg_spec)
+    return match.group("pkg_name") if match else None
 
 
 class PipRunner:
@@ -288,6 +327,23 @@ class PipRunner:
             return hash_string(self._generate_requirement_content())
         else:
             return hash_file(os.path.join(self.env_path, self._lock_file_name))
+
+    def installed_packages(self):
+        """Return a set of installed packages based on the lock file"""
+        self._check_env_configured()
+        pkgs = set()
+        if self.dry_run:
+            for spec in self.specs:
+                pkg_name = _extract_pkg_name(spec)
+                if pkg_name:
+                    pkgs.add(pkg_name)
+        else:
+            with open(os.path.join(self.env_path, self._lock_file_name)) as f:
+                reqs = f.readlines()
+                for req in reqs:
+                    if "==" in req:
+                        pkgs.add(req.split("==")[0].strip())
+        return pkgs
 
     def _dry_run_print(self, executable, args):
         logger.msg(f"DRY-RUN: would run {executable}")

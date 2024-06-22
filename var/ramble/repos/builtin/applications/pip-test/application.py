@@ -22,6 +22,14 @@ class PipTest(ExecutableApplication):
         package_manager="pip",
     )
 
+    software_spec(
+        "semver",
+        pkg_spec="semver",
+        package_manager="pip",
+    )
+
+    required_package("semver", package_manager="pip")
+
     executable(
         "import",
         'python -c "import requests"; echo "return code is $?"',
