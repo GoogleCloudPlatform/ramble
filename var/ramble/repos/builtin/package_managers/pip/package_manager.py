@@ -432,6 +432,8 @@ class PipRunner:
         self.specs.add(spec)
 
     def get_version(self):
+        if self.dry_run:
+            return "unknown"
         exe = self._get_venv_python()
         out = exe("-m", "pip", "--version", output=str)
         match = re.search(r"pip (?P<version>[\d.]+) from", out).group(
