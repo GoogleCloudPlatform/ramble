@@ -138,6 +138,7 @@ config_defaults = {
         "license_dir": spack.paths.default_license_dir,
         "shell": "sh",
         "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
+        "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
         "workspace_dirs": "$ramble/var/ramble/workspaces",
     }

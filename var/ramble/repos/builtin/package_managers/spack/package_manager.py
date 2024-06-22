@@ -85,7 +85,7 @@ class Spack(SpackLightweight):
 
         logger.msg("Defining Spack variables")
 
-        cache = workspace.pkg_path_cache
+        cache = workspace.pkg_path_cache[self.name]
         app_context = self.app_inst.expander.expand_var_name(
             self.keywords.env_name
         )
@@ -168,7 +168,7 @@ class Spack(SpackLightweight):
     )
 
     def _warn_deprecated_variables(self, workspace, app_inst=None):
-        cache = workspace.pkg_path_cache
+        cache = workspace.pkg_path_cache[self.name]
 
         app_context = self.app_inst.expander.expand_var_name(
             self.keywords.env_name
