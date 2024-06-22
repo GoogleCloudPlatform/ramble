@@ -12,6 +12,7 @@ import re
 from ramble.application import ApplicationError
 from ramble.pkgmankit import *
 
+import ramble.config
 from ramble.error import RambleError
 from ramble.util.executable import which
 from ramble.util.hashing import hash_file, hash_string
@@ -218,6 +219,8 @@ class PipRunner:
     _requirement_file_name = "requirements.txt"
     _lock_file_name = "requirements.lock"
 
+    install_config_name = "config:pip:install"
+
     def __init__(self, dry_run=False):
         cmds = ["python3", "python"]
         # Set up python for bootstrapping
@@ -277,7 +280,10 @@ class PipRunner:
         installer = self._get_venv_python()
         installer.add_default_arg("-m")
         installer.add_default_arg("pip")
-        install_args = ["install", "-r", req_file]
+        installer_flags = ramble.config.get(
+            f"{self.install_config_name}:flags"
+        )
+        install_args = ["install", "-r", req_file, *installer_flags]
         freeze_args = ["freeze", "-r", req_file]
         if self.dry_run:
             self._dry_run_print(installer, install_args)

@@ -109,6 +109,27 @@ properties["config"]["spack"] = {
 
 properties["config"]["spack"]["flags"] = {}
 
+properties["config"]["pip"] = {
+    "type": "object",
+    "default": {"install": {"flags": []}},
+    "properties": {
+        "install": {
+            "type": "object",
+            "properties": {
+                "flags": {
+                    "type": "array",
+                    "default": [],
+                    "items": {
+                        "type": "string",
+                    },
+                },
+            },
+            "additionalProperties": False,
+        },
+    },
+    "additionalProperties": False,
+}
+
 properties["config"]["input_cache"] = {"type": "string", "default": "$ramble/var/ramble/cache"}
 
 properties["config"]["workspace_dirs"] = {
