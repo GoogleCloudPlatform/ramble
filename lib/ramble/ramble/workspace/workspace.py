@@ -1039,7 +1039,7 @@ class Workspace(object):
 
         os.symlink(out_file, latest_file)
 
-    def dump_results(self, output_formats=["text"]):
+    def dump_results(self, output_formats=["text"], print_results=False):
         """
         Write out result file in desired format
 
@@ -1136,11 +1136,10 @@ class Workspace(object):
         for out_file in results_written:
             logger.all_msg(f"  {out_file}")
 
-        # Debug print the first written result file.
-        # Directly use tty to avoid cluttering the analyze log.
-        if ramble.config.get("config:debug"):
+        if print_results:
             with open(results_written[0], "r") as f:
-                tty.debug(f"Results from the analysis pipeline:\n{f.read()}")
+                # Use tty directly to avoid cluttering the analyze log
+                tty.msg(f"Results from the analysis pipeline:\n{f.read()}")
 
         return filename_base
 

@@ -502,6 +502,14 @@ def workspace_analyze_setup_parser(subparser):
         help="perform a dry run. Allows progress on workspaces which are not fully setup",
     )
 
+    subparser.add_argument(
+        "-p",
+        "--print-results",
+        dest="print_results",
+        action="store_true",
+        help="print out the analysis result",
+    )
+
     arguments.add_common_arguments(
         subparser,
         ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
@@ -527,7 +535,13 @@ def workspace_analyze(args):
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     logger.debug("Analyzing workspace")
-    pipeline = pipeline_cls(ws, filters, output_formats=args.output_formats, upload=args.upload)
+    pipeline = pipeline_cls(
+        ws,
+        filters,
+        output_formats=args.output_formats,
+        upload=args.upload,
+        print_results=args.print_results,
+    )
 
     with ws.write_transaction():
         workspace_run_pipeline(args, pipeline)
