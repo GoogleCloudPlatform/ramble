@@ -125,16 +125,21 @@ def repo_create(args):
 def repo_add(args):
     """Add a repository to Ramble's configuration."""
     path = args.path
+    # real_path is absolute and handles substitution.
+    canon_path = ramble.util.path.canonicalize_path(path)
     if args.type == "any":
         obj_types = ramble.repository.ObjectTypes
+        # When types are not explicitly specified, allow
+        # some (but not all) object types to be missing
+        # from the given repo.
+        allow_partial = True
     else:
         obj_types = [ramble.repository.ObjectTypes[args.type]]
+        allow_partial = False
 
+    added = False
     for obj_type in obj_types:
         type_def = ramble.repository.type_definitions[obj_type]
-
-        # real_path is absolute and handles substitution.
-        canon_path = ramble.util.path.canonicalize_path(path)
 
         # check if the path exists
         if not os.path.exists(canon_path):
@@ -145,9 +150,19 @@ def repo_add(args):
             logger.die(f"Not a Ramble repository: {path}")
 
         # Make sure it's actually a ramble repository by constructing it.
-        repo = ramble.repository.Repo(canon_path, obj_type)
+        try:
+            repo = ramble.repository.Repo(canon_path, obj_type)
+        except ramble.repository.BadRepoError as e:
+            if not allow_partial:
+                # Wrap the error to give a clearer message
+                raise ramble.repository.BadRepoError(
+                    f"Failed to find valid repo with type {obj_type}"
+                ) from e
+            repo = None
 
         # If that succeeds, finally add it to the configuration.
+        if not repo:
+            continue
         repos = ramble.config.get(type_def["config_section"], scope=args.scope)
         if not repos:
             repos = []
@@ -158,6 +173,11 @@ def repo_add(args):
             repos.insert(0, canon_path)
             ramble.config.set(type_def["config_section"], repos, args.scope)
             logger.msg(f"Added {obj_type.name} repo with namespace '{repo.namespace}'.")
+        added = True
+    if not added:
+        raise ramble.repository.BadRepoError(
+            f"The given path {path} is not a valid repo for any object types"
+        )
 
 
 def repo_remove(args):
