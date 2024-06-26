@@ -1258,7 +1258,7 @@
 
 <div class="viewcode-block" id="Workspace.dump_results">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.dump_results">[docs]</a>
-    <span class="k">def</span> <span class="nf">dump_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_formats</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">dump_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_formats</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">],</span> <span class="n">print_results</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Write out result file in desired format</span>
 
@@ -1355,11 +1355,10 @@
         <span class="k">for</span> <span class="n">out_file</span> <span class="ow">in</span> <span class="n">results_written</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">all_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  </span><span class="si">{</span><span class="n">out_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="c1"># Debug print the first written result file.</span>
-        <span class="c1"># Directly use tty to avoid cluttering the analyze log.</span>
-        <span class="k">if</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:debug&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">print_results</span><span class="p">:</span>
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">results_written</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Results from the analysis pipeline:</span><span class="se">\n</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Use tty directly to avoid cluttering the analyze log</span>
+                <span class="n">tty</span><span class="o">.</span><span class="n">msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Results from the analysis pipeline:</span><span class="se">\n</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">filename_base</span></div>
 
@@ -1941,7 +1940,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jun 20, 2024.
+      <span class="lastupdated">Last updated on Jun 26, 2024.
       </span></p>
   </div>
 
