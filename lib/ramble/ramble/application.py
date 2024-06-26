@@ -1158,7 +1158,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 input_path = self.expander.expand_var(
                     input_conf["target_dir"], extra_vars=input_vars
                 )
-                input_tuple = ("input-file", input_path)
+                input_tuple = (f"input-file-{input_file}", input_path)
 
                 # Skip inputs that have already been cached
                 if workspace.check_cache(input_tuple):
@@ -1171,10 +1171,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 with ramble.stage.InputStage(
                     input_conf["fetcher"],
                     name=input_namespace,
-                    path=self.expander.workload_input_dir,
+                    path=input_path,
                     mirror_paths=mirror_paths,
                 ) as stage:
-                    stage.set_subdir(input_path)
                     stage.fetch()
                     if input_conf["fetcher"].digest:
                         stage.check()
