@@ -705,7 +705,7 @@ _ramble_workspace_setup() {
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run -p --print-results --phases --include-phase-dependencies --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_push_to_cache() {
