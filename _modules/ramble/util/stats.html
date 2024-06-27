@@ -247,6 +247,36 @@
 
 
 
+<div class="viewcode-block" id="StatsCoefficientOfVariation">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCoefficientOfVariation">[docs]</a>
+<span class="k">class</span> <span class="nc">StatsCoefficientOfVariation</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;cv&quot;</span>
+    <span class="n">min_count</span> <span class="o">=</span> <span class="mi">2</span>
+
+<div class="viewcode-block" id="StatsCoefficientOfVariation.compute">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCoefficientOfVariation.compute">[docs]</a>
+    <span class="k">def</span> <span class="nf">compute</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="n">mean</span> <span class="o">=</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="c1"># Only guard against zero mean.</span>
+        <span class="c1"># While CV isn&#39;t particularly meaningful when negative values are present,</span>
+        <span class="c1"># calculate anyway and leave the interpretation to individual experiments.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">mean</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;NA&quot;</span>
+        <span class="k">return</span> <span class="nb">round</span><span class="p">(</span>
+            <span class="n">statistics</span><span class="o">.</span><span class="n">stdev</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">/</span> <span class="n">statistics</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">values</span><span class="p">),</span> <span class="n">max_decimal_places</span><span class="p">(</span><span class="n">values</span><span class="p">)</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StatsCoefficientOfVariation.get_unit">
+<a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCoefficientOfVariation.get_unit">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">unit</span><span class="p">):</span>
+        <span class="c1"># `unit` unused</span>
+        <span class="k">del</span> <span class="n">unit</span>
+        <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+</div>
+
+
+
 <div class="viewcode-block" id="StatsCountValues">
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.stats.StatsCountValues">[docs]</a>
 <span class="k">class</span> <span class="nc">StatsCountValues</span><span class="p">(</span><span class="n">StatsBase</span><span class="p">):</span>
@@ -273,6 +303,7 @@
     <span class="n">StatsMedian</span><span class="p">(),</span>
     <span class="n">StatsVar</span><span class="p">(),</span>
     <span class="n">StatsStdev</span><span class="p">(),</span>
+    <span class="n">StatsCoefficientOfVariation</span><span class="p">(),</span>
     <span class="n">StatsCountValues</span><span class="p">(),</span>
 <span class="p">]</span>
 </pre></div>
