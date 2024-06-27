@@ -92,6 +92,27 @@ class StatsStdev(StatsBase):
         return round(statistics.stdev(values), max_decimal_places(values))
 
 
+class StatsCoefficientOfVariation(StatsBase):
+    name = "cv"
+    min_count = 2
+
+    def compute(self, values):
+        mean = statistics.mean(values)
+        # Only guard against zero mean.
+        # While CV isn't particularly meaningful when negative values are present,
+        # calculate anyway and leave the interpretation to individual experiments.
+        if not mean:
+            return "NA"
+        return round(
+            statistics.stdev(values) / statistics.mean(values), max_decimal_places(values)
+        )
+
+    def get_unit(self, unit):
+        # `unit` unused
+        del unit
+        return ""
+
+
 class StatsCountValues(StatsBase):
     name = "n_successful_repeats"
 
@@ -110,4 +131,5 @@ all_stats = [
     StatsVar(),
     StatsStdev(),
     StatsCountValues(),
+    StatsCoefficientOfVariation(),
 ]
