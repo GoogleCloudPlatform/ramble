@@ -5,11 +5,12 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-import os.path
+import os
 
 import pytest
 
 from ramble.main import RambleCommand
+from ramble.repository import BadRepoError
 
 repo = RambleCommand("repo")
 
@@ -55,3 +56,28 @@ def test_create_add_list_remove_flags(mutable_config, tmpdir, subdir):
     repo("remove", "--scope=site", str(tmpdir))
     output = repo("list", "--scope=site", output=str)
     assert "mockrepo" not in output
+
+
+def test_add_behavior(mutable_config, tmpdir):
+    # Create an app-only repo
+    repo("create", str(tmpdir), "mockrepo", "-t", "applications")
+    assert os.path.exists(os.path.join(str(tmpdir), "application_repo.yaml"))
+    assert os.path.exists(os.path.join(str(tmpdir), "applications"))
+
+    # Complains when specified repo type is not found
+    with pytest.raises(
+        BadRepoError, match="Failed to find valid repo with type ObjectTypes.modifiers"
+    ):
+        repo("add", "-t", "modifiers", "--scope=site", str(tmpdir))
+    output = repo("list", "--scope=site", output=str)
+    assert "mockrepo" not in output
+
+    # Do not complain when type is not specified
+    repo("add", "--scope=site", str(tmpdir))
+    output = repo("list", "--scope=site", output=str)
+    assert "mockrepo" in output
+
+    # Complains if the given path contains no valid repo for all object types
+    os.rmdir(os.path.join(tmpdir, "applications"))
+    with pytest.raises(BadRepoError, match="not a valid repo for any object types"):
+        repo("add", "--scope=site", str(tmpdir))

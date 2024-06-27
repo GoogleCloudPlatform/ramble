@@ -815,6 +815,7 @@ class Repo(object):
             if os.path.exists(config_file):
                 self.config_name = config
                 self.config_file = config_file
+        check(self.config_file, "No valid config file found")
         check(os.path.isfile(self.config_file), "No %s found in '%s'" % (self.config_name, root))
 
         # Read configuration and validate namespace
