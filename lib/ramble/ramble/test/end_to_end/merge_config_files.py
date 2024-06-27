@@ -57,6 +57,12 @@ ramble:
     packages: {}
     environments: {}
 """
+    test_licenses = """
+licenses:
+  zlib:
+    set:
+      TEST_LICENSE: 'port@server'
+"""
     workspace_name = "test_merge_config_files"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
@@ -70,6 +76,7 @@ ramble:
 
         applications_file = os.path.join(ws.root, "applications_test.yaml")
         spack_file = os.path.join(ws.root, "spack_test.yaml")
+        licenses_file = os.path.join(ws.root, "licenses.yaml")
 
         with open(applications_file, "w+") as f:
             f.write(test_applications)
@@ -77,8 +84,12 @@ ramble:
         with open(spack_file, "w+") as f:
             f.write(test_spack)
 
+        with open(licenses_file, "w") as f:
+            f.write(test_licenses)
+
         config("add", "-f", applications_file, global_args=["-w", workspace_name])
         config("add", "-f", spack_file, global_args=["-w", workspace_name])
+        config("add", "-f", licenses_file, global_args=["-w", workspace_name])
 
         ws._re_read()
 
@@ -88,3 +99,12 @@ ramble:
             assert "test_experiment" in data
             assert "zlib" in data
             assert "spack_spec: zlib@1.2.12" in data
+            assert "licenses" in data
+            assert "TEST_LICENSE: port@server" in data
+
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+        exec_file = os.path.join(
+            ws.experiment_dir, "zlib", "ensure_installed", "test_experiment", "execute_experiment"
+        )
+        with open(exec_file) as f:
+            assert "license.inc" in f.read()

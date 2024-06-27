@@ -16,6 +16,7 @@ from llnl.util.lang import union_dicts
 import ramble.schema.applications
 import ramble.schema.config
 import ramble.schema.formatted_executables
+import ramble.schema.licenses
 import ramble.schema.repos
 import ramble.schema.spack
 import ramble.schema.success_criteria
@@ -30,6 +31,7 @@ properties = union_dicts(
     ramble.schema.applications.properties,
     ramble.schema.config.properties,
     ramble.schema.formatted_executables.properties,
+    ramble.schema.licenses.properties,
     ramble.schema.repos.properties,
     ramble.schema.spack.properties,
     ramble.schema.success_criteria.properties,
