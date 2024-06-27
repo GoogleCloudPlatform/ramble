@@ -373,6 +373,7 @@ class Gromacs(SpackApplication):
         fom_regex=r"\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*",
         group_name="core_time",
         units="s",
+        fom_type=FomType.TIME,
     )
 
     figure_of_merit(
@@ -382,6 +383,7 @@ class Gromacs(SpackApplication):
         + r"(?P<wall_time>[0-9]+\.[0-9]+).*",
         group_name="wall_time",
         units="s",
+        fom_type=FomType.TIME,
     )
 
     figure_of_merit(
@@ -391,6 +393,7 @@ class Gromacs(SpackApplication):
         + r"(?P<perc_core_time>[0-9]+\.[0-9]+).*",
         group_name="perc_core_time",
         units="%",
+        fom_type=FomType.MEASURE,
     )
 
     figure_of_merit(
@@ -399,6 +402,7 @@ class Gromacs(SpackApplication):
         fom_regex=r"Performance:\s+" + r"(?P<ns_per_day>[0-9]+\.[0-9]+).*",
         group_name="ns_per_day",
         units="ns/day",
+        fom_type=FomType.THROUGHPUT,
     )
 
     figure_of_merit(
@@ -408,4 +412,5 @@ class Gromacs(SpackApplication):
         + r"(?P<hours_per_ns>[0-9]+\.[0-9]+).*",
         group_name="hours_per_ns",
         units="hours/ns",
+        fom_type=FomType.TIME,
     )
