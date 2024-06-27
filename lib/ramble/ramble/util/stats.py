@@ -130,6 +130,6 @@ all_stats = [
     StatsMedian(),
     StatsVar(),
     StatsStdev(),
-    StatsCountValues(),
     StatsCoefficientOfVariation(),
+    StatsCountValues(),
 ]
