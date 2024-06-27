@@ -28,6 +28,14 @@ import ramble.util.stats
             "s",
             (4, "repeats", "summary::n_successful_repeats"),
         ),
+        (ramble.util.stats.StatsCoefficientOfVariation(), [3], "s", ("NA", "", "summary::cv")),
+        (ramble.util.stats.StatsCoefficientOfVariation(), [3, -3], "s", ("NA", "", "summary::cv")),
+        (
+            ramble.util.stats.StatsCoefficientOfVariation(),
+            [6.79, 5.6, 4.31, 5.5],
+            "s",
+            (0.18, "", "summary::cv"),
+        ),
     ],
 )
 def test_stats_for_repeat_foms(statistic, input_values, input_units, output):
