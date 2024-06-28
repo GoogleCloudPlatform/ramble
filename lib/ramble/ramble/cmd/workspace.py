@@ -261,6 +261,12 @@ def workspace_create_setup_parser(subparser):
         metavar="dir",
         help="external directory to link as inputs directory in workspace",
     )
+    subparser.add_argument(
+        "-a",
+        "--activate",
+        action="store_true",
+        help="activate the created workspace, if specified. Default is false",
+    )
 
 
 def workspace_create(args):
@@ -271,11 +277,18 @@ def workspace_create(args):
         args.template_execute,
         software_dir=args.software_dir,
         inputs_dir=args.inputs_dir,
+        activate=args.activate,
     )
 
 
 def _workspace_create(
-    name_or_path, dir=False, config=None, template_execute=None, software_dir=None, inputs_dir=None
+    name_or_path,
+    dir=False,
+    config=None,
+    template_execute=None,
+    software_dir=None,
+    inputs_dir=None,
+    activate=False,
 ):
     """Create a new workspace
 
@@ -292,6 +305,7 @@ def _workspace_create(
                             instead of creating a new directory.
         inputs_dir (str): Path to inputs dir that should be linked
                           instead of creating a new directory.
+        activate (bool): if True, activate the created workspace. Default is False.
     """
 
     # Sanity check file paths, to avoid half-creating an incomplete workspace
@@ -310,10 +324,7 @@ def _workspace_create(
         workspace = ramble.workspace.Workspace(
             name_or_path, read_default_template=read_default_template
         )
-
-        logger.msg(f"Created workspace in {workspace.path}")
-        logger.msg("You can activate this workspace with:")
-        logger.msg(f"  ramble workspace activate {workspace.path}")
+        ws_loc = workspace.path
 
     else:
         workspace = ramble.workspace.create(
@@ -321,9 +332,13 @@ def _workspace_create(
         )
 
         workspace.read_default_template = read_default_template
-        logger.msg(f"Created workspace in {name_or_path}")
+        ws_loc = name_or_path
+
+    activate_cmd = f"ramble workspace activate {ws_loc}"
+    if not activate:
+        logger.msg(f"Created workspace in {ws_loc}")
         logger.msg("You can activate this workspace with:")
-        logger.msg(f"  ramble workspace activate {name_or_path}")
+        logger.msg(f"  {activate_cmd}")
 
     workspace.write(inputs_dir=inputs_dir, software_dir=software_dir)
 
@@ -339,6 +354,8 @@ def _workspace_create(
             workspace._read_template(template_name, f.read())
             workspace._write_templates()
 
+    if activate:
+        sys.stdout.write(activate_cmd)
     return workspace
 
 

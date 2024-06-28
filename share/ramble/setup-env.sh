@@ -145,6 +145,23 @@ _ramble_shell_wrapper() {
                             eval $(command ramble $_rmb_flags workspace deactivate --sh)
                         fi
                         ;;
+                    create)
+                        _a=" $@"
+                        if [ "${_a#* -a}" != "$_a" ] || \
+                           [ "${_a#* --activate}" != "$_a" ];
+                        then
+                            # With -a, the command writes only the activation command
+                            # into stdout (`ramble workspace activate <ws>`.)
+                            # And the eval routes that command back to the wrapper to
+                            # inject shell args, etc.
+                            _activate_cmd="$(command ramble $_rmb_flags workspace create "$@")"
+                            eval $_activate_cmd
+                            _workspace="$(echo $_activate_cmd | awk '{print $NF}')"
+                            echo "==> Created and activated workspace in $_workspace"
+                        else
+                            command ramble $_rmb_flags workspace create "$@"
+                        fi
+                        ;;
                     *)
                         command ramble $_rmb_flags workspace $_rmb_arg "$@"
                         ;;

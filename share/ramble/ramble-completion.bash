@@ -658,7 +658,7 @@ _ramble_workspace_deactivate() {
 _ramble_workspace_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir"
+        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir -a --activate"
     else
         RAMBLE_COMREPLY=""
     fi
