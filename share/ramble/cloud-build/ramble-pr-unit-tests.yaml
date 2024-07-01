@@ -72,6 +72,6 @@ substitutions:
   _CONDA_VER: 22.11.1
   _BASE_IMG: centos
   _BASE_VER: '7'
-timeout: 900s
+timeout: 1500s
 options:
   machineType: N1_HIGHCPU_8
