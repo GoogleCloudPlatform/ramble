@@ -44,7 +44,8 @@ env_var_actions = {
     "unset": array_of_strings_or_num,
 }
 
-licenses_schema = {
+#: Properties for inclusion in other schemas
+properties = {
     "licenses": {
         "type": "object",
         "default": {},
@@ -64,5 +65,5 @@ schema = {
     "title": "Ramble licenses configuration file schema",
     "type": "object",
     "additionalProperties": False,
-    "properties": licenses_schema,
+    "properties": properties,
 }
