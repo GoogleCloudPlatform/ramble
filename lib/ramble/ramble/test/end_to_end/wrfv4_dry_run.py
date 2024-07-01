@@ -334,6 +334,7 @@ ramble:
                 unset:
                 - TEST_VAR
               variables:
+                wrf_path: '/not/a/real/path'
                 n_nodes: ['1', '2', '4', '8', '16']
               matrix:
               - n_nodes

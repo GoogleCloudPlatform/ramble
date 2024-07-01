@@ -341,7 +341,7 @@ class ExperimentSet(object):
         try:
             app_inst.validate_experiment()
         except ramble.keywords.RambleKeywordError as e:
-            raise RambleVariableDefinitionError(e)
+            raise RambleVariableDefinitionError(str(e))
 
         return app_inst
 
