@@ -411,9 +411,9 @@ _ramble_deployment_pull() {
 _ramble_edit() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -a --application-type -c --command -d --docs -t --test -m --module -r --repo -N --namespace"
+        RAMBLE_COMPREPLY="-h --help --type -c --command -d --docs -t --test -m --module -r --repo -N --namespace"
     else
-        _all_applications
+        RAMBLE_COMREPLY=""
     fi
 }
 
