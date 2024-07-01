@@ -80,13 +80,7 @@ schema = {
 
 
 def update(data):
-
     changed = False
-
-    """
-    This entire section is deprecated.
-    Replicate this into a `software` section instead.
-    """
 
     pkg_keymap = {
         "spack_spec": "pkg_spec",
