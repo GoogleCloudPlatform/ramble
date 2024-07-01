@@ -67,6 +67,7 @@ class ExperimentSet(object):
         workspace_context.internals = workspace.get_workspace_internals()
         workspace_context.modifiers = workspace.get_workspace_modifiers()
         workspace_context.zips = workspace.get_workspace_zips()
+        workspace_context.variants = workspace.get_workspace_variants()
 
         try:
             self.keywords.check_reserved_keys(workspace_context.variables)
@@ -281,6 +282,7 @@ class ExperimentSet(object):
 
         app_inst = ramble.repository.get(final_app_name).copy()
         app_inst.set_variables(variables, self)
+        app_inst.set_variants(context.variants)
         app_inst.set_env_variable_sets(context.env_variables)
         app_inst.set_internals(context.internals)
         app_inst.set_template(context.is_template)
@@ -339,7 +341,7 @@ class ExperimentSet(object):
         try:
             app_inst.validate_experiment()
         except ramble.keywords.RambleKeywordError as e:
-            raise RambleVariableDefinitionError(e)
+            raise RambleVariableDefinitionError(str(e))
 
         return app_inst
 

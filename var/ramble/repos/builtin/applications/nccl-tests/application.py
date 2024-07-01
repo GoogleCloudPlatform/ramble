@@ -65,7 +65,7 @@ class NcclTests(SpackApplication):
         "send-recv",
     ]
 
-    software_spec("nccl-test", spack_spec="nccl-tests")
+    software_spec("nccl-test", pkg_spec="nccl-tests", package_manager="spack*")
     required_package("nccl-tests")
 
     workload_variable(

@@ -32,6 +32,8 @@ def _spack_loc_log_line(pkg_spec):
 def test_define_package_paths():
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: '{execute_experiment}'
@@ -47,12 +49,12 @@ ramble:
             test2:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
       intel-mpi:
-        spack_spec: intel-oneapi-mpi@2021.11.0
+        pkg_spec: intel-oneapi-mpi@2021.11.0
     environments:
       gromacs:
         packages:
@@ -98,6 +100,8 @@ ramble:
 def test_package_path_variables():
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: '{execute_experiment}'
@@ -109,17 +113,17 @@ ramble:
           experiments:
             test1:
               variables:
-                gromacs: '/test/path'
+                gromacs_path: '/test/path'
                 n_nodes: '1'
             test2:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
       intel-mpi:
-        spack_spec: intel-oneapi-mpi@2021.11.0
+        pkg_spec: intel-oneapi-mpi@2021.11.0
     environments:
       gromacs:
         packages:

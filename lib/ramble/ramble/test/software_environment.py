@@ -23,6 +23,10 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
+def _get_package_manager(pm_name: str = "spack"):
+    return ramble.repository.get(pm_name, ramble.repository.ObjectTypes.package_managers).copy()
+
+
 def test_basic_software_environment(request, mutable_mock_workspace_path):
     ws_name = request.node.name
     workspace("create", ws_name)
@@ -30,10 +34,10 @@ def test_basic_software_environment(request, mutable_mock_workspace_path):
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic"] = {"spack_spec": "basic@1.1"}
+        spack_dict["packages"]["basic"] = {"pkg_spec": "basic@1.1"}
         spack_dict["environments"] = {"basic": {"packages": ["basic"]}}
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
@@ -44,7 +48,9 @@ def test_basic_software_environment(request, mutable_mock_workspace_path):
         variables = {}
         env_expander = ramble.expander.Expander(variables, None)
 
-        rendered_env = software_environments.render_environment("basic", env_expander)
+        rendered_env = software_environments.render_environment(
+            "basic", env_expander, _get_package_manager()
+        )
         assert rendered_env.name == "basic"
         pkg_found = False
         for pkg in rendered_env._packages:
@@ -61,7 +67,7 @@ def test_software_environments_no_packages(request, mutable_mock_workspace_path)
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
         spack_dict["environments"] = {"basic-{env_test}": {"packages": [""]}}
@@ -75,7 +81,9 @@ def test_software_environments_no_packages(request, mutable_mock_workspace_path)
         }
         env_expander = ramble.expander.Expander(variables, None)
 
-        rendered_env = software_environments.render_environment("basic-environment", env_expander)
+        rendered_env = software_environments.render_environment(
+            "basic-environment", env_expander, _get_package_manager()
+        )
         assert rendered_env.name == "basic-environment"
 
 
@@ -87,7 +95,7 @@ def test_software_environments_no_rendered_packages(request, mutable_mock_worksp
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
         spack_dict["environments"] = {"basic-{env_test}": {"packages": ["{var_pkg_name}"]}}
@@ -99,7 +107,9 @@ def test_software_environments_no_rendered_packages(request, mutable_mock_worksp
         variables = {"env_test": "environment", "var_pkg_name": ""}
         env_expander = ramble.expander.Expander(variables, None)
 
-        rendered_env = software_environments.render_environment("basic-environment", env_expander)
+        rendered_env = software_environments.render_environment(
+            "basic-environment", env_expander, _get_package_manager()
+        )
         assert rendered_env.name == "basic-environment"
 
 
@@ -111,10 +121,10 @@ def test_template_software_environments(request, mutable_mock_workspace_path):
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic-{pkg_test}"] = {"spack_spec": "basic@1.1"}
+        spack_dict["packages"]["basic-{pkg_test}"] = {"pkg_spec": "basic@1.1"}
         spack_dict["environments"] = {"basic-{env_test}": {"packages": ["basic-{pkg_test}"]}}
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
@@ -128,7 +138,9 @@ def test_template_software_environments(request, mutable_mock_workspace_path):
         }
         env_expander = ramble.expander.Expander(variables, None)
 
-        rendered_env = software_environments.render_environment("basic-environment", env_expander)
+        rendered_env = software_environments.render_environment(
+            "basic-environment", env_expander, _get_package_manager()
+        )
         assert rendered_env.name == "basic-environment"
         pkg_found = False
         for pkg in rendered_env._packages:
@@ -145,11 +157,11 @@ def test_multi_template_software_environments(request, mutable_mock_workspace_pa
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic1-{pkg_test}"] = {"spack_spec": "basic@1.1"}
-        spack_dict["packages"]["basic2-{pkg_test}"] = {"spack_spec": "basic@1.1"}
+        spack_dict["packages"]["basic1-{pkg_test}"] = {"pkg_spec": "basic@1.1"}
+        spack_dict["packages"]["basic2-{pkg_test}"] = {"pkg_spec": "basic@1.1"}
         spack_dict["environments"] = {
             "all-basic-{env_test}": {"packages": ["basic1-{pkg_test}", "basic2-{pkg_test}"]},
             "basic1-{env_test}": {"packages": ["basic1-{pkg_test}"]},
@@ -177,7 +189,9 @@ def test_multi_template_software_environments(request, mutable_mock_workspace_pa
         }
 
         for env_name, env_packages in env_tests.items():
-            rendered_env = software_environments.render_environment(env_name, env_expander)
+            rendered_env = software_environments.render_environment(
+                env_name, env_expander, _get_package_manager()
+            )
             assert rendered_env.name == env_name
 
             assert len(rendered_env._packages) == len(env_packages)
@@ -197,10 +211,10 @@ def test_undefined_package_errors(request, mutable_mock_workspace_path):
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic-{pkg_test}"] = {"spack_spec": "basic@{pkg_ver}"}
+        spack_dict["packages"]["basic-{pkg_test}"] = {"pkg_spec": "basic@{pkg_ver}"}
         spack_dict["environments"] = {
             "all-basic-{env_test}": {"packages": ["foo-basic-{pkg_test}"]}
         }
@@ -212,7 +226,9 @@ def test_undefined_package_errors(request, mutable_mock_workspace_path):
         env_expander = ramble.expander.Expander(variables, None)
 
         with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as pkg_err:
-            _ = software_environments.render_environment("all-basic-environment", env_expander)
+            _ = software_environments.render_environment(
+                "all-basic-environment", env_expander, _get_package_manager()
+            )
 
         err_str = (
             "Environment template all-basic-{env_test} references undefined "
@@ -229,10 +245,10 @@ def test_invalid_packages_error(request, mutable_mock_workspace_path):
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic-{pkg_test}"] = {"spack_spec": "basic@{pkg_ver}"}
+        spack_dict["packages"]["basic-{pkg_test}"] = {"pkg_spec": "basic@{pkg_ver}"}
         spack_dict["environments"] = {"all-basic-{env_test}": {"packages": ["basic-{pkg_test}"]}}
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
@@ -247,7 +263,9 @@ def test_invalid_packages_error(request, mutable_mock_workspace_path):
         }
         env_expander = ramble.expander.Expander(variables, None)
 
-        _ = software_environments.render_environment("all-basic-environment", env_expander)
+        _ = software_environments.render_environment(
+            "all-basic-environment", env_expander, _get_package_manager()
+        )
 
         with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as pkg_err:
             variables = {
@@ -257,7 +275,9 @@ def test_invalid_packages_error(request, mutable_mock_workspace_path):
             }
             env_expander = ramble.expander.Expander(variables, None)
 
-            _ = software_environments.render_environment("all-basic-environment", env_expander)
+            _ = software_environments.render_environment(
+                "all-basic-environment", env_expander, _get_package_manager()
+            )
         assert "Package basic-package defined multiple times" in str(pkg_err)
 
 
@@ -269,11 +289,11 @@ def test_invalid_environment_error(request, mutable_mock_workspace_path):
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic1-{pkg_test}"] = {"spack_spec": "basic@1.1"}
-        spack_dict["packages"]["basic2-{pkg_test}"] = {"spack_spec": "basic@1.1"}
+        spack_dict["packages"]["basic1-{pkg_test}"] = {"pkg_spec": "basic@1.1"}
+        spack_dict["packages"]["basic2-{pkg_test}"] = {"pkg_spec": "basic@1.1"}
         spack_dict["environments"] = {
             "all-basic-{env_test}": {"packages": ["basic1-{pkg_test}", "basic2-{pkg_test}"]}
         }
@@ -290,14 +310,18 @@ def test_invalid_environment_error(request, mutable_mock_workspace_path):
         }
         env_expander = ramble.expander.Expander(variables, None)
 
-        _ = software_environments.render_environment("all-basic-environment", env_expander)
+        _ = software_environments.render_environment(
+            "all-basic-environment", env_expander, _get_package_manager()
+        )
 
         variables = {"env_test": "environment", "pkg_test": "other-package"}
 
         env_expander = ramble.expander.Expander(variables, None)
 
         with pytest.raises(ramble.software_environments.RambleSoftwareEnvironmentError) as env_err:
-            _ = software_environments.render_environment("all-basic-environment", env_expander)
+            _ = software_environments.render_environment(
+                "all-basic-environment", env_expander, _get_package_manager()
+            )
 
         assert "Environment all-basic-environment defined multiple times" in str(env_err)
 
@@ -310,10 +334,10 @@ def test_undefined_compiler_errors(request, mutable_mock_workspace_path):
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["basic"] = {"spack_spec": "basic@1.1", "compiler": "foo_comp"}
+        spack_dict["packages"]["basic"] = {"pkg_spec": "basic@1.1", "compiler": "foo_comp"}
         spack_dict["environments"] = {"basic": {"packages": ["basic"]}}
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
@@ -327,7 +351,9 @@ def test_undefined_compiler_errors(request, mutable_mock_workspace_path):
         with pytest.raises(
             ramble.software_environments.RambleSoftwareEnvironmentError
         ) as comp_err:
-            _ = software_environments.render_environment("basic", env_expander)
+            _ = software_environments.render_environment(
+                "basic", env_expander, _get_package_manager()
+            )
         assert "Compiler foo_comp used, but not defined" in str(comp_err)
 
 
@@ -339,11 +365,11 @@ def test_compiler_in_environment_warns(request, mutable_mock_workspace_path, cap
     assert ws_name in workspace("list")
 
     with ramble.workspace.read(ws_name) as ws:
-        spack_dict = ws.get_spack_dict()
+        spack_dict = ws.get_software_dict()
 
         spack_dict["packages"] = {}
-        spack_dict["packages"]["test_comp"] = {"spack_spec": "comp@2.1"}
-        spack_dict["packages"]["basic"] = {"spack_spec": "basic@1.1", "compiler": "test_comp"}
+        spack_dict["packages"]["test_comp"] = {"pkg_spec": "comp@2.1"}
+        spack_dict["packages"]["basic"] = {"pkg_spec": "basic@1.1", "compiler": "test_comp"}
         spack_dict["environments"] = {"basic": {"packages": ["basic", "test_comp"]}}
 
         software_environments = ramble.software_environments.SoftwareEnvironments(ws)
@@ -354,7 +380,7 @@ def test_compiler_in_environment_warns(request, mutable_mock_workspace_path, cap
         variables = {}
         env_expander = ramble.expander.Expander(variables, None)
 
-        _ = software_environments.render_environment("basic", env_expander)
+        _ = software_environments.render_environment("basic", env_expander, _get_package_manager())
         captured = capsys.readouterr()
 
         assert "Environment basic contains packages and their compilers" in captured.err

@@ -87,6 +87,13 @@ pattern_exemptions = {
         "F403": [r"^from ramble.modkit import \*$"],
         **common_object_exemptions,
     },
+    # exemptions applied only to package_manager.py files.
+    r"package_manager.py$": {
+        # Allow 'from ramble.modkit import *' in applications,
+        # but no other wildcards
+        "F403": [r"^from ramble.pkgmankit import \*$"],
+        **common_object_exemptions,
+    },
     # exemptions applied to all files.
     r".py$": {
         "E501": [

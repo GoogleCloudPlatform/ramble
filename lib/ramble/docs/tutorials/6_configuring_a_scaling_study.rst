@@ -159,12 +159,14 @@ MPI implementation you wish to use, but good default might be
 ``mpirun -n {n_ranks}``. If you would like to add ``hostfile`` and ``ppn``
 flags, feel free to do so here.
 
-Your configuration file might look like the
-following after adding this information:
+Your configuration file might look like the following after adding this
+information:
 
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -199,13 +201,15 @@ suggested starting place for the experiments. To apply this to your workspace, u
 
     $ ramble workspace concretize
 
-This will fill out the ``spack`` dictionary within your workspace configuration
+This will fill out the ``software`` dictionary within your workspace configuration
 file. After executing this command, your workspace configuration file might
 look like the following:
 
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -222,15 +226,15 @@ look like the following:
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:

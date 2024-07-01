@@ -10,7 +10,7 @@ import os
 from ramble.appkit import *
 
 
-class Lammps(SpackApplication):
+class Lammps(ExecutableApplication):
     """Define LAMMPS application"""
 
     name = "lammps"
@@ -19,17 +19,20 @@ class Lammps(SpackApplication):
 
     tags("molecular-dynamics")
 
-    define_compiler("gcc9", spack_spec="gcc@9.3.0")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec("impi2018", spack_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
     software_spec(
         "lammps",
-        spack_spec="lammps@20220623.4 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
+        pkg_spec="lammps@20220623.4 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
         compiler="gcc9",
+        package_manager="spack*",
     )
 
-    required_package("lammps")
+    required_package("lammps", package_manager="spack*")
 
     input_file(
         "leonard-jones",

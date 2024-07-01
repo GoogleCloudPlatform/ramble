@@ -77,6 +77,18 @@ def specs():
 
 
 @arg
+def obj_type():
+    from ramble.repository import default_type, OBJECT_NAMES
+
+    return Args(
+        "--type",
+        default=f"{default_type.name}",
+        help=f"type of objects. Defaults to '{default_type.name}'. "
+        f"Allowed types are {', '.join(OBJECT_NAMES)}",
+    )
+
+
+@arg
 def repo_type():
     from ramble.repository import default_type, OBJECT_NAMES
 

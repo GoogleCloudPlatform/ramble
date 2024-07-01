@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Streamc(SpackApplication):
+class Streamc(ExecutableApplication):
     """Define STREAMC application"""
 
     name = "streamc"
@@ -25,15 +25,16 @@ class Streamc(SpackApplication):
         "micro-benchmark",
     )
 
-    define_compiler("gcc12", spack_spec="gcc@12.2.0")
+    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
 
     software_spec(
         "streamc",
-        spack_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
+        pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
         compiler="gcc12",
+        package_manager="spack*",
     )
 
-    required_package("stream")
+    required_package("stream", package_manager="spack*")
 
     executable("execute_c", "stream_c.exe")
 

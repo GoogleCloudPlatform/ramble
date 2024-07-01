@@ -12,6 +12,10 @@
    :lines: 12-
 """  # noqa E501
 
+import ramble.namespace
+
+namespace = ramble.namespace.namespace()
+
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -23,7 +27,7 @@ properties = {
                 "additionalProperties": {
                     "type": "object",
                     "properties": {
-                        "spack_spec": {"type": "string"},
+                        "pkg_spec": {"type": "string"},
                         "compiler_spec": {
                             "type": "string",
                             "default": None,
@@ -33,7 +37,7 @@ properties = {
                             "default": None,
                         },
                     },
-                    "additionalProperties": False,
+                    "additionalProperties": {"type": "string"},
                     "default": {},
                 },
             },
@@ -45,6 +49,10 @@ properties = {
                     "type": "object",
                     "properties": {
                         "external_spack_env": {
+                            "type": "string",
+                            "default": None,
+                        },
+                        namespace.external_env: {
                             "type": "string",
                             "default": None,
                         },
@@ -69,3 +77,31 @@ schema = {
     "additionalProperties": False,
     "properties": properties,
 }
+
+
+def update(data):
+    changed = False
+
+    pkg_keymap = {
+        "spack_spec": "pkg_spec",
+    }
+
+    if "packages" in data:
+        for pkg_name in data["packages"]:
+
+            for key, newkey in pkg_keymap.items():
+                if key in data["packages"][pkg_name] and newkey not in data["packages"][pkg_name]:
+                    changed = True
+                    data["packages"][pkg_name][newkey] = data["packages"][pkg_name][key]
+                    del data["packages"][pkg_name][key]
+
+    if "environments" in data:
+        for env_name in data["environments"]:
+            if "external_spack_env" in data["environments"][env_name]:
+                changed = True
+                data["environments"][env_name][namespace.external_env] = data["environments"][
+                    env_name
+                ]["external_spack_env"]
+                del data["environments"][env_name]["external_spack_env"]
+
+    return changed

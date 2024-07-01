@@ -6,10 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *
+from ramble.modkit import *  # noqa: F403
 
 
-class IntelAps(SpackModifier):
+class IntelAps(BasicModifier):
     """Define a modifier for Intel's Application Performance Snapshot
 
     Intel's Application Performance Snapshot (APS) is a high level profiler. It
@@ -41,9 +41,13 @@ class IntelAps(SpackModifier):
 
     archive_pattern("aps_*_results_dir/*")
 
-    software_spec("intel-oneapi-vtune", spack_spec="intel-oneapi-vtune")
+    software_spec(
+        "intel-oneapi-vtune",
+        pkg_spec="intel-oneapi-vtune",
+        package_manager="spack*",
+    )
 
-    required_package("intel-oneapi-vtune")
+    required_package("intel-oneapi-vtune", package_manager="spack*")
 
     executable_modifier("aps_summary")
 

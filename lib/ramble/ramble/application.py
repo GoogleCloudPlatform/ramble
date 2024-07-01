@@ -47,6 +47,7 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 from ramble.util.logger import logger
+from ramble.util.sourcing import source_str
 
 from ramble.workspace import namespace
 
@@ -71,7 +72,6 @@ def _get_context_display_name(context):
 
 class ApplicationBase(object, metaclass=ApplicationMeta):
     name = None
-    uses_spack = False
     _builtin_name = "builtin::{name}"
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
@@ -99,12 +99,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
-        self.keywords = ramble.keywords.keywords
+        self.keywords = ramble.keywords.keywords.copy()
 
         self._vars_are_expanded = False
         self.expander = None
         self._formatted_executables = {}
         self.variables = None
+        self.variants = None
         self.no_expand_vars = None
         self.experiment_set = None
         self.internals = {}
@@ -126,6 +127,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.results = {}
         self._phase_times = {}
         self._pipeline_graphs = None
+        self.package_manager = None
         self.custom_executables = {}
 
         self.hash_inventory = {
@@ -135,6 +137,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             "inputs": [],
             "software": [],
             "templates": [],
+            "package_manager": [],
         }
         self.experiment_hash = None
 
@@ -163,6 +166,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if self._formatted_executables:
             new_copy.set_formatted_executables(self._formatted_executables.copy())
 
+        new_copy.keywords = ramble.keywords.keywords.copy()
         new_copy.set_template(False)
         new_copy.repeats.set_repeats(False, 0)
         new_copy.set_chained_experiments(None)
@@ -180,6 +184,56 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             return False
 
         return True
+
+    def set_variants(self, variants):
+        """Set variants within an experiment instance, and process their
+        contents.
+
+        Args:
+            variants (dict): Dictionary of variant controls for this
+                             experiment.
+        """
+        self.variants = variants.copy()
+
+        if namespace.package_manager in self.variants:
+            pkgman_name = self.expander.expand_var(
+                self.variants[namespace.package_manager], typed=True
+            )
+
+            if pkgman_name is not None:
+                try:
+                    pkgman_type = ramble.repository.ObjectTypes.package_managers
+                    self.package_manager = ramble.repository.get(pkgman_name, pkgman_type).copy()
+                    self.package_manager.set_application(self)
+                except ramble.repository.UnknownObjectError:
+                    logger.die(
+                        f"{pkgman_name} is not a valid package manager. "
+                        "Valid package managers can be listed via:\n"
+                        "\tramble list --type package_managers"
+                    )
+
+        # Mark required package variables appropriately
+        if self.package_manager is None:
+            for pkgname, _ in self.required_packages.items():
+                self.keywords.update_keys(
+                    {
+                        f"{pkgname}_path": {
+                            "type": ramble.keywords.key_type.required,
+                            "level": ramble.keywords.output_level.variable,
+                        }
+                    }
+                )
+        else:
+            for pkgname, config in self.required_packages.items():
+                if fnmatch.fnmatch(self.package_manager.name, config["package_manager"]):
+                    self.keywords.update_keys(
+                        {
+                            f"{pkgname}_path": {
+                                "type": ramble.keywords.key_type.reserved,
+                                "level": ramble.keywords.output_level.variable,
+                            }
+                        }
+                    )
 
     def build_phase_order(self):
         if self._pipeline_graphs is not None:
@@ -201,6 +255,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
                 # Define phase edges
                 for phase, phase_node in mod_inst.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
+
+            if self.package_manager:
+                # Define phase nodes
+                for phase, phase_node in self.package_manager.all_pipeline_phases(pipeline):
+                    self._pipeline_graphs[pipeline].add_node(
+                        phase_node, obj_inst=self.package_manager
+                    )
+
+                # Define phase edges
+                for phase, phase_node in self.package_manager.all_pipeline_phases(pipeline):
                     self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
 
     def _long_print(self):
@@ -260,6 +325,27 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         if hasattr(self, "builtins"):
             out_str.append(rucolor.section_title("Builtin Executables:\n"))
             out_str.append("\t" + colified(self.builtins.keys(), tty=True) + "\n")
+
+        if hasattr(self, "package_manager_configs"):
+            out_str.append("\n")
+            out_str.append(rucolor.section_title("Package Manager Configs:\n"))
+            for name, config in self.package_manager_configs.items():
+                out_str.append(f"\t{name} = {config}\n")
+
+        spec_groups = [
+            ("compilers", "Compilers"),
+            ("software_specs", "Software Specs"),
+        ]
+        for group in spec_groups:
+            if hasattr(self, group[0]):
+                out_str.append("\n")
+                out_str.append(rucolor.section_title("%s:\n" % group[1]))
+                for name, info in getattr(self, group[0]).items():
+                    out_str.append(rucolor.nested_1("  %s:\n" % name))
+                    for key, val in info.items():
+                        if val:
+                            out_str.append("    %s = %s\n" % (key, val.replace("@", "@@")))
+
         return out_str
 
     def set_env_variable_sets(self, env_variable_sets):
@@ -358,28 +444,19 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             )
 
         phases = set()
+        final_added_index = None
         if pipeline in self._pipeline_graphs:
-            for phase in self._pipeline_graphs[pipeline].walk():
+            for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
                 for phase_filter in phase_filters:
                     if fnmatch.fnmatch(phase.key, phase_filter):
                         phases.add(phase)
+                        final_added_index = idx
 
         include_phase_deps = ramble.config.get("config:include_phase_dependencies")
         if include_phase_deps:
-            phases_for_deps = list(phases)
-            while phases_for_deps:
-                cur_phase = phases_for_deps.pop(0)
-                for phase in phases:
-                    if phase is not cur_phase and phase not in phases:
-                        if cur_phase.key in phase._order_before:
-                            phases_for_deps.append(phase)
-                            phases.add(phase)
-
-                for dep_phase_name in cur_phase._order_after:
-                    dep_node = self._pipeline_graphs[pipeline].get_node(dep_phase_name)
-                    if dep_node not in phases:
-                        phases_for_deps.append(dep_node)
-                        phases.add(dep_node)
+            for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
+                if idx < final_added_index and phase not in phases:
+                    phases.add(phase)
 
         phase_order = []
         for node in self._pipeline_graphs[pipeline].walk():
@@ -457,6 +534,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for template_name, template_conf in workspace.all_templates():
             self.expander._used_variables.add(template_name)
             self.expander.expand_var(template_conf["contents"])
+
+        if self.package_manager is not None:
+            self.package_manager.build_used_variables(workspace)
 
         return self.expander._used_variables
 
@@ -814,6 +894,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for mod_inst in self._modifier_instances:
             builtin_objects.append(mod_inst)
             all_builtins.append(mod_inst.builtins)
+
+        if self.package_manager is not None:
+            builtin_objects.append(self.package_manager)
+            all_builtins.append(self.package_manager.builtins)
 
         all_executables = self.executables.copy()
         all_executables.update(self.custom_executables)
@@ -1348,6 +1432,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             "digest": ramble.util.hashing.hash_string(input_conf["fetcher"].url),
                         }
                     )
+
+        if self.package_manager is not None:
+            self.package_manager.populate_inventory(workspace, force_compute, require_exist)
 
         self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
 
@@ -1993,7 +2080,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     app_licenses = license_conf[self.name]
                     if app_licenses:
                         # Append logic to source file which contains the exports
-                        command.append(f". {{license_input_dir}}/{self.license_inc_name}")
+                        shell = ramble.config.get("config:shell")
+                        command.append(
+                            f"{source_str(shell)} {{license_input_dir}}/{self.license_inc_name}"
+                        )
 
         # Process environment variable actions
         for env_var_set in self._env_variable_sets:

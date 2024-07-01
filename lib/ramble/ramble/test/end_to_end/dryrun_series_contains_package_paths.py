@@ -29,6 +29,8 @@ def test_dryrun_series_contains_package_paths(
 ):
     test_config = r"""
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
@@ -44,10 +46,10 @@ ramble:
               variables:
                 n_nodes: '1'
                 test_id: [1, 2]
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: zlib
+        pkg_spec: zlib
     environments:
       zlib:
         packages:

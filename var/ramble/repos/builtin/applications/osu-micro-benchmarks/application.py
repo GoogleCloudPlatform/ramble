@@ -15,7 +15,7 @@ from ramble.expander import Expander
 from enum import Enum
 
 
-class OsuMicroBenchmarks(SpackApplication):
+class OsuMicroBenchmarks(ExecutableApplication):
     """Define an OSU micro benchmarks application"""
 
     name = "osu-micro-benchmarks"
@@ -24,15 +24,16 @@ class OsuMicroBenchmarks(SpackApplication):
 
     tags("synthetic-benchmarks")
 
-    define_compiler("gcc", spack_spec="gcc")
-    software_spec("openmpi", spack_spec="openmpi")
+    define_compiler("gcc", pkg_spec="gcc", package_manager="spack*")
+    software_spec("openmpi", pkg_spec="openmpi", package_manager="spack*")
     software_spec(
         "osu-micro-benchmarks",
-        spack_spec="osu-micro-benchmarks",
+        pkg_spec="osu-micro-benchmarks",
         compiler="gcc",
+        package_manager="spack*",
     )
 
-    required_package("osu-micro-benchmarks")
+    required_package("osu-micro-benchmarks", package_manager="spack*")
 
     all_workloads = [
         "osu_bibw",

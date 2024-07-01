@@ -32,6 +32,8 @@ workspace = RambleCommand("workspace")
 def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
@@ -80,18 +82,18 @@ ramble:
                 order: 'before_root'
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gcc:
-        spack_spec: gcc@9.3.0 target=x86_64
+        pkg_spec: gcc@9.3.0 target=x86_64
       impi2018:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       imb:
-        spack_spec: intel-mpi-benchmarks
+        pkg_spec: intel-mpi-benchmarks
         compiler: gcc
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
         compiler: gcc
     environments:
       intel-mpi-benchmarks:

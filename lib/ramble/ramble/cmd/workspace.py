@@ -566,10 +566,10 @@ def workspace_push_to_cache(args):
 
 
 def workspace_push_to_cache_setup_parser(subparser):
-    """push workspace envs to a given spack buildcache"""
+    """push workspace envs to a given buildcache"""
 
     subparser.add_argument(
-        "-d", dest="cache_path", default=None, required=True, help="Path to spack cache."
+        "-d", dest="cache_path", default=None, required=True, help="Path to cache."
     )
 
     arguments.add_common_arguments(subparser, ["where", "exclude_where", "filter_tags"])
@@ -691,9 +691,11 @@ def workspace_info(args):
 
                 for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
                     app_inst = experiment_set.get_experiment(exp_name)
-                    if app_inst.uses_spack:
+                    if app_inst.package_manager is not None:
                         software_environments.render_environment(
-                            app_inst.expander.expand_var("{env_name}"), app_inst.expander
+                            app_inst.expander.expand_var("{env_name}"),
+                            app_inst.expander,
+                            app_inst.package_manager,
                         )
 
                     if print_header:
@@ -930,7 +932,7 @@ def workspace_mirror_setup_parser(subparser):
         "--dry-run",
         dest="dry_run",
         action="store_true",
-        help="perform a dry run. Creates spack environments, "
+        help="perform a dry run. Creates package environments, "
         + "prints commands that would be executed "
         + "for installation, and files that would be downloaded.",
     )

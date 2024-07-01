@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *
+from ramble.modkit import *  # noqa: F403
 
 
 class TestMod(BasicModifier):
@@ -47,7 +47,7 @@ class TestMod(BasicModifier):
     )
 
     software_spec(
-        "analysis_spec", spack_spec="analysis_pkg@1.1", compiler="gcc"
+        "analysis_spec", pkg_spec="analysis_pkg@1.1", package_manager="spack*"
     )
 
     fom_regex = r"(?P<context>fom_context)(?P<fom>.*)"

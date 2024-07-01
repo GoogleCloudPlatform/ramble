@@ -6,11 +6,13 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 from ramble.appkit import *
 import spack.util.executable
 
 
-class SpackStack(SpackApplication):
+class SpackStack(ExecutableApplication):
     """Application definition for creating a spack software stack
 
     This application definition is used solely to create spack software stacks.
@@ -23,6 +25,8 @@ class SpackStack(SpackApplication):
     accelerate package installation.
 
     The experiments are considered successful if the installation completed.
+
+    This application should be used with the `spack-lightweight` package manager.
     """
 
     name = "spack-stack"
@@ -40,28 +44,19 @@ class SpackStack(SpackApplication):
     )
 
     executable("install", "spack install {install_flags}", use_mpi=True)
-
     workload(
         "create",
-        executables=[
-            "builtin::remove_env_files",
-            "builtin::spack_source",
-            "builtin::spack_activate",
-            "configure",
-            "install",
-            "builtin::spack_deactivate",
-        ],
+        executables=["builtin::remove_env_files", "configure", "install"],
     )
 
     executable("uninstall", "spack uninstall {uninstall_flags}", use_mpi=True)
 
+    workload("remove", executables=["uninstall"])
+
     workload(
         "remove",
         executables=[
-            "builtin::spack_source",
-            "builtin::spack_activate",
             "uninstall",
-            "builtin::spack_deactivate",
         ],
     )
 
@@ -138,18 +133,22 @@ class SpackStack(SpackApplication):
         cmds = ["rm -f {env_path}/spack.lock", "rm -rf {env_path}/.spack-env"]
         return cmds
 
-    def _software_install(self, workspace, app_inst=None):
-        """This application never installs software during setup."""
-        pass
-
-    def _define_package_paths(self, workspace, app_inst=None):
-        pass
-
     def evaluate_success(self):
         import spack.util.spack_yaml as syaml
 
         spack_file = self.expander.expand_var("{env_path}/spack.yaml")
         spec_list = []
+
+        # Only evaluate if this is a spack package manager
+        if (
+            self.package_manager is None
+            or "spack" not in self.package_manager.name
+        ):
+            return True
+
+        if not os.path.isfile(spack_file):
+            return False
+
         with open(spack_file, "r") as f:
             spack_data = syaml.load_config(f)
 
@@ -158,13 +157,13 @@ class SpackStack(SpackApplication):
         for spec in spack_data["spack"]["specs"]:
             spec_list.append(spec)
 
-        self.spack_runner.set_env(self.expander.env_path)
-        self.spack_runner.activate()
+        self.package_manager.runner.set_env(self.expander.env_path)
+        self.package_manager.runner.activate()
 
         # Spack find errors if a spec is provided that is not installed.
         for spec in spec_list:
             try:
-                self.spack_runner.spack("find", spec, output=str)
+                self.package_manager.runner.spack("find", spec, output=str)
             except spack.util.executable.ProcessError:
                 return False
         return True

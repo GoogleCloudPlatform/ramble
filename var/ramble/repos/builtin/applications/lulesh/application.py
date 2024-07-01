@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Lulesh(SpackApplication):
+class Lulesh(ExecutableApplication):
     """Define LULESH application"""
 
     name = "LULESH"
@@ -20,15 +20,20 @@ class Lulesh(SpackApplication):
 
     tags("proxy-app", "mini-app")
 
-    define_compiler("gcc13", spack_spec="gcc@13.1.0")
-
-    software_spec("impi2018", spack_spec="intel-mpi@2018.4.274")
+    define_compiler("gcc13", pkg_spec="gcc@13.1.0", package_manager="spack*")
 
     software_spec(
-        "lulesh", spack_spec="lulesh@2.0.3 +openmp", compiler="gcc13"
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
     )
 
-    required_package("lulesh")
+    software_spec(
+        "lulesh",
+        pkg_spec="lulesh@2.0.3 +openmp",
+        compiler="gcc13",
+        package_manager="spack*",
+    )
+
+    required_package("lulesh", package_manager="spack*")
 
     executable("execute", "lulesh2.0 {flags}", use_mpi=True)
 

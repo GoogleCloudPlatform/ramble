@@ -9,10 +9,10 @@
 from ramble.appkit import *
 
 
-class Zlib(SpackApplication):
+class Zlib(ExecutableApplication):
     name = "zlib"
 
-    software_spec("zlib", spack_spec="zlib")
+    software_spec("zlib", pkg_spec="zlib", package_manager="spack*")
 
     executable("list_lib", "ls {zlib}/lib", use_mpi=False)
 

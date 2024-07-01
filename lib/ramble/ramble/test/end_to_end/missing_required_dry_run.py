@@ -23,9 +23,11 @@ workspace = RambleCommand("workspace")
 
 
 def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
-    """Tests tty.die at end of ramble.application_types.spack._create_spack_env"""
+    """Tests tty.die at end of ramble.application_types.spack._create_software_env"""
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
@@ -40,16 +42,16 @@ ramble:
             eight_node:
               variables:
                 n_nodes: '8'
-  spack:
+  software:
     packages:
       gcc8:
-        spack_spec: gcc@8.2.0 target=x86_64
+        pkg_spec: gcc@8.2.0 target=x86_64
         compiler_spec: gcc@8.2.0
       impi2018:
-        spack_spec: intel-mpi@2018.4.274 target=x86_64
+        pkg_spec: intel-mpi@2018.4.274 target=x86_64
         compiler: gcc8
       wrfv3:
-        spack_spec: my_wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
+        pkg_spec: my_wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf
         compiler: gcc8
     environments:
       wrfv3:

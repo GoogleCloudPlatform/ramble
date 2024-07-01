@@ -6,9 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import deprecation
+
 from ramble.main import RambleCommand
 
-mods = RambleCommand("mods")
+list_cmd = RambleCommand("list")
+info_cmd = RambleCommand("info")
 
 
 def check_info(output):
@@ -27,30 +30,36 @@ def check_info(output):
 
 
 def test_mods_list(mutable_mock_mods_repo):
-    out = mods("list")
+    out = list_cmd("--type", "modifiers")
 
     assert "test-mod" in out
 
 
 def test_mods_list_tags(mutable_mock_mods_repo):
-    out = mods("list", "-t", "test")
+    out = list_cmd("--type", "modifiers", "-t", "test")
 
     assert "test-mod" in out
 
 
 def test_mods_list_description(mutable_mock_mods_repo):
-    out = mods("list", "-d", "just a test")
+    out = list_cmd("--type", "modifiers", "-d", "just a test")
 
     assert "test-mod" in out
 
 
 def test_mods_info(mutable_mock_mods_repo, mock_modifier):
-    out = mods("info", mock_modifier)
+    out = info_cmd("--type", "modifiers", mock_modifier)
 
     check_info(out)
 
 
 def test_mods_info_all_real_modifiers(modifier):
-    mod_info = mods("info", modifier)
+    out = info_cmd("--type", "modifiers", modifier)
 
-    check_info(mod_info)
+    check_info(out)
+
+
+@deprecation.fail_if_not_removed
+def test_mods_deprecation():
+    mods = RambleCommand("mods")
+    mods()

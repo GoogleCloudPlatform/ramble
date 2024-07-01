@@ -20,6 +20,7 @@ import ramble.schema.env_vars
 import ramble.schema.internals
 import ramble.schema.types
 import ramble.schema.variables
+import ramble.schema.variants
 import ramble.schema.success_criteria
 import ramble.schema.licenses
 import ramble.schema.modifiers
@@ -98,6 +99,7 @@ repeats_def = union_dicts(ramble.schema.types.string_or_num, {"default": 0})
 
 sub_props = union_dicts(
     ramble.schema.variables.properties,
+    ramble.schema.variants.properties,
     ramble.schema.success_criteria.properties,
     ramble.schema.env_vars.properties,
     ramble.schema.internals.properties,

@@ -36,6 +36,8 @@ spack:
 
     test_config = f"""
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {{n_ranks}} -ppn {{processes_per_node}}'
     batch_submit: 'batch_submit {{execute_experiment}}'
@@ -50,11 +52,11 @@ ramble:
             test{{n_nodes}}_{{env_name}}:
               variables:
                 n_nodes: '1'
-  spack:
+  software:
     packages: {{}}
     environments:
       wrfv4:
-        external_spack_env: {env_path}
+        external_env: {env_path}
 """
 
     setup_type = ramble.pipeline.pipelines.setup

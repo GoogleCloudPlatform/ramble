@@ -14,10 +14,10 @@ import ramble.language.language_helpers
 import ramble.success_criteria
 
 
-"""This package contains directives that can be used within a package.
+"""This package contains directives that can be used within an application.
 
-Directives are functions that can be called inside a package
-definition to modify the package, for example:
+Directives are functions that can be called inside an application
+definition to modify then application, for example:
 
     .. code-block:: python
 

@@ -201,10 +201,10 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: 'zlib'
+        pkg_spec: 'zlib'
     environments:
       zlib:
         packages:
@@ -248,16 +248,18 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: 'zlib'
+        pkg_spec: 'zlib'
     environments:
       zlib:
         packages:
@@ -320,7 +322,7 @@ ramble:
               variables:
                 n_nodes: '2'
 
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -360,7 +362,6 @@ def test_workspace_from_template(tmpdir):
 cd "{experiment_run_dir}"
 
 cmake -DTEST=1 -h
-{spack_setup}
 
 {command}
         """
@@ -451,13 +452,15 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -474,12 +477,12 @@ ramble:
     ws1._re_read()
 
     assert search_files_for_string([config_path], "packages: {}") is True
-    assert search_files_for_string([config_path], "spack_spec: zlib") is False
+    assert search_files_for_string([config_path], "pkg_spec: zlib") is False
 
     workspace("concretize", global_args=["-w", workspace_name])
 
     assert search_files_for_string([config_path], "packages: {}") is False
-    assert search_files_for_string([config_path], "spack_spec: zlib") is True
+    assert search_files_for_string([config_path], "pkg_spec: zlib") is True
 
 
 def test_concretize_nothing():
@@ -492,12 +495,12 @@ def test_concretize_nothing():
         check_basic(ws)
 
         assert search_files_for_string([ws.config_file_path], "packages: {}") is True
-        assert search_files_for_string([ws.config_file_path], "spack_spec:") is False
+        assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
 
         ws.concretize()
 
         assert search_files_for_string([ws.config_file_path], "packages: {}") is True
-        assert search_files_for_string([ws.config_file_path], "spack_spec:") is False
+        assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
 
 
 def test_concretize_concrete_config():
@@ -522,16 +525,18 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: 'zlib'
+        pkg_spec: 'zlib'
     environments:
       zlib:
         packages:
@@ -576,16 +581,18 @@ ramble:
               variables:
                 n_nodes: '2'
     zlib:
+      variants:
+        package_manager: spack
       workloads:
         ensure_installed:
           experiments:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       zlib-test:
-        spack_spec: 'zlib-test'
+        pkg_spec: 'zlib-test'
     environments:
       zlib-test:
         packages:
@@ -846,7 +853,7 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -897,7 +904,7 @@ ramble:
                - - cells
                  - n_nodes
                - - idx
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -965,7 +972,7 @@ ramble:
               variables:
                 n_nodes: [1, 2, 4]
                 idx: [1, 2, 3, 4, 5, 6]
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1017,7 +1024,7 @@ ramble:
               matrices:
                 - - n_nodes
                 - - idx
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1059,7 +1066,7 @@ ramble:
             exp_series_{foo}:
               matrices:
                 - - foo
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1100,7 +1107,7 @@ ramble:
                 foo: '1'
               matrices:
                 - - foo
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1142,7 +1149,7 @@ ramble:
               matrices:
                 - - foo
                 - - foo
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1187,7 +1194,7 @@ ramble:
             exp_series_{foo}:
               variables:
                 foo: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1212,21 +1219,21 @@ ramble:
         write_config(ws_path, test_config)
 
         with ramble.workspace.Workspace(ws_path) as ws:
-            spack_dict = ws.get_spack_dict()
-            print(f"spack_dict before = {spack_dict}")
+            software_dict = ws.get_software_dict()
+            print(f"software_dict before = {software_dict}")
 
         workspace("concretize", global_args=workspace_flags)
 
         with ramble.workspace.Workspace(ws_path) as ws:
-            spack_dict = ws.get_spack_dict()
-            assert spack_dict[namespace.environments]
+            software_dict = ws.get_software_dict()
+            assert namespace.environments in software_dict
 
         write_config(ws_path, test_config)
 
         workspace("concretize", global_args=workspace_flags)
         with ramble.workspace.Workspace(ws_path) as ws:
-            spack_dict = ws.get_spack_dict()
-            assert spack_dict[namespace.environments]
+            software_dict = ws.get_software_dict()
+            assert namespace.environments in software_dict
 
 
 def test_workspace_archive():
@@ -1245,7 +1252,7 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1338,7 +1345,7 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1404,7 +1411,7 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1478,7 +1485,7 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1558,7 +1565,7 @@ ramble:
             test_experiment:
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1638,7 +1645,7 @@ ramble:
         test_wl:
           experiments:
             test_experiment: {}
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1704,7 +1711,7 @@ ramble:
                 n_nodes: '2'
   include:
      - '%s'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1739,7 +1746,7 @@ ramble:
         test_wl:
           experiments:
             test_experiment: {}
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1803,7 +1810,7 @@ ramble:
                     use_mpi: false
                     redirect: '{log_file}'
                     output_capture: '&>'
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1865,7 +1872,7 @@ ramble:
                 - exp_level_cmd
                 - wl_level_cmd
                 - app_level_cmd
-  spack:
+  software:
     packages: {}
     environments: {}
 """
@@ -1889,6 +1896,8 @@ ramble:
 def test_workspace_simplify():
     test_ws_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
@@ -1910,14 +1919,14 @@ ramble:
               template: True
               variables:
                 n_nodes: '1'
-  spack:
+  software:
     packages:
       zlib:
-        spack_spec: zlib
+        pkg_spec: zlib
       zlib-configs:
-        spack_spec: zlib-configs
+        pkg_spec: zlib-configs
       unused-pkg:
-        spack_spec: unused
+        pkg_spec: unused
     environments:
       zlib:
         packages:
@@ -1939,11 +1948,11 @@ applications:
             variables:
               n_ranks: 1
 """
-    test_spack_config = """
-spack:
+    test_software_config = """
+software:
   packages:
     pkg_not_in_ws_config:
-      spack_spec: 'gcc@10.5.0'
+      pkg_spec: 'gcc@10.5.0'
       compiler_spec: gcc@10.5.0
 """
 
@@ -1953,35 +1962,33 @@ spack:
 
     ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
     app_config_path = os.path.join(ws1.config_dir, "applications.yaml")
-    spack_config_path = os.path.join(ws1.config_dir, "spack.yaml")
+    software_config_path = os.path.join(ws1.config_dir, "software.yaml")
 
     with open(ws_config_path, "w+") as f:
         f.write(test_ws_config)
     with open(app_config_path, "w+") as f:
         f.write(test_app_config)
-    with open(spack_config_path, "w+") as f:
-        f.write(test_spack_config)
+    with open(software_config_path, "w+") as f:
+        f.write(test_software_config)
 
     ws1._re_read()
 
-    assert search_files_for_string([ws_config_path], "spack_spec: zlib") is True
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True
     assert search_files_for_string([ws_config_path], "unused-pkg") is True
     assert search_files_for_string([ws_config_path], "unused-env") is True
     assert search_files_for_string([ws_config_path], "unused_exp_template") is True
-    assert search_files_for_string([ws_config_path], "spack_spec: zlib-configs") is True
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs") is True
     assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
     assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
 
     workspace("concretize", "--simplify", global_args=["-w", workspace_name])
 
-    print(ws_config_path)
-
-    assert search_files_for_string([ws_config_path], "spack_spec: zlib") is True  # keep used pkg
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True  # keep used pkg
     assert search_files_for_string([ws_config_path], "unused-pkg") is False  # remove unused pkg
     assert search_files_for_string([ws_config_path], "unused-env") is False  # remove unused env
     # remove unused experiment template and associated pkgs/envs
     assert search_files_for_string([ws_config_path], "unused_exp_template") is False
-    assert search_files_for_string([ws_config_path], "spack_spec: zlib-configs") is False
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs") is False
     # ensure apps/pkgs/envs are not merged into workspace config from other config files
     assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
     assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False

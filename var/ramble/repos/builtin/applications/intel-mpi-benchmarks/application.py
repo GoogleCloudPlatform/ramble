@@ -15,7 +15,7 @@ from ramble.expander import Expander
 # - Check the compute nodes in a single rack using the network topology API
 
 
-class IntelMpiBenchmarks(SpackApplication):
+class IntelMpiBenchmarks(ExecutableApplication):
     """Intel MPI Benchmark application.
 
     https://www.intel.com/content/www/us/en/developer/articles/technical/intel-mpi-benchmarks.html
@@ -29,15 +29,18 @@ class IntelMpiBenchmarks(SpackApplication):
 
     tags("micro-benchmark", "benchmark", "mpi")
 
-    define_compiler("gcc9", spack_spec="gcc@9.3.0")
-    software_spec("impi2018", spack_spec="intel-mpi@2018.4.274")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
     software_spec(
         "intel-mpi-benchmarks",
-        spack_spec="intel-mpi-benchmarks@2019.6",
+        pkg_spec="intel-mpi-benchmarks@2019.6",
         compiler="gcc9",
+        package_manager="spack*",
     )
 
-    required_package("intel-mpi-benchmarks")
+    required_package("intel-mpi-benchmarks", package_manager="spack*")
 
     executable(
         "pingpong",

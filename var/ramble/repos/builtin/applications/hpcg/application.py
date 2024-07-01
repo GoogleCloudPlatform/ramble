@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Hpcg(SpackApplication):
+class Hpcg(ExecutableApplication):
     """Define HPCG application"""
 
     name = "hpcg"
@@ -20,13 +20,20 @@ class Hpcg(SpackApplication):
 
     tags("benchmark-app", "mini-app", "benchmark")
 
-    define_compiler("gcc9", spack_spec="gcc@9.3.0")
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
 
-    software_spec("impi2018", spack_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
-    software_spec("hpcg", spack_spec="hpcg@3.1 +openmp", compiler="gcc9")
+    software_spec(
+        "hpcg",
+        pkg_spec="hpcg@3.1 +openmp",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
-    required_package("hpcg")
+    required_package("hpcg", package_manager="spack*")
 
     executable("execute", "xhpcg", use_mpi=True)
 

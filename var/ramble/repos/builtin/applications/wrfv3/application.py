@@ -11,7 +11,7 @@ from ramble.appkit import *
 from ramble.expander import Expander
 
 
-class Wrfv3(SpackApplication):
+class Wrfv3(ExecutableApplication):
     """Define Wrf version 3 application"""
 
     name = "wrfv3"
@@ -20,17 +20,20 @@ class Wrfv3(SpackApplication):
 
     tags("nwp", "weather")
 
-    define_compiler("gcc8", spack_spec="gcc@8.2.0")
+    define_compiler("gcc8", pkg_spec="gcc@8.2.0", package_manager="spack*")
 
-    software_spec("impi2018", spack_spec="intel-mpi@2018.4.274")
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
     software_spec(
         "wrfv3",
-        spack_spec="wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf",
+        pkg_spec="wrf@3.9.1.1 build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf",
         compiler="gcc8",
+        package_manager="spack*",
     )
 
-    required_package("wrf")
+    required_package("wrf", package_manager="spack*")
 
     input_file(
         "CONUS_2p5km",

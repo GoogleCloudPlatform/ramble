@@ -37,6 +37,8 @@ def enable_verbose():
 def test_workspace_phase_selection(mutable_config, mutable_mock_workspace_path, enable_verbose):
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
@@ -77,18 +79,18 @@ ramble:
               matrix:
               - n_nodes
               - env_name
-  spack:
+  software:
     packages:
       gcc:
-        spack_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.0
       intel-mpi:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       wrfv4:
-        spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
+        pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf
         compiler: gcc
       wrfv4-portable:
-        spack_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
+        pkg_spec: 'wrf@4.2 build_type=dm+sm compile_type=em_real
           nesting=basic ~chem ~pnetcdf target=x86_64'
         compiler: gcc
     environments:

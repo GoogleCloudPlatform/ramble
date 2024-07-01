@@ -31,6 +31,8 @@ def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path):
 
     test_config = """
 ramble:
+  variants:
+    package_manager: spack
   variables:
     mpi_command: 'mpirun -n {{n_ranks}} -ppn {{processes_per_node}}'
     batch_submit: 'batch_submit {{execute_experiment}}'
@@ -51,15 +53,15 @@ ramble:
             "{}_test_{{{var_name}}}":
               variables:
                 n_ranks: "{{{var_name}}}"
-  spack:
+  software:
     packages:
       gcc:
-        spack_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.0
       intel:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       openfoam:
-        spack_spec: openfoam
+        pkg_spec: openfoam
         compiler: gcc
     environments:
       openfoam:

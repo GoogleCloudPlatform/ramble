@@ -49,7 +49,7 @@ ramble:
                 - name: test-mod
               variables:
                 n_nodes: 1
-  spack:
+  software:
     packages: {}
     environments: {}
 """

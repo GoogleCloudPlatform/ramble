@@ -21,7 +21,7 @@ Installation
 
 To install Ramble, see the :doc:`../getting_started` guide.
 
-**NOTE**: This tutorial does not require ``spack`` to be installed or configured.
+**NOTE**: This tutorial does not require a package manager to be installed or configured.
 
 Ramble Basics
 =============
@@ -175,11 +175,11 @@ following contents:
                 test: # Arbitrary experiment name
                   variables:
                     n_ranks: '1'
-      spack:
+      software:
         packages: {}
         environments: {}
 
-Note that since the ``hostname`` application does not rely on spack, the spack
+Note that since the ``hostname`` application does not rely on a package manager, the software
 dictionary has empty ``packages`` and ``environments`` dictionaries.
 
 The second file you should edit is the ``execute_experiment.tpl`` template file.
@@ -198,7 +198,7 @@ in the active workspace using:
     $ ramble workspace setup
 
 This command will create experiment directories, download and expand input files,
-and install the required software stack (and generate spack environments for
+and install the required software stack (and generate software environments for
 each workload).
 
 It can take a bit to run depending on if you need to build new software and how

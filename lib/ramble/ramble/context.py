@@ -26,6 +26,7 @@ class Context(object):
         """
         self.env_variables = []
         self.variables = syaml.syaml_dict()
+        self.variants = syaml.syaml_dict()
         self.internals = {}
         self.templates = None
         self.formatted_executables = {}
@@ -50,6 +51,8 @@ class Context(object):
 
         if in_context.variables:
             self.variables.update(in_context.variables)
+        if in_context.variants:
+            self.variants.update(in_context.variants)
         if in_context.env_variables:
             self.env_variables.append(in_context.env_variables)
         if in_context.internals:
@@ -92,13 +95,14 @@ class Context(object):
 
 
 def create_context_from_dict(context_name, in_dict):
-    """Creates a new Context object from a dictionary of variables
+    """Creates a new Context object from an input dictionary
 
     Dictionaries should follow the below format:
 
     in_dict = {
         'env_vars': [],
         'variables': {},
+        'variants': {},
         'internals': {},
         'template': '',
         'chained_experiments': [],
@@ -127,6 +131,9 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.variables in in_dict:
         new_context.variables = in_dict[namespace.variables]
+
+    if namespace.variants in in_dict:
+        new_context.variants = in_dict[namespace.variants]
 
     if namespace.internals in in_dict:
         new_context.internals = in_dict[namespace.internals]

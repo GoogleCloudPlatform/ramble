@@ -56,7 +56,7 @@ NOT_PROVIDED = object()
 # Implement type specific functionality between here, and
 #     END TYPE SPECIFIC FUNCTIONALITY
 ####
-ObjectTypes = Enum("ObjectTypes", ["applications", "modifiers"])
+ObjectTypes = Enum("ObjectTypes", ["applications", "modifiers", "package_managers"])
 
 OBJECT_NAMES = [obj.name for obj in ObjectTypes]
 
@@ -80,6 +80,14 @@ type_definitions = {
         "config_section": "modifier_repos",
         "accepted_configs": ["modifier_repo.yaml", unified_config],
         "singular": "modifier",
+    },
+    ObjectTypes.package_managers: {
+        "file_name": "package_manager.py",
+        "dir_name": "package_managers",
+        "abbrev": "pkg_man",
+        "config_section": "package_manager_repos",
+        "accepted_configs": ["package_manager_repo.yaml", unified_config],
+        "singular": "package manager",
     },
 }
 
@@ -117,9 +125,28 @@ def _mods(repo_dirs=None):
     return path
 
 
+def _package_managers(repo_dirs=None):
+    """Get the singleton RepoPath instance for Ramble.
+
+    Create a RepoPath, add it to sys.meta_path, and return it.
+
+    TODO: consider not making this a singleton.
+    """
+    repo_dirs = repo_dirs or ramble.config.get("package_manager_repos")
+    if not repo_dirs:
+        raise NoRepoConfiguredError(
+            "Ramble configuration contains no package manager repositories."
+        )
+
+    path = RepoPath(*repo_dirs, object_type=ObjectTypes.package_managers)
+    sys.meta_path.append(path)
+    return path
+
+
 paths = {
     ObjectTypes.applications: llnl.util.lang.Singleton(_apps),
     ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
+    ObjectTypes.package_managers: llnl.util.lang.Singleton(_package_managers),
 }
 
 #####################################
@@ -1427,9 +1454,10 @@ class ReposFinder(object):
         return None
 
 
-# Add the finder to sys.meta_path
-REPOS_FINDER = ReposFinder()
-sys.meta_path.append(REPOS_FINDER)
+# Add the finders to sys.meta_path
+for obj in ObjectTypes:
+    obj_finder = ReposFinder(object_type=obj)
+    sys.meta_path.append(obj_finder)
 
 
 class RepoError(ramble.error.RambleError):

@@ -39,7 +39,7 @@ class ConditionalPsm3(BasicModifier):
     executable_modifier("apply_psm3")
 
     required_variable("psm3_mpi")
-    required_package("intel-oneapi-mpi")
+    required_package("intel-oneapi-mpi", package_manager="spack*")
 
     modifier_variable(
         "apply_psm3_exec_regex",

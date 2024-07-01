@@ -25,9 +25,16 @@ Alternatively, the files can be edited directly with:
 Within the ``ramble.yaml`` file, write the following contents, which is the
 final configuration from a previous tutorial.
 
+
+**NOTE**: This workspace utilizes the ``spack`` package manager. As a result, it
+requires ``spack`` is installed and available in your path. Modifications to
+the ``package_manager`` variant will change this behavior.
+
 .. code-block:: YAML
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -44,15 +51,15 @@ final configuration from a previous tutorial.
                 scaling_{n_nodes}:
                   variables:
                     n_nodes: [1, 2]
-      spack:
+      software:
         packages:
           gcc9:
-            spack_spec: gcc@9.4.0
+            pkg_spec: gcc@9.4.0
           intel-mpi:
-            spack_spec: intel-oneapi-mpi@2021.11.0
+            pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
           wrfv4:
-            spack_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
+            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
               ~pnetcdf
             compiler: gcc9
         environments:

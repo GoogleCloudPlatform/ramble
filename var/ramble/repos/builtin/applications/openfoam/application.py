@@ -18,9 +18,14 @@ class Openfoam(OpenfoamOrg):
 
     maintainers("douglasjacobsen")
 
-    software_spec("openfoam", spack_spec="openfoam@2312", compiler="gcc9")
+    software_spec(
+        "openfoam",
+        pkg_spec="openfoam@2312",
+        compiler="gcc9",
+        package_manager="spack*",
+    )
 
-    required_package("openfoam")
+    required_package("openfoam", package_manager="spack*")
 
     executable(
         "surfaceFeatures",

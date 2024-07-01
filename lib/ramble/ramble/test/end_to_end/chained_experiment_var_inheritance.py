@@ -28,6 +28,8 @@ workspace = RambleCommand("workspace")
 def test_chained_experiment_variable_inheritance(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
 ramble:
+  variants:
+    package_manager: spack
   formatted_executables:
     command:
       join_separator: '\n'
@@ -91,18 +93,18 @@ ramble:
                 - n_ranks
               variables:
                 n_nodes: '2'
-  spack:
+  software:
     packages:
       gcc:
-        spack_spec: gcc@9.3.0 target=x86_64
+        pkg_spec: gcc@9.3.0 target=x86_64
       impi2018:
-        spack_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-mpi@2018.4.274
         compiler: gcc
       imb:
-        spack_spec: intel-mpi-benchmarks
+        pkg_spec: intel-mpi-benchmarks
         compiler: gcc
       gromacs:
-        spack_spec: gromacs
+        pkg_spec: gromacs
         compiler: gcc
     environments:
       intel-mpi-benchmarks:

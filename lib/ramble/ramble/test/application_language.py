@@ -23,6 +23,7 @@ app_types = [
 func_types = enum.Enum("func_types", ["method", "directive"])
 
 
+@deprecation.fail_if_not_removed
 @pytest.mark.parametrize("app_class", app_types)
 def test_application_type_features(app_class):
     app_path = "/path/to/app"
@@ -247,36 +248,36 @@ def add_input_file(app_inst, input_num=1, func_type=func_types.directive):
 @deprecation.fail_if_not_removed
 def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     spec_name = "Compiler%spec_num"
-    spec_spack_spec = f"compiler_base@{spec_num}.0 +var1 ~var2"
+    spec_pkg_spec = f"compiler_base@{spec_num}.0 +var1 ~var2"
     spec_compiler_spec = "compiler1_base@{spec_num}"
 
     spec_defs = {}
-    spec_defs[spec_name] = {"spack_spec": spec_spack_spec, "compiler_spec": spec_compiler_spec}
+    spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
     if func_type == func_types.directive:
         define_compiler(
-            spec_name, spack_spec=spec_spack_spec, compiler_spec=spec_compiler_spec  # noqa: F405
+            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
         )(app_inst)
     elif func_type == func_types.method:
         app_inst.define_compiler(
-            spec_name, spack_spec=spec_spack_spec, compiler_spec=spec_compiler_spec  # noqa: F405
+            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
         )
     else:
         assert False
 
     spec_name = "OtherCompiler%spec_num"
-    spec_spack_spec = f"compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64"
+    spec_pkg_spec = f"compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64"
     spec_compiler_spec = "compiler2_base@{spec_num}"
 
-    spec_defs[spec_name] = {"spack_spec": spec_spack_spec, "compiler_spec": spec_compiler_spec}
+    spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
     if func_type == func_types.directive:
         define_compiler(
-            spec_name, spack_spec=spec_spack_spec, compiler_spec=spec_compiler_spec  # noqa: f405
+            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: f405
         )(app_inst)
     elif func_type == func_types.method:
         app_inst.define_compiler(
-            spec_name, spack_spec=spec_spack_spec, compiler_spec=spec_compiler_spec  # noqa: F405
+            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
         )
     else:
         assert False
@@ -286,36 +287,36 @@ def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
 
 def add_software_spec(app_inst, spec_num=1, func_type=func_types.directive):
     spec_name = "NoMPISpec%s" % spec_num
-    spec_spack_spec = f"NoMPISpec@{spec_num} +var1 ~var2 target=x86_64"
+    spec_pkg_spec = f"NoMPISpec@{spec_num} +var1 ~var2 target=x86_64"
     spec_compiler = "spec_compiler1@1.1"
 
     spec_defs = {}
-    spec_defs[spec_name] = {"spack_spec": spec_spack_spec, "compiler": spec_compiler}
+    spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler": spec_compiler}
 
     if func_type == func_types.directive:
-        software_spec(spec_name, spack_spec=spec_spack_spec, compiler=spec_compiler)(  # noqa: F405
+        software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)(  # noqa: F405
             app_inst
         )
     elif func_type == func_types.method:
         app_inst.software_spec(
-            spec_name, spack_spec=spec_spack_spec, compiler=spec_compiler  # noqa: F405
+            spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler  # noqa: F405
         )
     else:
         assert False
 
     spec_name = "MPISpec%s" % spec_num
-    spec_spack_spec = f"MPISpec@{spec_num} +var1 ~var2 target=x86_64"
+    spec_pkg_spec = f"MPISpec@{spec_num} +var1 ~var2 target=x86_64"
     spec_compiler = "spec_compiler1@1.1"
 
-    spec_defs[spec_name] = {"spack_spec": spec_spack_spec, "compiler": spec_compiler}
+    spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler": spec_compiler}
 
     if func_type == func_types.directive:
-        software_spec(spec_name, spack_spec=spec_spack_spec, compiler=spec_compiler)(  # noqa: F405
+        software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)(  # noqa: F405
             app_inst
         )
     elif func_type == func_types.method:
         app_inst.software_spec(
-            spec_name, spack_spec=spec_spack_spec, compiler=spec_compiler  # noqa: F405
+            spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler  # noqa: F405
         )
     else:
         assert False
@@ -397,20 +398,14 @@ def test_input_file_directive(app_class, func_type):
 def test_define_compiler_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
     test_defs = {}
-    if app_inst.uses_spack:
-        test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
-        test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
+    test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
+    test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
 
-        assert hasattr(app_inst, "compilers")
-        for name, info in test_defs.items():
-            assert name in app_inst.compilers
-            for key, value in info.items():
-                assert app_inst.compilers[name][key] == value
-    else:
-        test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
-
-        assert hasattr(app_inst, "compilers")
-        assert not app_inst.compilers
+    assert hasattr(app_inst, "compilers")
+    for name, info in test_defs.items():
+        assert name in app_inst.compilers
+        for key, value in info.items():
+            assert app_inst.compilers[name][key] == value
 
 
 @pytest.mark.parametrize("func_type", func_types)
@@ -418,17 +413,11 @@ def test_define_compiler_directive(app_class, func_type):
 def test_software_spec_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
     test_defs = {}
-    if app_inst.uses_spack:
-        test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
-        test_defs.update(add_software_spec(app_inst, 2, func_type=func_type))
+    test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
+    test_defs.update(add_software_spec(app_inst, 2, func_type=func_type))
 
-        assert hasattr(app_inst, "software_specs")
-        for name, info in test_defs.items():
-            assert name in app_inst.software_specs
-            for key, value in info.items():
-                assert app_inst.software_specs[name][key] == value
-    else:
-        test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
-
-        assert hasattr(app_inst, "software_specs")
-        assert not app_inst.software_specs
+    assert hasattr(app_inst, "software_specs")
+    for name, info in test_defs.items():
+        assert name in app_inst.software_specs
+        for key, value in info.items():
+            assert app_inst.software_specs[name][key] == value

@@ -13,7 +13,7 @@ from ramble.expander import Expander
 from ramble.keywords import keywords
 
 
-class Namd(SpackApplication):
+class Namd(ExecutableApplication):
     """Define NAMD application"""
 
     name = "namd"
@@ -22,21 +22,29 @@ class Namd(SpackApplication):
 
     tags("molecular-dynamics", "charm++", "task-parallelism")
 
-    define_compiler("gcc12", spack_spec="gcc@12.2.0")
+    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
 
-    software_spec("impi2021p8", spack_spec="intel-oneapi-mpi@2021.8.0")
+    software_spec(
+        "impi2021p8",
+        pkg_spec="intel-oneapi-mpi@2021.8.0",
+        package_manager="spack*",
+    )
 
     software_spec(
         "charmpp",
-        spack_spec="charmpp backend=mpi build-target=charm++",
+        pkg_spec="charmpp backend=mpi build-target=charm++",
         compiler="gcc12",
+        package_manager="spack*",
     )
 
     software_spec(
-        "namd", spack_spec="namd@2.14 interface=tcl", compiler="gcc12"
+        "namd",
+        pkg_spec="namd@2.14 interface=tcl",
+        compiler="gcc12",
+        package_manager="spack*",
     )
 
-    required_package("namd")
+    required_package("namd", package_manager="spack*")
 
     input_file(
         "stmv",

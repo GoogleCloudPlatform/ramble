@@ -37,6 +37,7 @@ class namespace:
 
     # For rendering objects
     variables = "variables"
+    variants = "variants"
     zips = "zips"
     matrices = "matrices"
     matrix = "matrix"
@@ -44,13 +45,13 @@ class namespace:
     where = "where"
 
     # For software definitions
-    spack = "spack"
-    external_env = "external_spack_env"
+    software = "software"
+    external_env = "external_env"
 
     # v2 configs
     packages = "packages"
     environments = "environments"
-    spack_spec = "spack_spec"
+    pkg_spec = "pkg_spec"
     compiler_spec = "compiler_spec"
     compiler = "compiler"
 
@@ -58,3 +59,6 @@ class namespace:
     indentation = "indentation"
     prefix = "prefix"
     join_separator = "join_separator"
+
+    # For variants
+    package_manager = "package_manager"
