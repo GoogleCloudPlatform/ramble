@@ -359,6 +359,20 @@ function check_workspace_deactivate_flags -d "check ramble workspace subcommand 
 end
 
 
+function check_workspace_create_with_activate_flags -d "check create for activate flags"
+    set -l _a "$argv"
+
+    if test -n "$_a"
+        if match_flag $_a "-a"
+            return 0
+        end
+        if match_flag $_a "--activate"
+            return 0
+        end
+    end
+
+    return 1
+end
 
 
 #
@@ -470,6 +484,23 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
                                 end
                                 return 1
                             end
+                        end
+
+                    case "create"
+                        set -l _a (stream_args $__rmb_remaining_args)
+
+                        if check_workspace_create_with_activate_flags $_a
+                            set -l rmb_workspace_cmd "command ramble $rmb_flags workspace create $__rmb_remaining_args"
+                            capture_all $rmb_workspace_cmd __rmb_stat __rmb_stdout __rmb_stderr
+                            if test -n "$__rmb_stderr"
+                                echo -s \n$__rmb_stderr 1>&2  # current fish bug: handle stderr manually
+                            end
+                            set -l activate_cmd $__rmb_stdout
+                            eval $activate_cmd
+                            set -l ws (echo $activate_cmd | awk '{print $NF}')
+                            echo "==> Created and activated workspace in $ws"
+                        else
+                            command ramble workspace create $_a
                         end
 
                     case "*"
