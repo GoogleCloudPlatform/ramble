@@ -66,6 +66,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.package_manager_types.html">ramble.package_manager_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="ramble.test.html#subpackages">Subpackages</a></li>
@@ -88,7 +89,6 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-namespace-trie-module">ramble.test.namespace_trie module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-repository-module">ramble.test.repository module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-software-environment-module">ramble.test.software_environment module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-spack-runner-module">ramble.test.spack_runner module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.spec_basic">ramble.test.spec_basic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-stage-module">ramble.test.stage module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.success_criteria">ramble.test.success_criteria module</a></li>
@@ -100,7 +100,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
@@ -115,15 +115,16 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modkit-module">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.package_manager">ramble.package_manager module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.pkgmankit">ramble.pkgmankit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repeats">ramble.repeats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spec">ramble.spec module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.stage">ramble.stage module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.success_criteria">ramble.success_criteria module</a></li>
@@ -206,38 +207,8 @@
 <section id="ramble-test-cmd-mirror-module">
 <h2>ramble.test.cmd.mirror module<a class="headerlink" href="#ramble-test-cmd-mirror-module" title="Link to this heading"></a></h2>
 </section>
-<section id="module-ramble.test.cmd.mods">
-<span id="ramble-test-cmd-mods-module"></span><h2>ramble.test.cmd.mods module<a class="headerlink" href="#module-ramble.test.cmd.mods" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.cmd.mods.check_info">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">check_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/cmd/mods.html#check_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.cmd.mods.check_info" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.cmd.mods.test_mods_info">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">test_mods_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutable_mock_mods_repo</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mock_modifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/cmd/mods.html#test_mods_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.cmd.mods.test_mods_info" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.cmd.mods.test_mods_info_all_real_modifiers">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">test_mods_info_all_real_modifiers</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">modifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/cmd/mods.html#test_mods_info_all_real_modifiers"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.cmd.mods.test_mods_info_all_real_modifiers" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.cmd.mods.test_mods_list">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">test_mods_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutable_mock_mods_repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/cmd/mods.html#test_mods_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.cmd.mods.test_mods_list" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.cmd.mods.test_mods_list_description">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">test_mods_list_description</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutable_mock_mods_repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/cmd/mods.html#test_mods_list_description"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.cmd.mods.test_mods_list_description" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.test.cmd.mods.test_mods_list_tags">
-<span class="sig-prename descclassname"><span class="pre">ramble.test.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">test_mods_list_tags</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mutable_mock_mods_repo</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/test/cmd/mods.html#test_mods_list_tags"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.test.cmd.mods.test_mods_list_tags" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
+<section id="ramble-test-cmd-mods-module">
+<h2>ramble.test.cmd.mods module<a class="headerlink" href="#ramble-test-cmd-mods-module" title="Link to this heading"></a></h2>
 </section>
 <section id="ramble-test-cmd-on-module">
 <h2>ramble.test.cmd.on module<a class="headerlink" href="#ramble-test-cmd-on-module" title="Link to this heading"></a></h2>

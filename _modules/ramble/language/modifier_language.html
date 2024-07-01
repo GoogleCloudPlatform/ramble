@@ -417,9 +417,15 @@
 <a class="viewcode-back" href="../../../ramble.language.html#ramble.language.modifier_language.package_manager_requirement">[docs]</a>
 <span class="nd">@modifier_directive</span><span class="p">(</span><span class="s2">&quot;package_manager_requirements&quot;</span><span class="p">)</span>
 <span class="k">def</span> <span class="nf">package_manager_requirement</span><span class="p">(</span>
-    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">validation_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">modes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span> <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="n">command</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">validation_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">modes</span><span class="p">:</span> <span class="nb">list</span><span class="p">,</span>
+    <span class="n">regex</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="n">package_manager</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a requirement for the modifier&#39;s package manager</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Define a requirement when this modifier is used in an experiment with a</span>
+<span class="sd">    package manager.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        command: Package manager command to execute, when evaluating the requirement</span>
@@ -429,6 +435,7 @@
 <span class="sd">        modes: List of usage modes this requirement should apply to</span>
 <span class="sd">        regex: Regular expression to use when validation_type is either &#39;contains_regex&#39;</span>
 <span class="sd">               or &#39;does_no_contain_regex&#39;</span>
+<span class="sd">        package_manager: Name of the package manager this requirement applies to</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">_new_package_manager_requirement</span><span class="p">(</span><span class="n">mod</span><span class="p">):</span>
@@ -462,6 +469,7 @@
                     <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="n">command</span><span class="p">,</span>
                     <span class="s2">&quot;validation_type&quot;</span><span class="p">:</span> <span class="n">validation_type</span><span class="p">,</span>
                     <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="n">regex</span><span class="p">,</span>
+                    <span class="s2">&quot;package_manager&quot;</span><span class="p">:</span> <span class="n">package_manager</span><span class="p">,</span>
                 <span class="p">}</span>
             <span class="p">)</span>
 

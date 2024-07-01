@@ -110,6 +110,8 @@
 <span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">datetime</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 
 <span class="kn">import</span> <span class="nn">llnl.util.filesystem</span> <span class="k">as</span> <span class="nn">fs</span>
 <span class="kn">import</span> <span class="nn">llnl.util.tty</span> <span class="k">as</span> <span class="nn">tty</span>
@@ -120,7 +122,6 @@
 <span class="kn">import</span> <span class="nn">ramble.util.path</span>
 <span class="kn">import</span> <span class="nn">ramble.error</span>
 <span class="kn">import</span> <span class="nn">ramble.repository</span>
-<span class="kn">import</span> <span class="nn">ramble.spack_runner</span>
 <span class="kn">import</span> <span class="nn">ramble.experiment_set</span>
 <span class="kn">import</span> <span class="nn">ramble.context</span>
 <span class="kn">import</span> <span class="nn">ramble.util.web</span>
@@ -236,7 +237,7 @@
 <span class="s2">    batch_submit: &#39;</span><span class="si">{execute_experiment}</span><span class="s2">&#39;</span>
 <span class="s2">    processes_per_node: -1</span>
 <span class="s2">  applications: </span><span class="si">{}</span>
-<span class="s2">  spack:</span>
+<span class="s2">  software:</span>
 <span class="s2">    packages: </span><span class="si">{}</span>
 <span class="s2">    environments: </span><span class="si">{}</span>
 <span class="s2">&quot;&quot;&quot;</span></div>
@@ -667,20 +668,6 @@
             <span class="p">}</span>
         <span class="p">)</span>
 
-        <span class="kn">from</span> <span class="nn">ramble.spack_runner</span> <span class="kn">import</span> <span class="n">SpackRunner</span><span class="p">,</span> <span class="n">RunnerError</span>
-
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">runner</span> <span class="o">=</span> <span class="n">SpackRunner</span><span class="p">()</span>
-            <span class="n">spack_version</span> <span class="o">=</span> <span class="n">runner</span><span class="o">.</span><span class="n">get_version</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">[</span><span class="s2">&quot;versions&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;spack&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;version&quot;</span><span class="p">:</span> <span class="n">spack_version</span><span class="p">,</span>
-                    <span class="s2">&quot;digest&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_string</span><span class="p">(</span><span class="n">spack_version</span><span class="p">),</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-        <span class="k">except</span> <span class="n">RunnerError</span><span class="p">:</span>
-            <span class="k">pass</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">workspace_hash</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">specs</span> <span class="o">=</span> <span class="p">[]</span>
@@ -689,9 +676,9 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">install_cache</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">install_cache</span><span class="o">.</span><span class="n">SetCache</span><span class="p">()</span>
 
-        <span class="c1"># A dict mapping (concretized) package spec to its install prefix.</span>
+        <span class="c1"># A per-package_manager dict mapping package spec to its install prefix.</span>
         <span class="c1"># This can be re-used by all experiments of the workspace.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">pkg_path_cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pkg_path_cache</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">dict</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_results</span><span class="p">()</span>
 
@@ -1060,24 +1047,17 @@
             <span class="k">yield</span> <span class="n">contents</span><span class="p">,</span> <span class="n">experiment_context</span></div>
 
 
-<div class="viewcode-block" id="Workspace.external_spack_env">
-<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.external_spack_env">[docs]</a>
-    <span class="k">def</span> <span class="nf">external_spack_env</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env_name</span><span class="p">):</span>
-        <span class="n">env_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">get_env</span><span class="p">(</span><span class="n">env_name</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">external_env</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env_context</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span>
-        <span class="k">return</span> <span class="n">env_context</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">external_env</span><span class="p">]</span></div>
-
-
 <div class="viewcode-block" id="Workspace.concretize">
 <a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.concretize">[docs]</a>
     <span class="k">def</span> <span class="nf">concretize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">spack_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_spack_dict</span><span class="p">()</span>
+        <span class="n">full_software_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_software_dict</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">force_concretize</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="ow">or</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
+                    <span class="ow">or</span> <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span>
+                <span class="p">):</span>
                     <span class="k">raise</span> <span class="n">RambleWorkspaceError</span><span class="p">(</span>
                         <span class="s2">&quot;Cannot concretize an already concretized &quot;</span>
                         <span class="s2">&quot;workspace. To overwrite the current configuration &quot;</span>
@@ -1087,15 +1067,21 @@
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="k">pass</span>
 
-        <span class="n">spack_dict</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+        <span class="n">full_software_dict</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spack_dict</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]:</span>
-            <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">environments</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spack_dict</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]:</span>
-            <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">full_software_dict</span>
+            <span class="ow">or</span> <span class="ow">not</span> <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">namespace</span><span class="o">.</span><span class="n">environments</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">full_software_dict</span>
+            <span class="ow">or</span> <span class="ow">not</span> <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span>
+        <span class="p">):</span>
+            <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
 
-        <span class="n">packages_dict</span> <span class="o">=</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
-        <span class="n">environments_dict</span> <span class="o">=</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span>
+        <span class="n">packages_dict</span> <span class="o">=</span> <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
+        <span class="n">environments_dict</span> <span class="o">=</span> <span class="n">full_software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">SoftwareEnvironments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
@@ -1106,45 +1092,55 @@
             <span class="n">env_name_str</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expansion_str</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
             <span class="n">env_name</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">env_name_str</span><span class="p">)</span>
 
+            <span class="k">if</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">continue</span>
+
             <span class="n">compiler_dicts</span> <span class="o">=</span> <span class="p">[</span><span class="n">app_inst</span><span class="o">.</span><span class="n">compilers</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
                 <span class="n">compiler_dicts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">compilers</span><span class="p">)</span>
 
             <span class="k">for</span> <span class="n">compiler_dict</span> <span class="ow">in</span> <span class="n">compiler_dicts</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">comp</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">compiler_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span>
-                        <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s1">&#39;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:spack_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
-                            <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">(),</span>
-                        <span class="p">)</span>
-                        <span class="k">if</span> <span class="s2">&quot;compiler_spec&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]:</span>
-                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span>
-                            <span class="n">config_path</span> <span class="o">=</span> <span class="p">(</span>
-                                <span class="sa">f</span><span class="s2">&quot;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">:&quot;</span>
-                                <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;compiler_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">all_msg</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot; Comp info: </span><span class="si">{</span><span class="n">info</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">app_inst</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;package_manager&quot;</span><span class="p">]):</span>
+                        <span class="k">if</span> <span class="n">comp</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">]</span>
+                            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s1">&#39;software:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s1">:pkg_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">,</span>
+                                <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">(),</span>
                             <span class="p">)</span>
-                            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                        <span class="k">if</span> <span class="s2">&quot;compiler&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
-                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span>
-                            <span class="n">config_path</span> <span class="o">=</span> <span class="p">(</span>
-                                <span class="sa">f</span><span class="s2">&quot;spack:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">:&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;compiler:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                            <span class="k">if</span> <span class="s2">&quot;compiler_spec&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]:</span>
+                                <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span>
+                                <span class="n">config_path</span> <span class="o">=</span> <span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;software:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">:&quot;</span>
+                                    <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;compiler_spec:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                                <span class="p">)</span>
+                                <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                    <span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
+                                <span class="p">)</span>
+                            <span class="k">if</span> <span class="s2">&quot;compiler&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
+                                <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">][</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span>
+                                <span class="n">config_path</span> <span class="o">=</span> <span class="p">(</span>
+                                    <span class="sa">f</span><span class="s2">&quot;software:packages:</span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2">:&quot;</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39;compiler:</span><span class="si">{</span><span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+                                <span class="p">)</span>
+                                <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+                                    <span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
+                                <span class="p">)</span>
+                        <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]):</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 1: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 2: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Compiler </span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2"> defined in multiple conflicting ways&quot;</span>
                             <span class="p">)</span>
-                            <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">config_path</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">())</span>
-                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">]):</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 1: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 2: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">packages_dict</span><span class="p">[</span><span class="n">comp</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;Compiler </span><span class="si">{</span><span class="n">comp</span><span class="si">}</span><span class="s2"> defined in multiple conflicting ways&quot;</span>
-                        <span class="p">)</span>
 
+            <span class="n">add_env</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="n">env_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">environments_dict</span><span class="p">:</span>
-                <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-                <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">new_env</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+                <span class="n">new_env</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Trying to define packages for </span><span class="si">{</span><span class="n">env_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="n">app_packages</span> <span class="o">=</span> <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">][</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
+            <span class="n">app_packages</span> <span class="o">=</span> <span class="n">new_env</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
 
             <span class="n">software_dicts</span> <span class="o">=</span> <span class="p">[</span><span class="n">app_inst</span><span class="o">.</span><span class="n">software_specs</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
@@ -1152,27 +1148,32 @@
 
             <span class="k">for</span> <span class="n">software_dict</span> <span class="ow">in</span> <span class="n">software_dicts</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">spec_name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">software_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Found spec: </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-                        <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="s2">&quot;compiler_spec&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]:</span>
-                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span>
-                        <span class="k">if</span> <span class="s2">&quot;compiler&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
-                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">app_inst</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;package_manager&quot;</span><span class="p">]):</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;    Found spec: </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">packages_dict</span><span class="p">:</span>
+                            <span class="n">add_env</span> <span class="o">=</span> <span class="kc">True</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+                            <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="s2">&quot;compiler_spec&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]:</span>
+                                <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler_spec&quot;</span><span class="p">]</span>
+                            <span class="k">if</span> <span class="s2">&quot;compiler&quot;</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
+                                <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">][</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;compiler&quot;</span><span class="p">]</span>
 
-                    <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]):</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 1: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 2: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                        <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
-                            <span class="sa">f</span><span class="s2">&quot;Package </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s2"> defined in multiple conflicting ways&quot;</span>
-                        <span class="p">)</span>
+                        <span class="k">elif</span> <span class="ow">not</span> <span class="n">specs_equiv</span><span class="p">(</span><span class="n">info</span><span class="p">,</span> <span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">]):</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 1: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">info</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Spec 2: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">packages_dict</span><span class="p">[</span><span class="n">spec_name</span><span class="p">])</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="k">raise</span> <span class="n">RambleConflictingDefinitionError</span><span class="p">(</span>
+                                <span class="sa">f</span><span class="s2">&quot;Package </span><span class="si">{</span><span class="n">spec_name</span><span class="si">}</span><span class="s2"> defined in multiple conflicting ways&quot;</span>
+                            <span class="p">)</span>
 
-                    <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app_packages</span><span class="p">:</span>
-                        <span class="n">app_packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">spec_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">app_packages</span><span class="p">:</span>
+                            <span class="n">app_packages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">spec_name</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">add_env</span><span class="p">:</span>
+                <span class="n">environments_dict</span><span class="p">[</span><span class="n">env_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_env</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span>
-            <span class="s2">&quot;spack&quot;</span><span class="p">,</span> <span class="n">spack_dict</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
+            <span class="s2">&quot;software&quot;</span><span class="p">,</span> <span class="n">full_software_dict</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
         <span class="p">)</span>
 
         <span class="k">return</span></div>
@@ -1398,6 +1399,8 @@
         <span class="c1"># Build experiment sets to determine which templates never get used</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">software_environments</span><span class="o">.</span><span class="n">SoftwareEnvironments</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
         <span class="n">experiment_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_experiment_set</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Software environments:&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span><span class="p">))</span>
 
         <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">app_inst</span> <span class="ow">in</span> <span class="n">experiment_set</span><span class="o">.</span><span class="n">template_experiments</span><span class="p">():</span>
             <span class="k">if</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">is_template</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">generated_experiments</span><span class="p">:</span>
@@ -1427,11 +1430,11 @@
         <span class="n">software_environments</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">software_environments</span>
         <span class="n">experiment_set</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_experiment_set</span><span class="p">()</span>
 
-        <span class="n">spack_dict</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span>
-            <span class="n">namespace</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
+        <span class="n">software_dict</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span>
+            <span class="n">namespace</span><span class="o">.</span><span class="n">software</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
         <span class="p">)</span>
-        <span class="n">package_dict</span> <span class="o">=</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
-        <span class="n">environments_dict</span> <span class="o">=</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span>
+        <span class="n">package_dict</span> <span class="o">=</span> <span class="n">software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span>
+        <span class="n">environments_dict</span> <span class="o">=</span> <span class="n">software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">environments</span><span class="p">]</span>
 
         <span class="n">tty</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Removing configurations that do not spark joy.&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">pkg</span> <span class="ow">in</span> <span class="n">software_environments</span><span class="o">.</span><span class="n">unused_packages</span><span class="p">():</span>
@@ -1444,7 +1447,7 @@
                 <span class="n">environments_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
 
         <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">update_config</span><span class="p">(</span>
-            <span class="n">namespace</span><span class="o">.</span><span class="n">spack</span><span class="p">,</span> <span class="n">spack_dict</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
+            <span class="n">namespace</span><span class="o">.</span><span class="n">software</span><span class="p">,</span> <span class="n">software_dict</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">ws_file_config_scope_name</span><span class="p">()</span>
         <span class="p">)</span></div>
 
 
@@ -1743,11 +1746,49 @@
         <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">&quot;zips&quot;</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Workspace.get_spack_dict">
-<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_spack_dict">[docs]</a>
-    <span class="k">def</span> <span class="nf">get_spack_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the spack dictionary for this workspace&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">namespace</span><span class="o">.</span><span class="n">spack</span><span class="p">)</span></div>
+<div class="viewcode-block" id="Workspace.get_workspace_variants">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_workspace_variants">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_workspace_variants</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a dict of workspace variants&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">&quot;variants&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Workspace.get_software_dict">
+<a class="viewcode-back" href="../../../ramble.workspace.html#ramble.workspace.Workspace.get_software_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_software_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the software dictionary for this workspace&quot;&quot;&quot;</span>
+        <span class="c1"># DEPRECATED: Remove once the spack config section is completely removed</span>
+        <span class="n">spack_dict</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="s2">&quot;spack&quot;</span><span class="p">)</span>
+        <span class="n">software_dict</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_config</span><span class="p">(</span><span class="n">namespace</span><span class="o">.</span><span class="n">software</span><span class="p">)</span>
+
+        <span class="n">print_warnings</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_printed_deprecations&quot;</span><span class="p">):</span>
+            <span class="n">print_warnings</span> <span class="o">=</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_printed_deprecations</span>
+
+        <span class="k">if</span> <span class="n">spack_dict</span> <span class="ow">and</span> <span class="n">software_dict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">print_warnings</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Both a spack and software configuration section are defined.&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The spack configuration section is deprecated.&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The software configuration section will be used.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">spack_dict</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">print_warnings</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The spack configuration section is deprecated&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Please update to the software dict.&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">in</span> <span class="n">spack_dict</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">spack_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="s2">&quot;spack_spec&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Package </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s1"> defines &quot;spack_spec&quot; which is deprecated&#39;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Convert this to &quot;pkg_spec&quot; or &quot;spack_pkg_spec&quot; instead.&#39;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">spack_dict</span>
+
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">packages</span> <span class="ow">in</span> <span class="n">software_dict</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="n">software_dict</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">packages</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;spack_spec&quot;</span> <span class="ow">in</span> <span class="n">config</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Package </span><span class="si">{</span><span class="n">pkg</span><span class="si">}</span><span class="s1"> defines &quot;spack_spec&quot; which is deprecated&#39;</span><span class="p">)</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s1">&#39;Convert this to &quot;pkg_spec&quot; or &quot;spack_pkg_spec&quot; instead.&#39;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">software_dict</span></div>
 
 
 <div class="viewcode-block" id="Workspace.get_applications">

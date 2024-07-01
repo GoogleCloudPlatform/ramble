@@ -129,7 +129,7 @@ experiments. In this tutorial, you will set up and run a basic experiment using
 <section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Link to this heading"></a></h2>
 <p>To install Ramble, see the <a class="reference internal" href="../getting_started.html"><span class="doc">Getting Started</span></a> guide.</p>
-<p><strong>NOTE</strong>: This tutorial does not require <code class="docutils literal notranslate"><span class="pre">spack</span></code> to be installed or configured.</p>
+<p><strong>NOTE</strong>: This tutorial does not require a package manager to be installed or configured.</p>
 </section>
 <section id="ramble-basics">
 <h2>Ramble Basics<a class="headerlink" href="#ramble-basics" title="Link to this heading"></a></h2>
@@ -243,12 +243,12 @@ following contents:</p>
 <span class="w">            </span><span class="nt">test</span><span class="p">:</span><span class="w"> </span><span class="c1"># Arbitrary experiment name</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{}</span>
 </pre></div>
 </div>
-<p>Note that since the <code class="docutils literal notranslate"><span class="pre">hostname</span></code> application does not rely on spack, the spack
+<p>Note that since the <code class="docutils literal notranslate"><span class="pre">hostname</span></code> application does not rely on a package manager, the software
 dictionary has empty <code class="docutils literal notranslate"><span class="pre">packages</span></code> and <code class="docutils literal notranslate"><span class="pre">environments</span></code> dictionaries.</p>
 <p>The second file you should edit is the <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> template file.
 This file contains a template script that will be rendered into an execution
@@ -263,7 +263,7 @@ in the active workspace using:</p>
 </pre></div>
 </div>
 <p>This command will create experiment directories, download and expand input files,
-and install the required software stack (and generate spack environments for
+and install the required software stack (and generate software environments for
 each workload).</p>
 <p>It can take a bit to run depending on if you need to build new software and how
 long the input files take to download. If you’d like to see what will be installed,

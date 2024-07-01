@@ -22,6 +22,14 @@ ramble.test.end\_to\_end.chained\_experiment\_var\_inheritance module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.end\_to\_end.concretize\_with\_different\_package\_managers module
+------------------------------------------------------------------------------
+
+.. automodule:: ramble.test.end_to_end.concretize_with_different_package_managers
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.end\_to\_end.config\_section\_env\_vars module
 ----------------------------------------------------------
 

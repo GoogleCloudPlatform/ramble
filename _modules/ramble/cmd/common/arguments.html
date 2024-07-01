@@ -180,6 +180,18 @@
 
 
 <span class="nd">@arg</span>
+<span class="k">def</span> <span class="nf">obj_type</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">ramble.repository</span> <span class="kn">import</span> <span class="n">default_type</span><span class="p">,</span> <span class="n">OBJECT_NAMES</span>
+
+    <span class="k">return</span> <span class="n">Args</span><span class="p">(</span>
+        <span class="s2">&quot;--type&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">default_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;type of objects. Defaults to &#39;</span><span class="si">{</span><span class="n">default_type</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+        <span class="sa">f</span><span class="s2">&quot;Allowed types are </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">OBJECT_NAMES</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+
+
+<span class="nd">@arg</span>
 <span class="k">def</span> <span class="nf">repo_type</span><span class="p">():</span>
     <span class="kn">from</span> <span class="nn">ramble.repository</span> <span class="kn">import</span> <span class="n">default_type</span><span class="p">,</span> <span class="n">OBJECT_NAMES</span>
 

@@ -189,6 +189,13 @@
         <span class="s2">&quot;F403&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;^from ramble.modkit import \*$&quot;</span><span class="p">],</span>
         <span class="o">**</span><span class="n">common_object_exemptions</span><span class="p">,</span>
     <span class="p">},</span>
+    <span class="c1"># exemptions applied only to package_manager.py files.</span>
+    <span class="sa">r</span><span class="s2">&quot;package_manager.py$&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="c1"># Allow &#39;from ramble.modkit import *&#39; in applications,</span>
+        <span class="c1"># but no other wildcards</span>
+        <span class="s2">&quot;F403&quot;</span><span class="p">:</span> <span class="p">[</span><span class="sa">r</span><span class="s2">&quot;^from ramble.pkgmankit import \*$&quot;</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">common_object_exemptions</span><span class="p">,</span>
+    <span class="p">},</span>
     <span class="c1"># exemptions applied to all files.</span>
     <span class="sa">r</span><span class="s2">&quot;.py$&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="s2">&quot;E501&quot;</span><span class="p">:</span> <span class="p">[</span>

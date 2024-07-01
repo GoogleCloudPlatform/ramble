@@ -132,14 +132,18 @@
     <span class="n">ramble_dict</span><span class="p">[</span><span class="s2">&quot;ramble&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
     <span class="n">test_dict</span> <span class="o">=</span> <span class="n">ramble_dict</span><span class="p">[</span><span class="s2">&quot;ramble&quot;</span><span class="p">]</span>
 
+    <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
     <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
     <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;applications&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
     <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;applications&quot;</span><span class="p">][</span><span class="n">app_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-    <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+    <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;software&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
 
-    <span class="n">spack_dict</span> <span class="o">=</span> <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;spack&quot;</span><span class="p">]</span>
-    <span class="n">spack_dict</span><span class="p">[</span><span class="s2">&quot;packages&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
-    <span class="n">spack_dict</span><span class="p">[</span><span class="s2">&quot;environments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+    <span class="n">variants_dict</span> <span class="o">=</span> <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;variants&quot;</span><span class="p">]</span>
+    <span class="n">variants_dict</span><span class="p">[</span><span class="s2">&quot;package_manager&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;spack&quot;</span>
+
+    <span class="n">software_dict</span> <span class="o">=</span> <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;software&quot;</span><span class="p">]</span>
+    <span class="n">software_dict</span><span class="p">[</span><span class="s2">&quot;packages&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
+    <span class="n">software_dict</span><span class="p">[</span><span class="s2">&quot;environments&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">syaml</span><span class="o">.</span><span class="n">syaml_dict</span><span class="p">()</span>
 
     <span class="n">ws_var_dict</span> <span class="o">=</span> <span class="n">test_dict</span><span class="p">[</span><span class="s2">&quot;variables&quot;</span><span class="p">]</span>
     <span class="n">ws_var_dict</span><span class="p">[</span><span class="s2">&quot;mpi_command&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;mpirun -n </span><span class="si">{n_ranks}</span><span class="s2"> -ppn </span><span class="si">{processes_per_node}</span><span class="s2">&quot;</span>

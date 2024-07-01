@@ -95,7 +95,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.license">ramble.cmd.license module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.list">ramble.cmd.list module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mirror">ramble.cmd.mirror module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.mods">ramble.cmd.mods module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble-cmd-mods-module">ramble.cmd.mods module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble-cmd-on-module">ramble.cmd.on module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.python">ramble.cmd.python module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.cmd.repo">ramble.cmd.repo module</a></li>
@@ -109,6 +109,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.package_manager_types.html">ramble.package_manager_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html">ramble.util package</a></li>
@@ -116,7 +117,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
@@ -131,15 +132,16 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modkit-module">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.package_manager">ramble.package_manager module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.pkgmankit">ramble.pkgmankit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repeats">ramble.repeats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spec">ramble.spec module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.stage">ramble.stage module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.success_criteria">ramble.success_criteria module</a></li>
@@ -760,13 +762,14 @@ the workspace’s config file (ramble.yaml).</p>
 <dd></dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.edit.edit_application">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.edit.</span></span><span class="sig-name descname"><span class="pre">edit_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/edit.html#edit_application"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.edit.edit_application" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="ramble.cmd.edit.edit_object">
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.edit.</span></span><span class="sig-name descname"><span class="pre">edit_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">obj_type_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">repo_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">namespace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/edit.html#edit_object"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.edit.edit_object" title="Link to this definition"></a></dt>
 <dd><p>Opens the requested application file in your favorite $EDITOR.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>name</strong> (<em>str</em>) – The name of the application</p></li>
+<li><p><strong>obj_type_name</strong> (<em>str</em>) – Name of the object type to edit</p></li>
 <li><p><strong>repo_path</strong> (<em>str</em>) – The path to the repository containing this application</p></li>
 <li><p><strong>namespace</strong> (<em>str</em>) – A valid namespace registered with Ramble</p></li>
 </ul>
@@ -942,47 +945,8 @@ so far, just this command – so it can find LGPL things elsewhere</p>
 <dd></dd></dl>
 
 </section>
-<section id="module-ramble.cmd.mods">
-<span id="ramble-cmd-mods-module"></span><h2>ramble.cmd.mods module<a class="headerlink" href="#module-ramble.cmd.mods" title="Link to this heading"></a></h2>
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.mods.mods">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods" title="Link to this definition"></a></dt>
-<dd><p>Look for a function called mods_&lt;name&gt; and call it.</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.mods.mods_info">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_info" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.mods.mods_info_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_info_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_info_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_info_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>Information about a modifier</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.mods.mods_list">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_list</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_list"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_list" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.mods.mods_list_setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">mods_list_setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#mods_list_setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.mods_list_setup_parser" title="Link to this definition"></a></dt>
-<dd><p>List available modifiers</p>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="ramble.cmd.mods.setup_parser">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">setup_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subparser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/cmd/mods.html#setup_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.cmd.mods.setup_parser" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py data">
-<dt class="sig sig-object py" id="ramble.cmd.mods.subcommand_functions">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.mods.</span></span><span class="sig-name descname"><span class="pre">subcommand_functions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'info':</span> <span class="pre">&lt;function</span> <span class="pre">mods_info&gt;,</span> <span class="pre">'list':</span> <span class="pre">&lt;function</span> <span class="pre">mods_list&gt;,</span> <span class="pre">'ls':</span> <span class="pre">&lt;function</span> <span class="pre">mods_list&gt;}</span></em><a class="headerlink" href="#ramble.cmd.mods.subcommand_functions" title="Link to this definition"></a></dt>
-<dd><p>Dictionary mapping subcommand names and aliases to functions</p>
-</dd></dl>
-
+<section id="ramble-cmd-mods-module">
+<h2>ramble.cmd.mods module<a class="headerlink" href="#ramble-cmd-mods-module" title="Link to this heading"></a></h2>
 </section>
 <section id="ramble-cmd-on-module">
 <h2>ramble.cmd.on module<a class="headerlink" href="#ramble-cmd-on-module" title="Link to this heading"></a></h2>
@@ -1197,7 +1161,7 @@ into applications.</p>
 
 <dl class="py data">
 <dt class="sig sig-object py" id="ramble.cmd.style.pattern_exemptions">
-<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">pattern_exemptions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{re.compile('.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('(https?|ftp|file)\\:'),</span> <span class="pre">re.compile('([\\\'&quot;])[0-9a-fA-F]{32,}\\1')]},</span> <span class="pre">re.compile('application.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.appkit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]},</span> <span class="pre">re.compile('modifier.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.modkit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]}}</span></em><a class="headerlink" href="#ramble.cmd.style.pattern_exemptions" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.cmd.style.</span></span><span class="sig-name descname"><span class="pre">pattern_exemptions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{re.compile('.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('(https?|ftp|file)\\:'),</span> <span class="pre">re.compile('([\\\'&quot;])[0-9a-fA-F]{32,}\\1')]},</span> <span class="pre">re.compile('application.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.appkit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]},</span> <span class="pre">re.compile('modifier.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.modkit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]},</span> <span class="pre">re.compile('package_manager.py$'):</span> <span class="pre">{'E501':</span> <span class="pre">[re.compile('^\\s*homepage\\s*='),</span> <span class="pre">re.compile('^\\s*url\\s*='),</span> <span class="pre">re.compile('^\\s*git\\s*='),</span> <span class="pre">re.compile('^\\s*svn\\s*='),</span> <span class="pre">re.compile('^\\s*hg\\s*='),</span> <span class="pre">re.compile('^\\s*list_url\\s*='),</span> <span class="pre">re.compile('^\\s*version\\('),</span> <span class="pre">re.compile('^\\s*variant\\('),</span> <span class="pre">re.compile('^\\s*provides\\('),</span> <span class="pre">re.compile('^\\s*extends\\('),</span> <span class="pre">re.compile('^\\s*depends_on\\('),</span> <span class="pre">re.compile('^\\s*conflicts\\('),</span> <span class="pre">re.compile('^\\s*resource\\('),</span> <span class="pre">re.compile('^\\s*patch\\(')],</span> <span class="pre">'F403':</span> <span class="pre">[re.compile('^from</span> <span class="pre">ramble.pkgmankit</span> <span class="pre">import</span> <span class="pre">\\*$')],</span> <span class="pre">'F811':</span> <span class="pre">[re.compile('^\\s*&#64;when\\(.*\\)')]}}</span></em><a class="headerlink" href="#ramble.cmd.style.pattern_exemptions" title="Link to this definition"></a></dt>
 <dd><dl class="simple">
 <dt>This is a dict that maps:</dt><dd><dl class="simple">
 <dt>filename pattern -&gt;</dt><dd><dl class="simple">

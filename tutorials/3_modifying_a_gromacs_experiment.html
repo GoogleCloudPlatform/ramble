@@ -176,7 +176,12 @@ provided below.</p>
 <p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
 contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE_ROOT/examples/basic_gromacs_config.yaml</span></code>:</p>
+<p><strong>NOTE</strong>: This workspace utilizes the <code class="docutils literal notranslate"><span class="pre">spack</span></code> package manager. As a result, it
+requires <code class="docutils literal notranslate"><span class="pre">spack</span></code> is installed and available in your path. Modifications to
+the <code class="docutils literal notranslate"><span class="pre">package_manager</span></code> variant will change this behavior.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -215,16 +220,16 @@ contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE
 <span class="w">                </span><span class="nt">n_threads</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 <span class="w">                </span><span class="nt">size</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;0003&#39;</span>
 <span class="w">                </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;rf&#39;</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">impi2021</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
@@ -234,7 +239,7 @@ contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE
 </pre></div>
 </div>
 <p>Note that specifying compilers that Spack doesn’t have installed may take a while.
-To see available compilers, use <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compilers</span></code> or see <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers">Spack documentation</a>
+To see available compilers, use <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compilers</span></code> or see <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers">Spack’s documentation</a>
 for more information.</p>
 <p>The second file you should edit is the <code class="docutils literal notranslate"><span class="pre">execute_experiment.tpl</span></code> template file.
 This file contains a template script that will be rendered into an execution
@@ -339,7 +344,7 @@ available variables with the following command:</p>
 </div>
 <p>Focusing on the relevant workloads, you see the following information:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">Workload: water_gmx50</span>
-<span class="go">    Executables: [&#39;builtin::env_vars&#39;, &#39;builtin::spack_source&#39;, &#39;builtin::spack_activate&#39;, &#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
+<span class="go">    Executables: [&#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
 <span class="go">    Inputs: [&#39;water_gmx50_bare&#39;]</span>
 <span class="go">    Variables:</span>
 <span class="go">        size:</span>
@@ -354,7 +359,7 @@ available variables with the following command:</p>
 <span class="go">            Description: Input path for water GMX50</span>
 <span class="go">            Default: {water_gmx50_bare}/{size}</span>
 <span class="go">Workload: water_bare</span>
-<span class="go">    Executables: [&#39;builtin::env_vars&#39;, &#39;builtin::spack_source&#39;, &#39;builtin::spack_activate&#39;, &#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
+<span class="go">    Executables: [&#39;pre-process&#39;, &#39;execute-gen&#39;]</span>
 <span class="go">    Inputs: [&#39;water_bare_hbonds&#39;]</span>
 <span class="go">    Variables:</span>
 <span class="go">        size:</span>

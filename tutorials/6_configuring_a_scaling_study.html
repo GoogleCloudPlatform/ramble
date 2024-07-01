@@ -243,9 +243,11 @@ variables you would like to use for your experiments. These vary based on the
 MPI implementation you wish to use, but good default might be
 <code class="docutils literal notranslate"><span class="pre">mpirun</span> <span class="pre">-n</span> <span class="pre">{n_ranks}</span></code>. If you would like to add <code class="docutils literal notranslate"><span class="pre">hostfile</span></code> and <code class="docutils literal notranslate"><span class="pre">ppn</span></code>
 flags, feel free to do so here.</p>
-<p>Your configuration file might look like the
-following after adding this information:</p>
+<p>Your configuration file might look like the following after adding this
+information:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -277,10 +279,12 @@ suggested starting place for the experiments. To apply this to your workspace, u
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>concretize
 </pre></div>
 </div>
-<p>This will fill out the <code class="docutils literal notranslate"><span class="pre">spack</span></code> dictionary within your workspace configuration
+<p>This will fill out the <code class="docutils literal notranslate"><span class="pre">software</span></code> dictionary within your workspace configuration
 file. After executing this command, your workspace configuration file might
 look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -297,15 +301,15 @@ look like the following:</p>
 <span class="w">            </span><span class="l l-Scalar l-Scalar-Plain">scaling_{n_nodes}</span><span class="p p-Indicator">:</span>
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">2</span><span class="p p-Indicator">]</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
 <span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>

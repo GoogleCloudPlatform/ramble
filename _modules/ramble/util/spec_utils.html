@@ -122,6 +122,9 @@
     <span class="k">if</span> <span class="s2">&quot;spec_type&quot;</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
         <span class="n">all_keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;spec_type&quot;</span><span class="p">)</span>
 
+    <span class="k">if</span> <span class="s2">&quot;package_manager&quot;</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
+        <span class="n">all_keys</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;package_manager&quot;</span><span class="p">)</span>
+
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">all_keys</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">spec1</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">False</span>

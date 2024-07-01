@@ -69,6 +69,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#execute-experiments">Execute Experiments</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#adding-package-variants">Adding Package Variants</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#vector-and-matrix-software-definitions">Vector and Matrix Software Definitions</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#changing-package-managers">Changing Package Managers</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#cleaning-the-workspace">Cleaning the Workspace</a></li>
 </ul>
 </li>
@@ -177,7 +178,12 @@ provided below.</p>
 <p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
 contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE_ROOT/examples/vector_matrix_gromacs_config.yaml</span></code>:</p>
+<p><strong>NOTE</strong>: This workspace utilizes the <code class="docutils literal notranslate"><span class="pre">spack</span></code> package manager. As a result, it
+requires <code class="docutils literal notranslate"><span class="pre">spack</span></code> is installed and available in your path. Modifications to
+the <code class="docutils literal notranslate"><span class="pre">package_manager</span></code> variant will change this behavior.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -201,16 +207,16 @@ contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app_workloads</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_ranks</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">impi2021</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gromacs</span><span class="p">:</span>
@@ -246,17 +252,17 @@ environments:</p>
 <span class="go">    gcc9:</span>
 <span class="go">      Rendered Packages:</span>
 <span class="go">        gcc9:</span>
-<span class="go">          Spack spec: gcc@9.4.0 target=x86_64</span>
+<span class="go">          Spec: gcc@9.4.0 target=x86_64</span>
 <span class="go">          Compiler spec: gcc@9.4.0</span>
 <span class="go">    impi2021:</span>
 <span class="go">      Rendered Packages:</span>
 <span class="go">        impi2021:</span>
-<span class="go">          Spack spec: intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="go">          Spec: intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="go">          Compiler: gcc9</span>
 <span class="go">    gromacs:</span>
 <span class="go">      Rendered Packages:</span>
 <span class="go">        gromacs:</span>
-<span class="go">          Spack spec: gromacs@2021.6</span>
+<span class="go">          Spec: gromacs@2021.6</span>
 <span class="go">          Compiler: gcc9</span>
 <span class="go">  Environments:</span>
 <span class="go">    gromacs:</span>
@@ -274,16 +280,16 @@ a software environment named <code class="docutils literal notranslate"><span cl
 variable <code class="docutils literal notranslate"><span class="pre">env_name</span></code>, which can be the name of any environment defined in the
 workspace configuration file.</p>
 <p>The relevant portion of the workspace configuration file is:</p>
-<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">software</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">    </span><span class="nt">impi2021</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2021.6</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
@@ -300,17 +306,19 @@ within the <code class="docutils literal notranslate"><span class="pre">ramble:a
 Each environment has a <code class="docutils literal notranslate"><span class="pre">packages</span></code> block, which contains a list of package
 names that are defined in the higher level <code class="docutils literal notranslate"><span class="pre">packages</span></code> block.</p>
 <p>These are further documented in the
-<a class="reference internal" href="../configuration_files.html#spack-config"><span class="std std-ref">Spack configuration section</span></a> documentation.</p>
+<a class="reference internal" href="../configuration_files.html#software-config"><span class="std std-ref">Software configuration section</span></a> documentation.</p>
 </section>
 <section id="changing-software-definitions">
 <h2>Changing Software Definitions<a class="headerlink" href="#changing-software-definitions" title="Link to this heading"></a></h2>
-<p>As the GROMACS application definition inherits from the <code class="docutils literal notranslate"><span class="pre">SpackApplication</span></code>
-base class, it is expected to use Spack as its package manager. When changing
-the software definitions in a workspace, many options are available to you. For
-example, you could modify the compiler used for building GROMACS (as defined on
-line 45), or you could modify the MPI used for these experiments (as seen on
-line 53). However, we will explore changing aspects of GROMACS itself (such as
-its version or variants).</p>
+<p>In this workspace, we have <code class="docutils literal notranslate"><span class="pre">variants:package_manager:spack</span></code> which injects the
+use of the <code class="docutils literal notranslate"><span class="pre">spack</span></code> package manager. You are able to change the package
+manager through this variant option, however the remainder of this tutorial
+will assume the package manager is <code class="docutils literal notranslate"><span class="pre">spack</span></code>. When changing the software
+definitions in a workspace, many options are available to you. For example, you
+could modify the compiler used for building GROMACS (as defined on line 45), or
+you could modify the MPI used for these experiments (as seen on line 53).
+However, we will explore changing aspects of GROMACS itself (such as its
+version or variants).</p>
 <p><strong>NOTE:</strong> It is important to note that changing aspects of
 compilation could result in build-time errors that need to be resolved before
 Ramble can generate experiments. Oftentimes it is both easier and faster to
@@ -369,10 +377,10 @@ experiments and performing setup again.</p>
 <section id="adding-package-variants">
 <h2>Adding Package Variants<a class="headerlink" href="#adding-package-variants" title="Link to this heading"></a></h2>
 <p>So far, we have only explored changing the version a package used. More
-complicated changes to the Spack specs can be made by adding variant
-definitions. This can be directly added to the <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> lines within the
+complicated changes to the package specs can be made by adding variant
+definitions. This can be directly added to the <code class="docutils literal notranslate"><span class="pre">pkg_spec</span></code> lines within the
 package definitions in a workspace’s <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code>.</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute can be parameterized with variable definitions
+<p>The <code class="docutils literal notranslate"><span class="pre">pkg_spec</span></code> attribute can be parameterized with variable definitions
 also, to allow a wide range of variants to be explored with a single
 configuration.</p>
 </section>
@@ -385,6 +393,8 @@ definitions.</p>
 <p>As an example, to explore both of the versions of GROMACS described in this
 tutorial, your <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> could look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -411,16 +421,16 @@ tutorial, your <code class="docutils literal notranslate"><span class="pre">ramb
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">type</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_ranks</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs_version</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">impi2021</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span><span class="p p-Indicator">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@{gromacs_version}</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@{gromacs_version}</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">      </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{gromacs_version}</span><span class="p p-Indicator">:</span>
@@ -436,6 +446,24 @@ your workspace through:</p>
 <span class="gp">$ </span>ramble<span class="w"> </span>workspace<span class="w"> </span>setup<span class="w"> </span>--dry-run
 </pre></div>
 </div>
+</section>
+<section id="changing-package-managers">
+<h2>Changing Package Managers<a class="headerlink" href="#changing-package-managers" title="Link to this heading"></a></h2>
+<p>The experiments in this tutorial assumed the use of <code class="docutils literal notranslate"><span class="pre">spack</span></code> as your package
+manager. Ramble provides an option to change the package manager used in
+experiments. The workspace used contains the following lines:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
+</pre></div>
+</div>
+<p>This tells Ramble which package manager object to use when constructing the
+experiments. The available package managers can be viewed using:</p>
+<div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="gp">$ </span>ramble<span class="w"> </span>list<span class="w"> </span>--type<span class="w"> </span>package_managers
+</pre></div>
+</div>
+<p>In addition to any of these package managers, experiments can set
+<code class="docutils literal notranslate"><span class="pre">variants:package_manager</span></code> to either <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">null</span></code> to disable package
+managers for the experiment.</p>
 </section>
 <section id="cleaning-the-workspace">
 <h2>Cleaning the Workspace<a class="headerlink" href="#cleaning-the-workspace" title="Link to this heading"></a></h2>

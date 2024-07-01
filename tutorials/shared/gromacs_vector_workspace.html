@@ -139,6 +139,9 @@ provided below.</p>
 <p>To begin, you should edit the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
 contents of <code class="docutils literal notranslate"><span class="pre">$RAMBLE_ROOT/examples/vector_matrix_gromacs_config.yaml</span></code>:</p>
+<p><strong>NOTE</strong>: This workspace utilizes the <code class="docutils literal notranslate"><span class="pre">spack</span></code> package manager. As a result, it
+requires <code class="docutils literal notranslate"><span class="pre">spack</span></code> is installed and available in your path. Modifications to
+the <code class="docutils literal notranslate"><span class="pre">package_manager</span></code> variant will change this behavior.</p>
 <p>Note that specifying compilers that Spack doesn’t have installed may take a while.
 To see available compilers, use <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">compilers</span></code> or see <a class="reference external" href="https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers">Spack documentation</a>
 for more information.</p>

@@ -1,0 +1,15 @@
+ramble.package\_manager\_types namespace
+========================================
+
+.. py:module:: ramble.package_manager_types
+
+Submodules
+----------
+
+ramble.package\_manager\_types.runner module
+--------------------------------------------
+
+.. automodule:: ramble.package_manager_types.runner
+   :members:
+   :undoc-members:
+   :show-inheritance:

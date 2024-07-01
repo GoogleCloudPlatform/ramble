@@ -89,10 +89,26 @@ ramble.schema.modifiers module
    :undoc-members:
    :show-inheritance:
 
+ramble.schema.package\_manager\_repos module
+--------------------------------------------
+
+.. automodule:: ramble.schema.package_manager_repos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.schema.repos module
 --------------------------
 
 .. automodule:: ramble.schema.repos
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.software module
+-----------------------------
+
+.. automodule:: ramble.schema.software
    :members:
    :undoc-members:
    :show-inheritance:
@@ -125,6 +141,14 @@ ramble.schema.variables module
 ------------------------------
 
 .. automodule:: ramble.schema.variables
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.schema.variants module
+-----------------------------
+
+.. automodule:: ramble.schema.variants
    :members:
    :undoc-members:
    :show-inheritance:

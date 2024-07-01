@@ -70,10 +70,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_base">ramble.language.language_base module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.language_helpers">ramble.language.language_helpers module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.modifier_language">ramble.language.modifier_language module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.package_manager_language">ramble.language.package_manager_language module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#module-ramble.language.shared_language">ramble.language.shared_language module</a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.package_manager_types.html">ramble.package_manager_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.util.html">ramble.util package</a></li>
@@ -81,7 +83,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
@@ -96,15 +98,16 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modkit-module">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.package_manager">ramble.package_manager module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.pkgmankit">ramble.pkgmankit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repeats">ramble.repeats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spec">ramble.spec module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.stage">ramble.stage module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.success_criteria">ramble.success_criteria module</a></li>
@@ -544,8 +547,9 @@ append_execs: List of executables to inject after the base executable</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.modifier_language.package_manager_requirement">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#package_manager_requirement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.package_manager_requirement" title="Link to this definition"></a></dt>
-<dd><p>Define a requirement for the modifier’s package manager</p>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.modifier_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_requirement</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">command</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modes</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">list</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">regex</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">'*'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/modifier_language.html#package_manager_requirement"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.modifier_language.package_manager_requirement" title="Link to this definition"></a></dt>
+<dd><p>Define a requirement when this modifier is used in an experiment with a
+package manager.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -556,6 +560,7 @@ Valid types are: ‘empty’, ‘not_empty’, ‘contains_regex’,
 <li><p><strong>modes</strong> – List of usage modes this requirement should apply to</p></li>
 <li><p><strong>regex</strong> – Regular expression to use when validation_type is either ‘contains_regex’
 or ‘does_no_contain_regex’</p></li>
+<li><p><strong>package_manager</strong> – Name of the package manager this requirement applies to</p></li>
 </ul>
 </dd>
 </dl>
@@ -601,6 +606,15 @@ a key within JSON or YAML formatted results.</p></li>
 </dd></dl>
 
 </section>
+<section id="module-ramble.language.package_manager_language">
+<span id="ramble-language-package-manager-language-module"></span><h2>ramble.language.package_manager_language module<a class="headerlink" href="#module-ramble.language.package_manager_language" title="Link to this heading"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="ramble.language.package_manager_language.PackageManagerMeta">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">ramble.language.package_manager_language.</span></span><span class="sig-name descname"><span class="pre">PackageManagerMeta</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bases</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attr_dict</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/package_manager_language.html#PackageManagerMeta"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.package_manager_language.PackageManagerMeta" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#ramble.language.shared_language.SharedMeta" title="ramble.language.shared_language.SharedMeta"><code class="xref py py-class docutils literal notranslate"><span class="pre">SharedMeta</span></code></a></p>
+</dd></dl>
+
+</section>
 <section id="module-ramble.language.shared_language">
 <span id="ramble-language-shared-language-module"></span><h2>ramble.language.shared_language module<a class="headerlink" href="#module-ramble.language.shared_language" title="Link to this heading"></a></h2>
 <dl class="py class">
@@ -625,10 +639,22 @@ is being performed.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.shared_language.define_compiler">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">define_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#define_compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.define_compiler" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">define_compiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pkg_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#define_compiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.define_compiler" title="Link to this definition"></a></dt>
 <dd><p>Defines the compiler that will be used with this object</p>
 <p>Adds a new compiler spec to this object. Software specs should
 reference a compiler that has been added.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of compiler package</p></li>
+<li><p><strong>pkg_spec</strong> (<em>str</em>) – Package spec to install compiler</p></li>
+<li><p><strong>compiler_spec</strong> (<em>str</em>) – Compiler spec (if different from pkg_spec)</p></li>
+<li><p><strong>compiler</strong> (<em>str</em>) – Package name to use for compilation</p></li>
+<li><p><strong>package_manager</strong> (<em>str</em>) – Glob supported pattern to match package managers
+this compiler applies to</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -680,11 +706,20 @@ group names from context regular expression.</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.shared_language.package_manager_config">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#package_manager_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.package_manager_config" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">package_manager_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#package_manager_config"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.package_manager_config" title="Link to this definition"></a></dt>
 <dd><p>Defines a config option to set within a package manager</p>
 <p>Define a new config which will be passed to a package manager. The
 resulting experiment instance will pass the config to the package manager,
 which will control the logic of applying it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of this configuration</p></li>
+<li><p><strong>config</strong> (<em>str</em>) – Configuration option to set</p></li>
+<li><p><strong>package_manager</strong> (<em>str</em>) – Name of the package manager this config should be used with</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
@@ -741,14 +776,22 @@ instance of a phase will show up in the resulting dependency list for a phase.</
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.shared_language.required_package">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">required_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#required_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.required_package" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">required_package</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#required_package"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.required_package" title="Link to this definition"></a></dt>
 <dd><p>Defines a new spack package that is required for this object
 to function properly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of required package</p></li>
+<li><p><strong>package_manager</strong> (<em>str</em>) – Glob package manager name to apply this required package to</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="ramble.language.shared_language.software_spec">
-<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">software_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spack_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#software_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.software_spec" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">ramble.language.shared_language.</span></span><span class="sig-name descname"><span class="pre">software_spec</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pkg_spec</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler_spec</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compiler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">package_manager</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'*'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/language/shared_language.html#software_spec"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.language.shared_language.software_spec" title="Link to this definition"></a></dt>
 <dd><p>Defines a new software spec needed for this object.</p>
 <p>Adds a new software spec (for spack to use) that this object
 needs to execute properly.</p>
@@ -756,6 +799,19 @@ needs to execute properly.</p>
 <p>Specs can be described as an mpi spec, which means they
 will depend on the MPI library within the resulting spack
 environment.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of package</p></li>
+<li><p><strong>pkg_spec</strong> (<em>str</em>) – Package spec to install package</p></li>
+<li><p><strong>compiler_spec</strong> (<em>str</em>) – Spec to use if this package will be used as a
+compiler for another package</p></li>
+<li><p><strong>compiler</strong> (<em>str</em>) – Package name to use as compiler for compiling this package</p></li>
+<li><p><strong>package_manager</strong> (<em>str</em>) – Glob supported pattern to match package managers
+this package applies to</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

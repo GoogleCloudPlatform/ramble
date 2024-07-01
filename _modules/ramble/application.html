@@ -145,6 +145,7 @@
 <span class="kn">import</span> <span class="nn">ramble.util.graph</span>
 <span class="kn">import</span> <span class="nn">ramble.util.class_attributes</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
+<span class="kn">from</span> <span class="nn">ramble.util.sourcing</span> <span class="kn">import</span> <span class="n">source_str</span>
 
 <span class="kn">from</span> <span class="nn">ramble.workspace</span> <span class="kn">import</span> <span class="n">namespace</span>
 
@@ -171,7 +172,6 @@
 <a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase">[docs]</a>
 <span class="k">class</span> <span class="nc">ApplicationBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">ApplicationMeta</span><span class="p">):</span>
     <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">uses_spack</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">_builtin_name</span> <span class="o">=</span> <span class="s2">&quot;builtin::</span><span class="si">{name}</span><span class="s2">&quot;</span>
     <span class="n">_builtin_required_key</span> <span class="o">=</span> <span class="s2">&quot;required&quot;</span>
     <span class="n">_inventory_file_name</span> <span class="o">=</span> <span class="s2">&quot;ramble_inventory.json&quot;</span>
@@ -199,12 +199,13 @@
 
         <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">class_attributes</span><span class="o">.</span><span class="n">convert_class_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_vars_are_expanded</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">expander</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">variables</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variants</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">no_expand_vars</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_set</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">internals</span> <span class="o">=</span> <span class="p">{}</span>
@@ -226,6 +227,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_phase_times</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custom_executables</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span> <span class="o">=</span> <span class="p">{</span>
@@ -235,6 +237,7 @@
             <span class="s2">&quot;inputs&quot;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s2">&quot;software&quot;</span><span class="p">:</span> <span class="p">[],</span>
             <span class="s2">&quot;templates&quot;</span><span class="p">:</span> <span class="p">[],</span>
+            <span class="s2">&quot;package_manager&quot;</span><span class="p">:</span> <span class="p">[],</span>
         <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_hash</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -265,6 +268,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span><span class="p">:</span>
             <span class="n">new_copy</span><span class="o">.</span><span class="n">set_formatted_executables</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_formatted_executables</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
 
+        <span class="n">new_copy</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_template</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">repeats</span><span class="o">.</span><span class="n">set_repeats</span><span class="p">(</span><span class="kc">False</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
         <span class="n">new_copy</span><span class="o">.</span><span class="n">set_chained_experiments</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
@@ -285,6 +289,59 @@
             <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="ApplicationBase.set_variants">
+<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.set_variants">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_variants</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">variants</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Set variants within an experiment instance, and process their</span>
+<span class="sd">        contents.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            variants (dict): Dictionary of variant controls for this</span>
+<span class="sd">                             experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">variants</span> <span class="o">=</span> <span class="n">variants</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">variants</span><span class="p">:</span>
+            <span class="n">pkgman_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">variants</span><span class="p">[</span><span class="n">namespace</span><span class="o">.</span><span class="n">package_manager</span><span class="p">],</span> <span class="n">typed</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">pkgman_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">pkgman_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">package_managers</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">pkgman_name</span><span class="p">,</span> <span class="n">pkgman_type</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">set_application</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">UnknownObjectError</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">die</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pkgman_name</span><span class="si">}</span><span class="s2"> is not a valid package manager. &quot;</span>
+                        <span class="s2">&quot;Valid package managers can be listed via:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;</span><span class="se">\t</span><span class="s2">ramble list --type package_managers&quot;</span>
+                    <span class="p">)</span>
+
+        <span class="c1"># Mark required package variables appropriately</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_packages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">update_keys</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pkgname</span><span class="si">}</span><span class="s2">_path&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">required</span><span class="p">,</span>
+                            <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">pkgname</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required_packages</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">config</span><span class="p">[</span><span class="s2">&quot;package_manager&quot;</span><span class="p">]):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">update_keys</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">pkgname</span><span class="si">}</span><span class="s2">_path&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">key_type</span><span class="o">.</span><span class="n">reserved</span><span class="p">,</span>
+                                <span class="s2">&quot;level&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">output_level</span><span class="o">.</span><span class="n">variable</span><span class="p">,</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="ApplicationBase.build_phase_order">
@@ -309,6 +366,17 @@
 
                 <span class="c1"># Define phase edges</span>
                 <span class="k">for</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phase_node</span> <span class="ow">in</span> <span class="n">mod_inst</span><span class="o">.</span><span class="n">all_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">define_edges</span><span class="p">(</span><span class="n">phase_node</span><span class="p">,</span> <span class="n">internal_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="p">:</span>
+                <span class="c1"># Define phase nodes</span>
+                <span class="k">for</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phase_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">all_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">add_node</span><span class="p">(</span>
+                        <span class="n">phase_node</span><span class="p">,</span> <span class="n">obj_inst</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span>
+                    <span class="p">)</span>
+
+                <span class="c1"># Define phase edges</span>
+                <span class="k">for</span> <span class="n">phase</span><span class="p">,</span> <span class="n">phase_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">all_pipeline_phases</span><span class="p">(</span><span class="n">pipeline</span><span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">define_edges</span><span class="p">(</span><span class="n">phase_node</span><span class="p">,</span> <span class="n">internal_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
 
 
@@ -369,6 +437,27 @@
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;builtins&quot;</span><span class="p">):</span>
             <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Builtin Executables:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
             <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">colified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;package_manager_configs&quot;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Package Manager Configs:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">spec_groups</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="s2">&quot;compilers&quot;</span><span class="p">,</span> <span class="s2">&quot;Compilers&quot;</span><span class="p">),</span>
+            <span class="p">(</span><span class="s2">&quot;software_specs&quot;</span><span class="p">,</span> <span class="s2">&quot;Software Specs&quot;</span><span class="p">),</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="n">spec_groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">info</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                        <span class="k">if</span> <span class="n">val</span><span class="p">:</span>
+                            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">val</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;@@&quot;</span><span class="p">)))</span>
+
         <span class="k">return</span> <span class="n">out_str</span>
 
 <div class="viewcode-block" id="ApplicationBase.set_env_variable_sets">
@@ -499,28 +588,19 @@
             <span class="p">)</span>
 
         <span class="n">phases</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="n">final_added_index</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">walk</span><span class="p">()):</span>
                 <span class="k">for</span> <span class="n">phase_filter</span> <span class="ow">in</span> <span class="n">phase_filters</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="n">phase</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">phase_filter</span><span class="p">):</span>
                         <span class="n">phases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
+                        <span class="n">final_added_index</span> <span class="o">=</span> <span class="n">idx</span>
 
         <span class="n">include_phase_deps</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:include_phase_dependencies&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">include_phase_deps</span><span class="p">:</span>
-            <span class="n">phases_for_deps</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">phases</span><span class="p">)</span>
-            <span class="k">while</span> <span class="n">phases_for_deps</span><span class="p">:</span>
-                <span class="n">cur_phase</span> <span class="o">=</span> <span class="n">phases_for_deps</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-                <span class="k">for</span> <span class="n">phase</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">phase</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">cur_phase</span> <span class="ow">and</span> <span class="n">phase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">cur_phase</span><span class="o">.</span><span class="n">key</span> <span class="ow">in</span> <span class="n">phase</span><span class="o">.</span><span class="n">_order_before</span><span class="p">:</span>
-                            <span class="n">phases_for_deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
-                            <span class="n">phases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
-
-                <span class="k">for</span> <span class="n">dep_phase_name</span> <span class="ow">in</span> <span class="n">cur_phase</span><span class="o">.</span><span class="n">_order_after</span><span class="p">:</span>
-                    <span class="n">dep_node</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">get_node</span><span class="p">(</span><span class="n">dep_phase_name</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">dep_node</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">:</span>
-                        <span class="n">phases_for_deps</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dep_node</span><span class="p">)</span>
-                        <span class="n">phases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dep_node</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">phase</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">walk</span><span class="p">()):</span>
+                <span class="k">if</span> <span class="n">idx</span> <span class="o">&lt;</span> <span class="n">final_added_index</span> <span class="ow">and</span> <span class="n">phase</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">phases</span><span class="p">:</span>
+                    <span class="n">phases</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">phase</span><span class="p">)</span>
 
         <span class="n">phase_order</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pipeline_graphs</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">walk</span><span class="p">():</span>
@@ -604,6 +684,9 @@
         <span class="k">for</span> <span class="n">template_name</span><span class="p">,</span> <span class="n">template_conf</span> <span class="ow">in</span> <span class="n">workspace</span><span class="o">.</span><span class="n">all_templates</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_used_variables</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">template_name</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">template_conf</span><span class="p">[</span><span class="s2">&quot;contents&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">build_used_variables</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_used_variables</span></div>
 
@@ -992,6 +1075,10 @@
         <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
             <span class="n">builtin_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="p">)</span>
             <span class="n">all_builtins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">builtins</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">builtin_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="p">)</span>
+            <span class="n">all_builtins</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">builtins</span><span class="p">)</span>
 
         <span class="n">all_executables</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">executables</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">all_executables</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custom_executables</span><span class="p">)</span>
@@ -1531,6 +1618,9 @@
                             <span class="s2">&quot;digest&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_string</span><span class="p">(</span><span class="n">input_conf</span><span class="p">[</span><span class="s2">&quot;fetcher&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">url</span><span class="p">),</span>
                         <span class="p">}</span>
                     <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">populate_inventory</span><span class="p">(</span><span class="n">workspace</span><span class="p">,</span> <span class="n">force_compute</span><span class="p">,</span> <span class="n">require_exist</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">experiment_hash</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">hashing</span><span class="o">.</span><span class="n">hash_json</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">hash_inventory</span><span class="p">)</span></div>
 
@@ -2191,7 +2281,10 @@
                     <span class="n">app_licenses</span> <span class="o">=</span> <span class="n">license_conf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">app_licenses</span><span class="p">:</span>
                         <span class="c1"># Append logic to source file which contains the exports</span>
-                        <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;. </span><span class="se">{{</span><span class="s2">license_input_dir</span><span class="se">}}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="n">shell</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;config:shell&quot;</span><span class="p">)</span>
+                        <span class="n">command</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">source_str</span><span class="p">(</span><span class="n">shell</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="se">{{</span><span class="s2">license_input_dir</span><span class="se">}}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">license_inc_name</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
 
         <span class="c1"># Process environment variable actions</span>
         <span class="k">for</span> <span class="n">env_var_set</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_env_variable_sets</span><span class="p">:</span>

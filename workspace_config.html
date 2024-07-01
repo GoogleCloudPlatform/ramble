@@ -72,6 +72,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#list-or-vector-variables">List (or Vector) Variables</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#variable-matrices">Variable Matrices</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#explicit-variable-zips">Explicit Variable Zips</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#variant-control">Variant Control</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-exclusion">Experiment Exclusion</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#experiment-repeats">Experiment Repeats</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#environment-variable-control">Environment Variable Control</a></li>
@@ -83,7 +84,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#reserved-variables">Reserved Variables</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#spack-dictionary">Spack Dictionary</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#software-dictionary">Software Dictionary</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#controlling-mpi-libraries-and-batch-systems">Controlling MPI Libraries and Batch Systems</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#mpi-command-control">MPI Command Control</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#batch-system-control">Batch System Control</a></li>
@@ -139,15 +140,12 @@
 <p>Ramble workspaces are controlled through their configuration files. Each
 workspace has a configuration file stored at <code class="docutils literal notranslate"><span class="pre">$workspace/configs/ramble.yaml</span></code>.</p>
 <p>This document will describe the syntax for writing a workspace configuration file.</p>
-<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, there are two top level dictionairies.</p>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, all content lives under the top level <code class="docutils literal notranslate"><span class="pre">ramble</span></code> dictionary:</p>
 <div class="highlight-console notranslate"><div class="highlight"><pre><span></span><span class="go">ramble:</span>
-<span class="go">  ...</span>
-<span class="go">spack:</span>
 <span class="go">  ...</span>
 </pre></div>
 </div>
-<p>Each of these dictionaries is used to control different aspects of the Ramble
-workspace.</p>
+<p>This dictionary is used to control all of the aspects of the Ramble workspace.</p>
 <section id="ramble-dictionary">
 <h2>Ramble Dictionary<a class="headerlink" href="#ramble-dictionary" title="Link to this heading"></a></h2>
 <p>The ramble dictionary is used to control the experiments a workspace is
@@ -425,6 +423,22 @@ consumed by matrices just as list variables would be.</p>
 </div>
 <p>Which would result in eight experiments, crossing the <code class="docutils literal notranslate"><span class="pre">n_nodes</span></code> variable with
 the zip of <code class="docutils literal notranslate"><span class="pre">partition</span></code> and <code class="docutils literal notranslate"><span class="pre">processes_per_node</span></code>.</p>
+</section>
+<section id="variant-control">
+<span id="ramble-experiment-variants"></span><h3>Variant Control<a class="headerlink" href="#variant-control" title="Link to this heading"></a></h3>
+<p>Within a workspace configuration file, experiments are able to define variants.
+Variants are able to manipulate specific aspects of experiments and
+applications. More information on these configuration options can be seen in
+the <a class="reference internal" href="configuration_files.html#variants-config"><span class="std std-ref">Variants Configuration Section</span></a> documentation. To
+begin with, the only variant that can be specific is the <code class="docutils literal notranslate"><span class="pre">package_manager</span></code>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">package_manager</span></code> variant is used to define which package manager is used
+to configure and execute the experiments. To select <code class="docutils literal notranslate"><span class="pre">spack</span></code> as the package
+manager, the following block can be added to any scope that variables can be
+defined in.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
+</pre></div>
+</div>
 </section>
 <section id="experiment-exclusion">
 <span id="ramble-experiment-exclusion"></span><h3>Experiment Exclusion<a class="headerlink" href="#experiment-exclusion" title="Link to this heading"></a></h3>
@@ -829,7 +843,7 @@ not explicitly set, is defined as: <code class="docutils literal notranslate"><s
 <li><p><code class="docutils literal notranslate"><span class="pre">workload_name</span></code> - Set to the name of the workload within the application</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">experiment_name</span></code> - Set to the name of the experiment</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">env_name</span></code> - By default defined as <code class="docutils literal notranslate"><span class="pre">{application_name}</span></code>. Can be
-overridden to control the spack definition to use.</p></li>
+overridden to control the software environment to use.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">application_run_dir</span></code> - Absolute path to
 <code class="docutils literal notranslate"><span class="pre">$workspace_root/experiments/{application_name}</span></code></p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">workload_run_dir</span></code> - Absolute path to
@@ -857,19 +871,26 @@ directive.</p></li>
 absolute path to: <code class="docutils literal notranslate"><span class="pre">{experiment_run_dir}/&lt;template_name&gt;</span></code> where
 <code class="docutils literal notranslate"><span class="pre">&lt;template_name&gt;</span></code> is the filename of the template, without the extension.</p></li>
 </ul>
-<p>When using spack applications, Ramble also generates the following variables:</p>
+<p>Ramble also generates or requires the following variables, depending on the
+package manager used:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> - Set to the equivalent of <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">location</span> <span class="pre">-i</span>
-<span class="pre">&lt;spec&gt;</span></code> for packages defined in a ramble <code class="docutils literal notranslate"><span class="pre">spec_name</span></code> package set.
-<code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> is set to the name of the package as defined in the
-<code class="docutils literal notranslate"><span class="pre">spack:packages</span></code> dictionary.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;_path</span></code> - Set to the installation location for the package
+for all packages defined in an experiment’s environment definition.
+<code class="docutils literal notranslate"><span class="pre">&lt;software_spec_name&gt;</span></code> is the name of the package as defined in the
+<code class="docutils literal notranslate"><span class="pre">software:packages</span></code> dictionary.</p></li>
 </ul>
+<p>When the package manager is <code class="docutils literal notranslate"><span class="pre">spack</span></code> this is the equivalent to the output of
+<code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">location</span> <span class="pre">-i</span></code> for each install spec.</p>
+<p>Any applications that have required packages require path variables to be
+defined when a package manager is not used.</p>
 <p>As an example:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">grm</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2023.1</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2023.1</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">grm_env</span><span class="p">:</span>
 <span class="w">        </span><span class="nt">packages</span><span class="p">:</span>
@@ -879,7 +900,7 @@ absolute path to: <code class="docutils literal notranslate"><span class="pre">{
 <p>Defines a software environment named <code class="docutils literal notranslate"><span class="pre">grm_env</span></code>. The default environment used
 has the same name as the application the experiment is generated from. In
 experiments which use this <code class="docutils literal notranslate"><span class="pre">grm_env</span></code> environment, a variable is defined
-named: <code class="docutils literal notranslate"><span class="pre">gromacs</span></code>, as that is the package named defined by the <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code>
+named: <code class="docutils literal notranslate"><span class="pre">gromacs</span></code>, as that is the package named defined by the <code class="docutils literal notranslate"><span class="pre">pkg_spec</span></code>
 attribute of the <code class="docutils literal notranslate"><span class="pre">grm</span></code> package definition. This variable contains the path to
 the installation location for the <code class="docutils literal notranslate"><span class="pre">gromacs</span></code> package.</p>
 <p><strong>NOTE</strong>: Package installation location variables are only generated when
@@ -887,19 +908,19 @@ actually performing the setup of a workspace. When a <code class="docutils liter
 performed, these paths are not populated.</p>
 </section>
 </section>
-<section id="spack-dictionary">
-<h2>Spack Dictionary<a class="headerlink" href="#spack-dictionary" title="Link to this heading"></a></h2>
-<p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">spack:</span></code> dictionary controls the software
+<section id="software-dictionary">
+<h2>Software Dictionary<a class="headerlink" href="#software-dictionary" title="Link to this heading"></a></h2>
+<p>Within a ramble.yaml file, the <code class="docutils literal notranslate"><span class="pre">software:</span></code> dictionary controls the software
 stack installation that ramble performs. This configuration section is defined
-in the <a class="reference internal" href="configuration_files.html#spack-config"><span class="std std-ref">Spack section</span></a> documentation.
+in the <a class="reference internal" href="configuration_files.html#software-config"><span class="std std-ref">Software section</span></a> documentation.
 a packages dictionary, and an environments dictionary.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">concretize</span></code> command can help construct a functional
-spack dictionary based on the experiments listed.</p>
+software dictionary based on the experiments listed.</p>
 <p>It is important to note that packages and environments that are not used by an
 experiment are not installed.</p>
 <p>Application definition files can define one or more <code class="docutils literal notranslate"><span class="pre">software_spec</span></code>
 directives, which are packages the application might need to run properly.
-Additionally, spack packages can be marked as required through the
+Additionally, packages can be marked as required through the
 <code class="docutils literal notranslate"><span class="pre">required_package</span></code> directive.</p>
 </section>
 <section id="controlling-mpi-libraries-and-batch-systems">
@@ -918,6 +939,8 @@ insufficient for changing the flags used based on the MPI library used.</p>
 per-experiment basis.</p>
 <p>Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">batch_submit</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{execute_experiment}&#39;</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span>
@@ -933,18 +956,18 @@ per-experiment basis.</p>
 <span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 <span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 <span class="w">                </span><span class="nt">env_name</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&#39;gromacs-mpich&#39;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&#39;gromacs-ompi&#39;</span><span class="p p-Indicator">]</span>
-<span class="nt">spack</span><span class="p">:</span>
+<span class="nt">software</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
 <span class="w">    </span><span class="nt">mpich</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpich@4.0.2 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpich@4.0.2 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">ompi</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@4.1.4 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">    </span><span class="l l-Scalar l-Scalar-Plain">gromacs-{mpi}</span><span class="p p-Indicator">:</span>
@@ -972,6 +995,8 @@ different batch systems by overriding the <code class="docutils literal notransl
 <p>Below is an example configuration file showing how the <code class="docutils literal notranslate"><span class="pre">batch_submit</span></code>
 variable can be used to submit the same experiment to multiple batch systems.</p>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">mpi_command</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;mpirun</span><span class="nv"> </span><span class="s">-n</span><span class="nv"> </span><span class="s">{n_ranks}</span><span class="nv"> </span><span class="s">-ppn</span><span class="nv"> </span><span class="s">{processes_per_node}&#39;</span>
 <span class="w">    </span><span class="nt">batch_system</span><span class="p">:</span>
@@ -989,15 +1014,15 @@ variable can be used to submit the same experiment to multiple batch systems.</p
 <span class="w">              </span><span class="nt">variables</span><span class="p">:</span>
 <span class="w">                </span><span class="nt">n_ranks</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
 <span class="w">                </span><span class="nt">n_nodes</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;1&#39;</span>
-<span class="nt">spack</span><span class="p">:</span>
+<span class="nt">software</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span>
 <span class="w">    </span><span class="nt">impi2021</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>

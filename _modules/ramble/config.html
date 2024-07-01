@@ -153,6 +153,7 @@
 <span class="kn">import</span> <span class="nn">ramble.schema.formatted_executables</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.repos</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.modifier_repos</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.package_manager_repos</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.workspace</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.applications</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.internals</span>
@@ -160,8 +161,10 @@
 <span class="kn">import</span> <span class="nn">ramble.schema.mirrors</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.modifiers</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.spack</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.software</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.success_criteria</span>
 <span class="kn">import</span> <span class="nn">ramble.schema.variables</span>
+<span class="kn">import</span> <span class="nn">ramble.schema.variants</span>
 
 <span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
 <span class="kn">from</span> <span class="nn">ramble.util.logger</span> <span class="kn">import</span> <span class="n">logger</span>
@@ -182,9 +185,12 @@
     <span class="s2">&quot;modifier_repos&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifier_repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s2">&quot;modifiers&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">modifiers</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s2">&quot;spack&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">spack</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;software&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">software</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s2">&quot;success_criteria&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;package_manager_repos&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">package_manager_repos</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s2">&quot;applications&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">applications</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s2">&quot;variables&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">variables</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
+    <span class="s2">&quot;variants&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">variants</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
     <span class="s2">&quot;zips&quot;</span><span class="p">:</span> <span class="n">ramble</span><span class="o">.</span><span class="n">schema</span><span class="o">.</span><span class="n">zips</span><span class="o">.</span><span class="n">schema</span><span class="p">,</span>
 <span class="p">}</span>
 
@@ -230,6 +236,7 @@
         <span class="s2">&quot;license_dir&quot;</span><span class="p">:</span> <span class="n">spack</span><span class="o">.</span><span class="n">paths</span><span class="o">.</span><span class="n">default_license_dir</span><span class="p">,</span>
         <span class="s2">&quot;shell&quot;</span><span class="p">:</span> <span class="s2">&quot;sh&quot;</span><span class="p">,</span>
         <span class="s2">&quot;spack&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">,</span> <span class="s2">&quot;concretize&quot;</span><span class="p">:</span> <span class="s2">&quot;--reuse&quot;</span><span class="p">}},</span>
+        <span class="s2">&quot;pip&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;install&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;flags&quot;</span><span class="p">:</span> <span class="p">[]}},</span>
         <span class="s2">&quot;input_cache&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/cache&quot;</span><span class="p">,</span>
         <span class="s2">&quot;workspace_dirs&quot;</span><span class="p">:</span> <span class="s2">&quot;$ramble/var/ramble/workspaces&quot;</span><span class="p">,</span>
     <span class="p">}</span>

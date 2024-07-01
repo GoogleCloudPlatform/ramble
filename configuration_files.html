@@ -77,12 +77,14 @@
 <li class="toctree-l2"><a class="reference internal" href="#modifier-repos-section">Modifier Repos Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#modifiers-section">Modifiers Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#repos-section">Repos Section:</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#spack-section">Spack Section:</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#software-section">Software Section:</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#package-manager-specific-packages">Package Manager Specific Packages</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#external-spack-environment-support">External Spack Environment Support:</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#success-criteria-section">Success Criteria Section:</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#variables-section">Variables Section:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#variants-section">Variants Section</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="workspace.html">Ramble Workspace</a></li>
@@ -146,9 +148,10 @@ does not cover the <a class="reference internal" href="workspace_config.html#wor
 <li><p><a class="reference internal" href="#modifier-repos-config"><span class="std std-ref">modifier_repos</span></a></p></li>
 <li><p><a class="reference internal" href="#modifiers-config"><span class="std std-ref">modifiers</span></a></p></li>
 <li><p><a class="reference internal" href="#repos-config"><span class="std std-ref">repos</span></a></p></li>
-<li><p><a class="reference internal" href="#spack-config"><span class="std std-ref">spack</span></a></p></li>
+<li><p><a class="reference internal" href="#software-config"><span class="std std-ref">software</span></a></p></li>
 <li><p><a class="reference internal" href="#success-criteria-config"><span class="std std-ref">success_criteria</span></a></p></li>
 <li><p><a class="reference internal" href="#variables-config"><span class="std std-ref">variables</span></a></p></li>
+<li><p><a class="reference internal" href="#variants-config"><span class="std std-ref">variants</span></a></p></li>
 </ul>
 <p>Each of these config sections has a defined schema contained in
 <code class="docutils literal notranslate"><span class="pre">lib/ramble/ramble/schemas</span></code>.</p>
@@ -225,6 +228,7 @@ workspace should generate. The general format for this config section is as foll
 <li><p><a class="reference internal" href="#modifiers-config"><span class="std std-ref">modifiers</span></a></p></li>
 <li><p><a class="reference internal" href="#success-criteria-config"><span class="std std-ref">success_criteria</span></a></p></li>
 <li><p><a class="reference internal" href="#variables-config"><span class="std std-ref">variables</span></a></p></li>
+<li><p><a class="reference internal" href="#variants-config"><span class="std std-ref">variants</span></a></p></li>
 </ul>
 <p>Each of these will be described in their own section below.</p>
 <p>Within an experiment, each portion of <code class="docutils literal notranslate"><span class="pre">[optional_definitions]</span></code> will be merged
@@ -473,16 +477,16 @@ be searched for when looking for application definitions. Its format is as follo
 </pre></div>
 </div>
 </section>
-<section id="spack-section">
-<span id="spack-config"></span><h2>Spack Section:<a class="headerlink" href="#spack-section" title="Link to this heading"></a></h2>
-<p>The spack config section is used to define package definitions, and software
+<section id="software-section">
+<span id="software-config"></span><h2>Software Section:<a class="headerlink" href="#software-section" title="Link to this heading"></a></h2>
+<p>The software config section is used to define package definitions, and software
 environments created from those packages. Its format is as follows:</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software</span><span class="p">:</span>
 <span class="w">  </span><span class="p p-Indicator">[</span><span class="nv">variables</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{}]</span>
 <span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">&lt;package_name&gt;</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;spack_spec_for_package&#39;</span>
-<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Compiler</span><span class="nv"> </span><span class="s">spec,</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">different</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">spack_spec&#39;</span><span class="w"> </span><span class="c1"># Default: None</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;pkg_spec_for_package&#39;</span>
+<span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;Compiler</span><span class="nv"> </span><span class="s">spec,</span><span class="nv"> </span><span class="s">if</span><span class="nv"> </span><span class="s">different</span><span class="nv"> </span><span class="s">from</span><span class="nv"> </span><span class="s">pkg_spec&#39;</span><span class="w"> </span><span class="c1"># Default: None</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;package_name_to_use_as_compiler&#39;</span><span class="w"> </span><span class="c1"># Default: None</span>
 <span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">variables</span><span class="p p-Indicator">:</span><span class="w"> </span><span class="p p-Indicator">{}]</span>
 <span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrix</span><span class="p p-Indicator">:]</span>
@@ -497,33 +501,34 @@ environments created from those packages. Its format is as follows:</p>
 <span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrix</span><span class="p p-Indicator">:]</span>
 <span class="w">      </span><span class="p p-Indicator">[</span><span class="nv">matrices</span><span class="p p-Indicator">:]</span>
 <span class="w">    </span><span class="nt">&lt;external_env_name&gt;</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">external_spack_env</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;name_or_path_to_spack_env&#39;</span>
+<span class="w">      </span><span class="nt">external_env</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;name_or_path_to_spack_env&#39;</span>
 </pre></div>
 </div>
-<p>The packages dictionary houses ramble descriptions of spack packages that can
-be used to construct environments with. A package is defined as software that
-spack should install for the user. These have one required attribute, and two
-optional attributes. The <code class="docutils literal notranslate"><span class="pre">spack_spec</span></code> attribute is required to be defined,
-and should be the spec passed to <code class="docutils literal notranslate"><span class="pre">spack</span> <span class="pre">install</span></code> on the command line for the
-package. Optionally, a package can define a <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which
-will be the spec used when this package is used as a compiler for another
-package. Packages can also optionally define a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which
-is the name of another package that should be used as it’s compiler.</p>
-<p>The environments dictionary contains descriptions of spack environments that
+<p>The packages dictionary houses ramble descriptions of software packages that
+can be used to construct environments with. A package is defined as software
+that the defined package manager should install for the user. These have one
+required attribute, and two optional attributes. The <code class="docutils literal notranslate"><span class="pre">pkg_spec</span></code> attribute is
+required to be defined, and should be the arguments passed to the package
+manager’s <code class="docutils literal notranslate"><span class="pre">install</span></code> subcommand. Optionally, a package can define a
+<code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attribute, which will be the spec used when this package is
+used as a compiler for another package. Packages can also optionally define a
+<code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute, which is the name of another package that should be
+used as it’s compiler.</p>
+<p>The environments dictionary contains descriptions of groups of packages that
 Ramble might generate based on the requested experiments. Environments are
 defined as a list of packages (in the aforementioned packages dictionary) that
-should be bundled into a spack environment.</p>
-<p>Below is an annotated example of the spack dictionary.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+should be bundled into a shared environment within the package manager.</p>
+<p>Below is an annotated example of the software dictionary.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gcc9</span><span class="p">:</span><span class="w"> </span><span class="c1"># Abstract name to refer to this package</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span><span class="w"> </span><span class="c1"># Spack spec for this package</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0 target=x86_64</span><span class="w"> </span><span class="c1"># Spack spec for this package</span>
 <span class="w">      </span><span class="nt">compiler_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.3.0</span><span class="w"> </span><span class="c1"># Spack compiler spec for this package</span>
 <span class="w">    </span><span class="nt">impi2021</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0 target=x86_64</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span><span class="w"> </span><span class="c1"># Other package name to use as compiler for this package</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
+<span class="w">      </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs@2022.4</span>
 <span class="w">      </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
@@ -532,9 +537,18 @@ should be bundled into a spack environment.</p>
 <span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gromacs</span>
 </pre></div>
 </div>
-<p>Packages and environments defined inside the <code class="docutils literal notranslate"><span class="pre">spack</span></code> config section are
+<p>Packages and environments defined inside the <code class="docutils literal notranslate"><span class="pre">software</span></code> config section are
 merely templates. They will be rendered into explicit environments and packages
 by each individual experiment.</p>
+<section id="package-manager-specific-packages">
+<h3>Package Manager Specific Packages<a class="headerlink" href="#package-manager-specific-packages" title="Link to this heading"></a></h3>
+<p>When selecting package managers within Ramble experiments, the default spec a
+package manager will use is contained in the <code class="docutils literal notranslate"><span class="pre">pkg_spec</span></code> attribute. If
+multiple package managers will use the same package definition, specs for each
+can be defined using the <code class="docutils literal notranslate"><span class="pre">&lt;package_manager&gt;_pkg_spec</span></code> syntax. This syntax can
+be used on the <code class="docutils literal notranslate"><span class="pre">compiler</span></code> and <code class="docutils literal notranslate"><span class="pre">compiler_spec</span></code> attributes as well, if the
+package manager supports selecting a specific compiler.</p>
+</section>
 <section id="external-spack-environment-support">
 <h3>External Spack Environment Support:<a class="headerlink" href="#external-spack-environment-support" title="Link to this heading"></a></h3>
 <p><strong>NOTE</strong>: Using external Spack environments is an advanced feature.</p>
@@ -543,13 +557,13 @@ instead of having Ramble generate its own Spack environment file. This can be
 useful when the Spack environment a user wants to experiment with is
 complicated.</p>
 <p>This section shows how this feature can be used.</p>
-<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">spack</span><span class="p">:</span>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">software</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">environments</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">gromacs</span><span class="p">:</span>
-<span class="w">      </span><span class="nt">external_spack_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name_or_path_to_spack_env</span>
+<span class="w">      </span><span class="nt">external_env</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">name_or_path_to_spack_env</span>
 </pre></div>
 </div>
-<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">external_spack_env</span></code> keyword refers an external
+<p>In the above example, the <code class="docutils literal notranslate"><span class="pre">external_env</span></code> keyword refers an external
 Spack environment. This can be the name of a named Spack environment, or the
 path to a directory which contains a Spack environment. Ramble will copy the
 <code class="docutils literal notranslate"><span class="pre">spack.yaml</span></code> file from this environment, instead of generating its own.</p>
@@ -587,7 +601,25 @@ format is as follows:</p>
 </pre></div>
 </div>
 <p>Variables can be defined as lists, scalars, or can refer to a variable defined in
-another fully qualified experiment (through the <code class="docutils literal notranslate"><span class="pre">cross_ref_var</span></code> syntax).</p>
+another fully qualified experiment (through the syntax shown in <code class="docutils literal notranslate"><span class="pre">cross_reference_var</span></code>).</p>
+<p>For more information on variable expansion rules, see:
+<a class="reference internal" href="workspace_config.html#variable-dictionaries"><span class="std std-ref">workspace variable dictionary definitions</span></a>.</p>
+</section>
+<section id="variants-section">
+<span id="variants-config"></span><h2>Variants Section<a class="headerlink" href="#variants-section" title="Link to this heading"></a></h2>
+<p>The variants config section is used to customize variants to the experiment creation.
+These can include application defined variants, or higher level Ramble provided
+variants. Currently, the only supported variants is <code class="docutils literal notranslate"><span class="pre">package_manager</span></code> which
+allows an experiment to define the package manager it should use.
+The format of this section is as follows:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;pkg_man_name&gt; or null or None</span>
+</pre></div>
+</div>
+<p>Variants are expanded following the same logic to expand variables (so a
+variant could be lazily expanded based on an experiment’s variable definitions).</p>
+<p>The default value for <code class="docutils literal notranslate"><span class="pre">package_manager</span></code> is <code class="docutils literal notranslate"><span class="pre">null</span></code> which disables the use of
+a package manager.</p>
 </section>
 </section>
 

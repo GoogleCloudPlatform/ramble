@@ -163,14 +163,6 @@ ramble.test.software\_environment module
    :undoc-members:
    :show-inheritance:
 
-ramble.test.spack\_runner module
---------------------------------
-
-.. automodule:: ramble.test.spack_runner
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 ramble.test.spec\_basic module
 ------------------------------
 

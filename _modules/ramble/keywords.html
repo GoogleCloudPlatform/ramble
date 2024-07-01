@@ -182,6 +182,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">default_keys</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">update_keys</span><span class="p">(</span><span class="n">extra_keys</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Keywords.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">new_inst</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)()</span>
+        <span class="n">new_inst</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">new_inst</span><span class="o">.</span><span class="n">update_keys</span><span class="p">({})</span>
+        <span class="k">return</span> <span class="n">new_inst</span></div>
+
+
 <div class="viewcode-block" id="Keywords.update_keys">
 <a class="viewcode-back" href="../../ramble.html#ramble.keywords.Keywords.update_keys">[docs]</a>
     <span class="k">def</span> <span class="nf">update_keys</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">extra_keys</span><span class="p">):</span>

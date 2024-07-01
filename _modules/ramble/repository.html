@@ -154,7 +154,7 @@
 <span class="c1"># Implement type specific functionality between here, and</span>
 <span class="c1">#     END TYPE SPECIFIC FUNCTIONALITY</span>
 <span class="c1">####</span>
-<span class="n">ObjectTypes</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;ObjectTypes&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;applications&quot;</span><span class="p">,</span> <span class="s2">&quot;modifiers&quot;</span><span class="p">])</span>
+<span class="n">ObjectTypes</span> <span class="o">=</span> <span class="n">Enum</span><span class="p">(</span><span class="s2">&quot;ObjectTypes&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;applications&quot;</span><span class="p">,</span> <span class="s2">&quot;modifiers&quot;</span><span class="p">,</span> <span class="s2">&quot;package_managers&quot;</span><span class="p">])</span>
 
 <span class="n">OBJECT_NAMES</span> <span class="o">=</span> <span class="p">[</span><span class="n">obj</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">ObjectTypes</span><span class="p">]</span>
 
@@ -178,6 +178,14 @@
         <span class="s2">&quot;config_section&quot;</span><span class="p">:</span> <span class="s2">&quot;modifier_repos&quot;</span><span class="p">,</span>
         <span class="s2">&quot;accepted_configs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;modifier_repo.yaml&quot;</span><span class="p">,</span> <span class="n">unified_config</span><span class="p">],</span>
         <span class="s2">&quot;singular&quot;</span><span class="p">:</span> <span class="s2">&quot;modifier&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="n">ObjectTypes</span><span class="o">.</span><span class="n">package_managers</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s2">&quot;file_name&quot;</span><span class="p">:</span> <span class="s2">&quot;package_manager.py&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;dir_name&quot;</span><span class="p">:</span> <span class="s2">&quot;package_managers&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;abbrev&quot;</span><span class="p">:</span> <span class="s2">&quot;pkg_man&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;config_section&quot;</span><span class="p">:</span> <span class="s2">&quot;package_manager_repos&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;accepted_configs&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;package_manager_repo.yaml&quot;</span><span class="p">,</span> <span class="n">unified_config</span><span class="p">],</span>
+        <span class="s2">&quot;singular&quot;</span><span class="p">:</span> <span class="s2">&quot;package manager&quot;</span><span class="p">,</span>
     <span class="p">},</span>
 <span class="p">}</span>
 
@@ -215,9 +223,28 @@
     <span class="k">return</span> <span class="n">path</span>
 
 
+<span class="k">def</span> <span class="nf">_package_managers</span><span class="p">(</span><span class="n">repo_dirs</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the singleton RepoPath instance for Ramble.</span>
+
+<span class="sd">    Create a RepoPath, add it to sys.meta_path, and return it.</span>
+
+<span class="sd">    TODO: consider not making this a singleton.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">repo_dirs</span> <span class="o">=</span> <span class="n">repo_dirs</span> <span class="ow">or</span> <span class="n">ramble</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;package_manager_repos&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">repo_dirs</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">NoRepoConfiguredError</span><span class="p">(</span>
+            <span class="s2">&quot;Ramble configuration contains no package manager repositories.&quot;</span>
+        <span class="p">)</span>
+
+    <span class="n">path</span> <span class="o">=</span> <span class="n">RepoPath</span><span class="p">(</span><span class="o">*</span><span class="n">repo_dirs</span><span class="p">,</span> <span class="n">object_type</span><span class="o">=</span><span class="n">ObjectTypes</span><span class="o">.</span><span class="n">package_managers</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span>
+
+
 <span class="n">paths</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">ObjectTypes</span><span class="o">.</span><span class="n">applications</span><span class="p">:</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">_apps</span><span class="p">),</span>
     <span class="n">ObjectTypes</span><span class="o">.</span><span class="n">modifiers</span><span class="p">:</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">_mods</span><span class="p">),</span>
+    <span class="n">ObjectTypes</span><span class="o">.</span><span class="n">package_managers</span><span class="p">:</span> <span class="n">llnl</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">lang</span><span class="o">.</span><span class="n">Singleton</span><span class="p">(</span><span class="n">_package_managers</span><span class="p">),</span>
 <span class="p">}</span>
 
 <span class="c1">#####################################</span>
@@ -1756,9 +1783,10 @@
 
 
 
-<span class="c1"># Add the finder to sys.meta_path</span>
-<span class="n">REPOS_FINDER</span> <span class="o">=</span> <span class="n">ReposFinder</span><span class="p">()</span>
-<span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">REPOS_FINDER</span><span class="p">)</span>
+<span class="c1"># Add the finders to sys.meta_path</span>
+<span class="k">for</span> <span class="n">obj</span> <span class="ow">in</span> <span class="n">ObjectTypes</span><span class="p">:</span>
+    <span class="n">obj_finder</span> <span class="o">=</span> <span class="n">ReposFinder</span><span class="p">(</span><span class="n">object_type</span><span class="o">=</span><span class="n">obj</span><span class="p">)</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">meta_path</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">obj_finder</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="RepoError">

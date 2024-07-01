@@ -40,7 +40,7 @@ Searching the output for the sections marked ``Workload: water_bare`` and
 .. code-block:: console
 
     Workload: water_gmx50
-        Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'pre-process', 'execute-gen']
+        Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_gmx50_bare']
         Variables:
             size:
@@ -55,7 +55,7 @@ Searching the output for the sections marked ``Workload: water_bare`` and
                 Description: Input path for water GMX50
                 Default: {water_gmx50_bare}/{size}
     Workload: water_bare
-        Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'pre-process', 'execute-gen']
+        Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
         Variables:
             size:
@@ -83,13 +83,13 @@ software configuration:
 
    Default Compilers:
     gcc9:
-      spack_spec = gcc@9.3.0
+      pkg_spec = gcc@9.3.0
 
     Software Specs:
       impi2021:
-        spack_spec = intel-oneapi-mpi@2021.11.0
+        pkg_spec = intel-oneapi-mpi@2021.11.0
       gromacs:
-        spack_spec = gromacs@2020.5
+        pkg_spec = gromacs@2020.5
         compiler = gcc9
 
 This output does not represent the only possible configuration that works for

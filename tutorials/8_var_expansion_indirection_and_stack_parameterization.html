@@ -168,6 +168,8 @@ location can be seen under the <code class="docutils literal notranslate"><span 
 <p>Within the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file, write the following contents, which are the
 final configuration from the previous tutorial.</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -192,15 +194,15 @@ final configuration from the previous tutorial.</p>
 <span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
 <span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
@@ -220,20 +222,20 @@ variable expansion and indirection to construct more complex experiments.</p>
 <h2>Define Additional MPI and Parameterize Software Environments<a class="headerlink" href="#define-additional-mpi-and-parameterize-software-environments" title="Link to this heading"></a></h2>
 <p>To begin with, you will parameterize the software stack definitions to generate
 experiments using both IntelMPI and OpenMPI. For this section, you can focus on
-the <code class="docutils literal notranslate"><span class="pre">spack</span></code> portion of the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> configuration file. For more
-information on how this section is constructed, see the <a class="reference internal" href="../configuration_files.html#spack-config"><span class="std std-ref">Spack config
+the <code class="docutils literal notranslate"><span class="pre">software</span></code> portion of the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> configuration file. For more
+information on how this section is constructed, see the <a class="reference internal" href="../configuration_files.html#software-config"><span class="std std-ref">Software config
 section</span></a> documentation.</p>
 <p>To start with, you will create an OpenMPI package definition. This might look
 like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">  </span><span class="nt">openmpi</span><span class="p">:</span>
-<span class="w">    </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
+<span class="w">    </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
 </pre></div>
 </div>
 <p>In the definition of the Intel MPI package above, you’ll see we originally
 specified a <code class="docutils literal notranslate"><span class="pre">compiler</span></code> attribute (with the value of <code class="docutils literal notranslate"><span class="pre">gcc9</span></code>). This can be
-explicitly selected if you like, however Ramble generates Spack environments
-with <code class="docutils literal notranslate"><span class="pre">unify:</span> <span class="pre">true</span></code>
+explicitly selected if you like, however when using Spack, Ramble generates
+Spack environments with <code class="docutils literal notranslate"><span class="pre">unify:</span> <span class="pre">true</span></code>
 (See <a class="reference external" href="https://spack.readthedocs.io/en/latest/environments.html#spec-concretization">Spack’s environment documentation</a>
 for more details). As a result, OpenMPI should be compiled with the same
 compiler used for WRF.</p>
@@ -253,6 +255,8 @@ another named <code class="docutils literal notranslate"><span class="pre">wrfv4
 hoisted to the workspace level because we need to include it in the experiment
 generation as well. The result might look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -278,17 +282,17 @@ generation as well. The result might look like the following:</p>
 <span class="w">              </span><span class="nt">matrix</span><span class="p">:</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
 <span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
@@ -315,6 +319,8 @@ updated the experiment name template. To resolve this, add <code class="docutils
 the experiment name template. Additionally, you may explicitly add <code class="docutils literal notranslate"><span class="pre">mpi_name</span></code>
 into the matrix. The result might look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -341,17 +347,17 @@ into the matrix. The result might look like the following:</p>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi_name</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
 <span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
@@ -405,6 +411,8 @@ which variables you want to use. For example:</p>
 indirection to help parameterize the MPI arguments as shown above, the
 resulting configuration might look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -437,17 +445,17 @@ resulting configuration might look like the following:</p>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi_name</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
 <span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>
@@ -484,6 +492,8 @@ also utilize variable indirection / expansion to fix this issue. For the
 purposes of this tutorial, we will use indirection instead of explicit zips.</p>
 <p>The resulting configuration file might look like the following:</p>
 <div class="highlight-YAML notranslate"><div class="highlight"><pre><span></span><span class="nt">ramble</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">variants</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">package_manager</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">spack</span>
 <span class="w">  </span><span class="nt">env_vars</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">set</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">OMP_NUM_THREADS</span><span class="p">:</span><span class="w"> </span><span class="s">&#39;{n_threads}&#39;</span>
@@ -517,17 +527,17 @@ purposes of this tutorial, we will use indirection instead of explicit zips.</p>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">platform_config</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">n_nodes</span>
 <span class="w">              </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mpi_name</span>
-<span class="w">  </span><span class="nt">spack</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">software</span><span class="p">:</span>
 <span class="w">    </span><span class="nt">packages</span><span class="p">:</span>
 <span class="w">      </span><span class="nt">gcc9</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc@9.4.0</span>
 <span class="w">      </span><span class="nt">intel-mpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">intel-oneapi-mpi@2021.11.0</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">      </span><span class="nt">openmpi</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">openmpi@3.1.6 +orterunprefix</span>
 <span class="w">      </span><span class="nt">wrfv4</span><span class="p">:</span>
-<span class="w">        </span><span class="nt">spack_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
+<span class="w">        </span><span class="nt">pkg_spec</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem</span>
 <span class="w">          </span><span class="l l-Scalar l-Scalar-Plain">~pnetcdf</span>
 <span class="w">        </span><span class="nt">compiler</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">gcc9</span>
 <span class="w">    </span><span class="nt">environments</span><span class="p">:</span>

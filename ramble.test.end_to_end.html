@@ -66,6 +66,7 @@
 <li class="toctree-l3"><a class="reference internal" href="ramble.experimental.html">ramble.experimental namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html">ramble.language namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.modifier_types.html">ramble.modifier_types namespace</a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.package_manager_types.html">ramble.package_manager_types namespace</a></li>
 <li class="toctree-l3"><a class="reference internal" href="ramble.schema.html">ramble.schema package</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="ramble.test.html">ramble.test namespace</a><ul class="current">
 <li class="toctree-l4 current"><a class="reference internal" href="ramble.test.html#subpackages">Subpackages</a></li>
@@ -88,7 +89,6 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-namespace-trie-module">ramble.test.namespace_trie module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-repository-module">ramble.test.repository module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-software-environment-module">ramble.test.software_environment module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-spack-runner-module">ramble.test.spack_runner module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.spec_basic">ramble.test.spec_basic module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#ramble-test-stage-module">ramble.test.stage module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.test.html#module-ramble.test.success_criteria">ramble.test.success_criteria module</a></li>
@@ -100,7 +100,7 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.appkit">ramble.appkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-appkit-module">ramble.appkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.application">ramble.application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.caches">ramble.caches module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.config">ramble.config module</a></li>
@@ -115,15 +115,16 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.main">ramble.main module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.mirror">ramble.mirror module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modifier">ramble.modifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.modkit">ramble.modkit module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-modkit-module">ramble.modkit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.namespace">ramble.namespace module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.package_manager">ramble.package_manager module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.paths">ramble.paths module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#ramble-pipeline-module">ramble.pipeline module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.pkgmankit">ramble.pkgmankit module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.renderer">ramble.renderer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repeats">ramble.repeats module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.repository">ramble.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.software_environments">ramble.software_environments module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spack_runner">ramble.spack_runner module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.spec">ramble.spec module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.stage">ramble.stage module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.html#module-ramble.success_criteria">ramble.success_criteria module</a></li>
@@ -182,6 +183,9 @@
 </section>
 <section id="ramble-test-end-to-end-chained-experiment-var-inheritance-module">
 <h2>ramble.test.end_to_end.chained_experiment_var_inheritance module<a class="headerlink" href="#ramble-test-end-to-end-chained-experiment-var-inheritance-module" title="Link to this heading"></a></h2>
+</section>
+<section id="ramble-test-end-to-end-concretize-with-different-package-managers-module">
+<h2>ramble.test.end_to_end.concretize_with_different_package_managers module<a class="headerlink" href="#ramble-test-end-to-end-concretize-with-different-package-managers-module" title="Link to this heading"></a></h2>
 </section>
 <section id="ramble-test-end-to-end-config-section-env-vars-module">
 <h2>ramble.test.end_to_end.config_section_env_vars module<a class="headerlink" href="#ramble-test-end-to-end-config-section-env-vars-module" title="Link to this heading"></a></h2>

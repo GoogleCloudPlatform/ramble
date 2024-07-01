@@ -38,6 +38,14 @@ ramble.language.modifier\_language module
    :undoc-members:
    :show-inheritance:
 
+ramble.language.package\_manager\_language module
+-------------------------------------------------
+
+.. automodule:: ramble.language.package_manager_language
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.language.shared\_language module
 ---------------------------------------
 

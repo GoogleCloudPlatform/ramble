@@ -145,6 +145,14 @@ ramble.util.path module
    :undoc-members:
    :show-inheritance:
 
+ramble.util.sourcing module
+---------------------------
+
+.. automodule:: ramble.util.sourcing
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.util.spec\_utils module
 ------------------------------
 

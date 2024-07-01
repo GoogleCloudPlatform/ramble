@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ramble.package_manager &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">ramble.package_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for ramble.package_manager</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright 2022-2024 The Ramble Authors</span>
+<span class="c1">#</span>
+<span class="c1"># Licensed under the Apache License, Version 2.0 &lt;LICENSE-APACHE or</span>
+<span class="c1"># https://www.apache.org/licenses/LICENSE-2.0&gt; or the MIT license</span>
+<span class="c1"># &lt;LICENSE-MIT or https://opensource.org/licenses/MIT&gt;, at your</span>
+<span class="c1"># option. This file may not be copied, modified, or distributed</span>
+<span class="c1"># except according to those terms.</span>
+<span class="sd">&quot;&quot;&quot;Define base classes for package manager definitions&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">fnmatch</span>
+<span class="kn">import</span> <span class="nn">textwrap</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">llnl.util.tty.colify</span> <span class="kn">import</span> <span class="n">colified</span>
+
+<span class="kn">from</span> <span class="nn">ramble.language.package_manager_language</span> <span class="kn">import</span> <span class="n">PackageManagerMeta</span>
+<span class="kn">from</span> <span class="nn">ramble.language.shared_language</span> <span class="kn">import</span> <span class="n">SharedMeta</span><span class="p">,</span> <span class="n">register_builtin</span>  <span class="c1"># noqa: F401</span>
+<span class="kn">from</span> <span class="nn">ramble.error</span> <span class="kn">import</span> <span class="n">RambleError</span>
+<span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
+<span class="kn">import</span> <span class="nn">ramble.util.directives</span>
+<span class="kn">import</span> <span class="nn">ramble.util.class_attributes</span>
+
+<span class="kn">import</span> <span class="nn">spack.util.naming</span>
+
+
+<div class="viewcode-block" id="PackageManagerBase">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase">[docs]</a>
+<span class="k">class</span> <span class="nc">PackageManagerBase</span><span class="p">(</span><span class="nb">object</span><span class="p">,</span> <span class="n">metaclass</span><span class="o">=</span><span class="n">PackageManagerMeta</span><span class="p">):</span>
+    <span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">_builtin_name</span> <span class="o">=</span> <span class="s2">&quot;package_manager_builtin::</span><span class="si">{obj_name}</span><span class="s2">::</span><span class="si">{name}</span><span class="s2">&quot;</span>
+    <span class="n">_pkgman_prefix_builtin</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;package_manager_builtin::&quot;</span>
+    <span class="n">_language_classes</span> <span class="o">=</span> <span class="p">[</span><span class="n">PackageManagerMeta</span><span class="p">,</span> <span class="n">SharedMeta</span><span class="p">]</span>
+    <span class="n">_pipelines</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;analyze&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;archive&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;mirror&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;setup&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pushdeployment&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;pushtocache&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;execute&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+
+    <span class="n">_spec_groups</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="s2">&quot;compilers&quot;</span><span class="p">,</span> <span class="s2">&quot;Compilers&quot;</span><span class="p">),</span>
+        <span class="p">(</span><span class="s2">&quot;software_specs&quot;</span><span class="p">,</span> <span class="s2">&quot;Software Specs&quot;</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="n">_spec_prefix</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+    <span class="n">package_manager_class</span> <span class="o">=</span> <span class="s2">&quot;PackageManagerBase&quot;</span>
+
+    <span class="c1">#: Lists of strings which contains GitHub usernames of attributes.</span>
+    <span class="c1">#: Do not include @ here in order not to unnecessarily ping the users.</span>
+    <span class="n">maintainers</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">file_path</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+
+        <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">class_attributes</span><span class="o">.</span><span class="n">convert_class_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span> <span class="o">=</span> <span class="n">file_path</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="s2">&quot;short&quot;</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">runner</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_inst</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">directives</span><span class="o">.</span><span class="n">define_directive_methods</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="PackageManagerBase.copy">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.copy">[docs]</a>
+    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Deep copy a package manager instance&quot;&quot;&quot;</span>
+        <span class="n">new_copy</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">)</span>
+        <span class="n">new_copy</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span>
+
+        <span class="k">return</span> <span class="n">new_copy</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.environment_required">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.environment_required">[docs]</a>
+    <span class="k">def</span> <span class="nf">environment_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">app_inst</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_inst</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">app_inst</span><span class="p">,</span> <span class="s2">&quot;software_specs&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">software_specs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">fnmatch</span><span class="o">.</span><span class="n">fnmatch</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="s2">&quot;package_manager&quot;</span><span class="p">]):</span>
+                    <span class="k">return</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.get_spec_str">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.get_spec_str">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_spec_str</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pkg</span><span class="p">,</span> <span class="n">all_pkgs</span><span class="p">,</span> <span class="n">compiler</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return a spec string for the given pkg</span>
+
+<span class="sd">        Can be overridden by individual package managers to provide a more</span>
+<span class="sd">        specific package spec string. Default is to just return the detected</span>
+<span class="sd">        package spec.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pkg (RenderedPackage): Reference to a rendered package</span>
+<span class="sd">            all_pkgs (dict): All related packages</span>
+<span class="sd">            compiler (boolean): True if this pkg is used as a compiler</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">pkg</span><span class="o">.</span><span class="n">spec</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.spec_prefix">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.spec_prefix">[docs]</a>
+    <span class="k">def</span> <span class="nf">spec_prefix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return this package manager&#39;s spec prefix</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            self._spec_prefix (str): Prefix for this package manager&#39;s specs</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">prefix</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_prefix</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="k">return</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">spack_module_to_python_module</span><span class="p">(</span><span class="n">prefix</span><span class="p">)</span></div>
+
+
+    <span class="k">def</span> <span class="nf">_long_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">out_str</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Package Manager: &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">simplified_name</span> <span class="o">=</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">spack_module_to_python_module</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+        <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Spec prefix: &quot;</span><span class="p">)</span> <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">simplified_name</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Description:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">:</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">None</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;tags&quot;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Tags:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">colified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tags</span><span class="p">,</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;builtins&quot;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Builtin Executables:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">colified</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">builtins</span><span class="o">.</span><span class="n">keys</span><span class="p">(),</span> <span class="n">tty</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;package_manager_configs&quot;</span><span class="p">):</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;Package Manager Configs:</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">config</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager_configs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\t</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">config</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">group</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_groups</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">section_title</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">group</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">info</span> <span class="ow">in</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">group</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rucolor</span><span class="o">.</span><span class="n">nested_1</span><span class="p">(</span><span class="s2">&quot;  </span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">name</span><span class="p">))</span>
+                    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_spec_keys</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">info</span> <span class="ow">and</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]:</span>
+                            <span class="n">out_str</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;    </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">info</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;@&quot;</span><span class="p">,</span> <span class="s2">&quot;@@&quot;</span><span class="p">)))</span>
+
+        <span class="k">return</span> <span class="n">out_str</span>
+
+    <span class="k">def</span> <span class="nf">_short_print</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">==</span> <span class="s2">&quot;long&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_long_print</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">_verbosity</span> <span class="o">==</span> <span class="s2">&quot;short&quot;</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_short_print</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+<div class="viewcode-block" id="PackageManagerBase.format_doc">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.format_doc">[docs]</a>
+    <span class="k">def</span> <span class="nf">format_doc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Wrap doc string at 72 characters and format nicely&quot;&quot;&quot;</span>
+        <span class="n">indent</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;indent&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">doc</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\s+&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="vm">__doc__</span><span class="p">)</span>
+        <span class="n">lines</span> <span class="o">=</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="mi">72</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">six</span><span class="o">.</span><span class="n">StringIO</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">write</span><span class="p">((</span><span class="s2">&quot; &quot;</span> <span class="o">*</span> <span class="n">indent</span><span class="p">)</span> <span class="o">+</span> <span class="n">line</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.all_pipeline_phases">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.all_pipeline_phases">[docs]</a>
+    <span class="k">def</span> <span class="nf">all_pipeline_phases</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pipeline</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Iterator over all phases wtihin a specified pipeline</span>
+
+<span class="sd">        Iterate over all phases (and their graph nodes) within a pipeline.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pipeline (str): Name of pipeline to extract phases for</span>
+
+<span class="sd">        Yields:</span>
+<span class="sd">            phase_name (str): Name of phase</span>
+<span class="sd">            phase_note (GraphNode): Object representing a node in the phase graph</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">pipeline</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">phase_name</span><span class="p">,</span> <span class="n">phase_node</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phase_definitions</span><span class="p">[</span><span class="n">pipeline</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">phase_name</span><span class="p">,</span> <span class="n">phase_node</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.set_application">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.set_application">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_application</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">app_inst</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add an internal reference to the application instance this package</span>
+<span class="sd">        manager instance is attached to.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            app_inst (ApplicationBase): The experiment this package</span>
+<span class="sd">                                        manager will act on.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">app_inst</span> <span class="o">=</span> <span class="n">app_inst</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span> <span class="o">=</span> <span class="n">app_inst</span><span class="o">.</span><span class="n">keywords</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.build_used_variables">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.build_used_variables">[docs]</a>
+    <span class="k">def</span> <span class="nf">build_used_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build a set of all used variables</span>
+
+<span class="sd">        By expanding all necessary portions of this experiment (required /</span>
+<span class="sd">        reserved keywords, templates, commands, etc...), determine which</span>
+<span class="sd">        variables are used throughout the experiment definition.</span>
+
+<span class="sd">        Variables can have list definitions. These are iterated over to ensure</span>
+<span class="sd">        variables referenced by any of them are tracked properly.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            workspace (Workspace): Workspace to extract templates from</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            (set): All variable names used by this experiment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">app_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var_name</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">env_name</span><span class="p">)</span>
+
+        <span class="n">software_environments</span> <span class="o">=</span> <span class="n">workspace</span><span class="o">.</span><span class="n">software_environments</span>
+        <span class="n">software_environments</span><span class="o">.</span><span class="n">render_environment</span><span class="p">(</span>
+            <span class="n">app_context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="p">,</span> <span class="bp">self</span><span class="p">,</span> <span class="n">require</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">app_inst</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">_used_variables</span></div>
+
+
+<div class="viewcode-block" id="PackageManagerBase.populate_inventory">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerBase.populate_inventory">[docs]</a>
+    <span class="k">def</span> <span class="nf">populate_inventory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">workspace</span><span class="p">,</span> <span class="n">force_compute</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">require_exist</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Stub class method for populating an experiment inventory.</span>
+<span class="sd">        Specific package managers should implement this to convey inventory</span>
+<span class="sd">        information to the workspace / experiment.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            workspace (Workspace): Reference to the workspace that is currently</span>
+<span class="sd">                                   being acted on.</span>
+<span class="sd">            force_compute (boolean): Whether to force computation of hashes or not</span>
+<span class="sd">            require_exist (boolean): Whether to require environment hashes exist or not.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">pass</span></div>
+</div>
+
+
+
+<div class="viewcode-block" id="PackageManagerError">
+<a class="viewcode-back" href="../../ramble.html#ramble.package_manager.PackageManagerError">[docs]</a>
+<span class="k">class</span> <span class="nc">PackageManagerError</span><span class="p">(</span><span class="n">RambleError</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception that is raised by package managers</span>
+<span class="sd">    &quot;&quot;&quot;</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jul 01, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

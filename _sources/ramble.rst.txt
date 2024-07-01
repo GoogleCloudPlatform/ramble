@@ -17,6 +17,7 @@ Subpackages
    ramble.experimental
    ramble.language
    ramble.modifier_types
+   ramble.package_manager_types
    ramble.schema
    ramble.test
    ramble.util
@@ -161,6 +162,14 @@ ramble.namespace module
    :undoc-members:
    :show-inheritance:
 
+ramble.package\_manager module
+------------------------------
+
+.. automodule:: ramble.package_manager
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.paths module
 -------------------
 
@@ -173,6 +182,14 @@ ramble.pipeline module
 ----------------------
 
 .. automodule:: ramble.pipeline
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+ramble.pkgmankit module
+-----------------------
+
+.. automodule:: ramble.pkgmankit
    :members:
    :undoc-members:
    :show-inheritance:
@@ -205,14 +222,6 @@ ramble.software\_environments module
 ------------------------------------
 
 .. automodule:: ramble.software_environments
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ramble.spack\_runner module
----------------------------
-
-.. automodule:: ramble.spack_runner
    :members:
    :undoc-members:
    :show-inheritance:

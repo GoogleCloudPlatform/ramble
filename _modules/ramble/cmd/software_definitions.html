@@ -123,9 +123,9 @@
 <span class="n">definitions</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">conflicts</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="n">used_by</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+<span class="n">specs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">:</span> <span class="p">{},</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">:</span> <span class="p">{}}</span>
 <span class="n">spec_headers</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s2">&quot;spack_spec&quot;</span><span class="p">:</span> <span class="s2">&quot;Software Packages&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pkg_spec&quot;</span><span class="p">:</span> <span class="s2">&quot;Software Packages&quot;</span><span class="p">,</span>
     <span class="s2">&quot;compiler_spec&quot;</span><span class="p">:</span> <span class="s2">&quot;Compiler Definitions&quot;</span><span class="p">,</span>
 <span class="p">}</span>
 
@@ -239,7 +239,7 @@
 
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">nested_1</span><span class="p">(</span><span class="s2">&quot;Package&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">pkg_name</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
             <span class="n">color</span><span class="o">.</span><span class="n">cprint</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">Defined as:&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;spack_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
+            <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pkg_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler_spec&quot;</span><span class="p">,</span> <span class="s2">&quot;compiler&quot;</span><span class="p">]:</span>
                 <span class="k">if</span> <span class="n">attr</span> <span class="ow">in</span> <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">]:</span>
                     <span class="n">attr_def</span> <span class="o">=</span> <span class="n">definitions</span><span class="p">[</span><span class="n">pkg_name</span><span class="p">][</span><span class="n">attr</span><span class="p">]</span>
                     <span class="k">if</span> <span class="n">attr_def</span><span class="p">:</span>

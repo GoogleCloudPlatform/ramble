@@ -356,9 +356,7 @@
 
 <div class="viewcode-block" id="setup_list_parser">
 <a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.setup_list_parser">[docs]</a>
-<span class="k">def</span> <span class="nf">setup_list_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
-    <span class="n">object_def</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">type_definitions</span><span class="p">[</span><span class="n">object_type</span><span class="p">]</span>
-
+<span class="k">def</span> <span class="nf">setup_list_parser</span><span class="p">(</span><span class="n">subparser</span><span class="p">):</span>
     <span class="n">subparser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;filter&quot;</span><span class="p">,</span>
         <span class="n">nargs</span><span class="o">=</span><span class="n">argparse</span><span class="o">.</span><span class="n">REMAINDER</span><span class="p">,</span>
@@ -382,18 +380,20 @@
         <span class="n">metavar</span><span class="o">=</span><span class="s2">&quot;FILE&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store&quot;</span><span class="p">,</span>
-        <span class="n">help</span><span class="o">=</span><span class="sa">f</span><span class="s1">&#39;write output to the specified file, if any </span><span class="si">{</span><span class="n">object_def</span><span class="p">[</span><span class="s2">&quot;singular&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1"> is newer&#39;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;write output to the specified file, if any object is newer&quot;</span><span class="p">,</span>
     <span class="p">)</span>
 
-    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">])</span></div>
+    <span class="n">arguments</span><span class="o">.</span><span class="n">add_common_arguments</span><span class="p">(</span><span class="n">subparser</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;tags&quot;</span><span class="p">,</span> <span class="s2">&quot;obj_type&quot;</span><span class="p">])</span></div>
 
 
 
 <div class="viewcode-block" id="perform_list">
 <a class="viewcode-back" href="../../../../ramble.cmd.common.html#ramble.cmd.common.list.perform_list">[docs]</a>
-<span class="k">def</span> <span class="nf">perform_list</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">object_type</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">perform_list</span><span class="p">(</span><span class="n">args</span><span class="p">):</span>
     <span class="c1"># retrieve the formatter to use from args</span>
     <span class="n">formatter</span> <span class="o">=</span> <span class="n">formatters</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">format</span><span class="p">]</span>
+
+    <span class="n">object_type</span> <span class="o">=</span> <span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">ObjectTypes</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">type</span><span class="p">]</span>
 
     <span class="c1"># Retrieve the names of all the objects</span>
     <span class="n">objs</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">repository</span><span class="o">.</span><span class="n">all_object_names</span><span class="p">(</span><span class="n">object_type</span><span class="p">))</span>
