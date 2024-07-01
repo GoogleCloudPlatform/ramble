@@ -16,6 +16,20 @@ class SuccessCriteria(BasicModifier):
 
     mode("test", description="This is a test mode")
 
+    figure_of_merit(
+        "experiment status",
+        fom_regex=r".*Experiment status:\s+(?P<status>[\S_]+)\s*",
+        group_name="status",
+        units="",
+    )
+
+    success_criteria(
+        "success_criteria_status_check",
+        mode="fom_comparison",
+        fom_name="experiment status",
+        formula="'{value}' == 'SUCCESS'",
+    )
+
     success_criteria(
         "status",
         mode="string",

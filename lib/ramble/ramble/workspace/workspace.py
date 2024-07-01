@@ -103,6 +103,7 @@ auxiliary_software_dir_name = "auxiliary_software_files"
 config_schema = ramble.schema.workspace.schema
 config_section = "workspace"
 config_file_name = "ramble.yaml"
+licenses_file_name = "licenses.yaml"
 
 
 def default_config_yaml():
@@ -300,7 +301,7 @@ def root(name):
 
 
 def license_path(name):
-    """Get the root directory for a workspace by name."""
+    """Get the path to the shared license include for a workspace by name."""
     shared_license_path = os.path.join(workspace_shared_path, workspace_shared_license_path)
     os.path.join(root(name), shared_license_path)
     return _root(name)
@@ -318,11 +319,20 @@ def active(name):
     return _active_workspace and name == _active_workspace.name
 
 
+def get_yaml_filepath(path, file_name):
+    if is_workspace_dir(path):
+        return os.path.join(path, workspace_config_path, file_name)
+    return None
+
+
 def config_file(path):
     """Returns the path to a workspace's ramble.yaml"""
-    if is_workspace_dir(path):
-        return os.path.join(path, workspace_config_path, config_file_name)
-    return None
+    return get_yaml_filepath(path, config_file_name)
+
+
+def licenses_file(path):
+    """Returns the path to a workspace's licenses.yaml"""
+    return get_yaml_filepath(path, licenses_file_name)
 
 
 def template_path(ws_path, requested_template_name):
@@ -1033,7 +1043,7 @@ class Workspace(object):
 
         os.symlink(out_file, latest_file)
 
-    def dump_results(self, output_formats=["text"]):
+    def dump_results(self, output_formats=["text"], print_results=False):
         """
         Write out result file in desired format
 
@@ -1130,11 +1140,10 @@ class Workspace(object):
         for out_file in results_written:
             logger.all_msg(f"  {out_file}")
 
-        # Debug print the first written result file.
-        # Directly use tty to avoid cluttering the analyze log.
-        if ramble.config.get("config:debug"):
+        if print_results:
             with open(results_written[0], "r") as f:
-                tty.debug(f"Results from the analysis pipeline:\n{f.read()}")
+                # Use tty directly to avoid cluttering the analyze log
+                tty.msg(f"Results from the analysis pipeline:\n{f.read()}")
 
         return filename_base
 

@@ -391,6 +391,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
+            self.build_modifier_instances()
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -829,26 +830,29 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 mod_inst.set_on_executables(None)
 
             if "mode" in mod:
-                mod_inst.set_usage_mode(mod["mode"])
+                mode_name = self.expander.expand_var(mod["mode"])
+                mod_inst.set_usage_mode(mode_name)
             else:
                 mod_inst.set_usage_mode(None)
 
             mod_inst.inherit_from_application(self)
+            mod_inst.modify_experiment(self)
 
             self._modifier_instances.append(mod_inst)
 
             # Add this modifiers required variables for validation
             self.keywords.update_keys(mod_inst.required_vars)
 
-        # Validate the new modifiers variables exist
-        # (note: the base ramble variables are checked earlier too)
-        self.keywords.check_required_keys(self.variables)
-
         # Ensure no expand vars are set correctly for modifiers
         for mod_inst in self._modifier_instances:
             for var in mod_inst.no_expand_vars():
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
+
+    def validate_experiment(self):
+        # Validate the new modifiers variables exist
+        # (note: the base ramble variables are checked earlier too)
+        self.keywords.check_required_keys(self.variables)
 
     def define_modifier_variables(self):
         """Extract default variable definitions from modifier instances"""
@@ -1913,6 +1917,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         conf["mode"],
                         re.compile(self.expander.expand_var(conf["match"])),
                         conf["file"],
+                    )
+                elif conf["mode"] == "fom_comparison":
+                    criteria_list.add_criteria(
+                        success_scope,
+                        criteria,
+                        conf["mode"],
+                        fom_name=conf["fom_name"],
+                        fom_context=conf["fom_context"],
+                        formula=conf["formula"],
                     )
 
         criteria_list.add_criteria(

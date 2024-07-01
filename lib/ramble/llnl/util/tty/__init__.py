@@ -292,6 +292,7 @@ def get_number(prompt, **kwargs):
     number = None
     while number is None:
         msg(prompt, newline=False)
+        ans = input()
         if ans == str(abort):
             return None
 

@@ -502,6 +502,14 @@ def workspace_analyze_setup_parser(subparser):
         help="perform a dry run. Allows progress on workspaces which are not fully setup",
     )
 
+    subparser.add_argument(
+        "-p",
+        "--print-results",
+        dest="print_results",
+        action="store_true",
+        help="print out the analysis result",
+    )
+
     arguments.add_common_arguments(
         subparser,
         ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
@@ -527,7 +535,13 @@ def workspace_analyze(args):
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     logger.debug("Analyzing workspace")
-    pipeline = pipeline_cls(ws, filters, output_formats=args.output_formats, upload=args.upload)
+    pipeline = pipeline_cls(
+        ws,
+        filters,
+        output_formats=args.output_formats,
+        upload=args.upload,
+        print_results=args.print_results,
+    )
 
     with ws.write_transaction():
         workspace_run_pipeline(args, pipeline)
@@ -806,6 +820,15 @@ def workspace_edit_setup_parser(subparser):
     )
 
     subparser.add_argument(
+        "-l",
+        "--license_only",
+        dest="license_only",
+        action="store_true",
+        help="Only open license config files",
+        required=False,
+    )
+
+    subparser.add_argument(
         "-p", "--print-file", action="store_true", help="print the file name that would be edited"
     )
 
@@ -828,6 +851,9 @@ def workspace_edit(args):
         edit_files = [config_file]
     elif args.template_only:
         edit_files = template_files
+    elif args.license_only:
+        licenses_file = [ramble.workspace.licenses_file(ramble_ws)]
+        edit_files = licenses_file
 
     if args.print_file:
         for f in edit_files:

@@ -275,39 +275,9 @@ class ExperimentSet(object):
 
         expander = ramble.expander.Expander(variables, self)
         self._compute_mpi_vars(expander, variables)
+
         final_app_name = expander.expand_var_name(
             self.keywords.application_name, allow_passthrough=False
-        )
-        final_wl_name = expander.expand_var_name(
-            self.keywords.workload_name, allow_passthrough=False
-        )
-        final_exp_name = expander.expand_var(
-            exp_template_name + experiment_suffix, allow_passthrough=False
-        )
-
-        variables[self.keywords.experiment_template_name] = exp_template_name + experiment_suffix
-        variables[self.keywords.application_name] = final_app_name
-        variables[self.keywords.workload_name] = final_wl_name
-        variables[self.keywords.experiment_name] = final_exp_name
-        variables[self.keywords.experiment_index] = len(self.experiments) + 1
-
-        experiment_namespace = expander.experiment_namespace
-        variables[self.keywords.experiment_namespace] = experiment_namespace
-
-        variables[self.keywords.log_file] = os.path.join(
-            "{experiment_run_dir}", "{experiment_name}.out"
-        )
-
-        variables[self.keywords.simplified_application_namespace] = (
-            spack.util.naming.simplify_name(
-                expander.expand_var_name(self.keywords.application_namespace)
-            )
-        )
-        variables[self.keywords.simplified_workload_namespace] = spack.util.naming.simplify_name(
-            expander.expand_var_name(self.keywords.workload_namespace)
-        )
-        variables[self.keywords.simplified_experiment_namespace] = spack.util.naming.simplify_name(
-            expander.expand_var_name(self.keywords.experiment_namespace)
         )
 
         app_inst = ramble.repository.get(final_app_name).copy()
@@ -321,7 +291,57 @@ class ExperimentSet(object):
         app_inst.set_modifiers(context.modifiers)
         app_inst.set_tags(context.tags)
         app_inst.set_formatted_executables(context.formatted_executables)
+
+        final_wl_name = expander.expand_var_name(
+            self.keywords.workload_name, allow_passthrough=False
+        )
+        final_exp_name = expander.expand_var(
+            exp_template_name + experiment_suffix, allow_passthrough=False
+        )
+
+        app_inst.define_variable(
+            self.keywords.experiment_template_name, exp_template_name + experiment_suffix
+        )
+        app_inst.define_variable(self.keywords.application_name, final_app_name)
+        app_inst.define_variable(self.keywords.workload_name, final_wl_name)
+        app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
+
+        app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
+
+        experiment_namespace = expander.experiment_namespace
+        app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
+
+        app_inst.define_variable(
+            self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
+        )
+
+        app_inst.define_variable(
+            self.keywords.simplified_application_namespace,
+            (
+                spack.util.naming.simplify_name(
+                    expander.expand_var_name(self.keywords.application_namespace)
+                )
+            ),
+        )
+        app_inst.define_variable(
+            self.keywords.simplified_workload_namespace,
+            spack.util.naming.simplify_name(
+                expander.expand_var_name(self.keywords.workload_namespace)
+            ),
+        )
+        app_inst.define_variable(
+            self.keywords.simplified_experiment_namespace,
+            spack.util.naming.simplify_name(
+                expander.expand_var_name(self.keywords.experiment_namespace)
+            ),
+        )
+
         app_inst.read_status()
+
+        try:
+            app_inst.validate_experiment()
+        except ramble.keywords.RambleKeywordError as e:
+            raise RambleVariableDefinitionError(e)
 
         return app_inst
 

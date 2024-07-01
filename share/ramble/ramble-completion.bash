@@ -673,7 +673,7 @@ _ramble_workspace_setup() {
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload --always-print-foms --dry-run -p --print-results --phases --include-phase-dependencies --where --exclude-where --filter-tags"
 }
 
 _ramble_workspace_push_to_cache() {
@@ -685,7 +685,7 @@ _ramble_workspace_info() {
 }
 
 _ramble_workspace_edit() {
-    RAMBLE_COMPREPLY="-h --help -c --config_only -t --template_only -p --print-file"
+    RAMBLE_COMPREPLY="-h --help -c --config_only -t --template_only -l --license_only -p --print-file"
 }
 
 _ramble_workspace_mirror() {
