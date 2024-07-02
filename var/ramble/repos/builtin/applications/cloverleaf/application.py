@@ -51,7 +51,7 @@ class Cloverleaf(ExecutableApplication):
     executable(
         "get_input",
         template=[
-            "cp {cloverleaf}/doc/tests/clover_{workload_name}.in {experiment_run_dir}/clover.in"
+            "cp {cloverleaf_path}/doc/tests/clover_{workload_name}.in {experiment_run_dir}/clover.in"
         ],
         use_mpi=False,
     )
@@ -59,7 +59,7 @@ class Cloverleaf(ExecutableApplication):
     executable(
         "get_default_input",
         template=[
-            "cp {cloverleaf}/doc/tests/clover.in {experiment_run_dir}/clover.in"
+            "cp {cloverleaf_path}/doc/tests/clover.in {experiment_run_dir}/clover.in"
         ],
         use_mpi=False,
     )

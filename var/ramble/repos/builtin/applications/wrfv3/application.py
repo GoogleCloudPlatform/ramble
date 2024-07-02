@@ -59,7 +59,7 @@ class Wrfv3(ExecutableApplication):
         "copy",
         template=[
             "cp -R {input_path}/* {experiment_run_dir}/.",
-            "ln -s {wrf}/run/* {experiment_run_dir}/.",
+            "ln -s {wrf_path}/run/* {experiment_run_dir}/.",
         ],
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,

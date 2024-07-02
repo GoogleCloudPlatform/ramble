@@ -98,7 +98,7 @@ class Lammps(ExecutableApplication):
         use_mpi=False,
     )
 
-    exec_path = os.path.join("{lammps}", "bin", "lmp")
+    exec_path = os.path.join("{lammps_path}", "bin", "lmp")
     executable(
         "execute",
         f"{exec_path}" + " -i input.txt {lammps_flags}",

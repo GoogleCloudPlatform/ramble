@@ -62,7 +62,7 @@ class Ior(ExecutableApplication):
         template="ior -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations}",
         use_mpi=True,
     )
-    executable(name="ior-shared", template="{ior} -F", use_mpi=True)
+    executable(name="ior-shared", template="{ior_path} -F", use_mpi=True)
 
     # FOMS
     # Match per iteration output in the format:
