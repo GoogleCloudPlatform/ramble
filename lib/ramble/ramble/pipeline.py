@@ -302,8 +302,6 @@ class ArchivePipeline(Pipeline):
             )
 
     def _prepare(self):
-        import glob
-
         super()._construct_hash()
         super()._prepare()
 
@@ -334,18 +332,6 @@ class ArchivePipeline(Pipeline):
             self.workspace.latest_archive_path, ramble.workspace.workspace_config_path
         )
         _copy_tree(self.workspace.config_dir, archive_configs)
-
-        # Copy current software spack files
-        file_names = ["spack.yaml", "spack.lock"]
-        archive_software = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_software_path
-        )
-        fs.mkdirp(archive_software)
-        for file_name in file_names:
-            for file in glob.glob(os.path.join(self.workspace.software_dir, "*", file_name)):
-                dest = file.replace(self.workspace.software_dir, archive_software)
-                fs.mkdirp(os.path.dirname(dest))
-                shutil.copyfile(file, dest)
 
         # Copy shared files
         archive_shared = os.path.join(

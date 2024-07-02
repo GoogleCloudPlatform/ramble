@@ -25,6 +25,9 @@ class Spack(SpackLightweight):
 
     name = "spack"
 
+    archive_pattern("{env_path}/spack.yaml")
+    archive_pattern("{env_path}/spack.lock")
+
     register_phase(
         "software_install",
         pipeline="setup",
