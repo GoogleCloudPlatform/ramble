@@ -163,8 +163,8 @@
     <span class="k">if</span> <span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;csh&quot;</span><span class="p">:</span>
         <span class="n">cmds</span> <span class="o">+=</span> <span class="s2">&quot;unsetenv </span><span class="si">%s</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">ramble_workspace_var</span><span class="p">)</span>
         <span class="n">cmds</span> <span class="o">+=</span> <span class="s2">&quot;if ( $?RAMBLE_OLD_PROMPT ) &quot;</span>
-        <span class="n">cmds</span> <span class="o">+=</span> <span class="s1">&#39;set prompt=&quot;$RAMBLE_OLD_PROMPT&quot; &amp;&amp; &#39;</span>
-        <span class="n">cmds</span> <span class="o">+=</span> <span class="s2">&quot;unsetenv RAMBLE_OLD_PROMPT;</span><span class="se">\n</span><span class="s2">&quot;</span>
+        <span class="n">cmds</span> <span class="o">+=</span> <span class="s1">&#39;    eval </span><span class="se">\&#39;</span><span class="s1">set prompt=&quot;$RAMBLE_OLD_PROMPT&quot; &amp;&amp;&#39;</span>
+        <span class="n">cmds</span> <span class="o">+=</span> <span class="s2">&quot;        unsetenv RAMBLE_OLD_PROMPT&#39;;</span><span class="se">\n</span><span class="s2">&quot;</span>
     <span class="k">elif</span> <span class="n">shell</span> <span class="o">==</span> <span class="s2">&quot;fish&quot;</span><span class="p">:</span>
         <span class="n">cmds</span> <span class="o">+=</span> <span class="s2">&quot;set -e </span><span class="si">%s</span><span class="s2">;</span><span class="se">\n</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ramble</span><span class="o">.</span><span class="n">workspace</span><span class="o">.</span><span class="n">ramble_workspace_var</span><span class="p">)</span>
         <span class="c1">#</span>
@@ -264,7 +264,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 01, 2024.
+      <span class="lastupdated">Last updated on Jul 02, 2024.
       </span></p>
   </div>
 
