@@ -41,7 +41,7 @@ class IntelHpl(ExecutableApplication):
 
     executable(
         "execute",
-        "{intel-oneapi-mkl}/mkl/latest/benchmarks/mp_linpack/xhpl_intel64_dynamic",
+        "{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack/xhpl_intel64_dynamic",
         use_mpi=True,
     )
 

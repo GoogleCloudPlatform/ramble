@@ -53,7 +53,7 @@ class Minixyce(ExecutableApplication):
     executable(
         "get_simple_network",
         template=[
-            "cp {minixyce}/doc/tests/{workload_name}.net {experiment_run_dir}/{workload_name}.net"
+            "cp {minixyce_path}/doc/tests/{workload_name}.net {experiment_run_dir}/{workload_name}.net"
         ],
         use_mpi=False,
     )
@@ -61,7 +61,7 @@ class Minixyce(ExecutableApplication):
     executable(
         "generate_RC_ladder",
         template=[
-            "perl {minixyce}/doc/tests/RC_ladder.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
+            "perl {minixyce_path}/doc/tests/RC_ladder.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
         ],
         use_mpi=False,
     )
@@ -69,7 +69,7 @@ class Minixyce(ExecutableApplication):
     executable(
         "generate_RLC_ladder",
         template=[
-            "perl {minixyce}/doc/tests/RLC_ladder.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
+            "perl {minixyce_path}/doc/tests/RLC_ladder.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
         ],
         use_mpi=False,
     )
@@ -77,7 +77,7 @@ class Minixyce(ExecutableApplication):
     executable(
         "generate_RC_ladder2",
         template=[
-            "perl {minixyce}/doc/tests/RC_ladder2.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
+            "perl {minixyce_path}/doc/tests/RC_ladder2.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
         ],
         use_mpi=False,
     )
@@ -85,7 +85,7 @@ class Minixyce(ExecutableApplication):
     executable(
         "generate_RLC_ladder2",
         template=[
-            "perl {minixyce}/doc/tests/RLC_ladder2.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
+            "perl {minixyce_path}/doc/tests/RLC_ladder2.pl {num_ladder_stages} > {experiment_run_dir}/{workload_name}.net; echo Running perl"
         ],
         use_mpi=False,
     )

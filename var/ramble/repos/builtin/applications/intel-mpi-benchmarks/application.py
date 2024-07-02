@@ -95,7 +95,7 @@ class IntelMpiBenchmarks(ExecutableApplication):
     # from intel-mpi-benchmarks by default
     workload_variable(
         "install_path",
-        default="{intel-mpi-benchmarks}/bin",
+        default="{intel-mpi-benchmarks_path}/bin",
         description="User configurable dir to executables",
         workloads=["pingpong", "multi-pingpong", "collective"],
     )
