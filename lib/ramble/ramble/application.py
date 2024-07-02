@@ -1488,6 +1488,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         # Copy all archive patterns
         archive_patterns = set(self.archive_patterns.keys())
+        if self.package_manager:
+            for pattern in self.package_manager.archive_patterns.keys():
+                archive_patterns.add(pattern)
+
         for mod in self._modifier_instances:
             for pattern in mod.archive_patterns.keys():
                 archive_patterns.add(pattern)
@@ -1495,7 +1499,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         for pattern in archive_patterns:
             exp_pattern = self.expander.expand_var(pattern)
             for file in glob.glob(exp_pattern):
-                shutil.copy(file, archive_experiment_dir)
+                dest_dir = os.path.dirname(file.replace(workspace.root, ws_archive_dir))
+                fs.mkdirp(dest_dir)
+                shutil.copy(file, dest_dir)
 
         for file_name in [self._inventory_file_name, self._status_file_name]:
             file = os.path.join(experiment_run_dir, file_name)
