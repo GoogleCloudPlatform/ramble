@@ -98,6 +98,19 @@ case workspace:
                     eval `\ramble $_rmb_flags workspace deactivate --csh`
                 endif
                 breaksw
+            case create:
+                echo $_rmb_args
+                if ( "$_rmb_args" =~ *" -a"* || \
+                     "$_rmb_args" =~ *" --activate"* ) then
+                    # Args contain activate flag
+                    set _activate_cmd = `\ramble $_rmb_flags workspace $_rmb_args`
+                    eval $_activate_cmd
+                    set _ws = `echo $_activate_cmd | awk '{print $NF}'`
+                    echo "==> Created and activated workspace in $_ws"
+                else
+                    \ramble $_rmb_flags workspace $_rmb_args
+                endif
+                breaksw
             default:
                 \ramble $_rmb_flags workspace $_rmb_args
                 breaksw
