@@ -147,9 +147,21 @@ Supported math operators are:
 * ``-`` (subtraction)
 * ``*`` (multiplication)
 * ``/`` (division)
+* ``//`` (floor division)
 * ``**`` (exponent)
+* ``^`` (bitwise exclusive or)
+* ``-`` (unary subtraction)
+* ``==`` (equal)
+* ``!=`` (not equal)
+* ``>`` (greater than)
+* ``>=`` (greator or equal than)
+* ``<`` (less than)
+* ``<=`` (less or equal than)
+* ``and`` (logical and)
+* ``or`` (logical or)
+* ``%`` (modulo)
 
-Support functions are:
+Supported functions are:
 
 * ``str()`` (explicit string cast)
 * ``int()`` (explicit integer cast)
@@ -160,6 +172,8 @@ Support functions are:
 * ``floor()`` (floor of input)
 * ``range()`` (construct range, see :ref:`ramble vector logic<ramble-vector-logic>` for more information)
 * ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
+* ``randrange`` (from `random.randrange`)
+* ``randint`` (from `random.randint`)
 
 .. _ramble-escaped-variables:
 

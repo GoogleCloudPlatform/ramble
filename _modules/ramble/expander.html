@@ -118,6 +118,15 @@
 
 <span class="kn">import</span> <span class="nn">spack.util.naming</span>
 
+
+<span class="k">def</span> <span class="nf">_and</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="ow">and</span> <span class="n">b</span>
+
+
+<span class="k">def</span> <span class="nf">_or</span><span class="p">(</span><span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">a</span> <span class="ow">or</span> <span class="n">b</span>
+
+
 <span class="n">supported_math_operators</span> <span class="o">=</span> <span class="p">{</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">Add</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">add</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">Sub</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">sub</span><span class="p">,</span>
@@ -133,8 +142,8 @@
     <span class="n">ast</span><span class="o">.</span><span class="n">GtE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">ge</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">Lt</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">lt</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">LtE</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">le</span><span class="p">,</span>
-    <span class="n">ast</span><span class="o">.</span><span class="n">And</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">and_</span><span class="p">,</span>
-    <span class="n">ast</span><span class="o">.</span><span class="n">Or</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">or_</span><span class="p">,</span>
+    <span class="n">ast</span><span class="o">.</span><span class="n">And</span><span class="p">:</span> <span class="n">_and</span><span class="p">,</span>
+    <span class="n">ast</span><span class="o">.</span><span class="n">Or</span><span class="p">:</span> <span class="n">_or</span><span class="p">,</span>
     <span class="n">ast</span><span class="o">.</span><span class="n">Mod</span><span class="p">:</span> <span class="n">operator</span><span class="o">.</span><span class="n">mod</span><span class="p">,</span>
 <span class="p">}</span>
 
@@ -150,6 +159,7 @@
     <span class="s2">&quot;randint&quot;</span><span class="p">:</span> <span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">,</span>
     <span class="s2">&quot;simplify_str&quot;</span><span class="p">:</span> <span class="n">spack</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">naming</span><span class="o">.</span><span class="n">simplify_name</span><span class="p">,</span>
 <span class="p">}</span>
+
 
 <span class="n">supported_list_function_pointers</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;range&quot;</span><span class="p">:</span> <span class="nb">range</span><span class="p">,</span>
