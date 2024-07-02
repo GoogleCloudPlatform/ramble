@@ -8,6 +8,8 @@
 
 import copy
 import itertools
+import os
+import re
 
 import pandas as pd
 import plotly.express as px
@@ -15,12 +17,11 @@ import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
 
-import ramble.experimental.uploader
+import ramble.cmd.results
 import ramble.cmd.workspace
 import ramble.pipeline
 import ramble.filters
 from  ramble.util.logger import logger
-
 
 
 def is_numeric(series):
@@ -31,6 +32,41 @@ def is_numeric(series):
         return True
     except (ValueError, TypeError):
         return False
+
+
+def load_results(args):
+    """Loads results from a file or workspace to use for reports.
+
+    Check for results in this order:
+        1. via ``ramble results report -f FILENAME``
+        2. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` or 
+        ``ramble results report --workspace WRKSPC``(arguments)
+        3. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+    """
+    results_dict = {}
+
+    if args.file:
+        results_dict = ramble.cmd.results.import_results_file(args.file)
+        print(results_dict)
+    else:
+        ramble_ws = ramble.cmd.find_workspace_path(args)
+
+        if not ramble_ws:
+            logger.die("ramble results report requires either a results filename, "
+                       "a command line workspace, or an active workspace")
+
+        logger.debug("Looking for workspace results file...")
+        json_results_path = os.path.join(ramble_ws, "results.latest.json")
+        yaml_results_path = os.path.join(ramble_ws, "results.latest.yaml")
+        if os.path.exists(json_results_path):
+            logger.debug(f"Importing {json_results_path}")
+            results_dict = ramble.cmd.results.import_results_file(json_results_path)
+        elif os.path.exists(yaml_results_path):
+            logger.debug(f"Importing {yaml_results_path}")
+            results_dict = ramble.cmd.results.import_results_file(yaml_results_path)
+        else:
+            logger.die("No JSON or YAML results file was found. Please run "
+                       "'ramble workspace analyze -f json'.")
 
 
 def prepare_data(results: dict) -> pd.DataFrame:
@@ -59,24 +95,21 @@ def prepare_data(results: dict) -> pd.DataFrame:
                     exp_copy.pop('RAMBLE_VARIABLES')
                     exp_copy.pop('RAMBLE_RAW_VARIABLES')
 
-                    # Ignore vars that aren't needed for analysis, mainly paths and commands
+                    # Exclude vars that aren't needed for analysis, mainly paths and commands
+                    dir_regex = r"_dir$"
+                    path_regex = r"_path$"
                     vars_to_ignore = [
-                        'log_dir',
                         'batch_submit',
-                        'application_run_dir',
-                        'application_input_dir',
-                        'workload_run_dir',
-                        'workload_input_dir',
-                        'license_input_dir',
-                        'experiment_run_dir',
-                        'env_path',
                         'log_file',
-                        'input_path',
                         'command',
                         'execute_experiment'
                     ]
                     for key, value in exp['RAMBLE_VARIABLES'].items():
                         if key in vars_to_ignore:
+                            continue
+                        if re.search(dir_regex, key):
+                            continue
+                        if re.search(path_regex, key):
                             continue
                         exp_copy[key] = value
 
@@ -93,12 +126,12 @@ def prepare_data(results: dict) -> pd.DataFrame:
         if is_numeric(results_df[col]):
             results_df.loc[:, col] = pd.to_numeric(results_df[col])
 
-    pd.DataFrame.to_json(results_df, 'results.json')
+    pd.DataFrame.to_json(results_df, 'prepare_data_results.json')
 
     return results_df
 
 
-def make_report(ws, args):
+def make_report(results_df, args):
     # analyze_pipeline = ramble.pipeline.pipelines.analyze
     # pipeline_cls = ramble.pipeline.pipeline_class(analyze_pipeline)
 
@@ -150,13 +183,13 @@ def make_report(ws, args):
 
             for series in perf_results['series'].unique():
                 fig, ax = plt.subplots()
-                
+
                 ax.plot(f'{scale_var}', 'fom_value', data=perf_results.query(f'series == "{series}"'), marker='o')
                 ax.set_xlabel(f'{scale_var}')
                 # ax.set_xticks(perf_results[f'{scale_var}'].unique())
                 ax.set_ylabel(f'{perf_measure}')
                 ax.set_title(f'Scaling Chart for {series}')
-                
+
                 # fig =  (perf_results.query(f'series == "{series}"'), x=f'{scale_var}', y='fom_value')
                     # fig.update_layout(title=f'Scaling Chart for {data["perf_name"]} vs {data["scale_name"]}',
                     #                     xaxis_title=data['scale_name'],
