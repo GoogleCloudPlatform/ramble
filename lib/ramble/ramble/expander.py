@@ -20,6 +20,15 @@ from ramble.util.logger import logger
 
 import spack.util.naming
 
+
+def _and(a, b):
+    return a and b
+
+
+def _or(a, b):
+    return a or b
+
+
 supported_math_operators = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
@@ -35,8 +44,8 @@ supported_math_operators = {
     ast.GtE: operator.ge,
     ast.Lt: operator.lt,
     ast.LtE: operator.le,
-    ast.And: operator.and_,
-    ast.Or: operator.or_,
+    ast.And: _and,
+    ast.Or: _or,
     ast.Mod: operator.mod,
 }
 
@@ -52,6 +61,7 @@ supported_scalar_function_pointers = {
     "randint": random.randint,
     "simplify_str": spack.util.naming.simplify_name,
 }
+
 
 supported_list_function_pointers = {
     "range": range,
