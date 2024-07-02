@@ -37,10 +37,20 @@ Now you can activate the workspace and view its default configuration.
 .. code-block:: console
 
     $ ramble workspace activate basic_gromacs
-    $ ramble workspace info
+
+Alternatively, the workspace creation and activation can be combined in one command
+with the activate flag (``-a``):
+
+.. code-block:: console
+
+    $ ramble workspace create basic_gromacs -a
 
 You can use the ``ramble workspace info`` command after editing configuration
 files to see how ramble would use the changes you made.
+
+.. code-block:: console
+
+    $ ramble workspace info
 
 Configure the Workspace
 ~~~~~~~~~~~~~~~~~~~~~~~
