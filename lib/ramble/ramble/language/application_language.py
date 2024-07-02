@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 import ramble.workload
 import ramble.language.language_base
 from ramble.language.language_base import DirectiveError
@@ -149,7 +150,7 @@ def input_file(
     name,
     url,
     description,
-    target_dir="{input_name}",
+    target_dir=os.path.join("{workload_input_dir}", "{input_name}"),
     sha256=None,
     extension=None,
     expand=True,
@@ -165,7 +166,8 @@ def input_file(
         url: Path to the input file / archive
         description: Description of this input file
         target_dir (Optional): The directory where the archive will be
-                               expanded. Defaults to 'input'
+                               expanded. Defaults to the '{workload_input_dir}'
+                               + os.sep + '{input_name}'
         sha256 (Optional): The expected sha256 checksum for the input file
         extension (Optional): The extension to use for the input, if it isn't part of the
                               file name.

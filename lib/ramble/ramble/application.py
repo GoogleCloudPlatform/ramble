@@ -1252,12 +1252,16 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     input_conf["fetcher"], os.path.join(self.name, input_file)
                 )
 
+                input_dir = os.path.dirname(input_path)
+                input_base = os.path.basename(input_path)
+
                 with ramble.stage.InputStage(
                     input_conf["fetcher"],
                     name=input_namespace,
-                    path=input_path,
+                    path=input_dir,
                     mirror_paths=mirror_paths,
                 ) as stage:
+                    stage.set_subdir(input_base)
                     stage.fetch()
                     if input_conf["fetcher"].digest:
                         stage.check()
