@@ -104,6 +104,7 @@
 <span class="c1"># option. This file may not be copied, modified, or distributed</span>
 <span class="c1"># except according to those terms.</span>
 
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">ramble.workload</span>
 <span class="kn">import</span> <span class="nn">ramble.language.language_base</span>
 <span class="kn">from</span> <span class="nn">ramble.language.language_base</span> <span class="kn">import</span> <span class="n">DirectiveError</span>
@@ -261,7 +262,7 @@
     <span class="n">name</span><span class="p">,</span>
     <span class="n">url</span><span class="p">,</span>
     <span class="n">description</span><span class="p">,</span>
-    <span class="n">target_dir</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">{input_name}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="n">target_dir</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{workload_input_dir}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{input_name}</span><span class="s2">&quot;</span><span class="p">),</span>
     <span class="n">sha256</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">extension</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
     <span class="n">expand</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -277,7 +278,8 @@
 <span class="sd">        url: Path to the input file / archive</span>
 <span class="sd">        description: Description of this input file</span>
 <span class="sd">        target_dir (Optional): The directory where the archive will be</span>
-<span class="sd">                               expanded. Defaults to &#39;input&#39;</span>
+<span class="sd">                               expanded. Defaults to the &#39;{workload_input_dir}&#39;</span>
+<span class="sd">                               + os.sep + &#39;{input_name}&#39;</span>
 <span class="sd">        sha256 (Optional): The expected sha256 checksum for the input file</span>
 <span class="sd">        extension (Optional): The extension to use for the input, if it isn&#39;t part of the</span>
 <span class="sd">                              file name.</span>
@@ -463,7 +465,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 02, 2024.
+      <span class="lastupdated">Last updated on Jul 03, 2024.
       </span></p>
   </div>
 

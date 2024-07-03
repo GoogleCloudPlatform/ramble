@@ -1426,7 +1426,7 @@
                 <span class="n">input_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span>
                     <span class="n">input_conf</span><span class="p">[</span><span class="s2">&quot;target_dir&quot;</span><span class="p">],</span> <span class="n">extra_vars</span><span class="o">=</span><span class="n">input_vars</span>
                 <span class="p">)</span>
-                <span class="n">input_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;input-file&quot;</span><span class="p">,</span> <span class="n">input_path</span><span class="p">)</span>
+                <span class="n">input_tuple</span> <span class="o">=</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;input-file-</span><span class="si">{</span><span class="n">input_file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">input_path</span><span class="p">)</span>
 
                 <span class="c1"># Skip inputs that have already been cached</span>
                 <span class="k">if</span> <span class="n">workspace</span><span class="o">.</span><span class="n">check_cache</span><span class="p">(</span><span class="n">input_tuple</span><span class="p">):</span>
@@ -1436,13 +1436,16 @@
                     <span class="n">input_conf</span><span class="p">[</span><span class="s2">&quot;fetcher&quot;</span><span class="p">],</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">input_file</span><span class="p">)</span>
                 <span class="p">)</span>
 
+                <span class="n">input_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+                <span class="n">input_base</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+
                 <span class="k">with</span> <span class="n">ramble</span><span class="o">.</span><span class="n">stage</span><span class="o">.</span><span class="n">InputStage</span><span class="p">(</span>
                     <span class="n">input_conf</span><span class="p">[</span><span class="s2">&quot;fetcher&quot;</span><span class="p">],</span>
                     <span class="n">name</span><span class="o">=</span><span class="n">input_namespace</span><span class="p">,</span>
-                    <span class="n">path</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_input_dir</span><span class="p">,</span>
+                    <span class="n">path</span><span class="o">=</span><span class="n">input_dir</span><span class="p">,</span>
                     <span class="n">mirror_paths</span><span class="o">=</span><span class="n">mirror_paths</span><span class="p">,</span>
                 <span class="p">)</span> <span class="k">as</span> <span class="n">stage</span><span class="p">:</span>
-                    <span class="n">stage</span><span class="o">.</span><span class="n">set_subdir</span><span class="p">(</span><span class="n">input_path</span><span class="p">)</span>
+                    <span class="n">stage</span><span class="o">.</span><span class="n">set_subdir</span><span class="p">(</span><span class="n">input_base</span><span class="p">)</span>
                     <span class="n">stage</span><span class="o">.</span><span class="n">fetch</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">input_conf</span><span class="p">[</span><span class="s2">&quot;fetcher&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">digest</span><span class="p">:</span>
                         <span class="n">stage</span><span class="o">.</span><span class="n">check</span><span class="p">()</span>
@@ -2396,7 +2399,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 02, 2024.
+      <span class="lastupdated">Last updated on Jul 03, 2024.
       </span></p>
   </div>
 
