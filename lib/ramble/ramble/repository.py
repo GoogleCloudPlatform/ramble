@@ -56,7 +56,17 @@ NOT_PROVIDED = object()
 # Implement type specific functionality between here, and
 #     END TYPE SPECIFIC FUNCTIONALITY
 ####
-ObjectTypes = Enum("ObjectTypes", ["applications", "modifiers", "package_managers"])
+ObjectTypes = Enum(
+    "ObjectTypes",
+    [
+        "applications",
+        "modifiers",
+        "package_managers",
+        "base_applications",
+        "base_modifiers",
+        "base_package_managers",
+    ],
+)
 
 OBJECT_NAMES = [obj.name for obj in ObjectTypes]
 
@@ -88,6 +98,30 @@ type_definitions = {
         "config_section": "package_manager_repos",
         "accepted_configs": ["package_manager_repo.yaml", unified_config],
         "singular": "package manager",
+    },
+    ObjectTypes.base_applications: {
+        "file_name": "base_application.py",
+        "dir_name": "base_applications",
+        "abbrev": "base_app",
+        "config_section": "base_application_repos",
+        "accepted_configs": ["base_application_repo.yaml", unified_config],
+        "singular": "base application",
+    },
+    ObjectTypes.base_modifiers: {
+        "file_name": "base_modifier.py",
+        "dir_name": "base_modifiers",
+        "abbrev": "base_mod",
+        "config_section": "base_modifier_repos",
+        "accepted_configs": ["base_modifier_repo.yaml", unified_config],
+        "singular": "base modifier",
+    },
+    ObjectTypes.base_package_managers: {
+        "file_name": "base_package_manager.py",
+        "dir_name": "base_package_managers",
+        "abbrev": "base_pkg_man",
+        "config_section": "base_package_manager_repos",
+        "accepted_configs": ["base_package_manager_repo.yaml", unified_config],
+        "singular": "base package manager",
     },
 }
 
@@ -143,10 +177,65 @@ def _package_managers(repo_dirs=None):
     return path
 
 
+def _base_apps(repo_dirs=None):
+    """Get the singleton RepoPath instance for Ramble.
+
+    Create a RepoPath, add it to sys.meta_path, and return it.
+
+    TODO: consider not making this a singleton.
+    """
+    repo_dirs = repo_dirs or ramble.config.get("repos")
+    if not repo_dirs:
+        raise NoRepoConfiguredError(
+            "Ramble configuration contains no base application repositories."
+        )
+
+    path = RepoPath(*repo_dirs, object_type=ObjectTypes.base_applications)
+    sys.meta_path.append(path)
+    return path
+
+
+def _base_mods(repo_dirs=None):
+    """Get the singleton RepoPath instance for Ramble.
+
+    Create a RepoPath, add it to sys.meta_path, and return it.
+
+    TODO: consider not making this a singleton.
+    """
+    repo_dirs = repo_dirs or ramble.config.get("modifier_repos")
+    if not repo_dirs:
+        raise NoRepoConfiguredError("Ramble configuration contains no base modifier repositories.")
+
+    path = RepoPath(*repo_dirs, object_type=ObjectTypes.base_modifiers)
+    sys.meta_path.append(path)
+    return path
+
+
+def _base_package_managers(repo_dirs=None):
+    """Get the singleton RepoPath instance for Ramble.
+
+    Create a RepoPath, add it to sys.meta_path, and return it.
+
+    TODO: consider not making this a singleton.
+    """
+    repo_dirs = repo_dirs or ramble.config.get("package_manager_repos")
+    if not repo_dirs:
+        raise NoRepoConfiguredError(
+            "Ramble configuration contains no base package manager repositories."
+        )
+
+    path = RepoPath(*repo_dirs, object_type=ObjectTypes.base_package_managers)
+    sys.meta_path.append(path)
+    return path
+
+
 paths = {
     ObjectTypes.applications: llnl.util.lang.Singleton(_apps),
     ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
     ObjectTypes.package_managers: llnl.util.lang.Singleton(_package_managers),
+    ObjectTypes.base_applications: llnl.util.lang.Singleton(_base_apps),
+    ObjectTypes.base_modifiers: llnl.util.lang.Singleton(_base_mods),
+    ObjectTypes.base_package_managers: llnl.util.lang.Singleton(_base_package_managers),
 }
 
 #####################################
