@@ -134,6 +134,7 @@ config_defaults = {
         "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
         "input_cache": "$ramble/var/ramble/cache",
         "workspace_dirs": "$ramble/var/ramble/workspaces",
+        "report_dirs": "~/.ramble/reports",
     }
 }
 

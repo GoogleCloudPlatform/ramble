@@ -116,6 +116,11 @@ properties["config"]["workspace_dirs"] = {
     "default": "$ramble/var/ramble/workspaces",
 }
 
+properties["config"]["report_dirs"] = {
+    "type": "string",
+    "default": "~/.ramble/reports",
+}
+
 properties["config"]["upload"] = {
     "type": "object",
     "properties": {
