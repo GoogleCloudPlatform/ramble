@@ -1762,16 +1762,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                     else:
                                         fom_contexts.append(_NULL_CONTEXT)
 
-                                    for context in fom_contexts:
-                                        if context not in fom_values:
-                                            fom_values[context] = {}
-                                        fom_val = fom_match.group(fom_conf["group"])
-                                        fom_values[context][fom_name] = {
-                                            "value": fom_val,
-                                            "units": fom_conf["units"],
-                                            "origin": fom_conf["origin"],
-                                            "origin_type": fom_conf["origin_type"],
-                                        }
+                                for context in fom_contexts:
+                                    if context not in fom_values:
+                                        fom_values[context] = {}
+                                    fom_val = fom_match.group(fom_conf["group"])
+                                    fom_values[context][fom_name] = {
+                                        "value": fom_val,
+                                        "units": fom_conf["units"],
+                                        "origin": fom_conf["origin"],
+                                        "origin_type": fom_conf["origin_type"],
+                                        "fom_type": fom_conf["fom_type"].to_dict(),
+                                    }
 
         # Test all non-file based success criteria
         for criteria_obj in criteria_list.all_criteria():
@@ -2105,6 +2106,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         )
 
         for fom, conf in fom_definitions.items():
+            print(f'fom = {fom}')
+            print(f'conf = {conf}')
             log_path = self.expander.expand_var(conf["log_file"])
 
             if log_path not in files:
@@ -2123,6 +2126,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "units": conf["units"],
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
+                "fom_type": conf["fom_type"],
             }
             if conf["contexts"]:
                 foms[fom]["contexts"].extend(conf["contexts"])
