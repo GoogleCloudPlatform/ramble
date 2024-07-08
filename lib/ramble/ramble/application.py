@@ -854,9 +854,6 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(self.variables)
 
-    def define_modifier_variables(self):
-        """Extract default variable definitions from modifier instances"""
-
     def _define_custom_executables(self):
         # Define custom executables
         if namespace.custom_executables in self.internals:
@@ -941,6 +938,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         var_sets = []
         if self.expander.workload_name in self.workloads:
             var_sets.append(self.workloads[self.expander.workload_name].variables)
+
+        if self.package_manager is not None:
+            var_sets.append(self.package_manager.package_manager_variables)
 
         for mod_inst in self._modifier_instances:
             var_sets.append(mod_inst.mode_variables())
