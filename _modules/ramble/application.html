@@ -1032,12 +1032,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">keywords</span><span class="o">.</span><span class="n">check_required_keys</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="ApplicationBase.define_modifier_variables">
-<a class="viewcode-back" href="../../ramble.html#ramble.application.ApplicationBase.define_modifier_variables">[docs]</a>
-    <span class="k">def</span> <span class="nf">define_modifier_variables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Extract default variable definitions from modifier instances&quot;&quot;&quot;</span></div>
-
-
     <span class="k">def</span> <span class="nf">_define_custom_executables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># Define custom executables</span>
         <span class="k">if</span> <span class="n">namespace</span><span class="o">.</span><span class="n">custom_executables</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">internals</span><span class="p">:</span>
@@ -1122,6 +1116,9 @@
         <span class="n">var_sets</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="p">:</span>
             <span class="n">var_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">workloads</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">]</span><span class="o">.</span><span class="n">variables</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">var_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">package_manager</span><span class="o">.</span><span class="n">package_manager_variables</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">mod_inst</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_modifier_instances</span><span class="p">:</span>
             <span class="n">var_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">mod_inst</span><span class="o">.</span><span class="n">mode_variables</span><span class="p">())</span>
@@ -2399,7 +2396,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 03, 2024.
+      <span class="lastupdated">Last updated on Jul 08, 2024.
       </span></p>
   </div>
 

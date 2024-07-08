@@ -147,6 +147,14 @@ ramble.test.namespace\_trie module
    :undoc-members:
    :show-inheritance:
 
+ramble.test.package\_manager\_language module
+---------------------------------------------
+
+.. automodule:: ramble.test.package_manager_language
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 ramble.test.repository module
 -----------------------------
 

@@ -87,7 +87,6 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.compilers"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.copy"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.create_experiment_chain"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.create_experiment_chain()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.define_modifier_variables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.define_modifier_variables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.define_variable"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.define_variable()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.env_vars"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.env_vars()</span></code></a></li>
@@ -110,6 +109,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.name"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.package_manager_variables"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.package_manager_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.populate_inventory"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.populate_inventory()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.application.ApplicationBase.print_chain_order"><code class="docutils literal notranslate"><span class="pre">ApplicationBase.print_chain_order()</span></code></a></li>
@@ -657,10 +657,12 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.copy"><code class="docutils literal notranslate"><span class="pre">ModifierBase.copy()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executable_modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.executables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.executables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figure_of_merit_contexts</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">ModifierBase.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.format_doc"><code class="docutils literal notranslate"><span class="pre">ModifierBase.format_doc()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.inherit_from_application"><code class="docutils literal notranslate"><span class="pre">ModifierBase.inherit_from_application()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.inputs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.maintainers"><code class="docutils literal notranslate"><span class="pre">ModifierBase.maintainers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.modded_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.modded_variables()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.mode_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.mode_variables()</span></code></a></li>
@@ -672,6 +674,7 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.no_expand_vars"><code class="docutils literal notranslate"><span class="pre">ModifierBase.no_expand_vars()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ModifierBase.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">ModifierBase.package_manager_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.package_manager_variables"><code class="docutils literal notranslate"><span class="pre">ModifierBase.package_manager_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ModifierBase.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.required_packages"><code class="docutils literal notranslate"><span class="pre">ModifierBase.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.required_vars"><code class="docutils literal notranslate"><span class="pre">ModifierBase.required_vars</span></code></a></li>
@@ -682,6 +685,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.success_criteria"><code class="docutils literal notranslate"><span class="pre">ModifierBase.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.tags"><code class="docutils literal notranslate"><span class="pre">ModifierBase.tags</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.variable_modifications"><code class="docutils literal notranslate"><span class="pre">ModifierBase.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workload_group_vars"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workload_group_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workload_groups"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workload_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.modifier.ModifierBase.workloads"><code class="docutils literal notranslate"><span class="pre">ModifierBase.workloads</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.modifier.ModifierError"><code class="docutils literal notranslate"><span class="pre">ModifierError</span></code></a></li>
@@ -734,18 +740,41 @@
 <li class="toctree-l2"><a class="reference internal" href="#module-ramble.package_manager">ramble.package_manager module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.all_pipeline_phases"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.all_pipeline_phases()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.archive_patterns"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.archive_patterns</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.build_used_variables"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.build_used_variables()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.builtins"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.builtins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.compilers"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.compilers</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.copy"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.copy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.env_var_modifications</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.environment_required"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.environment_required()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.executable_modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.executables"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.executables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.figure_of_merit_contexts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.figures_of_merit</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.format_doc"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.format_doc()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.get_spec_str"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.get_spec_str()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.inputs"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.inputs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.maintainers"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.maintainers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.modes"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.modifier_variables"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.name"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.package_manager_class"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.package_manager_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.package_manager_configs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.package_manager_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.package_manager_variables"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.package_manager_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.phase_definitions"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.populate_inventory"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.populate_inventory()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.required_packages"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.required_packages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.required_vars"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.required_vars</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.set_application"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.set_application()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.software_specs"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.software_specs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.spec_prefix"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.spec_prefix()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.success_criteria"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.success_criteria</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.tags"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.tags</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.variable_modifications"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.workload_group_vars"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.workload_group_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.workload_groups"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.workload_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#ramble.package_manager.PackageManagerBase.workloads"><code class="docutils literal notranslate"><span class="pre">PackageManagerBase.workloads</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l3"><a class="reference internal" href="#ramble.package_manager.PackageManagerError"><code class="docutils literal notranslate"><span class="pre">PackageManagerError</span></code></a></li>
@@ -1161,6 +1190,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.modifier_variables"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.package_manager_variables"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.package_manager_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.phase_definitions"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.required_packages"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.application_types.html#ramble.application_types.executable.ExecutableApplication.required_vars"><code class="docutils literal notranslate"><span class="pre">ExecutableApplication.required_vars</span></code></a></li>
@@ -1460,6 +1490,7 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.language.html#module-ramble.language.package_manager_language">ramble.language.package_manager_language module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.package_manager_language.PackageManagerMeta"><code class="docutils literal notranslate"><span class="pre">PackageManagerMeta</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="ramble.language.html#ramble.language.package_manager_language.package_manager_variable"><code class="docutils literal notranslate"><span class="pre">package_manager_variable()</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.language.html#module-ramble.language.shared_language">ramble.language.shared_language module</a><ul>
@@ -1498,6 +1529,7 @@
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.modifier_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_configs</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.package_manager_variables"><code class="docutils literal notranslate"><span class="pre">BasicModifier.package_manager_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.phase_definitions"><code class="docutils literal notranslate"><span class="pre">BasicModifier.phase_definitions</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_packages"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_packages</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.modifier_types.html#ramble.modifier_types.basic.BasicModifier.required_vars"><code class="docutils literal notranslate"><span class="pre">BasicModifier.required_vars</span></code></a></li>
@@ -1518,7 +1550,30 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.package_manager_types.html#submodules">Submodules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.package_manager_types.html#module-ramble.package_manager_types.runner">ramble.package_manager_types.runner module</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.archive_patterns"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.archive_patterns</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.builtins"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.builtins</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.compilers"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.compilers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.env_var_modifications"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.env_var_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.executable_modifiers"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.executable_modifiers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.executables"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.executables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.figure_of_merit_contexts"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.figure_of_merit_contexts</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.figures_of_merit"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.figures_of_merit</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.inputs"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.inputs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.modes"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.modes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.modifier_variables"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.modifier_variables</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.package_manager_class"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.package_manager_class</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.package_manager_configs"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.package_manager_configs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.package_manager_requirements"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.package_manager_requirements</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.package_manager_variables"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.package_manager_variables</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.phase_definitions"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.phase_definitions</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.required_packages"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.required_packages</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.required_vars"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.required_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.software_specs"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.software_specs</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.success_criteria"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.success_criteria</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.variable_modifications"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.variable_modifications</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.workload_group_vars"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.workload_group_vars</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.workload_groups"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.workload_groups</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="ramble.package_manager_types.html#ramble.package_manager_types.runner.RunnerPackageManager.workloads"><code class="docutils literal notranslate"><span class="pre">RunnerPackageManager.workloads</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -1768,6 +1823,7 @@
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-modifier-application-module">ramble.test.modifier_application module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-modifier-language-module">ramble.test.modifier_language module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-namespace-trie-module">ramble.test.namespace_trie module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-package-manager-language-module">ramble.test.package_manager_language module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-repository-module">ramble.test.repository module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#ramble-test-software-environment-module">ramble.test.software_environment module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="ramble.test.html#module-ramble.test.spec_basic">ramble.test.spec_basic module</a><ul>
@@ -2399,12 +2455,6 @@ and builds an internal mapping from unique name to the chaining definition.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt class="sig sig-object py" id="ramble.application.ApplicationBase.define_modifier_variables">
-<span class="sig-name descname"><span class="pre">define_modifier_variables</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.define_modifier_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.define_modifier_variables" title="Link to this definition"></a></dt>
-<dd><p>Extract default variable definitions from modifier instances</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.define_variable">
 <span class="sig-name descname"><span class="pre">define_variable</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">var_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">var_value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/application.html#ApplicationBase.define_variable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.application.ApplicationBase.define_variable" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -2534,6 +2584,11 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.application.ApplicationBase.package_manager_requirements">
 <span class="sig-name descname"><span class="pre">package_manager_requirements</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.package_manager_requirements" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.application.ApplicationBase.package_manager_variables">
+<span class="sig-name descname"><span class="pre">package_manager_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.application.ApplicationBase.package_manager_variables" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -6116,6 +6171,11 @@ which to push resources.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.executables">
+<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.executables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.figure_of_merit_contexts">
 <span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.figure_of_merit_contexts" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -6134,6 +6194,11 @@ which to push resources.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.inherit_from_application">
 <span class="sig-name descname"><span class="pre">inherit_from_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/modifier.html#ModifierBase.inherit_from_application"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.modifier.ModifierBase.inherit_from_application" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.inputs">
+<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.inputs" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
@@ -6205,6 +6270,11 @@ the name of the resulting experiment.</p>
 <dd></dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.package_manager_variables">
+<span class="sig-name descname"><span class="pre">package_manager_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.package_manager_variables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.phase_definitions">
 <span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.phase_definitions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
@@ -6263,6 +6333,21 @@ modifier.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.modifier.ModifierBase.variable_modifications">
 <span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.variable_modifications" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workload_group_vars">
+<span class="sig-name descname"><span class="pre">workload_group_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workload_group_vars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workload_groups">
+<span class="sig-name descname"><span class="pre">workload_groups</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workload_groups" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.modifier.ModifierBase.workloads">
+<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.modifier.ModifierBase.workloads" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -6496,6 +6581,11 @@ phase_note (GraphNode): Object representing a node in the phase graph</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.archive_patterns">
+<span class="sig-name descname"><span class="pre">archive_patterns</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.archive_patterns" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.build_used_variables">
 <span class="sig-name descname"><span class="pre">build_used_variables</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">workspace</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/package_manager.html#PackageManagerBase.build_used_variables"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.build_used_variables" title="Link to this definition"></a></dt>
@@ -6518,15 +6608,50 @@ variables referenced by any of them are tracked properly.</p>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.builtins">
+<span class="sig-name descname"><span class="pre">builtins</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.builtins" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.compilers">
+<span class="sig-name descname"><span class="pre">compilers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.compilers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.copy">
 <span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/package_manager.html#PackageManagerBase.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.copy" title="Link to this definition"></a></dt>
 <dd><p>Deep copy a package manager instance</p>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.env_var_modifications">
+<span class="sig-name descname"><span class="pre">env_var_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.env_var_modifications" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.environment_required">
 <span class="sig-name descname"><span class="pre">environment_required</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/package_manager.html#PackageManagerBase.environment_required"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.environment_required" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.executable_modifiers">
+<span class="sig-name descname"><span class="pre">executable_modifiers</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.executable_modifiers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.executables">
+<span class="sig-name descname"><span class="pre">executables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.executables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.figure_of_merit_contexts">
+<span class="sig-name descname"><span class="pre">figure_of_merit_contexts</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.figure_of_merit_contexts" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.figures_of_merit">
+<span class="sig-name descname"><span class="pre">figures_of_merit</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.figures_of_merit" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -6554,11 +6679,26 @@ package spec.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.inputs">
+<span class="sig-name descname"><span class="pre">inputs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.inputs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.maintainers">
 <span class="sig-name descname"><span class="pre">maintainers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.maintainers" title="Link to this definition"></a></dt>
 <dd><p>Lists of strings which contains GitHub usernames of attributes.
 Do not include &#64; here in order not to unnecessarily ping the users.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.modes">
+<span class="sig-name descname"><span class="pre">modes</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.modes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.modifier_variables">
+<span class="sig-name descname"><span class="pre">modifier_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.modifier_variables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.name">
@@ -6568,6 +6708,26 @@ Do not include &#64; here in order not to unnecessarily ping the users.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.package_manager_class">
 <span class="sig-name descname"><span class="pre">package_manager_class</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'PackageManagerBase'</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.package_manager_class" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.package_manager_configs">
+<span class="sig-name descname"><span class="pre">package_manager_configs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.package_manager_configs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.package_manager_requirements">
+<span class="sig-name descname"><span class="pre">package_manager_requirements</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.package_manager_requirements" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.package_manager_variables">
+<span class="sig-name descname"><span class="pre">package_manager_variables</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.package_manager_variables" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.phase_definitions">
+<span class="sig-name descname"><span class="pre">phase_definitions</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.phase_definitions" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -6588,6 +6748,16 @@ being acted on.</p></li>
 </dl>
 </dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.required_packages">
+<span class="sig-name descname"><span class="pre">required_packages</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.required_packages" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.required_vars">
+<span class="sig-name descname"><span class="pre">required_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.required_vars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.set_application">
 <span class="sig-name descname"><span class="pre">set_application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">app_inst</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/ramble/package_manager.html#PackageManagerBase.set_application"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.set_application" title="Link to this definition"></a></dt>
@@ -6600,6 +6770,11 @@ manager will act on.</p>
 </dd>
 </dl>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.software_specs">
+<span class="sig-name descname"><span class="pre">software_specs</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.software_specs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.spec_prefix">
@@ -6616,8 +6791,33 @@ manager will act on.</p>
 </dd></dl>
 
 <dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.success_criteria">
+<span class="sig-name descname"><span class="pre">success_criteria</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.success_criteria" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
 <dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.tags">
 <span class="sig-name descname"><span class="pre">tags</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">[]</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.tags" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.variable_modifications">
+<span class="sig-name descname"><span class="pre">variable_modifications</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.variable_modifications" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.workload_group_vars">
+<span class="sig-name descname"><span class="pre">workload_group_vars</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.workload_group_vars" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.workload_groups">
+<span class="sig-name descname"><span class="pre">workload_groups</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.workload_groups" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="ramble.package_manager.PackageManagerBase.workloads">
+<span class="sig-name descname"><span class="pre">workloads</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#ramble.package_manager.PackageManagerBase.workloads" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
@@ -8766,7 +8966,7 @@ experiment.</p>
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 03, 2024.
+      <span class="lastupdated">Last updated on Jul 08, 2024.
       </span></p>
   </div>
 
