@@ -38,6 +38,7 @@ import ramble.repeats
 import ramble.repository
 import ramble.modifier
 import ramble.pipeline
+import ramble.success_criteria
 import ramble.util.executable
 import ramble.util.colors as rucolor
 import ramble.util.hashing
@@ -974,7 +975,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         if env_var.name not in env_var_set[action].keys():
                             env_var_set[action][env_var.name] = value
 
-    def _define_commands(self, exec_graph):
+    def _define_commands(
+        self, exec_graph, success_list=ramble.success_criteria.ScopedCriteriaList()
+    ):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -997,6 +1000,11 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 exec_cmd = exec_node.attribute
                 if exec_cmd.redirect:
                     logs.add(exec_cmd.redirect)
+
+        analysis_logs, _, _ = self._analysis_dicts(success_list)
+
+        for log in analysis_logs:
+            logs.add(log)
 
         for log in logs:
             self._command_list.append('rm -f "%s"' % log)
@@ -1141,7 +1149,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             exec_graph = self._get_executable_graph(self.expander.workload_name)
             self._set_default_experiment_variables()
             self._set_input_path()
-            self._define_commands(exec_graph)
+            self._define_commands(exec_graph, workspace.success_list)
             self._define_formatted_executables()
 
             self._derive_variables_for_template_path(workspace)
@@ -1574,6 +1582,10 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             active_contexts = {}
             logger.debug(f"Reading log file: {file}")
 
+            if not os.path.exists(file):
+                logger.debug(f"Skipping analysis of non-existent file: {file}")
+                continue
+
             with open(file, "r") as f:
                 for line in f.readlines():
                     logger.debug(f"Line: {line}")
@@ -1977,15 +1989,15 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         for fom, conf in fom_definitions.items():
             log_path = self.expander.expand_var(conf["log_file"])
-            if log_path not in files and os.path.exists(log_path):
+
+            if log_path not in files:
                 files[log_path] = self._new_file_dict()
 
-            if log_path in files:
-                logger.debug("Log = %s" % log_path)
-                logger.debug("Conf = %s" % conf)
-                if conf["contexts"]:
-                    files[log_path]["contexts"].extend(conf["contexts"])
-                files[log_path]["foms"].append(fom)
+            logger.debug("Log = %s" % log_path)
+            logger.debug("Conf = %s" % conf)
+            if conf["contexts"]:
+                files[log_path]["contexts"].extend(conf["contexts"])
+            files[log_path]["foms"].append(fom)
 
             foms[fom] = {
                 "regex": re.compile(r"%s" % self.expander.expand_var(conf["regex"])),
