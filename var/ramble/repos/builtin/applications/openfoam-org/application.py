@@ -467,7 +467,7 @@ class OpenfoamOrg(SpackApplication):
             f.write(f"simpleFoam ranks: {simple_ranks}\n")
             f.write(f"potentialFoam ranks: {simple_ranks}\n")
 
-    def _define_commands(self, exec_graph):
+    def _define_commands(self, exec_graph, success_list):
         export_prefix = self.expander.expand_var_name("export_prefix")
         export_vars = self.expander.expand_var_name("export_variables").split(
             ","
