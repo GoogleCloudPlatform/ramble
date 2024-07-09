@@ -136,6 +136,7 @@
 <span class="kn">import</span> <span class="nn">ramble.repository</span>
 <span class="kn">import</span> <span class="nn">ramble.modifier</span>
 <span class="kn">import</span> <span class="nn">ramble.pipeline</span>
+<span class="kn">import</span> <span class="nn">ramble.success_criteria</span>
 <span class="kn">import</span> <span class="nn">ramble.util.executable</span>
 <span class="kn">import</span> <span class="nn">ramble.util.colors</span> <span class="k">as</span> <span class="nn">rucolor</span>
 <span class="kn">import</span> <span class="nn">ramble.util.hashing</span>
@@ -1152,7 +1153,9 @@
                         <span class="k">if</span> <span class="n">env_var</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">env_var_set</span><span class="p">[</span><span class="n">action</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                             <span class="n">env_var_set</span><span class="p">[</span><span class="n">action</span><span class="p">][</span><span class="n">env_var</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
 
-    <span class="k">def</span> <span class="nf">_define_commands</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exec_graph</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_define_commands</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">exec_graph</span><span class="p">,</span> <span class="n">success_list</span><span class="o">=</span><span class="n">ramble</span><span class="o">.</span><span class="n">success_criteria</span><span class="o">.</span><span class="n">ScopedCriteriaList</span><span class="p">()</span>
+    <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Populate the internal list of commands based on executables</span>
 
 <span class="sd">        Populates self._command_list with a list of the executable commands that</span>
@@ -1175,6 +1178,11 @@
                 <span class="n">exec_cmd</span> <span class="o">=</span> <span class="n">exec_node</span><span class="o">.</span><span class="n">attribute</span>
                 <span class="k">if</span> <span class="n">exec_cmd</span><span class="o">.</span><span class="n">redirect</span><span class="p">:</span>
                     <span class="n">logs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">exec_cmd</span><span class="o">.</span><span class="n">redirect</span><span class="p">)</span>
+
+        <span class="n">analysis_logs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analysis_dicts</span><span class="p">(</span><span class="n">success_list</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">analysis_logs</span><span class="p">:</span>
+            <span class="n">logs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">log</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="n">logs</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_command_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;rm -f &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span> <span class="o">%</span> <span class="n">log</span><span class="p">)</span>
@@ -1321,7 +1329,7 @@
             <span class="n">exec_graph</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_executable_graph</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">workload_name</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_default_experiment_variables</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_set_input_path</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_define_commands</span><span class="p">(</span><span class="n">exec_graph</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_define_commands</span><span class="p">(</span><span class="n">exec_graph</span><span class="p">,</span> <span class="n">workspace</span><span class="o">.</span><span class="n">success_list</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_define_formatted_executables</span><span class="p">()</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_derive_variables_for_template_path</span><span class="p">(</span><span class="n">workspace</span><span class="p">)</span>
@@ -1758,6 +1766,10 @@
             <span class="n">active_contexts</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading log file: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Skipping analysis of non-existent file: </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="o">.</span><span class="n">readlines</span><span class="p">():</span>
                     <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Line: </span><span class="si">{</span><span class="n">line</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -2164,15 +2176,15 @@
 
         <span class="k">for</span> <span class="n">fom</span><span class="p">,</span> <span class="n">conf</span> <span class="ow">in</span> <span class="n">fom_definitions</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">log_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;log_file&quot;</span><span class="p">])</span>
-            <span class="k">if</span> <span class="n">log_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">log_path</span><span class="p">):</span>
+
+            <span class="k">if</span> <span class="n">log_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
                 <span class="n">files</span><span class="p">[</span><span class="n">log_path</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_file_dict</span><span class="p">()</span>
 
-            <span class="k">if</span> <span class="n">log_path</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Log = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">log_path</span><span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Conf = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;contexts&quot;</span><span class="p">]:</span>
-                    <span class="n">files</span><span class="p">[</span><span class="n">log_path</span><span class="p">][</span><span class="s2">&quot;contexts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;contexts&quot;</span><span class="p">])</span>
-                <span class="n">files</span><span class="p">[</span><span class="n">log_path</span><span class="p">][</span><span class="s2">&quot;foms&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fom</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Log = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">log_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Conf = </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">conf</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conf</span><span class="p">[</span><span class="s2">&quot;contexts&quot;</span><span class="p">]:</span>
+                <span class="n">files</span><span class="p">[</span><span class="n">log_path</span><span class="p">][</span><span class="s2">&quot;contexts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;contexts&quot;</span><span class="p">])</span>
+            <span class="n">files</span><span class="p">[</span><span class="n">log_path</span><span class="p">][</span><span class="s2">&quot;foms&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fom</span><span class="p">)</span>
 
             <span class="n">foms</span><span class="p">[</span><span class="n">fom</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;regex&quot;</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">conf</span><span class="p">[</span><span class="s2">&quot;regex&quot;</span><span class="p">])),</span>
