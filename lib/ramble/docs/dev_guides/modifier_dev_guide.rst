@@ -12,7 +12,7 @@
 Modifier Definition Developers Guide
 ====================================
 
-Modifier definitions files represent standardized objects which can be composed
+Modifier definition files represent standardized objects which can be composed
 with applications and experiments to modify their behavior. These can
 encapsulate many types of changes, including collecting additional system
 information (such as the output of ``lscpu``) or injecting a performance
@@ -39,7 +39,7 @@ behavior of an application directly. Depending on your goal for modifiers and
 the application of these patterns, you could write one modifier to apply all of
 the changes, or encapsulate a smaller set of changes into many modifiers.
 
-Some of the information you need to gather before writing your modifier includes:
+Some of the information you need to gather before writing your modifier include:
 
 #. Commands you need to execute as part of your changes
 #. Environment variables that need to be changed (set, appended, prepended, or unset)
@@ -50,8 +50,8 @@ Compilation / Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Some modifiers require specific software packages to be available to function
-properly. Modifiers can define software packages they both will install with
-supported package managers, or require to be available. See the
+properly. Modifiers can define software packages that will be install, or
+required to be available when a supported package manager is used. See the
 :ref:`application-definition-compilation` section of the application definition
 developers guide.
 
@@ -76,7 +76,7 @@ Individual repositories can control this through their own config file (
 Within the repository, each modifier definition file is a python module that is
 stored within a directory named for the modifier. As an example, Ramble comes
 with a repository named ``builtin``. This repository contains several standard
-modifier definitions that are proided to the community. One of the modifier
+modifier definitions that are provided to the community. One of the modifier
 definition files provided is
 `lscpu <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/lscpu/modifier.py>`_.
 
@@ -178,15 +178,15 @@ Executable Modification
 ^^^^^^^^^^^^^^^^^^^^^^^
 
 One of the most powerful modifications available within modifier definitions is
-the ``executable_modification`` directive. Some modifiers will require the
+the ``executable_modifier`` directive . Some modifiers will require the
 ability to inject commands around commands that exist in the experiments
 already. A good example of this is a performance analysis tool, which needs to
 modify the execution command to profile the experiment, and generate a summary
 of the performance characteristics of the experiment after it is complete.
 
-To accomplish this goal, the ``executable_modification`` directive can be used,
+To accomplish this goal, the ``executable_modifier`` directive can be used,
 which is implemented as a class method which returns two lists of
-``CommandExecutable`` objects, which are injected before and after the each
+``CommandExecutable`` objects, which are injected before and after each
 executable.
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -201,7 +201,7 @@ variables.
 Shared Functionality
 ^^^^^^^^^^^^^^^^^^^^
 
-This are several directives that are shared between applications and modifiers.
+There are several directives that are shared between applications and modifiers.
 These include success criteria, figures of merit, and figures of merit context.
 For more information on these, refer to either the :ref:`application-dev-guide` or 
 guide, :mod:`ramble.language`.

@@ -101,7 +101,7 @@ syntax.
 Writing a package manager definition
 ------------------------------------
 
-After a package managers's ``package_manager.py`` file is created, Ramble's
+After a package manager's ``package_manager.py`` file is created, Ramble's
 language features can be used to define the bahvior of the modifier. These
 language features provide directives which define specific portions of the
 package managers's functionality. 
@@ -136,7 +136,7 @@ Builtins
 ^^^^^^^^
 
 A builtin is a specific command that is injected within an experiment. Builtins
-can have dependencies, and and be injected either at the beginning or end of
+can have dependencies, and can be injected either at the beginning or end of
 the experiments. Builtins are written as class methods that return a list of
 strings which are explicit commands to add into an experiment. The
 ``register_builtin`` directive can be used to add a builtin into an experiment.
@@ -170,3 +170,10 @@ the runner and package manager were implemented. It is recommended that each
 individual runner implement its own ``dry-run`` behavior to enable exploration
 with the package manager without having to perform full installation. Existing
 package managers can be used as a reference.
+
+**NOTE**: Ramble's unit tests contain a tests called
+`known_applications
+<https://github.com/GoogleCloudPlatform/ramble/blob/develop/lib/ramble/ramble/test/end_to_end/known_applications.py>`_.
+This unit test by default will dry-run every possible application with every
+possible package manager. As a result, it is unlikely that a package manager
+without dry-run support would pass Ramble's unit tests.
