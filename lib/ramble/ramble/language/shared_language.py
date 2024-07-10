@@ -95,6 +95,12 @@ class FomType(Enum):
     INFO = {"better_direction": BetterDirection.INAPPLICABLE}
     UNDEFINED = {"better_direction": BetterDirection.INAPPLICABLE}
 
+    def to_dict(self):
+        """Converts the FomType enum member to a dictionary representation."""
+        return {
+            "name": self.name,
+            "better_direction": self.value["better_direction"].name
+        }
 
 @shared_directive("figures_of_merit")
 def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units="", contexts=[],

@@ -1523,6 +1523,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                                         "units": fom_conf["units"],
                                         "origin": fom_conf["origin"],
                                         "origin_type": fom_conf["origin_type"],
+                                        "fom_type": fom_conf["fom_type"].to_dict(),
                                     }
 
         # Test all non-file based success criteria
@@ -1858,6 +1859,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         )
 
         for fom, conf in fom_definitions.items():
+            print(f'fom = {fom}')
+            print(f'conf = {conf}')
             log_path = self.expander.expand_var(conf["log_file"])
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()
@@ -1876,6 +1879,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 "units": conf["units"],
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
+                "fom_type": conf["fom_type"],
             }
             if conf["contexts"]:
                 foms[fom]["contexts"].extend(conf["contexts"])
