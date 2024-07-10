@@ -696,17 +696,16 @@ class SpackRunner(object):
             fs.mkdirp(path)
 
         # Create a spack env
-        if not self.dry_run:
-            if not os.path.exists(os.path.join(path, "spack.yaml")):
-                env_create_flags = ramble.config.get(
-                    f"{self.env_create_config_name}:flags"
-                )
-                env_create_args = self.env_create_args.copy()
-                if env_create_flags:
-                    for flag in shlex.split(env_create_flags):
-                        env_create_args.append(flag)
-                with fs.working_dir(path):
-                    self._run_command(self.spack, env_create_args)
+        if not os.path.exists(os.path.join(path, "spack.yaml")):
+            env_create_flags = ramble.config.get(
+                f"{self.env_create_config_name}:flags"
+            )
+            env_create_args = self.env_create_args.copy()
+            if env_create_flags:
+                for flag in shlex.split(env_create_flags):
+                    env_create_args.append(flag)
+            with fs.working_dir(path):
+                self._run_command(self.spack, env_create_args)
 
         # Ensure subsequent commands use the created env now.
         self.env_path = path

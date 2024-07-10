@@ -48,17 +48,16 @@ class Spack(SpackLightweight):
         else:
             workspace.add_to_cache(cache_tupl)
 
-        if self.environment_required():
-            try:
-                self.runner.set_dry_run(workspace.dry_run)
-                self.runner.set_env(env_path)
+        try:
+            self.runner.set_dry_run(workspace.dry_run)
+            self.runner.set_env(env_path)
 
-                logger.msg("Installing software")
+            logger.msg("Installing software")
 
-                self.runner.activate()
-                self.runner.install()
-            except RunnerError as e:
-                logger.die(e)
+            self.runner.activate()
+            self.runner.install()
+        except RunnerError as e:
+            logger.die(e)
 
     register_phase(
         "define_package_paths",
