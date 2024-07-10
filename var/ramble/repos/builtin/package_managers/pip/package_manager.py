@@ -8,6 +8,7 @@
 
 import os
 import re
+import sys
 
 from ramble.application import ApplicationError
 from ramble.pkgmankit import *
@@ -223,14 +224,7 @@ class PipRunner:
     install_config_name = "config:pip:install"
 
     def __init__(self, dry_run=False):
-        cmds = ["python3", "python"]
-        # Set up python for bootstrapping
-        for c in cmds:
-            self.bs_python = which(c, required=False)
-            if self.bs_python:
-                break
-        if not self.bs_python:
-            raise RunnerError("python is not found in path")
+        self.bs_python = None
         self.env_path = None
         self.configs = []
         self.dry_run = dry_run
@@ -255,7 +249,8 @@ class PipRunner:
 
         if not self.dry_run:
             if not os.path.exists(os.path.join(env_path, self._venv_name)):
-                self.bs_python(
+                bs_python = self.get_bootstrap_python()
+                bs_python(
                     "-m", "venv", os.path.join(env_path, self._venv_name)
                 )
 
@@ -264,7 +259,7 @@ class PipRunner:
 
     def _get_venv_python(self):
         if self.dry_run:
-            return self.bs_python.copy()
+            return self.get_bootstrap_python().copy()
         return Executable(
             os.path.join(self.env_path, self._venv_name, "bin", "python")
         )
@@ -295,6 +290,13 @@ class PipRunner:
             with open(lock_file, "w") as f:
                 installer(*freeze_args, output=f)
         self.installed = True
+
+    def get_bootstrap_python(self):
+        if not self.bs_python:
+            # Set up python for bootstrapping.
+            # Simply use the same interpreter as the current Ramble.
+            self.bs_python = which(sys.executable, required=True)
+        return self.bs_python
 
     def _get_activate_script_path(self):
         return os.path.join(self.env_path, self._venv_name, "bin", "activate")
