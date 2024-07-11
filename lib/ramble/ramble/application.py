@@ -1848,6 +1848,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
             mod_vars = mod.modded_variables(self)
 
+            print(f'mod_figures_of_merit = {mod.figures_of_merit}')
+
             for fom, fom_def in mod.figures_of_merit.items():
                 fom_definitions[fom] = {"origin": f"{mod}", "origin_type": "modifier"}
                 for attr in fom_def.keys():
@@ -1859,8 +1861,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         )
 
         for fom, conf in fom_definitions.items():
-            print(f'fom = {fom}')
-            print(f'conf = {conf}')
+            #print(f'fom = {fom}')
+            #print(f'conf = {conf}')
             log_path = self.expander.expand_var(conf["log_file"])
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()

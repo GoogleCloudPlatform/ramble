@@ -93,7 +93,7 @@ class FomType(Enum):
     MEASURE = {"better_direction": BetterDirection.INDETERMINATE}
     CATEGORY = {"better_direction": BetterDirection.INAPPLICABLE}
     INFO = {"better_direction": BetterDirection.INAPPLICABLE}
-    UNDEFINED = {"better_direction": BetterDirection.INAPPLICABLE}
+    UNDEFINED = {"better_direction": BetterDirection.INDETERMINATE}
 
     def to_dict(self):
         """Converts the FomType enum member to a dictionary representation."""
@@ -120,6 +120,9 @@ def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units=""
     """
 
     def _execute_figure_of_merit(obj):
+        
+        print(f'figure_of_merit directive fom type input = {fom_type}')
+
         obj.figures_of_merit[name] = {
             "log_file": log_file,
             "regex": fom_regex,

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import copy
+import datetime
 import itertools
 import os
 import re
@@ -16,12 +17,27 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
+import llnl.util.filesystem as fs
 
 import ramble.cmd.results
 import ramble.cmd.workspace
-import ramble.pipeline
+import ramble.config
 import ramble.filters
-from  ramble.util.logger import logger
+import ramble.pipeline
+import ramble.util.path
+from ramble.util.logger import logger
+
+
+def get_reports_path():
+    """Returns current directory of ramble-created reports"""
+    path_in_config = ramble.config.get("config:report_dirs")
+    if not path_in_config:
+        # command above should have worked, so if it doesn't, error out:
+        logger.die("No config:report_dirs setting found in configuration. To add one,  "
+                   "use command: ramble config add \"config:report_dirs:~/.ramble/reports\"")
+
+    report_path = ramble.util.path.canonicalize_path(str(path_in_config))
+    return report_path
 
 
 def is_numeric(series):
@@ -47,7 +63,6 @@ def load_results(args):
 
     if args.file:
         results_dict = ramble.cmd.results.import_results_file(args.file)
-        print(results_dict)
     else:
         ramble_ws = ramble.cmd.find_workspace_path(args)
 
@@ -67,6 +82,7 @@ def load_results(args):
         else:
             logger.die("No JSON or YAML results file was found. Please run "
                        "'ramble workspace analyze -f json'.")
+    return results_dict
 
 
 def prepare_data(results: dict) -> pd.DataFrame:
@@ -143,12 +159,6 @@ def make_report(results_df, args):
 
     # results_df = prepare_data(ws.results)
 
-    import json
-    with open('/usr/local/google/home/dpomeroy/VSCode/ramble/var/ramble/workspaces/ansys-mech-archive/results.latest.json', 'r') as f:
-        results = json.load(f)
-
-    results_df = prepare_data(results)
-
     # pd.DataFrame.to_csv(results_df, 'results.csv')
 
     # import pprint
@@ -156,47 +166,88 @@ def make_report(results_df, args):
     # print(args)
     # print(args.scaling)
 
-    # print(results_df.dtypes)
+    dt = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    report_dir_root = get_reports_path()
+    ws_name = 'unknown_workspace'
+    if args.workspace:
+        ws_name = str(args.workspace)
+    report_name = f"{ws_name}.{dt}"
+    report_dir_path = os.path.join(report_dir_root, report_name)
+    fs.mkdirp(report_dir_path)
 
-    with PdfPages('report.pdf') as pdf:
+    print(f'report_path = {report_dir_path}')
 
-        if args.scaling:
-            scaling = list(itertools.chain.from_iterable(args.scaling))
+    pdf_path = os.path.join(report_dir_path, f'{report_name}.pdf')
+    print(f'pdf_path = {pdf_path}')
 
-            if len(scaling) < 2:
-                logger.die('Scaling plot requires two arguments: '
-                        'performance metric and scaling metric')
+    with PdfPages(pdf_path) as pdf_report:
 
-            for col in scaling:
-                if col not in results_df.columns and col not in results_df.loc[: ,'fom_name'].values:
-                    logger.die(f'{col} was not found in the results data.')
+        if args.strong_scaling:
+            print("strong_scaling")
+            generate_strong_scaling_chart(results_df, pdf_report, args)
 
-            perf_measure, scale_var, *additional_vars = scaling
+        if args.weak_scaling:
+            print("weak_scaling")
+            generate_weak_scaling_chart(results_df, pdf_report, args)
 
-            # FOMs are by row, so select only rows with the perf_measure FOM
-            perf_results = results_df.query(f'fom_name == "{perf_measure}"')
+        if args.compare:
+            print("compare")
+            generate_compare_chart(results_df, pdf_report, args)
 
-            perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
-            if additional_vars:
-                for var in additional_vars:
-                    perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_' + perf_results.loc[:, var].astype(str)
+        if args.foms:
+            print("foms")
+            generate_foms_chart(results_df, pdf_report, args)
 
-            for series in perf_results['series'].unique():
-                fig, ax = plt.subplots()
 
-                ax.plot(f'{scale_var}', 'fom_value', data=perf_results.query(f'series == "{series}"'), marker='o')
-                ax.set_xlabel(f'{scale_var}')
-                # ax.set_xticks(perf_results[f'{scale_var}'].unique())
-                ax.set_ylabel(f'{perf_measure}')
-                ax.set_title(f'Scaling Chart for {series}')
+def generate_strong_scaling_chart(results_df, pdf_report, args):
+    strong_scaling = list(itertools.chain.from_iterable(args.strong_scaling))
 
-                # fig =  (perf_results.query(f'series == "{series}"'), x=f'{scale_var}', y='fom_value')
-                    # fig.update_layout(title=f'Scaling Chart for {data["perf_name"]} vs {data["scale_name"]}',
-                    #                     xaxis_title=data['scale_name'],
-                    #                     yaxis_title=data['perf_name'])
-                #fig.show()
-                pdf.savefig(fig)
-                plt.close(fig)
-            
-            
-            # pd.DataFrame.to_csv(results_df, 'results.csv')
+    if len(strong_scaling) < 2:
+        logger.die('Scaling plot requires two arguments: '
+                   'performance metric and scaling metric')
+
+    for col in strong_scaling:
+        if col not in results_df.columns and col not in results_df.loc[: ,'fom_name'].values:
+            logger.die(f'{col} was not found in the results data.')
+
+    perf_measure, scale_var, *additional_vars = strong_scaling
+
+    # FOMs are by row, so select only rows with the perf_measure FOM
+    perf_results = results_df.query(f'fom_name == "{perf_measure}"')
+
+    perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
+    if additional_vars:
+        for var in additional_vars:
+            perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_' + perf_results.loc[:, var].astype(str)
+
+    for series in perf_results['series'].unique():
+        fig, ax = plt.subplots()
+
+        plot_name = f""
+
+        ax.plot(f'{scale_var}', 'fom_value', data=perf_results.query(f'series == "{series}"'), marker='o')
+        ax.set_xscale('log')
+        ax.set_xticks(perf_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
+        ax.set_xlabel(f'{scale_var}')
+        # ax.set_xticks(perf_results[f'{scale_var}'].unique())
+        ax.set_ylabel(f'{perf_measure}')
+        ax.set_title(f'Scaling Chart for {series}')
+
+        # fig =  (perf_results.query(f'series == "{series}"'), x=f'{scale_var}', y='fom_value')
+            # fig.update_layout(title=f'Scaling Chart for {data["perf_name"]} vs {data["scale_name"]}',
+            #                     xaxis_title=data['scale_name'],
+            #                     yaxis_title=data['perf_name'])
+        #fig.show()
+        pdf_report.savefig(fig)
+        plt.close(fig)
+
+    # pd.DataFrame.to_csv(results_df, 'results.csv')
+
+def generate_weak_scaling_chart(results_df, pdf_report, args):
+    pass
+
+def generate_compare_chart(results_df, pdf_report, args):
+    pass
+
+def generate_foms_chart(results_df, pdf_report, args):
+    pass

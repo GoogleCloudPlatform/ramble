@@ -412,5 +412,5 @@ class Gromacs(SpackApplication):
         + r"(?P<hours_per_ns>[0-9]+\.[0-9]+).*",
         group_name="hours_per_ns",
         units="hours/ns",
-        fom_type=FomType.TIME,
+        fom_type=FomType.INFO,
     )
