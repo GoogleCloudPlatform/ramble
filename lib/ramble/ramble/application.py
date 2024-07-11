@@ -1047,7 +1047,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             and int(self.expander.expand_var_name(self.keywords.n_nodes)) > 1
                         ):
                             logger.warn(
-                                f"Command {cmd_conf} requires a non-empty `mpi_cmd` "
+                                f"Command {cmd_conf} requires a non-empty `mpi_command` "
                                 "variable in a multi-node experiment"
                             )
                         mpi_cmd = " " + raw_mpi_cmd + " "
