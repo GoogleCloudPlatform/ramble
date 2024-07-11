@@ -88,19 +88,36 @@ class BetterDirection(Enum):
 
 
 class FomType(Enum):
-    TIME = {"better_direction": BetterDirection.LOWER}
-    THROUGHPUT = {"better_direction": BetterDirection.HIGHER}
-    MEASURE = {"better_direction": BetterDirection.INDETERMINATE}
-    CATEGORY = {"better_direction": BetterDirection.INAPPLICABLE}
-    INFO = {"better_direction": BetterDirection.INAPPLICABLE}
-    UNDEFINED = {"better_direction": BetterDirection.INAPPLICABLE}
+    TIME = 1
+    THROUGHPUT = 2
+    MEASURE = 3
+    CATEGORY = 4
+    INFO = 5
+    UNDEFINED = 6
+
+    def better_direction(self):
+        direction = {
+            FomType.TIME: BetterDirection.LOWER,
+            FomType.THROUGHPUT: BetterDirection.HIGHER,
+            FomType.MEASURE: BetterDirection.INDETERMINATE,
+            FomType.CATEGORY: BetterDirection.INAPPLICABLE,
+            FomType.INFO: BetterDirection.INAPPLICABLE,
+            FomType.UNDEFINED: BetterDirection.INDETERMINATE,
+        }
+
+        return direction[self]
+
+    def copy(self):
+        import copy
+        return copy.copy(self)
 
     def to_dict(self):
         """Converts the FomType enum member to a dictionary representation."""
         return {
             "name": self.name,
-            "better_direction": self.value["better_direction"].name
+            "better_direction": self.better_direction().name
         }
+
 
 @shared_directive("figures_of_merit")
 def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units="", contexts=[],
