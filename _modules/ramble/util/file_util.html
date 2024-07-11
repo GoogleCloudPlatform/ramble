@@ -132,7 +132,7 @@
 <a class="viewcode-back" href="../../../ramble.util.html#ramble.util.file_util.is_dry_run_path">[docs]</a>
 <span class="k">def</span> <span class="nf">is_dry_run_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Check if the path is already a dry_run path&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">path</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_DRY_RUN_PATH_PREFIX</span><span class="p">)</span></div>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">_DRY_RUN_PATH_PREFIX</span><span class="p">)</span></div>
 
 </pre></div>
 
@@ -144,7 +144,7 @@
 
   <div role="contentinfo">
     <p>&#169; Copyright 2022-2023, Google LLC.
-      <span class="lastupdated">Last updated on Jul 10, 2024.
+      <span class="lastupdated">Last updated on Jul 11, 2024.
       </span></p>
   </div>
 
