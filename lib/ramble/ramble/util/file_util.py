@@ -29,4 +29,4 @@ def get_file_path(path: str, workspace) -> str:
 
 def is_dry_run_path(path: str) -> bool:
     """Check if the path is already a dry_run path"""
-    return path.startswith(_DRY_RUN_PATH_PREFIX)
+    return str(path).startswith(_DRY_RUN_PATH_PREFIX)
