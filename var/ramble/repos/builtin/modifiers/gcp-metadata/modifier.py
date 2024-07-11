@@ -14,6 +14,9 @@ class GcpMetadata(BasicModifier):
 
     This mod can capture useful metadata (such as node type and VM image) for
     GCP VMs
+
+    Requires a definition for the `hostlist` variable, to be able to capture
+    per-node metadata.
     """
 
     name = "GcpMetadata"
@@ -23,6 +26,8 @@ class GcpMetadata(BasicModifier):
 
     mode("standard", description="Standard execution mode")
     default_mode("standard")
+
+    required_variable("hostlist")
 
     executable_modifier("gcp_metadata_exec")
 
@@ -38,21 +43,27 @@ class GcpMetadata(BasicModifier):
         pre_cmds = []
 
         payloads = [
-            # end point, use_mpi
+            # end point, per_node
             ("machine-type", False),
             ("image", False),
             ("hostname", False),
             ("id", True),  # True since we want the gid of every node
         ]
 
-        for end_point, use_mpi in payloads:
+        for end_point, per_node in payloads:
+            prefix = ""
+            suffix = ""
+            if per_node:
+                prefix = "pdsh -N -w {hostlist} '"
+                suffix = "'"
+
             pre_cmds.append(
                 CommandExecutable(
                     "machine-type",
                     template=[
-                        f'curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/{end_point}" -H "Metadata-Flavor: Google"'
+                        f'{prefix} curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/{end_point}" -H "Metadata-Flavor: Google" {suffix}'
                     ],
-                    mpi=use_mpi,
+                    mpi=False,
                     redirect=f"{{experiment_run_dir}}/gcp-metadata.{end_point}.log",
                     output_capture=">",
                 )
