@@ -156,16 +156,20 @@ write an application definition file.</p>
 However, this guide will not provide exhaustive information for all
 applications. So, in general, this step is left to you to complete.</p>
 <section id="compilation-installation">
-<h3>Compilation / Installation<a class="headerlink" href="#compilation-installation" title="Link to this heading"></a></h3>
-<p>Ramble has first party support for some package managers (currently, Spack). To
-improve provenance information that Ramble is able to track, we strongly
-recommend using a supported package manager.</p>
-<p>You have two options at this stage. The first (and arguably more complicated)
+<span id="application-definition-compilation"></span><h3>Compilation / Installation<a class="headerlink" href="#compilation-installation" title="Link to this heading"></a></h3>
+<p>Ramble has first party support for some package managers. The provided package
+managers can be seen through the <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">list</span> <span class="pre">--type</span> <span class="pre">package_managers</span></code>
+command. To improve provenance information that Ramble is able to track, we
+strongly recommend using a supported package manager.</p>
+<p>You have three options at this stage. The first (and arguably more complicated)
 option is to add support for a new package manager, if your application is not
 included in any of the supported package manager yet. The second is to add your
-application to one of the supported package managers.</p>
-<p>This might include writing a Spack package definition file. While this guide
-will not walk you through this process, Spack has
+application to one of the supported package managers. The third and final
+option is to manually install your application and use the default setting for
+a package manager which disables package manager support.</p>
+<p>This might include writing a definition file for the targeted package manager.
+This guide will not walk you through this process, however the actual steps
+vary dramatically from one package manager to another.  Spack has
 <a class="reference external" href="https://spack.readthedocs.io/en/latest/packaging_guide.html">documentation to help write package definition files</a>.</p>
 </section>
 <section id="collecting-inputs">
@@ -198,7 +202,7 @@ application definition file as well.</p>
 </section>
 <section id="application-definition-creation">
 <h2>Application Definition Creation<a class="headerlink" href="#application-definition-creation" title="Link to this heading"></a></h2>
-<p>Application definition files are stored within application repositories. These
+<p>Application definition files are stored within object repositories. These
 repositories generally store all applications within a directory named
 <code class="docutils literal notranslate"><span class="pre">applications</span></code>, however each repository can control this through their own
 config file ( <code class="docutils literal notranslate"><span class="pre">repo.yaml</span></code> ).</p>
@@ -220,6 +224,10 @@ application definition files. Currently, these are used to abstract the package
 manager logic, but more generally change the behavior of the underlying
 application definitions. These can be seen in more detail in
 <a class="reference internal" href="../ramble.application_types.html#module-ramble.application_types" title="ramble.application_types"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.application_types</span></code></a>.</p>
+<p>New application definitions can also inherit their behavior from other
+application classes to replicate aspects of their behavior.</p>
+<p>Existing application classes can be referenced using the:
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ramble.app.builtin.&lt;application_name&gt;</span> <span class="pre">import</span> <span class="pre">&lt;application_class&gt;</span></code> syntax.</p>
 </section>
 </section>
 <section id="writing-an-application-definition">
@@ -233,7 +241,7 @@ an exhaustive list of application language features, see
 <a class="reference internal" href="../ramble.language.html#module-ramble.language" title="ramble.language"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.language</span></code></a>.</p>
 <p>The directives from Ramble’s application language are placed alongside class
 variables, as in:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Hpl</span><span class="p">(</span><span class="n">SpackPackage</span><span class="p">):</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Hpl</span><span class="p">(</span><span class="n">ExecutableApplication</span><span class="p">):</span>
     <span class="n">executable</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
     <span class="n">executable</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>
     <span class="n">input_file</span><span class="p">(</span><span class="o">....</span><span class="p">)</span>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Package Manager Definition Developers Guide &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Package Manager Definition Developers Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guides/package_manager_dev_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="package-manager-definition-developers-guide">
+<span id="package-manager-dev-guide"></span><h1>Package Manager Definition Developers Guide<a class="headerlink" href="#package-manager-definition-developers-guide" title="Link to this heading"></a></h1>
+<p>Package manager definitions files contain objects which encapsulate the
+behaviors of specific package managers. Application definition files are
+written in an abstract way that is not tied to a specific package manager, and
+layering a package manager on top of the experiment allows Ramble to manage the
+software stack for its generated experiments. By default, Ramble does not
+impose a specific package manager on the experiments it generates, allowing
+experiments to reference manually created software stacks.</p>
+<p>This guide will provide general steps for creating a new package manager
+definition file.</p>
+<p><strong>NOTE:</strong> Package managers are considered a more advanced feature of Ramble.
+Writing a new pcakage manager definition file in Ramble largely follows the
+same workflow as writing an application definition file, although the intent
+and behavior are different. It is recommended that you review
+<span class="xref std std-ref">application-def-guide</span> before writing a modifier.</p>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h2>
+<p>Before writing a package manager definition file, it is helpful to understand
+how to manually accomplish the following steps with the package manager:</p>
+<ol class="arabic simple">
+<li><p>Installation of new software</p></li>
+<li><p>Environment creation (preferred, but not strictly required depending on the
+package manager)</p></li>
+<li><p>Installed package path extraction</p></li>
+<li><p>Provenance extraction for installed packages</p></li>
+<li><p>(Optional) Package mirroring</p></li>
+<li><p>(Optional) Package caching / repository building</p></li>
+</ol>
+<p>Ramble and its documentation cannot help with these steps. It is best to
+research how to perform these steps (if they are possible) with the package
+manager you are working with.</p>
+</section>
+<section id="package-manager-definition-creation">
+<h2>Package Manager Definition Creation<a class="headerlink" href="#package-manager-definition-creation" title="Link to this heading"></a></h2>
+<p>Package manager definition files are stored within object repositories. These
+repositories generally store package managers within a directory named
+<code class="docutils literal notranslate"><span class="pre">package_managers</span></code>. Individual repositories can control this through their
+own config file (<code class="docutils literal notranslate"><span class="pre">repo.yaml</span></code> or <code class="docutils literal notranslate"><span class="pre">package_manager_repo.yaml</span></code>).</p>
+<p>Within the repository, each package manager definition file is a python module
+that is stored within a directory named for the package manager. As an example,
+Ramble comes with a repository named <code class="docutils literal notranslate"><span class="pre">builtin</span></code>. This repository contains
+several standard package manager definitions that are provided to the
+community. One of the package manager definition files provided is 
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack/package_manager.py">spack</a>
+which inherits from
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/package_managers/spack-lightweight/package_manager.py">spack-lightweight</a>.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">spack</span></code> package manager definition file is named <code class="docutils literal notranslate"><span class="pre">package_manager.py</span></code>
+and is stored within a directory named <code class="docutils literal notranslate"><span class="pre">spack</span></code>. Witihn the
+<code class="docutils literal notranslate"><span class="pre">package_manager.py</span></code> file, a python class is defined with a similar name to
+the package manager directory.  Ramble’s package manager definition naming
+syntax follows
+<a class="reference external" href="https://spack.readthedocs.io/en/latest/packaging_guide.html#naming-directory-structure">Spack’s package naming rules</a>.</p>
+<p>When creating a new package manager, it is recommended that a <code class="docutils literal notranslate"><span class="pre">runner</span></code> class
+is created to encapsulate executing commands under the specific package
+manager. The <code class="docutils literal notranslate"><span class="pre">runner</span></code> class for <code class="docutils literal notranslate"><span class="pre">spack</span></code> is included in the
+<code class="docutils literal notranslate"><span class="pre">spack-lightweight</span></code> package manager definition.</p>
+<section id="base-classes">
+<h3>Base Classes<a class="headerlink" href="#base-classes" title="Link to this heading"></a></h3>
+<p>Ramble provides base classes which can be inherited when creating new package manager
+definition files. These encapsulate most of the basic package manager functionality,
+and allow new package managers to function with only a little syntax. These can be
+seen in more detail in <a class="reference internal" href="../ramble.package_manager_types.html#module-ramble.package_manager_types" title="ramble.package_manager_types"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.package_manager_types</span></code></a>, however most
+package managers inherit from the base package manager class defined in the
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/blob/develop/lib/ramble/ramble/package_manager.py">package manager module</a>.</p>
+<p>New package manager definitions can also inherit their behavior from other
+package manager classes to replicate aspects of their behavior.</p>
+<p>Existing package manager classes can be referenced using the:
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ramble.pkg_man.builtin.&lt;package_manager_name&gt;</span> <span class="pre">import</span> <span class="pre">&lt;package_manager_class&gt;</span></code>
+syntax.</p>
+</section>
+</section>
+<section id="writing-a-package-manager-definition">
+<h2>Writing a package manager definition<a class="headerlink" href="#writing-a-package-manager-definition" title="Link to this heading"></a></h2>
+<p>After a package manager’s <code class="docutils literal notranslate"><span class="pre">package_manager.py</span></code> file is created, Ramble’s
+language features can be used to define the bahvior of the modifier. These
+language features provide directives which define specific portions of the
+package managers’s functionality.</p>
+<p>There are many language features available to package managers, and the ones
+you use will change based on the specific package manager you need to
+implement. Some of the language features are shared with applications and
+modifiers, but some are specific to package managers. For more information see
+<a class="reference internal" href="../ramble.language.html#module-ramble.language" title="ramble.language"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.language</span></code></a>.</p>
+<p>The directives from Ramble’s package manager language are placed alongside
+class variables, as in:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Spack</span><span class="p">(</span><span class="n">PackageManagerBase</span><span class="p">):</span>
+  <span class="n">package_manager_variable</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">register_builtin</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">register_phase</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="package-manager-variables">
+<h3>Package Manager Variables<a class="headerlink" href="#package-manager-variables" title="Link to this heading"></a></h3>
+<p>When aspects of a package manager are able to be parameterized, it can be
+useful for a package manager to define a variable which users can modify to
+control the package manager’s behavior. The <code class="docutils literal notranslate"><span class="pre">package_manager_variable</span></code>
+directive can be used to define these variables.</p>
+</section>
+<section id="builtins">
+<h3>Builtins<a class="headerlink" href="#builtins" title="Link to this heading"></a></h3>
+<p>A builtin is a specific command that is injected within an experiment. Builtins
+can have dependencies, and can be injected either at the beginning or end of
+the experiments. Builtins are written as class methods that return a list of
+strings which are explicit commands to add into an experiment. The
+<code class="docutils literal notranslate"><span class="pre">register_builtin</span></code> directive can be used to add a builtin into an experiment.</p>
+</section>
+<section id="phase-registration">
+<h3>Phase Registration<a class="headerlink" href="#phase-registration" title="Link to this heading"></a></h3>
+<p>In Ramble there are several different <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> which are groupings of
+phases to perform a specific action (such as <code class="docutils literal notranslate"><span class="pre">setup</span></code> or <code class="docutils literal notranslate"><span class="pre">analyze</span></code>). Some
+modifiers need to inject phases into one or more of these pipelines. The
+<code class="docutils literal notranslate"><span class="pre">register_phase</span></code> directive can be used to add a phase into a pipeline. Phases
+are written as class methods with a specific signature, and will be
+automatically executed as part of the pipeline they belong to.</p>
+<p>Package managers will primarily define new phases, and register them into
+specific experiments to modify the behavior of the different pipelines.</p>
+</section>
+</section>
+<section id="testing-a-package-manager">
+<h2>Testing a Package Manager<a class="headerlink" href="#testing-a-package-manager" title="Link to this heading"></a></h2>
+<p>The package manager that is used in specific experiments is defined using the
+<a class="reference internal" href="../configuration_files.html#variants-config"><span class="std std-ref">variants</span></a> configuration section. Specifically
+<code class="docutils literal notranslate"><span class="pre">variants:package_manager:&lt;package_manager_name&gt;</span></code>. This quantity can be
+parameterized, and can refer to a variable which defines which package manager
+is used.</p>
+<p>The behavior of a package manager when executing a <code class="docutils literal notranslate"><span class="pre">dry-run</span></code> depends on how
+the runner and package manager were implemented. It is recommended that each
+individual runner implement its own <code class="docutils literal notranslate"><span class="pre">dry-run</span></code> behavior to enable exploration
+with the package manager without having to perform full installation. Existing
+package managers can be used as a reference.</p>
+<p><strong>NOTE</strong>: Ramble’s unit tests contain a tests called
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/blob/develop/lib/ramble/ramble/test/end_to_end/known_applications.py">known_applications</a>.
+This unit test by default will dry-run every possible application with every
+possible package manager. As a result, it is unlikely that a package manager
+without dry-run support would pass Ramble’s unit tests.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jul 12, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

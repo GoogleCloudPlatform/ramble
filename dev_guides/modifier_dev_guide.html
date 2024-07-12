@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Modifier Definition Developers Guide &mdash; Ramble 0.5.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=fd3f3429" />
+      <link rel="stylesheet" type="text/css" href="../_static/copybutton.css?v=76b2166b" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=1dd76d02"></script>
+        <script src="../_static/doctools.js?v=9a2dae69"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script src="../_static/clipboard.min.js?v=a7894cd8"></script>
+        <script src="../_static/copybutton.js?v=932ab54e"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html">
+            
+          </a>
+              <div class="version">
+                0.5
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Tutorials</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../tutorials.html">Tutorials</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Basics</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../ramble.html">ramble package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../configuration_files.html">Configuration Files</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace.html">Ramble Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../workspace_config.html">Workspace Configuration File</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../success_criteria.html">Success Criteria</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Contributing</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble#contributing">Contributing Guidelines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dev_guides.html">Developer Guides</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">External Resources</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/spack/spack">Spack</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Ramble</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Modifier Definition Developers Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/dev_guides/modifier_dev_guide.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="modifier-definition-developers-guide">
+<span id="modifier-dev-guide"></span><h1>Modifier Definition Developers Guide<a class="headerlink" href="#modifier-definition-developers-guide" title="Link to this heading"></a></h1>
+<p>Modifier definition files represent standardized objects which can be composed
+with applications and experiments to modify their behavior. These can
+encapsulate many types of changes, including collecting additional system
+information (such as the output of <code class="docutils literal notranslate"><span class="pre">lscpu</span></code>) or injecting a performance
+analysis tool into the experiment workflow.</p>
+<p>This guide will provide general steps for creating a new modifier definition file.</p>
+<p><strong>NOTE:</strong> Modifiers are considered a more advanced feature of Ramble. Writing a
+new modifier definition file in Ramble largely follows the same workflow as
+writing an application definition file, although the intent and behavior are
+different. It is recommended that you review <span class="xref std std-ref">application-def-guide</span>
+before writing a modifier.</p>
+<section id="preparation">
+<h2>Preparation<a class="headerlink" href="#preparation" title="Link to this heading"></a></h2>
+<p>Before writing a modifier definition file, it is helpful to determine what
+aspects of the modification need to be grouped together.</p>
+<p>It can be useful to think of a modifier as some pattern you would like to apply
+to many experiments, that doesn’t actually have anything to do with the
+behavior of an application directly. Depending on your goal for modifiers and
+the application of these patterns, you could write one modifier to apply all of
+the changes, or encapsulate a smaller set of changes into many modifiers.</p>
+<p>Some of the information you need to gather before writing your modifier include:</p>
+<ol class="arabic simple">
+<li><p>Commands you need to execute as part of your changes</p></li>
+<li><p>Environment variables that need to be changed (set, appended, prepended, or unset)</p></li>
+<li><p>An example of output the modifier would create (if any)</p></li>
+</ol>
+<section id="compilation-installation">
+<h3>Compilation / Installation<a class="headerlink" href="#compilation-installation" title="Link to this heading"></a></h3>
+<p>Some modifiers require specific software packages to be available to function
+properly. Modifiers can define software packages that will be install, or
+required to be available when a supported package manager is used. See the
+<a class="reference internal" href="application_dev_guide.html#application-definition-compilation"><span class="std std-ref">Compilation / Installation</span></a> section of the application definition
+developers guide.</p>
+</section>
+<section id="testing-execution-and-output-information">
+<h3>Testing execution and Output information<a class="headerlink" href="#testing-execution-and-output-information" title="Link to this heading"></a></h3>
+<p>For this step, it can be useful to manually execute the commands / steps you
+want to encapsulate into a modifier. This step helps you understand how the
+modification will actually behave, and can be used to get example output to
+create modifier figures of merit and success criteria.</p>
+</section>
+</section>
+<section id="modifier-definition-creation">
+<h2>Modifier Definition Creation<a class="headerlink" href="#modifier-definition-creation" title="Link to this heading"></a></h2>
+<p>Modifier definition files are stored within object repositories. These
+repositories generally store modifiers within a directory named <code class="docutils literal notranslate"><span class="pre">modifiers</span></code>.
+Individual repositories can control this through their own config file (
+<code class="docutils literal notranslate"><span class="pre">repo.yaml</span></code> or <code class="docutils literal notranslate"><span class="pre">modifier_repo.yaml</span></code> ).</p>
+<p>Within the repository, each modifier definition file is a python module that is
+stored within a directory named for the modifier. As an example, Ramble comes
+with a repository named <code class="docutils literal notranslate"><span class="pre">builtin</span></code>. This repository contains several standard
+modifier definitions that are provided to the community. One of the modifier
+definition files provided is
+<a class="reference external" href="https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/lscpu/modifier.py">lscpu</a>.</p>
+<p>The lscpu modifier definition file is named <code class="docutils literal notranslate"><span class="pre">modifier.py</span></code> and is stored
+within a directory named <code class="docutils literal notranslate"><span class="pre">lscpu</span></code>. Within the <code class="docutils literal notranslate"><span class="pre">modifier.py</span></code> file, a python
+class is defined with a similar name to the modifier directory. Ramble’s
+modifier definition naming syntax follows
+<a class="reference external" href="https://spack.readthedocs.io/en/latest/packaging_guide.html#naming-directory-structure">Spack’s package naming rules</a>.</p>
+<section id="base-classes">
+<h3>Base Classes<a class="headerlink" href="#base-classes" title="Link to this heading"></a></h3>
+<p>Ramble provides base classes which can be inherited when creating new modifier
+definition files. These encapsulate most of the basic modifier functionality,
+and allow new modifiers to function with only a little syntax. These can be
+seen in more detail in <a class="reference internal" href="../ramble.modifier_types.html#module-ramble.modifier_types" title="ramble.modifier_types"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.modifier_types</span></code></a>.</p>
+<p>New modifier definitions can also inherit their behavior from other
+modifier classes to replicate aspects of their behavior.</p>
+<p>Existing modifier classes can be referenced using the:
+<code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">ramble.mod.builtin.&lt;modifier_name&gt;</span> <span class="pre">import</span> <span class="pre">&lt;modifier_class&gt;</span></code> syntax.</p>
+</section>
+</section>
+<section id="writing-a-modifier-definition">
+<h2>Writing a modifier definition<a class="headerlink" href="#writing-a-modifier-definition" title="Link to this heading"></a></h2>
+<p>After a modifier’s <code class="docutils literal notranslate"><span class="pre">modifier.py</span></code> file is created, Ramble’s language features
+can be used to define the bahvior of the modifier. These language features
+provide directives which define specific portions of the modifier’s
+functionality.</p>
+<p>There are many language features available to modifiers, and the ones you use
+will change based on the specific modifier you need to implement. Some of the
+language features are shared with applications and package managers, but some
+are specific to modifiers. For more information see <a class="reference internal" href="../ramble.language.html#module-ramble.language" title="ramble.language"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.language</span></code></a>.</p>
+<p>The directives from Ramble’s modifier language are placed alongside class
+variables, as in:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Lscpu</span><span class="p">(</span><span class="n">BasicModifier</span><span class="p">):</span>
+  <span class="n">mode</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">default_mode</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">modifier_variable</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">variable_modification</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">register_builtin</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">register_phase</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">executable_modification</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+  <span class="n">env_var_modification</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+</pre></div>
+</div>
+<section id="modes">
+<h3>Modes<a class="headerlink" href="#modes" title="Link to this heading"></a></h3>
+<p>Modifiers can have multiple <code class="docutils literal notranslate"><span class="pre">modes</span></code> which are used to change the behavior of
+the modifier. This can be helpful if the general modifier stays the same, but
+some aspects of the modifier change under different usage models.</p>
+<p>If a modifier only has a single <code class="docutils literal notranslate"><span class="pre">mode</span></code> defined, this becomes the default
+mode. The default mode can be specified using the <code class="docutils literal notranslate"><span class="pre">default_mode</span></code> directive.</p>
+</section>
+<section id="modifier-variables-and-variable-modifications">
+<h3>Modifier Variables and Variable Modifications<a class="headerlink" href="#modifier-variables-and-variable-modifications" title="Link to this heading"></a></h3>
+<p>Sometimes a modifier needs to define or manipulate variable definitions inside an
+experiment. This could include something like adding arguments to a command
+(like <code class="docutils literal notranslate"><span class="pre">mpirun</span></code>) or defining new variables entirely.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">modifier_variable</span></code> and <code class="docutils literal notranslate"><span class="pre">variable_modification</span></code> directives can be used
+to define or edit variables within experiments.</p>
+</section>
+<section id="builtins">
+<h3>Builtins<a class="headerlink" href="#builtins" title="Link to this heading"></a></h3>
+<p>A builtin is a specific command that is injected within an experiment. Builtins
+can have dependencies, and and be injected either at the beginning or end of
+the experiments. Builtins are written as class methods that return a list of
+strings which are explicit commands to add into an experiment. The
+<code class="docutils literal notranslate"><span class="pre">register_builtin</span></code> directive can be used to add a builtin into an experiment.</p>
+</section>
+<section id="phase-registration">
+<h3>Phase Registration<a class="headerlink" href="#phase-registration" title="Link to this heading"></a></h3>
+<p>In Ramble there are several different <code class="docutils literal notranslate"><span class="pre">pipelines</span></code> which are groupings of
+phases to perform a specific action (such as <code class="docutils literal notranslate"><span class="pre">setup</span></code> or <code class="docutils literal notranslate"><span class="pre">analyze</span></code>). Some
+modifiers need to inject phases into one or more of these pipelines. The
+<code class="docutils literal notranslate"><span class="pre">register_phase</span></code> directive can be used to add a phase into a pipeline. Phases
+are written as class methods with a specific signature, and will be
+automatically executed as part of the pipeline they belong to.</p>
+</section>
+<section id="executable-modification">
+<h3>Executable Modification<a class="headerlink" href="#executable-modification" title="Link to this heading"></a></h3>
+<p>One of the most powerful modifications available within modifier definitions is
+the <code class="docutils literal notranslate"><span class="pre">executable_modifier</span></code> directive . Some modifiers will require the
+ability to inject commands around commands that exist in the experiments
+already. A good example of this is a performance analysis tool, which needs to
+modify the execution command to profile the experiment, and generate a summary
+of the performance characteristics of the experiment after it is complete.</p>
+<p>To accomplish this goal, the <code class="docutils literal notranslate"><span class="pre">executable_modifier</span></code> directive can be used,
+which is implemented as a class method which returns two lists of
+<code class="docutils literal notranslate"><span class="pre">CommandExecutable</span></code> objects, which are injected before and after each
+executable.</p>
+</section>
+<section id="environment-variable-modification">
+<h3>Environment Variable Modification<a class="headerlink" href="#environment-variable-modification" title="Link to this heading"></a></h3>
+<p>Some modifiers need to edit environment variables within an experiment. The
+<code class="docutils literal notranslate"><span class="pre">env_var_modification</span></code> directive can be used to change existing environment
+variables.</p>
+</section>
+<section id="shared-functionality">
+<h3>Shared Functionality<a class="headerlink" href="#shared-functionality" title="Link to this heading"></a></h3>
+<p>There are several directives that are shared between applications and modifiers.
+These include success criteria, figures of merit, and figures of merit context.
+For more information on these, refer to either the <a class="reference internal" href="application_dev_guide.html#application-dev-guide"><span class="std std-ref">Application Definition Developers Guide</span></a> or 
+guide, <a class="reference internal" href="../ramble.language.html#module-ramble.language" title="ramble.language"><code class="xref py py-mod docutils literal notranslate"><span class="pre">ramble.language</span></code></a>.</p>
+</section>
+</section>
+<section id="testing-a-modifier">
+<h2>Testing a Modifier<a class="headerlink" href="#testing-a-modifier" title="Link to this heading"></a></h2>
+<p>Modifiers are added into experiments using the <a class="reference internal" href="../configuration_files.html#modifiers-config"><span class="std std-ref">modifiers</span></a> configuration section.</p>
+<p>Modifiers are used within <code class="docutils literal notranslate"><span class="pre">dry-run</span></code> pipeline executions in Ramble. As an
+example, it can be useful to verify the behvior of the modifier is functioning
+correctly by using <code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">setup</span> <span class="pre">--dry-run</span></code>. The output from the
+preparation steps can be copied into the experiment directory to verify the
+<code class="docutils literal notranslate"><span class="pre">ramble</span> <span class="pre">workspace</span> <span class="pre">analyze</span></code> pipeline works, without having to execute the
+experiment itself.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022-2023, Google LLC.
+      <span class="lastupdated">Last updated on Jul 12, 2024.
+      </span></p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
