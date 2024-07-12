@@ -123,12 +123,37 @@ This various parts of this directory structure are defined as:
 
 In the ``configs`` directory, the ``ramble.yaml`` file is the primary workspace
 configuration file. The definition for this file is documented in the
-:ref:``workspace config documentation<workspace-config>``
+:ref:`workspace config documentation<workspace-config>`
 
+^^^^^^^^^^^^^^^^^^^^^^^^
+Workspace Template Files
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 Every file with the ``.tpl`` extension is considered a template file in the
-workspace. These are rendered into each experiment (with the extension
-omitted). This allows control over the script format to execute an experiment.
+workspace. Every one of these are rendered into each experiment (with the
+extension omitted).
+
+Workflows can be constructed by chaining multiple of these template files
+together. Ramble will define a variable within each experiment that will be the
+name of the file (without the extenison) and the value will be the absolute
+path to the rendered template.
+
+As an example, if the file ``configs/execute_experiment.tpl`` exists, each
+experiment will have a variable ``execute_experiment`` who's value is set to
+something like:
+``{workspace_root}/experiments/{application_name}/{workload_name}/{experiment_name}/execute_experiment``
+
+Ramble supports arbitrary format template files. Variables can be referenced
+within these files using the standard ``{`` and ``}`` syntax. Nested variable
+expansion is possible by using repeated curly braces (i.e. ``{{foo}}`` will
+evaluate ``{foo}``, and if this expands to ``bar`` then the result will be the
+expansion of ``{bar}``).
+
+**NOTE:** Some file formats require escaping curly braces to ensure their
+format is correct. This happens frequently with JSON and YAML formatted
+template files. For more information on escaping expansion characters, see
+:ref:`ramble-escaped-variables` in the :ref:`workspace config
+documentation<workspace-config>`
 
 
 ----------------------
