@@ -272,7 +272,7 @@ functions to help construct useful variable definitions.</p>
 <p>When referring to variables in Ramble, sometimes it is useful to be able to
 escape curly braces to prevent the expander from fully expanding the variable
 reference. Curly braces that are prefixed with a back slash (i.e. <code class="docutils literal notranslate"><span class="pre">\{</span></code> or
-<code class="docutils literal notranslate"><span class="pre">\}</span></code>) will be ignored by the expander.</p>
+<code class="docutils literal notranslate"><span class="pre">\}</span></code>) will be replaced with an unexpanded curly brace by Ramble’s expander.</p>
 <p>Each time the variable is expanded, the escaped curly braces will be replaced
 with unescaped curly braces (i.e. <code class="docutils literal notranslate"><span class="pre">\{</span></code> will expand to <code class="docutils literal notranslate"><span class="pre">{</span></code>). Additional back
 slashes can be added to prevent multiple expansions (i.e. <code class="docutils literal notranslate"><span class="pre">\\{</span></code> will expand

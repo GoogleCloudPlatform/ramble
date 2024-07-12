@@ -184,7 +184,7 @@ Escaped Variables
 When referring to variables in Ramble, sometimes it is useful to be able to
 escape curly braces to prevent the expander from fully expanding the variable
 reference. Curly braces that are prefixed with a back slash (i.e. ``\{`` or
-``\}``) will be ignored by the expander.
+``\}``) will be replaced with an unexpanded curly brace by Ramble's expander.
 
 Each time the variable is expanded, the escaped curly braces will be replaced
 with unescaped curly braces (i.e. ``\{`` will expand to ``{``). Additional back

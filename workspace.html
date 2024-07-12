@@ -67,7 +67,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#workspace-links">Workspace Links</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#workspace-structure">Workspace Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#workspace-structure">Workspace Structure</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#workspace-template-files">Workspace Template Files</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#activating-a-workspace">Activating a Workspace</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#printing-workspace-information">Printing Workspace Information</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#concretizing-a-workspace">Concretizing a Workspace</a></li>
@@ -211,10 +214,31 @@ for software environments and input files.</p>
 * <code class="docutils literal notranslate"><span class="pre">software</span></code>: Contain software environments an application’s package manager creates</p>
 <p>In the <code class="docutils literal notranslate"><span class="pre">configs</span></code> directory, the <code class="docutils literal notranslate"><span class="pre">ramble.yaml</span></code> file is the primary workspace
 configuration file. The definition for this file is documented in the
-:ref:<code class="docutils literal notranslate"><span class="pre">workspace</span> <span class="pre">config</span> <span class="pre">documentation&lt;workspace-config&gt;</span></code></p>
+<a class="reference internal" href="workspace_config.html#workspace-config"><span class="std std-ref">workspace config documentation</span></a></p>
+<section id="workspace-template-files">
+<h3>Workspace Template Files<a class="headerlink" href="#workspace-template-files" title="Link to this heading"></a></h3>
 <p>Every file with the <code class="docutils literal notranslate"><span class="pre">.tpl</span></code> extension is considered a template file in the
-workspace. These are rendered into each experiment (with the extension
-omitted). This allows control over the script format to execute an experiment.</p>
+workspace. Every one of these are rendered into each experiment (with the
+extension omitted).</p>
+<p>Workflows can be constructed by chaining multiple of these template files
+together. Ramble will define a variable within each experiment that will be the
+name of the file (without the extenison) and the value will be the absolute
+path to the rendered template.</p>
+<p>As an example, if the file <code class="docutils literal notranslate"><span class="pre">configs/execute_experiment.tpl</span></code> exists, each
+experiment will have a variable <code class="docutils literal notranslate"><span class="pre">execute_experiment</span></code> who’s value is set to
+something like:
+<code class="docutils literal notranslate"><span class="pre">{workspace_root}/experiments/{application_name}/{workload_name}/{experiment_name}/execute_experiment</span></code></p>
+<p>Ramble supports arbitrary format template files. Variables can be referenced
+within these files using the standard <code class="docutils literal notranslate"><span class="pre">{</span></code> and <code class="docutils literal notranslate"><span class="pre">}</span></code> syntax. Nested variable
+expansion is possible by using repeated curly braces (i.e. <code class="docutils literal notranslate"><span class="pre">{{foo}}</span></code> will
+evaluate <code class="docutils literal notranslate"><span class="pre">{foo}</span></code>, and if this expands to <code class="docutils literal notranslate"><span class="pre">bar</span></code> then the result will be the
+expansion of <code class="docutils literal notranslate"><span class="pre">{bar}</span></code>).</p>
+<p><strong>NOTE:</strong> Some file formats require escaping curly braces to ensure their
+format is correct. This happens frequently with JSON and YAML formatted
+template files. For more information on escaping expansion characters, see
+<a class="reference internal" href="workspace_config.html#ramble-escaped-variables"><span class="std std-ref">Escaped Variables</span></a> in the <a class="reference internal" href="workspace_config.html#workspace-config"><span class="std std-ref">workspace config
+documentation</span></a></p>
+</section>
 </section>
 <section id="activating-a-workspace">
 <h2>Activating a Workspace<a class="headerlink" href="#activating-a-workspace" title="Link to this heading"></a></h2>
