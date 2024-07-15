@@ -59,6 +59,7 @@ class Experiment:
         self.n_ranks = data["n_ranks"]
         self.n_threads = data["n_threads"]
         self.node_type = default_node_type_val
+        self.status = data["RAMBLE_STATUS"]
         self.user = get_user()
 
         # FIXME: this is no longer strictly needed since it is just a concat of known properties
@@ -183,7 +184,10 @@ def format_data(data_in):
     current_dateTime = datetime.now()
 
     for exp in data_in["experiments"]:
-        if exp["RAMBLE_STATUS"] == "SUCCESS":
+
+        upload_failed = ramble.config.get("config:upload:push_failed")
+
+        if exp["RAMBLE_STATUS"] == "SUCCESS" or upload_failed:
             e = Experiment(exp["name"], data_in["workspace_hash"], exp, current_dateTime)
             results.append(e)
             # experiment_id = exp.hash()

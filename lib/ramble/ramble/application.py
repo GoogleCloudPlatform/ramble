@@ -1672,40 +1672,38 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.results["RAMBLE_STATUS"] = self.get_status()
 
-        if success or workspace.always_print_foms:
+        self.results["TAGS"] = list(self.experiment_tags)
 
-            self.results["TAGS"] = list(self.experiment_tags)
+        # Add defined keywords as top level keys
+        for key in self.keywords.keys:
+            if self.keywords.is_key_level(key):
+                self.results[key] = self.expander.expand_var_name(key)
 
-            # Add defined keywords as top level keys
-            for key in self.keywords.keys:
-                if self.keywords.is_key_level(key):
-                    self.results[key] = self.expander.expand_var_name(key)
+        self.results["RAMBLE_VARIABLES"] = {}
+        self.results["RAMBLE_RAW_VARIABLES"] = {}
+        for var, val in self.variables.items():
+            self.results["RAMBLE_RAW_VARIABLES"][var] = val
+            if var not in self.keywords.keys or not self.keywords.is_key_level(var):
+                self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
 
-            self.results["RAMBLE_VARIABLES"] = {}
-            self.results["RAMBLE_RAW_VARIABLES"] = {}
-            for var, val in self.variables.items():
-                self.results["RAMBLE_RAW_VARIABLES"][var] = val
-                if var not in self.keywords.keys or not self.keywords.is_key_level(var):
-                    self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
+        self.results["CONTEXTS"] = []
 
-            self.results["CONTEXTS"] = []
+        for context, fom_map in fom_values.items():
+            context_map = {
+                "name": context,
+                "foms": [],
+                "display_name": _get_context_display_name(context),
+            }
 
-            for context, fom_map in fom_values.items():
-                context_map = {
-                    "name": context,
-                    "foms": [],
-                    "display_name": _get_context_display_name(context),
-                }
+            for fom_name, fom in fom_map.items():
+                fom_copy = fom.copy()
+                fom_copy["name"] = fom_name
+                context_map["foms"].append(fom_copy)
 
-                for fom_name, fom in fom_map.items():
-                    fom_copy = fom.copy()
-                    fom_copy["name"] = fom_name
-                    context_map["foms"].append(fom_copy)
-
-                if context == _NULL_CONTEXT:
-                    self.results["CONTEXTS"].insert(0, context_map)
-                else:
-                    self.results["CONTEXTS"].append(context_map)
+            if context == _NULL_CONTEXT:
+                self.results["CONTEXTS"].insert(0, context_map)
+            else:
+                self.results["CONTEXTS"].append(context_map)
 
         workspace.append_result(self.results)
 
