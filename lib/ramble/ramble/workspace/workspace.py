@@ -468,7 +468,6 @@ class Workspace(object):
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
-        self.always_print_foms = False
         self.repeat_success_strict = True
         self.force_concretize = False
 
@@ -1079,39 +1078,38 @@ class Workspace(object):
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
 
-                        if exp["RAMBLE_STATUS"] == "SUCCESS" or self.always_print_foms:
-                            if exp["N_REPEATS"] > 0:  # this is a base exp with summary of repeats
-                                for context in exp["CONTEXTS"]:
-                                    f.write(f'  {context["display_name"]} figures of merit:\n')
+                        if exp["N_REPEATS"] > 0:  # this is a base exp with summary of repeats
+                            for context in exp["CONTEXTS"]:
+                                f.write(f'  {context["display_name"]} figures of merit:\n')
 
-                                    fom_summary = {}
-                                    for fom in context["foms"]:
-                                        name = fom["name"]
-                                        if name not in fom_summary.keys():
-                                            fom_summary[name] = []
-                                        stat_name = fom["origin_type"]
-                                        value = fom["value"]
-                                        units = fom["units"]
+                                fom_summary = {}
+                                for fom in context["foms"]:
+                                    name = fom["name"]
+                                    if name not in fom_summary.keys():
+                                        fom_summary[name] = []
+                                    stat_name = fom["origin_type"]
+                                    value = fom["value"]
+                                    units = fom["units"]
 
-                                        output = f"{stat_name} = {value} {units}\n"
-                                        fom_summary[name].append(output)
+                                    output = f"{stat_name} = {value} {units}\n"
+                                    fom_summary[name].append(output)
 
-                                    for fom_name, fom_val_list in fom_summary.items():
-                                        f.write(f"    {fom_name}:\n")
-                                        for fom_val in fom_val_list:
-                                            f.write(f"      {fom_val.strip()}\n")
-                            else:
-                                for context in exp["CONTEXTS"]:
-                                    f.write(f'  {context["display_name"]} figures of merit:\n')
-                                    for fom in context["foms"]:
-                                        name = fom["name"]
-                                        if fom["origin_type"] == "modifier":
-                                            delim = "::"
-                                            mod = fom["origin"]
-                                            name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
+                                for fom_name, fom_val_list in fom_summary.items():
+                                    f.write(f"    {fom_name}:\n")
+                                    for fom_val in fom_val_list:
+                                        f.write(f"      {fom_val.strip()}\n")
+                        else:
+                            for context in exp["CONTEXTS"]:
+                                f.write(f'  {context["display_name"]} figures of merit:\n')
+                                for fom in context["foms"]:
+                                    name = fom["name"]
+                                    if fom["origin_type"] == "modifier":
+                                        delim = "::"
+                                        mod = fom["origin"]
+                                        name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                        output = "%s = %s %s" % (name, fom["value"], fom["units"])
-                                        f.write("    %s\n" % (output.strip()))
+                                    output = "%s = %s %s" % (name, fom["value"], fom["units"])
+                                    f.write("    %s\n" % (output.strip()))
                 else:
                     logger.msg("No results to write")
 

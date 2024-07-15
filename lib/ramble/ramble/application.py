@@ -1799,96 +1799,95 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
 
         self.results["RAMBLE_STATUS"] = self.get_status()
 
-        if repeat_success or workspace.always_print_foms:
-            logger.debug(
-                f"Calculating statistics for {self.repeats.n_repeats} repeats of "
-                f"{base_exp_name}"
-            )
+        logger.debug(
+            f"Calculating statistics for {self.repeats.n_repeats} repeats of "
+            f"{base_exp_name}"
+        )
 
-            # Add defined keywords as top level keys
-            for key in self.keywords.keys:
-                if self.keywords.is_key_level(key):
-                    self.results[key] = self.expander.expand_var_name(key)
+        # Add defined keywords as top level keys
+        for key in self.keywords.keys:
+            if self.keywords.is_key_level(key):
+                self.results[key] = self.expander.expand_var_name(key)
 
-            self.results["RAMBLE_VARIABLES"] = {}
-            self.results["RAMBLE_RAW_VARIABLES"] = {}
-            for var, val in self.variables.items():
-                self.results["RAMBLE_RAW_VARIABLES"][var] = val
-                self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
-            self.results["CONTEXTS"] = []
+        self.results["RAMBLE_VARIABLES"] = {}
+        self.results["RAMBLE_RAW_VARIABLES"] = {}
+        for var, val in self.variables.items():
+            self.results["RAMBLE_RAW_VARIABLES"][var] = val
+            self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
+        self.results["CONTEXTS"] = []
 
-            results = []
+        results = []
 
-            # Iterate through repeat experiment instances, extract foms, and aggregate them
-            for exp in repeat_experiments.keys():
-                if exp in self.experiment_set.experiments.keys():
-                    exp_inst = self.experiment_set.experiments[exp]
-                elif exp in self.experiment_set.chained_experiments.keys():
-                    exp_inst = self.experiment_set.chained_experiments[exp]
-                else:
-                    continue
+        # Iterate through repeat experiment instances, extract foms, and aggregate them
+        for exp in repeat_experiments.keys():
+            if exp in self.experiment_set.experiments.keys():
+                exp_inst = self.experiment_set.experiments[exp]
+            elif exp in self.experiment_set.chained_experiments.keys():
+                exp_inst = self.experiment_set.chained_experiments[exp]
+            else:
+                continue
 
-                # When strict success is off for repeats (loose success), skip failed exps
-                if (
-                    not workspace.repeat_success_strict
-                    and exp_inst.results["RAMBLE_STATUS"] == "FAILED"
-                ):
-                    continue
+            # When strict success is off for repeats (loose success), skip failed exps
+            if (
+                not workspace.repeat_success_strict
+                and exp_inst.results["RAMBLE_STATUS"] == "FAILED"
+            ):
+                continue
 
-                if "CONTEXTS" in exp_inst.results:
-                    for context in exp_inst.results["CONTEXTS"]:
-                        context_name = context["name"]
+            if "CONTEXTS" in exp_inst.results:
+                for context in exp_inst.results["CONTEXTS"]:
+                    context_name = context["name"]
 
-                        if context_name not in repeat_foms.keys():
-                            repeat_foms[context_name] = {}
+                    if context_name not in repeat_foms.keys():
+                        repeat_foms[context_name] = {}
 
-                        for foms in context["foms"]:
-                            fom_key = (
-                                foms["name"],
-                                foms["units"],
-                                foms["origin"],
-                                foms["origin_type"],
-                            )
+                    for foms in context["foms"]:
+                        fom_key = (
+                            foms["name"],
+                            foms["units"],
+                            foms["origin"],
+                            foms["origin_type"],
+                        )
 
-                            # Stats will not be calculated for non-numeric foms so they're skipped
-                            if is_numeric(foms["value"]):
-                                if fom_key not in repeat_foms[context_name].keys():
-                                    repeat_foms[context_name][fom_key] = []
-                                repeat_foms[context_name][fom_key].append(float(foms["value"]))
+                        # Stats will not be calculated for non-numeric foms so they're skipped
+                        if is_numeric(foms["value"]):
+                            if fom_key not in repeat_foms[context_name].keys():
+                                repeat_foms[context_name][fom_key] = []
+                            repeat_foms[context_name][fom_key].append(float(foms["value"]))
 
-            # Iterate through the aggregated foms, calculate stats, and insert into results
-            for context, fom_dict in repeat_foms.items():
-                context_map = {
-                    "name": context,
-                    "foms": [],
-                    "display_name": _get_context_display_name(context),
-                }
+        # Iterate through the aggregated foms, calculate stats, and insert into results
+        for context, fom_dict in repeat_foms.items():
+            context_map = {
+                "name": context,
+                "foms": [],
+                "display_name": _get_context_display_name(context),
+            }
 
-                for fom_key, fom_values in fom_dict.items():
-                    fom_name = fom_key[0]
-                    fom_units = fom_key[1]
-                    fom_origin = fom_key[2]
+            for fom_key, fom_values in fom_dict.items():
+                fom_name = fom_key[0]
+                fom_units = fom_key[1]
+                fom_origin = fom_key[2]
 
-                    calcs = []
+                calcs = []
 
-                    for statistic in ramble.util.stats.all_stats:
-                        calcs.append(statistic.report(fom_values, fom_units))
+                for statistic in ramble.util.stats.all_stats:
+                    calcs.append(statistic.report(fom_values, fom_units))
 
-                    for calc in calcs:
-                        fom_dict = {
-                            "value": calc[0],
-                            "units": calc[1],
-                            "origin": fom_origin,
-                            "origin_type": calc[2],
-                            "name": fom_name,
-                        }
+                for calc in calcs:
+                    fom_dict = {
+                        "value": calc[0],
+                        "units": calc[1],
+                        "origin": fom_origin,
+                        "origin_type": calc[2],
+                        "name": fom_name,
+                    }
 
-                        context_map["foms"].append(fom_dict)
+                    context_map["foms"].append(fom_dict)
 
-                results.append(context_map)
+            results.append(context_map)
 
-            if results:
-                self.results["CONTEXTS"] = results
+        if results:
+            self.results["CONTEXTS"] = results
 
         workspace.insert_result(self.results, first_repeat_exp)
 
