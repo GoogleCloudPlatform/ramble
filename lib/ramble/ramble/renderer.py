@@ -207,6 +207,9 @@ class Renderer(object):
 
                 # Validate variable definitions
                 for var_name in group_def:
+                    object_variables[var_name] = expander.expand_var(
+                        object_variables[var_name], typed=True
+                    )
                     if var_name not in object_variables:
                         logger.die(
                             f"An undefined variable {var_name} " f"is defined in zip {zip_group}"
@@ -303,6 +306,9 @@ class Renderer(object):
                     matrix_vars.add(var)
 
                     if var in object_variables:
+                        object_variables[var] = expander.expand_var(
+                            object_variables[var], typed=True
+                        )
                         if not isinstance(object_variables[var], list):
                             err_context = object_variables[render_group.context]
                             logger.die(

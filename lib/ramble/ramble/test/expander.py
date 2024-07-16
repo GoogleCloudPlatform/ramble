@@ -133,6 +133,8 @@ def test_expansions(input, output, no_expand_vars, passes):
         ("2 or 1", 2, set(), 1),
         ("randrange(2, 3, 1)", 2, set(), 1),
         ("randint(3, 3)", 3, set(), 1),
+        ("[1, 2, 3]", [1, 2, 3], set(), 1),
+        ("abc", "abc", set(), 1),
     ],
 )
 def test_typed_expansions(input, output, no_expand_vars, passes):
