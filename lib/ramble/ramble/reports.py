@@ -23,6 +23,7 @@ import ramble.cmd.results
 import ramble.cmd.workspace
 import ramble.config
 import ramble.filters
+from ramble.language.shared_language import BetterDirection
 import ramble.pipeline
 import ramble.util.path
 from ramble.util.logger import logger
@@ -48,6 +49,13 @@ def is_numeric(series):
         return True
     except (ValueError, TypeError):
         return False
+
+
+def validate_spec(results_df, chart_spec):
+    """Validates that the FOMs and variables in the chart spec are in the results data."""
+    for var in chart_spec:
+        if var not in results_df.columns and var not in results_df.loc[:, 'fom_name'].values:
+            logger.die(f'{var} was not found in the results data.')
 
 
 def load_results(args):
@@ -106,6 +114,10 @@ def prepare_data(results: dict) -> pd.DataFrame:
                     exp_copy['fom_units'] = fom['units']
                     exp_copy['fom_origin'] = fom['origin']
                     exp_copy['fom_origin_type'] = fom['origin_type']
+                    if 'fom_type' in fom.keys():
+                        exp_copy['better_direction'] = fom['fom_type']['better_direction']
+                    else:  # if using older data file without fom_type
+                        exp_copy['better_direction'] = 'INDETERMINATE'
 
                     # Flatten final vars dict and drop raw vars dict
                     exp_copy.pop('RAMBLE_VARIABLES')
@@ -118,7 +130,7 @@ def prepare_data(results: dict) -> pd.DataFrame:
                         'batch_submit',
                         'log_file',
                         'command',
-                        'execute_experiment'
+                        'execute_experiment',
                     ]
                     for key, value in exp['RAMBLE_VARIABLES'].items():
                         if key in vars_to_ignore:
@@ -147,107 +159,222 @@ def prepare_data(results: dict) -> pd.DataFrame:
     return results_df
 
 
-def make_report(results_df, args):
-    # analyze_pipeline = ramble.pipeline.pipelines.analyze
-    # pipeline_cls = ramble.pipeline.pipeline_class(analyze_pipeline)
-
-    # filters = ramble.filters.Filters(
-    #     phase_filters='*'
-    # )
-    # pipeline = pipeline_cls(ws, filters)
-    # pipeline.run()
-
-    # results_df = prepare_data(ws.results)
-
-    # pd.DataFrame.to_csv(results_df, 'results.csv')
-
-    # import pprint
-    # pprint.pprint(ws.results)
-    # print(args)
-    # print(args.scaling)
-
+def make_report(results_df, args):    
     dt = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     report_dir_root = get_reports_path()
+    # TODO(dpomeroy): update file import to extract workspace name and pass it through here
     ws_name = 'unknown_workspace'
     if args.workspace:
         ws_name = str(args.workspace)
     report_name = f"{ws_name}.{dt}"
     report_dir_path = os.path.join(report_dir_root, report_name)
     fs.mkdirp(report_dir_path)
-
-    print(f'report_path = {report_dir_path}')
-
     pdf_path = os.path.join(report_dir_path, f'{report_name}.pdf')
-    print(f'pdf_path = {pdf_path}')
 
     with PdfPages(pdf_path) as pdf_report:
 
         if args.strong_scaling:
             print("strong_scaling")
-            generate_strong_scaling_chart(results_df, pdf_report, args)
+            generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
         if args.weak_scaling:
             print("weak_scaling")
-            generate_weak_scaling_chart(results_df, pdf_report, args)
+            generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
         if args.compare:
             print("compare")
-            generate_compare_chart(results_df, pdf_report, args)
+            generate_compare_chart(results_df, pdf_report, report_dir_path, args)
 
         if args.foms:
             print("foms")
-            generate_foms_chart(results_df, pdf_report, args)
+            generate_foms_chart(results_df, pdf_report, report_dir_path, args)
+
+    # TODO(dpomeroy): this needs to error out if the PDF is empty, currently it succeeds
+    # print(f'pdf size is {os.path.getsize(pdf_path)}')
+    if os.path.isfile(pdf_path):
+        logger.msg("Report generated successfully. A PDF summary is available at:\n"
+                   f"    {pdf_path}")
+        logger.msg("Individual chart images are available at:\n"
+                   f"    {report_dir_path}")
 
 
-def generate_strong_scaling_chart(results_df, pdf_report, args):
-    strong_scaling = list(itertools.chain.from_iterable(args.strong_scaling))
+def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args):
+    for chart_spec in args.strong_scaling:
 
-    if len(strong_scaling) < 2:
-        logger.die('Scaling plot requires two arguments: '
-                   'performance metric and scaling metric')
+        if len(chart_spec) < 2:
+            logger.die('Scaling plot requires two arguments: '
+                       'performance metric and scaling metric')
 
-    for col in strong_scaling:
-        if col not in results_df.columns and col not in results_df.loc[: ,'fom_name'].values:
-            logger.die(f'{col} was not found in the results data.')
+        validate_spec(results_df, chart_spec)
 
-    perf_measure, scale_var, *additional_vars = strong_scaling
+        perf_measure, scale_var, *additional_vars = chart_spec
 
-    # FOMs are by row, so select only rows with the perf_measure FOM
-    perf_results = results_df.query(f'fom_name == "{perf_measure}"')
+        # FOMs are by row, so select only rows with the perf_measure FOM
+        perf_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
 
-    perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
-    if additional_vars:
-        for var in additional_vars:
-            perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_' + perf_results.loc[:, var].astype(str)
+        # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
+        better_direction = 'INDETERMINATE'
+        if len(perf_results.loc[:, 'better_direction'].unique()) == 1:
+            better_direction = perf_results.loc[:, 'better_direction'].unique()[0]
 
-    for series in perf_results['series'].unique():
-        fig, ax = plt.subplots()
+        perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
+        if additional_vars:
+            for var in additional_vars:
+                perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_x_' + var
 
-        plot_name = f""
+        for series in perf_results.loc[:, 'series'].unique():
 
-        ax.plot(f'{scale_var}', 'fom_value', data=perf_results.query(f'series == "{series}"'), marker='o')
-        ax.set_xscale('log')
-        ax.set_xticks(perf_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
-        ax.set_xlabel(f'{scale_var}')
-        # ax.set_xticks(perf_results[f'{scale_var}'].unique())
-        ax.set_ylabel(f'{perf_measure}')
-        ax.set_title(f'Scaling Chart for {series}')
+            print(f'series = {series}')
 
-        # fig =  (perf_results.query(f'series == "{series}"'), x=f'{scale_var}', y='fom_value')
-            # fig.update_layout(title=f'Scaling Chart for {data["perf_name"]} vs {data["scale_name"]}',
-            #                     xaxis_title=data['scale_name'],
-            #                     yaxis_title=data['perf_name'])
-        #fig.show()
-        pdf_report.savefig(fig)
-        plt.close(fig)
+            series_results = perf_results.query(f'series == "{series}"')
+            selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
 
-    # pd.DataFrame.to_csv(results_df, 'results.csv')
+            fig, ax = plt.subplots()
 
-def generate_weak_scaling_chart(results_df, pdf_report, args):
-    pass
+            if args.normalize:
+                first_perf_value = selected['fom_value'].iloc[0]
+                selected.loc[:, 'normalized_fom_value'] = first_perf_value / selected.loc[:, 'fom_value']
 
-def generate_compare_chart(results_df, pdf_report, args):
-    pass
+                first_scale_value = selected[f'{scale_var}'].iloc[0]
+                selected.loc[:, 'ideal_perf_value'] = selected.loc[:, f'{scale_var}'] / first_scale_value
 
-def generate_foms_chart(results_df, pdf_report, args):
+                ax.plot(f'{scale_var}', 'normalized_fom_value', data=selected, marker='o')
+                ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
+
+                ax.set_xlabel(f'{scale_var}')
+                ax.set_ylabel('Speedup')
+            else:
+                first_perf_value = selected['fom_value'].iloc[0]
+
+                if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
+                    first_perf_value = selected['fom_value'].iloc[0]
+                    selected.loc[:, 'ideal_perf_value'] = first_perf_value / selected.loc[:, f'{scale_var}']
+                if better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
+                    first_perf_value = selected['fom_value'].iloc[0]
+                    selected.loc[:, 'ideal_perf_value'] = first_perf_value * selected.loc[:, f'{scale_var}']                
+
+                ax.plot(f'{scale_var}', 'fom_value', data=selected, marker='o')
+                ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
+
+                ax.set_xlabel(f'{scale_var}')
+                ax.set_ylabel(f'{perf_measure}')
+
+            # ax.set_xscale('log')
+            ax.set_xticks(perf_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
+            ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}')
+
+            # TODO(dpomeroy): add data table below chart
+            # cols = (f'{scale_var}', f'{perf_measure}')
+            # n_rows = len(selected)
+
+            chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
+            chart_filename = chart_filename.replace(" ", "-")
+
+            plt.savefig(os.path.join(report_dir_path, chart_filename))
+            pdf_report.savefig(fig)
+            plt.close(fig)
+
+
+def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
+    for chart_spec in args.weak_scaling:
+
+        if len(chart_spec) < 2:
+            logger.die('Scaling plot requires two arguments: '
+                       'performance metric and scaling metric')
+
+        validate_spec(results_df, chart_spec)
+
+        perf_measure, scale_var, *additional_vars = chart_spec
+
+        # FOMs are by row, so select only rows with the perf_measure FOM
+        perf_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
+
+        # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
+        better_direction = 'INDETERMINATE'
+        if len(perf_results.loc[:, 'better_direction'].unique()) == 1:
+            better_direction = perf_results.loc[:, 'better_direction'].unique()[0]
+
+        perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
+        if additional_vars:
+            for var in additional_vars:
+                perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_x_' + var
+
+        for series in perf_results.loc[:, 'series'].unique():
+
+            print(f'series = {series}')
+
+            series_results = perf_results.query(f'series == "{series}"')
+            selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
+
+            fig, ax = plt.subplots()
+
+            if args.normalize:
+                first_perf_value = selected['fom_value'].iloc[0]
+                selected.loc[:, 'normalized_fom_value'] = first_perf_value / selected.loc[:, 'fom_value']
+
+                selected.loc[:, 'ideal_perf_value'] = 1
+
+                ax.plot(f'{scale_var}', 'normalized_fom_value', data=selected, marker='o')
+                ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
+
+                ax.set_xlabel(f'{scale_var}')
+                ax.set_ylabel('Efficiency')
+            else:
+                first_perf_value = selected['fom_value'].iloc[0]
+
+                # TODO(dpomeroy): figure out if there's supposed to be a difference between non-normalized
+                # weak scaling charts
+                if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
+                    first_perf_value = selected['fom_value'].iloc[0]
+                    selected.loc[:, 'ideal_perf_value'] = first_perf_value
+                if better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
+                    first_perf_value = selected['fom_value'].iloc[0]
+                    selected.loc[:, 'ideal_perf_value'] = first_perf_value
+
+                ax.plot(f'{scale_var}', 'fom_value', data=selected, marker='o')
+                ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
+
+                ax.set_xlabel(f'{scale_var}')
+                ax.set_ylabel(f'{perf_measure}')
+
+            # ax.set_xscale('log')
+            ax.set_xticks(perf_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
+            ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}')
+
+            # TODO(dpomeroy): add data table below chart
+            # cols = (f'{scale_var}', f'{perf_measure}')
+            # n_rows = len(selected)
+
+            chart_filename = f'weak-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
+            chart_filename = chart_filename.replace(" ", "-")
+
+            plt.savefig(os.path.join(report_dir_path, chart_filename))
+            pdf_report.savefig(fig)
+            plt.close(fig)
+
+# --compare -n [FOM_1] [FOM_2] [optional: add'l FOMs] [optional: group by]
+def generate_compare_chart(results_df, pdf_report, report_dir_path, args):
+    for chart_spec in args.compare:
+        validate_spec(results_df, chart_spec)
+
+        # Organize input args into FOMs and groups
+        foms = []
+        groups = []
+
+        for input in chart_spec:
+            if input in results_df.loc[:, 'fom_name'].values:
+                foms.append(input)
+            else:
+                groups.append(input)
+
+        compare_results = results_df.pivot_table('fom_value', index=groups, columns='fom_name').copy()
+        compare_results = compare_results[foms]
+        # print(f'compare_results:\n{compare_results}')
+
+
+def generate_foms_chart(results_df, pdf_report, report_dir_path, args):
+    # this one doesn't have a chart spec, it's just a flag
+    # first divide results into series based on workload namespace
+    # then iterate through foms and create 1 chart per fom comparing fom_value (y) by experiment (x)
+
     pass
