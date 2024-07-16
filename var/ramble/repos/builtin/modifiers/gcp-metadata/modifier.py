@@ -86,12 +86,14 @@ class GcpMetadata(BasicModifier):
         fom_regex=r".*machineTypes/(?P<machine>.*)",
         group_name="machine",
         log_file="{experiment_run_dir}/gcp-metadata.machine-type.log",
+        fom_type=FomType.INFO,
     )
     figure_of_merit(
         "image",
         fom_regex=r"(?P<image>.*global/images.*)",
         group_name="image",
         log_file="{experiment_run_dir}/gcp-metadata.image.log",
+        fom_type=FomType.INFO,
     )
 
     # This is intentionally left singular, to get the hostname of the "parent" or "root" process
@@ -100,6 +102,7 @@ class GcpMetadata(BasicModifier):
         fom_regex=r"(?P<ghostname>.*internal)",
         group_name="ghostname",
         log_file="{experiment_run_dir}/gcp-metadata.hostname.log",
+        fom_type=FomType.INFO,
     )
 
     # This returns a list of all known gids in the job
@@ -108,4 +111,5 @@ class GcpMetadata(BasicModifier):
         fom_regex=r"(?P<gid>.*)",
         group_name="gid",
         log_file="{experiment_run_dir}/gcp-metadata.id_list.log",
+        fom_type=FomType.INFO,
     )

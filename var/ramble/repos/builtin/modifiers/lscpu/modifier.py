@@ -90,6 +90,7 @@ class Lscpu(BasicModifier):
             units="",
             log_file="{lscpu_log}",
             contexts=["architecture"],
+            fom_type=FomType.INFO,
         )
 
     register_builtin("lscpu_exec")
