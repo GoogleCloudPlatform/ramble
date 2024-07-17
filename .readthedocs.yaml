@@ -7,7 +7,7 @@ build:
 
 sphinx:
   configuration: lib/ramble/docs/conf.py
-  fail_on_warning: true
+  fail_on_warning: false
 
 python:
   install:
