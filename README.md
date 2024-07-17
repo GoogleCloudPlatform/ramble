@@ -40,7 +40,7 @@ Documentation
 ----------------
 
 Ramble’s documentation can be viewed at
-[https://googlecloudplatform.github.io/ramble/](https://googlecloudplatform.github.io/ramble/).
+[https://ramble.readthedocs.io/](https://ramble.readthedocs.io/).
 
 For help with Ramble’s commands, run `ramble help` or `ramble help --all`.
 
