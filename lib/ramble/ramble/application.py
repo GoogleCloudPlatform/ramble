@@ -999,7 +999,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
                 exec_cmd = exec_node.attribute
                 if exec_cmd.redirect:
-                    logs.add(exec_cmd.redirect)
+                    expanded_log = self.expander.expand_var(exec_cmd.redirect)
+                    logs.add(expanded_log)
 
         analysis_logs, _, _ = self._analysis_dicts(success_list)
 
