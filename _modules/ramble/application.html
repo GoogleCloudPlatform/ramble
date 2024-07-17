@@ -1177,7 +1177,8 @@
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exec_node</span><span class="o">.</span><span class="n">attribute</span><span class="p">,</span> <span class="n">ramble</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">executable</span><span class="o">.</span><span class="n">CommandExecutable</span><span class="p">):</span>
                 <span class="n">exec_cmd</span> <span class="o">=</span> <span class="n">exec_node</span><span class="o">.</span><span class="n">attribute</span>
                 <span class="k">if</span> <span class="n">exec_cmd</span><span class="o">.</span><span class="n">redirect</span><span class="p">:</span>
-                    <span class="n">logs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">exec_cmd</span><span class="o">.</span><span class="n">redirect</span><span class="p">)</span>
+                    <span class="n">expanded_log</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">expander</span><span class="o">.</span><span class="n">expand_var</span><span class="p">(</span><span class="n">exec_cmd</span><span class="o">.</span><span class="n">redirect</span><span class="p">)</span>
+                    <span class="n">logs</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">expanded_log</span><span class="p">)</span>
 
         <span class="n">analysis_logs</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_analysis_dicts</span><span class="p">(</span><span class="n">success_list</span><span class="p">)</span>
 
