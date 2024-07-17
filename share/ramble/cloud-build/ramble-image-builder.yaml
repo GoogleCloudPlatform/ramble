@@ -13,9 +13,9 @@ steps:
     args:
     - 'build'
     - '-t'
-    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}-pip${_PIP_VER}:latest'
+    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest'
     - '--cache-from'
-    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}-pip${_PIP_VER}:latest'
+    - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest'
     - '-f'
     - 'share/ramble/cloud-build/Dockerfile-${_PKG_MANAGER}'
     - '--build-arg'
@@ -26,17 +26,14 @@ steps:
     - 'SPACK_REF=${_SPACK_REF}'
     - '--build-arg'
     - 'PYTHON_VER=${_PYTHON_VER}'
-    - '--build-arg'
-    - 'PIP_VER=${_PIP_VER}'
     - '.'
 substitutions:
   _SPACK_REF: v0.21.2
   _PYTHON_VER: 3.11.6
-  _PIP_VER: 23.1.2
   _BASE_IMG: centos
   _BASE_VER: '7'
   _PKG_MANAGER: 'yum'
-images: ['us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}-pip${_PIP_VER}']
+images: ['us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}']
 timeout: 6000s
 options:
   machineType: N1_HIGHCPU_8
