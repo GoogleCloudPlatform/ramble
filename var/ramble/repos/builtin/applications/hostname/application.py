@@ -27,6 +27,13 @@ class Hostname(ExecutableApplication):
         "local", "hostname", use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL
     )
     executable(
+        "local_bg",
+        "hostname",
+        use_mpi=False,
+        output_capture=OUTPUT_CAPTURE.ALL,
+        run_in_background=True,
+    )
+    executable(
         "serial",
         "/usr/bin/time hostname",
         use_mpi=False,
@@ -40,6 +47,7 @@ class Hostname(ExecutableApplication):
     )
 
     workload("local", executable="local")
+    workload("local_bg", executable="local_bg")
     workload("serial", executable="serial")
     workload("parallel", executable="parallel")
 

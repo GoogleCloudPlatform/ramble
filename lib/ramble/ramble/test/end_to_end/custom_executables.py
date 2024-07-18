@@ -45,6 +45,7 @@ ramble:
                     use_mpi: false
                     redirect: '{log_file}'
                     output_capture: '>>'
+                    run_in_background: true
                   before_all:
                     template:
                     - 'echo "before all"'
@@ -102,7 +103,7 @@ ramble:
 
         import re
 
-        custom_regex = re.compile("lscpu >>")
+        custom_regex = re.compile(r"^lscpu >> .* &$")
         export_regex = re.compile(r"export MY_VAR=TEST")
         cmd_regex = re.compile("foo >>")
 
