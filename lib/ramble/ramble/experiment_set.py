@@ -434,6 +434,7 @@ class ExperimentSet(object):
                     exclude_exp_name = expander.expand_var(
                         experiment_template_name, allow_passthrough=False
                     )
+                    logger.debug(f"  Excluding experiment {exclude_exp_name}")
                     excluded_experiments.add(exclude_exp_name)
 
         exclude_where = []

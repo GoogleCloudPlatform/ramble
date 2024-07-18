@@ -217,30 +217,35 @@ class ExpansionNode(object):
                 kw_parts = format_kw.split(":")
                 required_passthrough = False
 
-                if kw_parts[0] in expansion_dict:
-                    used_vars.add(kw_parts[0])
-                    # Exit expansion for variables defined as no_expand
-                    if kw_parts[0] in no_expand_vars:
-                        self.value = expansion_dict[kw_parts[0]]
-                        return
+                if not cache.contains(kw_parts[0]):
+                    if kw_parts[0] in expansion_dict:
+                        used_vars.add(kw_parts[0])
+                        # Exit expansion for variables defined as no_expand
+                        if kw_parts[0] in no_expand_vars:
+                            self.value = expansion_dict[kw_parts[0]]
+                            return
+                        else:
+                            self.value = expansion_func(
+                                expansion_dict,
+                                expansion_dict[kw_parts[0]],
+                                allow_passthrough=allow_passthrough,
+                            )
                     else:
-                        self.value = expansion_func(
-                            expansion_dict,
-                            expansion_dict[kw_parts[0]],
-                            allow_passthrough=allow_passthrough,
-                        )
-                else:
-                    self.value = kw_parts[0]
-                    required_passthrough = True
+                        self.value = kw_parts[0]
+                        required_passthrough = True
 
-                # Evaluation should go here
-                try:
-                    old_value = self.value
-                    self.value = evaluation_func(self.value)
-                    if old_value != self.value:
-                        required_passthrough = False
-                except SyntaxError:
-                    pass
+                    # Evaluation should go here
+                    try:
+                        old_value = self.value
+                        self.value = evaluation_func(self.value)
+                        if old_value != self.value:
+                            required_passthrough = False
+                    except SyntaxError:
+                        pass
+
+                    cache.add(kw_parts[0], self.value)
+                else:
+                    self.value = cache.retrieve(kw_parts[0])
 
                 # If we had a format spec, add it
                 if len(kw_parts) > 1:
@@ -633,10 +638,12 @@ class Expander(object):
             boolean: True or False, based on the evaluation of in_str
         """
 
+        logger.debug(f" BEGIN EVAL PREDICATE: {in_str}")
         evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
 
         if not isinstance(evaluated, str):
             logger.die("Logical compute failed to return a string")
+        logger.debug(f" END EVAL PREDICATE: {evaluated}")
 
         if evaluated == "True":
             return True
@@ -666,18 +673,23 @@ class Expander(object):
         """
 
         if isinstance(in_str, str):
-            str_graph = ExpansionGraph(in_str)
-            for node in str_graph.walk():
-                node.define_value(
-                    expansion_vars,
-                    allow_passthrough=allow_passthrough,
-                    expansion_func=self._partial_expand,
-                    evaluation_func=self.perform_math_eval,
-                    no_expand_vars=self._no_expand_vars,
-                    used_vars=self._used_variables,
-                )
+            if not self._cache.contains(in_str):
+                str_graph = ExpansionGraph(in_str)
+                for node in str_graph.walk():
+                    node.define_value(
+                        expansion_vars,
+                        allow_passthrough=allow_passthrough,
+                        expansion_func=self._partial_expand,
+                        evaluation_func=self.perform_math_eval,
+                        no_expand_vars=self._no_expand_vars,
+                        used_vars=self._used_variables,
+                        cache=self._cache,
+                    )
 
-            return str(str_graph.root.value)
+                self._cache.add(in_str, str(str_graph.root.value))
+                return str(str_graph.root.value)
+            else:
+                return self._cache.retrieve(in_str)
 
         return str(in_str)
 

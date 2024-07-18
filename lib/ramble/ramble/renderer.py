@@ -430,15 +430,16 @@ class Renderer(object):
         where_expander = ramble.expander.Expander(object_variables, None)
 
         for obj in new_objects:
-            logger.debug(f"Rendering {render_group.object}:")
+            where_expander._cache.flush()
             for var, val in obj.items():
                 object_variables[var] = val
+                where_expander._variables[var] = val
 
             keep_object = True
             if exclude_where:
                 for where in exclude_where:
-                    evaluated = where_expander.expand_var(where)
-                    if evaluated == "True":
+                    evaluated = where_expander.evaluate_predicate(where)
+                    if evaluated:
                         keep_object = False
 
             if keep_object:
