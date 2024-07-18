@@ -71,6 +71,38 @@ supported_list_function_pointers = {
 formatter = string.Formatter()
 
 
+class ExpansionCache(object):
+    def __init__(self, enabled=True):
+        self.cache = {}
+        self.enabled = enabled
+
+    def flush(self):
+        self.cache = {}
+
+    def contains(self, key):
+        if self.enabled:
+            return key in self.cache
+        return False
+
+    def add(self, key, value):
+        if self.enabled:
+            self.cache[key] = value
+
+    def retrieve(self, key):
+        if self.enabled and key in self.cache:
+            return self.cache[key]
+        return key
+
+    def set_enabled(self, enabled):
+        self.enabled = enabled
+
+    def enable(self):
+        self.enabled = True
+
+    def disable(self):
+        self.enabled = False
+
+
 class ExpansionDelimiter(object):
     """Class representing the delimiters for ramble expansion strings"""
 
@@ -138,6 +170,7 @@ class ExpansionNode(object):
         evaluation_func=eval,
         no_expand_vars=set(),
         used_vars=set(),
+        cache=ExpansionCache(),
     ):
         """Define the value for this node.
 
@@ -157,6 +190,8 @@ class ExpansionNode(object):
             variable definitions
             evaluation_func (func): function to use for evaluating math of strings
             no_expand_vars (set): set of variable names that should never be expanded
+            cache (ExpansionCache): an expansion cache used to prevent
+                                    repeatedly expanding the same strings
         """
         if self.contents is not None:
             parts = []
@@ -329,6 +364,7 @@ class Expander(object):
         self._variables = variables
         self._no_expand_vars = no_expand_vars
         self._used_variables = set()
+        self._cache = ExpansionCache()
 
         self._experiment_set = experiment_set
 
@@ -493,6 +529,7 @@ class Expander(object):
         extra_vars: Dict = None,
         allow_passthrough: bool = True,
         typed: bool = False,
+        cache: bool = True,
     ):
         """Convert a variable name to an expansion string, and expand it
 
@@ -506,12 +543,14 @@ class Expander(object):
             allow_passthrough (bool): Whether the string is allowed to have keywords
                                       after expansion
             typed (bool): Whether the return type should be typed or not
+            cache (bool): Whether to cache the expansion of var_name or not
         """
         return self.expand_var(
             self.expansion_str(var_name),
             extra_vars=extra_vars,
             allow_passthrough=allow_passthrough,
             typed=typed,
+            cache=cache,
         )
 
     def expand_var(
@@ -520,6 +559,7 @@ class Expander(object):
         extra_vars: Dict = None,
         allow_passthrough: bool = True,
         typed: bool = False,
+        cache: bool = True,
     ):
         """Perform expansion of a string
 
@@ -532,9 +572,17 @@ class Expander(object):
             allow_passthrough (bool): Whether the string is allowed to have keywords
                                       after expansion
             typed (bool): Whether the return type should be typed or not
+            cache (bool): Whether to cache the expansion of var_name or not
         """
 
+        prev_enabled_cache = self._cache.enabled
+
         passthrough_setting = allow_passthrough
+
+        if cache:
+            self._cache.enable()
+        else:
+            self._cache.disable()
 
         # If disable_passthrough is set, override allow_passthrough from caller
         if ramble.config.get("config:disable_passthrough"):
@@ -545,6 +593,10 @@ class Expander(object):
         if extra_vars:
             expansions = self._variables.copy()
             expansions.update(extra_vars)
+
+            # Disable the cache when extra_vars are present, since these are
+            # primarily used to override generic variable names.
+            self._cache.disable()
 
         try:
             value = self._partial_expand(
@@ -566,6 +618,8 @@ class Expander(object):
                 logger.debug("END OF TYPING Failed with ValueError")
             except SyntaxError:
                 logger.debug("END OF TYPING Failed with SyntaxError")
+
+        self._cache.set_enabled(prev_enabled_cache)
         return value
 
     def evaluate_predicate(self, in_str, extra_vars=None):
