@@ -1800,8 +1800,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         self.results["RAMBLE_STATUS"] = self.get_status()
 
         logger.debug(
-            f"Calculating statistics for {self.repeats.n_repeats} repeats of "
-            f"{base_exp_name}"
+            f"Calculating statistics for {self.repeats.n_repeats} repeats of " f"{base_exp_name}"
         )
 
         # Add defined keywords as top level keys

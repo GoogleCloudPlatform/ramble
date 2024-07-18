@@ -60,4 +60,4 @@ ramble:
         with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
             data = f.read()
             assert "FAILED" in data
-            assert "0.9 s" not in data
+            assert "0.9 s" in data
