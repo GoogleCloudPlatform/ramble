@@ -6,9 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 from ramble.appkit import *
-from ramble.expander import Expander
 
 
 class Hostname(ExecutableApplication):
@@ -20,21 +18,20 @@ class Hostname(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    time_file = os.path.join(
-        Expander.expansion_str("experiment_run_dir"), "time_output"
-    )
+    # TODO: Remove in the future. local should be replaced by serial in all cases.
     executable(
         "local", "hostname", use_mpi=False, output_capture=OUTPUT_CAPTURE.ALL
     )
+
     executable(
         "serial",
-        "/usr/bin/time hostname",
+        "hostname",
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
     executable(
         "parallel",
-        "/usr/bin/time hostname",
+        "hostname",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
@@ -42,21 +39,6 @@ class Hostname(ExecutableApplication):
     workload("local", executable="local")
     workload("serial", executable="serial")
     workload("parallel", executable="parallel")
-
-    figure_of_merit(
-        "user time from file",
-        log_file=time_file,
-        fom_regex=r"(?P<user_time>[0-9]+\.[0-9]+)user.*",
-        group_name="user_time",
-        units="s",
-    )
-
-    figure_of_merit(
-        "user time",
-        fom_regex=r"(?P<user_time>[0-9]+\.[0-9]+)user.*",
-        group_name="user_time",
-        units="s",
-    )
 
     figure_of_merit(
         "possible hostname",
