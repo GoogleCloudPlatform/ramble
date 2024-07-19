@@ -205,43 +205,9 @@ This will fill out the ``software`` dictionary within your workspace configurati
 file. After executing this command, your workspace configuration file might
 look like the following:
 
-.. code-block:: YAML
 
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_6_config.yaml
+   :language: YAML
 
 At this point, you have fully described experiments that can be executed.
 However, your system might not have the correct compiler (and building a

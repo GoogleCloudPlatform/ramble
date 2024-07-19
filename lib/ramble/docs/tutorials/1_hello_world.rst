@@ -160,24 +160,8 @@ To begin, you should edit the ``ramble.yaml`` file to set up the configuration
 for your experiments. For this tutorial, replace the default yaml text with the
 following contents:
 
-.. code-block:: yaml
-
-    ramble:
-      variables:
-        processes_per_node: 1
-        mpi_command: ''
-        batch_submit: '{execute_experiment}'
-      applications:
-        hostname: # Application name, from `ramble list`
-          workloads:
-            local: # Workload name from application, in `ramble info <app>`
-              experiments:
-                test: # Arbitrary experiment name
-                  variables:
-                    n_ranks: '1'
-      software:
-        packages: {}
-        environments: {}
+.. literalinclude:: ../../../../examples/tutorial_1_config.yaml
+   :language: YAML
 
 Note that since the ``hostname`` application does not rely on a package manager, the software
 dictionary has empty ``packages`` and ``environments`` dictionaries.
