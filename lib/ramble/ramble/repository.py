@@ -126,107 +126,34 @@ type_definitions = {
 }
 
 
-# Applications
 def _apps(repo_dirs=None):
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    repo_dirs = repo_dirs or ramble.config.get("repos")
-    if not repo_dirs:
-        raise NoRepoConfiguredError("Ramble configuration contains no application repositories.")
-
-    path = RepoPath(*repo_dirs, object_type=ObjectTypes.applications)
-    sys.meta_path.append(path)
-    return path
+    """Get the applications singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.applications)
 
 
 def _mods(repo_dirs=None):
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    repo_dirs = repo_dirs or ramble.config.get("modifier_repos")
-    if not repo_dirs:
-        raise NoRepoConfiguredError("Ramble configuration contains no modifier repositories.")
-
-    path = RepoPath(*repo_dirs, object_type=ObjectTypes.modifiers)
-    sys.meta_path.append(path)
-    return path
+    """Get the modifiers singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.modifiers)
 
 
 def _package_managers(repo_dirs=None):
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    repo_dirs = repo_dirs or ramble.config.get("package_manager_repos")
-    if not repo_dirs:
-        raise NoRepoConfiguredError(
-            "Ramble configuration contains no package manager repositories."
-        )
-
-    path = RepoPath(*repo_dirs, object_type=ObjectTypes.package_managers)
-    sys.meta_path.append(path)
-    return path
+    """Get the package managers singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.package_managers)
 
 
 def _base_apps(repo_dirs=None):
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    repo_dirs = repo_dirs or ramble.config.get("repos")
-    if not repo_dirs:
-        raise NoRepoConfiguredError(
-            "Ramble configuration contains no base application repositories."
-        )
-
-    path = RepoPath(*repo_dirs, object_type=ObjectTypes.base_applications)
-    sys.meta_path.append(path)
-    return path
+    """Get the base applications singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_applications)
 
 
 def _base_mods(repo_dirs=None):
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    repo_dirs = repo_dirs or ramble.config.get("modifier_repos")
-    if not repo_dirs:
-        raise NoRepoConfiguredError("Ramble configuration contains no base modifier repositories.")
-
-    path = RepoPath(*repo_dirs, object_type=ObjectTypes.base_modifiers)
-    sys.meta_path.append(path)
-    return path
+    """Get the base modifiers singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_modifiers)
 
 
 def _base_package_managers(repo_dirs=None):
-    """Get the singleton RepoPath instance for Ramble.
-
-    Create a RepoPath, add it to sys.meta_path, and return it.
-
-    TODO: consider not making this a singleton.
-    """
-    repo_dirs = repo_dirs or ramble.config.get("package_manager_repos")
-    if not repo_dirs:
-        raise NoRepoConfiguredError(
-            "Ramble configuration contains no base package manager repositories."
-        )
-
-    path = RepoPath(*repo_dirs, object_type=ObjectTypes.base_package_managers)
-    sys.meta_path.append(path)
-    return path
+    """Get the base package managers singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_package_managers)
 
 
 paths = {
@@ -241,6 +168,21 @@ paths = {
 #####################################
 #     END TYPE SPECIFIC FUNCTIONALITY
 #####################################
+
+
+def _gen_path(repo_dirs=None, obj_type=default_type):
+    """Create a RepoPath for a specific object, add it to sys.meta_path, and return it."""
+    section_name = type_definitions[obj_type]["config_section"]
+    singular_name = type_definitions[obj_type]["singular"]
+    repo_dirs = repo_dirs or ramble.config.get(section_name)
+    if not repo_dirs:
+        raise NoRepoConfiguredError(
+            f"Ramble configuration contains no {singular_name} repositories."
+        )
+
+    path = RepoPath(*repo_dirs, object_type=obj_type)
+    sys.meta_path.append(path)
+    return path
 
 
 def all_object_names(object_type=default_type):
