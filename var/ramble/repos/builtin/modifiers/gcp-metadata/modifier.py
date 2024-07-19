@@ -27,6 +27,8 @@ class GcpMetadata(BasicModifier):
     mode("standard", description="Standard execution mode")
     default_mode("standard")
 
+    software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
+
     required_variable("hostlist")
 
     executable_modifier("gcp_metadata_exec")
