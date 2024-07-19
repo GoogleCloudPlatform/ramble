@@ -28,7 +28,14 @@ class Hostname(ExecutableApplication):
     )
     executable(
         "local_bg",
-        "hostname",
+        "(sleep 5; hostname)",
+        use_mpi=False,
+        output_capture=OUTPUT_CAPTURE.ALL,
+        run_in_background=True,
+    )
+    executable(
+        "local_bg2",
+        "(sleep 10; hostname)",
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
         run_in_background=True,
@@ -47,7 +54,7 @@ class Hostname(ExecutableApplication):
     )
 
     workload("local", executable="local")
-    workload("local_bg", executable="local_bg")
+    workload("local_bg", executables=["local_bg", "local_bg2"])
     workload("serial", executable="serial")
     workload("parallel", executable="parallel")
 
