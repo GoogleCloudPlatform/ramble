@@ -10,12 +10,14 @@ from ramble.modkit import *
 import ramble.config
 from ramble.util.executable import CommandExecutable
 from ramble.util.shell_vars import last_pid_var
+import ramble.util.logger as logger
 
 
 class WaitForBgJobs(BasicModifier):
     """Define a modifier for waiting for background jobs.
 
     This only waits for background jobs started from the experiment.
+    For now, this modifier works with bash only.
     """
 
     name = "wait-for-bg-jobs"
@@ -38,6 +40,10 @@ class WaitForBgJobs(BasicModifier):
 
         if executable.run_in_background:
             shell = ramble.config.get("config:shell")
+            if shell != "bash":
+                logger.die(
+                    f"waif-for-bg-jobs does not support {shell}, it's currently bash-only"
+                )
             last_pid_str = last_pid_var(shell)
             post_exec.append(
                 CommandExecutable(
