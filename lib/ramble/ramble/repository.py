@@ -185,6 +185,39 @@ def _gen_path(repo_dirs=None, obj_type=default_type):
     return path
 
 
+def list_object_files(obj_inst, object_type):
+    """List object file paths of the given object along the inheritance chain.
+
+    This is currently used by `ramble deployment` to copy relevant files
+    to create a self-contained repo.
+    """
+    type_def = type_definitions[object_type]
+    base_type = ObjectTypes[f"base_{type_def['dir_name']}"]
+    base_type_def = type_definitions[base_type]
+
+    repo_path = paths[object_type]
+    base_repo_path = paths[base_type]
+    obj_file = obj_inst._file_path
+    result = [(type_def["dir_name"], obj_file)]
+    base_chain = obj_inst.__class__.__mro__[1:]
+
+    for cls in base_chain:
+        path = importlib.util.find_spec(cls.__module__).origin
+
+        if not repo_path.in_path(path) and not base_repo_path.in_path(path):
+            # Stop upon hitting a non-repo file
+            break
+
+        basename = os.path.basename(path)
+        if basename == type_def["file_name"]:
+            result.append((type_def["dir_name"], path))
+        elif basename == base_type_def["file_name"]:
+            result.append((base_type_def["dir_name"], path))
+        else:
+            break
+    return result
+
+
 def all_object_names(object_type=default_type):
     """Convenience wrapper around ``ramble.repository.all_object_names()``."""  # noqa: E501
     return paths[object_type].all_object_names()
@@ -809,6 +842,10 @@ class RepoPath(object):
         Note that virtual objects do not "exist".
         """
         return any(repo.exists(obj_name) for repo in self.repos)
+
+    def in_path(self, maybe_obj_path):
+        """Whether the path belongs to any of the repos."""
+        return any(os.path.commonprefix([maybe_obj_path, r.root]) == r.root for r in self.repos)
 
     # TODO: DWJ - Maybe we don't need this? Are we going to have virtual
     #             objects

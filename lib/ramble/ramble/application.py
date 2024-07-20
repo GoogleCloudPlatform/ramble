@@ -2075,18 +2075,26 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     register_phase("deploy_artifacts", pipeline="pushdeployment")
 
     def _deploy_artifacts(self, workspace, app_inst=None):
+
+        def _copy_files(obj_inst, obj_type, repo_root):
+            flist = ramble.repository.list_object_files(obj_inst, obj_type)
+            for type_dir_name, obj_path in flist:
+                obj_dir_name = os.path.basename(os.path.dirname(obj_path))
+                obj_dir = os.path.join(repo_root, type_dir_name, obj_dir_name)
+                fs.mkdirp(obj_dir)
+                shutil.copyfile(obj_path, os.path.join(obj_dir, os.path.basename(obj_path)))
+
         repo_path = os.path.join(workspace.named_deployment, "object_repo")
 
-        app_dir_name = os.path.basename(os.path.dirname(self._file_path))
-        app_dir = os.path.join(repo_path, "applications", app_dir_name)
-        fs.mkdirp(app_dir)
-        shutil.copyfile(self._file_path, os.path.join(app_dir, "application.py"))
+        _copy_files(self, ramble.repository.ObjectTypes.applications, repo_path)
 
         for mod_inst in self._modifier_instances:
-            mod_dir_name = os.path.basename(os.path.dirname(mod_inst._file_path))
-            mod_dir = os.path.join(repo_path, "modifiers", mod_dir_name)
-            fs.mkdirp(mod_dir)
-            shutil.copyfile(mod_inst._file_path, os.path.join(mod_dir, "modifier.py"))
+            _copy_files(mod_inst, ramble.repository.ObjectTypes.modifiers, repo_path)
+
+        if self.package_manager is not None:
+            _copy_files(
+                self.package_manager, ramble.repository.ObjectTypes.package_managers, repo_path
+            )
 
     register_builtin("env_vars", required=True)
 

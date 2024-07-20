@@ -575,7 +575,14 @@ class PushDeploymentPipeline(Pipeline):
         fs.mkdirp(aux_software_dir)
         aux_repo_conf = os.path.join(aux_software_dir, "repos.yaml")
 
-        repo_conf_defs = [("repos", "repos.yaml"), ("modifier_repos", "modifier_repos.yaml")]
+        repo_conf_defs = [
+            ("repos", "repos.yaml"),
+            ("modifier_repos", "modifier_repos.yaml"),
+            ("package_manager_repos", "package_manager_repos.yaml"),
+            ("base_application_repos", "base_application_repos.yaml"),
+            ("base_modifier_repos", "base_modifier_repos.yaml"),
+            ("base_package_manager_repos", "base_package_manager_repos.yaml"),
+        ]
 
         for repo_conf in repo_conf_defs:
             aux_repo_conf = os.path.join(aux_software_dir, repo_conf[1])
@@ -597,11 +604,26 @@ class PushDeploymentPipeline(Pipeline):
                 f.write(syaml.dump_config(repo_data))
 
         repo_path = os.path.join(self.workspace.named_deployment, self.object_repo_name)
-        object_types = ["applications", "modifiers", "packages"]
+        object_types = [
+            "applications",
+            "modifiers",
+            "packages",
+            "package_managers",
+            "base_applications",
+            "base_modifiers",
+            "base_package_managers",
+        ]
         for object_type in object_types:
             fs.mkdirp(os.path.join(repo_path, object_type))
 
-        for conf_file in ["repo.yaml", "modifier_repo.yaml"]:
+        for conf_file in [
+            "repo.yaml",
+            "modifier_repo.yaml",
+            "package_manager_repo.yaml",
+            "base_application_repo.yaml",
+            "base_modifier_repo.yaml",
+            "base_package_manager_repo.yaml",
+        ]:
             with open(os.path.join(repo_path, conf_file), "w+") as f:
                 f.write("repo:\n")
                 f.write(f"  namespace: deployment_{self.deployment_name}\n")
