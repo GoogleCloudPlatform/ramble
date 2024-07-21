@@ -74,7 +74,7 @@ def add_workload(app_inst, wl_num=1, func_type=func_types.directive):
 
 
 def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
-    nompi_exec_name = "SerialExe%s" % exe_num
+    nompi_bg_exec_name = "SerialExe%s" % exe_num
     mpi_exec_name = "MpiExe%s" % exe_num
     nompi_list_exec_name = "MultiLineSerialExe%s" % exe_num
     mpi_list_exec_name = "MultiLineMpiExe%s" % exe_num
@@ -84,11 +84,12 @@ def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
 
     if func_type == func_types.directive:
         executable(
-            nompi_exec_name,
+            nompi_bg_exec_name,
             template,  # noqa: F405
             use_mpi=False,
             redirect=redirect_test,
             output_capture=output_capture,
+            run_in_background=True,
         )(app_inst)
 
         executable(mpi_exec_name, template, use_mpi=True)(app_inst)  # noqa: F405
@@ -108,11 +109,12 @@ def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
         )(app_inst)
     elif func_type == func_types.method:
         app_inst.executable(
-            nompi_exec_name,
+            nompi_bg_exec_name,
             template,  # noqa: F405
             use_mpi=False,
             redirect=redirect_test,
             output_capture=output_capture,
+            run_in_background=True,
         )
 
         app_inst.executable(mpi_exec_name, template, use_mpi=True)  # noqa: F405
@@ -134,16 +136,18 @@ def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
         assert False
 
     exec_def = {
-        nompi_exec_name: {
+        nompi_bg_exec_name: {
             "template": [template],
             "mpi": False,
             "redirect": redirect_test,
             "output_capture": output_capture,
+            "run_in_background": True,
         },
         mpi_exec_name: {
             "template": [template],
             "mpi": True,
             "redirect": "{log_file}",  # Default value
+            "run_in_background": False,  # Default
         },
         nompi_list_exec_name: {
             "template": [template, template, template],

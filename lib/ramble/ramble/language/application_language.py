@@ -134,7 +134,8 @@ def executable(name, template, **kwargs):
                              defaults to {log_file}
         output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
                                    capture. Defaults to stdout
-
+        run_in_background (Optional): Declare if the command should run in the background.
+                                      Defaults to False
     """
 
     def _execute_executable(app):

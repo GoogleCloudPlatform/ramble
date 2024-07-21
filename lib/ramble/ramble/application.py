@@ -1061,8 +1061,13 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                         if ramble.config.get("config:shell") in ["bash", "sh"]:
                             redirect += " 2>&1"
 
+                    if cmd_conf.run_in_background:
+                        bg_cmd = " &"
+                    else:
+                        bg_cmd = ""
+
                     for part in cmd_conf.template:
-                        command_part = f"{mpi_cmd}{part}{redirect}"
+                        command_part = f"{mpi_cmd}{part}{redirect}{bg_cmd}"
                         self._command_list.append(
                             self.expander.expand_var(command_part, exec_vars)
                         )
