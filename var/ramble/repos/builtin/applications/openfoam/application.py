@@ -8,15 +8,21 @@
 
 from ramble.appkit import *
 
-from ramble.app.builtin.openfoam_org import OpenfoamOrg
+from ramble.base_app.builtin.openfoam import Openfoam as OpenfoamBase
 
 
-class Openfoam(OpenfoamOrg):
+class Openfoam(OpenfoamBase):
     """Define the Openfoam application"""
 
     name = "openfoam"
 
     maintainers("douglasjacobsen")
+
+    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+
+    software_spec(
+        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+    )
 
     software_spec(
         "openfoam",
@@ -75,10 +81,3 @@ class Openfoam(OpenfoamOrg):
         + "WM_PROJECT_USER_DIR,WM_PROJECT_VERSION,WM_THIRD_PARTY_DIR",
         workloads=["*"],
     )
-
-    # TODO: Remove when base classes exist
-    # Remove incorrect definitions from `openfoam-org`
-    def __init__(self, file_path):
-        super().__init__(file_path)
-        del self.software_specs["openfoam-org"]
-        del self.required_packages["openfoam-org"]
