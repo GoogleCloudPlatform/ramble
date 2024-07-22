@@ -10,10 +10,13 @@
 
 
 class OUTPUT_CAPTURE:
-    STDERR = "2>"
-    STDOUT = ">>"
-    ALL = "&>"
-    DEFAULT = STDOUT
+    STDERR = {"prefix": "2>>", "suffix": ""}
+    STDOUT = {"prefix": ">>", "suffix": ""}
+    ALL = {"prefix": ">>", "suffix": "2>&1"}
+    DEFAULT = ALL
+
+    def generate_out_string(out_log, output_operator):
+        return f' {output_operator["prefix"]} "{out_log}" {output_operator["suffix"]}'
 
 
 string_or_num_list = [{"type": "string"}, {"type": "number"}]
