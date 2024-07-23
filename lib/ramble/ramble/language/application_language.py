@@ -22,7 +22,7 @@ definition to modify then application, for example:
 
     .. code-block:: python
 
-      class Gromacs(SpackApplication):
+      class Gromacs(ExecutableApplication):
           # Workload directive:
           workload('water_bare', executables=['pre-process', 'execute-gen'],
                input='water_bare_hbonds')
