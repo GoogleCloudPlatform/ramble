@@ -238,7 +238,7 @@ class SpackLightweight(PackageManagerBase):
             if not env_concretized:
                 self.runner.concretize()
 
-        except ramble.runner.RunnerError as e:
+        except RunnerError as e:
             logger.die(e)
 
     register_phase(
