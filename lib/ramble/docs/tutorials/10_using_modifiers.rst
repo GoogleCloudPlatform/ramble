@@ -122,45 +122,9 @@ And add the following lines, at the workspace scope:
 
 The resulting configuration file should look like the following.
 
-.. code-block:: YAML
 
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      modifiers:
-      - name: lscpu
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_10_lscpu_config.yaml
+   :language: YAML
 
 The ``modifiers`` dictionary can be defined at any scope ``variables`` can be
 defined at. Defined ``modifiers`` are inherited by all experiments at lower
@@ -217,46 +181,8 @@ To the list of modifiers. This will cause both ``lscpu`` and ``intel-aps`` to
 be applied to all of the experiments. The resulting configuration file should
 look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      modifiers:
-      - name: lscpu
-      - name: intel-aps
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_10_aps_error_config.yaml
+   :language: YAML
 
 To test some aspects of the workspace configuration before spending time
 performing a real setup, use:
@@ -288,50 +214,8 @@ And write a Spack package definition for ``intel-oneapi-vtune``. After the
 package is defined, add the package to the ``wrfv4`` environment. The resulting
 configuration file should look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      modifiers:
-      - name: lscpu
-      - name: intel-aps
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          aps:
-            pkg_spec: intel-oneapi-vtune
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
-            - aps
-
+.. literalinclude:: ../../../../examples/tutorial_10_aps_final_config.yaml
+   :language: YAML
 
 .. include:: shared/wrf_execute.rst
 

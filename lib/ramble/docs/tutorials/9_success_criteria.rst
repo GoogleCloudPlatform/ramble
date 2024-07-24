@@ -98,45 +98,8 @@ Edit your workspace configuration file with:
 And add the example block within the ``wrfv4`` application block. The resulting
 configuration file might look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      applications:
-        wrfv4:
-          success_criteria:
-          - name: 'timing-present'
-            mode: 'string'
-            match: 'Timing for main.*'
-            file: '{experiment_run_dir}/rsl.out.0000'
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_9_regex_criteria_config.yaml
+   :language: YAML
 
 Placing the success criteria definition here applies it to all of the
 experiments defined within the ``wrfv4`` application.
@@ -169,50 +132,8 @@ Edit your workspace configuration using:
 And add the success criteria within the ``CONUS_12km`` workload definition. The
 resulting configuration file might look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      applications:
-        wrfv4:
-          success_criteria:
-          - name: 'timing-present'
-            mode: 'string'
-            match: 'Timing for main.*'
-            file: '{experiment_run_dir}/rsl.out.0000'
-          workloads:
-            CONUS_12km:
-              success_criteria:
-              - name: 'correct-timesteps'
-                mode: 'fom_comparison'
-                fom_name: 'Number of timesteps'
-                formula: '{value} >= 50'
-              experiments:
-                scaling_{n_nodes}:
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_9_fom_criteria_config.yaml
+   :language: YAML
 
 This new success criteria will apply to all experiments within the
 ``CONUS_12km`` workload. This is because different workloads could have

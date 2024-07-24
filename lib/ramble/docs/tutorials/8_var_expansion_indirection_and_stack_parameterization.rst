@@ -67,51 +67,9 @@ Additionally, the files can be edited directly with:
 Within the ``ramble.yaml`` file, write the following contents, which are the
 final configuration from the previous tutorial.
 
-.. code-block:: YAML
 
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['16', '18']
-      zips:
-        platform_config:
-        - platform
-        - processes_per_node
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}_{platform}:
-                  variables:
-                    n_nodes: [1, 2]
-                  matrix:
-                  - platform_config
-                  - n_nodes
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_8_base_config.yaml
+   :language: YAML
 
 The above configuration will execute 4 experiments, comprising a basic scaling
 study on three different sets of nodes across two different platforms.
@@ -164,54 +122,8 @@ another named ``wrfv4-openmpi``. However, the definition of ``mpi_name`` can be
 hoisted to the workspace level because we need to include it in the experiment
 generation as well. The result might look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['16', '18']
-        mpi_name: ['intel-mpi', 'openmpi']
-      zips:
-        platform_config:
-        - platform
-        - processes_per_node
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}_{platform}:
-                  variables:
-                    n_nodes: [1, 2]
-                  matrix:
-                  - platform_config
-                  - n_nodes
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          openmpi:
-            pkg_spec: openmpi@3.1.6 +orterunprefix
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4-{mpi_name}:
-            packages:
-            - '{mpi_name}'
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_8_mpi_config.yaml
+   :language: YAML
 
 **NOTE** The reference to ``{mpi_name}`` within the environment package list is
 escaped using single quotes. This is to prevent YAML from parsing this as a
@@ -235,55 +147,8 @@ updated the experiment name template. To resolve this, add ``{mpi_name}`` into
 the experiment name template. Additionally, you may explicitly add ``mpi_name``
 into the matrix. The result might look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['16', '18']
-        mpi_name: ['intel-mpi', 'openmpi']
-      zips:
-        platform_config:
-        - platform
-        - processes_per_node
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}_{platform}_{mpi_name}:
-                  variables:
-                    n_nodes: [1, 2]
-                  matrix:
-                  - platform_config
-                  - n_nodes
-                  - mpi_name
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          openmpi:
-            pkg_spec: openmpi@3.1.6 +orterunprefix
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4-{mpi_name}:
-            packages:
-            - '{mpi_name}'
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_8_mpi_matrix_config.yaml
+   :language: YAML
 
 Variable Expansion and Indirection
 ----------------------------------
@@ -340,61 +205,9 @@ Allows the ``mpi_command`` definition to change based on the definition of
 indirection to help parameterize the MPI arguments as shown above, the
 resulting configuration might look like the following:
 
-.. code-block:: YAML
+.. literalinclude:: ../../../../examples/tutorial_8_expansion_indirection_config.yaml
+   :language: YAML
 
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['16', '18']
-
-        # Execution Template
-        batch_submit: '{execute_experiment}'
-        mpi_command: 'mpirun {{mpi_name}_args}'
-
-        # Experiment Expansions
-        mpi_name: ['intel-mpi', 'openmpi']
-        intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
-        openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS'
-      zips:
-        platform_config:
-        - platform
-        - processes_per_node
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}_{platform}_{mpi_name}:
-                  variables:
-                    n_nodes: [1, 2]
-                  matrix:
-                  - platform_config
-                  - n_nodes
-                  - mpi_name
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          openmpi:
-            pkg_spec: openmpi@3.1.6 +orterunprefix
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4-{mpi_name}:
-            packages:
-            - '{mpi_name}'
-            - wrfv4
 
 **NOTE** The arguments for the various MPI implementations may not run on your
 system if you require additional arguments. To be able to execute these on your
@@ -430,62 +243,9 @@ purposes of this tutorial, we will use indirection instead of explicit zips.
 
 The resulting configuration file might look like the following:
 
-.. code-block:: YAML
 
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        platform: ['platform1', 'platform2']
-        processes_per_node: ['16', '18']
-
-        # Execution Template
-        batch_submit: '{execute_experiment}'
-        mpi_command: 'mpirun {{mpi_name}_args}'
-
-        # Experiment Expansions
-        mpi_name: ['intel-mpi', 'openmpi']
-        intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
-        openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS'
-      zips:
-        platform_config:
-        - platform
-        - processes_per_node
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}_{platform}_{mpi_name}:
-                  variables:
-                    n_nodes: [1, 2]
-                    env_name: 'wrfv4-{mpi_name}'
-                  matrix:
-                  - platform_config
-                  - n_nodes
-                  - mpi_name
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          openmpi:
-            pkg_spec: openmpi@3.1.6 +orterunprefix
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4-{mpi_name}:
-            packages:
-            - '{mpi_name}'
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_8_software_environments_config.yaml
+   :language: YAML
 
 In this case, we defined ``env_name`` to be ``wrfv4-{mpi_name}`` which matches
 the definition of the software environments.
