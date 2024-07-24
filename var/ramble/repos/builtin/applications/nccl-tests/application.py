@@ -10,7 +10,7 @@
 from ramble.appkit import *
 
 
-class NcclTests(SpackApplication):
+class NcclTests(ExecutableApplication):
     """These tests check both the performance and the correctness of NCCL
     operations.
 
