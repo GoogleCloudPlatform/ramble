@@ -57,6 +57,8 @@ steps:
         cat hello_world/results.latest.txt
 
         ramble workspace deactivate
+
+        grep "possible hostname" hello_world/results.latest.txt
     id: ramble-tutorial-test
     entrypoint: /bin/bash
 substitutions:
