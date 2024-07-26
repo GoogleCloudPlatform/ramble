@@ -169,6 +169,10 @@ def changed_files(base=None, untracked=True, all_files=False):
             if any(os.path.realpath(f).startswith(e) for e in excludes):
                 continue
 
+            # Exclude non-existent files
+            if not os.path.exists(f):
+                continue
+
             changed.add(f)
 
     return sorted(changed)
