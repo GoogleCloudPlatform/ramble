@@ -903,7 +903,6 @@ class Workspace(object):
 
             for compiler_dict in compiler_dicts:
                 for comp, info in compiler_dict.items():
-                    logger.all_msg(f" Comp info: {info}")
                     if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
                         if comp not in packages_dict:
                             packages_dict[comp] = syaml.syaml_dict()
