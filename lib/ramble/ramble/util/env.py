@@ -11,7 +11,7 @@ import spack.util.environment
 
 class Env:
     def get_env_set_commands(var_conf, var_set, shell="sh"):
-        env_mods = spack.util.environment.EnvironmentModifications()
+        env_mods = RambleEnvModifications()
         for var, val in var_conf.items():
             var_set.add(var)
             env_mods.set(var, val)
@@ -21,7 +21,7 @@ class Env:
         return (env_cmds_arr.split("\n"), var_set)
 
     def get_env_unset_commands(var_conf, var_set, shell="sh"):
-        env_mods = spack.util.environment.EnvironmentModifications()
+        env_mods = RambleEnvModifications()
         for var in var_conf:
             if var in var_set:
                 var_set.remove(var)
@@ -32,7 +32,7 @@ class Env:
         return (env_cmds_arr.split("\n"), var_set)
 
     def get_env_append_commands(var_conf, var_set, shell="sh"):
-        env_mods = spack.util.environment.EnvironmentModifications()
+        env_mods = RambleEnvModifications()
 
         append_funcs = {
             "vars": env_mods.append_flags,
@@ -59,7 +59,7 @@ class Env:
         return (env_cmds_arr.split("\n"), var_set_orig)
 
     def get_env_prepend_commands(var_conf, var_set, shell="sh"):
-        env_mods = spack.util.environment.EnvironmentModifications()
+        env_mods = RambleEnvModifications()
 
         prepend_funcs = {
             "paths": env_mods.prepend_path,
@@ -86,3 +86,11 @@ action_funcs = {
     "append": Env.get_env_append_commands,
     "prepend": Env.get_env_prepend_commands,
 }
+
+
+class RambleEnvModifications(spack.util.environment.EnvironmentModifications):
+
+    def shell_modifications(self, shell="sh", explicit=False, env=None):
+        """Wrapper around spack's shell_modifications"""
+        shell_name = "sh" if shell == "bash" else shell
+        return super().shell_modifications(shell=shell_name, explicit=explicit, env=env)
