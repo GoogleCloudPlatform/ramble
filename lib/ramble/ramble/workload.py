@@ -39,6 +39,11 @@ class WorkloadVariable:
         self.values = values.copy() if isinstance(values, list) else [values]
         self.expandable = expandable
 
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
     def as_str(self, n_indent: int = 0):
         """String representation of this variable
 
@@ -137,6 +142,11 @@ class Workload:
                 if vals:
                     attr_val.append(vals)
                 setattr(self, attr, attr_val)
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
 
     def as_str(self, n_indent: int = 0):
         """String representation of this workload

@@ -16,13 +16,9 @@ info_cmd = RambleCommand("info")
 
 def check_info(output):
     expected_sections = [
-        "Tags",
-        "Mode",
-        "Builtin Executables",
-        "Executable Modifiers",
-        "Default Compilers",
-        "Software Specs",
-        "Package Manager Configs",
+        "Description:",
+        "modes",
+        "pipelines",
     ]
 
     for section in expected_sections:

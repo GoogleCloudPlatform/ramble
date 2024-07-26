@@ -50,9 +50,8 @@ def test_info_fields(app_query, parser, info_lines):
 
     expected_fields = (
         "Description:",
-        'Pipeline "setup" Phases:',
-        'Pipeline "analyze" Phases:',
-        "Tags:",
+        "pipelines",
+        "tags",
     )
 
     args = parser.parse_args([app_query])
@@ -67,12 +66,15 @@ def test_info_fields(app_query, parser, info_lines):
 def test_spack_info_software(app_query):
     expected_fields = (
         "Description:",
-        'Pipeline "setup" Phases:',
-        'Pipeline "analyze" Phases:',
-        "Tags:",
+        "executables",
+        "pipelines",
+        "setup:",
+        "analyze:",
+        "tags",
+        "software_specs",
     )
 
-    out = info(app_query)
+    out = info("-v", app_query)
 
     for field in expected_fields:
         assert field in out
@@ -87,14 +89,13 @@ def test_spack_info_software(app_query):
 def test_mock_spack_info_software(mock_applications, app_query):
     expected_fields = (
         "Description:",
-        'Pipeline "setup" Phases:',
-        'Pipeline "analyze" Phases:',
-        "Tags:",
-        "Package Manager Configs:",
-        "Software Specs:",
+        "executables",
+        "pipelines",
+        "setup:",
+        "software_specs",
     )
 
-    out = info(app_query)
+    out = info("-v", app_query)
 
     for field in expected_fields:
         assert field in out

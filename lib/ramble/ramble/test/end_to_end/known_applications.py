@@ -30,7 +30,7 @@ workspace = RambleCommand("workspace")
 @pytest.mark.long
 @deprecation.fail_if_not_removed
 @pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
-def test_known_applications(application, package_manager, capsys, mock_file_auto_create):
+def test_known_applications(application, package_manager, mock_file_auto_create):
     info_cmd = RambleCommand("info")
 
     setup_type = ramble.pipeline.pipelines.setup
@@ -50,7 +50,7 @@ def test_known_applications(application, package_manager, capsys, mock_file_auto
     batch_submit: '{execute_experiment}'
   applications:\n"""
 
-    app_info = info_cmd(application)
+    app_info = info_cmd("--attributes", "workloads", "-v", application)
     workloads = []
     for line in app_info.split("\n"):
         match = workload_regex.search(line)
