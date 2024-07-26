@@ -16,6 +16,7 @@ from llnl.util.lang import union_dicts
 
 import ramble.schema.types
 import ramble.schema.variables
+from ramble.util.output_capture import OUTPUT_CAPTURE
 
 
 custom_executables_def = {
@@ -28,7 +29,7 @@ custom_executables_def = {
             "use_mpi": False,
             "redirect": "{log_file}",
             "variables": {},
-            "output_capture": ramble.schema.types.OUTPUT_CAPTURE.DEFAULT,
+            "output_capture": OUTPUT_CAPTURE.DEFAULT,
         },
         "properties": union_dicts(
             {

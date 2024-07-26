@@ -55,7 +55,7 @@ from ramble.workspace import namespace
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.error import RambleError
-from ramble.schema.types import output_mapper
+from ramble.util.output_capture import output_mapper
 
 from enum import Enum
 
