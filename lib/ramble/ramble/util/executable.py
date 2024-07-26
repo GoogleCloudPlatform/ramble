@@ -10,7 +10,7 @@ import shlex
 
 import ramble.error
 
-from ramble.schema.types import OUTPUT_CAPTURE
+from ramble.util.output_capture import OUTPUT_CAPTURE
 
 import spack.util.executable
 from spack.util.path import system_path_filter

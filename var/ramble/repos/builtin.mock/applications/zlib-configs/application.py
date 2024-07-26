@@ -14,7 +14,7 @@ class ZlibConfigs(ExecutableApplication):
 
     software_spec("zlib", pkg_spec="zlib", package_manager="spack*")
 
-    executable("list_lib", "ls {zlib}/lib", use_mpi=False)
+    executable("list_lib", "ls {zlib_path}/lib", use_mpi=False)
 
     workload("ensure_installed", executable="list_lib")
 

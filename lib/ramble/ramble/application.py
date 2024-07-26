@@ -55,6 +55,7 @@ from ramble.workspace import namespace
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.error import RambleError
+from ramble.util.output_capture import output_mapper
 
 from enum import Enum
 
@@ -1057,9 +1058,9 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     if cmd_conf.redirect:
                         out_log = self.expander.expand_var(cmd_conf.redirect, exec_vars)
                         output_operator = cmd_conf.output_capture
-                        redirect = f' {output_operator} "{out_log}"'
-                        if ramble.config.get("config:shell") in ["bash", "sh"]:
-                            redirect += " 2>&1"
+
+                        redirect_mapper = output_mapper()
+                        redirect = redirect_mapper.generate_out_string(out_log, output_operator)
 
                     if cmd_conf.run_in_background:
                         bg_cmd = " &"

@@ -106,55 +106,8 @@ Within this file, use the example above to define two new executables
 in the ``end_time`` executable definition. The resulting file should look like
 the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  internals:
-                    custom_executables:
-                      start_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/start_time'
-                        use_mpi: false
-                      end_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/end_time'
-                        use_mpi: false
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_11_new_exec_config.yaml
+   :language: YAML
 
 Defining Executable Order
 ~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,65 +157,8 @@ For the purposes of this tutorial, add ``start_time`` directly before
 ``execute`` and ``end_time`` directly after ``execute``. The resulting
 configuration file should look like the following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      env_vars:
-        set:
-          OMP_NUM_THREADS: '{n_threads}'
-      variables:
-        processes_per_node: 16
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  internals:
-                    custom_executables:
-                      start_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/start_time'
-                        use_mpi: false
-                      end_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/end_time'
-                        use_mpi: false
-                    executables:
-                    - builtin::env_vars
-                    - builtin::spack_source
-                    - builtin::spack_activate
-                    - cleanup
-                    - copy
-                    - fix_12km
-                    - start_time
-                    - execute
-                    - end_time
-                  variables:
-                    n_nodes: [1, 2]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
+.. literalinclude:: ../../../../examples/tutorial_11_exec_order_config.yaml
+   :language: YAML
 
 **NOTE** Omitting any executables from the ``executables`` list will
 prevent it from being used in the generated experiments.
@@ -285,6 +181,7 @@ As an example, the following YAML could replace the ``executables`` section of
 your existing configuration with the following:
 
 .. code-block:: YAML
+
    executable_injection:
    - name: start_time
      order: before
@@ -303,60 +200,8 @@ Replace the ``executables`` block with the ``executable_injection`` block
 presented above.  The resulting configuration file should look like the
 following:
 
-.. code-block:: YAML
-
-    ramble:
-      variants:
-        package_manager: spack
-      variables:
-        processes_per_node: 4
-        n_ranks: '{processes_per_node}*{n_nodes}'
-        batch_submit: '{execute_experiment}'
-        mpi_command: mpirun -n {n_ranks}
-      applications:
-        wrfv4:
-          workloads:
-            CONUS_12km:
-              experiments:
-                scaling_{n_nodes}:
-                  internals:
-                    custom_executables:
-                      start_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/start_time'
-                        use_mpi: false
-                      end_time:
-                        template:
-                        - 'date +%s'
-                        redirect: '{experiment_run_dir}/end_time'
-                        use_mpi: false
-                    executable_injection:
-                    - name: start_time
-                      order: before
-                      relative_to: execute
-                    - name: end_time
-                      order: after
-                      relative_to: execute
-                  variables:
-                    n_nodes: [1, 2, 4]
-      software:
-        packages:
-          gcc9:
-            pkg_spec: gcc@9.4.0
-          intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
-        environments:
-          wrfv4:
-            packages:
-            - intel-mpi
-            - wrfv4
-
+.. literalinclude:: ../../../../examples/tutorial_11_exec_injection_config.yaml
+   :language: YAML
 
 .. include:: shared/wrf_execute.rst
 
