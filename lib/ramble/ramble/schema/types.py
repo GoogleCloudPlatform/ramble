@@ -8,14 +8,6 @@
 
 """Base types for building schema files from"""
 
-
-class OUTPUT_CAPTURE:
-    STDERR = "2>"
-    STDOUT = ">>"
-    ALL = "&>"
-    DEFAULT = STDOUT
-
-
 string_or_num_list = [{"type": "string"}, {"type": "number"}]
 
 string_or_num = {"anyOf": string_or_num_list}

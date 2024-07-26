@@ -28,6 +28,6 @@ from ramble.spec import Spec
 import ramble.language.package_manager_language
 from ramble.language.package_manager_language import *
 from ramble.language.shared_language import *
-from ramble.schema.types import OUTPUT_CAPTURE
+from ramble.util.output_capture import OUTPUT_CAPTURE
 
 from ramble.software_environments import ExternalEnvironment
