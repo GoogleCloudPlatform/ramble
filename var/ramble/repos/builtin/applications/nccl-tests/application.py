@@ -128,22 +128,22 @@ class NcclTests(ExecutableApplication):
     regex_parts = [
         ("Size", "B", "size", "[0-9]+"),
         ("Count", "elements", "count", "[0-9]+"),
-        ("Type", "", "type", "\S+"),
-        ("Reduction Operator", "", "redop", "\S+"),
-        ("Root", "", "root", "\S+"),
+        ("Type", "", "type", r"\S+"),
+        ("Reduction Operator", "", "redop", r"\S+"),
+        ("Root", "", "root", r"\S+"),
         ("Out of Place Time", "us", "ooptime", r"[0-9]+\.?[0-9]+"),
         ("Out of Place Alg Bandwidth", "GB/s", "oopalgbw", r"[0-9]+\.?[0-9]+"),
         ("Out of Place Bus Bandwidth", "GB/s", "oopbusbw", r"[0-9]+\.?[0-9]+"),
-        ("Out of Place Number Wrong", "", "oopnumwrong", "\S+"),
+        ("Out of Place Number Wrong", "", "oopnumwrong", r"\S+"),
         ("In Place Time", "us", "iptime", r"[0-9]+\.?[0-9]+"),
         ("In Place Alg Bandwidth", "GB/s", "ipalgbw", r"[0-9]+\.?[0-9]+"),
         ("In Place Bus Bandwidth", "GB/s", "ipbusbw", r"[0-9]+\.?[0-9]+"),
-        ("In Place Number Wrong", "", "ipnumwrong", "\S+"),
+        ("In Place Number Wrong", "", "ipnumwrong", r"\S+"),
     ]
 
     fom_regex = ""
     for regex_part in regex_parts:
-        fom_regex += f"\s+(?P<{regex_part[2]}>{regex_part[3]})"
+        fom_regex += rf"\s+(?P<{regex_part[2]}>{regex_part[3]})"
 
     figure_of_merit_context("size", output_format="{size}", regex=fom_regex)
     for regex_part in regex_parts:
