@@ -9,7 +9,7 @@
 import itertools
 
 
-class Filters(object):
+class Filters:
     """Object containing filters for limiting various operations in Ramble"""
 
     def __init__(

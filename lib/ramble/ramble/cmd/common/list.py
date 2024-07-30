@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
-from __future__ import division
 
 import argparse
 import fnmatch
@@ -22,10 +20,7 @@ import ramble.repository
 import ramble.cmd.common.arguments as arguments
 from ramble.util.logger import logger
 
-if sys.version_info > (3, 1):
-    from html import escape  # novm
-else:
-    from cgi import escape
+from html import escape  # novm
 
 
 formatters = {}
@@ -179,7 +174,7 @@ def html(obj_names, out, object_type):
         out.write('<tr class="row-odd">\n' if i % 2 == 0 else '<tr class="row-even">\n')
         for name in row:
             out.write("<td>\n")
-            out.write('<a class="reference internal" href="#%s">%s</a></td>\n' % (name, name))
+            out.write(f'<a class="reference internal" href="#{name}">{name}</a></td>\n')
             out.write("</td>\n")
         out.write("</tr>\n")
     out.write("</tbody>\n")
@@ -204,13 +199,11 @@ def html(obj_names, out, object_type):
         out.write(f'<dt>Ramble {obj_def["dir_name"]}:</dt>\n')
         out.write('<dd><ul class="first last simple">\n')
         out.write(
-            (
-                "<li>"
-                '<a class="reference external" '
-                f'href="{github_url(obj, object_type)}">'
-                f'{obj.name}/{obj_def["file_name"]}</a>'  # noqa: E501
-                "</li>\n"
-            )
+            "<li>"
+            '<a class="reference external" '
+            f'href="{github_url(obj, object_type)}">'
+            f'{obj.name}/{obj_def["file_name"]}</a>'  # noqa: E501
+            "</li>\n"
         )
         out.write("</ul></dd>\n")
 

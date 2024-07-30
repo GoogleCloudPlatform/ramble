@@ -90,7 +90,7 @@ def test_analyze_fom_output():
     workspace("analyze", "-p", global_args=["-w", workspace_name])
     result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
 
-    with open(result_file, "r") as f:
+    with open(result_file) as f:
         content = f.read()
         assert "default (null) context figures of merit" in content
         assert "possible hostname = test-user.c.googlers.com" in content

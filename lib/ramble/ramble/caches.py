@@ -56,7 +56,7 @@ def _fetch_cache():
     return ramble.fetch_strategy.FsCache(path)
 
 
-class MirrorCache(object):
+class MirrorCache:
     def __init__(self, root):
         self.root = os.path.abspath(root)
 

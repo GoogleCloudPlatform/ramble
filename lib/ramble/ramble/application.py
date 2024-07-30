@@ -72,7 +72,7 @@ def _get_context_display_name(context):
     )
 
 
-class ApplicationBase(object, metaclass=ApplicationMeta):
+class ApplicationBase(metaclass=ApplicationMeta):
     name = None
     _builtin_name = "builtin::{name}"
     _builtin_required_key = "required"
@@ -346,7 +346,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     out_str.append(rucolor.nested_1("  %s:\n" % name))
                     for key, val in info.items():
                         if val:
-                            out_str.append("    %s = %s\n" % (key, val.replace("@", "@@")))
+                            out_str.append("    {} = {}\n".format(key, val.replace("@", "@@")))
 
         return out_str
 
@@ -639,7 +639,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Build initial stack. Uses a reversal of the current instance's
         # chained experiments
         parent_namespace = self.expander.experiment_namespace
-        classes_in_stack = set([self])
+        classes_in_stack = {self}
         chain_idx = 0
         chain_stack = []
         for exp in reversed(self.chained_experiments):
@@ -1386,7 +1386,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
 
         if os.path.exists(inventory_file) and not force_compute:
-            with open(inventory_file, "r") as f:
+            with open(inventory_file) as f:
                 self.hash_inventory = spack.util.spack_json.load(f)
 
         else:
@@ -1593,7 +1593,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 logger.debug(f"Skipping analysis of non-existent file: {file}")
                 continue
 
-            with open(file, "r") as f:
+            with open(file) as f:
                 for line in f.readlines():
                     logger.debug(f"Line: {line}")
 
@@ -2038,7 +2038,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         )
 
         if os.path.isfile(status_path):
-            with open(status_path, "r") as f:
+            with open(status_path) as f:
                 status_data = spack.util.spack_json.load(f)
             self.variables[self.keywords.experiment_status] = status_data[
                 self.keywords.experiment_status

@@ -10,7 +10,7 @@
 from ramble.spec import Spec
 
 
-class TestSpec(object):
+class TestSpec:
 
     def test_spec_examples(self):
         app_name = "test_application"

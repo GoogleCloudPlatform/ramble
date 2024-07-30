@@ -82,5 +82,5 @@ ramble:
 
         assert os.path.exists(env_file)
 
-        with open(env_file, "r") as f:
+        with open(env_file) as f:
             assert "wrf" in f.read()

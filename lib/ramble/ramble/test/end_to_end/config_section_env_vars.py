@@ -67,7 +67,7 @@ ramble:
         export_regex = re.compile(r"export MY_VAR=TEST")
 
         # Assert experiment 1 has exports before commands
-        with open(exp1_script, "r") as f:
+        with open(exp1_script) as f:
             export_found = False
             for line in f.readlines():
                 if export_regex.search(line):

@@ -208,7 +208,7 @@ def activate(ws):
 
     # Fail early to avoid ending in an invalid state
     if not isinstance(ws, Workspace):
-        raise TypeError("`ws` should be of type {0}".format(Workspace.__name__))
+        raise TypeError(f"`ws` should be of type {Workspace.__name__}")
 
     # Check if we need to reinitialize the store due to pushing the configuration
     # below.
@@ -431,7 +431,7 @@ def get_workspace(args, cmd_name, required=False):
         )
 
 
-class Workspace(object):
+class Workspace:
     """Class representing a working directory for workload
     experiments
 
@@ -576,13 +576,13 @@ class Workspace(object):
                             f"template name of {template_name}" + " which is reserved by ramble."
                         )
 
-                    with open(template_path, "r") as f:
+                    with open(template_path) as f:
                         self._read_template(template_name, f.read())
 
             if os.path.exists(self.auxiliary_software_dir):
                 for filename in os.listdir(self.auxiliary_software_dir):
                     aux_file_path = os.path.join(self.auxiliary_software_dir, filename)
-                    with open(aux_file_path, "r") as f:
+                    with open(aux_file_path) as f:
                         self._read_auxiliary_software_file(filename, f.read())
 
         if read_default_script:
@@ -605,8 +605,8 @@ class Workspace(object):
                 for dirpath, _, filenames in os.walk(app_dir):
                     for file in filenames:
                         if file.endswith(".yaml"):
-                            full_path = "%s/%s" % (dirpath, file)
-                            with open(full_path, "r") as f:
+                            full_path = f"{dirpath}/{file}"
+                            with open(full_path) as f:
                                 self._read_application_config(full_path, f)
 
     def _read_application_config(self, path, f, raw_yaml=None):
@@ -1109,7 +1109,9 @@ class Workspace(object):
                                             mod = fom["origin"]
                                             name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                        output = "%s = %s %s" % (name, fom["value"], fom["units"])
+                                        output = "{} = {} {}".format(
+                                            name, fom["value"], fom["units"]
+                                        )
                                         f.write("    %s\n" % (output.strip()))
                 else:
                     logger.msg("No results to write")
@@ -1140,7 +1142,7 @@ class Workspace(object):
             logger.all_msg(f"  {out_file}")
 
         if print_results:
-            with open(results_written[0], "r") as f:
+            with open(results_written[0]) as f:
                 # Use tty directly to avoid cluttering the analyze log
                 tty.msg(f"Results from the analysis pipeline:\n{f.read()}")
 
@@ -1353,13 +1355,11 @@ class Workspace(object):
 
     def all_templates(self):
         """Iterator over each template in the workspace"""
-        for name, conf in self._templates.items():
-            yield name, conf
+        yield from self._templates.items()
 
     def all_auxiliary_software_files(self):
         """Iterator over each file in $workspace/configs/auxiliary_software_files"""
-        for name, value in self._auxiliary_software_files.items():
-            yield name, value
+        yield from self._auxiliary_software_files.items()
 
     def included_config_scopes(self):
         """List of included configuration scopes from the environment.
@@ -1388,11 +1388,11 @@ class Workspace(object):
 
             if os.path.isdir(config_path):
                 # directories are treated as regular ConfigScopes
-                config_name = "workspace:%s:%s" % (self.name, os.path.basename(config_path))
+                config_name = f"workspace:{self.name}:{os.path.basename(config_path)}"
                 scope = ramble.config.ConfigScope(config_name, config_path)
             elif os.path.exists(config_path):
                 # files are assumed to be SingleFileScopes
-                config_name = "workspace:%s:%s" % (self.name, config_path)
+                config_name = f"workspace:{self.name}:{config_path}"
                 scope = ramble.config.SingleFileScope(
                     config_name, config_path, ramble.schema.merged.schema
                 )
@@ -1403,15 +1403,15 @@ class Workspace(object):
             scopes.append(scope)
 
         if missing:
-            msg = "Detected {0} missing include path(s):".format(len(missing))
-            msg += "\n   {0}".format("\n   ".join(missing))
+            msg = f"Detected {len(missing)} missing include path(s):"
+            msg += "\n   {}".format("\n   ".join(missing))
             logger.die(f"{msg}\nPlease correct and try again.")
 
         return scopes
 
     def ws_file_config_scope_name(self):
         """Name of the config scope of this workspace's config file."""
-        return "workspace:%s:%s" % (self.name, self.config_dir)
+        return f"workspace:{self.name}:{self.config_dir}"
         # return 'ws:%s' % self.name
 
     def ws_file_config_scope(self):

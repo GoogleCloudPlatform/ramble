@@ -52,7 +52,7 @@ def _display_mirror_entry(size, name, url, type_=None):
     print("%-*s%s%s" % (size + 4, name, url, type_))
 
 
-class Mirror(object):
+class Mirror:
     """Represents a named location for storing input tarballs.
 
     Mirrors have a fetch_url that indicate where and how artifacts are fetched
@@ -117,16 +117,16 @@ class Mirror(object):
             name = ' "%s"' % name
 
         if self._push_url is None:
-            return "[Mirror%s (%s)]" % (name, self._fetch_url)
+            return f"[Mirror{name} ({self._fetch_url})]"
 
-        return "[Mirror%s (fetch: %s, push: %s)]" % (name, self._fetch_url, self._push_url)
+        return f"[Mirror{name} (fetch: {self._fetch_url}, push: {self._push_url})]"
 
     def __repr__(self):
         return "".join(
             (
                 "Mirror(",
                 ", ".join(
-                    "%s=%s" % (k, repr(v))
+                    f"{k}={repr(v)}"
                     for k, v in (
                         ("fetch_url", self._fetch_url),
                         ("push_url", self._push_url),
@@ -324,7 +324,7 @@ Ramble not to expand it with the following syntax:
     return ext
 
 
-class MirrorReference(object):
+class MirrorReference:
     """A ``MirrorReference`` stores the relative paths where you can store a
     resource in a mirror directory.
 
@@ -466,7 +466,7 @@ def remove(name, scope):
     logger.msg(f"Removed mirror {name}.")
 
 
-class MirrorStats(object):
+class MirrorStats:
     def __init__(self):
         self.present = {}
         self.new = {}
@@ -546,7 +546,7 @@ def push_url_from_mirror_name(mirror_name):
     """Given a mirror name, return the URL on which to push resources."""
     mirror = ramble.mirror.MirrorCollection().lookup(mirror_name)
     if mirror.name == "<unnamed>":
-        raise ValueError('no mirror named "{0}"'.format(mirror_name))
+        raise ValueError(f'no mirror named "{mirror_name}"')
     return url_util.format(mirror.push_url)
 
 
@@ -554,7 +554,7 @@ def push_url_from_mirror_url(mirror_url):
     """Given a mirror URL, return the URL on which to push resources."""
     scheme = url_util.parse(mirror_url, scheme="<missing>").scheme
     if scheme == "<missing>":
-        raise ValueError('"{0}" is not a valid URL'.format(mirror_url))
+        raise ValueError(f'"{mirror_url}" is not a valid URL')
     mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
     return url_util.format(mirror.push_url)
 
@@ -563,4 +563,4 @@ class MirrorError(ramble.error.RambleError):
     """Superclass of all mirror-creation related errors."""
 
     def __init__(self, msg, long_msg=None):
-        super(MirrorError, self).__init__(msg, long_msg)
+        super().__init__(msg, long_msg)

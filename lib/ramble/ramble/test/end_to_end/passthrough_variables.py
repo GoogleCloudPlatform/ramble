@@ -69,7 +69,7 @@ ramble:
         undefined_regex = re.compile(r"{undefined_var}")
 
         # Assert undefined variable is found
-        with open(exp1_script, "r") as f:
+        with open(exp1_script) as f:
             undefined_found = False
             for line in f.readlines():
                 if undefined_regex.search(line):

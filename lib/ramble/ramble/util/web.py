@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
+from html.parser import HTMLParser
 
 import codecs
 import errno
@@ -38,18 +38,12 @@ from spack.util.compression import ALLOWED_ARCHIVE_TYPES
 from spack.util.path import convert_to_posix_path
 
 #: User-Agent used in Request objects
-SPACK_USER_AGENT = "Spackbot/{0}".format(spack.spack_version)
+SPACK_USER_AGENT = f"Spackbot/{spack.spack_version}"
 
-if sys.version_info < (3, 0):
-    # Python 2 had these in the HTMLParser package.
-    from HTMLParser import HTMLParseError, HTMLParser  # novm
-else:
-    # In Python 3, things moved to html.parser
-    from html.parser import HTMLParser
 
-    # Also, HTMLParseError is deprecated and never raised.
-    class HTMLParseError(Exception):
-        pass
+# Also, HTMLParseError is deprecated and never raised.
+class HTMLParseError(Exception):
+    pass
 
 
 class LinkParser(HTMLParser):
@@ -141,7 +135,7 @@ def read_from_url(url, accept_content_type=None):
     try:
         response = _urlopen(req, timeout=timeout, context=context)
     except URLError as err:
-        raise SpackWebError("Download failed: {ERROR}".format(ERROR=str(err)))
+        raise SpackWebError(f"Download failed: {str(err)}")
 
     if accept_content_type and not is_web_url:
         content_type = get_header(response.headers, "Content-type")
@@ -152,7 +146,7 @@ def read_from_url(url, accept_content_type=None):
 
     if reject_content_type:
         logger.debug(
-            "ignoring page {0}{1}{2}".format(
+            "ignoring page {}{}{}".format(
                 url, " with content type " if content_type is not None else "", content_type or ""
             )
         )
@@ -222,9 +216,7 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
             os.remove(local_file_path)
 
     else:
-        raise NotImplementedError(
-            "Unrecognized URL scheme: {SCHEME}".format(SCHEME=remote_url.scheme)
-        )
+        raise NotImplementedError(f"Unrecognized URL scheme: {remote_url.scheme}")
 
 
 def url_exists(url):
@@ -367,8 +359,7 @@ def _iter_s3_prefix(client, url, num_entries=1024):
     while True:
         contents, key = _list_s3_objects(client, bucket, prefix, num_entries, start_after=key)
 
-        for x in contents:
-            yield x
+        yield from contents
 
         if not key:
             break
@@ -398,7 +389,7 @@ def list_url(url, recursive=False):
         if recursive:
             return list(_iter_s3_prefix(s3, url))
 
-        return list(set(key.split("/", 1)[0] for key in _iter_s3_prefix(s3, url)))
+        return list({key.split("/", 1)[0] for key in _iter_s3_prefix(s3, url)})
 
     elif url.scheme == "gs":
         gcs = gcs_util.GCSBucket(url)
@@ -502,7 +493,7 @@ def spider(root_urls, depth=0, concurrency=32):
             logger.debug(f"Error in _spider: {type(e)}:{str(e)}", traceback.format_exc())
 
         finally:
-            logger.debug("SPIDER: [url={0}]".format(url))
+            logger.debug(f"SPIDER: [url={url}]")
 
         return pages, links, subcalls
 
@@ -524,7 +515,7 @@ def spider(root_urls, depth=0, concurrency=32):
     try:
         while current_depth <= depth:
             logger.debug(
-                "SPIDER: [depth={0}, max_depth={1}, urls={2}]".format(
+                "SPIDER: [depth={}, max_depth={}, urls={}]".format(
                     current_depth, depth, len(spider_args)
                 )
             )
@@ -731,7 +722,5 @@ class NoNetworkConnectionError(SpackWebError):
     """Raised when an operation can't get an internet connection."""
 
     def __init__(self, message, url):
-        super(NoNetworkConnectionError, self).__init__(
-            "No network connection: " + str(message), "URL was: " + str(url)
-        )
+        super().__init__("No network connection: " + str(message), "URL was: " + str(url))
         self.url = url

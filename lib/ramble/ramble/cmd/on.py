@@ -6,19 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import sys
-
 import ramble.workspace
 import ramble.expander
 import ramble.pipeline
 import ramble.filters
 
 import ramble.cmd.common.arguments as arguments
-
-if sys.version_info >= (3, 3):
-    from collections.abc import Sequence  # novm noqa: F401
-else:
-    from collections import Sequence  # noqa: F401
 
 
 description = '"And now\'s the time, the time is now" (execute workspace experiments)'

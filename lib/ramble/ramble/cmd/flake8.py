@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
 
 import deprecation
 import re
@@ -91,13 +90,12 @@ pattern_exemptions = {
 }
 
 # compile all regular expressions.
-pattern_exemptions = dict(
-    (
-        re.compile(file_pattern),
-        dict((code, [re.compile(p) for p in patterns]) for code, patterns in error_dict.items()),
-    )
+pattern_exemptions = {
+    re.compile(file_pattern): {
+        code: [re.compile(p) for p in patterns] for code, patterns in error_dict.items()
+    }
     for file_pattern, error_dict in pattern_exemptions.items()
-)
+}
 
 
 def changed_files(base=None, untracked=True, all_files=False):
@@ -108,7 +106,7 @@ def changed_files(base=None, untracked=True, all_files=False):
     if base is None:
         base = os.environ.get("GITHUB_BASE_REF", "develop")
 
-    range = "{0}...".format(base)
+    range = f"{base}..."
 
     git_args = [
         # Add changed files committed since branching off of develop
@@ -172,9 +170,9 @@ def add_pattern_exemptions(line, codes):
 
     # append exemption to line
     if "# noqa: " in line:
-        line += ",{0}".format(exemptions)
+        line += f",{exemptions}"
     elif line:  # ignore noqa on empty lines
-        line += "  # noqa: {0}".format(exemptions)
+        line += f"  # noqa: {exemptions}"
 
     # if THIS made the line too long, add an exemption for that
     if len(line) > max_line_length and orig_len <= max_line_length:
@@ -315,7 +313,7 @@ def flake8(parser, args):
         print()
         print("Modified files:")
         for filename in file_list:
-            print("  {0}".format(filename.strip()))
+            print(f"  {filename.strip()}")
         print("=======================================================")
 
         # run flake8 on the temporary tree, once for core, once for apps
@@ -372,7 +370,7 @@ def flake8(parser, args):
         else:
             # print results relative to current working directory
             def cwd_relative(path):
-                return "{0}: [".format(
+                return "{}: [".format(
                     os.path.relpath(os.path.join(ramble.paths.prefix, path.group(1)), os.getcwd())
                 )
 

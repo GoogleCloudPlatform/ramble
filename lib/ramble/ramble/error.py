@@ -5,7 +5,6 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-from __future__ import print_function
 
 import sys
 import inspect
@@ -24,7 +23,7 @@ class RambleError(Exception):
     """
 
     def __init__(self, message, long_message=None):
-        super(RambleError, self).__init__()
+        super().__init__()
         self.message = message
         self._long_message = long_message
 

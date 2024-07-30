@@ -17,7 +17,7 @@ import ramble.util.matrices
 from ramble.util.logger import logger
 
 
-class RenderGroup(object):
+class RenderGroup:
     _obj_types = ["experiment", "package", "environment"]
     _actions = ["create", "exclude"]
 
@@ -113,7 +113,7 @@ class RenderGroup(object):
         return extracted
 
 
-class Renderer(object):
+class Renderer:
     def render_objects(self, render_group, exclude_where=None, ignore_used=True, fatal=True):
         """Render objects based on the input variables and matrices
 

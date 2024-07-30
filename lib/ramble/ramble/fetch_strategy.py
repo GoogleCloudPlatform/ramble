@@ -99,7 +99,7 @@ def fetcher(cls):
     return cls
 
 
-class FetchStrategy(object):
+class FetchStrategy:
     """Superclass of all fetch strategies."""
 
     #: The URL attribute must be specified either at the package class
@@ -235,9 +235,7 @@ class FetchStrategyComposite(pattern.Composite):
     matches = FetchStrategy.matches
 
     def __init__(self):
-        super(FetchStrategyComposite, self).__init__(
-            ["fetch", "check", "expand", "reset", "archive", "cachable", "mirror_id"]
-        )
+        super().__init__(["fetch", "check", "expand", "reset", "archive", "cachable", "mirror_id"])
 
     def source_id(self):
         component_ids = tuple(i.source_id() for i in self)
@@ -260,7 +258,7 @@ class URLFetchStrategy(FetchStrategy):
     optional_attrs = list(crypto.hashes.keys()) + ["checksum"]
 
     def __init__(self, url=None, checksum=None, **kwargs):
-        super(URLFetchStrategy, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         # Prefer values in kwargs to the positionals.
         self.url = kwargs.get("url", url)
@@ -319,7 +317,7 @@ class URLFetchStrategy(FetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            logger.debug("Already downloaded {0}".format(self.archive_file))
+            logger.debug(f"Already downloaded {self.archive_file}")
             return
 
         url = None
@@ -343,7 +341,7 @@ class URLFetchStrategy(FetchStrategy):
             raise FailedDownloadError(url)
 
     def _existing_url(self, url):
-        logger.debug("Checking existence of {0}".format(url))
+        logger.debug(f"Checking existence of {url}")
 
         if ramble.config.get("config:url_fetch_method") == "curl":
             curl = self.curl
@@ -360,7 +358,7 @@ class URLFetchStrategy(FetchStrategy):
                 url, headers, response = ramble.util.web.read_from_url(url)
             except ramble.util.web.SpackWebError as werr:
                 msg = "Urllib fetch failed to verify url\
-                      {0}\n with error {1}".format(
+                      {}\n with error {}".format(
                     url, werr
                 )
                 raise FailedDownloadError(url, msg)
@@ -385,7 +383,7 @@ class URLFetchStrategy(FetchStrategy):
         save_file = None
         if self.stage.save_filename:
             save_file = self.stage.save_filename
-        logger.msg("Fetching {0}".format(url))
+        logger.msg(f"Fetching {url}")
 
         # Check if we're about to try and open a broken simlink, and if so
         # remove that file to avoid a bad situation where a file "exists" but
@@ -402,7 +400,7 @@ class URLFetchStrategy(FetchStrategy):
                 os.remove(self.archive_file)
             if save_file and os.path.exists(save_file):
                 os.remove(save_file)
-            msg = "urllib failed to fetch with error {0}".format(e)
+            msg = f"urllib failed to fetch with error {e}"
             raise FailedDownloadError(url, msg)
 
         with open(save_file, "wb") as _open_file:
@@ -418,7 +416,7 @@ class URLFetchStrategy(FetchStrategy):
         if self.stage.save_filename:
             save_file = self.stage.save_filename
             partial_file = self.stage.save_filename + ".part"
-        logger.msg("Fetching {0}".format(url))
+        logger.msg(f"Fetching {url}")
         if partial_file:
             save_args = [
                 "-C",
@@ -602,8 +600,8 @@ class URLFetchStrategy(FetchStrategy):
         checker = crypto.Checker(self.digest)
         if not checker.check(self.archive_file):
             raise ChecksumError(
-                "%s checksum failed for %s" % (checker.hash_name, self.archive_file),
-                "Expected %s but got %s" % (self.digest, checker.sum),
+                f"{checker.hash_name} checksum failed for {self.archive_file}",
+                f"Expected {self.digest} but got {checker.sum}",
             )
 
     @_needs_stage
@@ -628,7 +626,7 @@ class URLFetchStrategy(FetchStrategy):
 
     def __repr__(self):
         url = self.url if self.url else "no url"
-        return "%s<%s>" % (self.__class__.__name__, url)
+        return f"{self.__class__.__name__}<{url}>"
 
     def __str__(self):
         if self.url:
@@ -684,12 +682,12 @@ class VCSFetchStrategy(FetchStrategy):
     """
 
     def __init__(self, **kwargs):
-        super(VCSFetchStrategy, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
         # Set a URL based on the type of fetch strategy.
         self.url = kwargs.get(self.url_attr, None)
         if not self.url:
-            raise ValueError("%s requires %s argument." % (self.__class__, self.url_attr))
+            raise ValueError(f"{self.__class__} requires {self.url_attr} argument.")
 
         for attr in self.optional_attrs:
             setattr(self, attr, kwargs.get(attr, None))
@@ -731,7 +729,7 @@ class VCSFetchStrategy(FetchStrategy):
         return "VCS: %s" % self.url
 
     def __repr__(self):
-        return "%s<%s>" % (self.__class__, self.url)
+        return f"{self.__class__}<{self.url}>"
 
 
 @fetcher
@@ -756,7 +754,7 @@ class GoFetchStrategy(VCSFetchStrategy):
         # call to __init__
         forwarded_args = copy.copy(kwargs)
         forwarded_args.pop("name", None)
-        super(GoFetchStrategy, self).__init__(**forwarded_args)
+        super().__init__(**forwarded_args)
 
         self._go = None
 
@@ -785,7 +783,7 @@ class GoFetchStrategy(VCSFetchStrategy):
             self.go("get", "-v", "-d", self.url, env=env)
 
     def archive(self, destination):
-        super(GoFetchStrategy, self).archive(destination, exclude=".git")
+        super().archive(destination, exclude=".git")
 
     @_needs_stage
     def expand(self):
@@ -843,7 +841,7 @@ class GitFetchStrategy(VCSFetchStrategy):
         # to __init__
         forwarded_args = copy.copy(kwargs)
         forwarded_args.pop("name", None)
-        super(GitFetchStrategy, self).__init__(**forwarded_args)
+        super().__init__(**forwarded_args)
 
         self._git = None
         self.submodules = kwargs.get("submodules", False)
@@ -899,13 +897,13 @@ class GitFetchStrategy(VCSFetchStrategy):
         args = ""
 
         if self.commit:
-            args = " at commit {0}".format(self.commit)
+            args = f" at commit {self.commit}"
         elif self.tag:
-            args = " at tag {0}".format(self.tag)
+            args = f" at tag {self.tag}"
         elif self.branch:
-            args = " on branch {0}".format(self.branch)
+            args = f" on branch {self.branch}"
 
-        return "{0}{1}".format(self.url, args)
+        return f"{self.url}{args}"
 
     @_needs_stage
     def fetch(self):
@@ -1034,7 +1032,7 @@ class GitFetchStrategy(VCSFetchStrategy):
                 git(*args)
 
     def archive(self, destination):
-        super(GitFetchStrategy, self).archive(destination, exclude=".git")
+        super().archive(destination, exclude=".git")
 
     @_needs_stage
     def reset(self):
@@ -1055,7 +1053,7 @@ class GitFetchStrategy(VCSFetchStrategy):
         return not (self.url.startswith("http://") or self.url.startswith("/"))
 
     def __str__(self):
-        return "[git] {0}".format(self._repo_info())
+        return f"[git] {self._repo_info()}"
 
 
 @fetcher
@@ -1083,7 +1081,7 @@ class CvsFetchStrategy(VCSFetchStrategy):
         # to __init__
         forwarded_args = copy.copy(kwargs)
         forwarded_args.pop("name", None)
-        super(CvsFetchStrategy, self).__init__(**forwarded_args)
+        super().__init__(**forwarded_args)
 
         self._cvs = None
         if self.branch is not None:
@@ -1163,7 +1161,7 @@ class CvsFetchStrategy(VCSFetchStrategy):
                         os.unlink(path)
 
     def archive(self, destination):
-        super(CvsFetchStrategy, self).archive(destination, exclude="CVS")
+        super().archive(destination, exclude="CVS")
 
     @_needs_stage
     def reset(self):
@@ -1198,7 +1196,7 @@ class SvnFetchStrategy(VCSFetchStrategy):
         # to __init__
         forwarded_args = copy.copy(kwargs)
         forwarded_args.pop("name", None)
-        super(SvnFetchStrategy, self).__init__(**forwarded_args)
+        super().__init__(**forwarded_args)
 
         self._svn = None
         if self.revision is not None:
@@ -1257,7 +1255,7 @@ class SvnFetchStrategy(VCSFetchStrategy):
                     shutil.rmtree(path, ignore_errors=True)
 
     def archive(self, destination):
-        super(SvnFetchStrategy, self).archive(destination, exclude=".svn")
+        super().archive(destination, exclude=".svn")
 
     @_needs_stage
     def reset(self):
@@ -1300,7 +1298,7 @@ class HgFetchStrategy(VCSFetchStrategy):
         # to __init__
         forwarded_args = copy.copy(kwargs)
         forwarded_args.pop("name", None)
-        super(HgFetchStrategy, self).__init__(**forwarded_args)
+        super().__init__(**forwarded_args)
 
         self._hg = None
 
@@ -1361,7 +1359,7 @@ class HgFetchStrategy(VCSFetchStrategy):
             shutil.move(repo_name, self.stage.source_path)
 
     def archive(self, destination):
-        super(HgFetchStrategy, self).archive(destination, exclude=".hg")
+        super().archive(destination, exclude=".hg")
 
     @_needs_stage
     def reset(self):
@@ -1390,7 +1388,7 @@ class S3FetchStrategy(URLFetchStrategy):
 
     def __init__(self, *args, **kwargs):
         try:
-            super(S3FetchStrategy, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
         except ValueError:
             if not kwargs.get("url"):
                 raise ValueError("S3FetchStrategy requires a url for fetching.")
@@ -1435,7 +1433,7 @@ class GCSFetchStrategy(URLFetchStrategy):
 
     def __init__(self, *args, **kwargs):
         try:
-            super(GCSFetchStrategy, self).__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
         except ValueError:
             if not kwargs.get("url"):
                 raise ValueError("GCSFetchStrategy requires a url for fetching.")
@@ -1522,10 +1520,10 @@ def check_pkg_attributes(pkg):
     """
     # a single package cannot have URL attributes for multiple VCS fetch
     # strategies *unless* they are the same attribute.
-    conflicts = set([s.url_attr for s in all_strategies if hasattr(pkg, s.url_attr)])
+    conflicts = {s.url_attr for s in all_strategies if hasattr(pkg, s.url_attr)}
 
     # URL isn't a VCS fetch method. We can use it with a VCS method.
-    conflicts -= set(["url"])
+    conflicts -= {"url"}
 
     if len(conflicts) > 1:
         raise FetcherConflict(
@@ -1540,10 +1538,10 @@ def _check_version_attributes(fetcher, pkg, version):
     This assumes that we have already determined the fetcher for the
     specific version using ``for_package_version()``
     """
-    all_optionals = set(a for s in all_strategies for a in s.optional_attrs)
+    all_optionals = {a for s in all_strategies for a in s.optional_attrs}
 
     args = pkg.versions[version]
-    extra = set(args) - set(fetcher.optional_attrs) - set([fetcher.url_attr, "no_cache"])
+    extra = set(args) - set(fetcher.optional_attrs) - {fetcher.url_attr, "no_cache"}
     extra.intersection_update(all_optionals)
 
     if extra:
@@ -1669,9 +1667,7 @@ def from_url_scheme(url, *args, **kwargs):
         if url_attr and url_attr == scheme:
             return fetcher(url, *args, **kwargs)
 
-    raise ValueError(
-        'No FetchStrategy found for url with scheme: "{SCHEME}"'.format(SCHEME=parsed_url.scheme)
-    )
+    raise ValueError(f'No FetchStrategy found for url with scheme: "{parsed_url.scheme}"')
 
 
 def from_list_url(pkg):
@@ -1707,7 +1703,7 @@ def from_list_url(pkg):
             logger.msg("Could not determine url from list_url.")
 
 
-class FsCache(object):
+class FsCache:
 
     def __init__(self, root):
         self.root = os.path.abspath(root)
@@ -1745,7 +1741,7 @@ class FailedDownloadError(FetchError):
     """Raised when a download fails."""
 
     def __init__(self, url, msg=""):
-        super(FailedDownloadError, self).__init__("Failed to fetch file from URL: %s" % url, msg)
+        super().__init__("Failed to fetch file from URL: %s" % url, msg)
         self.url = url
 
 
@@ -1771,11 +1767,11 @@ class InvalidArgsError(FetchError):
     def __init__(self, pkg=None, version=None, **args):
         msg = "Could not guess a fetch strategy"
         if pkg:
-            msg += " for {pkg}".format(pkg=pkg)
+            msg += f" for {pkg}"
             if version:
-                msg += "@{version}".format(version=version)
-        long_msg = "with arguments: {args}".format(args=args)
-        super(InvalidArgsError, self).__init__(msg, long_msg)
+                msg += f"@{version}"
+        long_msg = f"with arguments: {args}"
+        super().__init__(msg, long_msg)
 
 
 class ChecksumError(FetchError):
@@ -1786,6 +1782,4 @@ class NoStageError(FetchError):
     """Raised when fetch operations are called before set_stage()."""
 
     def __init__(self, method):
-        super(NoStageError, self).__init__(
-            "Must call FetchStrategy.set_stage() before calling %s" % method.__name__
-        )
+        super().__init__("Must call FetchStrategy.set_stage() before calling %s" % method.__name__)

@@ -78,7 +78,7 @@ ramble:
 
         results_files = glob.glob(os.path.join(ws.root, "results.latest.txt"))
 
-        with open(results_files[0], "r") as f:
+        with open(results_files[0]) as f:
             data = f.read()
             assert "matched_shared_context" in data  # find the merged context
             assert "test_fom = 123.4" in data  # from the app

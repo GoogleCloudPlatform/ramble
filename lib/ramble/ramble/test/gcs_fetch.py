@@ -52,7 +52,7 @@ def test_gcsfetchstrategy_downloaded(tmpdir, _fetch_method):
             def archive_file(self):
                 return archive
 
-        url = "gcs:///{0}".format(archive)
+        url = f"gcs:///{archive}"
         fetcher = Archived_GCSFS(url=url)
         with ramble.stage.InputStage(fetcher, name="test", path=testpath):
             fetcher.fetch()

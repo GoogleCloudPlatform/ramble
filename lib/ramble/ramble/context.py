@@ -12,7 +12,7 @@ import ramble.util.matrices
 import spack.util.spack_yaml as syaml
 
 
-class Context(object):
+class Context:
     """Class to represent a context
 
     This class contains variable definitions to store any individual context

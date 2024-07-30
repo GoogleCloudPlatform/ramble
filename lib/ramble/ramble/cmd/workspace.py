@@ -34,11 +34,6 @@ import ramble.software_environments
 import ramble.util.colors as rucolor
 from ramble.util.logger import logger
 
-if sys.version_info >= (3, 3):
-    from collections.abc import Sequence  # novm noqa: F401
-else:
-    from collections import Sequence  # noqa: F401
-
 
 description = "manage experiment workspaces"
 section = "workspaces"
@@ -343,12 +338,12 @@ def _workspace_create(
     workspace.write(inputs_dir=inputs_dir, software_dir=software_dir)
 
     if config:
-        with open(config, "r") as f:
+        with open(config) as f:
             workspace._read_config("workspace", f)
             workspace._write_config("workspace")
 
     if template_execute:
-        with open(template_execute, "r") as f:
+        with open(template_execute) as f:
             _, file_name = os.path.split(template_execute)
             template_name = os.path.splitext(file_name)[0]
             workspace._read_template(template_name, f.read())

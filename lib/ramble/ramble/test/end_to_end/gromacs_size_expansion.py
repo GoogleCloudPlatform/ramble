@@ -76,5 +76,5 @@ ramble:
             ws1.experiment_dir, "gromacs", "water_bare", "expansion_test", "execute_experiment"
         )
 
-        with open(exec_script_path, "r") as f:
+        with open(exec_script_path) as f:
             assert "0000.96" in f.read()

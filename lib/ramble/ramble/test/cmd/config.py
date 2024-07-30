@@ -581,7 +581,7 @@ def test_config_add_invalid_file_fails(tmpdir):
     with open(file, "w") as f:
         f.write(contents)
 
-    with pytest.raises((ramble.config.ConfigFormatError)):
+    with pytest.raises(ramble.config.ConfigFormatError):
         config("add", "-f", file)
 
 
@@ -828,7 +828,7 @@ def mock_editor(monkeypatch):
 
 
 def section_args(section_name):
-    class TestArgs(object):
+    class TestArgs:
         scope = None
         section = section_name
         config_command = "edit"

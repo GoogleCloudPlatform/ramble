@@ -1151,7 +1151,7 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers, ca
         app_inst = exp_set.experiments["basic.test_wl.test1"]
         assert app_inst.modifiers is not None
 
-        expected_modifier_modes = set(["app-scope", "wl-scope", "exp-scope"])
+        expected_modifier_modes = {"app-scope", "wl-scope", "exp-scope"}
         for mod_def in app_inst.modifiers:
             assert mod_def["mode"] in expected_modifier_modes
             expected_modifier_modes.remove(mod_def["mode"])
