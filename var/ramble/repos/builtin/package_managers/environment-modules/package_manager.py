@@ -14,7 +14,7 @@ import llnl.util.filesystem as fs
 import ramble.util.hashing
 
 import ramble.config
-from ramble.util.sourcing import source_str
+from ramble.util.shell_utils import source_str
 
 
 class EnvironmentModules(PackageManagerBase):

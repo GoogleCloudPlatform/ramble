@@ -48,7 +48,7 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 from ramble.util.logger import logger
-from ramble.util.sourcing import source_str
+from ramble.util.shell_utils import source_str
 
 from ramble.workspace import namespace
 
@@ -72,7 +72,23 @@ def _get_context_display_name(context):
     )
 
 
-# Intentional old syntax to verify ci build check
+def _check_shell_support(app_inst):
+    def _check_match(inst, shell_to_support):
+        pat = getattr(inst, "shell_support_pattern", None)
+        matched = pat is None or fnmatch.fnmatch(shell_to_support, pat)
+        if not matched:
+            logger.die(
+                f"{inst.name} does not support {shell_to_support} shell"
+                f", the supported shell pattern is '{pat}'"
+            )
+
+    shell = ramble.config.get("config:shell")
+    _check_match(app_inst, shell)
+    for mod_inst in app_inst._modifier_instances:
+        _check_match(mod_inst, shell)
+    _check_match(app_inst.package_manager, shell)
+
+
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
     _builtin_name = "builtin::{name}"
@@ -1323,6 +1339,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         templates, and injecting the experiment into the workspace all
         experiments file.
         """
+
+        _check_shell_support(self)
 
         experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)

@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.util.shell_vars import last_pid_var
+from ramble.util.shell_utils import last_pid_var, source_str, get_compatible_base_shell
 
 import pytest
 
@@ -17,7 +17,12 @@ import pytest
         (last_pid_var, "fish", "$last_pid"),
         (last_pid_var, "bash", "$!"),
         (last_pid_var, "unknown_shell", "$!"),
+        (source_str, "bash", "."),
+        (source_str, "csh", "source"),
+        (source_str, "unknown_shell", ""),
+        (get_compatible_base_shell, "bash", "sh"),
+        (get_compatible_base_shell, "sh", "sh"),
     ],
 )
-def test_shell_vars(var_func, shell, expect):
+def test_shell_specializations(var_func, shell, expect):
     assert var_func(shell) == expect

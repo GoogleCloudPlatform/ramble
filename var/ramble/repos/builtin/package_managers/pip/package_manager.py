@@ -18,7 +18,7 @@ from ramble.error import RambleError
 from ramble.util.executable import which
 from ramble.util.hashing import hash_file, hash_string
 from ramble.util.logger import logger
-from ramble.util.sourcing import source_str
+from ramble.util.shell_utils import source_str
 
 from spack.util.executable import Executable
 import llnl.util.filesystem as fs

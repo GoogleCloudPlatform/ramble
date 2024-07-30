@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import spack.util.environment
+from ramble.util.shell_utils import get_compatible_base_shell
 
 
 class Env:
@@ -92,5 +93,5 @@ class RambleEnvModifications(spack.util.environment.EnvironmentModifications):
 
     def shell_modifications(self, shell="sh", explicit=False, env=None):
         """Wrapper around spack's shell_modifications"""
-        shell_name = "sh" if shell == "bash" else shell
-        return super().shell_modifications(shell=shell_name, explicit=explicit, env=env)
+        base_shell = get_compatible_base_shell(shell)
+        return super().shell_modifications(shell=base_shell, explicit=explicit, env=env)
