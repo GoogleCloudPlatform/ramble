@@ -27,25 +27,6 @@ pytestmark = pytest.mark.usefixtures(
 
 workspace = RambleCommand("workspace")
 
-common_test_config = """
-ramble:
-  variables:
-    mpi_command: ''
-    batch_submit: 'batch_submit {execute_experiment}'
-    processes_per_node: '1'
-  applications:
-    hostname:
-      workloads:
-        local:
-          experiments:
-            test:
-              variables:
-                n_nodes: '1'
-  spack:
-    packages: {}
-    environments: {}
-"""
-
 
 def _setup_workspace(ws_name):
     test_config = """
