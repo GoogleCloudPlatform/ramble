@@ -301,22 +301,17 @@ def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
             scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
 
-
             print(scale_pivot)
-
-            # print(selected)
 
             fig, ax = plt.subplots()
 
             if args.normalize:
                 first_perf_value = scale_pivot['fom_value'].iloc[0]
                 scale_pivot.loc[:, 'normalized_fom_value'] = first_perf_value / scale_pivot.loc[:, 'fom_value']
+                scale_pivot.loc[:, 'ideal_perf_value'] = scale_pivot.index / scale_pivot.index[0]
 
-                first_scale_value = scale_pivot[f'{scale_var}'].iloc[0]
-                scale_pivot.loc[:, 'ideal_perf_value'] = scale_pivot.loc[:, f'{scale_var}'] / first_scale_value
-
-                ax.plot(f'{scale_var}', 'normalized_fom_value', data=scale_pivot, marker='o')
-                ax.plot(f'{scale_var}', 'ideal_perf_value', data=scale_pivot)
+                ax.plot(scale_pivot.index, 'normalized_fom_value', data=scale_pivot, marker='o')
+                ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
 
                 ax.set_xlabel(f'{scale_var}')
                 ax.set_ylabel('Speedup')
@@ -324,21 +319,21 @@ def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
                 first_perf_value = scale_pivot['fom_value'].iloc[0]
 
                 if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
-                    first_perf_value = scale_pivot['fom_value'].iloc[0]
-                    scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value / scale_pivot.loc[:, f'{scale_var}']
+                    scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value / scale_pivot.index
+                    ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
                 if better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
-                    first_perf_value = scale_pivot['fom_value'].iloc[0]
-                    scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value * scale_pivot.loc[:, f'{scale_var}']                
+                    scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value * scale_pivot.index
+                    ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
 
-                ax.plot(f'{scale_var}', 'fom_value', data=scale_pivot, marker='o')
-                ax.plot(f'{scale_var}', 'ideal_perf_value', data=scale_pivot)
+                ax.plot(scale_pivot.index, 'fom_value', data=scale_pivot, marker='o')
 
                 ax.set_xlabel(f'{scale_var}')
                 ax.set_ylabel(f'{perf_measure}')
 
             # ax.set_xscale('log')
-            ax.set_xticks(scale_pivot[f'{scale_var}'].unique().tolist())
+            ax.set_xticks(scale_pivot.index.unique().tolist())
             ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}')
+            plt.tight_layout()
 
             # TODO(dpomeroy): add data table below chart to show what's in the pivot table
             # cols = (f'{scale_var}', f'{perf_measure}')
