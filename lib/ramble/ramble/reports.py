@@ -320,11 +320,12 @@ def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
                 if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
                     scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value / scale_pivot.index
+                    ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
                 if better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
                     scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value * scale_pivot.index
+                    ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
 
                 ax.plot(scale_pivot.index, 'fom_value', data=scale_pivot, marker='o')
-                ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
 
                 ax.set_xlabel(f'{scale_var}')
                 ax.set_ylabel(f'{perf_measure}')
