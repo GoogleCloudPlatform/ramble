@@ -32,7 +32,7 @@ def test_single_criteria(tmpdir):
         "test", "string", r".*Success string.*", log_path
     )
 
-    with open(log_path, "r") as f:
+    with open(log_path) as f:
         for line in f.readlines():
             if new_criteria.passed(line):
                 new_criteria.mark_found()
@@ -58,7 +58,7 @@ def test_criteria_list(tmpdir):
 
     criteria_list.add_criteria("workspace", "test-ws", "string", r".*Into a log file.*", log_path)
 
-    with open(log_path, "r") as f:
+    with open(log_path) as f:
         for line in f.readlines():
             for criteria in criteria_list.all_criteria():
                 if criteria.passed(line):

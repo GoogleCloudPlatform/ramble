@@ -26,7 +26,7 @@ import ramble.context
 import spack.util.naming
 
 
-class ExperimentSet(object):
+class ExperimentSet:
     """Class to represent a full set of experiments
 
     This class contains logic to take sets of variable definitions and generate

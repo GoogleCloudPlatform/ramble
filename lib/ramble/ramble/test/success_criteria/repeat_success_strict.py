@@ -60,7 +60,7 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
+        with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             print(data)
             assert "FAILED" not in data
@@ -75,7 +75,7 @@ ramble:
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
+        with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             print(data)
             assert "SUCCESS" in data
@@ -91,7 +91,7 @@ ramble:
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
+        with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             print(data)
             assert "SUCCESS" not in data

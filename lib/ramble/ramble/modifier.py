@@ -24,7 +24,7 @@ import ramble.util.class_attributes
 from ramble.util.logger import logger
 
 
-class ModifierBase(object, metaclass=ModifierMeta):
+class ModifierBase(metaclass=ModifierMeta):
     name = None
     _builtin_name = "modifier_builtin::{obj_name}::{name}"
     _mod_prefix_builtin = r"modifier_builtin::"
@@ -294,18 +294,15 @@ class ModifierBase(object, metaclass=ModifierMeta):
         if self._usage_mode not in self.env_var_modifications:
             return
 
-        for action, conf in self.env_var_modifications[self._usage_mode].items():
-            yield action, conf
+        yield from self.env_var_modifications[self._usage_mode].items()
 
     def all_package_manager_requirements(self):
         if self._usage_mode in self.package_manager_requirements:
-            for req in self.package_manager_requirements[self._usage_mode]:
-                yield req
+            yield from self.package_manager_requirements[self._usage_mode]
 
     def all_pipeline_phases(self, pipeline):
         if pipeline in self.phase_definitions:
-            for phase_name, phase_node in self.phase_definitions[pipeline].items():
-                yield phase_name, phase_node
+            yield from self.phase_definitions[pipeline].items()
 
     def no_expand_vars(self):
         """Iterator over non-expandable variables in current mode

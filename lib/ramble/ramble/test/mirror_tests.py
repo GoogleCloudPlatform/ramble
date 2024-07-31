@@ -35,7 +35,7 @@ pytestmark = [
 ]
 
 
-class MockFetcher(object):
+class MockFetcher:
     """Mock fetcher object which implements the necessary functionality for
     testing MirrorCache
     """

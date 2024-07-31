@@ -91,7 +91,7 @@ ramble:
         ws._re_read()
 
         req_test = True
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             for line in f.readlines():
                 if re.match(r"^[^#]*required", line):
                     req_test = False

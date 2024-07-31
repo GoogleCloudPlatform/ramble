@@ -66,6 +66,6 @@ ramble:
 
             assert os.path.exists(exp_script)
 
-            with open(exp_script, "r") as f:
+            with open(exp_script) as f:
                 data = f.read()
                 assert f"mpirun -n {n_ranks}" in data

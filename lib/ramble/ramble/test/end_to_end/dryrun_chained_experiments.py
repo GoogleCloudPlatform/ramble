@@ -141,7 +141,7 @@ ramble:
         assert os.path.exists(script)
 
         # Check all chained experiments are referenced
-        with open(script, "r") as f:
+        with open(script) as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
@@ -156,7 +156,7 @@ ramble:
 
             # Check that experiment 1 has n_ranks = 4 instead of 2
             if chain_idx == 3:
-                with open(chained_script, "r") as f:
+                with open(chained_script) as f:
                     assert "mpirun -n 4" in f.read()
 
         expected_order = [
@@ -169,7 +169,7 @@ ramble:
         ]
 
         # Check prepend / append order is correct
-        with open(script, "r") as f:
+        with open(script) as f:
 
             for line in f.readlines():
                 if expected_order[0].match(line):
@@ -207,7 +207,7 @@ ramble:
         names = ["results.latest.json", "results.latest.yaml"]
         loaders = [sjson.load, syaml.load]
         for name, loader in zip(names, loaders):
-            with open(os.path.join(ws.root, name), "r") as f:
+            with open(os.path.join(ws.root, name)) as f:
                 data = loader(f)
 
                 assert "experiments" in data

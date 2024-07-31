@@ -16,17 +16,17 @@ import types
 
 class PrependFileLoader(SourceFileLoader):
     def __init__(self, full_name, path, prepend=None):
-        super(PrependFileLoader, self).__init__(full_name, path)
+        super().__init__(full_name, path)
         self.prepend = prepend
 
     def path_stats(self, path):
-        stats = super(PrependFileLoader, self).path_stats(path)
+        stats = super().path_stats(path)
         if self.prepend:
             stats["size"] += len(self.prepend) + 1
         return stats
 
     def get_data(self, path):
-        data = super(PrependFileLoader, self).get_data(path)
+        data = super().get_data(path)
         if path != self.path or self.prepend is None:
             return data
         else:

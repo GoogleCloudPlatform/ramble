@@ -93,7 +93,7 @@ def editor(*args, **kwargs):
 
             # Show variable we were trying to use, if it's from one
             if var:
-                exe = "$%s (%s)" % (var, exe)
+                exe = f"${var} ({exe})"
             logger.warn(f"Could not execute {exe} due to error: {e}")
             return False
 
@@ -128,7 +128,7 @@ def editor(*args, **kwargs):
         return
 
     # Fail if nothing could be found
-    raise EnvironmentError(
+    raise OSError(
         "No text editor found! Please set the VISUAL and/or EDITOR "
         "environment variable(s) to your preferred text editor."
     )

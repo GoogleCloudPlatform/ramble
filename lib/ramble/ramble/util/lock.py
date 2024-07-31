@@ -27,27 +27,27 @@ class Lock(llnl.util.lock.Lock):
     """
 
     def __init__(self, *args, **kwargs):
-        super(Lock, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._enable = ramble.config.get("config:locks", True)
 
     def _lock(self, op, timeout=0):
         if self._enable:
-            return super(Lock, self)._lock(op, timeout)
+            return super()._lock(op, timeout)
         else:
             return 0, 0
 
     def _unlock(self):
         """Unlock call that always succeeds."""
         if self._enable:
-            super(Lock, self)._unlock()
+            super()._unlock()
 
     def _debug(self, *args):
         if self._enable:
-            super(Lock, self)._debug(*args)
+            super()._debug(*args)
 
     def cleanup(self, *args):
         if self._enable:
-            super(Lock, self).cleanup(*args)
+            super().cleanup(*args)
 
 
 def check_lock_safety(path):
@@ -74,9 +74,9 @@ def check_lock_safety(path):
             writable = "world"
 
         if writable:
-            msg = "Refusing to disable locks: ramble is {0}-writable.".format(writable)
+            msg = f"Refusing to disable locks: ramble is {writable}-writable."
             long_msg = (
                 "Running a shared ramble without locks is unsafe. You must "
-                "restrict permissions on {0} or enable locks."
+                "restrict permissions on {} or enable locks."
             ).format(path)
             raise ramble.error.RambleError(msg, long_msg)

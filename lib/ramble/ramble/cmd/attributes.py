@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
 
 import argparse
 from collections import defaultdict
@@ -91,7 +90,7 @@ def objects_to_attributes(
     if not object_names:
         object_names = ramble.repository.paths[object_type].all_object_names()
 
-    app_to_users = defaultdict(lambda: set())
+    app_to_users = defaultdict(set)
     for name in object_names:
         cls = ramble.repository.paths[object_type].get_obj_class(name)
         for user in getattr(cls, attr_name):
@@ -103,7 +102,7 @@ def objects_to_attributes(
 def attributes_to_objects(
     users=None, attr_name=default_attr, object_type=ramble.repository.default_type
 ):
-    user_to_apps = defaultdict(lambda: [])
+    user_to_apps = defaultdict(list)
     object_names = ramble.repository.paths[object_type].all_object_names()
     for name in object_names:
         cls = ramble.repository.paths[object_type].get_obj_class(name)
@@ -163,7 +162,7 @@ def attributes(parser, args):
                 args.object_or_attr, attr_name=attr_name, object_type=object_type
             )
             for user, objects in sorted(attributes.items()):
-                color.cprint("@c{%s}: %s" % (user, ", ".join(sorted(objects))))
+                color.cprint("@c{{{}}}: {}".format(user, ", ".join(sorted(objects))))
             return 0 if attributes else 1
 
         else:
@@ -171,7 +170,7 @@ def attributes(parser, args):
                 args.object_or_attr, attr_name=attr_name, object_type=object_type
             )
             for app, attributes in sorted(objects.items()):
-                color.cprint("@c{%s}: %s" % (app, ", ".join(sorted(attributes))))
+                color.cprint("@c{{{}}}: {}".format(app, ", ".join(sorted(attributes))))
             return 0 if objects else 1
 
     if args.by_attribute:

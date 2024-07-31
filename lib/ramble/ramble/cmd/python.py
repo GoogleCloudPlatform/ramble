@@ -106,7 +106,7 @@ def ipython_interpreter(args):
     elif args.python_command:
         IPython.start_ipython(argv=["-c", args.python_command])
     else:
-        header = "Ramble version %s\nPython %s, %s %s" % (
+        header = "Ramble version {}\nPython {}, {} {}".format(
             ramble.ramble_version,
             platform.python_version(),
             platform.system(),

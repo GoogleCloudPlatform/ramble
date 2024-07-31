@@ -81,5 +81,5 @@ ramble:
             )
 
             assert os.path.exists(script)
-            with open(script, "r") as f:
+            with open(script) as f:
                 assert r"{zlib}" not in f.read()

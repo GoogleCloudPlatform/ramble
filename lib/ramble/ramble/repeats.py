@@ -9,7 +9,7 @@
 from ramble.util.logger import logger
 
 
-class Repeats(object):
+class Repeats:
     """Class to represent configuration of experiment repeats"""
 
     def __init__(self):

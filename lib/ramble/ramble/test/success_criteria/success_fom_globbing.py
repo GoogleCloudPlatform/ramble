@@ -95,6 +95,6 @@ def test_success_fom_globbing(
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
+        with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             assert result in data

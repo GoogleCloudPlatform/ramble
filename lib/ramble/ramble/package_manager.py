@@ -25,7 +25,7 @@ import ramble.util.class_attributes
 import spack.util.naming
 
 
-class PackageManagerBase(object, metaclass=PackageManagerMeta):
+class PackageManagerBase(metaclass=PackageManagerMeta):
     name = None
     _builtin_name = "package_manager_builtin::{obj_name}::{name}"
     _pkgman_prefix_builtin = r"package_manager_builtin::"
@@ -147,7 +147,9 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
                     out_str.append(rucolor.nested_1("  %s:\n" % name))
                     for key in self._spec_keys:
                         if key in info and info[key]:
-                            out_str.append("    %s = %s\n" % (key, info[key].replace("@", "@@")))
+                            out_str.append(
+                                "    {} = {}\n".format(key, info[key].replace("@", "@@"))
+                            )
 
         return out_str
 
@@ -188,8 +190,7 @@ class PackageManagerBase(object, metaclass=PackageManagerMeta):
             phase_note (GraphNode): Object representing a node in the phase graph
         """
         if pipeline in self.phase_definitions:
-            for phase_name, phase_node in self.phase_definitions[pipeline].items():
-                yield phase_name, phase_node
+            yield from self.phase_definitions[pipeline].items()
 
     def set_application(self, app_inst):
         """Add an internal reference to the application instance this package

@@ -7,7 +7,7 @@
 # except according to those terms.
 
 
-class GraphNode(object):
+class GraphNode:
     """Class representing a node of a graph, where the node can have an
     attribute attached to it.
 

@@ -54,7 +54,7 @@ def which(*args, **kwargs):
     return PrefixedExecutable(exe) if exe else None
 
 
-class CommandExecutable(object):
+class CommandExecutable:
     """CommandExecutable class
     This class is used to represent internal executables in Ramble.
 

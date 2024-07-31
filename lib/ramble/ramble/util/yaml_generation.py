@@ -40,7 +40,7 @@ def read_config_file(conf_path: str):
     Returns:
         (dict): Dictionary representation of the data contained in conf_path
     """
-    with open(conf_path, "r") as base_conf:
+    with open(conf_path) as base_conf:
         logger.debug(f"Reading config from {conf_path}")
         try:
             config_dict = yaml.safe_load(base_conf)

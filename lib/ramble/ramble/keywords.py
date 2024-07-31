@@ -50,7 +50,7 @@ default_keys = {
 }
 
 
-class Keywords(object):
+class Keywords:
     """Class to represent known ramble keywords.
 
     Each keyword contains a dictionary of its attributes. Currently, these include:

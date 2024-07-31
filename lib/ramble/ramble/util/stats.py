@@ -29,7 +29,7 @@ def max_decimal_places(list):
     return max
 
 
-class StatsBase(object):
+class StatsBase:
     min_count = 1
 
     def compute(self, values):

@@ -115,7 +115,7 @@ ramble:
         ]
 
         # Assert command order is: lscpu -> export -> foo
-        with open(exp_script, "r") as f:
+        with open(exp_script) as f:
             custom_found = False
             cmd_found = False
             export_found = False

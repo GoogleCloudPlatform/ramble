@@ -331,7 +331,7 @@ def failing_fetch_strategy():
 def search_fn():
     """Returns a search function that always succeeds."""
 
-    class _Mock(object):
+    class _Mock:
         performed_search = False
 
         def __call__(self):
@@ -375,7 +375,7 @@ def check_stage_dir_perms(prefix, path):
         assert p_status.st_mode & stat.S_IRWXU == stat.S_IRWXU
 
 
-class TestStage(object):
+class TestStage:
 
     stage_name = "ramble-test-stage"
 
@@ -798,7 +798,7 @@ class TestStage(object):
         assert ramble.stage._resolve_paths(paths) == can_paths
 
         # resolved path with node including user does not append user
-        paths = [os.path.join(os.path.sep, "spack-{0}".format(user), "stage")]
+        paths = [os.path.join(os.path.sep, f"spack-{user}", "stage")]
         assert ramble.stage._resolve_paths(paths) == paths
 
         tempdir = "$tempdir"

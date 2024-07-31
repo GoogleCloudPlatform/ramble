@@ -79,13 +79,13 @@ ramble:
         workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
         software_path = os.path.join(ws1.software_dir, "wrfv4", "spack.yaml")
-        with open(software_path, "r") as f:
+        with open(software_path) as f:
             assert "intel-oneapi-vtune" in f.read()
 
         execute_script = os.path.join(
             ws1.experiment_dir, "wrfv4", "CONUS_12km", "modifier_test", "execute_experiment"
         )
-        with open(execute_script, "r") as f:
+        with open(execute_script) as f:
             data = f.read()
             assert "aps -c mpi" in data
             assert "aps-report" in data

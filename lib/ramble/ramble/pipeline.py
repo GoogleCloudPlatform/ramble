@@ -42,7 +42,7 @@ if not ramble.config.get("config:disable_progress_bar", False):
         logger.die("Module `tqdm` is not found. Ensure requirements.txt are installed.")
 
 
-class Pipeline(object):
+class Pipeline:
     """Base Class for all pipeline objects"""
 
     name = "base"
@@ -83,7 +83,7 @@ class Pipeline(object):
         files_exist = os.path.exists(workspace_inventory) and os.path.exists(workspace_hash_file)
 
         if not self.force_inventory and files_exist:
-            with open(workspace_inventory, "r") as f:
+            with open(workspace_inventory) as f:
                 self.workspace.hash_inventory = sjson.load(f)
 
             self.workspace.workspace_hash = ramble.util.hashing.hash_json(
@@ -314,7 +314,7 @@ class ArchivePipeline(Pipeline):
         if not self.archive_prefix:
             self.archive_prefix = os.path.basename(self.workspace.path)
 
-        self.archive_name = "%s-archive-%s" % (self.archive_prefix, date_str)
+        self.archive_name = f"{self.archive_prefix}-archive-{date_str}"
 
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
@@ -585,7 +585,7 @@ class PushDeploymentPipeline(Pipeline):
             aux_repo_conf = os.path.join(aux_software_dir, repo_conf[1])
             repo_data = syaml.syaml_dict()
             if os.path.exists(aux_repo_conf):
-                with open(aux_repo_conf, "r") as f:
+                with open(aux_repo_conf) as f:
                     repo_data = syaml.load_config(f.read())
             else:
                 repo_data[repo_conf[0]] = []

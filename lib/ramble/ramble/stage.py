@@ -7,8 +7,6 @@
 # except according to those terms.
 
 
-from __future__ import print_function
-
 import errno
 import getpass
 import glob
@@ -176,7 +174,7 @@ def _mirror_roots():
     ]
 
 
-class InputStage(object):
+class InputStage:
     """Manages a stage directory for containing input files.
 
     A Stage object is a context manager that handles a directory where
@@ -450,14 +448,12 @@ class InputStage(object):
                     fetchers.insert(0, cache_fetcher)
 
         def generate_fetchers():
-            for fetcher in fetchers:
-                yield fetcher
+            yield from fetchers
             # The search function may be expensive, so wait until now to
             # call it so the user can stop if a prior fetcher succeeded
             if self.search_fn and not mirror_only:
                 dynamic_fetchers = self.search_fn()
-                for fetcher in dynamic_fetchers:
-                    yield fetcher
+                yield from dynamic_fetchers
 
         def print_errors(errors):
             for msg in errors:
@@ -474,11 +470,11 @@ class InputStage(object):
                 # Don't bother reporting when something is not cached.
                 continue
             except ramble.error.RambleError as e:
-                errors.append("Fetching from {0} failed.".format(fetcher))
+                errors.append(f"Fetching from {fetcher} failed.")
                 logger.debug(e)
                 continue
             except spack.util.web.SpackWebError as e:
-                errors.append("Fetching from {0} failed.".format(fetcher))
+                errors.append(f"Fetching from {fetcher} failed.")
                 logger.debug(e)
                 continue
 
@@ -631,16 +627,16 @@ class InputStage(object):
 class ResourceStage(InputStage):
 
     def __init__(self, url_or_fetch_strategy, root, resource, **kwargs):
-        super(ResourceStage, self).__init__(url_or_fetch_strategy, **kwargs)
+        super().__init__(url_or_fetch_strategy, **kwargs)
         self.root_stage = root
         self.resource = resource
 
     def restage(self):
-        super(ResourceStage, self).restage()
+        super().restage()
         self._add_to_root_stage()
 
     def expand_archive(self):
-        super(ResourceStage, self).expand_archive()
+        super().expand_archive()
         self._add_to_root_stage()
 
     def _add_to_root_stage(self):
@@ -701,7 +697,7 @@ class StageComposite(pattern.Composite):
     #
 
     def __init__(self):
-        super(StageComposite, self).__init__(
+        super().__init__(
             [
                 "fetch",
                 "create",
@@ -747,7 +743,7 @@ class StageComposite(pattern.Composite):
         return self[0].archive_file
 
 
-class DIYStage(object):
+class DIYStage:
     """
     Simple class that allows any directory to be a ramble input stage.
     Consequently, it does not expect or require that the source path adhere to
@@ -842,7 +838,7 @@ def get_checksums_for_versions(
     num_ver = len(sorted_versions)
 
     logger.msg(
-        "Found {0} version{1} of {2}:".format(num_ver, "" if num_ver == 1 else "s", name),
+        "Found {} version{} of {}:".format(num_ver, "" if num_ver == 1 else "s", name),
         "",
         *llnl.util.lang.elide_list(
             ["{0:{1}}  {2}".format(str(v), max_len, url_dict[v]) for v in sorted_versions]
@@ -887,7 +883,7 @@ def get_checksums_for_versions(
                 )
                 i += 1
         except FailedDownloadError:
-            errors.append("Failed to fetch {0}".format(url))
+            errors.append(f"Failed to fetch {url}")
         except Exception as e:
             logger.msg(f"Something failed on {url}, skipping.  ({e})")
 
@@ -903,14 +899,14 @@ def get_checksums_for_versions(
     # Generate the version directives to put in a package.py
     version_lines = "\n".join(
         [
-            "    version('{0}', {1}sha256='{2}')".format(v, " " * (max_len - len(str(v))), h)
+            "    version('{}', {}sha256='{}')".format(v, " " * (max_len - len(str(v))), h)
             for v, h in version_hashes
         ]
     )
 
     num_hash = len(version_hashes)
     logger.debug(
-        "Checksummed {0} version{1} of {2}:".format(num_hash, "" if num_hash == 1 else "s", name)
+        "Checksummed {} version{} of {}:".format(num_hash, "" if num_hash == 1 else "s", name)
     )
 
     return version_lines

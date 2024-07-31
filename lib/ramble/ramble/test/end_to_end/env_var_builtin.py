@@ -92,7 +92,7 @@ ramble:
         cmd3_regex = re.compile("foo >>")
 
         # Assert experiment 1 has exports before commands
-        with open(exp1_script, "r") as f:
+        with open(exp1_script) as f:
             cmd_found = False
             export_found = False
             for line in f.readlines():
@@ -104,7 +104,7 @@ ramble:
             assert cmd_found and export_found
 
         # Assert experiment 2 has commands before exports
-        with open(exp2_script, "r") as f:
+        with open(exp2_script) as f:
             cmd_found = False
             export_found = False
             for line in f.readlines():
@@ -116,7 +116,7 @@ ramble:
             assert cmd_found and export_found
 
         # Assert experiment 3 has exports before commands
-        with open(exp3_script, "r") as f:
+        with open(exp3_script) as f:
             cmd_found = False
             export_found = False
             for line in f.readlines():
@@ -164,5 +164,5 @@ ramble:
         experiment_root = ws.experiment_dir
         exp1_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
 
-        with open(os.path.join(exp1_dir, "execute_experiment"), "r") as f:
+        with open(os.path.join(exp1_dir, "execute_experiment")) as f:
             assert "FROM_DIRECTIVE" in f.read()

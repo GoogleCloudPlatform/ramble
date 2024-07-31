@@ -76,7 +76,7 @@ def test_success_modifier(
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt"), "r") as f:
+        with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             assert result in data
 
@@ -128,7 +128,7 @@ ramble:
     workspace("analyze", global_args=["-w", workspace_name])
     result_file = os.path.join(ws.root, "results.latest.txt")
 
-    with open(result_file, "r") as f:
+    with open(result_file) as f:
         content = f.read()
         assert "FAILED" not in content
         assert "default (null) context figures of merit" in content

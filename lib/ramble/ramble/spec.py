@@ -32,7 +32,7 @@ class SpecLexer(spack.parse.Lexer):
     """Parses tokens that make up spack specs."""
 
     def __init__(self):
-        super(SpecLexer, self).__init__(
+        super().__init__(
             [
                 (r"\^", lambda scanner, val: self.token(DEP, val)),
                 (r"\@", lambda scanner, val: self.token(AT, val)),
@@ -76,7 +76,7 @@ class SpecParser(spack.parse.Parser):
                 superfluous Spec object in the Spec constructor.
         """
         logger.debug(f"Starting parser with spec {initial_spec}")
-        super(SpecParser, self).__init__(_lexer)
+        super().__init__(_lexer)
         self.previous = None
         self._initial = initial_spec
 
@@ -116,10 +116,10 @@ class SpecParser(spack.parse.Parser):
         if not id:
             id = self.token.value
         if "." in id:
-            self.last_token_error("{0}: Identifier cannot contain '.'".format(id))
+            self.last_token_error(f"{id}: Identifier cannot contain '.'")
 
 
-class Spec(object):
+class Spec:
     def __init__(self, spec_like=None):
         """Create a new Spec.
 
@@ -216,7 +216,7 @@ class Spec(object):
                     except AttributeError:
                         parent = ".".join(parts[:idx])
                         m = "Attempted to format attribute %s." % attribute
-                        m += "Spec %s has no attribute %s" % (parent, part)
+                        m += f"Spec {parent} has no attribute {part}"
                         raise SpecFormatStringError(m)
 
                     if callable(current):
@@ -273,7 +273,7 @@ class Spec(object):
     @property
     def fullname(self):
         return (
-            ("%s.%s" % (self.namespace, self.name))
+            (f"{self.namespace}.{self.name}")
             if self.namespace
             else (self.name if self.name else "")
         )
@@ -311,7 +311,7 @@ class SpecParseError(ramble.error.SpecError):
     """Wrapper for ParseError for when we're parsing specs."""
 
     def __init__(self, parse_error):
-        super(SpecParseError, self).__init__(parse_error.message)
+        super().__init__(parse_error.message)
         self.string = parse_error.string
 
 

@@ -15,7 +15,7 @@ from ramble.error import RambleError
 from ramble.util.lock import Lock, ReadTransaction, WriteTransaction
 
 
-class FileCache(object):
+class FileCache:
     """This class manages cached data in the filesystem.
 
     - Cache files are fetched and stored by unique keys.  Keys can be relative
@@ -123,13 +123,13 @@ class FileCache(object):
         # TODO: is pretty hard to reason about in llnl.util.lock. At some
         # TODO: point we should just replace it with functions and simplify
         # TODO: the locking code.
-        class WriteContextManager(object):
+        class WriteContextManager:
 
             def __enter__(cm):  # noqa
                 cm.orig_filename = self.cache_path(key)
                 cm.orig_file = None
                 if os.path.exists(cm.orig_filename):
-                    cm.orig_file = open(cm.orig_filename, "r")
+                    cm.orig_file = open(cm.orig_filename)
 
                 cm.tmp_filename = self.cache_path(key) + ".tmp"
                 cm.tmp_file = open(cm.tmp_filename, "w")

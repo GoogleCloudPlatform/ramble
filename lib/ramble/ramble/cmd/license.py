@@ -5,7 +5,6 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
-from __future__ import print_function
 
 import os
 import re
@@ -99,7 +98,7 @@ def list_files(args):
 OLD_LICENSE, SPDX_MISMATCH, GENERAL_MISMATCH = range(1, 4)
 
 
-class LicenseError(object):
+class LicenseError:
     def __init__(self):
         self.error_counts = defaultdict(int)
 
@@ -154,7 +153,7 @@ def _check_license(lines, path):
 
     def old_license(line, path):
         if re.search("This program is free software", line):
-            print("{0}: has old LGPL license header".format(path))
+            print(f"{path}: has old LGPL license header")
             return OLD_LICENSE
 
     # If the SPDX identifier is present, then there is a mismatch (since it
@@ -163,8 +162,8 @@ def _check_license(lines, path):
         m = re.search(r"SPDX-License-Identifier: ([^\n]*)", line)
         if m and m.group(1) != apache2_mit_spdx:
             print(
-                "{0}: SPDX license identifier mismatch"
-                "(expecting {1}, found {2})".format(path, apache2_mit_spdx, m.group(1))
+                "{}: SPDX license identifier mismatch"
+                "(expecting {}, found {})".format(path, apache2_mit_spdx, m.group(1))
             )
             return SPDX_MISMATCH
 
@@ -176,7 +175,7 @@ def _check_license(lines, path):
             if error:
                 return error
 
-    print("{0}: the license does not match the expected format".format(path))
+    print(f"{path}: the license does not match the expected format")
     return GENERAL_MISMATCH
 
 

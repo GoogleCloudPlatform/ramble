@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
 
 import os
 import re
@@ -113,7 +112,7 @@ def get_module(cmd_name):
 
     try:
         # Try to import the command from the built-in directory
-        module_name = "%s.%s" % (__name__, pname)
+        module_name = f"{__name__}.{pname}"
         module = __import__(module_name, fromlist=[pname, SETUP_PARSER, DESCRIPTION], level=0)
         logger.debug(f"Imported {pname} from built-in commands")
     except ImportError:
@@ -190,7 +189,7 @@ class PythonNameError(ramble.error.RambleError):
 
     def __init__(self, name):
         self.name = name
-        super(PythonNameError, self).__init__("{0} is not a permissible Python name.".format(name))
+        super().__init__(f"{name} is not a permissible Python name.")
 
 
 class CommandNameError(ramble.error.RambleError):
@@ -198,9 +197,7 @@ class CommandNameError(ramble.error.RambleError):
 
     def __init__(self, name):
         self.name = name
-        super(CommandNameError, self).__init__(
-            "{0} is not a permissible Ramble command name.".format(name)
-        )
+        super().__init__(f"{name} is not a permissible Ramble command name.")
 
 
 ########################################

@@ -145,7 +145,7 @@ ramble:
         assert os.path.exists(script)
 
         # Check all chained experiments have the correct arguments
-        with open(script, "r") as f:
+        with open(script) as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
@@ -158,5 +158,5 @@ ramble:
             assert os.path.exists(chained_script)
             assert chained_script in parent_script_data
 
-            with open(chained_script, "r") as f:
+            with open(chained_script) as f:
                 assert "mpirun -n 20 -ppn 10" in f.read()

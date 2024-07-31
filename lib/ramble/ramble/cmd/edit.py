@@ -127,7 +127,7 @@ def edit(parser, args):
                 blacklist = [".pyc", "~"]  # blacklist binaries and backups
                 files = list(filter(lambda x: all(s not in x for s in blacklist), files))
                 if len(files) > 1:
-                    m = "Multiple files exist with the name {0}.".format(name)
+                    m = f"Multiple files exist with the name {name}."
                     m += " Please specify a suffix. Files are:\n\n"
                     for f in files:
                         m += "        " + os.path.basename(f) + "\n"
