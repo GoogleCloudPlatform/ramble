@@ -8,12 +8,11 @@
 
 import copy
 import datetime
-import itertools
 import os
 import re
 
 import pandas as pd
-import plotly.express as px
+# import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_pdf import PdfPages
 
@@ -41,14 +40,13 @@ def get_reports_path():
     return report_path
 
 
-def is_numeric(series):
-    """Check if a pandas series contains only numeric values.
+def to_numeric_if_possible(series):
+    """Try to convert a Pandas series to numeric, or return the series unchanged.
     """
     try:
-        pd.to_numeric(series)
-        return True
+        return pd.to_numeric(series)
     except (ValueError, TypeError):
-        return False
+        return series
 
 
 def validate_spec(results_df, chart_spec):
@@ -95,12 +93,67 @@ def load_results(args):
 
 def prepare_data(results: dict) -> pd.DataFrame:
     """Creates a Pandas DataFrame from the results dictionary to use for reports.
+
+    Transforms nested results dictionary into a flat dataframe. Each row equals
+    one FOM from one context of one experiment, with columns including
+    associated experiment variables (except paths and commands).
+
+    Input (dict):
+        {
+            "experiments": [
+                {"name": "exp_1",
+                 "n_nodes": 1,
+                 "CONTEXTS": [
+                    {"name": "null",
+                     "foms": [
+                        {"name": "fom_1", "value": 42.0},
+                        {"name": "fom_2", "value": 35},
+                     ]
+                    },
+                 ]
+                },
+                {"name": "exp_2",
+                 "n_nodes": 2,
+                 "CONTEXTS": [
+                    {"name": "null",
+                     "foms": [
+                        {"name": "fom_1", "value": 56.5},
+                        {"name": "fom_2", "value": 73},
+                     ]
+                    },
+                 ]
+                },
+            ]
+        }
+
+    Output (pd.DataFrame):
+             name   fom_name    fom_value  n_nodes
+        0   exp_1      fom_1         42.0        1
+        1   exp_1      fom_2           35        1
+        2   exp_2      fom_1         56.5        2
+        3   exp_2      fom_2           73        2
     """
 
     unnest_context = []
+    skip_exps = []
     # first unnest dictionaries
     for exp in results['experiments']:
-        if exp['RAMBLE_STATUS'] == 'SUCCESS':
+        # TODO(dpomeroy): in charts, annotate chart if using aggregated/statistical data (e.g., 'avg' or 'mean')
+
+        if exp['RAMBLE_STATUS'] == 'SUCCESS' and exp['name'] not in skip_exps:
+            # For repeat experiments, use summary stats from base exp and skip repeats
+            # Repeats are sequenced after base exp
+            if exp['N_REPEATS'] > 0:
+                # Generate repeat experiment names in order to skip them explicitly
+                exp_name = exp['name']
+                for n in range(1, exp['N_REPEATS'] + 1):
+                    if ".chain" in exp_name:
+                        insert_idx = exp_name.index(".chain")
+                        repeat_exp_name = exp_name[:insert_idx] + f".{n}" + exp_name[insert_idx:]
+                        skip_exps.append(repeat_exp_name)
+                    else:
+                        skip_exps.append(exp_name + f".{n}")
+
             for context in exp['CONTEXTS']:
                 for fom in context['foms']:
                     # Expand to one row per FOM per context w/ a copy of the experiment vars and metadata
@@ -142,19 +195,14 @@ def prepare_data(results: dict) -> pd.DataFrame:
                         exp_copy[key] = value
 
                     unnest_context.append(exp_copy)
-        else:  # exclude failed experiments from dataset
+        else:  # exclude failed experiments from dataframe
             continue
 
     results_df = pd.DataFrame.from_dict(unnest_context)
 
-    # Convert numeric columns to numeric
-    # TODO(dpomeroy): need to fix this for fom_values column
-    # to handle case when there are both numeric and non-numeric FOMs
-    for col in results_df.columns:
-        if is_numeric(results_df[col]):
-            results_df.loc[:, col] = pd.to_numeric(results_df[col])
-
+    # TODO(dpomeroy): cleanup - delete exports
     pd.DataFrame.to_json(results_df, 'prepare_data_results.json')
+    pd.DataFrame.to_csv(results_df, 'prepare_data_results.csv')
 
     return results_df
 
@@ -210,60 +258,89 @@ def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
         perf_measure, scale_var, *additional_vars = chart_spec
 
         # FOMs are by row, so select only rows with the perf_measure FOM
-        perf_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
+        perf_measure_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
         better_direction = 'INDETERMINATE'
-        if len(perf_results.loc[:, 'better_direction'].unique()) == 1:
-            better_direction = perf_results.loc[:, 'better_direction'].unique()[0]
+        if len(perf_measure_results.loc[:, 'better_direction'].unique()) == 1:
+            better_direction = perf_measure_results.loc[:, 'better_direction'].unique()[0]
 
-        perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
+        perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'application_namespace'] + '_' + perf_measure_results.loc[:, 'workload_name']
+
+        # Break data down into series using app, workload, and vars input by user
         if additional_vars:
-            for var in additional_vars:
-                perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_x_' + var
+            perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'series'] + '_x_' + perf_measure_results[additional_vars].agg('_x_'.join, axis=1)
 
-        for series in perf_results.loc[:, 'series'].unique():
+        for col in perf_measure_results.columns:
+            perf_measure_results.loc[:, col] = to_numeric_if_possible(perf_measure_results[col])
+
+            # for var in additional_vars:
+            #     vals = raw_results.loc[:, var].unique()
+            #     for val in vals:
+
+            #     raw_results.loc[:, 'series'] = raw_results.loc[:, 'series'] + '_x_' + var
+
+        # for col in perf_measure_results.columns:
+        #     print(col)
+        #     try:
+        #         print(str(results_df[col].unique()))
+        #     except:
+        #         pass
+
+
+        for series in perf_measure_results.loc[:, 'series'].unique():
 
             print(f'series = {series}')
 
-            series_results = perf_results.query(f'series == "{series}"')
+            series_results = perf_measure_results.query(f'series == "{series}"')
             selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
+
+            print(series_results)
+
+            print(f"selected = {selected}")
+
+            scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
+
+
+            print(scale_pivot)
+
+            # print(selected)
 
             fig, ax = plt.subplots()
 
             if args.normalize:
-                first_perf_value = selected['fom_value'].iloc[0]
-                selected.loc[:, 'normalized_fom_value'] = first_perf_value / selected.loc[:, 'fom_value']
+                first_perf_value = scale_pivot['fom_value'].iloc[0]
+                scale_pivot.loc[:, 'normalized_fom_value'] = first_perf_value / scale_pivot.loc[:, 'fom_value']
 
-                first_scale_value = selected[f'{scale_var}'].iloc[0]
-                selected.loc[:, 'ideal_perf_value'] = selected.loc[:, f'{scale_var}'] / first_scale_value
+                first_scale_value = scale_pivot[f'{scale_var}'].iloc[0]
+                scale_pivot.loc[:, 'ideal_perf_value'] = scale_pivot.loc[:, f'{scale_var}'] / first_scale_value
 
-                ax.plot(f'{scale_var}', 'normalized_fom_value', data=selected, marker='o')
-                ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
+                ax.plot(f'{scale_var}', 'normalized_fom_value', data=scale_pivot, marker='o')
+                ax.plot(f'{scale_var}', 'ideal_perf_value', data=scale_pivot)
 
                 ax.set_xlabel(f'{scale_var}')
                 ax.set_ylabel('Speedup')
             else:
-                first_perf_value = selected['fom_value'].iloc[0]
+                first_perf_value = scale_pivot['fom_value'].iloc[0]
 
                 if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
-                    first_perf_value = selected['fom_value'].iloc[0]
-                    selected.loc[:, 'ideal_perf_value'] = first_perf_value / selected.loc[:, f'{scale_var}']
+                    first_perf_value = scale_pivot['fom_value'].iloc[0]
+                    scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value / scale_pivot.loc[:, f'{scale_var}']
                 if better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
-                    first_perf_value = selected['fom_value'].iloc[0]
-                    selected.loc[:, 'ideal_perf_value'] = first_perf_value * selected.loc[:, f'{scale_var}']                
+                    first_perf_value = scale_pivot['fom_value'].iloc[0]
+                    scale_pivot.loc[:, 'ideal_perf_value'] = first_perf_value * scale_pivot.loc[:, f'{scale_var}']                
 
-                ax.plot(f'{scale_var}', 'fom_value', data=selected, marker='o')
-                ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
+                ax.plot(f'{scale_var}', 'fom_value', data=scale_pivot, marker='o')
+                ax.plot(f'{scale_var}', 'ideal_perf_value', data=scale_pivot)
 
                 ax.set_xlabel(f'{scale_var}')
                 ax.set_ylabel(f'{perf_measure}')
 
             # ax.set_xscale('log')
-            ax.set_xticks(perf_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
+            ax.set_xticks(scale_pivot[f'{scale_var}'].unique().tolist())
             ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}')
 
-            # TODO(dpomeroy): add data table below chart
+            # TODO(dpomeroy): add data table below chart to show what's in the pivot table
             # cols = (f'{scale_var}', f'{perf_measure}')
             # n_rows = len(selected)
 
@@ -275,6 +352,8 @@ def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
             plt.close(fig)
 
 
+# TODO(dpomeroy): once strong scaling chart is fixed up for repeats / summary,
+# copy those changes here
 def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
     for chart_spec in args.weak_scaling:
 
@@ -287,23 +366,23 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
         perf_measure, scale_var, *additional_vars = chart_spec
 
         # FOMs are by row, so select only rows with the perf_measure FOM
-        perf_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
+        raw_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
         better_direction = 'INDETERMINATE'
-        if len(perf_results.loc[:, 'better_direction'].unique()) == 1:
-            better_direction = perf_results.loc[:, 'better_direction'].unique()[0]
+        if len(raw_results.loc[:, 'better_direction'].unique()) == 1:
+            better_direction = raw_results.loc[:, 'better_direction'].unique()[0]
 
-        perf_results.loc[:, 'series'] = perf_results.loc[:, 'workload_namespace']
+        raw_results.loc[:, 'series'] = raw_results.loc[:, 'simplified_workload_namespace']
         if additional_vars:
             for var in additional_vars:
-                perf_results.loc[:, 'series'] = perf_results.loc[:, 'series'] + '_x_' + var
+                raw_results.loc[:, 'series'] = raw_results.loc[:, 'series'] + '_x_' + var
 
-        for series in perf_results.loc[:, 'series'].unique():
+        for series in raw_results.loc[:, 'series'].unique():
 
             print(f'series = {series}')
 
-            series_results = perf_results.query(f'series == "{series}"')
+            series_results = raw_results.query(f'series == "{series}"')
             selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
 
             fig, ax = plt.subplots()
@@ -313,6 +392,9 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
                 selected.loc[:, 'normalized_fom_value'] = first_perf_value / selected.loc[:, 'fom_value']
 
                 selected.loc[:, 'ideal_perf_value'] = 1
+
+                print(selected)
+
 
                 ax.plot(f'{scale_var}', 'normalized_fom_value', data=selected, marker='o')
                 ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
@@ -331,6 +413,8 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
                     first_perf_value = selected['fom_value'].iloc[0]
                     selected.loc[:, 'ideal_perf_value'] = first_perf_value
 
+                print(selected)
+
                 ax.plot(f'{scale_var}', 'fom_value', data=selected, marker='o')
                 ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
 
@@ -338,7 +422,7 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
                 ax.set_ylabel(f'{perf_measure}')
 
             # ax.set_xscale('log')
-            ax.set_xticks(perf_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
+            ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
             ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}')
 
             # TODO(dpomeroy): add data table below chart
@@ -357,24 +441,68 @@ def generate_compare_chart(results_df, pdf_report, report_dir_path, args):
     for chart_spec in args.compare:
         validate_spec(results_df, chart_spec)
 
-        # Organize input args into FOMs and groups
+        # Break out input args into FOMs and dimensions
         foms = []
-        groups = []
+        dimensions = []
 
         for input in chart_spec:
             if input in results_df.loc[:, 'fom_name'].values:
                 foms.append(input)
             else:
-                groups.append(input)
+                dimensions.append(input)
 
-        compare_results = results_df.pivot_table('fom_value', index=groups, columns='fom_name').copy()
-        compare_results = compare_results[foms]
+        # TODO(dpomeroy): pull in better_direction for the foms. If it's the same for all foms 
+        # (e.g., all are 'time' foms) then append (lower/higher is better) to chart title
+        # else if there's a mix of foms or foms are not higher/lower, append nothing (indeterminate)
+
+        # TODO(dpomeroy): convert to numeric (moved here from prepare_data function)
+
+        raw_results = results_df[results_df.loc[:, 'fom_name'].isin(foms)].copy()
+
+        raw_results.loc[:, 'Figure of Merit'] = (raw_results.loc[:, 'fom_name'] +
+                                          ' (' + raw_results.loc[:, 'fom_units'] + ')')
+
+        raw_results.to_csv('raw_results.csv')
+
+        print(raw_results.loc[:, 'fom_value'])
+
+        compare_pivot = raw_results.pivot_table('fom_value', index=dimensions, columns='Figure of Merit')
+
+        # Pivot table aggregates values by mean. Check if results were aggregated and label them
+        # Raw results have FOMs by row, pivot by columns, so multiply the pivot rows x cols
+        print(f'raw values = {len(raw_results)}  vs pivot values = {len(compare_pivot)} x {len(compare_pivot.columns)} ={len(compare_pivot) * len(compare_pivot.columns)}')
+
+        # If all FOMs are either higher or lower is better, add it to chart title
+        title_suffix = ''
+        if len(raw_results.loc[:, 'better_direction'].unique()) == 1:
+            if raw_results.loc[:, 'better_direction'].unique()[0] == 'HIGHER':
+                title_suffix = '(higher is better)'
+            elif raw_results.loc[:, 'better_direction'].unique()[0] == 'LOWER':
+                title_suffix = '(lower is better)'
+
+
+        ax = compare_pivot.plot(kind="bar")
+        fig = ax.get_figure()
+
+        ax.set_title(f'{" vs ".join(foms)} by {" and ".join(dimensions)} {title_suffix}')
+
+        plt.tight_layout()
+
+        # Create filenames
+        chart_filename = f'{"_vs_".join(foms)}_by_{"_and_".join(dimensions)}.png'
+        chart_filename = chart_filename.replace(" ", "-")
+
+        plt.savefig(os.path.join(report_dir_path, chart_filename))
+        pdf_report.savefig(fig)
+        plt.close(fig)
+
         # print(f'compare_results:\n{compare_results}')
 
 
 def generate_foms_chart(results_df, pdf_report, report_dir_path, args):
     # this one doesn't have a chart spec, it's just a flag
     # first divide results into series based on workload namespace
-    # then iterate through foms and create 1 chart per fom comparing fom_value (y) by experiment (x)
+    # then iterate over each fom in each series and create 1 bar chart per fom
+    # comparing fom_value (y) by experiment (x)
 
     pass
