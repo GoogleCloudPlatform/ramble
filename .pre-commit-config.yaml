@@ -10,3 +10,12 @@ repos:
     entry: share/ramble/qa/run-unit-tests
     language: system
     stages: [push]
+
+- repo: https://github.com/asottile/pyupgrade
+  rev: v3.17.0
+  hooks:
+  - id: pyupgrade
+    name: python-old-syntax-check
+    args: [--py36-plus]
+    files: lib/ramble/ramble/.*\.py$
+

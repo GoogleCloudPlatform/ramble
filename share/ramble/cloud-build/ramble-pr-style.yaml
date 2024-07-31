@@ -40,6 +40,10 @@ steps:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         commands_err=$$?
 
+        # Enforce up-to-date python syntax
+        pre-commit run pyupgrade --all-files --verbose
+        pyupgrade_err=$$?
+
         ramble license verify
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
@@ -82,6 +86,12 @@ steps:
         if [ $$license_err -gt 0 ]; then
           echo "License check error = $$license_err"
           echo " ***** License check failed"
+          error=1
+        fi
+
+        if [ $$pyupgrade_err -gt 0 ]; then
+          echo "pyupgrade check error = $$pyupgrade_err"
+          echo " ***** pyupgrade check failed"
           error=1
         fi
 
