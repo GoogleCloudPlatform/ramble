@@ -76,7 +76,7 @@ ramble:
         print(output)
 
         text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        with open(text_results_files[0], "r") as f:
+        with open(text_results_files[0]) as f:
             data = f.read()
             for expected in expected_expansions:
                 assert f"test_fom {expected} = 567.8" in data

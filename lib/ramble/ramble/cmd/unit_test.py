@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
-from __future__ import division
 
 import collections
 import io
@@ -119,7 +117,7 @@ def do_list(args, extra_args):
         sys.stdout = old_output
 
     lines = output.getvalue().split("\n")
-    tests = collections.defaultdict(lambda: set())
+    tests = collections.defaultdict(set)
     prefix = []
 
     print("All lines =")
@@ -141,19 +139,19 @@ def do_list(args, extra_args):
         if nodetype.endswith("Function"):
             key = tuple(prefix)
             tests[key].add(name)
-            print("added test {0}={1} from {2}".format(key, name, nodetype))
+            print(f"added test {key}={name} from {nodetype}")
         else:
             prefix = prefix[:depth]
             prefix.append(name)
-            print("added prefix {0}".format(name))
+            print(f"added prefix {name}")
 
     def colorize(c, prefix):
         if isinstance(prefix, tuple):
-            return "::".join(color.colorize("@%s{%s}" % (c, p)) for p in prefix if p != "()")
-        return color.colorize("@%s{%s}" % (c, prefix))
+            return "::".join(color.colorize(f"@{c}{{{p}}}") for p in prefix if p != "()")
+        return color.colorize(f"@{c}{{{prefix}}}")
 
     if args.list == "list":
-        files = set(prefix[0] for prefix in tests)
+        files = {prefix[0] for prefix in tests}
         color_files = [colorize("B", file) for file in sorted(files)]
         colify(color_files)
 

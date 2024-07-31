@@ -190,7 +190,7 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
 
             license_inc_path = os.path.join(ws1.root, "shared", "licenses", "wrfv4", "license.inc")
-            with open(os.path.join(exp_dir, "full_command"), "r") as f:
+            with open(os.path.join(exp_dir, "full_command")) as f:
                 data = f.read()
                 # Test the license exists
                 assert f". {license_inc_path}" in data
@@ -214,7 +214,7 @@ licenses:
                 # Test the license is added to the include file
                 assert "export WRF_LICENSE=port@server" in data
 
-            with open(os.path.join(exp_dir, "execute_experiment"), "r") as f:
+            with open(os.path.join(exp_dir, "execute_experiment")) as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -268,7 +268,7 @@ licenses:
         assert len(yaml_results_files) == 2
 
         for text_result in text_results_files:
-            with open(text_result, "r") as f:
+            with open(text_result) as f:
                 data = f.read()
                 assert "Tags =" in data
                 assert "Average Timestep Time = 33.3 s" in data
@@ -417,7 +417,7 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
 
             license_inc_path = os.path.join(ws1.root, "shared", "licenses", "wrfv4", "license.inc")
-            with open(os.path.join(exp_dir, "full_command"), "r") as f:
+            with open(os.path.join(exp_dir, "full_command")) as f:
                 data = f.read()
                 # Test the license exists
                 assert f". {license_inc_path}" in data
@@ -441,7 +441,7 @@ licenses:
                 # Test the license is added to the include file
                 assert "export WRF_LICENSE=port@server" in data
 
-            with open(os.path.join(exp_dir, "execute_experiment"), "r") as f:
+            with open(os.path.join(exp_dir, "execute_experiment")) as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -492,7 +492,7 @@ licenses:
         assert len(yaml_results_files) == 2
 
         for text_result in text_results_files:
-            with open(text_result, "r") as f:
+            with open(text_result) as f:
                 data = f.read()
                 assert "Tags =" in data
                 assert "Average Timestep Time = 33.3 s" in data

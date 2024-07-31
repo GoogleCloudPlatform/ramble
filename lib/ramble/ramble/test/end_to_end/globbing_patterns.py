@@ -92,7 +92,7 @@ ramble:
         glob_var_mod_regex = re.compile("var_mod_modified")
         glob_env_var_mod_regex = re.compile("env_var_mod=modded")
 
-        with open(exp1_script, "r") as f:
+        with open(exp1_script) as f:
             # Check for only 'test' executable command
             test_cmd_found = False
             glob_cmd_not_found = True
@@ -137,7 +137,7 @@ ramble:
             assert test_wl_var_found and glob_wl_var_found and baz_wl_var_not_found
             assert test_env_var_found and glob_env_var_found and baz_env_var_not_found
 
-        with open(exp2_script, "r") as f:
+        with open(exp2_script) as f:
             # Check for executables matching 'test*' glob pattern
             test_cmd_found = False
             glob_cmd_found = False

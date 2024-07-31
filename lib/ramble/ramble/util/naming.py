@@ -7,7 +7,6 @@
 # except according to those terms.
 
 # Need this because of ramble.util.string
-from __future__ import absolute_import
 import io
 import string
 import itertools
@@ -168,7 +167,7 @@ class InvalidModuleNameError(ramble.error.RambleError):
     """Raised when we encounter a bad module name."""
 
     def __init__(self, name):
-        super(InvalidModuleNameError, self).__init__("Invalid module name: " + name)
+        super().__init__("Invalid module name: " + name)
         self.name = name
 
 
@@ -176,15 +175,13 @@ class InvalidFullyQualifiedModuleNameError(ramble.error.RambleError):
     """Raised when we encounter a bad full package name."""
 
     def __init__(self, name):
-        super(InvalidFullyQualifiedModuleNameError, self).__init__(
-            "Invalid fully qualified package name: " + name
-        )
+        super().__init__("Invalid fully qualified package name: " + name)
         self.name = name
 
 
-class NamespaceTrie(object):
+class NamespaceTrie:
 
-    class Element(object):
+    class Element:
 
         def __init__(self, value):
             self.value = value

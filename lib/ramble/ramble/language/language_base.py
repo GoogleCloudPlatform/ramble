@@ -11,17 +11,13 @@ directives, which are to allow functions to be invoked at class level
 """
 
 import functools
-import sys
 
 import llnl.util.lang
 import llnl.util.tty.color
 
 import ramble.error
 
-if sys.version_info >= (3, 3):
-    from collections.abc import Sequence  # novm
-else:
-    from collections import Sequence
+from collections.abc import Sequence  # novm
 
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
@@ -74,7 +70,7 @@ class DirectiveMeta(type):
             )
             DirectiveMeta._directives_to_be_executed = []
 
-        return super(DirectiveMeta, cls).__new__(cls, name, bases, attr_dict)
+        return super().__new__(cls, name, bases, attr_dict)
 
     def __init__(cls, name, bases, attr_dict):
         # The instance is being initialized: if it is a package we must ensure
@@ -112,7 +108,7 @@ class DirectiveMeta(type):
             # directives by clearing out the queue they're appended to
             DirectiveMeta._directives_to_be_executed = []
 
-        super(DirectiveMeta, cls).__init__(name, bases, attr_dict)
+        super().__init__(name, bases, attr_dict)
 
     @classmethod
     def directive(cls, dicts=None):

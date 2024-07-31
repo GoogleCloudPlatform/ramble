@@ -10,7 +10,7 @@ import shlex
 
 import ramble.error
 
-from ramble.schema.types import OUTPUT_CAPTURE
+from ramble.util.output_capture import OUTPUT_CAPTURE
 
 import spack.util.executable
 from spack.util.path import system_path_filter
@@ -54,7 +54,7 @@ def which(*args, **kwargs):
     return PrefixedExecutable(exe) if exe else None
 
 
-class CommandExecutable(object):
+class CommandExecutable:
     """CommandExecutable class
     This class is used to represent internal executables in Ramble.
 
@@ -72,6 +72,7 @@ class CommandExecutable(object):
         variables={},
         redirect="{log_file}",
         output_capture=OUTPUT_CAPTURE.DEFAULT,
+        run_in_background=False,
         **kwargs,
     ):
         """Create a CommandExecutable instance
@@ -85,6 +86,7 @@ class CommandExecutable(object):
         - variables (dict): dictionary of variable definitions to use for this executable only
         - redirect: File to redirect output of template into
         - output_capture: Operator to use when capturing output
+        - run_in_background: If true, run the command in background
         """
 
         if isinstance(template, str):
@@ -100,6 +102,7 @@ class CommandExecutable(object):
         self.mpi = use_mpi or mpi
         self.redirect = redirect
         self.output_capture = output_capture
+        self.run_in_background = run_in_background
         self.variables = variables.copy()
 
     def copy(self):
@@ -111,6 +114,7 @@ class CommandExecutable(object):
             redirect=self.redirect,
             variables=self.variables,
             output_capture=self.output_capture,
+            run_in_background=self.run_in_background,
         )
         return new_inst
 
@@ -123,6 +127,7 @@ class CommandExecutable(object):
             + f"    variables: {self.variables}\n"
             + f"    redirect: {self.redirect}\n"
             + f"    output_capture: {self.output_capture}\n"
+            + f"    run_in_background: {self.run_in_background}\n"
         )
 
         return self_str

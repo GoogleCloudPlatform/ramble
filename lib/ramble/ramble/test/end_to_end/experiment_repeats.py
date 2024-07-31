@@ -175,7 +175,7 @@ ramble:
         assert len(yaml_results_files) == 2
 
         for text_result in text_results_files:
-            with open(text_result, "r") as f:
+            with open(text_result) as f:
                 data = f.read()
                 assert "Core Time = 11.111 s" in data
                 assert "Core Time = 22.222 s" in data

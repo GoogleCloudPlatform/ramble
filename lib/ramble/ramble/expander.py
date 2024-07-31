@@ -71,7 +71,7 @@ supported_list_function_pointers = {
 formatter = string.Formatter()
 
 
-class ExpansionDelimiter(object):
+class ExpansionDelimiter:
     """Class representing the delimiters for ramble expansion strings"""
 
     left = "{"
@@ -79,14 +79,14 @@ class ExpansionDelimiter(object):
     escape = "\\"
 
 
-class VformatDelimiter(object):
+class VformatDelimiter:
     """Class representing the delimiters for the string.Formatter class"""
 
     left = "{"
     right = "}"
 
 
-class ExpansionNode(object):
+class ExpansionNode:
     """Class representing a node in a ramble expansion graph"""
 
     def __init__(self, left_idx, right_idx):
@@ -239,7 +239,7 @@ class ExpansionNode(object):
                     self.value = self.value.replace("\\{", "{").replace("\\}", "}")
 
 
-class ExpansionGraph(object):
+class ExpansionGraph:
     """Class representing a graph of ExpansionNodes"""
 
     def __init__(self, in_str):
@@ -301,7 +301,7 @@ class ExpansionGraph(object):
         lines = []
         lines.append(f"Processing string: {self.str}")
         for node in self.walk():
-            lines.append((f"{node}"))
+            lines.append(f"{node}")
         return "\n".join(lines)
 
 
@@ -310,7 +310,7 @@ class ExpansionDict(dict):
         return "{" + key + "}"
 
 
-class Expander(object):
+class Expander:
     """A class that will track and expand keyword arguments
 
     This class will track variables and their definitions, to allow for
@@ -394,14 +394,14 @@ class Expander(object):
     @property
     def workload_namespace(self):
         if not self._workload_namespace:
-            self._workload_namespace = "%s.%s" % (self.application_name, self.workload_name)
+            self._workload_namespace = f"{self.application_name}.{self.workload_name}"
 
         return self._workload_namespace
 
     @property
     def experiment_namespace(self):
         if not self._experiment_namespace:
-            self._experiment_namespace = "%s.%s.%s" % (
+            self._experiment_namespace = "{}.{}.{}".format(
                 self.application_name,
                 self.workload_name,
                 self.experiment_name,

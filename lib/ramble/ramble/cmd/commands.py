@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
 
 import argparse
 import copy
@@ -102,15 +101,15 @@ class RambleArgparseRstWriter(ArgparseRstWriter):
         rst_levels=["-", "-", "^", "~", ":", "`"],
     ):
         out = sys.stdout if out is None else out
-        super(RambleArgparseRstWriter, self).__init__(prog, out, aliases, rst_levels)
+        super().__init__(prog, out, aliases, rst_levels)
         self.documented = documented_commands
 
     def usage(self, *args):
-        string = super(RambleArgparseRstWriter, self).usage(*args)
+        string = super().usage(*args)
 
         cmd = self.parser.prog.replace(" ", "-")
         if cmd in self.documented:
-            string += "\n:ref:`More documentation <cmd-{0}>`\n".format(cmd)
+            string += f"\n:ref:`More documentation <cmd-{cmd}>`\n"
 
         return string
 
@@ -141,9 +140,9 @@ class BashCompletionWriter(ArgparseCompletionWriter):
             return """
     if $list_options
     then
-        {0}
+        {}
     else
-        {1}
+        {}
     fi
 """.format(
                 self.optionals(optionals), self.positionals(positionals)
@@ -152,16 +151,16 @@ class BashCompletionWriter(ArgparseCompletionWriter):
             return """
     if $list_options
     then
-        {0}
+        {}
     else
-        {1}
+        {}
     fi
 """.format(
                 self.optionals(optionals), self.subcommands(subcommands)
             )
         else:
             return """
-    {0}
+    {}
 """.format(
                 self.optionals(optionals)
             )
@@ -177,10 +176,10 @@ class BashCompletionWriter(ArgparseCompletionWriter):
         return 'RAMBLE_COMREPLY=""'
 
     def optionals(self, optionals):
-        return 'RAMBLE_COMPREPLY="{0}"'.format(" ".join(optionals))
+        return 'RAMBLE_COMPREPLY="{}"'.format(" ".join(optionals))
 
     def subcommands(self, subcommands):
-        return 'RAMBLE_COMPREPLY="{0}"'.format(" ".join(subcommands))
+        return 'RAMBLE_COMPREPLY="{}"'.format(" ".join(subcommands))
 
 
 @formatter
@@ -200,7 +199,7 @@ def rst_index(out):
     dmax = max(len(section_descriptions.get(s, s)) for s in sections) + 2
     cmax = max(len(c) for _, c in sections.items()) + 60
 
-    row = "%s  %s\n" % ("=" * dmax, "=" * cmax)
+    row = "{}  {}\n".format("=" * dmax, "=" * cmax)
     line = "%%-%ds  %%s\n" % dmax
 
     out.write(row)
@@ -211,7 +210,7 @@ def rst_index(out):
 
         for i, cmd in enumerate(sorted(commands)):
             description = description.capitalize() if i == 0 else ""
-            ref = ":ref:`%s <ramble-%s>`" % (cmd, cmd)
+            ref = f":ref:`{cmd} <ramble-{cmd}>`"
             comma = "," if i != len(commands) - 1 else ""
             bar = "| " if i % 8 == 0 else "  "
             out.write(line % (description, bar + ref + comma))

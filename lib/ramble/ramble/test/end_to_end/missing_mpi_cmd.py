@@ -32,10 +32,11 @@ ramble:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '1'
+    hostlist: 'foo'
   applications:
-    hostname:
+    gromacs:
       workloads:
-        local:
+        water_bare:
           experiments:
             multi-node-test:
               variables:
@@ -43,8 +44,6 @@ ramble:
             single-node-test:
               variables:
                 n_nodes: '1'
-  modifiers:
-  - name: gcp-metadata
   spack:
     packages: {}
     environments: {}
@@ -63,16 +62,16 @@ ramble:
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
     single_setup_out = os.path.join(
-        ws.log_dir, "setup.latest", "hostname.local.single-node-test.out"
+        ws.log_dir, "setup.latest", "gromacs.water_bare.single-node-test.out"
     )
     with open(single_setup_out) as f:
         content = f.read()
         assert "Warning:" not in content
 
     multi_setup_out = os.path.join(
-        ws.log_dir, "setup.latest", "hostname.local.multi-node-test.out"
+        ws.log_dir, "setup.latest", "gromacs.water_bare.multi-node-test.out"
     )
     with open(multi_setup_out) as f:
         content = f.read()
         assert "Warning:" in content
-        assert "requires a non-empty `mpi_cmd` variable" in content
+        assert "requires a non-empty `mpi_command` variable" in content

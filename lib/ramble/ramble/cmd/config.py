@@ -280,7 +280,7 @@ def config_update(args):
     if cannot_overwrite:
         msg = "Detected permission issues with the following scopes:\n\n"
         for scope, cfg_file in cannot_overwrite:
-            msg += "\t[scope={0}, cfg={1}]\n".format(scope.name, cfg_file)
+            msg += f"\t[scope={scope.name}, cfg={cfg_file}]\n"
         msg += (
             "\nEither ensure that you have sufficient permissions to "
             "modify these files or do not include these scopes in the "
@@ -304,7 +304,7 @@ def config_update(args):
         )
         for scope in updates:
             cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
-            msg += "\t[scope={0}, file={1}]\n".format(scope.name, cfg_file)
+            msg += f"\t[scope={scope.name}, file={cfg_file}]\n"
         msg += (
             "\nIf the configuration files are updated, versions of Ramble "
             "that are older than this version may not be able to read "

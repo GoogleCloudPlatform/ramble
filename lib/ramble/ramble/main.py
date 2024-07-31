@@ -11,7 +11,6 @@
 In a normal Ramble installation, this is invoked from the bin/ramble script
 after the system path is set up.
 """
-from __future__ import print_function
 
 import argparse
 import inspect
@@ -21,6 +20,7 @@ import os
 import os.path
 import pstats
 import re
+import shlex
 import signal
 import sys
 import traceback
@@ -178,7 +178,7 @@ def index_commands():
 class RambleHelpFormatter(argparse.RawTextHelpFormatter):
     def _format_actions_usage(self, actions, groups):
         """Formatter with more concise usage strings."""
-        usage = super(RambleHelpFormatter, self)._format_actions_usage(actions, groups)
+        usage = super()._format_actions_usage(actions, groups)
 
         # Eliminate any occurrence of two or more consecutive spaces
         usage = re.sub(r"[ ]{2,}", " ", usage)
@@ -188,12 +188,12 @@ class RambleHelpFormatter(argparse.RawTextHelpFormatter):
         chars = "".join(re.findall(r"\[-(.)\]", usage))
         usage = re.sub(r"\[-.\] ?", "", usage)
         if chars:
-            usage = "[-%s] %s" % (chars, usage)
+            usage = f"[-{chars}] {usage}"
         return usage.strip()
 
     def add_arguments(self, actions):
         actions = sorted(actions, key=operator.attrgetter("option_strings"))
-        super(RambleHelpFormatter, self).add_arguments(actions)
+        super().add_arguments(actions)
 
 
 class RambleArgumentParser(argparse.ArgumentParser):
@@ -228,10 +228,10 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         def add_subcommand_group(title, commands):
             """Add informational help group for a specific subcommand set."""
-            cmd_set = set(c for c in commands)
+            cmd_set = {c for c in commands}
 
             # make a dict of commands of interest
-            cmds = dict((a.dest, a) for a in self.actions if a.dest in cmd_set)
+            cmds = {a.dest: a for a in self.actions if a.dest in cmd_set}
 
             # add commands to a group in order, and add the group
             group = argparse._ArgumentGroup(self, title=title)
@@ -244,9 +244,9 @@ class RambleArgumentParser(argparse.ArgumentParser):
         # select only the options for the particular level we're showing.
         show_options = options_by_level[level]
         if show_options != "all":
-            opts = dict(
-                (opt.option_strings[0].strip("-"), opt) for opt in self._optionals._group_actions
-            )
+            opts = {
+                opt.option_strings[0].strip("-"): opt for opt in self._optionals._group_actions
+            }
 
             new_actions = [opts[letter] for letter in show_options]
             self._optionals._group_actions = new_actions
@@ -313,7 +313,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
         if sys.version_info[:2] > (3, 6):
             kwargs.setdefault("required", True)
 
-        sp = super(RambleArgumentParser, self).add_subparsers(**kwargs)
+        sp = super().add_subparsers(**kwargs)
         # This monkey patching is needed for Python 3.5 and 3.6, which support
         # having a required subparser but don't expose the API used above
         if sys.version_info[:2] == (3, 5) or sys.version_info[:2] == (3, 6):
@@ -337,17 +337,24 @@ class RambleArgumentParser(argparse.ArgumentParser):
                 self._remove_action(self._actions[-1])
             self.subparsers = self.add_subparsers(metavar="COMMAND", dest="command")
 
-        # each command module implements a parser() function, to which we
-        # pass its subparser for setup.
-        module = ramble.cmd.get_module(cmd_name)
+        if cmd_name not in self.subparsers._name_parser_map:
+            # each command module implements a parser() function, to which we
+            # pass its subparser for setup.
+            module = ramble.cmd.get_module(cmd_name)
 
-        # build a list of aliases
-        alias_list = [k for k, v in aliases.items() if v == cmd_name]
+            # build a list of aliases
+            alias_list = []
+            aliases = ramble.config.get("config:aliases")
+            if aliases:
+                alias_list = [k for k, v in aliases.items() if shlex.split(v)[0] == cmd_name]
 
-        subparser = self.subparsers.add_parser(
-            cmd_name, aliases=alias_list, help=module.description, description=module.description
-        )
-        module.setup_parser(subparser)
+            subparser = self.subparsers.add_parser(
+                cmd_name,
+                aliases=alias_list,
+                help=module.description,
+                description=module.description,
+            )
+            module.setup_parser(subparser)
 
         # return the callable function for the command
         return ramble.cmd.get_command(cmd_name)
@@ -359,13 +366,13 @@ class RambleArgumentParser(argparse.ArgumentParser):
             return self.format_help_sections(level)
         else:
             # in subparsers, self.prog is, e.g., 'ramble list'
-            return super(RambleArgumentParser, self).format_help()
+            return super().format_help()
 
     def _check_value(self, action, value):
         # converted value must be one of the choices (if specified)
         if action.choices is not None and value not in action.choices:
             cols = llnl.util.tty.colify.colified(sorted(action.choices), indent=4, tty=True)
-            msg = "invalid choice: %r choose from:\n%s" % (value, cols)
+            msg = f"invalid choice: {value!r} choose from:\n{cols}"
             raise argparse.ArgumentError(action, msg)
 
 
@@ -672,7 +679,7 @@ def _invoke_command(command, parser, args, unknown_args):
     return 0 if return_val is None else return_val
 
 
-class RambleCommand(object):
+class RambleCommand:
     """Callable object that invokes a ramble command (for testing).
 
     Example usage::
@@ -810,9 +817,9 @@ def print_setup_info(*info):
 
     def shell_set(var, value):
         if shell == "sh":
-            print("%s='%s'" % (var, value))
+            print(f"{var}='{value}'")
         elif shell == "csh":
-            print("set %s = '%s'" % (var, value))
+            print(f"set {var} = '{value}'")
         else:
             logger.die("shell must be sh or csh")
 
@@ -1014,10 +1021,7 @@ def main(argv=None):
             raise
         sys.stderr.write("\n")
         logger.error("Keyboard interrupt.")
-        if sys.version_info >= (3, 5):
-            return signal.SIGINT.value
-        else:
-            return signal.SIGINT
+        return signal.SIGINT.value
 
     except SystemExit as e:
         if ramble.config.get("config:debug"):

@@ -1,23 +1,10 @@
-# This is a ramble workspace config file.
-#
-# It describes the experiments, the software stack
-# and all variables required for ramble to configure
-# experiments.
-# As an example, experiments can be defined as follows.
-# applications:
-#   variables:
-#     processes_per_node: '30'
-#   hostname:
-#     variables:
-#       iterations: '5'
-#     workloads:
-#       serial:
-#         variables:
-#           type: 'test'
-#         experiments:
-#           single_node:
-#             variables:
-#               n_ranks: '{processes_per_node}'
+# Copyright 2022-2024 The Ramble Authors
+# 
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
 
 ramble:
   env_vars:

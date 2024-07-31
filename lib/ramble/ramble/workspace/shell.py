@@ -19,7 +19,7 @@ def activate_header(ws, shell, prompt=None):
     cmds = ""
     if shell == "csh":
         # TODO: figure out how to make color work for csh
-        cmds += "setenv %s %s;\n" % (ramble.workspace.ramble_workspace_var, ws.root)
+        cmds += f"setenv {ramble.workspace.ramble_workspace_var} {ws.root};\n"
         if prompt:
             cmds += "if (! $?RAMBLE_OLD_PROMPT ) "
             cmds += 'setenv RAMBLE_OLD_PROMPT "${prompt}";\n'
@@ -28,7 +28,7 @@ def activate_header(ws, shell, prompt=None):
         if "color" in os.getenv("TERM", "") and prompt:
             prompt = colorize("@G{%s} " % prompt, color=True)
 
-        cmds += "set -gx %s %s;\n" % (ramble.workspace.ramble_workspace_var, ws.root)
+        cmds += f"set -gx {ramble.workspace.ramble_workspace_var} {ws.root};\n"
         #
         # NOTE: We're not changing the fish_prompt function (which is fish's
         # solution to the PS1 variable) here. This is a bit fiddly, and easy to
@@ -36,13 +36,13 @@ def activate_header(ws, shell, prompt=None):
         #
     elif shell == "bat":
         # TODO: Color
-        cmds += 'set "%s=%s"\n' % (ramble.workspace.ramble_workspace_var, ws.root)
+        cmds += f'set "{ramble.workspace.ramble_workspace_var}={ws.root}"\n'
         # TODO: prompt
     else:
         if "color" in os.getenv("TERM", "") and prompt:
             prompt = colorize("@G{%s}" % prompt, color=True)
 
-        cmds += "export %s=%s;\n" % (ramble.workspace.ramble_workspace_var, ws.root)
+        cmds += f"export {ramble.workspace.ramble_workspace_var}={ws.root};\n"
         if prompt:
             cmds += "if [ -z ${RAMBLE_OLD_PS1+x} ]; then\n"
             cmds += "    if [ -z ${PS1+x} ]; then\n"
@@ -74,7 +74,7 @@ def deactivate_header(shell):
         # TODO: prompt
     else:
         cmds += "if [ ! -z ${%s+x} ]; then\n" % (ramble.workspace.ramble_workspace_var)
-        cmds += "unset %s; export %s;\n" % (
+        cmds += "unset {}; export {};\n".format(
             ramble.workspace.ramble_workspace_var,
             ramble.workspace.ramble_workspace_var,
         )

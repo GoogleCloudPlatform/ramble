@@ -164,7 +164,7 @@ licenses:
         for file in out_files:
             found = [False, False, False]
             cur_found = 0
-            with open(file, "r") as f:
+            with open(file) as f:
                 for line in f.readlines():
                     if expected_phase_order[cur_found] in line:
                         found[cur_found] = True

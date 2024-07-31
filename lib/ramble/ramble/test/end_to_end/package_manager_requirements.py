@@ -74,7 +74,7 @@ ramble:
 
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml, "r") as f:
+        with open(spack_yaml) as f:
             data = f.read()
             assert "config:" in data
             assert "debug: true" in data

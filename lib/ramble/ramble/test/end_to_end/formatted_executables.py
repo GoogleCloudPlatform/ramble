@@ -82,7 +82,7 @@ ramble:
         exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
         exp_script = os.path.join(exp_dir, "execute_experiment")
 
-        with open(exp_script, "r") as f:
+        with open(exp_script) as f:
             data = f.read()
             assert "from_app echo" in data
             assert ";" + " " * 9 + "from_ws echo" in data

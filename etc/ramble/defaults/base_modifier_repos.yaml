@@ -1,0 +1,14 @@
+# -------------------------------------------------------------------------
+# This is the default ramble repository configuration. It includes the
+# builtin ramble base modifier repository.
+#
+# Users can override these settings by editing the following files.
+#
+# Per-ramble-instance settings (overrides defaults):
+#   $RAMBLE_ROOT/etc/ramble/base_modifier_repos.yaml
+#
+# Per-user settings (overrides default and site settings):
+#   ~/.ramble/base_modifier_repos.yaml
+# -------------------------------------------------------------------------
+base_modifier_repos:
+  - $ramble/var/ramble/repos/builtin

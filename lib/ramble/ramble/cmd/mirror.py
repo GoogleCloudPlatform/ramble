@@ -176,7 +176,7 @@ def mirror_list(args):
 
 def _read_specs_from_file(filename):
     specs = []
-    with open(filename, "r") as stream:
+    with open(filename) as stream:
         for i, string in enumerate(stream):
             try:
                 s = ramble.Spec(string)

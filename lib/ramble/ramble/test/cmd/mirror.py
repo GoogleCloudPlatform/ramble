@@ -29,14 +29,12 @@ def tmp_scope():
     """Creates a temporary configuration scope"""
 
     base_name = "internal-testing-scope"
-    current_overrides = set(
-        x.name for x in ramble.config.config.matching_scopes(r"^{0}".format(base_name))
-    )
+    current_overrides = {x.name for x in ramble.config.config.matching_scopes(rf"^{base_name}")}
 
     num_overrides = 0
     scope_name = base_name
     while scope_name in current_overrides:
-        scope_name = "{0}{1}".format(base_name, num_overrides)
+        scope_name = f"{base_name}{num_overrides}"
         num_overrides += 1
 
     with ramble.config.override(ramble.config.InternalConfigScope(scope_name)):
@@ -124,7 +122,7 @@ def test_mirror_destroy(
     tmpdir,
 ):
     mirror_dir = tmpdir.join("mirror_dir")
-    mirror_url = "file://{0}".format(mirror_dir.strpath)
+    mirror_url = f"file://{mirror_dir.strpath}"
     mirror("add", "atest", mirror_url)
 
     fs.mkdirp(mirror_dir.strpath)

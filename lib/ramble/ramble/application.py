@@ -55,6 +55,7 @@ from ramble.workspace import namespace
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.error import RambleError
+from ramble.util.output_capture import output_mapper
 
 from enum import Enum
 
@@ -71,7 +72,7 @@ def _get_context_display_name(context):
     )
 
 
-class ApplicationBase(object, metaclass=ApplicationMeta):
+class ApplicationBase(metaclass=ApplicationMeta):
     name = None
     _builtin_name = "builtin::{name}"
     _builtin_required_key = "required"
@@ -345,7 +346,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     out_str.append(rucolor.nested_1("  %s:\n" % name))
                     for key, val in info.items():
                         if val:
-                            out_str.append("    %s = %s\n" % (key, val.replace("@", "@@")))
+                            out_str.append("    {} = {}\n".format(key, val.replace("@", "@@")))
 
         return out_str
 
@@ -638,7 +639,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         # Build initial stack. Uses a reversal of the current instance's
         # chained experiments
         parent_namespace = self.expander.experiment_namespace
-        classes_in_stack = set([self])
+        classes_in_stack = {self}
         chain_idx = 0
         chain_stack = []
         for exp in reversed(self.chained_experiments):
@@ -999,7 +1000,8 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
             if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
                 exec_cmd = exec_node.attribute
                 if exec_cmd.redirect:
-                    logs.add(exec_cmd.redirect)
+                    expanded_log = self.expander.expand_var(exec_cmd.redirect)
+                    logs.add(expanded_log)
 
         analysis_logs, _, _ = self._analysis_dicts(success_list)
 
@@ -1047,7 +1049,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                             and int(self.expander.expand_var_name(self.keywords.n_nodes)) > 1
                         ):
                             logger.warn(
-                                f"Command {cmd_conf} requires a non-empty `mpi_cmd` "
+                                f"Command {cmd_conf} requires a non-empty `mpi_command` "
                                 "variable in a multi-node experiment"
                             )
                         mpi_cmd = " " + raw_mpi_cmd + " "
@@ -1056,12 +1058,17 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                     if cmd_conf.redirect:
                         out_log = self.expander.expand_var(cmd_conf.redirect, exec_vars)
                         output_operator = cmd_conf.output_capture
-                        redirect = f' {output_operator} "{out_log}"'
-                        if ramble.config.get("config:shell") in ["bash", "sh"]:
-                            redirect += " 2>&1"
+
+                        redirect_mapper = output_mapper()
+                        redirect = redirect_mapper.generate_out_string(out_log, output_operator)
+
+                    if cmd_conf.run_in_background:
+                        bg_cmd = " &"
+                    else:
+                        bg_cmd = ""
 
                     for part in cmd_conf.template:
-                        command_part = f"{mpi_cmd}{part}{redirect}"
+                        command_part = f"{mpi_cmd}{part}{redirect}{bg_cmd}"
                         self._command_list.append(
                             self.expander.expand_var(command_part, exec_vars)
                         )
@@ -1379,7 +1386,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
 
         if os.path.exists(inventory_file) and not force_compute:
-            with open(inventory_file, "r") as f:
+            with open(inventory_file) as f:
                 self.hash_inventory = spack.util.spack_json.load(f)
 
         else:
@@ -1586,7 +1593,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
                 logger.debug(f"Skipping analysis of non-existent file: {file}")
                 continue
 
-            with open(file, "r") as f:
+            with open(file) as f:
                 for line in f.readlines():
                     logger.debug(f"Line: {line}")
 
@@ -2027,7 +2034,7 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
         )
 
         if os.path.isfile(status_path):
-            with open(status_path, "r") as f:
+            with open(status_path) as f:
                 status_data = spack.util.spack_json.load(f)
             self.variables[self.keywords.experiment_status] = status_data[
                 self.keywords.experiment_status
@@ -2065,18 +2072,26 @@ class ApplicationBase(object, metaclass=ApplicationMeta):
     register_phase("deploy_artifacts", pipeline="pushdeployment")
 
     def _deploy_artifacts(self, workspace, app_inst=None):
+
+        def _copy_files(obj_inst, obj_type, repo_root):
+            flist = ramble.repository.list_object_files(obj_inst, obj_type)
+            for type_dir_name, obj_path in flist:
+                obj_dir_name = os.path.basename(os.path.dirname(obj_path))
+                obj_dir = os.path.join(repo_root, type_dir_name, obj_dir_name)
+                fs.mkdirp(obj_dir)
+                shutil.copyfile(obj_path, os.path.join(obj_dir, os.path.basename(obj_path)))
+
         repo_path = os.path.join(workspace.named_deployment, "object_repo")
 
-        app_dir_name = os.path.basename(os.path.dirname(self._file_path))
-        app_dir = os.path.join(repo_path, "applications", app_dir_name)
-        fs.mkdirp(app_dir)
-        shutil.copyfile(self._file_path, os.path.join(app_dir, "application.py"))
+        _copy_files(self, ramble.repository.ObjectTypes.applications, repo_path)
 
         for mod_inst in self._modifier_instances:
-            mod_dir_name = os.path.basename(os.path.dirname(mod_inst._file_path))
-            mod_dir = os.path.join(repo_path, "modifiers", mod_dir_name)
-            fs.mkdirp(mod_dir)
-            shutil.copyfile(mod_inst._file_path, os.path.join(mod_dir, "modifier.py"))
+            _copy_files(mod_inst, ramble.repository.ObjectTypes.modifiers, repo_path)
+
+        if self.package_manager is not None:
+            _copy_files(
+                self.package_manager, ramble.repository.ObjectTypes.package_managers, repo_path
+            )
 
     register_builtin("env_vars", required=True)
 

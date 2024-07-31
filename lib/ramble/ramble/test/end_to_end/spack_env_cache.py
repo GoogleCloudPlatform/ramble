@@ -99,26 +99,26 @@ ramble:
 
         # First encounter of an env_name (test1 -> gromacs, test2 -> g2) requires spack usage.
         test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
-        with open(test1_log, "r") as f:
+        with open(test1_log) as f:
             content = f.read()
             assert "spack install" in content
             assert "spack concretize" in content
 
         test2_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test2.out")
-        with open(test2_log, "r") as f:
+        with open(test2_log) as f:
             content = f.read()
             assert "spack install" in content
             assert "spack concretize" in content
 
         # Envs should already exist and can skip spack calls.
         test3_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test3.out")
-        with open(test3_log, "r") as f:
+        with open(test3_log) as f:
             content = f.read()
             assert "spack install" not in content
             assert "spack concretize" not in content
 
         test4_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_gmx50.test4.out")
-        with open(test4_log, "r") as f:
+        with open(test4_log) as f:
             content = f.read()
             assert "spack install" not in content
             assert "spack concretize" not in content

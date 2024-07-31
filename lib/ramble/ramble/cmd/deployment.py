@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import os
-import sys
 
 import llnl.util.filesystem as fs
 
@@ -25,11 +24,6 @@ import ramble.workspace
 import ramble.workspace.shell
 import ramble.pipeline
 import ramble.filters
-
-if sys.version_info >= (3, 3):
-    from collections.abc import Sequence  # novm noqa: F401
-else:
-    from collections import Sequence  # noqa: F401
 
 
 description = "(experimental) manage workspace deployments"
@@ -130,7 +124,7 @@ def deployment_pull(args):
 
         pull_file(remote_index_path, local_index_path)
 
-        with open(local_index_path, "r") as f:
+        with open(local_index_path) as f:
             index_data = sjson.load(f)
 
         for file in index_data[push_cls.index_namespace]:

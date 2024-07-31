@@ -214,7 +214,7 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
 
-            with open(os.path.join(exp_dir, "full_command"), "r") as f:
+            with open(os.path.join(exp_dir, "full_command")) as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -231,7 +231,7 @@ licenses:
                 # Test the run script has a reference to the experiment log file
                 assert os.path.join(exp_dir, f"{exp}.out") in data
 
-            with open(os.path.join(exp_dir, "execute_experiment"), "r") as f:
+            with open(os.path.join(exp_dir, "execute_experiment")) as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -275,7 +275,7 @@ licenses:
         assert len(json_results_files) == 2
         assert len(yaml_results_files) == 2
 
-        with open(text_results_files[0], "r") as f:
+        with open(text_results_files[0]) as f:
             data = f.read()
             assert "Average Timestep Time = 33.3 s" in data
             assert "Cumulative Timestep Time = 166.5 s" in data

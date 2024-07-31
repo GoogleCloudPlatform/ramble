@@ -95,7 +95,7 @@ licenses:
 
         ws._re_read()
 
-        with open(config_path, "r") as f:
+        with open(config_path) as f:
             data = f.read()
 
             assert "ensure_installed" in data

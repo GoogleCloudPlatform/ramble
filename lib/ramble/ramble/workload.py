@@ -12,7 +12,7 @@ import copy
 import ramble.util.colors as rucolor
 
 
-class WorkloadVariable(object):
+class WorkloadVariable:
     """Class representing a variable definition"""
 
     def __init__(
@@ -68,7 +68,7 @@ class WorkloadVariable(object):
         return copy.deepcopy(self)
 
 
-class WorkloadEnvironmentVariable(object):
+class WorkloadEnvironmentVariable:
     """Class representing an environment variable in a workload"""
 
     def __init__(self, name: str, value=None, description: str = None):
@@ -108,7 +108,7 @@ class WorkloadEnvironmentVariable(object):
         return copy.deepcopy(self)
 
 
-class Workload(object):
+class Workload:
     """Class representing a single workload"""
 
     def __init__(

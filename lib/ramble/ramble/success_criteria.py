@@ -12,7 +12,7 @@ import fnmatch
 from ramble.util.logger import logger
 
 
-class ScopedCriteriaList(object):
+class ScopedCriteriaList:
     """A scoped list of success criteria
 
     This object represents a list of success criteria. The criteria are scoped
@@ -88,8 +88,7 @@ class ScopedCriteriaList(object):
 
     def all_criteria(self):
         for scope in self._valid_scopes:
-            for criteria in self.criteria[scope]:
-                yield criteria
+            yield from self.criteria[scope]
 
     def find_criteria(self, name):
         for scope in self._valid_scopes:
@@ -99,7 +98,7 @@ class ScopedCriteriaList(object):
         return None
 
 
-class SuccessCriteria(object):
+class SuccessCriteria:
     """A single success criteria object
 
     This object represents a single criteria for success for a Ramble

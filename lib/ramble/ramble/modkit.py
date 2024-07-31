@@ -26,6 +26,6 @@ from ramble.spec import Spec
 import ramble.language.modifier_language
 from ramble.language.modifier_language import *
 from ramble.language.shared_language import *
-from ramble.schema.types import OUTPUT_CAPTURE
+from ramble.util.output_capture import OUTPUT_CAPTURE
 
 from ramble.util.file_util import get_file_path

@@ -15,7 +15,7 @@ import ramble.util.graph
 from ramble.util.logger import logger
 
 
-class AttributeGraph(object):
+class AttributeGraph:
 
     node_type = "object"
 
@@ -124,8 +124,7 @@ class AttributeGraph(object):
                 )
             self._prepared = True
 
-        for node in self._sorted:
-            yield node
+        yield from self._sorted
 
     def get_node(self, key):
         """Given a key, return the node containing this key

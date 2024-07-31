@@ -14,7 +14,7 @@ from contextlib import contextmanager
 from pathlib import Path
 
 
-class Logger(object):
+class Logger:
     """Logger class
 
     This class providers additional functionality on top of LLNL's tty utility.

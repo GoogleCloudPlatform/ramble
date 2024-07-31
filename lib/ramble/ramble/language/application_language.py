@@ -22,7 +22,7 @@ definition to modify then application, for example:
 
     .. code-block:: python
 
-      class Gromacs(SpackApplication):
+      class Gromacs(ExecutableApplication):
           # Workload directive:
           workload('water_bare', executables=['pre-process', 'execute-gen'],
                input='water_bare_hbonds')
@@ -134,7 +134,8 @@ def executable(name, template, **kwargs):
                              defaults to {log_file}
         output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
                                    capture. Defaults to stdout
-
+        run_in_background (Optional): Declare if the command should run in the background.
+                                      Defaults to False
     """
 
     def _execute_executable(app):

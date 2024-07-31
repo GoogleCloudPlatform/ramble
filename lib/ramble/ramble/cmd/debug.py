@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import print_function
 
 import os
 import platform
@@ -52,9 +51,9 @@ def _debug_tarball_suffix():
         commit = git("rev-parse", "--short", "HEAD", output=str).strip()
 
         if symbolic == commit:
-            return "nobranch.%s.%s" % (commit, suffix)
+            return f"nobranch.{commit}.{suffix}"
         else:
-            return "%s.%s.%s" % (symbolic, commit, suffix)
+            return f"{symbolic}.{commit}.{suffix}"
 
 
 def report(args):

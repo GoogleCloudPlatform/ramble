@@ -378,7 +378,7 @@ def _store_dir_and_cache(tmpdir_factory):
     return store, cache
 
 
-class MockLayout(object):
+class MockLayout:
     def __init__(self, root):
         self.root = root
 
@@ -401,7 +401,7 @@ def gen_mock_layout(tmpdir):
     yield create_layout
 
 
-class MockConfig(object):
+class MockConfig:
     def __init__(self, configuration, writer_key):
         self._configuration = configuration
         self.writer_key = writer_key
@@ -413,7 +413,7 @@ class MockConfig(object):
         return self.configuration()[self.writer_key]
 
 
-class ConfigUpdate(object):
+class ConfigUpdate:
     def __init__(self, root_for_conf, writer_mod, writer_key, monkeypatch):
         self.root_for_conf = root_for_conf
         self.writer_mod = writer_mod
@@ -441,7 +441,7 @@ class ConfigUpdate(object):
 ##########
 
 
-class MockBundle(object):
+class MockBundle:
     has_code = False
     name = "mock-bundle"
     versions = {}
@@ -528,8 +528,8 @@ def mock_archive(request, tmpdir_factory):
 
     # Archive it
     with tmpdir.as_cwd():
-        archive_name = "{0}{1}".format(ramble.stage._input_subdir, request.param[0])
-        tar("-c{0}f".format(request.param[1]), archive_name, ramble.stage._input_subdir)
+        archive_name = f"{ramble.stage._input_subdir}{request.param[0]}"
+        tar(f"-c{request.param[1]}f", archive_name, ramble.stage._input_subdir)
 
     Archive = collections.namedtuple(
         "Archive", ["url", "path", "archive_file", "expanded_archive_basedir"]
@@ -559,7 +559,7 @@ def install_mockery_mutable_config(mutable_config, mock_applications):
         yield
 
 
-class MockCache(object):
+class MockCache:
     def store(self, copy_cmd, relative_dest):
         pass
 
@@ -567,7 +567,7 @@ class MockCache(object):
         return MockCacheFetcher()
 
 
-class MockCacheFetcher(object):
+class MockCacheFetcher:
     def fetch(self):
         raise FetchError("Mock cache always fails for tests")
 

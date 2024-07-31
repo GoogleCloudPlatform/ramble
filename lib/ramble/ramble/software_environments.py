@@ -35,7 +35,7 @@ def _is_dict_empty(rendered: defaultdict):
     return True
 
 
-class SoftwarePackage(object):
+class SoftwarePackage:
     """Class to represent a single software package"""
 
     def __init__(
@@ -287,7 +287,7 @@ class TemplatePackage(SoftwarePackage):
             all_packages[pm_name][new_package.name] = new_package
 
 
-class SoftwareEnvironment(object):
+class SoftwareEnvironment:
     """Class representing a single software environment"""
 
     def __init__(self, name: str):
@@ -508,7 +508,7 @@ class TemplateEnvironment(SoftwareEnvironment):
                 template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
 
 
-class SoftwareEnvironments(object):
+class SoftwareEnvironments:
     """Class representing a group of software environments"""
 
     def __init__(self, workspace):
