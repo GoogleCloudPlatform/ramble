@@ -128,16 +128,16 @@ available variables with the following command:
 
 .. code-block:: console
 
-    $ ramble info gromacs
+    $ ramble info -a workloads -v -p "water*" gromacs
 
-
-Focusing on the relevant workloads, you see the following information:
+Which should contain the following information:
 
 .. code-block:: console
 
     Workload: water_gmx50
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_gmx50_bare']
+        Tags: []
         Variables:
             size:
                 Description: Workload size
@@ -153,6 +153,7 @@ Focusing on the relevant workloads, you see the following information:
     Workload: water_bare
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
+        Tags: []
         Variables:
             size:
                 Description: Workload size

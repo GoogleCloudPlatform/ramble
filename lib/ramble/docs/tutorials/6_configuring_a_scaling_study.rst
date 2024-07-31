@@ -54,10 +54,13 @@ you want to execute. To begin with, select a workload from the output of:
 
 .. code-block:: console
 
-    $ ramble info wrfv4
+    $ ramble info -a workloads wrfv4
 
 For the purposes of this tutorial, the ``CONUS_12km`` workload is recommended
 because it is less computationally expensive than the ``CONUS_2p5km`` workload.
+
+**NOTE**: To get more detailed information about the workload definitions, you
+can use ``ramble info -a workloads -v wrfv4``.
 
 Configure Experiment Definitions
 --------------------------------
