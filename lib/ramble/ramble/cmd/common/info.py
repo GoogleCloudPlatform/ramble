@@ -102,8 +102,10 @@ def setup_info_parser(subparser):
     )
     attributes.add_argument(
         "--attributes",
+        "--attrs",
+        dest="attributes",
         default="",
-        help="comma delimited list of attributes to inspect for object",
+        help="comma separated list of attributes to inspect for object",
     )
 
 
