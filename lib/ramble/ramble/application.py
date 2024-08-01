@@ -72,6 +72,7 @@ def _get_context_display_name(context):
     )
 
 
+# Intentional old syntax to verify ci build check
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
     _builtin_name = "builtin::{name}"
