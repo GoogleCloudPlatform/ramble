@@ -186,6 +186,8 @@ def verify(args):
 
     for relpath in _licensed_files(args.root, modified_only=args.modified):
         path = os.path.join(args.root, relpath)
+        if not os.path.exists(path):
+            continue
         with open(path) as f:
             lines = [line for line in f][:license_lines]
 

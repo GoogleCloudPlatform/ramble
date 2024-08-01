@@ -415,3 +415,21 @@ def tags(*values: str):
         obj.tags = list(sorted(set(tags_from_base + list(values))))
 
     return _execute_tag
+
+
+@shared_directive(dicts=())
+def target_shells(shell_support_pattern=None):
+    """Directive to specify supported shells.
+
+    If not specified, i.e., not directly specified or inherited from the base,
+    then it assumes all shells are supported.
+
+    Args:
+        shell_support_pattern: The glob pattern that is used to match with the configured shell
+    """
+
+    def _execute_target_shells(obj):
+        if shell_support_pattern is not None:
+            obj.shell_support_pattern = shell_support_pattern
+
+    return _execute_target_shells

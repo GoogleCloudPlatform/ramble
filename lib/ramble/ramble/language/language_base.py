@@ -114,9 +114,9 @@ class DirectiveMeta(type):
     def directive(cls, dicts=None):
         """Decorator for Ramble directives.
 
-        Ramble directives allow you to modify a package while it is being
+        Ramble directives allow you to modify an object while it is being
         defined, e.g. to add version or dependency information.  Directives are
-        one of the key pieces of Ramble's application "language", which is
+        one of the key pieces of Ramble's object "language", which is
         embedded in python.
 
         Here's an example directive:
