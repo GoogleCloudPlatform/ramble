@@ -44,9 +44,7 @@ steps:
 
         ramble info hostname
 
-        ramble workspace create -d hello_world -c /workspace/examples/tutorial_1_config.yaml
-
-        ramble workspace activate ./hello_world
+        ramble workspace create -d hello_world -c /workspace/examples/tutorial_1_config.yaml -a
 
         ramble workspace setup
 
