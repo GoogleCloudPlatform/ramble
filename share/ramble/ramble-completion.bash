@@ -438,7 +438,7 @@ _ramble_help() {
 _ramble_info() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --type"
+        RAMBLE_COMPREPLY="-h --help --type --format --pattern -p --overview -o --verbose -v --all --attributes --attrs"
     else
         RAMBLE_COMREPLY=""
     fi

@@ -272,6 +272,8 @@ def modifier_variable(
     """
 
     def _define_modifier_variable(mod):
+        import ramble.workload
+
         all_modes = ramble.language.language_helpers.require_definition(
             mode, modes, mod.modes, "mode", "modes", "modifier_variable"
         )

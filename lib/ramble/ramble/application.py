@@ -271,16 +271,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
 
     def _long_print(self):
-        out_str = []
-        out_str.append(rucolor.section_title("Application: ") + f"{self.name}\n")
-        out_str.append("\n")
-
-        out_str.append(rucolor.section_title("Description:\n"))
-        if self.__doc__:
-            out_str.append(f"\t{self.__doc__}\n")
-        else:
-            out_str.append("\tNone\n")
-
+        out_str = ""
         if hasattr(self, "maintainers"):
             out_str.append("\n")
             out_str.append(rucolor.section_title("Maintainers:\n"))

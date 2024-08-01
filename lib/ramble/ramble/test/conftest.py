@@ -610,6 +610,10 @@ def mock_file_auto_create(monkeypatch):
 
 
 def pytest_generate_tests(metafunc):
+    import re
+
+    name_regex = re.compile(r"\s*(?P<name>[a-z0-9\-\_]+)\s*$")
+
     if "application" in metafunc.fixturenames:
         from ramble.main import RambleCommand
 
@@ -619,8 +623,9 @@ def pytest_generate_tests(metafunc):
         repo_apps = list_cmd().split("\n")
 
         for app_str in repo_apps:
-            if app_str != "":
-                all_applications.append(app_str.strip())
+            m = name_regex.match(app_str)
+            if m:
+                all_applications.append(m.group("name"))
 
         metafunc.parametrize("application", all_applications)
 
@@ -633,8 +638,9 @@ def pytest_generate_tests(metafunc):
         repo_mods = list_cmd("--type", "modifiers").split("\n")
 
         for mod_str in repo_mods:
-            if mod_str != "":
-                all_modifiers.append(mod_str.strip())
+            m = name_regex.match(mod_str)
+            if m:
+                all_modifiers.append(m.group("name"))
 
         metafunc.parametrize("modifier", all_modifiers)
 
@@ -654,11 +660,12 @@ def pytest_generate_tests(metafunc):
         list_cmd = RambleCommand("list")
 
         all_package_managers = ["None"]
-        repo_mods = list_cmd("--type", "package_managers").split("\n")
+        repo_pms = list_cmd("--type", "package_managers").split("\n")
 
-        for mod_str in repo_mods:
-            if mod_str != "":
-                all_package_managers.append(mod_str.strip())
+        for pm_str in repo_pms:
+            m = name_regex.match(pm_str)
+            if m:
+                all_package_managers.append(m.group("name"))
 
         metafunc.parametrize("package_manager", all_package_managers)
 
