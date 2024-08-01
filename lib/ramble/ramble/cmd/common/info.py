@@ -34,6 +34,7 @@ obj_attribute_map = {
     "software_specs": None,
     "archive_patterns": None,
     "success_criteria": None,
+    "target_shells": "shell_support_pattern",
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -196,7 +197,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     format specification and filter pattern.
     """
     internal_attr_name = _map_attr_name(attr)
-    internal_attr = getattr(obj, internal_attr_name)
+    internal_attr = getattr(obj, internal_attr_name, None)
 
     if attr == "registered_phases":
         _print_phases(obj, attr, verbose, pattern, format=format)
