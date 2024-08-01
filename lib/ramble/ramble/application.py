@@ -986,19 +986,21 @@ class ApplicationBase(metaclass=ApplicationMeta):
             self._command_list.append(self.chain_commands[chained_exp])
 
         # ensure all log files are purged and set up
-        logs = set()
+        logs = []
 
         for exec_node in exec_graph.walk():
             if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
                 exec_cmd = exec_node.attribute
                 if exec_cmd.redirect:
                     expanded_log = self.expander.expand_var(exec_cmd.redirect)
-                    logs.add(expanded_log)
+                    logs.append(expanded_log)
 
         analysis_logs, _, _ = self._analysis_dicts(success_list)
 
         for log in analysis_logs:
-            logs.add(log)
+            logs.append(log)
+
+        logs = list(dict.fromkeys(logs))
 
         for log in logs:
             self._command_list.append('rm -f "%s"' % log)
