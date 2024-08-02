@@ -1107,9 +1107,7 @@ class Workspace:
                                         mod = fom["origin"]
                                         name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                    output = "{} = {} {}".format(
-                                        name, fom["value"], fom["units"]
-                                    )
+                                    output = "{} = {} {}".format(name, fom["value"], fom["units"])
                                     f.write("    %s\n" % (output.strip()))
 
                 else:

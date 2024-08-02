@@ -1773,9 +1773,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
 
         # If repeat_success_strict is true, one failed experiment will fail the whole set
-        # and statistics will not be calculated
-        # If repeat_success_strict is false, statistics will be calculated for all successful
-        # experiments
+        # If repeat_success_strict is false, any passing experiment will pass the whole set
         repeat_success = False
         exp_success = []
         for exp in repeat_experiments.keys():
@@ -1834,10 +1832,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 continue
 
             # When strict success is off for repeats (loose success), skip failed exps
-            if (
-                not workspace.repeat_success_strict
-                and exp_inst.results["RAMBLE_STATUS"] == "FAILED"
-            ):
+            if exp_inst.results["RAMBLE_STATUS"] == "FAILED":
                 continue
 
             if "CONTEXTS" in exp_inst.results:
