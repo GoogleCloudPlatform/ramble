@@ -125,11 +125,10 @@ def results_report(args):
     """
     print(f'args: {args}')
 
-    print(args.workspace)
-
     results_dict = ramble.reports.load_results(args)
+    ws_name = results_dict['workspace_name']
     results_df = ramble.reports.prepare_data(results_dict)
-    ramble.reports.make_report(results_df, args)
+    ramble.reports.make_report(results_df, ws_name, args)
 
 
 def results(parser, args):

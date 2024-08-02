@@ -61,7 +61,7 @@ def load_results(args):
 
     Check for results in this order:
         1. via ``ramble results report -f FILENAME``
-        2. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` or 
+        2. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` or
         ``ramble results report --workspace WRKSPC``(arguments)
         3. via a path in the ramble.workspace.ramble_workspace_var environment variable.
     """
@@ -207,13 +207,19 @@ def prepare_data(results: dict) -> pd.DataFrame:
     return results_df
 
 
-def make_report(results_df, args):    
+def make_report(results_df, ws_name, args):
     dt = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     report_dir_root = get_reports_path()
+
     # TODO(dpomeroy): update file import to extract workspace name and pass it through here
-    ws_name = 'unknown_workspace'
+
+    print(results_df)
     if args.workspace:
         ws_name = str(args.workspace)
+
+    if not ws_name:
+        ws_name = 'unknown_workspace'
+
     report_name = f"{ws_name}.{dt}"
     report_dir_path = os.path.join(report_dir_root, report_name)
     fs.mkdirp(report_dir_path)
@@ -222,19 +228,15 @@ def make_report(results_df, args):
     with PdfPages(pdf_path) as pdf_report:
 
         if args.strong_scaling:
-            print("strong_scaling")
             generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
         if args.weak_scaling:
-            print("weak_scaling")
             generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
         if args.compare:
-            print("compare")
             generate_compare_chart(results_df, pdf_report, report_dir_path, args)
 
         if args.foms:
-            print("foms")
             generate_foms_chart(results_df, pdf_report, report_dir_path, args)
 
     # TODO(dpomeroy): this needs to error out if the PDF is empty, currently it succeeds
@@ -290,18 +292,18 @@ def generate_strong_scaling_chart(results_df, pdf_report, report_dir_path, args)
 
         for series in perf_measure_results.loc[:, 'series'].unique():
 
-            print(f'series = {series}')
+            #print(f'series = {series}')
 
             series_results = perf_measure_results.query(f'series == "{series}"')
             selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
 
-            print(series_results)
+            #print(series_results)
 
-            print(f"selected = {selected}")
+            #print(f"selected = {selected}")
 
             scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
 
-            print(scale_pivot)
+            #print(scale_pivot)
 
             fig, ax = plt.subplots()
 
@@ -375,7 +377,7 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
 
         for series in raw_results.loc[:, 'series'].unique():
 
-            print(f'series = {series}')
+            #print(f'series = {series}')
 
             series_results = raw_results.query(f'series == "{series}"')
             selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
@@ -388,7 +390,7 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
 
                 selected.loc[:, 'ideal_perf_value'] = 1
 
-                print(selected)
+                #print(selected)
 
 
                 ax.plot(f'{scale_var}', 'normalized_fom_value', data=selected, marker='o')
@@ -408,7 +410,7 @@ def generate_weak_scaling_chart(results_df, pdf_report, report_dir_path, args):
                     first_perf_value = selected['fom_value'].iloc[0]
                     selected.loc[:, 'ideal_perf_value'] = first_perf_value
 
-                print(selected)
+                #print(selected)
 
                 ax.plot(f'{scale_var}', 'fom_value', data=selected, marker='o')
                 ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
@@ -446,7 +448,7 @@ def generate_compare_chart(results_df, pdf_report, report_dir_path, args):
             else:
                 dimensions.append(input)
 
-        # TODO(dpomeroy): pull in better_direction for the foms. If it's the same for all foms 
+        # TODO(dpomeroy): pull in better_direction for the foms. If it's the same for all foms
         # (e.g., all are 'time' foms) then append (lower/higher is better) to chart title
         # else if there's a mix of foms or foms are not higher/lower, append nothing (indeterminate)
 
@@ -457,9 +459,13 @@ def generate_compare_chart(results_df, pdf_report, report_dir_path, args):
         raw_results.loc[:, 'Figure of Merit'] = (raw_results.loc[:, 'fom_name'] +
                                           ' (' + raw_results.loc[:, 'fom_units'] + ')')
 
+        #print(raw_results.dtypes)
+        #print(raw_results['fom_value'])
+
+        raw_results['fom_value'] = pd.to_numeric(raw_results['fom_value'])
         raw_results.to_csv('raw_results.csv')
 
-        print(raw_results.loc[:, 'fom_value'])
+        #print(raw_results.loc[:, 'fom_value'])
 
         compare_pivot = raw_results.pivot_table('fom_value', index=dimensions, columns='Figure of Merit')
 
