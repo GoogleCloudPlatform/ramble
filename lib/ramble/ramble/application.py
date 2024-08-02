@@ -1574,7 +1574,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
 
         if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
-            logger.warn(f"Experiment has status is {self.get_status()}. Skipping analysis..\n")
+            logger.warn(f"Experiment has status {self.get_status()}. Skipping analysis..\n")
             return
 
         def format_context(context_match, context_format):
