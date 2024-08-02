@@ -163,6 +163,24 @@ class Renderer:
             value = expander.expand_lists(unexpanded)
             object_variables[name] = value
 
+        # Expand zip and matrix members to allow indirections like
+        # ```
+        # variables:
+        #   my_vec: [1, 2, 3]
+        #   my_vec_ref: 'my_vec'
+        #   matrix:
+        #   - '{my_vec_ref}'
+        # ```
+        if matrices:
+            for matrix in matrices:
+                for i, unexpanded_var in enumerate(matrix):
+                    var = expander.expand_var(unexpanded_var)
+                    matrix[i] = var
+        if zips:
+            for zip_group, group_def in zips.items():
+                for i, unexpanded_var in enumerate(group_def):
+                    group_def[i] = expander.expand_var(unexpanded_var)
+
         new_objects = []
         defined_zips = {}
         consumed_zips = set()
