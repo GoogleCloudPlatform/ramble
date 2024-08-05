@@ -415,7 +415,7 @@ class MirrorPipeline(Pipeline):
     def _complete(self):
         verb = "updated" if self.workspace.mirror_existed else "created"
         logger.msg(
-            f"Successfully {verb} spack software in {self.workspace.mirror_path}",
+            f"Successfully {verb} software in {self.workspace.mirror_path}",
             "Archive stats:",
             "  %-4d already present" % len(self.workspace.software_mirror_stats.present),
             "  %-4d added" % len(self.workspace.software_mirror_stats.new),
