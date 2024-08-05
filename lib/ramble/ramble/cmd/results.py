@@ -126,7 +126,14 @@ def results_report(args):
     print(f'args: {args}')
 
     results_dict = ramble.reports.load_results(args)
+
     ws_name = results_dict['workspace_name']
+    if not ws_name:
+        ws_name = 'unknown_workspace'
+
+    if args.workspace:
+        ws_name = str(args.workspace)
+
     results_df = ramble.reports.prepare_data(results_dict)
     ramble.reports.make_report(results_df, ws_name, args)
 
