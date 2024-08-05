@@ -1671,9 +1671,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 if criteria_obj.passed(app_inst=self, fom_values=fom_values):
                     criteria_obj.mark_found()
 
-        exp_ns = self.expander.experiment_namespace
-        self.results = {"name": exp_ns}
-
         success = False
         for fom in fom_values.values():
             for value in fom.values():
@@ -1681,33 +1678,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        self.results["N_REPEATS"] = self.repeats.n_repeats
-        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
-
         if success:
             self.set_status(status=experiment_status.SUCCESS)
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        self.results["RAMBLE_STATUS"] = self.get_status()
+        self._prepare_results(workspace, self.expander.experiment_namespace, success)
 
         if success or workspace.always_print_foms:
 
             self.results["TAGS"] = list(self.experiment_tags)
-
-            # Add defined keywords as top level keys
-            for key in self.keywords.keys:
-                if self.keywords.is_key_level(key):
-                    self.results[key] = self.expander.expand_var_name(key)
-
-            self.results["RAMBLE_VARIABLES"] = {}
-            self.results["RAMBLE_RAW_VARIABLES"] = {}
-            for var, val in self.variables.items():
-                self.results["RAMBLE_RAW_VARIABLES"][var] = val
-                if var not in self.keywords.keys or not self.keywords.is_key_level(var):
-                    self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
-
-            self.results["CONTEXTS"] = []
 
             for context, fom_map in fom_values.items():
                 context_map = {
@@ -1781,11 +1761,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if n == 1:
                 first_repeat_exp = repeat_exp_namespace
 
-        # Create initial results dict since analysis pipeline was skipped for base exp
-        self.results = {"name": base_exp_namespace}
-        self.results["N_REPEATS"] = self.repeats.n_repeats
-        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
-
         # If repeat_success_strict is true, one failed experiment will fail the whole set
         # and statistics will not be calculated
         # If repeat_success_strict is false, statistics will be calculated for all successful
@@ -1818,25 +1793,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        self.results["RAMBLE_STATUS"] = self.get_status()
+        self._prepare_results(workspace, base_exp_namespace, repeat_success)
 
         if repeat_success or workspace.always_print_foms:
             logger.debug(
                 f"Calculating statistics for {self.repeats.n_repeats} repeats of "
                 f"{base_exp_name}"
             )
-
-            # Add defined keywords as top level keys
-            for key in self.keywords.keys:
-                if self.keywords.is_key_level(key):
-                    self.results[key] = self.expander.expand_var_name(key)
-
-            self.results["RAMBLE_VARIABLES"] = {}
-            self.results["RAMBLE_RAW_VARIABLES"] = {}
-            for var, val in self.variables.items():
-                self.results["RAMBLE_RAW_VARIABLES"][var] = val
-                self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
-            self.results["CONTEXTS"] = []
 
             results = []
 
@@ -1912,6 +1875,27 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.results["CONTEXTS"] = results
 
         workspace.insert_result(self.results, first_repeat_exp)
+
+    def _prepare_results(self, workspace, exp_namespace, success):
+        self.results = {"name": exp_namespace}
+        self.results["N_REPEATS"] = self.repeats.n_repeats
+        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
+        self.results["RAMBLE_STATUS"] = self.get_status()
+
+        if success or workspace.always_print_foms:
+            # Add defined keywords as top level keys
+            for key in self.keywords.keys:
+                if self.keywords.is_key_level(key):
+                    self.results[key] = self.expander.expand_var_name(key)
+
+            self.results["RAMBLE_VARIABLES"] = {}
+            self.results["RAMBLE_RAW_VARIABLES"] = {}
+            for var, val in self.variables.items():
+                self.results["RAMBLE_RAW_VARIABLES"][var] = val
+                if var not in self.keywords.keys or not self.keywords.is_key_level(var):
+                    self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
+
+            self.results["CONTEXTS"] = []
 
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""
