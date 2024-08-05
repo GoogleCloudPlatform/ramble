@@ -146,7 +146,7 @@ this mirror in the first place.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==>     Executing phase mirror_software
-    ==> Successfully updated spack software in $HOME/wrfv4_mirror
+    ==> Successfully updated software in $HOME/wrfv4_mirror
       Archive stats:
         44   already present
         44   added
