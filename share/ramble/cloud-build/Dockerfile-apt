@@ -10,7 +10,7 @@ RUN cd /opt && \
     cd spack && \
     git checkout $SPACK_REF && \
     . /opt/spack/share/spack/setup-env.sh && \
-    spack install py-pip ^python@${PYTHON_VER} && \
+    spack install --deprecated py-pip ^python@${PYTHON_VER} && \
     spack clean -a
 RUN echo -e ". /opt/spack/share/spack/setup-env.sh\n spack load py-pip ^python@$PYTHON_VER\n export SPACK_PYTHON=`which python3`" > /etc/profile.d/ramble.sh
 RUN cd /opt &&  \
