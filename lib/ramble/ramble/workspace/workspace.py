@@ -486,6 +486,9 @@ class Workspace:
         self.software_environments = None
         self.hash_inventory = {"experiments": [], "versions": []}
 
+        # Reference to the currently running pipeline instance
+        self.running_pipeline_inst = None
+
         from ramble.main import get_version
 
         self.hash_inventory["versions"].append(

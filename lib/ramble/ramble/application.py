@@ -1229,7 +1229,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def _check_mirror_support(self, workspace, app_inst=None):
         """Check if the given package manager supports mirroring"""
         pkgman = self.package_manager
-        if pkgman is not None:
+        phase_filter = workspace.running_pipeline_inst.filters.phases
+        # When phases are explicitly specified, this check is disabled.
+        # This allows for running mirror-inputs only.
+        if pkgman is not None and phase_filter == ["*"]:
             # Use the presence of a `mirror_software` phase as an indicator.
             # This is not very robust, a better approach may be to claim support
             # from individual package managers.

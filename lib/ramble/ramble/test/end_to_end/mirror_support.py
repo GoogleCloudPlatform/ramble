@@ -29,10 +29,21 @@ def assert_text_in_mirror_log(ws, text):
 
 
 @pytest.mark.parametrize(
-    "pkgman,expect_error",
-    [("null", False), ("spack", False), ("pip", True), ("eessi", True)],
+    "pkgman,expect_error, extra_args",
+    [
+        ("null", False, []),
+        ("spack", False, []),
+        ("pip", True, []),
+        ("eessi", True, []),
+        # Allowed when phases are explicitly specified
+        (
+            "pip",
+            False,
+            ["--phases", "mirror_inputs", "--include-phase-dependencies"],
+        ),
+    ],
 )
-def test_mirror_support(pkgman, expect_error, tmpdir):
+def test_mirror_support(pkgman, expect_error, extra_args, tmpdir):
     test_config = f"""
 ramble:
   variants:
@@ -67,8 +78,8 @@ ramble:
     mirror_path = os.path.join(tmpdir, ws_name)
     if expect_error:
         with pytest.raises(RambleCommandError):
-            workspace("mirror", "--dry-run", "-d", mirror_path)
+            workspace("mirror", "--dry-run", "-d", mirror_path, *extra_args)
         assert_text_in_mirror_log(ws, f"{pkgman} does not support mirroring")
     else:
-        workspace("mirror", "--dry-run", "-d", mirror_path)
+        workspace("mirror", "--dry-run", "-d", mirror_path, *extra_args)
         assert_text_in_mirror_log(ws, "Successfully created software")

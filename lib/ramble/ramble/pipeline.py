@@ -12,6 +12,7 @@ import os
 import shutil
 import py.path
 import shlex
+from contextlib import contextmanager
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -201,10 +202,11 @@ class Pipeline:
         if logger.enabled:
             self.create_simlink(self.log_path, self.log_path_latest)
 
-        self._prepare()
-        self._execute()
-        self._complete()
-        logger.remove_log()
+        with running_pipeline(self.workspace, self):
+            self._prepare()
+            self._execute()
+            self._complete()
+            logger.remove_log()
 
     def create_simlink(self, base, link):
         """
@@ -708,3 +710,10 @@ def pipeline_class(name):
         )
 
     return _pipeline_map[name]
+
+
+@contextmanager
+def running_pipeline(workspace, pipeline_inst):
+    workspace.running_pipeline_inst = pipeline_inst
+    yield
+    workspace.running_pipeline_inst = None
