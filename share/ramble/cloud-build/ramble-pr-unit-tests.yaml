@@ -13,7 +13,7 @@ steps:
       - fetch
       - '--unshallow'
     id: ramble-clone
-  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-conda${_CONDA_VER}:latest
+  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest
     args:
       - '-c'
       - |
@@ -21,10 +21,10 @@ steps:
 
         git branch develop origin/develop
 
-        export PATH=$$(. /opt/spack/share/spack/setup-env.sh && spack location -i miniconda3)/bin:$${PATH}
-
         . /opt/spack/share/spack/setup-env.sh
         . /workspace/share/ramble/setup-env.sh
+
+        spack load py-pip ^python
 
         echo "Spack version is $(spack --version)"
         echo "Python version is $(python3 --version)"
@@ -69,9 +69,9 @@ steps:
     entrypoint: /bin/bash
 substitutions:
   _SPACK_REF: v0.21.2
-  _CONDA_VER: 22.11.1
+  _PYTHON_VER: 3.11.6
   _BASE_IMG: centos
   _BASE_VER: '7'
-timeout: 1500s
+timeout: 2000s
 options:
   machineType: N1_HIGHCPU_8
