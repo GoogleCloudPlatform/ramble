@@ -16,18 +16,19 @@ from typing import List
 from llnl.util.tty.colify import colified
 
 from ramble.language.modifier_language import ModifierMeta
-from ramble.language.shared_language import SharedMeta, register_builtin  # noqa: F401
+from ramble.language.shared_language import SharedMeta
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
 import ramble.util.directives
 import ramble.util.class_attributes
 from ramble.util.logger import logger
+from ramble.util.naming import NS_SEPARATOR
 
 
 class ModifierBase(metaclass=ModifierMeta):
     name = None
-    _builtin_name = "modifier_builtin::{obj_name}::{name}"
-    _mod_prefix_builtin = r"modifier_builtin::"
+    _builtin_name = NS_SEPARATOR.join(("modifier_builtin", "{obj_name}", "{name}"))
+    _mod_prefix_builtin = f"modifier_builtin{NS_SEPARATOR}"
     _language_classes = [ModifierMeta, SharedMeta]
     _pipelines = ["analyze", "archive", "mirror", "setup", "pushtocache", "execute"]
 
@@ -266,7 +267,7 @@ class ModifierBase(metaclass=ModifierMeta):
     def applies_to_executable(self, executable):
         apply = False
 
-        mod_regex = re.compile(self._mod_prefix_builtin + f"{self.name}::")
+        mod_regex = re.compile(self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}")
         for pattern in self._on_executables:
             if fnmatch.fnmatch(executable, pattern):
                 apply = True

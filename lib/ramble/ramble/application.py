@@ -49,6 +49,7 @@ import ramble.util.graph
 import ramble.util.class_attributes
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
+from ramble.util.naming import NS_SEPARATOR
 
 from ramble.workspace import namespace
 
@@ -91,7 +92,7 @@ def _check_shell_support(app_inst):
 
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
-    _builtin_name = "builtin::{name}"
+    _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
     _status_file_name = "ramble_status.json"
@@ -141,7 +142,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.modifiers = []
         self.experiment_tags = []
         self._modifier_instances = []
-        self._modifier_builtins = {}
         self._input_fetchers = None
         self.results = {}
         self._phase_times = {}
