@@ -92,6 +92,7 @@ def import_results_file(filename):
     logger.debug("File to import:")
     logger.debug(filename)
 
+    # TODO: this isn't very safe checking
     imported_file = open(filename)
     ext = os.path.splitext(filename)[1]
 
