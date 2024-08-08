@@ -227,7 +227,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
             elif format == supported_formats.text:
                 color.cprint(colified(to_print, tty=True, indent=4))
         else:
-            color.cprint("    " + str(to_print))
+            color.cprint(f"    {str(to_print)}\n")
     else:
         # With verbose output, and a dict attribute, we try to print all of the
         # sub items. These need to be iterated over, and we need to escape
