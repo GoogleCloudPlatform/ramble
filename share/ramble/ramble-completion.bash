@@ -449,7 +449,7 @@ _ramble_license() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="list-files verify"
+        RAMBLE_COMPREPLY="list-files verify update-copyright-year"
     fi
 }
 
@@ -459,6 +459,10 @@ _ramble_license_list_files() {
 
 _ramble_license_verify() {
     RAMBLE_COMPREPLY="-h --help --root --modified -m"
+}
+
+_ramble_license_update_copyright_year() {
+    RAMBLE_COMPREPLY="-h --help"
 }
 
 _ramble_list() {

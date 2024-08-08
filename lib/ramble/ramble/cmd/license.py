@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from datetime import datetime, timezone
 import os
 import re
 from collections import defaultdict
@@ -121,17 +122,22 @@ class LicenseError:
         )
 
 
-def _check_license(lines, path):
-    license_lines = [
-        r"Copyright 2022-2024 The Ramble Authors",  # noqa: E501
-        r"Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",  # noqa: E501
-        r"https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",  # noqa: E501
-        r"<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",  # noqa: E501
-        r"option. This file may not be copied, modified, or distributed",  # noqa: E501
-        r"except according to those terms.",  # noqa: E501
-    ]
+strict_date_range = f"2022-{datetime.now(timezone.utc).year}"
 
-    strict_date = r"Copyright 2024"
+strict_copyright_date = f"Copyright {strict_date_range}"
+
+
+def _check_license(lines, path):
+    # The years are hard-coded in the license header to allow them to be out-dated.
+    # The `strict_copyright_date` below issues warnings as reminders for refreshing.
+    license_lines = [
+        r"Copyright 2022-2024 The Ramble Authors",
+        r"Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",
+        r"https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",
+        r"<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",
+        r"option. This file may not be copied, modified, or distributed",
+        r"except according to those terms.",
+    ]
 
     found = []
 
@@ -144,8 +150,8 @@ def _check_license(lines, path):
                 # We allow it to be out of date but print a warning if it is
                 # out of date.
                 if i == 0:
-                    if not re.search(strict_date, line):
-                        logger.debug(f"{path}: copyright date mismatch")
+                    if not re.search(strict_copyright_date, line):
+                        logger.warn(f"{path}: copyright date mismatch")
                 found.append(i)
 
     if len(found) == len(license_lines) and found == list(sorted(found)):
@@ -201,6 +207,25 @@ def verify(args):
         logger.msg("No license issues found.")
 
 
+def update_copyright_year(args):
+    """update copyright header for the current year (utc-based) in all licensed files"""
+    for filename in _licensed_files():
+        with open(filename) as lic_f:
+            lines = lic_f.readlines()
+            lines[0] = re.sub(r"Copyright \d{4}-\d{4}", strict_copyright_date, lines[0])
+        with open(filename, "w") as lic_f:
+            lic_f.writelines(lines)
+
+    mit_lic = os.path.join(ramble.paths.ramble_root, "LICENSE-MIT")
+    with open(mit_lic) as mit_f:
+        content = mit_f.read()
+        content = re.sub(
+            r"Copyright \(c\) \d{4}-\d{4}", f"Copyright (c) {strict_date_range}", content
+        )
+    with open(mit_lic, "w") as mit_f:
+        mit_f.write(content)
+
+
 def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="license_command")
     sp.add_parser("list-files", help=list_files.__doc__, description=list_files.__doc__)
@@ -220,6 +245,12 @@ def setup_parser(subparser):
         help="verify only the modified files as outputted by `git ls-files --modified`",
     )
 
+    sp.add_parser(
+        "update-copyright-year",
+        help=update_copyright_year.__doc__,
+        description=update_copyright_year.__doc__,
+    )
+
 
 def license(parser, args):
     if not git:
@@ -230,5 +261,6 @@ def license(parser, args):
     commands = {
         "list-files": list_files,
         "verify": verify,
+        "update-copyright-year": update_copyright_year,
     }
     return commands[args.license_command](args)
