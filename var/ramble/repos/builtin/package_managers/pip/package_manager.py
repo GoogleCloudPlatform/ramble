@@ -197,6 +197,15 @@ class Pip(PackageManagerBase):
             }
         )
 
+    register_phase("warn_mirror_support", pipeline="mirror")
+
+    def _warn_mirror_support(self, workspace, app_inst=None):
+        del workspace, app_inst  # unused arguments
+        logger.warn(
+            f"Mirroring software using {self.name} is not currently supported. "
+            "If a software mirror is required, it needs to be set up outside of Ramble"
+        )
+
 
 package_name_regex = re.compile(
     r"\s*(?P<pkg_name>[A-Z0-9][A-Z0-9._-]*[A-Z0-9]|[A-Z0-9]).*", re.IGNORECASE
