@@ -45,7 +45,7 @@ class Pip(PackageManagerBase):
     register_builtin(
         "pip_deactivate",
         required=False,
-        depends_on=["package_manager_builtin::pip::pip_activate"],
+        depends_on=["pip_activate"],
     )
 
     def pip_deactivate(self):

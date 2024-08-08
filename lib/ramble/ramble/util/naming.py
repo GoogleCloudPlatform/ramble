@@ -24,7 +24,10 @@ __all__ = [
     "possible_ramble_module_names",
     "simplify_name",
     "NamespaceTrie",
+    "NS_SEPARATOR",
 ]
+
+NS_SEPARATOR = "::"
 
 # Valid module names can contain '-' but can't start with it.
 _valid_module_re = r"^\w[\w-]*$"

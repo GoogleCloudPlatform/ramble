@@ -263,7 +263,10 @@ def register_builtin(name, required=True, injection_method="prepend", depends_on
     `modifier_builtin::modifier_name::method_name`.
 
     Application modifiers are named:
-    `builtin::method_name`
+    `builtin::method_name`.
+
+    Package manager builtins are named:
+    `package_manager_builtin::package_manager_name::method_name`.
 
     As an example, if the following builtin was defined:
 
