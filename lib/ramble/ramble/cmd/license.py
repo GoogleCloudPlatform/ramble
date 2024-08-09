@@ -216,14 +216,24 @@ def update_copyright_year(args):
         with open(filename, "w") as lic_f:
             lic_f.writelines(lines)
 
-    mit_lic = os.path.join(ramble.paths.ramble_root, "LICENSE-MIT")
-    with open(mit_lic) as mit_f:
-        content = mit_f.read()
-        content = re.sub(
-            r"Copyright \(c\) \d{4}-\d{4}", f"Copyright (c) {strict_date_range}", content
-        )
-    with open(mit_lic, "w") as mit_f:
-        mit_f.write(content)
+    def replace_text(file, regex, new_text):
+        with open(file) as f:
+            content = f.read()
+            content = re.sub(regex, new_text, content)
+        with open(file, "w") as f:
+            f.write(content)
+
+    # Update also the mit license and sphinx config file
+    replace_text(
+        os.path.join(ramble.paths.ramble_root, "LICENSE-MIT"),
+        r"Copyright \(c\) \d{4}-\d{4}",
+        f"Copyright (c) {strict_date_range}",
+    )
+    replace_text(
+        os.path.join(ramble.paths.ramble_root, "lib", "ramble", "docs", "conf.py"),
+        r"\d{4}-\d{4}, Google LLC",
+        f"{strict_date_range}, Google LLC",
+    )
 
 
 def setup_parser(subparser):
