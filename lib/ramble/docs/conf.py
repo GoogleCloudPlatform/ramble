@@ -159,7 +159,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "Ramble"
-copyright = "2022-2023, Google LLC"
+copyright = "2022-2024, Google LLC"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
