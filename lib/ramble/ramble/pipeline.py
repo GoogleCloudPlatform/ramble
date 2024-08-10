@@ -246,11 +246,7 @@ class AnalyzePipeline(Pipeline):
                 if app_inst.get_status() != ramble.application.experiment_status.UNKNOWN.name:
                     found_valid_experiment = True
 
-        if (
-            not found_valid_experiment
-            and self._experiment_set.num_experiments()
-            and not self.workspace.dry_run
-        ):
+        if not found_valid_experiment and self._experiment_set.num_experiments():
             logger.die(
                 "No analyzeable experiment detected."
                 " Make sure your workspace is setup with\n"

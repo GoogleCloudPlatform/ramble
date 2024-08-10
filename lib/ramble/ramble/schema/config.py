@@ -141,7 +141,7 @@ properties["config"]["upload"] = {
     "type": "object",
     "properties": {
         "uri": {"type": "string", "default": ""},
-        "type": {"type": "string", "default": "BigQuery"},
+        "type": {"type": "string", "default": "BigQuery", "enum": ["BigQuery", "PrintOnly"]},
     },
 }
 
