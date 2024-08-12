@@ -24,6 +24,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.long
 def test_wrfv4_explicit_zips(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:

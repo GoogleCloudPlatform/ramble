@@ -27,6 +27,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.long
 def test_package_manager_requirements_zlib(mock_applications, mock_modifiers):
     test_config = """
 ramble:
