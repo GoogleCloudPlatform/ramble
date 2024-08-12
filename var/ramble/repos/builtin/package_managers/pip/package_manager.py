@@ -18,7 +18,7 @@ from ramble.error import RambleError
 from ramble.util.executable import which
 from ramble.util.hashing import hash_file, hash_string
 from ramble.util.logger import logger
-from ramble.util.sourcing import source_str
+from ramble.util.shell_utils import source_str
 
 from spack.util.executable import Executable
 import llnl.util.filesystem as fs
@@ -45,7 +45,7 @@ class Pip(PackageManagerBase):
     register_builtin(
         "pip_deactivate",
         required=False,
-        depends_on=["package_manager_builtin::pip::pip_activate"],
+        depends_on=["pip_activate"],
     )
 
     def pip_deactivate(self):
@@ -195,6 +195,15 @@ class Pip(PackageManagerBase):
                 ),
                 "digest": self.runner.inventory_hash(),
             }
+        )
+
+    register_phase("warn_mirror_support", pipeline="mirror")
+
+    def _warn_mirror_support(self, workspace, app_inst=None):
+        del workspace, app_inst  # unused arguments
+        logger.warn(
+            f"Mirroring software using {self.name} is not currently supported. "
+            "If a software mirror is required, it needs to be set up outside of Ramble"
         )
 
 

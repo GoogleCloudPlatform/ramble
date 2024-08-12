@@ -32,9 +32,9 @@ get information about these workloads:
 
 .. code-block:: console
 
-    $ ramble info gromacs
+    $ ramble info -a workloads -v -p "water*" gromacs
 
-Searching the output for the sections marked ``Workload: water_bare`` and
+Under the workloads marked by ``Workload: water_bare`` and
 ``Workload: water_gmx50``, you should see something like the following output:
 
 .. code-block:: console
@@ -42,6 +42,7 @@ Searching the output for the sections marked ``Workload: water_bare`` and
     Workload: water_gmx50
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_gmx50_bare']
+        Tags: []
         Variables:
             size:
                 Description: Workload size
@@ -57,6 +58,7 @@ Searching the output for the sections marked ``Workload: water_bare`` and
     Workload: water_bare
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
+        Tags: []
         Variables:
             size:
                 Description: Workload size
@@ -70,27 +72,43 @@ Searching the output for the sections marked ``Workload: water_bare`` and
                 Description: Input path for water bare hbonds
                 Default: {water_bare_hbonds}/{size}
 
-
-
 Here we see that both of these workloads have a ``type`` variable (with
 possible values of ``pme`` and ``rf``) and a ``size`` variable with a variety
 of available sizes.
 
-Towards the bottom of the output you should also see information about a valid
-software configuration:
+To determine a suggested software configuration, you can use:
 
 .. code-block:: console
 
-   Default Compilers:
-    gcc9:
-      pkg_spec = gcc@9.3.0
+  $ ramble info -a software_specs,compilers -v gromacs
 
-    Software Specs:
-      impi2021:
-        pkg_spec = intel-oneapi-mpi@2021.11.0
-      gromacs:
-        pkg_spec = gromacs@2020.5
-        compiler = gcc9
+With this command, you should see output similar to the following:
+
+.. code-block:: console
+
+  ##################
+  # software_specs #
+  ##################
+  impi2018:
+      pkg_spec: intel-mpi@2018.4.274
+      compiler_spec: None
+      compiler: None
+      package_manager: spack*
+  
+  gromacs:
+      pkg_spec: gromacs@2020.5
+      compiler_spec: None
+      compiler: gcc9
+      package_manager: spack*
+  
+  #############
+  # compilers #
+  #############
+  gcc9:
+      pkg_spec: gcc@9.3.0
+      compiler_spec: None
+      compiler: None
+      package_manager: spack*
 
 This output does not represent the only possible configuration that works for
 this application, it only presents a good starting point. When using Ramble,

@@ -503,7 +503,8 @@ def workspace_analyze_setup_parser(subparser):
         "--dry-run",
         dest="dry_run",
         action="store_true",
-        help="perform a dry run. Allows progress on workspaces which are not fully setup",
+        help="perform a dry run. Allows going through analysis phases"
+        + "on workspaces which are not fully setup",
     )
 
     subparser.add_argument(
@@ -936,8 +937,8 @@ def workspace_mirror_setup_parser(subparser):
         dest="dry_run",
         action="store_true",
         help="perform a dry run. Creates package environments, "
-        + "prints commands that would be executed "
-        + "for installation, and files that would be downloaded.",
+        + "prints package manager specific commands that would be executed "
+        + "for creating the mirror.",
     )
 
     arguments.add_common_arguments(

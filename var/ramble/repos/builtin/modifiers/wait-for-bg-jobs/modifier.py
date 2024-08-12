@@ -7,10 +7,8 @@
 # except according to those terms.
 
 from ramble.modkit import *
-import ramble.config
 from ramble.util.executable import CommandExecutable
-from ramble.util.shell_vars import last_pid_var
-import ramble.util.logger as logger
+from ramble.util.shell_utils import last_pid_var
 
 
 class WaitForBgJobs(BasicModifier):
@@ -28,6 +26,8 @@ class WaitForBgJobs(BasicModifier):
 
     default_mode("standard")
 
+    target_shells("bash")
+
     register_builtin("setup_pid_array")
 
     def setup_pid_array(self):
@@ -39,11 +39,6 @@ class WaitForBgJobs(BasicModifier):
         post_exec = []
 
         if executable.run_in_background:
-            shell = ramble.config.get("config:shell")
-            if shell != "bash":
-                logger.die(
-                    f"waif-for-bg-jobs does not support {shell}, it's currently bash-only"
-                )
             last_pid_str = last_pid_var(shell)
             post_exec.append(
                 CommandExecutable(

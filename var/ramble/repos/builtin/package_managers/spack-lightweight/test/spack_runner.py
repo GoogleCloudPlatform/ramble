@@ -344,6 +344,7 @@ packages:
                 sr.activate()
                 sr.add_include_file(packages_path)
                 sr.add_include_file(compilers_path)
+                sr.generate_env_file()
                 sr.install_compiler("gcc@12.1.0")
                 captured = capsys.readouterr()
 

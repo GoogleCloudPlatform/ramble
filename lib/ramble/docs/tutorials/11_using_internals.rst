@@ -130,16 +130,36 @@ experiments, execute:
 
 .. code-block:: console
 
-    $ ramble info wrfv4
+    $ ramble info -a workloads -v -p "CONUS_12km" wrfv4
 
-
-And examine the section under the ``Workload: CONUS_12km`` header. The
+This prints the information for the ``CONUS_12km`` workload in the wrfv4 application definition.
 ``Executables:`` definition lists the order of executables used for this
 workload. As an example, you might see the following:
 
 .. code-block:: console
 
-    Executables: ['builtin::env_vars', 'builtin::spack_source', 'builtin::spack_activate', 'cleanup', 'copy', 'fix_12km', 'execute']
+    Executables: ['cleanup', 'copy', 'fix_12km', 'execute']
+
+Some executables are provided through the ``builtin`` functionality. These are
+executable commands that are injected by default from the object definitions.
+To be able to see these, you can execute:
+
+.. code-block:: console
+
+    $ ramble info -a builtins -v wrfv4
+
+This command should print something like the following:
+
+.. code-block:: console
+
+  ############
+  # builtins #
+  ############
+  builtin::env_vars:
+      name: env_vars
+      required: True
+      injection_method: prepend
+      depends_on: []
 
 Now, edit the workspace configuration file with:
 

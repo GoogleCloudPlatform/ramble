@@ -136,6 +136,13 @@ Ramble would create an anonymous workspace for you in ``${PWD}/hello_world``
 for more information on named and anonymous workspaces, see
 :ref:`Ramble workspace documentation<ramble-workspaces>`.
 
+For convenience, the workspace creation and activation can also be combined
+in one command with the activate flag (``-a``):
+
+.. code-block:: console
+
+    $ ramble workspace create hello_world -a
+
 Configure the Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^
 

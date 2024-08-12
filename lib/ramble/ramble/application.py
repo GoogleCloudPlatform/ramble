@@ -48,7 +48,8 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 from ramble.util.logger import logger
-from ramble.util.sourcing import source_str
+from ramble.util.shell_utils import source_str
+from ramble.util.naming import NS_SEPARATOR
 
 from ramble.workspace import namespace
 
@@ -72,9 +73,26 @@ def _get_context_display_name(context):
     )
 
 
+def _check_shell_support(app_inst):
+    def _check_match(inst, shell_to_support):
+        pat = getattr(inst, "shell_support_pattern", None)
+        matched = pat is None or fnmatch.fnmatch(shell_to_support, pat)
+        if not matched:
+            logger.die(
+                f"{inst.name} does not support {shell_to_support} shell"
+                f", the supported shell pattern is '{pat}'"
+            )
+
+    shell = ramble.config.get("config:shell")
+    _check_match(app_inst, shell)
+    for mod_inst in app_inst._modifier_instances:
+        _check_match(mod_inst, shell)
+    _check_match(app_inst.package_manager, shell)
+
+
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
-    _builtin_name = "builtin::{name}"
+    _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
     _status_file_name = "ramble_status.json"
@@ -124,7 +142,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.modifiers = []
         self.experiment_tags = []
         self._modifier_instances = []
-        self._modifier_builtins = {}
         self._input_fetchers = None
         self.results = {}
         self._phase_times = {}
@@ -271,16 +288,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
 
     def _long_print(self):
-        out_str = []
-        out_str.append(rucolor.section_title("Application: ") + f"{self.name}\n")
-        out_str.append("\n")
-
-        out_str.append(rucolor.section_title("Description:\n"))
-        if self.__doc__:
-            out_str.append(f"\t{self.__doc__}\n")
-        else:
-            out_str.append("\tNone\n")
-
+        out_str = ""
         if hasattr(self, "maintainers"):
             out_str.append("\n")
             out_str.append(rucolor.section_title("Maintainers:\n"))
@@ -994,19 +1002,21 @@ class ApplicationBase(metaclass=ApplicationMeta):
             self._command_list.append(self.chain_commands[chained_exp])
 
         # ensure all log files are purged and set up
-        logs = set()
+        logs = []
 
         for exec_node in exec_graph.walk():
             if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
                 exec_cmd = exec_node.attribute
                 if exec_cmd.redirect:
                     expanded_log = self.expander.expand_var(exec_cmd.redirect)
-                    logs.add(expanded_log)
+                    logs.append(expanded_log)
 
         analysis_logs, _, _ = self._analysis_dicts(success_list)
 
         for log in analysis_logs:
-            logs.add(log)
+            logs.append(log)
+
+        logs = list(dict.fromkeys(logs))
 
         for log in logs:
             self._command_list.append('rm -f "%s"' % log)
@@ -1332,6 +1342,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         experiments file.
         """
 
+        _check_shell_support(self)
+
         experiment_run_dir = self.expander.experiment_run_dir
         fs.mkdirp(experiment_run_dir)
 
@@ -1562,7 +1574,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
 
         if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
-            logger.warn(f"Experiment has status is {self.get_status()}. Skipping analysis..\n")
+            logger.warn(f"Experiment has status {self.get_status()}. Skipping analysis..\n")
             return
 
         def format_context(context_match, context_format):
@@ -1659,9 +1671,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 if criteria_obj.passed(app_inst=self, fom_values=fom_values):
                     criteria_obj.mark_found()
 
-        exp_ns = self.expander.experiment_namespace
-        self.results = {"name": exp_ns}
-
         success = False
         for fom in fom_values.values():
             for value in fom.values():
@@ -1669,15 +1678,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        self.results["N_REPEATS"] = self.repeats.n_repeats
-        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
-
         if success:
             self.set_status(status=experiment_status.SUCCESS)
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        self.results["RAMBLE_STATUS"] = self.get_status()
+        self._prepare_results(workspace, self.expander.experiment_namespace, success)
 
         self.results["TAGS"] = list(self.experiment_tags)
 
@@ -1767,11 +1773,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if n == 1:
                 first_repeat_exp = repeat_exp_namespace
 
-        # Create initial results dict since analysis pipeline was skipped for base exp
-        self.results = {"name": base_exp_namespace}
-        self.results["N_REPEATS"] = self.repeats.n_repeats
-        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
-
         # If repeat_success_strict is true, one failed experiment will fail the whole set
         # If repeat_success_strict is false, any passing experiment will pass the whole set
         repeat_success = False
@@ -1802,23 +1803,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        self.results["RAMBLE_STATUS"] = self.get_status()
+        self._prepare_results(workspace, base_exp_namespace, repeat_success)
 
         logger.debug(
             f"Calculating statistics for {self.repeats.n_repeats} repeats of " f"{base_exp_name}"
         )
-
-        # Add defined keywords as top level keys
-        for key in self.keywords.keys:
-            if self.keywords.is_key_level(key):
-                self.results[key] = self.expander.expand_var_name(key)
-
-        self.results["RAMBLE_VARIABLES"] = {}
-        self.results["RAMBLE_RAW_VARIABLES"] = {}
-        for var, val in self.variables.items():
-            self.results["RAMBLE_RAW_VARIABLES"][var] = val
-            self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
-        self.results["CONTEXTS"] = []
 
         results = []
 
@@ -1891,6 +1880,26 @@ class ApplicationBase(metaclass=ApplicationMeta):
             self.results["CONTEXTS"] = results
 
         workspace.insert_result(self.results, first_repeat_exp)
+
+    def _prepare_results(self, workspace, exp_namespace, success):
+        self.results = {"name": exp_namespace}
+        self.results["N_REPEATS"] = self.repeats.n_repeats
+        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
+        self.results["RAMBLE_STATUS"] = self.get_status()
+
+        # Add defined keywords as top level keys
+        for key in self.keywords.keys:
+            if self.keywords.is_key_level(key):
+                self.results[key] = self.expander.expand_var_name(key)
+
+        self.results["RAMBLE_VARIABLES"] = {}
+        self.results["RAMBLE_RAW_VARIABLES"] = {}
+        for var, val in self.variables.items():
+            self.results["RAMBLE_RAW_VARIABLES"][var] = val
+            if var not in self.keywords.keys or not self.keywords.is_key_level(var):
+                self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
+
+        self.results["CONTEXTS"] = []
 
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""

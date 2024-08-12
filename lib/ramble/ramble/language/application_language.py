@@ -323,7 +323,7 @@ def register_phase(name, pipeline=None, run_before=[], run_after=[]):
         if name in app.phase_definitions[pipeline]:
             phase_node = app.phase_definitions[pipeline][name]
         else:
-            phase_node = ramble.util.graph.GraphNode(name)
+            phase_node = ramble.util.graph.GraphNode(name, attribute=pipeline)
 
         for before in run_before:
             phase_node.order_before(before)

@@ -16,19 +16,19 @@ from typing import List
 from llnl.util.tty.colify import colified
 
 from ramble.language.package_manager_language import PackageManagerMeta
-from ramble.language.shared_language import SharedMeta, register_builtin  # noqa: F401
+from ramble.language.shared_language import SharedMeta
 from ramble.error import RambleError
 import ramble.util.colors as rucolor
 import ramble.util.directives
 import ramble.util.class_attributes
+from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
 
 class PackageManagerBase(metaclass=PackageManagerMeta):
     name = None
-    _builtin_name = "package_manager_builtin::{obj_name}::{name}"
-    _pkgman_prefix_builtin = r"package_manager_builtin::"
+    _builtin_name = NS_SEPARATOR.join(("package_manager_builtin", "{obj_name}", "{name}"))
     _language_classes = [PackageManagerMeta, SharedMeta]
     _pipelines = [
         "analyze",

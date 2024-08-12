@@ -33,12 +33,13 @@ ramble:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
     partition: ['part1', 'part2']
+    partition_ref: partition
     processes_per_node: ['16', '36']
     n_ranks: '{processes_per_node}*{n_nodes}'
     n_threads: '1'
   zips:
     partitions:
-    - partition
+    - '{partition_ref}'
     - processes_per_node
   applications:
     wrfv4:
@@ -73,13 +74,17 @@ ramble:
                 - TEST_VAR
               variables:
                 n_nodes: ['1', '2', '4', '8', '16']
+                n_nodes_ref: n_nodes
+                matrix_var: [1]
+                matrix_var_ref: matrix_var
               zips:
                 nodes:
-                - n_nodes
+                - '{n_nodes_ref}'
               matrix:
               - nodes
               - environments
               - partitions
+              - '{matrix_var_ref}'
   software:
     packages:
       gcc:

@@ -12,6 +12,8 @@ import ramble.error
 
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
+import ramble.util.colors
+
 import spack.util.executable
 from spack.util.path import system_path_filter
 
@@ -120,15 +122,16 @@ class CommandExecutable:
 
     def __str__(self):
         """String representation of CommandExecutable instance"""
-        self_str = (
-            f"exec: {self.name}:\n"
-            + f"    template: {str(self.template)}\n"
-            + f"    mpi: {self.mpi}\n"
-            + f"    variables: {self.variables}\n"
-            + f"    redirect: {self.redirect}\n"
-            + f"    output_capture: {self.output_capture}\n"
-            + f"    run_in_background: {self.run_in_background}\n"
-        )
+
+        color_name = ramble.util.colors.section_title(self.name)
+        attrs = ["mpi", "variables", "redirect", "output_capture", "run_in_background"]
+        self_str = f"{color_name}:\n"
+        self_str += f"    {ramble.util.colors.nested_1('template')}:\n"
+        for temp in self.template:
+            self_str += f"    - {temp}:\n"
+        for attr in attrs:
+            color_attr = ramble.util.colors.nested_1(attr)
+            self_str += f"    {color_attr}: {getattr(self, attr)}\n"
 
         return self_str
 

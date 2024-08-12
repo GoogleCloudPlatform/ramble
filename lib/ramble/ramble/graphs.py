@@ -6,11 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from collections import defaultdict
 import enum
+import itertools
 import graphlib
 
 import ramble.error
 import ramble.util.graph
+from ramble.util.naming import NS_SEPARATOR
 
 from ramble.util.logger import logger
 
@@ -259,6 +262,8 @@ class ExecutableGraph(AttributeGraph):
         """
         super().__init__(obj_inst)
         self._builtin_dependencies = {}
+        # Mapping from shorter_name -> fully qualified names
+        self._builtin_aliases = defaultdict(list)
 
         # Define nodes for executable
         for exec_name, cmd_exec in executables.items():
@@ -276,6 +281,7 @@ class ExecutableGraph(AttributeGraph):
                     builtin, attribute=blt_func, obj_inst=builtin_obj
                 )
                 self.node_definitions[builtin] = exec_node
+                self._build_builtin_aliases(builtin)
 
         dep_exec = None
         for exec_name in exec_order:
@@ -320,7 +326,7 @@ class ExecutableGraph(AttributeGraph):
                     if blt_conf["depends_on"]:
                         deps = []
                         for dep in blt_conf["depends_on"]:
-                            dep_node = self.node_definitions[dep]
+                            dep_node = self._resolve_builtin_node(dep)
                             super().update_graph(dep_node)
                             deps.append(dep_node)
 
@@ -417,6 +423,23 @@ class ExecutableGraph(AttributeGraph):
                 dep_nodes.append(dep_node)
             super().update_graph(exec_node, dep_nodes)
 
+    def _build_builtin_aliases(self, full_builtin_name):
+        ns_list_r = full_builtin_name.split(NS_SEPARATOR)[::-1][:-1]
+        for alias in itertools.accumulate(ns_list_r, lambda accu, ns: f"{ns}{NS_SEPARATOR}{accu}"):
+            self._builtin_aliases[alias].append(full_builtin_name)
+
+    def _resolve_builtin_node(self, builtin_name):
+        if builtin_name in self.node_definitions:
+            return self.node_definitions[builtin_name]
+        full_names = self._builtin_aliases.get(builtin_name, None)
+        if full_names is None:
+            raise GraphNodeNotFoundError(f"builtin {builtin_name} does not exist")
+        if len(full_names) > 1:
+            raise GraphNodeAmbiguousError(
+                f"builtin {builtin_name} matches more than one node ({full_names})"
+            )
+        return self.node_definitions[full_names[0]]
+
 
 class GraphError(ramble.error.RambleError):
     """
@@ -427,4 +450,16 @@ class GraphError(ramble.error.RambleError):
 class GraphCycleError(GraphError):
     """
     Exception raised when a cycle is detected in a graph
+    """
+
+
+class GraphNodeAmbiguousError(GraphError):
+    """
+    Exception raised when the given name can be resolved to non-unique nodes
+    """
+
+
+class GraphNodeNotFoundError(GraphError):
+    """
+    Exception raised when the given name cannot be resolved to a node
     """
