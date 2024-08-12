@@ -330,8 +330,7 @@ class SpackLightweight(PackageManagerBase):
     def _push_to_spack_cache(self, workspace, app_inst=None):
 
         # Test if experiment requires an environment
-        if not self.environment_required():
-            return
+        env_required = self.environment_required()
 
         env_path = self.app_inst.expander.env_path
         cache_tupl = ("push-to-cache", env_path)
@@ -343,7 +342,7 @@ class SpackLightweight(PackageManagerBase):
 
         try:
             self.runner.set_dry_run(workspace.dry_run)
-            self.runner.set_env(env_path)
+            self.runner.set_env(env_path, require_exists=env_required)
             self.runner.activate()
 
             self.runner.push_to_spack_cache(workspace.spack_cache_path)
