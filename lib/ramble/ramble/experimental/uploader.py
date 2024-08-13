@@ -136,17 +136,17 @@ def upload_results(results):
 
     uri = ramble.config.get("config:upload:uri")
     if not uri:
-        logger.die("No upload URI (config:upload:uri) in config.")
+        raise ConfigError("No upload URI (config:upload:uri) in config.")
 
     try:
         formatted_data = format_data(results)
-    except KeyError:
-        logger.die("Error parsing file: Does not contain valid data to upload.")
+    except (KeyError, TypeError) as e:
+        raise ConfigError("Error parsing file: Does not contain valid data to upload.") from e
     if len(formatted_data) == 0:
         logger.warn("No data to upload")
         return
 
-    logger.msg(f"Uploading Results to {uri} with {uploader_type} uploader")
+    logger.msg(f"Uploading results to {uri} with {uploader_type} uploader")
     if uploader_type == uploader_types.BigQuery:
         uploader = BigQueryUploader()
     else:
