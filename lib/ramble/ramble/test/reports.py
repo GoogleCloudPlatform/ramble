@@ -39,8 +39,9 @@ results = {
             "RAMBLE_STATUS": "SUCCESS",
             "name": "exp_1",
             "n_nodes": 1,
-            "application_namespace": "test_namespace",
-            "workload_name": "test_workload",
+            #"application_namespace": "test_app",
+            #"workload_name": "test_workload",
+            "simplified_workload_namespace": "test_app_test_workload",
             "RAMBLE_VARIABLES": {},
             "RAMBLE_RAW_VARIABLES": {},
             "CONTEXTS": [
@@ -58,7 +59,7 @@ results = {
                         },
                         {
                             "name": "fom_2",
-                            "value": 35,
+                            "value": 50,
                             "units": "",
                             "origin": "dummy_app",
                             "origin_type": "application",
@@ -71,8 +72,9 @@ results = {
             "RAMBLE_STATUS": "SUCCESS",
             "name": "exp_2",
             "n_nodes": 2,
-            "application_namespace": "test_namespace",
-            "workload_name": "test_workload",
+            #"application_namespace": "test_namespace",
+            #"workload_name": "test_workload",
+            "simplified_workload_namespace": "test_app_test_workload",
             "RAMBLE_VARIABLES": {},
             "RAMBLE_RAW_VARIABLES": {},
             "CONTEXTS": [
@@ -104,13 +106,29 @@ results = {
 }
 
 def test_strong_scaling(mutable_mock_workspace_path, tmpdir_factory):
+
     report_name = 'unit_test'
-    #report_dir_root = ramble.reports.get_reports_path()
     report_dir_path = tmpdir_factory.mktemp(report_name)
     pdf_path = os.path.join(report_dir_path, f'{report_name}.pdf')
+
     test_spec = [['fom_1', 'n_nodes']]
     normalize = True
+
     with PdfPages(pdf_path) as pdf_report:
         plot = StrongScalingPlot(test_spec, normalize, report_dir_path, pdf_report)
+        results_df = prepare_data(results)
+        plot.generate_plot(results_df)
+
+def test_weak_scaling(mutable_mock_workspace_path, tmpdir_factory):
+
+    report_name = 'unit_test'
+    report_dir_path = tmpdir_factory.mktemp(report_name)
+    pdf_path = os.path.join(report_dir_path, f'{report_name}.pdf')
+
+    test_spec = [['fom_2', 'n_nodes']]
+    normalize = True
+
+    with PdfPages(pdf_path) as pdf_report:
+        plot = WeakScalingPlot(test_spec, normalize, report_dir_path, pdf_report)
         results_df = prepare_data(results)
         plot.generate_plot(results_df)

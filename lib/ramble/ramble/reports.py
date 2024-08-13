@@ -76,6 +76,14 @@ def load_results(args):
     return results_dict
 
 
+def is_repeat_child(experiment):
+    # TODO: find a more robust way to do this
+    ends_in_number = re.search(r'\.\d+$', experiment['name'])
+    if ends_in_number:
+        return True
+    else:
+        return False
+
 def prepare_data(results: dict) -> pd.DataFrame:
     """Creates a Pandas DataFrame from the results dictionary to use for reports.
 
@@ -119,16 +127,32 @@ def prepare_data(results: dict) -> pd.DataFrame:
         3   exp_2      fom_2           73        2
     """
 
+    # TODO: is this sufficient?
+    panda = pd.json_normalize(results['experiments'])
+    print(panda.columns)
+    #print(panda['CONTEXTS']) # would need to flatten contexts too
+    # Then remove things we don't need, like failures and repeats
+
     unnest_context = []
     skip_exps = []
     # first unnest dictionaries
     for exp in results['experiments']:
-        if exp['RAMBLE_STATUS'] != 'SUCCESS' or exp['name'] in skip_exps:
+        # TODO: this does not work as expected for repeats since success is not clear
+        # TODO: how to handle success? Repeats make this tricky because some children migth have statu=success but parent might have status=failed
+        #if exp['RAMBLE_STATUS'] != 'SUCCESS' or exp['name'] in skip_exps:
+
+        # TODO: disable skip_exps in favor of a more explicit is_child or is_parent check
+        if exp['name'] in skip_exps or is_repeat_child(exp):
             logger.debug(f"Skipping import of experiment {exp['name']}")
             continue
+        # TODO: is this wise?
+        elif exp['RAMBLE_STATUS'] != 'SUCCESS':
+            continue
         else:
+            logger.debug(f"Importing experiment {exp['name']}")
             # For repeat experiments, use summary stats from base exp and skip repeats
             # Repeats are sequenced after base exp
+
             if exp.get('N_REPEATS', 0) > 0:
                 # Generate repeat experiment names in order to skip them explicitly
                 exp_name = exp['name']
@@ -154,16 +178,16 @@ def prepare_data(results: dict) -> pd.DataFrame:
                     exp_copy['fom_units'] = fom['units']
                     exp_copy['fom_origin'] = fom['origin']
                     exp_copy['fom_origin_type'] = fom['origin_type']
-                    print(fom)
+
                     if 'fom_type' in fom.keys():
                         exp_copy['better_direction'] = fom['fom_type']['better_direction']
                     else:  # if using older data file without fom_type
                         exp_copy['better_direction'] = 'INDETERMINATE'
 
                     # Flatten final vars dict and drop raw vars dict
-                    for key in ["RAMBLE_VARIABLES", "RAMBLE_RAW_VARIABLES"]:
-                        if key in exp_copy:
-                            exp_copy.pop(key)
+                    ##for key in ["RAMBLE_VARIABLES", "RAMBLE_RAW_VARIABLES"]:
+                        #if key in exp_copy:
+                            #exp_copy.pop(key)
 
                     # Exclude vars that aren't needed for analysis, mainly paths and commands
                     dir_regex = r"_dir$"
@@ -182,6 +206,15 @@ def prepare_data(results: dict) -> pd.DataFrame:
                         if re.search(path_regex, key):
                             continue
                         exp_copy[key] = value
+
+                    for key, value in exp['RAMBLE_RAW_VARIABLES'].items():
+                        if key in vars_to_ignore:
+                            continue
+                        if re.search(dir_regex, key):
+                            continue
+                        if re.search(path_regex, key):
+                            continue
+                        exp_copy['RAW' + key] = value
 
                     unnest_context.append(exp_copy)
 
@@ -227,6 +260,8 @@ class PlotGenerator:
         self.report_dir_path = report_dir_path
         self.pdf_report = pdf_report
 
+        self.results_df = pd.DataFrame()
+
     def normalize_data(self, data, speedup=False):
         # Performs inplace edit on data, no need to return
         if speedup:
@@ -237,6 +272,9 @@ class PlotGenerator:
     def generate_plot(self, results_df):
         for chart_spec in self.spec:
             self.validate_spec(results_df, chart_spec)
+
+    def draw(self, results_df):
+        pass
 
     def validate_spec(self, results_df, chart_spec):
         """Validates that the FOMs and variables in the chart spec are in the results data."""
@@ -302,12 +340,20 @@ class WeakScalingPlot(ScalingPlotGenerator):
             # FOMs are by row, so select only rows with the perf_measure FOM
             raw_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
 
+            print(raw_results.columns)
+            raw_results.loc[:, 'exp_group'] = raw_results.loc[:, 'RAWexperiment_template_name']
+            #raw_results.loc[:, 'series'] = raw_results.loc[:, 'RAWexperiment_template_name']
             raw_results.loc[:, 'series'] = raw_results.loc[:, 'simplified_workload_namespace']
+
             if additional_vars:
-                for var in additional_vars:
-                    raw_results.loc[:, 'series'] = raw_results.loc[:, 'series'] + '_x_' + var
+                #for var in additional_vars:
+                    #raw_results.loc[:, 'series'] = raw_results.loc[:, 'series'] + '_x_' + var
+                print(raw_results)
+                raw_results = raw_results.groupby(additional_vars + ['series']).size()
+                print(raw_results)
 
             for series in raw_results.loc[:, 'series'].unique():
+                print(series)
                 series_results = raw_results.query(f'series == "{series}"')
                 selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
                 selected['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
@@ -338,7 +384,7 @@ class WeakScalingPlot(ScalingPlotGenerator):
                 ax.set_xlabel(scale_var)
                 plt.legend(loc="upper left")
 
-                # TODO: add a way to enable log axix
+                # TODO: add a way to enable log axis
                 # ax.set_xscale('log')
 
                 #ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
@@ -351,10 +397,10 @@ class WeakScalingPlot(ScalingPlotGenerator):
 
 class StrongScalingPlot(ScalingPlotGenerator):
     # TODO: I'm not super sure why david wanted this, but it will be missing some data as-iis
-    def show_table(self, ax, scale_pivot):
+    def show_table(self, ax, series_results):
         ax.axis('tight')
         ax.axis('off')
-        ax.table(cellText=scale_pivot.values, colLabels=scale_pivot.columns, loc='center')
+        ax.table(cellText=series_results.values, colLabels=series_results.columns, loc='center')
 
     def default_better(self):
         if self.normalize:
@@ -363,7 +409,7 @@ class StrongScalingPlot(ScalingPlotGenerator):
             return BetterDirection.LOWER
 
     def add_ideal_line(self, raw_results, selected_data, better_direction=BetterDirection.INDETERMINATE):
-        # TODO: we need to set the better direction to be the oposite when normalized
+        # TODO: we need to set the better direction to be the opposite when normalized
         if better_direction is BetterDirection.INDETERMINATE:
             better_direction = self.default_better()
 
@@ -383,8 +429,9 @@ class StrongScalingPlot(ScalingPlotGenerator):
             if len(perf_measure_results.loc[:, 'better_direction'].unique()) == 1:
                 better_direction = perf_measure_results.loc[:, 'better_direction'].unique()[0]
 
-            # TODO: Take magic strings like 'application_namespace' from an ENUM
-            perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'application_namespace'] + '_' + perf_measure_results.loc[:, 'workload_name']
+            # TODO: Take magic strings like 'simplified_workload_name' from an ENUM
+            # TODO: We can probably use something like derived than 'simplified_workload_name'
+            perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'simplified_workload_namespace']
 
             # Break data down into series using app, workload, and vars input by user
             if additional_vars:
@@ -406,8 +453,8 @@ class StrongScalingPlot(ScalingPlotGenerator):
                 selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
 
                 # TODO: what is driving the need for a pivot here?
-                # TODO: can we seperate out the data generation from the plotting?
-                scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
+                # TODO: can we separate out the data generation from the plotting?
+                #scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
 
                 # TODO: add way to enable (or remove)
                 need_table = False
@@ -418,45 +465,35 @@ class StrongScalingPlot(ScalingPlotGenerator):
                 else:
                     fig, ax = plt.subplots()
 
-                # TODO: We interpret this as requesting speedup, which isn't striclty true
+                # TODO: We interpret this as requesting speedup, which isn't strictly true
                 # We need a more clear semantic for this
                 if self.normalize:
-                    self.normalize_data(scale_pivot, speedup=True)
+                    self.normalize_data(series_results, speedup=True)
 
-                    scale_pivot = self.add_ideal_line(perf_measure_results, scale_pivot)
+                    series_results = self.add_ideal_line(perf_measure_results, series_results)
 
-                    ax.plot(scale_pivot.index, 'normalized_fom_value', data=scale_pivot, marker='o')
+                    ax.plot(series_results.index, 'normalized_fom_value', data=series_results, marker='o')
                     ax.set_ylabel('Speedup')
                 else:
-                    scale_pivot = self.add_ideal_line(perf_measure_results, scale_pivot)
-                    ax.plot(scale_pivot.index, 'fom_value', data=scale_pivot, marker='o')
+                    series_results = self.add_ideal_line(perf_measure_results, series_results)
+                    ax.plot(series_results.index, 'fom_value', data=series_results, marker='o')
 
                     # TODO: move out so it works for normalized too
                     if not series_min.empty:
-                        #series_min.loc[:, 'fom_value'] = to_numeric_if_possible(series_min['fom_value'])
-                        #series_max.loc[:, 'fom_value'] = to_numeric_if_possible(series_max['fom_value'])
-
                         # I re-index to scale_var/n_nodes for the main data so we need it here too
                         series_min = series_min.set_index(scale_var)
                         series_max = series_max.set_index(scale_var)
 
-
                         logger.debug('Adding fill lines for min and max')
-                        print('Min')
-                        print(series_min['fom_value'])
-                        print('Max')
-                        print(series_max['fom_value'])
-                        print('Actual')
-                        print(scale_pivot['fom_value'])
 
-                        scale_pivot['fom_value_min'] = series_min['fom_value']
-                        scale_pivot['fom_value_max'] = series_max['fom_value']
+                        series_results['fom_value_min'] = series_min['fom_value']
+                        series_results['fom_value_max'] = series_max['fom_value']
 
                         ax.fill_between(
-                                scale_pivot.index,
+                                series_results.index,
                                 'fom_value_min',
                                 'fom_value_max',
-                                data=scale_pivot,
+                                data=series_results,
                                 alpha=0.2)
 
                     ymin, ymax = ax.get_ylim()
@@ -464,19 +501,19 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
                     ax.set_ylabel(f'{perf_measure}')
 
-                ax.plot(scale_pivot.index, 'ideal_perf_value', data=scale_pivot)
+                ax.plot(series_results.index, 'ideal_perf_value', data=series_results)
 
                 plt.legend(loc="upper left")
                 ax.set_xlabel(f'{scale_var}')
 
                 # ax.set_xscale('log')
-                ax.set_xticks(scale_pivot.index.unique().tolist())
+                ax.set_xticks(series_results.index.unique().tolist())
                 ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
                 #plt.tight_layout()
 
                 if need_table:
                     table_ax = axs[1]
-                    self.show_table(table_ax, scale_pivot)
+                    self.show_table(table_ax, series_results)
 
                 chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
                 self.write(fig, chart_filename)
