@@ -225,25 +225,25 @@ def prepare_data(results: dict) -> pd.DataFrame:
 
 
 class PlotFactory:
-    def create_plot_generators(self, args, report_dir_path, pdf_report):
+    def create_plot_generators(self, args, report_dir_path, pdf_report, results_df):
         plots = []
         normalize = args.normalize
 
         if args.strong_scaling:
             spec = args.strong_scaling
-            plots.append( StrongScalingPlot(spec, normalize, report_dir_path, pdf_report) )
+            plots.append( StrongScalingPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
 
         if args.weak_scaling:
             spec = args.weak_scaling
-            plots.append( WeakScalingPlot(spec, normalize, report_dir_path, pdf_report) )
+            plots.append( WeakScalingPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
 
         if args.compare:
             spec = args.compare
-            plots.append( ComparisonPlot(spec, normalize, report_dir_path, pdf_report) )
+            plots.append( ComparisonPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
 
         if args.foms:
             spec = args.foms
-            plots.append( FomPlot(spec, normalize, report_dir_path, pdf_report) )
+            plots.append( FomPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
 
         if not plots:
             # TODO: should this be checked in cmd?
@@ -254,13 +254,17 @@ class PlotFactory:
 
 
 class PlotGenerator:
-    def __init__(self, spec, normalize, report_dir_path, pdf_report):
+    def __init__(self, spec, normalize, report_dir_path, pdf_report, results_df):
         self.normalize = normalize
         self.spec = spec
         self.report_dir_path = report_dir_path
         self.pdf_report = pdf_report
 
-        self.results_df = pd.DataFrame()
+        self.results_df = results_df
+        self.output_df = pd.DataFrame()
+
+        # TODO: enable
+        self.have_statistics = False
 
     def normalize_data(self, data, speedup=False):
         # Performs inplace edit on data, no need to return
@@ -269,17 +273,17 @@ class PlotGenerator:
         else:
             data.loc[:, 'normalized_fom_value'] = data.loc[:, 'fom_value'] / data['fom_value'].iloc[0]
 
-    def generate_plot(self, results_df):
+    def generate_plot_data(self):
         for chart_spec in self.spec:
-            self.validate_spec(results_df, chart_spec)
+            self.validate_spec(chart_spec)
 
-    def draw(self, results_df):
-        pass
+    #def draw(self, perf_measure, scale_var, series):
+        #pass
 
-    def validate_spec(self, results_df, chart_spec):
+    def validate_spec(self, chart_spec):
         """Validates that the FOMs and variables in the chart spec are in the results data."""
         for var in chart_spec:
-            if var not in results_df.columns and var not in results_df.loc[:, 'fom_name'].values:
+            if var not in self.results_df.columns and var not in self.results_df.loc[:, 'fom_name'].values:
                 logger.die(f'{var} was not found in the results data.')
 
     def write(self, fig, filename):
@@ -290,25 +294,31 @@ class PlotGenerator:
 
 
 class ScalingPlotGenerator(PlotGenerator):
-    def add_ideal_line(self, raw_results, selected_data, better_direction):
+    def add_idealized_data(self, raw_results, selected_data, better_direction):
 
         if self.normalize:
             first_perf_value = selected_data['normalized_fom_value'].iloc[0]
         else:
             first_perf_value = selected_data['fom_value'].iloc[0]
 
+        print(first_perf_value)
         selected_data.loc[:, 'ideal_perf_value'] = first_perf_value
+        print("Post op")
+        print(selected_data)
 
         if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
             selected_data['ideal_perf_value'] = selected_data.loc[:, 'ideal_perf_value'] / (selected_data.index)
         elif better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
             selected_data['ideal_perf_value'] = selected_data.loc[:, 'ideal_perf_value'] * (selected_data.index)
+        print("index")
+        print(selected_data.index)
 
+        print("Out")
         print(selected_data)
         return selected_data
 
-    def generate_plot(self, results_df):
-        super().generate_plot(results_df)
+    def generate_plot_data(self):
+        super().generate_plot_data()
 
         # TODO: this could be in init?
         for chart_spec in self.spec:
@@ -322,38 +332,63 @@ class WeakScalingPlot(ScalingPlotGenerator):
         # TODO: By default we expect this to be flat...
         return BetterDirection.LOWER
 
-    def add_ideal_line(self, raw_results, selected_data, better_direction = BetterDirection.INDETERMINATE):
+    # TODO: these args come from the spec, so don't need to be passed and could be stored at init
+    def draw(self, perf_measure, scale_var, series):
+        fig, ax = plt.subplots()
+
+        col_to_plot = 'fom_value'
+        if self.normalize:
+            ax.set_ylabel('Efficiency')
+            col_to_plot = 'normalized_fom_value'
+        else:
+            ax.set_ylabel(f'{perf_measure}')
+
+        ax.plot('ideal_perf_value', data=self.output_df)
+        ax.plot(col_to_plot, data=self.output_df, marker='o')
+
+        ax.set_xlabel(scale_var)
+        plt.legend(loc="upper left")
+
+        # TODO: add a way to enable log axis
+        # ax.set_xscale('log')
+
+        #ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
+        ax.set_xticks(self.output_df.index.unique().tolist())
+        ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
+
+        chart_filename = f'weak-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
+        self.write(fig, chart_filename)
+
+
+    def add_idealized_data(self, raw_results, selected_data, better_direction = BetterDirection.INDETERMINATE):
         if better_direction is BetterDirection.INDETERMINATE:
             better_direction = self.default_better()
 
-        selected_data = super().add_ideal_line(raw_results, selected_data, better_direction)
+        selected_data = super().add_idealized_data(raw_results, selected_data, better_direction)
 
         selected_data.loc[:, 'ideal_perf_value'] = selected_data['ideal_perf_value'].iloc[0]
         return selected_data
 
-    def generate_plot(self, results_df):
-        super().generate_plot(results_df)
+    def generate_plot_data(self):
+        super().generate_plot_data()
 
         for chart_spec in self.spec:
             perf_measure, scale_var, *additional_vars = chart_spec
 
             # FOMs are by row, so select only rows with the perf_measure FOM
-            raw_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
+            raw_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
 
-            print(raw_results.columns)
             raw_results.loc[:, 'exp_group'] = raw_results.loc[:, 'RAWexperiment_template_name']
-            #raw_results.loc[:, 'series'] = raw_results.loc[:, 'RAWexperiment_template_name']
             raw_results.loc[:, 'series'] = raw_results.loc[:, 'simplified_workload_namespace']
 
+            # TODO: check this does what we want and generates unique results
             if additional_vars:
                 #for var in additional_vars:
                     #raw_results.loc[:, 'series'] = raw_results.loc[:, 'series'] + '_x_' + var
-                print(raw_results)
+
                 raw_results = raw_results.groupby(additional_vars + ['series']).size()
-                print(raw_results)
 
             for series in raw_results.loc[:, 'series'].unique():
-                print(series)
                 series_results = raw_results.query(f'series == "{series}"')
                 selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
                 selected['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
@@ -361,68 +396,94 @@ class WeakScalingPlot(ScalingPlotGenerator):
 
                 selected = selected.set_index(scale_var)
 
-                fig, ax = plt.subplots()
-
-                col_to_plot = 'fom_value'
-
                 if self.normalize:
                     self.normalize_data(selected)
-                    ax.set_ylabel('Efficiency')
-                    col_to_plot = 'normalized_fom_value'
-                else:
-                    first_perf_value = selected['fom_value'].iloc[0]
-                    ax.set_ylabel(f'{perf_measure}')
 
                 # TODO: this might go the wrong way post abstraction, but ideal scaling on weak is confusing.. since it should be flat (and can easily be fixed in the class hierarchy
-                selected = self.add_ideal_line(series_results, selected)
+                selected = self.add_idealized_data(series_results, selected)
+                self.output_df = selected
 
-                ax.plot('ideal_perf_value', data=selected)
-                ax.plot(col_to_plot, data=selected, marker='o')
-                #ax.plot(f'{scale_var}', 'ideal_perf_value', data=selected)
-                #ax.plot(f'{scale_var}', col_to_plot, data=selected, marker='o')
+                self.draw(perf_measure, scale_var, series)
 
-                ax.set_xlabel(scale_var)
-                plt.legend(loc="upper left")
-
-                # TODO: add a way to enable log axis
-                # ax.set_xscale('log')
-
-                #ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
-                ax.set_xticks(selected.index.unique().tolist())
-                ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
-
-                chart_filename = f'weak-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
-                self.write(fig, chart_filename)
 
 
 class StrongScalingPlot(ScalingPlotGenerator):
     # TODO: I'm not super sure why david wanted this, but it will be missing some data as-iis
-    def show_table(self, ax, series_results):
+    def show_table(self, ax):
         ax.axis('tight')
         ax.axis('off')
-        ax.table(cellText=series_results.values, colLabels=series_results.columns, loc='center')
+        ax.table(cellText=self.output_df.values, colLabels=self.output_df.columns, loc='center')
+
+    def draw(self, perf_measure, scale_var, series):
+        # TODO: add way to enable (or remove)
+        need_table = False
+
+        if need_table:
+            fig, axs = plt.subplots(2,1)
+            ax = axs[0]
+        else:
+            fig, ax = plt.subplots()
+
+        if self.normalize:
+            ax.plot(self.output_df.index, 'normalized_fom_value', data=self.output_df, marker='o')
+            ax.set_ylabel('Speedup')
+        else:
+            ax.plot(self.output_df.index, 'fom_value', data=self.output_df, marker='o')
+            ymin, ymax = ax.get_ylim()
+            plt.ylim(0, ymax*1.1)
+
+            ax.set_ylabel(f'{perf_measure}')
+
+        if self.have_statistics:
+            ax.fill_between(
+                    self.output_df.index,
+                    'fom_value_min',
+                    'fom_value_max',
+                    data=self.output_df,
+                    alpha=0.2)
+
+        ax.plot(self.output_df.index, 'ideal_perf_value', data=self.output_df)
+
+        plt.legend(loc="upper left")
+        ax.set_xlabel(f'{scale_var}')
+
+        # ax.set_xscale('log')
+        ax.set_xticks(self.output_df.index.unique().tolist())
+        ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
+        #plt.tight_layout()
+
+        if need_table:
+            table_ax = axs[1]
+            self.show_table(table_ax, self.output_df)
+
+        chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
+        self.write(fig, chart_filename)
+
+
+
 
     def default_better(self):
+
         if self.normalize:
             return BetterDirection.HIGHER
         else:
             return BetterDirection.LOWER
 
-    def add_ideal_line(self, raw_results, selected_data, better_direction=BetterDirection.INDETERMINATE):
+    def add_idealized_data(self, raw_results, selected_data, better_direction=BetterDirection.INDETERMINATE):
         # TODO: we need to set the better direction to be the opposite when normalized
         if better_direction is BetterDirection.INDETERMINATE:
             better_direction = self.default_better()
 
-        return super().add_ideal_line(raw_results, selected_data, better_direction)
+        return super().add_idealized_data(raw_results, selected_data, better_direction)
 
-    def generate_plot(self, results_df):
-        super().generate_plot(results_df)
+    def generate_plot_data(self):
+        super().generate_plot_data()
         for chart_spec in self.spec:
 
             perf_measure, scale_var, *additional_vars = chart_spec
 
             # FOMs are by row, so select only rows with the perf_measure FOM
-            perf_measure_results = results_df.query(f'fom_name == "{perf_measure}"').copy()
+            perf_measure_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
 
             # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
             better_direction = BetterDirection.INDETERMINATE
@@ -450,34 +511,24 @@ class StrongScalingPlot(ScalingPlotGenerator):
                 series_min = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::min"')
                 series_max = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::max"')
 
-                selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
+                # TODO: I can probably centralize setting index
+                #series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+                series_results = series_results.set_index(scale_var)
 
                 # TODO: what is driving the need for a pivot here?
                 # TODO: can we separate out the data generation from the plotting?
                 #scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
 
-                # TODO: add way to enable (or remove)
-                need_table = False
-
-                if need_table:
-                    fig, axs = plt.subplots(2,1)
-                    ax = axs[0]
-                else:
-                    fig, ax = plt.subplots()
 
                 # TODO: We interpret this as requesting speedup, which isn't strictly true
                 # We need a more clear semantic for this
                 if self.normalize:
+                    #print(series_results)
                     self.normalize_data(series_results, speedup=True)
-
-                    series_results = self.add_ideal_line(perf_measure_results, series_results)
-
-                    ax.plot(series_results.index, 'normalized_fom_value', data=series_results, marker='o')
-                    ax.set_ylabel('Speedup')
+                    #print(series_results)
+                    series_results = self.add_idealized_data(perf_measure_results, series_results)
                 else:
-                    series_results = self.add_ideal_line(perf_measure_results, series_results)
-                    ax.plot(series_results.index, 'fom_value', data=series_results, marker='o')
-
+                    series_results = self.add_idealized_data(perf_measure_results, series_results)
                     # TODO: move out so it works for normalized too
                     if not series_min.empty:
                         # I re-index to scale_var/n_nodes for the main data so we need it here too
@@ -486,42 +537,25 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
                         logger.debug('Adding fill lines for min and max')
 
-                        series_results['fom_value_min'] = series_min['fom_value']
-                        series_results['fom_value_max'] = series_max['fom_value']
+                        #self.have_statistics = True
 
-                        ax.fill_between(
-                                series_results.index,
-                                'fom_value_min',
-                                'fom_value_max',
-                                data=series_results,
-                                alpha=0.2)
+                        # TODO: fix copy semantics
+                        # "A value is trying to be set on a copy of a slice from a DataFrame."
+                        # there might be some accidentally copy semantics with series_results
+                        #series_results['fom_value_min'] = series_min['fom_value']
+                        #series_results['fom_value_max'] = series_max['fom_value']
+                        series_results.loc[:, 'fom_value_min'] = series_min['fom_value']
+                        series_results.loc[:, 'fom_value_max'] = series_max['fom_value']
 
-                    ymin, ymax = ax.get_ylim()
-                    plt.ylim(0, ymax*1.1)
+                self.output_df = series_results
+                self.draw(perf_measure, scale_var, series)
 
-                    ax.set_ylabel(f'{perf_measure}')
 
-                ax.plot(series_results.index, 'ideal_perf_value', data=series_results)
-
-                plt.legend(loc="upper left")
-                ax.set_xlabel(f'{scale_var}')
-
-                # ax.set_xscale('log')
-                ax.set_xticks(series_results.index.unique().tolist())
-                ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
-                #plt.tight_layout()
-
-                if need_table:
-                    table_ax = axs[1]
-                    self.show_table(table_ax, series_results)
-
-                chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
-                self.write(fig, chart_filename)
 
 
 class FomPlot(PlotGenerator):
-    def generate_plot(self, results_df):
-        super().generate_plot(results_df)
+    def generate_plot_data(self):
+        super().generate_plot_data()
         # TODO: what is this for?
         # this one doesn't have a chart spec, it's just a flag
         # first divide results into series based on workload namespace
@@ -531,8 +565,21 @@ class FomPlot(PlotGenerator):
 
 
 class ComparisonPlot(PlotGenerator):
-    def generate_plot(self, results_df):
-        super().generate_plot(results_df)
+    def draw(self, perf_measure, scale_var, series):
+        ax = self.output_df.plot(kind="bar")
+        fig = ax.get_figure()
+
+        plt.tight_layout()
+
+        # If all FOMs are either higher or lower is better, add it to chart title
+        title_suffix = ''
+        ax.set_title(f'{" vs ".join(perf_measure)} by {" and ".join(series)} {title_suffix}', wrap=True)
+
+        chart_filename = f'{"_vs_".join(perf_measure)}_by_{"_and_".join(series)}.png'
+        self.write(fig, chart_filename)
+
+    def generate_plot_data(self):
+        super().generate_plot_data()
 
         for chart_spec in self.spec:
             # Break out input args into FOMs and dimensions
@@ -540,7 +587,7 @@ class ComparisonPlot(PlotGenerator):
             dimensions = []
 
             for input_spec in chart_spec:
-                if input_spec in results_df.loc[:, 'fom_name'].values:
+                if input_spec in self.results_df.loc[:, 'fom_name'].values:
                     foms.append(input_spec)
                 else:
                     dimensions.append(input_spec)
@@ -548,7 +595,7 @@ class ComparisonPlot(PlotGenerator):
             if not dimensions:
                 dimensions.append('experiment_name')
 
-            raw_results = results_df[results_df.loc[:, 'fom_name'].isin(foms)].copy()
+            raw_results = self.results_df[self.results_df.loc[:, 'fom_name'].isin(foms)].copy()
 
             raw_results.loc[:, 'Figure of Merit'] = (raw_results.loc[:, 'fom_name'] +
                                               ' (' + raw_results.loc[:, 'fom_units'] + ')')
@@ -560,30 +607,20 @@ class ComparisonPlot(PlotGenerator):
                 self.normalize_data(raw_results)
                 plot_col = "normalized_fom_value"
 
+            # TODO: remove pivot?
             compare_pivot = raw_results.pivot_table(plot_col, index=dimensions, columns='Figure of Merit')
+            self.output_df = compare_pivot
 
             # Pivot table aggregates values by mean. Check if results were aggregated and label them
             # Raw results have FOMs by row, pivot by columns, so multiply the pivot rows x cols
             print(f'raw values = {len(raw_results)}  vs pivot values = {len(compare_pivot)} x {len(compare_pivot.columns)} ={len(compare_pivot) * len(compare_pivot.columns)}')
 
-            # If all FOMs are either higher or lower is better, add it to chart title
-            title_suffix = ''
-            if len(raw_results.loc[:, 'better_direction'].unique()) == 1:
-                if raw_results.loc[:, 'better_direction'].unique()[0] == 'HIGHER':
-                    title_suffix = '(higher is better)'
-                elif raw_results.loc[:, 'better_direction'].unique()[0] == 'LOWER':
-                    title_suffix = '(lower is better)'
+            # TODO: empty is silly here.. as is changing types
+            perf_measure = foms
+            scale_var = ""
+            series = dimensions
+            self.draw(perf_measure, scale_var, series)
 
-
-            ax = compare_pivot.plot(kind="bar")
-            fig = ax.get_figure()
-
-            ax.set_title(f'{" vs ".join(foms)} by {" and ".join(dimensions)} {title_suffix}', wrap=True)
-
-            plt.tight_layout()
-
-            chart_filename = f'{"_vs_".join(foms)}_by_{"_and_".join(dimensions)}.png'
-            self.write(fig, chart_filename)
 
 
 def get_reports_path():
@@ -609,10 +646,10 @@ def make_report(results_df, ws_name, args):
     with PdfPages(pdf_path) as pdf_report:
 
        plot_factory = PlotFactory()
-       plot_generators = plot_factory.create_plot_generators(args, report_dir_path, pdf_report)
+       plot_generators = plot_factory.create_plot_generators(args, report_dir_path, pdf_report, results_df)
 
        for plot in plot_generators:
-           plot.generate_plot(results_df)
+           plot.generate_plot_data()
 
     if os.path.isfile(pdf_path):
         logger.msg("Report generated successfully. A PDF summary is available at:\n"
