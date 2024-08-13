@@ -104,31 +104,63 @@ results = {
         },
     ]
 }
+def prep_dict(success, name, n_nodes, ns, ramble_vars, ramble_raw_vars, context, fom_name, fom_value, units, origin, origin_type, better_direction, fv, ifv, normalized=False):
+    return {
+        'RAMBLE_STATUS': success,
+        'name': name,
+        'n_nodes': n_nodes,
+        'simplified_workload_namespace': ns,
+        'RAMBLE_VARIABLES': ramble_vars,
+        'RAMBLE_RAW_VARIABLES': ramble_raw_vars,
+        'context': context,
+        'fom_name': fom_name,
+        'fom_value': fom_value,
+        'fom_units': units,
+        'fom_origin': origin,
+        'fom_origin_type': origin_type,
+        'better_direction': better_direction,
+        'series': ns,
+        'normalized_fom_value' if normalized else 'fom_value': fv,
+        'ideal_perf_value': ifv
+    }
 
-def test_strong_scaling(mutable_mock_workspace_path, tmpdir_factory):
+
+@pytest.mark.parametrize(
+    "values", [
+        (StrongScalingPlot, 'fom_1', 42.0, 42.0, 42.0, 28.0, 28.0, 21.0, False),
+        (StrongScalingPlot, 'fom_1', 42.0, 1.0, 1.0, 28.0, 1.5, 2.0, True),
+        (WeakScalingPlot, 'fom_2', 50, 50, 50.0, 55, 55.0, 50.0, False),
+        (WeakScalingPlot, 'fom_2', 50.0, 1.0, 1.0, 55.0, 1.1, 1.0, True),
+    ]
+)
+def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
 
     report_name = 'unit_test'
     report_dir_path = tmpdir_factory.mktemp(report_name)
     pdf_path = os.path.join(report_dir_path, f'{report_name}.pdf')
 
-    test_spec = [['fom_1', 'n_nodes']]
-    normalize = True
+    plot_type, fom_name, fom1, nfv1, ideal1, fom2, nfv2, ideal2, normalize = values
+
+    test_spec = [[fom_name, 'n_nodes']]
+
+    ideal_data = []
+    ideal_data.append(prep_dict('SUCCESS', 'exp_1', 1, 'test_app_test_workload', {}, {}, 'null', fom_name, fom1, '', 'dummy_app', 'application', 'INDETERMINATE', nfv1, ideal1, normalized=normalize))
+    ideal_data.append(prep_dict('SUCCESS', 'exp_2', 2, 'test_app_test_workload', {}, {}, 'null', fom_name, fom2, '', 'dummy_app', 'application', 'INDETERMINATE', nfv2, ideal2, normalized=normalize))
+
+    ideal_df = pd.DataFrame(ideal_data, columns=ideal_data[0].keys())
+
+    # Update index to match
+    ideal_df = ideal_df.set_index('n_nodes')
+
+    # Update data types to match
+    #for col in ideal_df:
+         #ideal_df[col] = ramble.reports.to_numeric_if_possible(ideal_df[col])
+
+    ideal_df[['RAMBLE_VARIABLES', 'RAMBLE_RAW_VARIABLES', 'fom_units']] = ideal_df[['RAMBLE_VARIABLES', 'RAMBLE_RAW_VARIABLES', 'fom_units']].astype(object)
 
     with PdfPages(pdf_path) as pdf_report:
-        plot = StrongScalingPlot(test_spec, normalize, report_dir_path, pdf_report)
         results_df = prepare_data(results)
-        plot.generate_plot(results_df)
+        plot = plot_type(test_spec, normalize, report_dir_path, pdf_report, results_df)
+        plot.generate_plot_data()
 
-def test_weak_scaling(mutable_mock_workspace_path, tmpdir_factory):
-
-    report_name = 'unit_test'
-    report_dir_path = tmpdir_factory.mktemp(report_name)
-    pdf_path = os.path.join(report_dir_path, f'{report_name}.pdf')
-
-    test_spec = [['fom_2', 'n_nodes']]
-    normalize = True
-
-    with PdfPages(pdf_path) as pdf_report:
-        plot = WeakScalingPlot(test_spec, normalize, report_dir_path, pdf_report)
-        results_df = prepare_data(results)
-        plot.generate_plot(results_df)
+        assert(plot.output_df.equals(ideal_df))

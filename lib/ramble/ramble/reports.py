@@ -128,8 +128,7 @@ def prepare_data(results: dict) -> pd.DataFrame:
     """
 
     # TODO: is this sufficient?
-    panda = pd.json_normalize(results['experiments'])
-    print(panda.columns)
+    #panda = pd.json_normalize(results['experiments'])
     #print(panda['CONTEXTS']) # would need to flatten contexts too
     # Then remove things we don't need, like failures and repeats
 
@@ -301,20 +300,13 @@ class ScalingPlotGenerator(PlotGenerator):
         else:
             first_perf_value = selected_data['fom_value'].iloc[0]
 
-        print(first_perf_value)
         selected_data.loc[:, 'ideal_perf_value'] = first_perf_value
-        print("Post op")
-        print(selected_data)
 
         if better_direction == 'LOWER' or better_direction == BetterDirection.LOWER:
             selected_data['ideal_perf_value'] = selected_data.loc[:, 'ideal_perf_value'] / (selected_data.index)
         elif better_direction == 'HIGHER' or better_direction == BetterDirection.HIGHER:
             selected_data['ideal_perf_value'] = selected_data.loc[:, 'ideal_perf_value'] * (selected_data.index)
-        print("index")
-        print(selected_data.index)
 
-        print("Out")
-        print(selected_data)
         return selected_data
 
     def generate_plot_data(self):
@@ -378,7 +370,7 @@ class WeakScalingPlot(ScalingPlotGenerator):
             # FOMs are by row, so select only rows with the perf_measure FOM
             raw_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
 
-            raw_results.loc[:, 'exp_group'] = raw_results.loc[:, 'RAWexperiment_template_name']
+            #raw_results.loc[:, 'exp_group'] = raw_results.loc[:, 'RAWexperiment_template_name']
             raw_results.loc[:, 'series'] = raw_results.loc[:, 'simplified_workload_namespace']
 
             # TODO: check this does what we want and generates unique results
@@ -389,8 +381,9 @@ class WeakScalingPlot(ScalingPlotGenerator):
                 raw_results = raw_results.groupby(additional_vars + ['series']).size()
 
             for series in raw_results.loc[:, 'series'].unique():
-                series_results = raw_results.query(f'series == "{series}"')
-                selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
+                # TODO: query should support fom_origin_type
+                selected = raw_results.query(f'series == "{series}"')
+                #selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
                 selected['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
                 selected[scale_var] = to_numeric_if_possible(pd.to_numeric(raw_results[scale_var]))
 
@@ -400,7 +393,7 @@ class WeakScalingPlot(ScalingPlotGenerator):
                     self.normalize_data(selected)
 
                 # TODO: this might go the wrong way post abstraction, but ideal scaling on weak is confusing.. since it should be flat (and can easily be fixed in the class hierarchy
-                selected = self.add_idealized_data(series_results, selected)
+                selected = self.add_idealized_data(raw_results, selected)
                 self.output_df = selected
 
                 self.draw(perf_measure, scale_var, series)
@@ -498,9 +491,9 @@ class StrongScalingPlot(ScalingPlotGenerator):
             if additional_vars:
                 perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'series'] + '_x_' + perf_measure_results[additional_vars].agg('_x_'.join, axis=1)
 
-            for col in perf_measure_results.columns:
+            #for col in perf_measure_results.columns:
                 # TODO: generate_if_possible should be done elsewhere in a more abstract way
-                perf_measure_results.loc[:, col] = to_numeric_if_possible(perf_measure_results[col])
+                #perf_measure_results.loc[:, col] = to_numeric_if_possible(perf_measure_results[col])
 
             for series in perf_measure_results.loc[:, 'series'].unique():
 
