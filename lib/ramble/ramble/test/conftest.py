@@ -54,7 +54,7 @@ def pytest_collection_modifyitems(config, items):
         # --fast not given, run all the tests
         return
 
-    slow_tests = ["db", "network", "maybeslow"]
+    slow_tests = ["db", "network", "maybeslow", "long"]
     skip_as_slow = pytest.mark.skip(reason="skipped slow test [--fast command line option given]")
     for item in items:
         if any(x in item.keywords for x in slow_tests):

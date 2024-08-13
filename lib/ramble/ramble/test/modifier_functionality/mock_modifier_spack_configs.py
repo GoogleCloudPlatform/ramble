@@ -18,6 +18,7 @@ from ramble.main import RambleCommand
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.long
 @pytest.mark.parametrize(
     "scope",
     [
