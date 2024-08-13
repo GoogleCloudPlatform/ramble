@@ -384,6 +384,7 @@ class WeakScalingPlot(ScalingPlotGenerator):
                 # TODO: query should support fom_origin_type
                 selected = raw_results.query(f'series == "{series}"')
                 #selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
+                # TODO: why does this have a double numberic?
                 selected['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
                 selected[scale_var] = to_numeric_if_possible(pd.to_numeric(raw_results[scale_var]))
 
@@ -411,6 +412,9 @@ class StrongScalingPlot(ScalingPlotGenerator):
         # TODO: add way to enable (or remove)
         need_table = False
 
+        title = f'Generating plot for {perf_measure} vs {scale_var} for {series}'
+        logger.debug(title)
+
         if need_table:
             fig, axs = plt.subplots(2,1)
             ax = axs[0]
@@ -427,12 +431,14 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
             ax.set_ylabel(f'{perf_measure}')
 
+        #self.have_statistics = False
         if self.have_statistics:
+            logger.debug('Adding fill lines for min and max')
             ax.fill_between(
-                    self.output_df.index,
+                    self.minmax.index,
                     'fom_value_min',
                     'fom_value_max',
-                    data=self.output_df,
+                    data=self.minmax,
                     alpha=0.2)
 
         ax.plot(self.output_df.index, 'ideal_perf_value', data=self.output_df)
@@ -442,7 +448,7 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
         # ax.set_xscale('log')
         ax.set_xticks(self.output_df.index.unique().tolist())
-        ax.set_title(f'Strong Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
+        ax.set_title(title, wrap=True)
         #plt.tight_layout()
 
         if need_table:
@@ -500,50 +506,37 @@ class StrongScalingPlot(ScalingPlotGenerator):
                 # TODO: this needs to account for repeats
                 # TODO: This is way over complicated
                 series_results = perf_measure_results.query(f'series == "{series}" and (fom_origin_type == "application" or fom_origin_type == "summary::mean")')
+                series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+                series_results = series_results.set_index(scale_var)
 
                 series_min = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::min"')
                 series_max = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::max"')
 
-                # TODO: I can probably centralize setting index
-                #series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
-                series_results = series_results.set_index(scale_var)
-
-                # TODO: what is driving the need for a pivot here?
-                # TODO: can we separate out the data generation from the plotting?
-                #scale_pivot = series_results.pivot_table('fom_value', index=scale_var)
-
-
                 # TODO: We interpret this as requesting speedup, which isn't strictly true
                 # We need a more clear semantic for this
                 if self.normalize:
-                    #print(series_results)
                     self.normalize_data(series_results, speedup=True)
-                    #print(series_results)
-                    series_results = self.add_idealized_data(perf_measure_results, series_results)
-                else:
-                    series_results = self.add_idealized_data(perf_measure_results, series_results)
-                    # TODO: move out so it works for normalized too
-                    if not series_min.empty:
-                        # I re-index to scale_var/n_nodes for the main data so we need it here too
-                        series_min = series_min.set_index(scale_var)
-                        series_max = series_max.set_index(scale_var)
 
-                        logger.debug('Adding fill lines for min and max')
+                series_results = self.add_idealized_data(perf_measure_results, series_results)
 
-                        #self.have_statistics = True
+                # TODO: move out so it works for normalized too
+                if not series_min.empty:
+                    self.have_statistics = True
 
-                        # TODO: fix copy semantics
-                        # "A value is trying to be set on a copy of a slice from a DataFrame."
-                        # there might be some accidentally copy semantics with series_results
-                        #series_results['fom_value_min'] = series_min['fom_value']
-                        #series_results['fom_value_max'] = series_max['fom_value']
-                        series_results.loc[:, 'fom_value_min'] = series_min['fom_value']
-                        series_results.loc[:, 'fom_value_max'] = series_max['fom_value']
+                    # TODO: fix copy semantics
+                    # "A value is trying to be set on a copy of a slice from a DataFrame."
+                    # there might be some accidentally copy semantics with series_results
+                    series_min = series_min.set_index(scale_var)
+                    series_max = series_max.set_index(scale_var)
+
+                    minmax = pd.DataFrame()
+                    minmax['fom_value_min'] = series_min['fom_value']
+                    minmax['fom_value_max'] = series_max['fom_value']
+                    minmax.index = to_numeric_if_possible(series_min.index)
+                    self.minmax = minmax
 
                 self.output_df = series_results
                 self.draw(perf_measure, scale_var, series)
-
-
 
 
 class FomPlot(PlotGenerator):
@@ -593,6 +586,7 @@ class ComparisonPlot(PlotGenerator):
             raw_results.loc[:, 'Figure of Merit'] = (raw_results.loc[:, 'fom_name'] +
                                               ' (' + raw_results.loc[:, 'fom_units'] + ')')
 
+            # TODO: why does this have a double to_numbeirc?
             raw_results['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
 
             plot_col = 'fom_value'

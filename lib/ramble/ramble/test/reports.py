@@ -164,5 +164,4 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
         plot.generate_plot_data()
 
         assert(plot.output_df.equals(ideal_df))
-        print(pdf_path)
         assert(os.path.isfile(pdf_path))
