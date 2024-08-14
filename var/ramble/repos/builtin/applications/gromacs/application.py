@@ -45,7 +45,7 @@ class Gromacs(ExecutableApplication):
         "execute-gen",
         "{mdrun} {notunepme} -dlb {dlb} "
         + "{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} "
-        + "-s exp_input.tpr",
+        + "-s exp_input.tpr {additional_args}",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
@@ -53,7 +53,7 @@ class Gromacs(ExecutableApplication):
         "execute",
         "{mdrun} {notunepme} -dlb {dlb} "
         + "{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} "
-        + "-s {input_path}",
+        + "-s {input_path} {additional_args}",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
@@ -163,72 +163,81 @@ class Gromacs(ExecutableApplication):
         input="JCP_benchmarks",
     )
 
-    all_workloads = [
-        "water_gmx50",
-        "water_bare",
-        "lignocellulose",
-        "hecbiosim",
-        "benchpep",
-        "benchpep_h",
-        "benchmem",
-        "benchrib",
-        "stmv_rf",
-        "stmv_pme",
-        "rnase_cubic",
-        "ion_channel",
-        "adh_dodec",
-    ]
+    workload_group(
+        "all_workloads",
+        workloads=[
+            "water_gmx50",
+            "water_bare",
+            "lignocellulose",
+            "hecbiosim",
+            "benchpep",
+            "benchpep_h",
+            "benchmem",
+            "benchrib",
+            "stmv_rf",
+            "stmv_pme",
+            "rnase_cubic",
+            "ion_channel",
+            "adh_dodec",
+        ],
+    )
 
+    workload_variable(
+        "additional_args",
+        default="",
+        description="Additiaonl Exec Args",
+        workload_group="all_workloads",
+    )
     workload_variable(
         "gmx",
         default="gmx_mpi",
         description="Name of the gromacs binary",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "grompp",
         default="{gmx} grompp",
         description="How to run grompp",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "mdrun",
         default="{gmx} mdrun",
         description="How to run mdrun",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "nsteps",
         default=str(20000),
         description="Simulation steps",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "resetstep",
         default="{str(int(0.9*{nsteps}))}",
         description="Reset performance counters at this step",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "verbose",
         default="",
         values=["", "-v"],
         description="Set to empty string to run without verbose mode",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "notunepme",
         default="-notunepme",
         values=["", "-notunepme"],
         description="Whether to set -notunepme for mdrun",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
     workload_variable(
         "dlb",
         default="yes",
         values=["yes", "no"],
         description="Whether to use dynamic load balancing for mdrun",
-        workloads=all_workloads,
+        workload_group="all_workloads",
     )
 
     workload_variable(
