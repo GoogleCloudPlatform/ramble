@@ -9,6 +9,7 @@
 import json
 import sys
 import math
+from enum import Enum
 
 import ramble.config
 from ramble.util.logger import logger
@@ -16,6 +17,8 @@ from ramble.config import ConfigError
 
 
 default_node_type_val = "Not Specified"
+
+uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly"])
 
 
 class Uploader:
@@ -124,32 +127,31 @@ def determine_node_type(experiment, contexts):
 
 
 def upload_results(results):
-    if ramble.config.get("config:upload"):
-        # Read upload type and push it there
-        if ramble.config.get("config:upload:type") == "BigQuery":  # TODO: enum?
-            try:
-                formatted_data = ramble.experimental.uploader.format_data(results)
-            except KeyError:
-                logger.die("Error parsing file: Does not contain valid data to upload.")
-            # TODO: strategy object?
+    uploader_type = ramble.config.get("config:upload:type")
+    if uploader_type is None:
+        raise ConfigError("No upload type (config:upload:type) in config.")
+    if not hasattr(uploader_types, uploader_type):
+        raise ConfigError(f"Upload type {uploader_type} is not valid.")
+    uploader_type = getattr(uploader_types, uploader_type)
 
-            uploader = BigQueryUploader()
+    uri = ramble.config.get("config:upload:uri")
+    if not uri:
+        raise ConfigError("No upload URI (config:upload:uri) in config.")
 
-            uri = ramble.config.get("config:upload:uri")
-            if not uri:
-                logger.die("No upload URI (config:upload:uri) in config.")
+    try:
+        formatted_data = format_data(results)
+    except (KeyError, TypeError) as e:
+        raise ConfigError("Error parsing file: Does not contain valid data to upload.") from e
+    if len(formatted_data) == 0:
+        logger.warn("No data to upload")
+        return
 
-            logger.msg(f"Uploading Results to {uri}")
-
-            if len(formatted_data) == 0:
-                logger.warn("No data to upload")
-            else:
-                uploader.perform_upload(uri, formatted_data)
-        else:
-            raise ConfigError("Unknown config:upload:type value")
-
+    logger.msg(f"Uploading results to {uri} with {uploader_type} uploader")
+    if uploader_type == uploader_types.BigQuery:
+        uploader = BigQueryUploader()
     else:
-        raise ConfigError("Missing correct config:upload parameters")
+        uploader = PrintOnlyUploader()
+    uploader.perform_upload(uri, formatted_data)
 
 
 def format_data(data_in):
@@ -208,6 +210,27 @@ def format_data(data_in):
     return results
 
 
+def _prepare_data(results, uri):
+    # It is expected that the user will create these tables outside of this
+    # tooling
+    exp_table_id = f"{uri}.experiments"
+    fom_table_id = f"{uri}.foms"
+
+    exps_to_insert = []
+    foms_to_insert = []
+
+    for experiment in results:
+        exps_to_insert.append(experiment.to_json())
+
+        for fom in experiment.foms:
+            fom_data = fom
+            fom_data["experiment_id"] = experiment.get_hash()
+            fom_data["experiment_name"] = experiment.name
+            foms_to_insert.append(fom_data)
+
+    return exp_table_id, exps_to_insert, fom_table_id, foms_to_insert
+
+
 class BigQueryUploader(Uploader):
     """Class to handle upload of FOMs to BigQuery"""
 
@@ -246,22 +269,7 @@ class BigQueryUploader(Uploader):
 
     def insert_data(self, uri: str, results) -> None:
 
-        # It is expected that the user will create these tables outside of this
-        # tooling
-        exp_table_id = "{uri}.{table_name}".format(uri=uri, table_name="experiments")
-        fom_table_id = "{uri}.{table_name}".format(uri=uri, table_name="foms")
-
-        exps_to_insert = []
-        foms_to_insert = []
-
-        for experiment in results:
-            exps_to_insert.append(experiment.to_json())
-
-            for fom in experiment.foms:
-                fom_data = fom
-                fom_data["experiment_id"] = experiment.get_hash()
-                fom_data["experiment_name"] = experiment.name
-                foms_to_insert.append(fom_data)
+        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
 
         logger.debug("Experiments to insert:")
         logger.debug(exps_to_insert)
@@ -304,3 +312,18 @@ class BigQueryUploader(Uploader):
         # This should be stable per machine/python version, but is not
         # guaranteed to be globally stable
         return hash(json.dumps(experiment, sort_keys=True))
+
+
+class PrintOnlyUploader(Uploader):
+    """An uploader that only prints out formatted data without actually uploading."""
+
+    def perform_upload(self, uri, results):
+        super().perform_upload(uri, results)
+        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
+        logger.info("NOTE: The PrintOnly uploader only logs, but does not upload any data.")
+        logger.info(f"{len(exps_to_insert)} experiment(s) would be uploaded to {exp_table_id}:")
+        for exp in exps_to_insert:
+            logger.info(f"  {exp}")
+        logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
+        for fom in foms_to_insert:
+            logger.info(f"  {fom}")
