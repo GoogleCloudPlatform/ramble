@@ -321,5 +321,9 @@ class PrintOnlyUploader(Uploader):
         super().perform_upload(uri, results)
         exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
         logger.info("NOTE: The PrintOnly uploader only logs, but does not upload any data.")
-        logger.info(f"Experiments {exps_to_insert} would be uploaded to table {exp_table_id}")
-        logger.info(f"Foms {foms_to_insert} would be uploaded to table {fom_table_id}")
+        logger.info(f"{len(exps_to_insert)} experiment(s) would be uploaded to {exp_table_id}:")
+        for exp in exps_to_insert:
+            logger.info(f"  {exp}")
+        logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
+        for fom in foms_to_insert:
+            logger.info(f"  {fom}")

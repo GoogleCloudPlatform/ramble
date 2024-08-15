@@ -69,4 +69,6 @@ ramble:
         content = f.read()
         assert "Uploading results to fake-dataset" in content
         assert "The PrintOnly uploader only logs" in content
+        assert "1 experiment(s) would be uploaded" in content
+        assert "1 fom(s) would be uploaded" in content
         assert "test-user.c.googlers.com" in content
