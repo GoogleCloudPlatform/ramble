@@ -128,7 +128,7 @@ available variables with the following command:
 
 .. code-block:: console
 
-    $ ramble info -a workloads -v -p "water*" gromacs
+    $ ramble info --attrs workloads -v -p "water*" gromacs
 
 Which should contain the following information:
 

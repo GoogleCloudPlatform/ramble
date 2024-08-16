@@ -6,15 +6,17 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 
-.. _running_an_experiment_tutorial:
+.. _eessi_package_manager_tutorial:
 
-=======================================
-2) Running A Simple GROMACS Experiment
-=======================================
+===============================
+Using the EESSI Package Manager
+===============================
 
 In this tutorial, you will set up and run a benchmark simulation using
 `GROMACS <https://www.gromacs.org/>`_, a free and open-source application
-for molecular dynamics.
+for molecular dynamics. The execution environment will be created and managed
+using the
+`European Environment for Scientific Software Installations (EESSI) package manager <https://www.eessi.io/docs/>`.
 
 This tutorial builds off of concepts introduced in previous tutorials. Please
 make sure you review those before starting with this tutorial's content,
@@ -116,11 +118,154 @@ With this command, you should see output similar to the following:
       compiler: None
       package_manager: spack*
 
-This output does not represent the only possible configuration that works for
-this application, it only presents a good starting point. When using Ramble,
-these can be modified freely and will be explored in a later tutorial.
 
-.. include:: shared/gromacs_workspace.rst
+Package Manager Information
+---------------------------
+
+When learning how to use a new package manager in Ramble, it can be useful to
+inspect the information of the package manager definition. To do this, execute
+the following command:
+
+.. code-block:: console
+
+  $ ramble info --type package_managers eessi
+
+This should print a summary of the ``eessi`` definition, as follows:
+
+.. code-block:: console
+
+  Package Manager: eessi
+
+  Description:
+      Package manager definition for EESSI
+      
+          This package manager uses the European Environment for Scientific Software
+          Installations to stream binaries from an EESSI mirror.
+      
+          https://www.eessi.io/
+      
+      
+          To control the target architecture used, add EESSI_SOFTWARE_SUBDIR_OVERRIDE
+          to the workspace's environment variable definitions.
+          
+
+  maintainers:
+      douglasjacobsen
+
+  pipelines:
+      analyze  archive  mirror  setup  pushdeployment  pushtocache  execute
+
+  builtins:
+      package_manager_builtin::eessi::module_load  package_manager_builtin::eessi::eessi_init
+
+  registered_phases:
+      setup:
+          write_module_commands
+
+  package_manager_variables:
+      eessi_version
+
+Examining the ``package_manager_variables`` section, you can see that ``eessi``
+has a defined variable named ``eessi_version``. To get more information about
+this portion of the package manager definition, you can execute the following:
+
+.. code-block:: console
+
+  $ ramble info --type package_managers --attrs package_manager_variables -v eessi
+
+Which should print something like the following output:
+
+.. code-block:: console
+
+  #############################
+  # package_manager_variables #
+  #############################
+  eessi_version:
+      Description: Version of EESSI to use
+      Default: 2023.06
+      Suggested Values: [None]
+
+Here, we can see that the version of ``eessi`` can be contolled through the use
+of the ``eessi_version`` variable definition. Defining this variable within an
+experiment can allow you to parameterize the versions of EESSI used.
+
+Configuring experiments
+-----------------------
+
+For this tutorial, you are going to focus on creating experiments from the
+``water_bare`` and ``water_gmx50`` workloads. The default configuration will
+contain experiments for each value of the ``type`` variable, and a single value
+for the ``size`` variable.
+
+You will use a Ramble workspace to manage these experiments.
+
+Create and Activate a Workspace
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Before you can configure your GROMACS experiments, you'll need to set up a
+workspace. You can call this workspace ``eessi_gromacs``.
+
+.. code-block:: console
+
+    $ ramble workspace create eessi_gromacs
+
+This will create a workspace for you in:
+
+.. code-block:: console
+
+    $ $RAMBLE_ROOT/var/ramble/workspaces/eessi_gromacs
+
+Now you can activate the workspace and view its default configuration.
+
+.. code-block:: console
+
+    $ ramble workspace activate eessi_gromacs
+
+Alternatively, the workspace creation and activation can be combined in one command
+with the activate flag (``-a``):
+
+.. code-block:: console
+
+    $ ramble workspace create eessi_gromacs -a
+
+You can use the ``ramble workspace info`` command after editing configuration
+files to see how ramble would use the changes you made.
+
+.. code-block:: console
+
+    $ ramble workspace info
+
+Configure the Workspace
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Within the workspace directory, ramble creates a directory named ``configs``.
+This directory contains generated configuration and template files. Each of
+these files can be edited to configure the workspace, and examples will be
+provided below.
+
+The available files are:
+
+ * ``ramble.yaml`` This file describes all aspects of the workspace. This includes the software stack, the experiments, and all variables.
+ * ``execute_experiment.tpl`` This file is a template shell script that will be rendered to execute each of the experiments that ramble generates.
+
+You can edit these files directly or with the command ``ramble workspace edit``.
+
+To begin, you should edit the ``ramble.yaml`` file to set up the configuration
+for your experiments. For this tutorial, replace the default yaml text with the
+contents of ``$RAMBLE_ROOT/examples/eessi_gromacs_config.yaml``:
+
+**NOTE**: This workspace utilizes the ``eessi`` package manager. As a result, it
+requires ``eessi`` is installed following
+`EESSI installation instructions <https://www.eessi.io/docs/getting_access/native_installation/>`.
+Modifications to the ``package_manager`` variant will change this behavior.
+
+.. literalinclude:: ../../../../examples/gromacs_eessi_config.yaml
+   :language: YAML
+
+The second file you should edit is the ``execute_experiment.tpl`` template file.
+This file contains a template script that will be rendered into an execution
+script for each generated experiment. You can feel free to edit it as you need
+to for your given system, but for this tutorial the default value will work.
 
 Setting Up the Experiments
 ---------------------------
@@ -156,7 +301,7 @@ monitor the process by looking at the contents of:
 
 .. code-block:: console
 
-    $ $RAMBLE_ROOT/var/ramble/workspaces/basic_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
+    $ $RAMBLE_ROOT/var/ramble/workspaces/eessi_gromacs/logs/setup.latest/gromacs.water_gmx50.pme_single_rank.out
 
 Executing Experiments
 ---------------------
@@ -198,7 +343,7 @@ After analyzing the workspace, you can exmine the structure of the workspace at:
 
 .. code-block:: console
 
-    $ $RAMBLE_ROOT/var/ramble/workspaces/basic_gromacs
+    $ $RAMBLE_ROOT/var/ramble/workspaces/eessi_gromacs
 
 Within this directory, you should see the following directories:
 
@@ -223,4 +368,5 @@ Additionally, you can remove the workspace using:
 
 .. code-block:: console
 
-    $ ramble workspace remove basic_gromacs
+    $ ramble workspace remove eessi_gromacs
+

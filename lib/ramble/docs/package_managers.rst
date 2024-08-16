@@ -80,9 +80,9 @@ EESSI Package Manager
 ^^^^^^^^^^^^^^^^^^^^^
 
 Setting the package manager config option to ``eessi`` enables the use of
-`EESSI <https://www.eessi.io/docs/>` for each experiment. Ramble will then
-inject commands to initialize the use of EESSI, and load the correct module
-files for the execution environment.
+`the European Environment for Scientific Software Installations (EESSI) <https://www.eessi.io/docs/>`
+for each experiment. Ramble will then inject commands to initialize the use of
+EESSI, and load the correct module files for the execution environment.
 
 The :ref:`software configuration section <software-config>` is used to
 determine what modules to load within the resulting environment.
