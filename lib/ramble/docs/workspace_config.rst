@@ -406,6 +406,9 @@ defined in.
   variants:
     package_manager: spack
 
+For more information about controlling package managers see the
+:ref:`package manager documentation <package-manager-control>`.
+
 
 .. _ramble-experiment-exclusion:
 
