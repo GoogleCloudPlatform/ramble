@@ -45,14 +45,19 @@ class GcpMetadata(BasicModifier):
         pre_cmds = []
 
         payloads = [
-            # end point, per_node
-            ("machine-type", False),
-            ("image", False),
-            ("hostname", False),
-            ("id", True),  # True since we want the gid of every node
+            # type, end point, per_node
+            ("instance", "machine-type", False),
+            ("instance", "image", False),
+            ("instance", "hostname", False),
+            (
+                "instance",
+                "id",
+                True,
+            ),  # True since we want the gid of every node
+            ("project", "numeric-project-id", False),
         ]
 
-        for end_point, per_node in payloads:
+        for type, end_point, per_node in payloads:
             prefix = ""
             suffix = ""
             if per_node:
@@ -63,7 +68,7 @@ class GcpMetadata(BasicModifier):
                 CommandExecutable(
                     "machine-type",
                     template=[
-                        f'{prefix} curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/instance/{end_point}" -H "Metadata-Flavor: Google" {suffix}'
+                        f'{prefix} curl -s -w "\\n" "http://metadata.google.internal/computeMetadata/v1/{type}/{end_point}" -H "Metadata-Flavor: Google" {suffix}'
                     ],
                     mpi=False,
                     redirect=f"{{experiment_run_dir}}/gcp-metadata.{end_point}.log",
@@ -123,4 +128,11 @@ class GcpMetadata(BasicModifier):
         fom_regex=r"(?P<gid>.*)",
         group_name="gid",
         log_file="{experiment_run_dir}/gcp-metadata.id_list.log",
+    )
+
+    figure_of_merit(
+        "project-id",
+        fom_regex=r"(?P<numeric_project_id>\d+)",
+        group_name="numeric_project_id",
+        log_file="{experiment_run_dir}/gcp-metadata.numeric-project-id.log",
     )
