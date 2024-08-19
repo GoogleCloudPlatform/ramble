@@ -33,6 +33,7 @@ def enable_verbose():
     llnl.util.tty._verbose = old_setting
 
 
+@pytest.mark.long
 def test_workspace_phase_selection_with_dependencies(
     mutable_config, mutable_mock_workspace_path, enable_verbose
 ):

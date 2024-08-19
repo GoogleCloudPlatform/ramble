@@ -64,7 +64,6 @@ ramble:
         )
         workspace(
             "analyze",
-            "--dry-run",
             "--exclude-where",
             '"{workload_name}" == "serial"',
             global_args=["-w", workspace_name],

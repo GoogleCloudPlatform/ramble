@@ -22,6 +22,7 @@ workspace = RambleCommand("workspace")
 on_cmd = RambleCommand("on")
 
 
+@pytest.mark.long
 @pytest.mark.parametrize(
     "scope",
     [

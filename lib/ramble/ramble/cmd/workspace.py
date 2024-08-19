@@ -500,14 +500,6 @@ def workspace_analyze_setup_parser(subparser):
     )
 
     subparser.add_argument(
-        "--dry-run",
-        dest="dry_run",
-        action="store_true",
-        help="perform a dry run. Allows going through analysis phases"
-        + "on workspaces which are not fully setup",
-    )
-
-    subparser.add_argument(
         "-p",
         "--print-results",
         dest="print_results",
@@ -525,9 +517,6 @@ def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace(cmd_name="workspace analyze")
     ws.repeat_success_strict = ramble.config.get("config:repeat_success_strict")
-
-    if args.dry_run:
-        ws.dry_run = True
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
