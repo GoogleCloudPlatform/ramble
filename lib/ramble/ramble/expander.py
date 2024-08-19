@@ -329,6 +329,7 @@ class Expander:
         self._variables = variables
         self._no_expand_vars = no_expand_vars
         self._used_variables = set()
+        self._used_variable_stage = set()
 
         self._experiment_set = experiment_set
 
@@ -359,6 +360,13 @@ class Expander:
 
     def set_no_expand_vars(self, no_expand_vars):
         self._no_expand_vars = no_expand_vars.copy()
+
+    def flush_used_variable_stage(self):
+        self._used_variable_stage = set()
+
+    def merge_used_variable_stage(self):
+        self._used_variables = self._used_variables.union(self._used_variable_stage)
+        self.flush_used_variable_stage()
 
     def copy(self):
         return Expander(self._variables.copy(), self._experiment_set)
@@ -493,6 +501,7 @@ class Expander:
         extra_vars: Dict = None,
         allow_passthrough: bool = True,
         typed: bool = False,
+        merge_used_stage: bool = True,
     ):
         """Convert a variable name to an expansion string, and expand it
 
@@ -506,12 +515,15 @@ class Expander:
             allow_passthrough (bool): Whether the string is allowed to have keywords
                                       after expansion
             typed (bool): Whether the return type should be typed or not
+            merge_used_stage (bool): Whether tracked variables are merged into
+                                     the used variable set or not.
         """
         return self.expand_var(
             self.expansion_str(var_name),
             extra_vars=extra_vars,
             allow_passthrough=allow_passthrough,
             typed=typed,
+            merge_used_stage=merge_used_stage,
         )
 
     def expand_var(
@@ -520,6 +532,7 @@ class Expander:
         extra_vars: Dict = None,
         allow_passthrough: bool = True,
         typed: bool = False,
+        merge_used_stage: bool = True,
     ):
         """Perform expansion of a string
 
@@ -532,6 +545,8 @@ class Expander:
             allow_passthrough (bool): Whether the string is allowed to have keywords
                                       after expansion
             typed (bool): Whether the return type should be typed or not
+            merge_used_stage (bool): Whether tracked variables are merged into
+                                     the used variable set or not.
         """
 
         passthrough_setting = allow_passthrough
@@ -566,9 +581,13 @@ class Expander:
                 logger.debug("END OF TYPING Failed with ValueError")
             except SyntaxError:
                 logger.debug("END OF TYPING Failed with SyntaxError")
+
+        if merge_used_stage:
+            self.merge_used_variable_stage()
+
         return value
 
-    def evaluate_predicate(self, in_str, extra_vars=None):
+    def evaluate_predicate(self, in_str, extra_vars=None, merge_used_stage: bool = True):
         """Evaluate a predicate by expanding and evaluating math contained in a string
 
         Args:
@@ -579,7 +598,12 @@ class Expander:
             boolean: True or False, based on the evaluation of in_str
         """
 
-        evaluated = self.expand_var(in_str, extra_vars=extra_vars, allow_passthrough=False)
+        evaluated = self.expand_var(
+            in_str,
+            extra_vars=extra_vars,
+            allow_passthrough=False,
+            merge_used_stage=merge_used_stage,
+        )
 
         if not isinstance(evaluated, str):
             logger.die("Logical compute failed to return a string")
@@ -620,7 +644,7 @@ class Expander:
                     expansion_func=self._partial_expand,
                     evaluation_func=self.perform_math_eval,
                     no_expand_vars=self._no_expand_vars,
-                    used_vars=self._used_variables,
+                    used_vars=self._used_variable_stage,
                 )
 
             return str(str_graph.root.value)

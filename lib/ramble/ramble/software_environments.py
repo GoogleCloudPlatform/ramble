@@ -238,7 +238,7 @@ class TemplatePackage(SoftwarePackage):
         Returns:
             (SoftwarePackage): Rendered SoftwarePackage
         """
-        name = expander.expand_var(self.name)
+        name = expander.expand_var(self.name, merge_used_stage=False)
         pm_name = package_manager.name
         pkg_info = self.pkg_info
         pm_prefix = package_manager.spec_prefix()
@@ -253,9 +253,15 @@ class TemplatePackage(SoftwarePackage):
                 + f"no spec was found for package manager {pm_name}.\n"
             )
 
-        spec = expander.expand_var(raw_spec)
-        compiler = expander.expand_var(raw_compiler) if raw_compiler else None
-        compiler_spec = expander.expand_var(raw_compiler_spec) if raw_compiler_spec else None
+        spec = expander.expand_var(raw_spec, merge_used_stage=False)
+        compiler = (
+            expander.expand_var(raw_compiler, merge_used_stage=False) if raw_compiler else None
+        )
+        compiler_spec = (
+            expander.expand_var(raw_compiler_spec, merge_used_stage=False)
+            if raw_compiler_spec
+            else None
+        )
 
         new_pkg = RenderedPackage(name, pkg_info, package_manager, spec, compiler, compiler_spec)
 
@@ -461,9 +467,12 @@ class TemplateEnvironment(SoftwareEnvironment):
             if rendered_env_pkg_name:
                 added = False
                 for template_pkg in all_package_templates.values():
+                    expander.flush_used_variable_stage()
                     rendered_pkg = template_pkg.render_package(expander, package_manager)
 
                     if rendered_env_pkg_name == rendered_pkg.name:
+                        expander.merge_used_variable_stage()
+
                         if rendered_pkg.name in all_packages[pm_name]:
                             if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
                                 raise RambleSoftwareEnvironmentError(
@@ -614,9 +623,11 @@ class SoftwareEnvironments:
                 while cur_compiler and cur_compiler not in self._rendered_packages[pm_name]:
                     added = False
                     for template_name, template_def in self._package_templates.items():
-                        rendered_name = expander.expand_var(template_name)
+                        expander.flush_used_variable_stage()
+                        rendered_name = expander.expand_var(template_name, merge_used_stage=False)
 
                         if rendered_name == cur_compiler:
+                            expander.merge_used_variable_stage()
                             rendered_pkg = template_def.render_package(
                                 expander, environment.package_manager
                             )
@@ -759,8 +770,10 @@ class SoftwareEnvironments:
                 return self._rendered_environments[pm_name][env_name]
 
         for template_name, template_def in self._environment_templates.items():
-            rendered_name = expander.expand_var(template_name)
+            expander.flush_used_variable_stage()
+            rendered_name = expander.expand_var(template_name, merge_used_stage=False)
             if rendered_name == env_name:
+                expander.merge_used_variable_stage()
                 rendered_env = template_def.render_environment(
                     expander, self._package_templates, self._rendered_packages, package_manager
                 )
