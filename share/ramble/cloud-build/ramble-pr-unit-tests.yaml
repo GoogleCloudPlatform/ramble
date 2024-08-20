@@ -72,6 +72,6 @@ substitutions:
   _PYTHON_VER: 3.11.6
   _BASE_IMG: centos
   _BASE_VER: '7'
-timeout: 2000s
+timeout: 3600s
 options:
   machineType: N1_HIGHCPU_8
