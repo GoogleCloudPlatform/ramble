@@ -500,14 +500,6 @@ def workspace_analyze_setup_parser(subparser):
     )
 
     subparser.add_argument(
-        "--always-print-foms",
-        dest="always_print_foms",
-        action="store_true",
-        help="Control if figures of merit are printed even if an experiment fails",
-        required=False,
-    )
-
-    subparser.add_argument(
         "-p",
         "--print-results",
         dest="print_results",
@@ -524,7 +516,6 @@ def workspace_analyze_setup_parser(subparser):
 def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace(cmd_name="workspace analyze")
-    ws.always_print_foms = args.always_print_foms
     ws.repeat_success_strict = ramble.config.get("config:repeat_success_strict")
 
     filters = ramble.filters.Filters(

@@ -55,7 +55,7 @@ ramble:
 
         workspace("setup", global_args=["-w", workspace_name])
         ramble_on(global_args=["-w", workspace_name])
-        workspace("analyze", "--always-print-foms", global_args=["-w", workspace_name])
+        workspace("analyze", global_args=["-w", workspace_name])
 
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
