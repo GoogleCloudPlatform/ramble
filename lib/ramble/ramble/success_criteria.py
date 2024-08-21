@@ -83,7 +83,7 @@ class ScopedCriteriaList:
         succeed = True
         for scope in self._valid_scopes:
             for criteria in self.criteria[scope]:
-                succeed = succeed and criteria.found
+                succeed = succeed and criteria.ok()
         return succeed
 
     def all_criteria(self):
@@ -117,6 +117,7 @@ class SuccessCriteria:
         fom_name=None,
         fom_context="null",
         formula=None,
+        anti_match=None,
     ):
         self.name = name
         if mode not in self._valid_modes:
@@ -124,17 +125,29 @@ class SuccessCriteria:
 
         self.mode = mode
         self.match = None
+        self.anti_match = None
         self.file = None
         self.fom_name = None
         self.fom_context = None
         self.fom_formula = None
         self.found = False
+        self.anti_found = False
 
         if mode == "string":
-            if match is None:
-                logger.die(f'Success criteria with mode="{mode}" ' 'require a "match" attribute.')
-
-            self.match = re.compile(match)
+            if match is None and anti_match is None:
+                logger.die(
+                    f'Success criteria with mode="{mode}" '
+                    'require a "match" or "anti_match" attribute.'
+                )
+            if anti_match is not None and match is not None:
+                logger.die(
+                    f'Success criteria {name} with mode="{mode}" '
+                    'require exactly one of "anti_match" and "match" to be set.'
+                )
+            if match is not None:
+                self.match = re.compile(match)
+            else:
+                self.anti_match = re.compile(anti_match)
             self.file = file
 
         elif mode == "fom_comparison":
@@ -150,9 +163,10 @@ class SuccessCriteria:
     def passed(self, test=None, app_inst=None, fom_values=None):
         logger.debug(f"Testing criteria {self.name} mode = {self.mode}")
         if self.mode == "string":
-            match_obj = self.match.match(test)
-            if match_obj:
-                return True
+            if self.match is not None:
+                match_obj = self.match.match(test)
+                if match_obj:
+                    return True
         elif self.mode == "application_function":
             if hasattr(app_inst, self._success_function):
                 func = getattr(app_inst, self._success_function)
@@ -210,9 +224,28 @@ class SuccessCriteria:
 
         return False
 
+    def anti_matched(self, test=None):
+        logger.debug(f"Testing anti-criterion {self.name} mode = {self.mode}")
+        if self.mode == "string":
+            if self.anti_match is not None:
+                anti_match_obj = self.anti_match.match(test)
+                if anti_match_obj:
+                    return True
+        return False
+
     def mark_found(self):
         logger.debug(f"   {self.name} was matched!")
         self.found = True
 
-    def reset_found(self):
+    def mark_anti_found(self):
+        logger.debug(f"   {self.name} was anti-matched!")
+        self.anti_found = True
+
+    def reset(self):
         self.found = False
+        self.anti_found = False
+
+    def ok(self):
+        if self.anti_match is not None:
+            return not self.anti_found
+        return self.found

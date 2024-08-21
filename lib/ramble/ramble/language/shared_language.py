@@ -208,7 +208,14 @@ def required_package(name, package_manager="*"):
 
 @shared_directive("success_criteria")
 def success_criteria(
-    name, mode, match=None, file="{log_file}", fom_name=None, fom_context="null", formula=None
+    name,
+    mode,
+    match=None,
+    file="{log_file}",
+    fom_name=None,
+    fom_context="null",
+    formula=None,
+    anti_match=None,
 ):
     """Defines a success criteria used by experiments of this object
 
@@ -229,6 +236,8 @@ def success_criteria(
                    in. Accepts globbing.
       formula: For mode='fom_comparison'. Formula to use to evaluate success.
                '{value}' keyword is set as the value of the FOM.
+      anti_match: For mode='string'. Value to check indicate failure.
+                  This setting and `match` are mutually exclusive.
     """
 
     def _execute_success_criteria(obj):
@@ -239,6 +248,7 @@ def success_criteria(
         obj.success_criteria[name] = {
             "mode": mode,
             "match": match,
+            "anti_match": anti_match,
             "file": file,
             "fom_name": fom_name,
             "fom_context": fom_context,

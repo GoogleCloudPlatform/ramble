@@ -24,6 +24,19 @@ Or maybe an exit code: 0
         f.write(file_contents)
 
 
+def remark_all(crit_list, file_path):
+    for c in crit_list:
+        c.reset()
+
+    with open(file_path) as f:
+        for line in f.readlines():
+            for c in crit_list:
+                if c.passed(line):
+                    c.mark_found()
+                if c.anti_matched(line):
+                    c.mark_anti_found()
+
+
 def test_single_criteria(tmpdir):
     log_path = tmpdir.join("log.out")
     generate_file(log_path)
@@ -32,12 +45,17 @@ def test_single_criteria(tmpdir):
         "test", "string", r".*Success string.*", log_path
     )
 
-    with open(log_path) as f:
-        for line in f.readlines():
-            if new_criteria.passed(line):
-                new_criteria.mark_found()
+    remark_all([new_criteria], log_path)
 
-    assert new_criteria.found
+    assert new_criteria.ok()
+
+    anti_criteria = ramble.success_criteria.SuccessCriteria(
+        name="test-anti", mode="string", file=log_path, anti_match=r"Or maybe"
+    )
+
+    remark_all([anti_criteria], log_path)
+
+    assert not anti_criteria.ok()
 
 
 def test_criteria_list(tmpdir):
@@ -58,10 +76,18 @@ def test_criteria_list(tmpdir):
 
     criteria_list.add_criteria("workspace", "test-ws", "string", r".*Into a log file.*", log_path)
 
-    with open(log_path) as f:
-        for line in f.readlines():
-            for criteria in criteria_list.all_criteria():
-                if criteria.passed(line):
-                    criteria.mark_found()
+    remark_all(list(criteria_list.all_criteria()), log_path)
 
     assert criteria_list.passed()
+
+    criteria_list.add_criteria(
+        scope="application_definition",
+        name="test-anti",
+        mode="string",
+        file=log_path,
+        anti_match=r"From",
+    )
+
+    remark_all(list(criteria_list.all_criteria()), log_path)
+
+    assert not criteria_list.passed()
