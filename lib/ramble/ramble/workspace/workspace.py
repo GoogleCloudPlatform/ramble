@@ -543,52 +543,54 @@ class Workspace:
 
     def _read(self):
         # Create the workspace config section
-        self.config_sections["workspace"] = {
-            "filename": self.config_file_path,
-            "path": self.config_file_path,
-            "schema": config_schema,
-            "section_filename": self.config_file_path,
-            "raw_yaml": None,
-            "yaml": None,
-        }
+        with lk.ReadTransaction(self.txlock):
+            self.config_sections["workspace"] = {
+                "filename": self.config_file_path,
+                "path": self.config_file_path,
+                "schema": config_schema,
+                "section_filename": self.config_file_path,
+                "raw_yaml": None,
+                "yaml": None,
+            }
 
-        keywords = ramble.keywords.keywords
+            keywords = ramble.keywords.keywords
 
-        read_default = not os.path.exists(self.config_file_path)
-        if read_default:
-            self._read_config(config_section, default_config_yaml())
-        else:
-            with open(self.config_file_path) as f:
-                self._read_config(config_section, f)
+            read_default = not os.path.exists(self.config_file_path)
+            if read_default:
+                self._read_config(config_section, default_config_yaml())
+            else:
+                with open(self.config_file_path) as f:
+                    self._read_config(config_section, f)
 
-        read_default_script = self.read_default_template
-        ext_len = len(workspace_template_extension)
-        if os.path.exists(self.config_dir):
-            for filename in os.listdir(self.config_dir):
-                if filename.endswith(workspace_template_extension):
-                    read_default_script = False
-                    template_name = filename[0:-ext_len]
-                    template_path = os.path.join(self.config_dir, filename)
-                    if keywords.is_reserved(template_name):
-                        raise RambleInvalidTemplateNameError(
-                            f"Template file {filename} results in a "
-                            f"template name of {template_name}" + " which is reserved by ramble."
-                        )
+            read_default_script = self.read_default_template
+            ext_len = len(workspace_template_extension)
+            if os.path.exists(self.config_dir):
+                for filename in os.listdir(self.config_dir):
+                    if filename.endswith(workspace_template_extension):
+                        read_default_script = False
+                        template_name = filename[0:-ext_len]
+                        template_path = os.path.join(self.config_dir, filename)
+                        if keywords.is_reserved(template_name):
+                            raise RambleInvalidTemplateNameError(
+                                f"Template file {filename} results in a "
+                                f"template name of {template_name}"
+                                + " which is reserved by ramble."
+                            )
 
-                    with open(template_path) as f:
-                        self._read_template(template_name, f.read())
+                        with open(template_path) as f:
+                            self._read_template(template_name, f.read())
 
-            if os.path.exists(self.auxiliary_software_dir):
-                for filename in os.listdir(self.auxiliary_software_dir):
-                    aux_file_path = os.path.join(self.auxiliary_software_dir, filename)
-                    with open(aux_file_path) as f:
-                        self._read_auxiliary_software_file(filename, f.read())
+                if os.path.exists(self.auxiliary_software_dir):
+                    for filename in os.listdir(self.auxiliary_software_dir):
+                        aux_file_path = os.path.join(self.auxiliary_software_dir, filename)
+                        with open(aux_file_path) as f:
+                            self._read_auxiliary_software_file(filename, f.read())
 
-        if read_default_script:
-            template_name = workspace_execution_template[0:-ext_len]
-            self._read_template(template_name, template_execute_script)
+            if read_default_script:
+                template_name = workspace_execution_template[0:-ext_len]
+                self._read_template(template_name, template_execute_script)
 
-        self._read_all_application_configs()
+            self._read_all_application_configs()
 
     def _read_all_application_configs(self):
         path_replacements = {"workspace": self.root, "workspace_config": self.config_dir}
@@ -671,29 +673,32 @@ class Workspace:
     def write(self, software_dir=None, inputs_dir=None):
         """Write an in-memory workspace to its location on disk."""
 
-        # Ensure required directory structure exists
-        fs.mkdirp(self.path)
-        fs.mkdirp(self.config_dir)
-        fs.mkdirp(self.auxiliary_software_dir)
-        fs.mkdirp(self.log_dir)
-        fs.mkdirp(self.experiment_dir)
+        with lk.WriteTransaction(self.txlock, acquire=self._re_read):
+            # Ensure required directory structure exists
+            fs.mkdirp(self.path)
+            fs.mkdirp(self.config_dir)
+            fs.mkdirp(self.auxiliary_software_dir)
+            fs.mkdirp(self.log_dir)
+            fs.mkdirp(self.experiment_dir)
 
-        if inputs_dir:
-            os.symlink(os.path.abspath(inputs_dir), self.input_dir, target_is_directory=True)
-        elif not os.path.exists(self.input_dir):
-            fs.mkdirp(self.input_dir)
+            if inputs_dir:
+                os.symlink(os.path.abspath(inputs_dir), self.input_dir, target_is_directory=True)
+            elif not os.path.exists(self.input_dir):
+                fs.mkdirp(self.input_dir)
 
-        if software_dir:
-            os.symlink(os.path.abspath(software_dir), self.software_dir, target_is_directory=True)
-        elif not os.path.exists(self.software_dir):
-            fs.mkdirp(self.software_dir)
+            if software_dir:
+                os.symlink(
+                    os.path.abspath(software_dir), self.software_dir, target_is_directory=True
+                )
+            elif not os.path.exists(self.software_dir):
+                fs.mkdirp(self.software_dir)
 
-        fs.mkdirp(self.shared_dir)
-        fs.mkdirp(self.shared_license_dir)
+            fs.mkdirp(self.shared_dir)
+            fs.mkdirp(self.shared_license_dir)
 
-        self._write_config(config_section)
+            self._write_config(config_section)
 
-        self._write_templates()
+            self._write_templates()
 
     def _write_config(self, section):
         """Update YAML config file for this workspace, based on
@@ -1279,11 +1284,16 @@ class Workspace:
         return _active_workspace and self.path == _active_workspace.path
 
     @property
+    def internal_subdir(self):
+        """Subdirectory for housing ramble internals"""
+        return os.path.join(self.root, ".ramble-workspace")
+
+    @property
     def _transaction_lock_path(self):
         """The location of the lock file used to synchronize multiple
         processes updating the same workspace.
         """
-        return os.path.join(self.root, "transaction_lock")
+        return os.path.join(self.internal_subdir, "transaction_lock")
 
     @property
     def experiment_dir(self):
