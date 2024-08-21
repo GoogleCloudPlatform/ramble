@@ -1614,6 +1614,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         criteria_obj = criteria_list.find_criteria(criteria)
                         if criteria_obj.passed(line, self):
                             criteria_obj.mark_found()
+                        if criteria_obj.anti_matched(line):
+                            criteria_obj.mark_anti_found()
 
                     for context in file_conf["contexts"]:
                         context_conf = contexts[context]

@@ -24,6 +24,7 @@ success_criteria_def = {
         "fom_name": {"type": "string", "default": None},
         "fom_context": {"type": "string", "default": None},
         "formula": {"type": "string", "default": None},
+        "anti_match": {"type": "string", "default": None},
     },
     "additionalProperties": False,
 }
