@@ -107,6 +107,11 @@ class Orca(ExecutableApplication):
     )
 
     success_criteria(
+        "Error free",
+        mode="string",
+        anti_match=r".*Error:.*",
+    )
+    success_criteria(
         "Normal termination",
         mode="string",
         match=r".*ORCA TERMINATED NORMALLY.*",
