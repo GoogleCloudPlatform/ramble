@@ -135,7 +135,7 @@ ramble:
   variables:
     mpi_command: mpirun -n {n_ranks}
     batch_submit: '{execute_experiment}'
-    processes_per_node: -1
+    processes_per_node: 1
   applications: {}
   software:
     packages: {}
