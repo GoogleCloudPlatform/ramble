@@ -46,7 +46,7 @@ default_keys = {
     "n_threads": {"type": key_type.required, "level": output_level.key},
     "batch_submit": {"type": key_type.required, "level": output_level.variable},
     "mpi_command": {"type": key_type.required, "level": output_level.variable},
-    "experiment_template_name": {"type": key_type.required, "level": output_level.key},
+    "experiment_template_name": {"type": key_type.reserved, "level": output_level.key},
 }
 
 
