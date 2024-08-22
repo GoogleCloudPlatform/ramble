@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
-import re
 import deprecation
 
 import pytest
@@ -31,8 +29,6 @@ workspace = RambleCommand("workspace")
 @deprecation.fail_if_not_removed
 @pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
 def test_known_applications(application, package_manager, mock_file_auto_create):
-    info_cmd = RambleCommand("info")
-
     setup_type = ramble.pipeline.pipelines.setup
     analyze_type = ramble.pipeline.pipelines.analyze
     archive_type = ramble.pipeline.pipelines.archive
@@ -41,53 +37,30 @@ def test_known_applications(application, package_manager, mock_file_auto_create)
     archive_cls = ramble.pipeline.pipeline_class(archive_type)
     filters = ramble.filters.Filters()
 
-    workload_regex = re.compile(r"Workload: (?P<wl_name>.*)")
     ws_name = f"test_all_apps_{application}"
-
-    base_config = """ramble:
-  variables:
-    mpi_command: 'mpirun -n {n_ranks}'
-    batch_submit: '{execute_experiment}'
-  applications:\n"""
-
-    app_info = info_cmd("--attributes", "workloads", "-v", application)
-    workloads = []
-    for line in app_info.split("\n"):
-        match = workload_regex.search(line)
-        if match:
-            workloads.append(match.group("wl_name").replace(" ", ""))
 
     with ramble.workspace.create(ws_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        args = [
+            application,
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "n_ranks=1",
+            "-w",
+            "test_workload",
+        ]
+        if package_manager == "None":
+            app_inst = ramble.repository.get(application)
+            for pkg in app_inst.required_packages.keys():
+                args.append("-v")
+                args.append(f"{pkg}_path='/not/real/path'")
 
-        with open(config_path, "w+") as f:
-            f.write(base_config)
-            f.write(f"    {application}:\n")
-            f.write("      workloads:\n")
-            for workload in workloads:
-                f.write(
-                    f"""        {workload.strip()}:
-          experiments:
-            test_experiment:
-              variables:
-                n_ranks: '1'
-                n_nodes: '1'
-                processes_per_node: '1'\n"""
-                )
-                if package_manager == "None":
-                    app_inst = ramble.repository.get(application)
-                    for pkg in app_inst.required_packages.keys():
-                        f.write(f"                {pkg}_path: '/not/real/path'\n")
-            f.write(
-                """  software:
-    packages: {}
-    environments: {}\n"""
-            )
-            f.write(
-                f"""  variants:
-    package_manager: {package_manager}\n"""
-            )
+        else:
+            args.append("-p")
+            args.append(package_manager)
+
+        workspace("generate-config", *args, global_args=["-w", ws_name])
 
         ws._re_read()
         ws.concretize()
