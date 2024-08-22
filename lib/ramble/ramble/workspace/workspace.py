@@ -855,6 +855,270 @@ class Workspace:
 
             yield contents, experiment_context
 
+    def add_experiments(
+        self,
+        application,
+        workload_name_variable,
+        workload_filters,
+        include_default_variables,
+        variable_filters,
+        variable_definitions,
+        experiment_name,
+        package_manager=None,
+        zips=[],
+        matrix=None,
+    ):
+        """Add new experiments to this workspace
+
+        Iterate over the workloads of the input application and define new
+        experiments for each workload that matches any filter provided in
+        workload_filters.
+
+        Args:
+            application (str): Name of application to define experiments for
+            workload_name_variable (str): Name of variable to contain workload names,
+                                          if the workload names should be collapsed
+            workload_filters (list(str)): List of filters to downselect workloads with
+            include_default_variables (bool): Whether to include default variables in the
+                                              resulting config or not
+            variable_filters (list(str)): List of filters to downselect variables with
+            variable_definitions (list(str)): List of variable definitions to use
+                                              within generated experiments
+            experiment_name (str): The name of the experiments to add
+            package_manager (str): Name of package manager to use for the generated experiments
+            zips (list(str)): List of strings representing zips to define, in the
+                              format zipname=[var1,var2,var3]
+            matrix (str): String representing a matrix to define within the
+                          experiment in the format of var1,var2,var3.
+        """
+
+        def create_valid_list(in_str):
+            if "[" not in in_str and "]" not in in_str:
+                return in_str
+
+            temp = in_str.replace("[", "").replace("]", "")
+            out_value = []
+            for part in temp.split(","):
+                if part[0] == " ":
+                    out_value.append(part[1:])
+                else:
+                    out_value.append(part)
+            return out_value
+
+        def yaml_add_comment_before_key(
+            base, key, comment, column=None, clear=False, start_char="#"
+        ):
+            """
+            Insert a comment before the provided key within the base commented
+            object.
+
+            Args:
+                base: Typically a CommentedMap, but the object comments should
+                      be added to
+                key: Key in base object to inject the comment before.
+                column (int): Column to start the comment at. If not specified,
+                              will use previously defined comments to determine
+                              indentation.
+                clear (bool): Whether to clear previous comments or not
+                start_char (str): Character to begin the comment with
+            """
+            import ruamel.yaml as yaml
+
+            key_comment = base.ca.items.setdefault(key, [None, [], None, None])
+
+            if clear:
+                key_comment[1] = []
+            comment_list = key_comment[1]
+
+            if comment:
+                comment_start = f"{start_char} "
+                if comment[-1] == "\n":
+                    comment = comment[:-1]  # strip final newline if there
+            else:
+                comment_start = f"{start_char}"
+
+            if column is None:
+                if comment_list:
+                    # if there already are other comments get the column from them
+                    column = comment_list[-1].start_mark.column
+                else:
+                    column = 0
+
+            start_mark = yaml.error.Mark(None, None, None, column, None, None)
+
+            comment_list.append(
+                yaml.tokens.CommentToken(comment_start + comment + "\n", start_mark, None)
+            )
+
+            return base
+
+        import ruamel.yaml as yaml
+
+        workspace_vars = self.get_workspace_vars()
+        apps_dict = self.get_applications().copy()
+
+        app_inst = ramble.repository.get(application)
+
+        var_def_dict = {}
+        def_regex = re.compile(r"(?P<key>.*)=(?P<value>.*)")
+        for definition in variable_definitions:
+            m = def_regex.match(definition)
+            if m:
+                key = m.group("key")
+                value = create_valid_list(m.group("value"))
+                var_def_dict[key] = value
+            else:
+                logger.die(
+                    f"Invalid variable definition provided: {definition}. "
+                    + "Accepted form is 'key=value'"
+                )
+
+        if application not in apps_dict:
+            apps_dict[application] = syaml.syaml_dict()
+            apps_dict[application]["workloads"] = syaml.syaml_dict()
+
+        workloads_dict = apps_dict[application]["workloads"]
+
+        exp_zips = {}
+        for zip_def in zips:
+            m = def_regex.match(zip_def)
+            if m:
+                key = m.group("key")
+                value = create_valid_list(m.group("value"))
+                exp_zips[key] = value
+            else:
+                logger.die(
+                    f"Invalid zip definition provided: {zip_def}. "
+                    + "Accepted form is 'zipname=[var1,var2,var3]'"
+                )
+
+        exp_matrix = []
+        if matrix:
+            for part in matrix.split(","):
+                exp_matrix.append(part)
+
+        workload_names = []
+        for workload in app_inst.workloads.values():
+            add_workload = False
+            for wl_filter in workload_filters:
+                if fnmatch.fnmatch(workload.name, wl_filter):
+                    add_workload = True
+                    break
+
+            # Don't add this experiment if it already exists in the workspace
+            if add_workload:
+                if application in apps_dict:
+                    subdict = apps_dict[application]
+                    if "workloads" in subdict:
+                        subdict = subdict["workloads"]
+                        if workload.name in subdict:
+                            subdict = subdict[workload.name]
+                            if "experiments" in subdict:
+                                subdict = subdict["experiments"]
+                                if experiment_name in subdict:
+                                    add_workload = False
+
+            if add_workload:
+                workload_names.append(workload.name)
+
+        if workload_name_variable:
+            var_def_dict[workload_name_variable] = workload_names.copy()
+            workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
+
+        for workload_name in workload_names:
+            if workload_name not in workloads_dict:
+                workloads_dict[workload_name] = syaml.syaml_dict()
+                workloads_dict[workload_name]["experiments"] = syaml.syaml_dict()
+
+            exps_dict = workloads_dict[workload_name]["experiments"]
+
+            if experiment_name not in exps_dict:
+                exps_dict[experiment_name] = syaml.syaml_dict()
+                exp_dict = exps_dict[experiment_name]
+
+                if package_manager is not None:
+                    exp_dict["variants"] = syaml.syaml_dict()
+                    variants_dict = exp_dict["variants"]
+                    variants_dict["package_manager"] = package_manager
+
+                if "variables" not in exp_dict:
+                    exp_dict["variables"] = yaml.comments.CommentedMap()
+
+                vars_dict = exp_dict["variables"]
+
+                # Ensure required variables are defined
+                for key in app_inst.keywords.all_required_keys():
+                    if key not in workspace_vars:
+                        vars_dict[key] = ""
+
+                # Only extract variable defaults if requested.
+                # This is mutually exclusive with workload_name_variable
+                if include_default_variables:
+                    # At this point we should only have a valid workload name
+                    workload = app_inst.workloads[workload_name]
+                    if workload.variables:
+                        first_var = True
+                        for var in workload.variables.values():
+                            keep_var = False
+                            for var_filter in variable_filters:
+                                if fnmatch.fnmatch(var.name, var_filter):
+                                    keep_var = True
+                                    break
+
+                            if keep_var:
+                                vars_dict[var.name] = var.default
+
+                                # Add blank line before all variables except
+                                # the first
+                                if first_var:
+                                    first_var = False
+                                else:
+                                    yaml_add_comment_before_key(
+                                        vars_dict, var.name, "", column=17, start_char=""
+                                    )
+                                if var.description:
+                                    yaml_add_comment_before_key(
+                                        vars_dict, var.name, var.description, column=17
+                                    )
+                                if len(var.values) > 1 or var.values[0] is not None:
+                                    yaml_add_comment_before_key(
+                                        vars_dict,
+                                        var.name,
+                                        f"Suggested values: {var.values}",
+                                        column=17,
+                                    )
+
+                    if workload.environment_variables:
+                        if "env_vars" not in exps_dict[experiment_name]:
+                            exp_dict["env_vars"] = syaml.syaml_dict()
+                            exp_dict["env_vars"]["set"] = syaml.syaml_dict()
+
+                        env_vars_dict = exp_dict["env_vars"]["set"]
+
+                        for env_var in workload.environment_variables.values():
+                            env_vars_dict[env_var.name] = env_var.value
+
+                # Add any variables that are defined to the variables dict
+                if var_def_dict:
+                    vars_dict.update(var_def_dict)
+
+                if exp_zips:
+                    if "zips" not in exp_dict:
+                        exp_dict["zips"] = exp_zips.copy()
+
+                if exp_matrix:
+                    if "matrix" not in exp_dict:
+                        exp_dict["matrix"] = exp_matrix.copy()
+
+        if not self.dry_run:
+            ramble.config.config.update_config(
+                "applications", apps_dict, scope=self.ws_file_config_scope_name()
+            )
+        else:
+            workspace_dict = self._get_workspace_dict().copy()
+            workspace_dict["ramble"]["applications"] = apps_dict
+            print(f"\n{syaml.dump(workspace_dict)}")
+
     def concretize(self):
         full_software_dict = self.get_software_dict()
 
