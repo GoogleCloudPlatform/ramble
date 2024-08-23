@@ -1605,17 +1605,23 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 logger.debug(f"Skipping analysis of non-existent file: {file}")
                 continue
 
+            per_file_crit_objs = [
+                criteria_list.find_criteria(c) for c in file_conf["success_criteria"]
+            ]
+
             with open(file) as f:
                 for line in f.readlines():
                     logger.debug(f"Line: {line}")
-
-                    for criteria in file_conf["success_criteria"]:
-                        logger.debug("Looking for criteria %s" % criteria)
-                        criteria_obj = criteria_list.find_criteria(criteria)
-                        if criteria_obj.passed(line, self):
-                            criteria_obj.mark_found()
-                        if criteria_obj.anti_matched(line):
-                            criteria_obj.mark_anti_found()
+                    new_per_file_crit_objs = []
+                    for crit_obj in per_file_crit_objs:
+                        logger.debug(f"Looking for criteria {crit_obj.name}")
+                        if crit_obj.passed(line, self):
+                            crit_obj.mark_found()
+                        elif crit_obj.anti_matched(line):
+                            crit_obj.mark_anti_found()
+                        else:
+                            new_per_file_crit_objs.append(crit_obj)
+                    per_file_crit_objs = new_per_file_crit_objs
 
                     for context in file_conf["contexts"]:
                         context_conf = contexts[context]
