@@ -1941,12 +1941,23 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for success_scope, success_list in success_lists:
             for criteria, conf in success_list.items():
                 if conf["mode"] == "string":
+                    match = (
+                        self.expander.expand_var(conf["match"])
+                        if conf["match"] is not None
+                        else None
+                    )
+                    anti_match = (
+                        self.expander.expand_var(conf["anti_match"])
+                        if conf["anti_match"] is not None
+                        else None
+                    )
                     criteria_list.add_criteria(
                         success_scope,
                         criteria,
-                        conf["mode"],
-                        re.compile(self.expander.expand_var(conf["match"])),
-                        conf["file"],
+                        mode=conf["mode"],
+                        match=match,
+                        file=conf["file"],
+                        anti_match=anti_match,
                     )
                 elif conf["mode"] == "fom_comparison":
                     criteria_list.add_criteria(
