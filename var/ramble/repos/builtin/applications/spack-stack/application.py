@@ -8,6 +8,7 @@
 
 import os
 
+import ramble.config
 from ramble.appkit import *
 import spack.util.executable
 
@@ -46,7 +47,12 @@ class SpackStack(ExecutableApplication):
     executable("install", "spack install {install_flags}", use_mpi=True)
     workload(
         "create",
-        executables=["builtin::remove_env_files", "configure", "install"],
+        executables=[
+            "builtin::remove_env_files",
+            "configure",
+            "install",
+            "builtin::remove_packages",
+        ],
     )
 
     executable("uninstall", "spack uninstall {uninstall_flags}", use_mpi=True)
@@ -64,6 +70,13 @@ class SpackStack(ExecutableApplication):
         "install_flags",
         default="",
         description="Flags to use for `spack install`",
+        workloads=["create"],
+    )
+
+    workload_variable(
+        "removed_packages",
+        default=[],
+        description="List of packages to remove from the environment after installation is complete",
         workloads=["create"],
     )
 
@@ -131,6 +144,34 @@ class SpackStack(ExecutableApplication):
 
     def remove_env_files(self):
         cmds = ["rm -f {env_path}/spack.lock", "rm -rf {env_path}/.spack-env"]
+        return cmds
+
+    register_builtin("remove_packages", required=False)
+
+    def remove_packages(self):
+        """Inject command to uninstall selected packages.
+
+        This allows spack to omit some packages from a buildcache by
+        uninstalling them after the whole environment is installed.
+        """
+        cmds = []
+
+        # Package removal is only supported in bash or sh
+        if ramble.config.get("config:shell") in ["sh", "bash"]:
+            # Do not expand the `removed_packages` variable, so it will not be
+            # used to render experiments.
+            packages_to_remove = self.expander.expand_var_name(
+                "removed_packages", merge_used_stage=False, typed=True
+            )
+            self.expander.flush_used_variable_stage()
+            for pkg in packages_to_remove:
+                cmds.append(
+                    f'grep "{pkg}" ' + "{env_path}/spack.yaml &> /dev/null"
+                )
+                cmds.append("if [ $? -eq 0 ]; then")
+                cmds.append(f"  spack uninstall {pkg}")
+                cmds.append(f"  spack remove {pkg}")
+                cmds.append("fi")
         return cmds
 
     def evaluate_success(self):
