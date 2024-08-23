@@ -72,6 +72,18 @@ def setup_parser(subparser):
               "specified as either 'time' or 'throughput'."),
         required=False
     )
+    report_parser.add_argument(
+        "--logx", dest="logx",
+        action="store_true",
+        help=("Plot X axis as log"),
+        required=False
+    )
+    report_parser.add_argument(
+        "--logy", dest="logy",
+        action="store_true",
+        help=("Plot Y axis as log"),
+        required=False
+    )
     report_parser.add_argument("-f", "--file", help="path of results file")
 
 

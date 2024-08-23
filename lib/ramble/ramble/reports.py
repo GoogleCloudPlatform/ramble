@@ -227,22 +227,19 @@ class PlotFactory:
     def create_plot_generators(self, args, report_dir_path, pdf_report, results_df):
         plots = []
         normalize = args.normalize
+        logx = args.logx
+        logy = args.logy
 
-        if args.strong_scaling:
-            spec = args.strong_scaling
-            plots.append( StrongScalingPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
+        plot_types = [
+            (args.strong_scaling, StrongScalingPlot),
+            (args.weak_scaling, WeakScalingPlot),
+            (args.compare, ComparisonPlot),
+            (args.foms, FomPlot),
+        ]
 
-        if args.weak_scaling:
-            spec = args.weak_scaling
-            plots.append( WeakScalingPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
-
-        if args.compare:
-            spec = args.compare
-            plots.append( ComparisonPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
-
-        if args.foms:
-            spec = args.foms
-            plots.append( FomPlot(spec, normalize, report_dir_path, pdf_report, results_df) )
+        for spec, plot_class in plot_types:
+            if spec:
+                plots.append( plot_class(spec, normalize, report_dir_path, pdf_report, results_df, logx, logy) )
 
         if not plots:
             # TODO: should this be checked in cmd?
@@ -253,7 +250,7 @@ class PlotFactory:
 
 
 class PlotGenerator:
-    def __init__(self, spec, normalize, report_dir_path, pdf_report, results_df):
+    def __init__(self, spec, normalize, report_dir_path, pdf_report, results_df, logx, logy):
         self.normalize = normalize
         self.spec = spec
         self.report_dir_path = report_dir_path
@@ -262,15 +259,19 @@ class PlotGenerator:
         self.results_df = results_df
         self.output_df = pd.DataFrame()
 
+        self.logx = logx
+        self.logy = logy
+
         # TODO: enable
         self.have_statistics = False
 
-    def normalize_data(self, data, speedup=False):
+    def normalize_data(self, data, to_col='normalized_fom_value', from_col='fom_value', speedup=False):
+        # TODO: support more than normalizing by the first value
         # Performs inplace edit on data, no need to return
         if speedup:
-            data.loc[:, 'normalized_fom_value'] = data['fom_value'].iloc[0] / data.loc[:, 'fom_value']
+            data.loc[:, to_col] = data[from_col].iloc[0] / data.loc[:, from_col]
         else:
-            data.loc[:, 'normalized_fom_value'] = data.loc[:, 'fom_value'] / data['fom_value'].iloc[0]
+            data.loc[:, to_col] = data.loc[:, from_col] / data[from_col].iloc[0]
 
     def generate_plot_data(self):
         for chart_spec in self.spec:
@@ -341,8 +342,17 @@ class WeakScalingPlot(ScalingPlotGenerator):
         ax.set_xlabel(scale_var)
         plt.legend(loc="upper left")
 
-        # TODO: add a way to enable log axis
-        # ax.set_xscale('log')
+        from matplotlib.ticker import ScalarFormatter
+        formatter = ScalarFormatter()
+        formatter.set_scientific(False)
+
+        if self.logx:
+            ax.set_xscale('log', base=2)
+            ax.xaxis.set_major_formatter(formatter)
+
+        if self.logy:
+            ax.set_yscale('log', base=2)
+            ax.yaxis.set_major_formatter(formatter)
 
         #ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
         ax.set_xticks(self.output_df.index.unique().tolist())
@@ -427,11 +437,24 @@ class StrongScalingPlot(ScalingPlotGenerator):
         else:
             ax.plot(self.output_df.index, 'fom_value', data=self.output_df, marker='o')
             ymin, ymax = ax.get_ylim()
-            plt.ylim(0, ymax*1.1)
+
+            # TODO: help plot fit in bounds
+            #plt.ylim(0, ymax*1.1)
 
             ax.set_ylabel(f'{perf_measure}')
 
-        #self.have_statistics = False
+        from matplotlib.ticker import ScalarFormatter
+        formatter = ScalarFormatter()
+        formatter.set_scientific(False)
+
+        if self.logx:
+            ax.set_xscale('log', base=2)
+            ax.xaxis.set_major_formatter(formatter)
+
+        if self.logy:
+            ax.set_yscale('log', base=2)
+            ax.yaxis.set_major_formatter(formatter)
+
         if self.have_statistics:
             logger.debug('Adding fill lines for min and max')
             ax.fill_between(
@@ -462,7 +485,6 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
 
     def default_better(self):
-
         if self.normalize:
             return BetterDirection.HIGHER
         else:
@@ -517,9 +539,7 @@ class StrongScalingPlot(ScalingPlotGenerator):
                 if self.normalize:
                     self.normalize_data(series_results, speedup=True)
 
-                series_results = self.add_idealized_data(perf_measure_results, series_results)
-
-                # TODO: move out so it works for normalized too
+                # TODO: generalize for strong scaling too
                 if not series_min.empty:
                     self.have_statistics = True
 
@@ -533,7 +553,14 @@ class StrongScalingPlot(ScalingPlotGenerator):
                     minmax['fom_value_min'] = series_min['fom_value']
                     minmax['fom_value_max'] = series_max['fom_value']
                     minmax.index = to_numeric_if_possible(series_min.index)
+
+                    if self.normalize:
+                        self.normalize_data(minmax, to_col='fom_value_min', from_col='fom_value_min', speedup=True)
+                        self.normalize_data(minmax, to_col='fom_value_max', from_col='fom_value_max', speedup=True)
+
                     self.minmax = minmax
+
+                series_results = self.add_idealized_data(perf_measure_results, series_results)
 
                 self.output_df = series_results
                 self.draw(perf_measure, scale_var, series)
