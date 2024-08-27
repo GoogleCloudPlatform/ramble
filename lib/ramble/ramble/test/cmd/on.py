@@ -25,7 +25,7 @@ workspace = RambleCommand("workspace")
 on = RambleCommand("on")
 
 
-def test_on_command(mutable_mock_workspace_path):
+def test_on_command():
     ws_name = "test"
     workspace("create", ws_name)
     assert ws_name in workspace("list")
@@ -40,7 +40,7 @@ def test_on_command(mutable_mock_workspace_path):
         on(global_args=["-w", ws_name])
 
 
-def test_execute_pipeline(mutable_mock_workspace_path):
+def test_execute_pipeline():
     ws_name = "test"
     workspace("create", ws_name)
     assert ws_name in workspace("list")
@@ -63,7 +63,7 @@ def test_execute_pipeline(mutable_mock_workspace_path):
         execute_pipeline.run()
 
 
-def test_on_where(mutable_mock_workspace_path):
+def test_on_where():
     ws_name = "test"
     workspace("create", ws_name)
 
@@ -77,7 +77,7 @@ def test_on_where(mutable_mock_workspace_path):
         on("--where", '"{experiment_index}" == "1"', global_args=["-w", ws_name])
 
 
-def test_on_executor(mutable_mock_workspace_path):
+def test_on_executor():
     ws_name = "test"
     workspace("create", ws_name)
 
