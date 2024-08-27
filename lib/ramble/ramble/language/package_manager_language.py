@@ -41,6 +41,8 @@ def package_manager_variable(
     """
 
     def _define_package_manager_variable(pm):
+        import ramble.workload
+
         pm.package_manager_variables[name] = ramble.workload.WorkloadVariable(
             name,
             default=default,

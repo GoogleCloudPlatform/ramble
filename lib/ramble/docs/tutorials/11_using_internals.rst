@@ -130,7 +130,7 @@ experiments, execute:
 
 .. code-block:: console
 
-    $ ramble info -a workloads -v -p "CONUS_12km" wrfv4
+    $ ramble info --attrs workloads -v -p "CONUS_12km" wrfv4
 
 This prints the information for the ``CONUS_12km`` workload in the wrfv4 application definition.
 ``Executables:`` definition lists the order of executables used for this
@@ -146,7 +146,7 @@ To be able to see these, you can execute:
 
 .. code-block:: console
 
-    $ ramble info -a builtins -v wrfv4
+    $ ramble info --attrs builtins -v wrfv4
 
 This command should print something like the following:
 

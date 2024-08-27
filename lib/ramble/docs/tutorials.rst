@@ -31,3 +31,4 @@ various features.
     tutorials/10_using_modifiers
     tutorials/11_using_internals
     tutorials/mirrors
+    tutorials/EESSI_package_manager
