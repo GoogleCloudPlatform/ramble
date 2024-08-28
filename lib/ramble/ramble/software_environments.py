@@ -379,9 +379,9 @@ class ExternalEnvironment(SoftwareEnvironment):
 class RenderedExternalEnvironment(ExternalEnvironment):
     """Class representing a rendered externally defined software environment"""
 
-    def __init__(self, external_env: ExternalEnvironment, package_manager: PackageManagerBase):
+    def __init__(self, name: str, name_or_path: str, package_manager: PackageManagerBase):
         """Constructor for external software environment"""
-        super().__init__(external_env.name, external_env.external_env)
+        super().__init__(name, name_or_path)
         self.package_manager = package_manager
 
     @property
@@ -776,9 +776,9 @@ class SoftwareEnvironments:
 
         # Check for an external environment before checking templates that need to be rendered
         if env_name in self._external_env_templates:
-            rendered_ext_env = RenderedExternalEnvironment(
-                self._external_env_templates[env_name], package_manager
-            )
+            ext_env_tmpl = self._external_env_templates[env_name]
+            ext_env_spec = expander.expand_var(ext_env_tmpl.external_env)
+            rendered_ext_env = RenderedExternalEnvironment(env_name, ext_env_spec, package_manager)
             self._rendered_environments[pm_name][env_name] = rendered_ext_env
             return rendered_ext_env
 
