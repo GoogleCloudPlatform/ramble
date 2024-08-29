@@ -53,6 +53,7 @@ from ramble.util.shell_utils import source_str
 from ramble.util.naming import NS_SEPARATOR
 
 from ramble.workspace import namespace
+from ramble.experiment_result import ExperimentResult
 
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
@@ -144,7 +145,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.experiment_tags = []
         self._modifier_instances = []
         self._input_fetchers = None
-        self.results = {}
+        self.result = None
         self._phase_times = {}
         self._pipeline_graphs = None
         self.package_manager = None
@@ -1747,23 +1748,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        self._prepare_results(workspace, self.expander.experiment_namespace, success)
-
-        self.results["TAGS"] = list(self.experiment_tags)
-
-        # Add defined keywords as top level keys
-        for key in self.keywords.keys:
-            if self.keywords.is_key_level(key):
-                self.results[key] = self.expander.expand_var_name(key)
-
-        self.results["RAMBLE_VARIABLES"] = {}
-        self.results["RAMBLE_RAW_VARIABLES"] = {}
-        for var, val in self.variables.items():
-            self.results["RAMBLE_RAW_VARIABLES"][var] = val
-            if var not in self.keywords.keys or not self.keywords.is_key_level(var):
-                self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
-
-        self.results["CONTEXTS"] = []
+        self._init_result()
 
         for context, fom_map in fom_values.items():
             context_map = {
@@ -1778,11 +1763,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 context_map["foms"].append(fom_copy)
 
             if context == _NULL_CONTEXT:
-                self.results["CONTEXTS"].insert(0, context_map)
+                self.result.contexts.insert(0, context_map)
             else:
-                self.results["CONTEXTS"].append(context_map)
+                self.result.contexts.append(context_map)
 
-        workspace.append_result(self.results)
+        workspace.append_result(self.result.to_dict())
 
     def calculate_statistics(self, workspace):
         """Calculate statistics for results of repeated experiments
@@ -1867,7 +1852,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         else:
             self.set_status(status=experiment_status.FAILED)
 
-        self._prepare_results(workspace, base_exp_namespace, repeat_success)
+        self._init_result()
 
         logger.debug(
             f"Calculating statistics for {self.repeats.n_repeats} repeats of " f"{base_exp_name}"
@@ -1885,11 +1870,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 continue
 
             # When strict success is off for repeats (loose success), skip failed exps
-            if exp_inst.results["RAMBLE_STATUS"] == "FAILED":
+            if exp_inst.result.status == "FAILED":
                 continue
 
-            if "CONTEXTS" in exp_inst.results:
-                for context in exp_inst.results["CONTEXTS"]:
+            if exp_inst.result.contexts:
+                for context in exp_inst.result.contexts:
                     context_name = context["name"]
 
                     if context_name not in repeat_foms.keys():
@@ -1941,29 +1926,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
             results.append(context_map)
 
         if results:
-            self.results["CONTEXTS"] = results
+            self.result.contexts = results
 
-        workspace.insert_result(self.results, first_repeat_exp)
+        workspace.insert_result(self.result.to_dict(), first_repeat_exp)
 
-    def _prepare_results(self, workspace, exp_namespace, success):
-        self.results = {"name": exp_namespace}
-        self.results["N_REPEATS"] = self.repeats.n_repeats
-        self.results["EXPERIMENT_CHAIN"] = self.chain_order.copy()
-        self.results["RAMBLE_STATUS"] = self.get_status()
-
-        # Add defined keywords as top level keys
-        for key in self.keywords.keys:
-            if self.keywords.is_key_level(key):
-                self.results[key] = self.expander.expand_var_name(key)
-
-        self.results["RAMBLE_VARIABLES"] = {}
-        self.results["RAMBLE_RAW_VARIABLES"] = {}
-        for var, val in self.variables.items():
-            self.results["RAMBLE_RAW_VARIABLES"][var] = val
-            if var not in self.keywords.keys or not self.keywords.is_key_level(var):
-                self.results["RAMBLE_VARIABLES"][var] = self.expander.expand_var(val)
-
-        self.results["CONTEXTS"] = []
+    def _init_result(self):
+        if self.result is None:
+            self.result = ExperimentResult(self)
 
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""
