@@ -39,6 +39,7 @@ class WaitForBgJobs(BasicModifier):
         post_exec = []
 
         if executable.run_in_background:
+            shell = ramble.config.get("config:shell")
             last_pid_str = last_pid_var(shell)
             post_exec.append(
                 CommandExecutable(
