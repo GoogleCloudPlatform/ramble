@@ -375,9 +375,18 @@ class ExternalEnvironment(SoftwareEnvironment):
         super().__init__(name)
         self.external_env = name_or_path
 
+
+class RenderedExternalEnvironment(ExternalEnvironment):
+    """Class representing a rendered externally defined software environment"""
+
+    def __init__(self, name: str, name_or_path: str, package_manager: PackageManagerBase):
+        """Constructor for external software environment"""
+        super().__init__(name, name_or_path)
+        self.package_manager = package_manager
+
     @property
     def package_manager_name(self):
-        return "spack"
+        return self.package_manager.name
 
 
 class RenderedEnvironment(SoftwareEnvironment):
@@ -530,6 +539,7 @@ class SoftwareEnvironments:
         self._workspace = workspace
         self._software_dict = workspace.get_software_dict().copy()
         self._environment_templates = {}
+        self._external_env_templates = {}
         self._package_templates = {}
         self._rendered_packages = defaultdict(dict)
         self._rendered_environments = defaultdict(dict)
@@ -592,10 +602,10 @@ class SoftwareEnvironments:
         if namespace.environments in self._software_dict:
             for env_template, env_info in self._software_dict[namespace.environments].items():
                 if namespace.external_env in env_info and env_info[namespace.external_env]:
-                    # External environments are considered rendered
+                    # External environments are stored in a separate template dict, such that it
+                    # still goes through the rendering to concretize on the package_manager used.
                     new_env = ExternalEnvironment(env_template, env_info[namespace.external_env])
-                    # TODO: is external env a spack-only concept?
-                    self._rendered_environments["spack"][env_template] = new_env
+                    self._external_env_templates[env_template] = new_env
                 else:
                     # Define a new template environment
                     new_env = TemplateEnvironment(env_template)
@@ -764,10 +774,13 @@ class SoftwareEnvironments:
                 "`render_environment` expects a non-null package manager"
             )
 
-        # Check for an external environment before checking templates
-        if env_name in self._rendered_environments[pm_name]:
-            if isinstance(self._rendered_environments[pm_name][env_name], ExternalEnvironment):
-                return self._rendered_environments[pm_name][env_name]
+        # Check for an external environment before checking templates that need to be rendered
+        if env_name in self._external_env_templates:
+            ext_env_tmpl = self._external_env_templates[env_name]
+            ext_env_spec = expander.expand_var(ext_env_tmpl.external_env)
+            rendered_ext_env = RenderedExternalEnvironment(env_name, ext_env_spec, package_manager)
+            self._rendered_environments[pm_name][env_name] = rendered_ext_env
+            return rendered_ext_env
 
         for template_name, template_def in self._environment_templates.items():
             expander.flush_used_variable_stage()

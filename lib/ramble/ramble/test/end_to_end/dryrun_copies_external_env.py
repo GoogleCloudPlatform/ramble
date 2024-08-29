@@ -44,6 +44,7 @@ ramble:
     processes_per_node: '10'
     n_ranks: '{{processes_per_node}}*{{n_nodes}}'
     n_threads: '1'
+    my_external_env: {env_path}
   applications:
     wrfv4:
       workloads:
@@ -56,7 +57,7 @@ ramble:
     packages: {{}}
     environments:
       wrfv4:
-        external_env: {env_path}
+        external_env: '{{my_external_env}}'
 """
 
     setup_type = ramble.pipeline.pipelines.setup

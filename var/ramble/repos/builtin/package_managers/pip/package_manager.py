@@ -8,6 +8,7 @@
 
 import os
 import re
+import shutil
 import sys
 
 from ramble.application import ApplicationError
@@ -359,6 +360,14 @@ class PipRunner:
         and writes the output requirements.txt to the current env_path.
         """
         self._check_env_configured()
+        dest = os.path.join(self.env_path, self._requirement_file_name)
+        # When a file is given, assume it's a requirements.txt.
+        if os.path.isfile(external_env_path):
+            logger.msg(
+                f"Treat {external_env_path} as an externally defined requirements.txt file"
+            )
+            shutil.copyfile(external_env_path, dest)
+            return
         # Assume the given external_env_path already points to a venv path,
         # If not, also attempt path/.venv/.
         maybe_paths = ["", self._venv_name]
@@ -370,12 +379,11 @@ class PipRunner:
                 break
         if not ext_python_path:
             raise RunnerError(
-                f"The given external env path {external_env_path} does not point to a valid venv"
+                f"The given external env path {external_env_path} does not point to a valid venv "
+                "or requirements.txt file"
             )
         ext_python = Executable(ext_python_path)
-        with open(
-            os.path.join(self.env_path, self._requirement_file_name), "w"
-        ) as f:
+        with open(dest, "w") as f:
             ext_python("-m", "pip", "freeze", output=f)
 
     def define_path_vars(self, app_inst, cache):
