@@ -8,6 +8,10 @@
 
 """Utils for handling shell specialization"""
 
+from ramble.error import RambleError
+
+_SUPPORTED_BASE_SHELLS = frozenset(["sh", "fish", "csh", "bat"])
+
 
 def last_pid_var(shell: str) -> str:
     if shell == "fish":
@@ -53,3 +57,17 @@ def get_compatible_base_shell(shell):
         (str): The base compatible shell.
     """
     return _base_shell_map.get(shell, shell)
+
+
+def cmd_sub_str(shell, cmd: str):
+    """Get the command substitution string of the given shell"""
+    base_shell = get_compatible_base_shell(shell)
+    if base_shell not in _SUPPORTED_BASE_SHELLS or base_shell == "bat":
+        raise UnsupportedError(f"Command substitution is not supported in {shell} shell")
+    if shell == "fish":
+        return f"({cmd})"
+    return f"`{cmd}`"
+
+
+class UnsupportedError(RambleError):
+    """Error when certain shell features are not supported."""

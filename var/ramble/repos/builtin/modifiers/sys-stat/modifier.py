@@ -93,14 +93,18 @@ class SysStat(BasicModifier):
 
         if applicable:
             shell = ramble.config.get("config:shell")
+            last_pid_str = ramble.util.shell_utils.last_pid_var(shell)
+            hostname_str = ramble.util.shell_utils.cmd_sub_str(
+                shell, "uname -n"
+            )
 
             pre_cmds.append(
                 CommandExecutable(
                     f"add-sampler-{exe_name}",
                     template=[
-                        f'log_path="{{experiment_run_dir}}/sampler_{exe_name}_$HOSTNAME.out"',
+                        f'log_path="{{experiment_run_dir}}/sampler_{exe_name}_{hostname_str}.out"',
                         '{sampler_cmd} > "$log_path" 2>&1 &',
-                        f"sampler_cmd_pid={ramble.util.shell_utils.last_pid_var(shell)}",
+                        f"sampler_cmd_pid={last_pid_str}",
                     ],
                     mpi=False,
                     redirect="",
