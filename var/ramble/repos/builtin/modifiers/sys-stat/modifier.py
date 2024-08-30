@@ -24,7 +24,7 @@ class SysStat(BasicModifier):
         package_manager: spack
       variables:
         apply_sampler_exe_regex: 'sleep'
-        sampler_cmd: 'iostat -xz 5'
+        sampler_cmd: 'iostat -xzt 5'
         processes_per_node: 1
         n_nodes: 1
         mpi_command: ''
@@ -54,8 +54,11 @@ class SysStat(BasicModifier):
 
     tags("system-info", "performance-analysis")
 
-    mode("standard", description="Collect system metrics during program run")
-    default_mode("standard")
+    mode(
+        "custom",
+        description="Use user-defined collection command during program run",
+    )
+    default_mode("custom")
 
     # sysstat contains common tools such as mpstat and iostat
     software_spec(
@@ -72,14 +75,14 @@ class SysStat(BasicModifier):
         "apply_sampler_exe_regex",
         default="",
         description="Apply the sampler when exe_name matches with the regex",
-        mode="standard",
+        mode="custom",
     )
 
     modifier_variable(
         "sampler_cmd",
         default="mpstat 10",
         description="Apply the sampler when exec_name matches with the regex",
-        mode="standard",
+        mode="custom",
     )
 
     executable_modifier("apply_sampler")
