@@ -878,6 +878,25 @@ class ApplicationBase(metaclass=ApplicationMeta):
         # Validate the new modifiers variables exist
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(self.variables)
+        self._validate_objects()
+
+    def _validate_objects(self):
+        required_self_attrs = ["name"]
+
+        def is_attr_self_defined(obj, attr):
+            # Use the low level __dict__ to exclude inherited class attrs
+            return attr in obj.__class__.__dict__
+
+        objs = [self, *self._modifier_instances]
+        if self.package_manager is not None:
+            objs.append(self.package_manager)
+        for req_attr in required_self_attrs:
+            for obj in objs:
+                if not is_attr_self_defined(obj, req_attr):
+                    raise ApplicationError(
+                        f"Object class {obj.__class__.__name__} is missing "
+                        f"required attribute '{req_attr}'"
+                    )
 
     def _define_custom_executables(self):
         # Define custom executables
