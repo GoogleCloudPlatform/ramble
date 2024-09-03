@@ -14,9 +14,11 @@ Python, and Ramble’s dependencies are installed as per the dependency section
 below.
 Then:
 
-    $ git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
-    $ cd ramble/bin
-    $ ./ramble workspace create -d test_workspace -c ../examples/basic_hostname_config.yaml
+    git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
+    python3 -m venv ramble/env
+    . ramble/env/bin/activate
+    pip install -r ramble/requirements.txt
+    ./ramble/bin/ramble workspace create -d test_workspace -c ramble/examples/basic_hostname_config.yaml
 
 Dependencies
 ------------
@@ -25,7 +27,7 @@ Ramble’s python dependencies can be installed using the included requirements.
 
 e.g.
 
-    $ pip install -r requirements.txt
+    pip install -r requirements.txt
 
 We recommend Python >= 3.7 for Ramble, but a best effort attempt is made to
 support Python 3.6 as it is used by older operating systems such as Centos7.
