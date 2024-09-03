@@ -6,14 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from ramble.namespace import namespace
+
 
 _DICT_MAPPING = {
     "name": "name",
     "status": "RAMBLE_STATUS",
     "experiment_chain": "EXPERIMENT_CHAIN",
-    "n_repeats": "N_REPEATS",
-    "tags": "TAGS",
-    "variables": "RAMBLE_VARIABLES",
+    namespace.n_repeats: "N_REPEATS",
+    namespace.tags: "TAGS",
+    namespace.variables: "RAMBLE_VARIABLES",
     "raw_variables": "RAMBLE_RAW_VARIABLES",
     "contexts": "CONTEXTS",
 }
