@@ -978,9 +978,9 @@ class Workspace:
 
         if application not in apps_dict:
             apps_dict[application] = syaml.syaml_dict()
-            apps_dict[application]["workloads"] = syaml.syaml_dict()
+            apps_dict[application][namespace.workload] = syaml.syaml_dict()
 
-        workloads_dict = apps_dict[application]["workloads"]
+        workloads_dict = apps_dict[application][namespace.workload]
 
         exp_zips = {}
         for zip_def in zips:
@@ -1012,12 +1012,12 @@ class Workspace:
             if add_workload:
                 if application in apps_dict:
                     subdict = apps_dict[application]
-                    if "workloads" in subdict:
-                        subdict = subdict["workloads"]
+                    if namespace.workload in subdict:
+                        subdict = subdict[namespace.workload]
                         if workload.name in subdict:
                             subdict = subdict[workload.name]
-                            if "experiments" in subdict:
-                                subdict = subdict["experiments"]
+                            if namespace.experiment in subdict:
+                                subdict = subdict[namespace.experiment]
                                 if experiment_name in subdict:
                                     exp_name = f"{application}.{workload.name}.{experiment_name}"
                                     if not overwrite:
@@ -1037,21 +1037,21 @@ class Workspace:
         for workload_name in workload_names:
             if workload_name not in workloads_dict:
                 workloads_dict[workload_name] = syaml.syaml_dict()
-                workloads_dict[workload_name]["experiments"] = syaml.syaml_dict()
+                workloads_dict[workload_name][namespace.experiment] = syaml.syaml_dict()
 
-            exps_dict = workloads_dict[workload_name]["experiments"]
+            exps_dict = workloads_dict[workload_name][namespace.experiment]
             exps_dict[experiment_name] = syaml.syaml_dict()
             exp_dict = exps_dict[experiment_name]
 
             if package_manager is not None:
-                exp_dict["variants"] = syaml.syaml_dict()
-                variants_dict = exp_dict["variants"]
-                variants_dict["package_manager"] = package_manager
+                exp_dict[namespace.variants] = syaml.syaml_dict()
+                variants_dict = exp_dict[namespace.variants]
+                variants_dict[namespace.package_manager] = package_manager
 
-            if "variables" not in exp_dict:
-                exp_dict["variables"] = yaml.comments.CommentedMap()
+            if namespace.variables not in exp_dict:
+                exp_dict[namespace.variables] = yaml.comments.CommentedMap()
 
-            vars_dict = exp_dict["variables"]
+            vars_dict = exp_dict[namespace.variables]
 
             # Ensure required variables are defined
             for key in app_inst.keywords.all_required_keys():
@@ -1096,11 +1096,11 @@ class Workspace:
                                 )
 
                 if workload.environment_variables:
-                    if "env_vars" not in exps_dict[experiment_name]:
-                        exp_dict["env_vars"] = syaml.syaml_dict()
-                        exp_dict["env_vars"]["set"] = syaml.syaml_dict()
+                    if namespace.env_var not in exps_dict[experiment_name]:
+                        exp_dict[namespace.env_var] = syaml.syaml_dict()
+                        exp_dict[namespace.env_var]["set"] = syaml.syaml_dict()
 
-                    env_vars_dict = exp_dict["env_vars"]["set"]
+                    env_vars_dict = exp_dict[namespace.env_var]["set"]
 
                     for env_var in workload.environment_variables.values():
                         env_vars_dict[env_var.name] = env_var.value
@@ -1110,20 +1110,20 @@ class Workspace:
                 vars_dict.update(var_def_dict)
 
             if exp_zips:
-                if "zips" not in exp_dict:
-                    exp_dict["zips"] = exp_zips.copy()
+                if namespace.zips not in exp_dict:
+                    exp_dict[namespace.zips] = exp_zips.copy()
 
             if exp_matrix:
-                if "matrix" not in exp_dict:
-                    exp_dict["matrix"] = exp_matrix.copy()
+                if namespace.matrix not in exp_dict:
+                    exp_dict[namespace.matrix] = exp_matrix.copy()
 
         if not self.dry_run:
             ramble.config.config.update_config(
-                "applications", apps_dict, scope=self.ws_file_config_scope_name()
+                namespace.application, apps_dict, scope=self.ws_file_config_scope_name()
             )
         else:
             workspace_dict = self._get_workspace_dict().copy()
-            workspace_dict["ramble"]["applications"] = apps_dict
+            workspace_dict[namespace.ramble][namespace.application] = apps_dict
             print(f"\n{syaml.dump(workspace_dict)}")
 
     def concretize(self):
