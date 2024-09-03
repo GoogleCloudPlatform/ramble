@@ -1006,6 +1006,7 @@ def workspace_generate_config_setup_parser(subparser):
 
     subparser.add_argument(
         "--dry-run",
+        "--print",
         dest="dry_run",
         action="store_true",
         help="perform a dry run. Print resulting config to screen and not "
@@ -1046,7 +1047,18 @@ def workspace_generate_config_setup_parser(subparser):
 
 def workspace_generate_config(args):
     """Generate a configuration file for this ramble workspace"""
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace generate-config")
+    ws = ramble.cmd.find_workspace(args)
+
+    if ws is None:
+        import tempfile
+
+        logger.warn("No active workspace found. Defaulting to `--dry-run`")
+
+        root = tempfile.TemporaryDirectory()
+        ws = ramble.workspace.Workspace(str(root))
+        ws.dry_run = True
+    else:
+        ws.dry_run = args.dry_run
 
     workload_filters = ["*"]
     if args.workload_filters:
@@ -1067,8 +1079,6 @@ def workspace_generate_config(args):
     matrix = None
     if args.matrix:
         matrix = args.matrix
-
-    ws.dry_run = args.dry_run
 
     ws.add_experiments(
         args.application,
