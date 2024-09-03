@@ -867,6 +867,7 @@ class Workspace:
         package_manager=None,
         zips=[],
         matrix=None,
+        overwrite=False,
     ):
         """Add new experiments to this workspace
 
@@ -890,6 +891,8 @@ class Workspace:
                               format zipname=[var1,var2,var3]
             matrix (str): String representing a matrix to define within the
                           experiment in the format of var1,var2,var3.
+            overwrite (bool): Whether to overwrite existing definitions that
+                              collide with new definitions or not.
         """
 
         def create_valid_list(in_str):
@@ -1016,7 +1019,13 @@ class Workspace:
                             if "experiments" in subdict:
                                 subdict = subdict["experiments"]
                                 if experiment_name in subdict:
-                                    add_workload = False
+                                    exp_name = f"{application}.{workload.name}.{experiment_name}"
+                                    if not overwrite:
+                                        logger.warn(
+                                            f"Experiment {exp_name} is defined already. "
+                                            + "To overwrite, use '--overwrite'"
+                                        )
+                                    add_workload = overwrite
 
             if add_workload:
                 workload_names.append(workload.name)
@@ -1031,84 +1040,82 @@ class Workspace:
                 workloads_dict[workload_name]["experiments"] = syaml.syaml_dict()
 
             exps_dict = workloads_dict[workload_name]["experiments"]
+            exps_dict[experiment_name] = syaml.syaml_dict()
+            exp_dict = exps_dict[experiment_name]
 
-            if experiment_name not in exps_dict:
-                exps_dict[experiment_name] = syaml.syaml_dict()
-                exp_dict = exps_dict[experiment_name]
+            if package_manager is not None:
+                exp_dict["variants"] = syaml.syaml_dict()
+                variants_dict = exp_dict["variants"]
+                variants_dict["package_manager"] = package_manager
 
-                if package_manager is not None:
-                    exp_dict["variants"] = syaml.syaml_dict()
-                    variants_dict = exp_dict["variants"]
-                    variants_dict["package_manager"] = package_manager
+            if "variables" not in exp_dict:
+                exp_dict["variables"] = yaml.comments.CommentedMap()
 
-                if "variables" not in exp_dict:
-                    exp_dict["variables"] = yaml.comments.CommentedMap()
+            vars_dict = exp_dict["variables"]
 
-                vars_dict = exp_dict["variables"]
+            # Ensure required variables are defined
+            for key in app_inst.keywords.all_required_keys():
+                if key not in workspace_vars:
+                    vars_dict[key] = ""
 
-                # Ensure required variables are defined
-                for key in app_inst.keywords.all_required_keys():
-                    if key not in workspace_vars:
-                        vars_dict[key] = ""
+            # Only extract variable defaults if requested.
+            # This is mutually exclusive with workload_name_variable
+            if include_default_variables:
+                # At this point we should only have a valid workload name
+                workload = app_inst.workloads[workload_name]
+                if workload.variables:
+                    first_var = True
+                    for var in workload.variables.values():
+                        keep_var = False
+                        for var_filter in variable_filters:
+                            if fnmatch.fnmatch(var.name, var_filter):
+                                keep_var = True
+                                break
 
-                # Only extract variable defaults if requested.
-                # This is mutually exclusive with workload_name_variable
-                if include_default_variables:
-                    # At this point we should only have a valid workload name
-                    workload = app_inst.workloads[workload_name]
-                    if workload.variables:
-                        first_var = True
-                        for var in workload.variables.values():
-                            keep_var = False
-                            for var_filter in variable_filters:
-                                if fnmatch.fnmatch(var.name, var_filter):
-                                    keep_var = True
-                                    break
+                        if keep_var:
+                            vars_dict[var.name] = var.default
 
-                            if keep_var:
-                                vars_dict[var.name] = var.default
+                            # Add blank line before all variables except
+                            # the first
+                            if first_var:
+                                first_var = False
+                            else:
+                                yaml_add_comment_before_key(
+                                    vars_dict, var.name, "", column=17, start_char=""
+                                )
+                            if var.description:
+                                yaml_add_comment_before_key(
+                                    vars_dict, var.name, var.description, column=17
+                                )
+                            if len(var.values) > 1 or var.values[0] is not None:
+                                yaml_add_comment_before_key(
+                                    vars_dict,
+                                    var.name,
+                                    f"Suggested values: {var.values}",
+                                    column=17,
+                                )
 
-                                # Add blank line before all variables except
-                                # the first
-                                if first_var:
-                                    first_var = False
-                                else:
-                                    yaml_add_comment_before_key(
-                                        vars_dict, var.name, "", column=17, start_char=""
-                                    )
-                                if var.description:
-                                    yaml_add_comment_before_key(
-                                        vars_dict, var.name, var.description, column=17
-                                    )
-                                if len(var.values) > 1 or var.values[0] is not None:
-                                    yaml_add_comment_before_key(
-                                        vars_dict,
-                                        var.name,
-                                        f"Suggested values: {var.values}",
-                                        column=17,
-                                    )
+                if workload.environment_variables:
+                    if "env_vars" not in exps_dict[experiment_name]:
+                        exp_dict["env_vars"] = syaml.syaml_dict()
+                        exp_dict["env_vars"]["set"] = syaml.syaml_dict()
 
-                    if workload.environment_variables:
-                        if "env_vars" not in exps_dict[experiment_name]:
-                            exp_dict["env_vars"] = syaml.syaml_dict()
-                            exp_dict["env_vars"]["set"] = syaml.syaml_dict()
+                    env_vars_dict = exp_dict["env_vars"]["set"]
 
-                        env_vars_dict = exp_dict["env_vars"]["set"]
+                    for env_var in workload.environment_variables.values():
+                        env_vars_dict[env_var.name] = env_var.value
 
-                        for env_var in workload.environment_variables.values():
-                            env_vars_dict[env_var.name] = env_var.value
+            # Add any variables that are defined to the variables dict
+            if var_def_dict:
+                vars_dict.update(var_def_dict)
 
-                # Add any variables that are defined to the variables dict
-                if var_def_dict:
-                    vars_dict.update(var_def_dict)
+            if exp_zips:
+                if "zips" not in exp_dict:
+                    exp_dict["zips"] = exp_zips.copy()
 
-                if exp_zips:
-                    if "zips" not in exp_dict:
-                        exp_dict["zips"] = exp_zips.copy()
-
-                if exp_matrix:
-                    if "matrix" not in exp_dict:
-                        exp_dict["matrix"] = exp_matrix.copy()
+            if exp_matrix:
+                if "matrix" not in exp_dict:
+                    exp_dict["matrix"] = exp_matrix.copy()
 
         if not self.dry_run:
             ramble.config.config.update_config(

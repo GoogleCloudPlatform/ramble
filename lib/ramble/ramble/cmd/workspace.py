@@ -966,7 +966,7 @@ def workspace_generate_config_setup_parser(subparser):
         "--wf",
         dest="workload_filters",
         action="append",
-        help="filter to use when selecting workloads in the application. "
+        help="glob filter to use when selecting workloads in the application. "
         + "Workload is kept if it matches any filter.",
     )
 
@@ -975,7 +975,7 @@ def workspace_generate_config_setup_parser(subparser):
         "--vf",
         dest="variable_filters",
         action="append",
-        help="filter to use when selecting variables in the workloads. "
+        help="glob filter to use when selecting variables in the workloads. "
         + "Variable is kept if it matches any filter.",
     )
 
@@ -1011,6 +1011,13 @@ def workspace_generate_config_setup_parser(subparser):
         action="store_true",
         help="perform a dry run. Print resulting config to screen and not "
         + "to the workspace configuration file",
+    )
+
+    subparser.add_argument(
+        "--overwrite",
+        dest="overwrite",
+        action="store_true",
+        help="overwrite existing definitions with newly generated definitions",
     )
 
     variable_control = subparser.add_mutually_exclusive_group()
@@ -1091,6 +1098,7 @@ def workspace_generate_config(args):
         args.package_manager,
         zips,
         matrix,
+        args.overwrite,
     )
 
 
