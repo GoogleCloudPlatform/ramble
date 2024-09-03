@@ -6,7 +6,13 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.util.shell_utils import last_pid_var, source_str, get_compatible_base_shell
+from ramble.util.shell_utils import (
+    last_pid_var,
+    source_str,
+    get_compatible_base_shell,
+    cmd_sub_str,
+    UnsupportedError,
+)
 
 import pytest
 
@@ -26,3 +32,11 @@ import pytest
 )
 def test_shell_specializations(var_func, shell, expect):
     assert var_func(shell) == expect
+
+
+def test_cmd_sub_str():
+    with pytest.raises(UnsupportedError):
+        cmd_sub_str("bat", "VER")
+
+    assert cmd_sub_str("fish", "uname -n") == "(uname -n)"
+    assert cmd_sub_str("bash", "uname -n") == "`uname -n`"
