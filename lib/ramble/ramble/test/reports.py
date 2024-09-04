@@ -154,6 +154,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
 
     ideal_df[['RAMBLE_VARIABLES', 'RAMBLE_RAW_VARIABLES', 'fom_units']] = ideal_df[['RAMBLE_VARIABLES', 'RAMBLE_RAW_VARIABLES', 'fom_units']].astype(object)
 
+    # TODO: test things like log
     logx = False
     logy = False
     split_by = 'simplified_workload_namespace'

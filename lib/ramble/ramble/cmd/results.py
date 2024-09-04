@@ -60,6 +60,12 @@ def setup_parser(subparser):
         required=False
     )
     report_parser.add_argument(
+        "--where", dest="where",
+        action="store",
+        help="Down select data to plot (usefull for complex workspaces with collisions). Takes pandas query format",
+        required=False
+    )
+    report_parser.add_argument(
         "--compare", dest="compare",
         nargs="+",
         action="append",
@@ -163,7 +169,7 @@ def results_report(args):
     if args.workspace:
         ws_name = str(args.workspace)
 
-    results_df = ramble.reports.prepare_data(results_dict)
+    results_df = ramble.reports.prepare_data(results_dict, args.where)
     ramble.reports.make_report(results_df, ws_name, args)
 
 

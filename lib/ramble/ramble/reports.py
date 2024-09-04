@@ -49,7 +49,7 @@ def load_results(args):
     results_dict = {}
 
     if args.file:
-        # TODO: why does this call back into cmd?
+        # FIXME: why does this call back into cmd?
         if os.path.exists(args.file):
             results_dict = ramble.cmd.results.import_results_file(args.file)
         else:
@@ -84,7 +84,7 @@ def is_repeat_child(experiment):
     else:
         return False
 
-def prepare_data(results: dict) -> pd.DataFrame:
+def prepare_data(results: dict, where_query) -> pd.DataFrame:
     """Creates a Pandas DataFrame from the results dictionary to use for reports.
 
     Transforms nested results dictionary into a flat dataframe. Each row equals
@@ -144,7 +144,7 @@ def prepare_data(results: dict) -> pd.DataFrame:
         if exp['name'] in skip_exps or is_repeat_child(exp):
             logger.debug(f"Skipping import of experiment {exp['name']}")
             continue
-        # TODO: is this wise?
+        # FIXME: is this wise? We need to flesh out the CUJ around success/fail
         elif exp['RAMBLE_STATUS'] != 'SUCCESS':
             continue
         else:
@@ -218,7 +218,11 @@ def prepare_data(results: dict) -> pd.DataFrame:
                     unnest_context.append(exp_copy)
 
     results_df = pd.DataFrame.from_dict(unnest_context)
-    #pd.DataFrame.to_json(results_df, 'prepare_data_results.json')
+
+    # Apply where to down select
+    if where_query:
+        logger.info(f'Applying where query: {where_query}')
+        results_df = results_df.query(where_query)
 
     return results_df
 
@@ -246,7 +250,7 @@ class PlotFactory:
         if not plots:
             # TODO: should this be checked in cmd?
             # TODO: make this error more descriptive
-            logger.die("No plots requested. Please specify required plots")
+            logger.die("No plots requested. Please specify required plots or see help (-h)")
         else:
             return plots
 
@@ -270,7 +274,9 @@ class PlotGenerator:
         self.have_statistics = False
 
     def normalize_data(self, data, to_col='normalized_fom_value', from_col='fom_value', speedup=False):
-        # TODO: support more than normalizing by the first value
+        # FIXME: do we need to support more than normalizing by the first
+        # value?
+
         # Performs inplace edit on data, no need to return
         if speedup:
             data.loc[:, to_col] = data[from_col].iloc[0] / data.loc[:, from_col]
@@ -314,24 +320,41 @@ class ScalingPlotGenerator(PlotGenerator):
 
         return selected_data
 
-    def generate_plot_data(self):
-        super().generate_plot_data()
-
-        # TODO: this could be in init?
+    def validate_spec(self, chart_spec):
+        super().validate_spec(chart_spec)
         for chart_spec in self.spec:
             if len(chart_spec) < 2:
                 logger.die('Scaling plot requires two arguments: '
                            'performance metric and scaling metric')
 
+    def validate_data(self, data):
+        has_duplicate_index = any(data.index.duplicated())
+        if has_duplicate_index:
+            logger.die(f"Attempting to plot none-unique data. Please reduce data and try again")
+
+
+    def prep_draw(self, perf_measure, scale_var, series):
+        fig, ax = plt.subplots()
+
+        if self.logx or self.logy:
+            from matplotlib.ticker import ScalarFormatter
+            formatter = ScalarFormatter()
+            formatter.set_scientific(False)
+
+        if self.logx:
+            ax.set_xscale('log', base=2)
+            ax.xaxis.set_major_formatter(formatter)
+
+        if self.logy:
+            ax.set_yscale('log', base=2)
+            ax.yaxis.set_major_formatter(formatter)
+
+        return fig, ax
 
 class WeakScalingPlot(ScalingPlotGenerator):
-    def default_better(self):
-        # TODO: By default we expect this to be flat...
-        return BetterDirection.LOWER
-
     # TODO: these args come from the spec, so don't need to be passed and could be stored at init
     def draw(self, perf_measure, scale_var, series):
-        fig, ax = plt.subplots()
+        fig, ax = self.prep_draw(perf_measure, scale_var, series)
 
         col_to_plot = 'fom_value'
         if self.normalize:
@@ -347,19 +370,6 @@ class WeakScalingPlot(ScalingPlotGenerator):
         ax.set_xlabel(scale_var)
         plt.legend(loc="upper left")
 
-        if self.logx or self.logy:
-            from matplotlib.ticker import ScalarFormatter
-            formatter = ScalarFormatter()
-            formatter.set_scientific(False)
-
-        if self.logx:
-            ax.set_xscale('log', base=2)
-            ax.xaxis.set_major_formatter(formatter)
-
-        if self.logy:
-            ax.set_yscale('log', base=2)
-            ax.yaxis.set_major_formatter(formatter)
-
         #ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
         ax.set_xticks(self.output_df.index.unique().tolist())
         ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
@@ -369,9 +379,6 @@ class WeakScalingPlot(ScalingPlotGenerator):
 
 
     def add_idealized_data(self, raw_results, selected_data, better_direction = BetterDirection.INDETERMINATE):
-        if better_direction is BetterDirection.INDETERMINATE:
-            better_direction = self.default_better()
-
         selected_data = super().add_idealized_data(raw_results, selected_data, better_direction)
 
         selected_data.loc[:, 'ideal_perf_value'] = selected_data['ideal_perf_value'].iloc[0]
@@ -392,19 +399,19 @@ class WeakScalingPlot(ScalingPlotGenerator):
             # TODO: check this does what we want and generates unique results
             if additional_vars:
                 raw_results = raw_results.groupby(additional_vars + ['series']).size()
-                # TODO: warn if not unique
 
             for series in raw_results.loc[:, 'series'].unique():
                 # TODO: query should support fom_origin_type
                 selected = raw_results.query(f'series == "{series}"')
-
-                #selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
 
                 # TODO: why does this have a double numberic?
                 selected['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
                 selected[scale_var] = to_numeric_if_possible(pd.to_numeric(raw_results[scale_var]))
 
                 selected = selected.set_index(scale_var)
+
+                self.validate_data(selected)
+
 
                 if self.normalize:
                     self.normalize_data(selected)
@@ -425,17 +432,10 @@ class StrongScalingPlot(ScalingPlotGenerator):
         ax.table(cellText=self.output_df.values, colLabels=self.output_df.columns, loc='center')
 
     def draw(self, perf_measure, scale_var, series):
-        # TODO: add way to enable (or remove)
-        need_table = False
-
         title = f'Generating plot for {perf_measure} vs {scale_var} for {series}'
         logger.debug(title)
 
-        if need_table:
-            fig, axs = plt.subplots(2,1)
-            ax = axs[0]
-        else:
-            fig, ax = plt.subplots()
+        fig, ax = self.prep_draw(perf_measure, scale_var, series)
 
         if self.normalize:
             ax.plot(self.output_df.index, 'normalized_fom_value', data=self.output_df, marker='o')
@@ -448,18 +448,6 @@ class StrongScalingPlot(ScalingPlotGenerator):
             #plt.ylim(0, ymax*1.1)
 
             ax.set_ylabel(f'{perf_measure}')
-
-        from matplotlib.ticker import ScalarFormatter
-        formatter = ScalarFormatter()
-        formatter.set_scientific(False)
-
-        if self.logx:
-            ax.set_xscale('log', base=2)
-            ax.xaxis.set_major_formatter(formatter)
-
-        if self.logy:
-            ax.set_yscale('log', base=2)
-            ax.yaxis.set_major_formatter(formatter)
 
         if self.have_statistics:
             logger.debug('Adding fill lines for min and max')
@@ -480,14 +468,12 @@ class StrongScalingPlot(ScalingPlotGenerator):
         ax.set_title(title, wrap=True)
         #plt.tight_layout()
 
-        if need_table:
-            table_ax = axs[1]
-            self.show_table(table_ax, self.output_df)
+        #if need_table:
+            #table_ax = axs[1]
+            #self.show_table(table_ax, self.output_df)
 
         chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
         self.write(fig, chart_filename)
-
-
 
 
     def default_better(self):
@@ -517,25 +503,24 @@ class StrongScalingPlot(ScalingPlotGenerator):
             if len(perf_measure_results.loc[:, 'better_direction'].unique()) == 1:
                 better_direction = perf_measure_results.loc[:, 'better_direction'].unique()[0]
 
-            # TODO: Take magic strings like 'simplified_workload_name' from an ENUM
-            # TODO: We can probably use something like derived than 'simplified_workload_name'
+            # TODO: this needs to support a list
             perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, self.split_by]
 
             # Break data down into series using app, workload, and vars input by user
             if additional_vars:
                 perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'series'] + '_x_' + perf_measure_results[additional_vars].agg('_x_'.join, axis=1)
 
-            #for col in perf_measure_results.columns:
-                # TODO: generate_if_possible should be done elsewhere in a more abstract way
-                #perf_measure_results.loc[:, col] = to_numeric_if_possible(perf_measure_results[col])
-
             for series in perf_measure_results.loc[:, 'series'].unique():
 
-                # TODO: this needs to account for repeats
-                # TODO: This is way over complicated
+                # TODO: this needs to account for repeats in a more elegant way
                 series_results = perf_measure_results.query(f'series == "{series}" and (fom_origin_type == "application" or fom_origin_type == "summary::mean")')
+
+                # TODO: why are the data frame names so different between plot types
+
                 series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
                 series_results = series_results.set_index(scale_var)
+
+                self.validate_data(series_results)
 
                 series_min = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::min"')
                 series_max = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::max"')
@@ -545,7 +530,7 @@ class StrongScalingPlot(ScalingPlotGenerator):
                 if self.normalize:
                     self.normalize_data(series_results, speedup=True)
 
-                # TODO: generalize for strong scaling too
+                # TODO: generalize for other scaling too
                 if not series_min.empty:
                     self.have_statistics = True
 
