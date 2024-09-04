@@ -1,0 +1,2 @@
+base_package_manager_repos:
+  - $ramble/var/ramble/repos/builtin

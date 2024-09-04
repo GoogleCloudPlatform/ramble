@@ -53,6 +53,7 @@ subcommands = [
     "mirror",
     ["list", "ls"],
     ["remove", "rm"],
+    "generate-config",
 ]
 
 
@@ -953,6 +954,152 @@ def workspace_mirror(args):
 
     workspace_run_pipeline(args, pipeline)
     pipeline.run()
+
+
+def workspace_generate_config_setup_parser(subparser):
+    """generate current workspace config"""
+
+    arguments.add_common_arguments(subparser, ["application"])
+
+    subparser.add_argument(
+        "--workload-filter",
+        "--wf",
+        dest="workload_filters",
+        action="append",
+        help="glob filter to use when selecting workloads in the application. "
+        + "Workload is kept if it matches any filter.",
+    )
+
+    subparser.add_argument(
+        "--variable-filter",
+        "--vf",
+        dest="variable_filters",
+        action="append",
+        help="glob filter to use when selecting variables in the workloads. "
+        + "Variable is kept if it matches any filter.",
+    )
+
+    subparser.add_argument(
+        "--variable-definition",
+        "-v",
+        dest="variable_definitions",
+        action="append",
+        help="variable definition to set in the generated experiments. "
+        + "Given in the form key=value",
+    )
+
+    subparser.add_argument(
+        "--experiment-name",
+        "-e",
+        dest="experiment_name",
+        default="generated",
+        help="name of generated experiment",
+    )
+
+    subparser.add_argument(
+        "--package-manager",
+        "-p",
+        dest="package_manager",
+        default=None,
+        help="name of (optional) package to define within the experiment scope",
+    )
+
+    subparser.add_argument(
+        "--dry-run",
+        "--print",
+        dest="dry_run",
+        action="store_true",
+        help="perform a dry run. Print resulting config to screen and not "
+        + "to the workspace configuration file",
+    )
+
+    subparser.add_argument(
+        "--overwrite",
+        dest="overwrite",
+        action="store_true",
+        help="overwrite existing definitions with newly generated definitions",
+    )
+
+    variable_control = subparser.add_mutually_exclusive_group()
+    variable_control.add_argument(
+        "--include-default-variables",
+        "-i",
+        action="store_true",
+        help="whether to include default variable values in the resulting config",
+    )
+
+    variable_control.add_argument(
+        "--workload-name-variable",
+        "-w",
+        default=None,
+        metavar="VAR",
+        help="variable name to collapse workloads in",
+    )
+
+    subparser.add_argument(
+        "--zip",
+        "-z",
+        dest="zips",
+        action="append",
+        help="zip to define for the experiments, in the format zipname=[zipvar1,zipvar2]",
+    )
+
+    subparser.add_argument(
+        "--matrix",
+        "-m",
+        dest="matrix",
+        help="comma delimited list of variable names to matrix in the experiments",
+    )
+
+
+def workspace_generate_config(args):
+    """Generate a configuration file for this ramble workspace"""
+    ws = ramble.cmd.find_workspace(args)
+
+    if ws is None:
+        import tempfile
+
+        logger.warn("No active workspace found. Defaulting to `--dry-run`")
+
+        root = tempfile.TemporaryDirectory()
+        ws = ramble.workspace.Workspace(str(root))
+        ws.dry_run = True
+    else:
+        ws.dry_run = args.dry_run
+
+    workload_filters = ["*"]
+    if args.workload_filters:
+        workload_filters = args.workload_filters
+
+    variable_filters = ["*"]
+    if args.variable_filters:
+        variable_filters = args.variable_filters
+
+    variable_definitions = []
+    if args.variable_definitions:
+        variable_definitions = args.variable_definitions
+
+    zips = []
+    if args.zips:
+        zips = args.zips
+
+    matrix = None
+    if args.matrix:
+        matrix = args.matrix
+
+    ws.add_experiments(
+        args.application,
+        args.workload_name_variable,
+        workload_filters,
+        args.include_default_variables,
+        variable_filters,
+        variable_definitions,
+        args.experiment_name,
+        args.package_manager,
+        zips,
+        matrix,
+        args.overwrite,
+    )
 
 
 #: Dictionary mapping subcommand names and aliases to functions

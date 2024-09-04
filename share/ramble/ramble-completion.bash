@@ -638,7 +638,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror list ls remove rm"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror list ls remove rm generate-config"
     fi
 }
 
@@ -719,5 +719,14 @@ _ramble_workspace_rm() {
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
         _workspaces
+    fi
+}
+
+_ramble_workspace_generate_config() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --workload-filter --wf --variable-filter --vf --variable-definition -v --experiment-name -e --package-manager -p --dry-run --print --overwrite --include-default-variables -i --workload-name-variable -w --zip -z --matrix -m"
+    else
+        _all_applications
     fi
 }
