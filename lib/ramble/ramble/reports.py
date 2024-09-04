@@ -301,7 +301,10 @@ class PlotGenerator:
             perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, self.split_by]
 
             if additional_vars:
-                perf_measure_results = perf_measure_results.groupby(additional_vars + ['series']).size()
+                # TODO: this would be nicer as a group by
+                perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'series'] + '_x_' + perf_measure_results[additional_vars].agg('_x_'.join, axis=1)
+
+
             for series in perf_measure_results.loc[:, 'series'].unique():
 
                 # TODO: this needs to account for repeats in a more elegant way
@@ -347,9 +350,46 @@ class PlotGenerator:
                 self.draw(perf_measure, scale_var, series)
 
 
+    # TODO: these args come from the spec, so don't need to be passed and could be stored at init
+    def draw(self, perf_measure, scale_var, series, y_label):
+        title = f'Generating plot for {perf_measure} vs {scale_var} for {series}'
+        logger.debug(title)
 
-    #def draw(self, perf_measure, scale_var, series):
-        #pass
+        fig, ax = self.prep_draw(perf_measure, scale_var, series)
+
+        if self.normalize:
+            ax.plot(self.output_df.index, 'normalized_fom_value', data=self.output_df, marker='o')
+        else:
+            ax.plot(self.output_df.index, 'fom_value', data=self.output_df, marker='o')
+            ymin, ymax = ax.get_ylim()
+
+        # TODO: help plot fit in bounds
+        #plt.ylim(0, ymax*1.1)
+
+        ax.set_ylabel(y_label)
+        ax.set_xlabel(scale_var)
+
+        if self.have_statistics:
+            logger.debug('Adding fill lines for min and max')
+            ax.fill_between(
+                    self.minmax.index,
+                    'fom_value_min',
+                    'fom_value_max',
+                    data=self.minmax,
+                    alpha=0.2)
+
+        ax.plot(self.output_df.index, 'ideal_perf_value', data=self.output_df)
+
+        plt.legend(loc="upper left")
+
+        ax.set_xticks(self.output_df.index.unique().tolist())
+        ax.set_title(title, wrap=True)
+        #plt.tight_layout()
+
+        chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
+        self.write(fig, chart_filename)
+
+
 
     def validate_spec(self, chart_spec):
         """Validates that the FOMs and variables in the chart spec are in the results data."""
@@ -372,7 +412,7 @@ class ScalingPlotGenerator(PlotGenerator):
         else:
             first_perf_value = selected_data['fom_value'].iloc[0]
 
-        logger.debug(f"Normalizing all data by {first_perf_value}")
+        logger.debug(f"Normalizing data (by {first_perf_value})")
 
         selected_data.loc[:, 'ideal_perf_value'] = first_perf_value
 
@@ -417,30 +457,14 @@ class ScalingPlotGenerator(PlotGenerator):
         return fig, ax
 
 class WeakScalingPlot(ScalingPlotGenerator):
-    # TODO: these args come from the spec, so don't need to be passed and could be stored at init
     def draw(self, perf_measure, scale_var, series):
-        fig, ax = self.prep_draw(perf_measure, scale_var, series)
-
-        col_to_plot = 'fom_value'
         if self.normalize:
-            ax.set_ylabel('Efficiency')
-            col_to_plot = 'normalized_fom_value'
+            y_label='Efficiency'
         else:
-            ax.set_ylabel(f'{perf_measure}')
+            y_label=perf_measure
 
-        ax.plot('ideal_perf_value', data=self.output_df)
+        super().draw(perf_measure, scale_var, series, y_label)
 
-        ax.plot(col_to_plot, data=self.output_df, marker='o')
-
-        ax.set_xlabel(scale_var)
-        plt.legend(loc="upper left")
-
-        #ax.set_xticks(raw_results.query(f'series == "{series}"')[f'{scale_var}'].unique().tolist())
-        ax.set_xticks(self.output_df.index.unique().tolist())
-        ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
-
-        chart_filename = f'weak-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
-        self.write(fig, chart_filename)
 
     def add_idealized_data(self, raw_results, selected_data, better_direction = BetterDirection.INDETERMINATE):
         selected_data = super().add_idealized_data(raw_results, selected_data, better_direction)
@@ -450,53 +474,6 @@ class WeakScalingPlot(ScalingPlotGenerator):
 
 
 class StrongScalingPlot(ScalingPlotGenerator):
-    # TODO: I'm not super sure why david wanted this, but it will be missing some data as-iis
-    def show_table(self, ax):
-        ax.axis('tight')
-        ax.axis('off')
-        ax.table(cellText=self.output_df.values, colLabels=self.output_df.columns, loc='center')
-
-    def draw(self, perf_measure, scale_var, series):
-        title = f'Generating plot for {perf_measure} vs {scale_var} for {series}'
-        logger.debug(title)
-
-        fig, ax = self.prep_draw(perf_measure, scale_var, series)
-
-        if self.normalize:
-            ax.plot(self.output_df.index, 'normalized_fom_value', data=self.output_df, marker='o')
-            ax.set_ylabel('Speedup')
-        else:
-            ax.plot(self.output_df.index, 'fom_value', data=self.output_df, marker='o')
-            ymin, ymax = ax.get_ylim()
-
-            # TODO: help plot fit in bounds
-            #plt.ylim(0, ymax*1.1)
-
-            ax.set_ylabel(f'{perf_measure}')
-
-        if self.have_statistics:
-            logger.debug('Adding fill lines for min and max')
-            ax.fill_between(
-                    self.minmax.index,
-                    'fom_value_min',
-                    'fom_value_max',
-                    data=self.minmax,
-                    alpha=0.2)
-
-        ax.plot(self.output_df.index, 'ideal_perf_value', data=self.output_df)
-
-        plt.legend(loc="upper left")
-        ax.set_xlabel(f'{scale_var}')
-
-        # ax.set_xscale('log')
-        ax.set_xticks(self.output_df.index.unique().tolist())
-        ax.set_title(title, wrap=True)
-        #plt.tight_layout()
-
-        chart_filename = f'strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
-        self.write(fig, chart_filename)
-
-
     def default_better(self):
         if self.normalize:
             return BetterDirection.HIGHER
@@ -512,6 +489,14 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
     def normalize_data(self, data, to_col='normalized_fom_value', from_col='fom_value', speedup=True):
         super().normalize_data(data, to_col=to_col, from_col=from_col, speedup=speedup)
+
+    def draw(self, perf_measure, scale_var, series):
+        if self.normalize:
+            y_label='Speedup'
+        else:
+            y_label=perf_measure
+
+        super().draw(perf_measure, scale_var, series, y_label)
 
 class FomPlot(PlotGenerator):
     def generate_plot_data(self):
