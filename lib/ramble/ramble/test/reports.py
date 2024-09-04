@@ -144,8 +144,8 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     test_spec = [[fom_name, 'n_nodes']]
 
     ideal_data = []
-    ideal_data.append(prep_dict('SUCCESS', 'exp_1', 1, 'test_app_test_workload', {}, {}, 'null', fom_name, fom1, '', 'dummy_app', 'application', 'INDETERMINATE', nfv1, ideal1, normalized=normalize))
-    ideal_data.append(prep_dict('SUCCESS', 'exp_2', 2, 'test_app_test_workload', {}, {}, 'null', fom_name, fom2, '', 'dummy_app', 'application', 'INDETERMINATE', nfv2, ideal2, normalized=normalize))
+    ideal_data.append(prep_dict('SUCCESS', 'exp_1', 1, 'test_app_test_workload', {}, {}, 'null', fom_name, fom1, '', 'dummy_app', 'application', BetterDirection.INDETERMINATE, nfv1, ideal1, normalized=normalize))
+    ideal_data.append(prep_dict('SUCCESS', 'exp_2', 2, 'test_app_test_workload', {}, {}, 'null', fom_name, fom2, '', 'dummy_app', 'application', BetterDirection.INDETERMINATE, nfv2, ideal2, normalized=normalize))
 
     ideal_df = pd.DataFrame(ideal_data, columns=ideal_data[0].keys())
 
@@ -160,9 +160,14 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     split_by = 'simplified_workload_namespace'
 
     with PdfPages(pdf_path) as pdf_report:
-        results_df = prepare_data(results)
+        where_query = None
+        results_df = prepare_data(results, where_query)
         plot = plot_type(test_spec, normalize, report_dir_path, pdf_report, results_df, logx, logy, split_by)
         plot.generate_plot_data()
 
         assert(plot.output_df.equals(ideal_df))
         assert(os.path.isfile(pdf_path))
+
+# TODO: test where query
+# TODO: test multiple groupby
+# TODO: test multiple splitby

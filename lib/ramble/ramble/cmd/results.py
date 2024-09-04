@@ -158,8 +158,6 @@ def import_results_file(filename):
 def results_report(args):
     """Create a report with charts from Ramble experiment results.
     """
-    print(f'args: {args}')
-
     results_dict = ramble.reports.load_results(args)
 
     ws_name = results_dict['workspace_name']
