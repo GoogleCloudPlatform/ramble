@@ -152,15 +152,15 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     # Update index to match
     ideal_df = ideal_df.set_index('n_nodes')
 
-    # Update data types to match
-    #for col in ideal_df:
-         #ideal_df[col] = ramble.reports.to_numeric_if_possible(ideal_df[col])
-
     ideal_df[['RAMBLE_VARIABLES', 'RAMBLE_RAW_VARIABLES', 'fom_units']] = ideal_df[['RAMBLE_VARIABLES', 'RAMBLE_RAW_VARIABLES', 'fom_units']].astype(object)
+
+    logx = False
+    logy = False
+    split_by = 'simplified_workload_namespace'
 
     with PdfPages(pdf_path) as pdf_report:
         results_df = prepare_data(results)
-        plot = plot_type(test_spec, normalize, report_dir_path, pdf_report, results_df)
+        plot = plot_type(test_spec, normalize, report_dir_path, pdf_report, results_df, logx, logy, split_by)
         plot.generate_plot_data()
 
         assert(plot.output_df.equals(ideal_df))

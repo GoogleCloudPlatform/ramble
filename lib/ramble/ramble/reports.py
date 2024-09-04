@@ -229,17 +229,19 @@ class PlotFactory:
         normalize = args.normalize
         logx = args.logx
         logy = args.logy
+        split_by = args.split_by
 
         plot_types = [
             (args.strong_scaling, StrongScalingPlot),
             (args.weak_scaling, WeakScalingPlot),
             (args.compare, ComparisonPlot),
             (args.foms, FomPlot),
+            (args.multi_line, MultiLinePlot),
         ]
 
         for spec, plot_class in plot_types:
             if spec:
-                plots.append( plot_class(spec, normalize, report_dir_path, pdf_report, results_df, logx, logy) )
+                plots.append( plot_class(spec, normalize, report_dir_path, pdf_report, results_df, logx, logy, split_by) )
 
         if not plots:
             # TODO: should this be checked in cmd?
@@ -250,7 +252,7 @@ class PlotFactory:
 
 
 class PlotGenerator:
-    def __init__(self, spec, normalize, report_dir_path, pdf_report, results_df, logx, logy):
+    def __init__(self, spec, normalize, report_dir_path, pdf_report, results_df, logx, logy, split_by):
         self.normalize = normalize
         self.spec = spec
         self.report_dir_path = report_dir_path
@@ -262,7 +264,9 @@ class PlotGenerator:
         self.logx = logx
         self.logy = logy
 
-        # TODO: enable
+        self.split_by = split_by
+
+        # TODO: enable more robustly
         self.have_statistics = False
 
     def normalize_data(self, data, to_col='normalized_fom_value', from_col='fom_value', speedup=False):
@@ -337,14 +341,16 @@ class WeakScalingPlot(ScalingPlotGenerator):
             ax.set_ylabel(f'{perf_measure}')
 
         ax.plot('ideal_perf_value', data=self.output_df)
+
         ax.plot(col_to_plot, data=self.output_df, marker='o')
 
         ax.set_xlabel(scale_var)
         plt.legend(loc="upper left")
 
-        from matplotlib.ticker import ScalarFormatter
-        formatter = ScalarFormatter()
-        formatter.set_scientific(False)
+        if self.logx or self.logy:
+            from matplotlib.ticker import ScalarFormatter
+            formatter = ScalarFormatter()
+            formatter.set_scientific(False)
 
         if self.logx:
             ax.set_xscale('log', base=2)
@@ -381,19 +387,19 @@ class WeakScalingPlot(ScalingPlotGenerator):
             raw_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
 
             #raw_results.loc[:, 'exp_group'] = raw_results.loc[:, 'RAWexperiment_template_name']
-            raw_results.loc[:, 'series'] = raw_results.loc[:, 'simplified_workload_namespace']
+            raw_results.loc[:, 'series'] = raw_results.loc[:, self.split_by]
 
             # TODO: check this does what we want and generates unique results
             if additional_vars:
-                #for var in additional_vars:
-                    #raw_results.loc[:, 'series'] = raw_results.loc[:, 'series'] + '_x_' + var
-
                 raw_results = raw_results.groupby(additional_vars + ['series']).size()
+                # TODO: warn if not unique
 
             for series in raw_results.loc[:, 'series'].unique():
                 # TODO: query should support fom_origin_type
                 selected = raw_results.query(f'series == "{series}"')
+
                 #selected = series_results.loc[:, [f'{scale_var}', 'fom_value']]
+
                 # TODO: why does this have a double numberic?
                 selected['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
                 selected[scale_var] = to_numeric_if_possible(pd.to_numeric(raw_results[scale_var]))
@@ -513,7 +519,7 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
             # TODO: Take magic strings like 'simplified_workload_name' from an ENUM
             # TODO: We can probably use something like derived than 'simplified_workload_name'
-            perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'simplified_workload_namespace']
+            perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, self.split_by]
 
             # Break data down into series using app, workload, and vars input by user
             if additional_vars:
@@ -635,6 +641,72 @@ class ComparisonPlot(PlotGenerator):
             series = dimensions
             self.draw(perf_measure, scale_var, series)
 
+class MultiLinePlot(ScalingPlotGenerator):
+    series_to_plot = []
+
+    def default_better(self):
+        return BetterDirection.LOWER
+
+    def draw(self, perf_measure, scale_var, series):
+        fig, ax = plt.subplots()
+
+        col_to_plot = 'fom_value'
+        ax.set_ylabel(f'{perf_measure}')
+
+        ax.plot('ideal_perf_value', data=self.output_df)
+
+        for name, this_series in self.series_to_plot:
+            ax.plot(col_to_plot, data=this_series, marker='o', label=name)
+
+        ax.set_xlabel(scale_var)
+        plt.legend(loc="upper left")
+
+        if self.logx or self.logy:
+            from matplotlib.ticker import ScalarFormatter
+            formatter = ScalarFormatter()
+            formatter.set_scientific(False)
+
+        if self.logx:
+            ax.set_xscale('log', base=2)
+            ax.xaxis.set_major_formatter(formatter)
+
+        if self.logy:
+            ax.set_yscale('log', base=2)
+            ax.yaxis.set_major_formatter(formatter)
+
+        ax.set_title(f'Weak Scaling: {perf_measure} vs {scale_var} for {series}', wrap=True)
+
+        chart_filename = f'weak-scaling_{perf_measure}_vs_{scale_var}_{series}.png'
+        self.write(fig, chart_filename)
+
+        self.series_to_plot = []
+
+
+    def generate_plot_data(self):
+        super().generate_plot_data()
+
+        for chart_spec in self.spec:
+            perf_measure, scale_var, *additional_vars = chart_spec
+
+            # FOMs are by row, so select only rows with the perf_measure FOM
+            #raw_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
+            # TODO this wont work for non-repeats
+            raw_results = self.results_df.query(f'fom_name == "{perf_measure}" and fom_origin_type == "summary::mean"').copy()
+
+            raw_results.loc[:, 'series'] = raw_results.loc[:, self.split_by]
+
+            # TODO: check this does what we want and generates unique results/groups
+            for series in raw_results.loc[:, 'series'].unique():
+                # TODO: query should support fom_origin_type
+                selected = raw_results.query(f'series == "{series}"')
+                pretty_results = selected.groupby(additional_vars + [self.split_by] + ['series'] + ['fom_name']).agg({'fom_value': [np.min, np.max]})
+                group_results = selected.groupby(additional_vars + [self.split_by] + ['series'] + ['fom_name'])
+                for name, group in group_results:
+                    group['fom_value'] = to_numeric_if_possible(pd.to_numeric(group['fom_value']))
+                    group[scale_var] = to_numeric_if_possible(pd.to_numeric(group[scale_var]))
+                    group = group.set_index(scale_var)
+                    self.series_to_plot.append((name, group))
+                self.draw(perf_measure, scale_var, series)
 
 
 def get_reports_path():
@@ -670,3 +742,4 @@ def make_report(results_df, ws_name, args):
                    f"    {pdf_path}")
         logger.msg("Individual chart images are available at:\n"
                    f"    {report_dir_path}")
+

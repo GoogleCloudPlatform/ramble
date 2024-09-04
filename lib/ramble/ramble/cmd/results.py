@@ -53,6 +53,13 @@ def setup_parser(subparser):
         required=False
     )
     report_parser.add_argument(
+        "--multi-line", dest="multi_line",
+        nargs="+",
+        action="append",
+        help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
+        required=False
+    )
+    report_parser.add_argument(
         "--compare", dest="compare",
         nargs="+",
         action="append",
@@ -82,6 +89,15 @@ def setup_parser(subparser):
         "--logy", dest="logy",
         action="store_true",
         help=("Plot Y axis as log"),
+        required=False
+    )
+
+    # TODO: should this make it into the final cut?
+    report_parser.add_argument(
+        "--split-by", dest="split_by",
+        action="store",
+        default="simplified_workload_namespace",
+        help=("Ramble Variable to split out into different plots"),
         required=False
     )
     report_parser.add_argument("-f", "--file", help="path of results file")
