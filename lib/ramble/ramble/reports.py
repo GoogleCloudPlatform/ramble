@@ -573,6 +573,7 @@ class FomPlot(PlotGenerator):
             logger.warn(f'Skipping drawing of non numeric FOM: {perf_measure}')
             return
 
+        # TODO: this should leverage the avaible min/max to add candle sticks
         ax = self.output_df.plot(y='fom_value', kind="bar")
         fig = ax.get_figure()
 
@@ -627,8 +628,7 @@ class ComparisonPlot(PlotGenerator):
             raw_results.loc[:, 'Figure of Merit'] = (raw_results.loc[:, 'fom_name'] +
                                               ' (' + raw_results.loc[:, 'fom_units'] + ')')
 
-            # TODO: why does this have a double to_numbeirc?
-            raw_results['fom_value'] = to_numeric_if_possible(pd.to_numeric(raw_results['fom_value']))
+            raw_results['fom_value'] = to_numeric_if_possible(raw_results['fom_value'])
 
             plot_col = 'fom_value'
             if self.normalize:
@@ -711,8 +711,8 @@ class MultiLinePlot(ScalingPlotGenerator):
                 pretty_results = selected.groupby(additional_vars + ['series'] + ['fom_name']).agg({'fom_value': [np.min, np.max]})
                 group_results = selected.groupby(additional_vars + ['series'] + ['fom_name'])
                 for name, group in group_results:
-                    group['fom_value'] = to_numeric_if_possible(pd.to_numeric(group['fom_value']))
-                    group[scale_var] = to_numeric_if_possible(pd.to_numeric(group[scale_var]))
+                    group['fom_value'] = to_numeric_if_possible(group['fom_value'])
+                    group[scale_var] = to_numeric_if_possible(group[scale_var])
                     group = group.set_index(scale_var)
                     self.series_to_plot.append((name, group))
                 self.draw(perf_measure, scale_var, series)
