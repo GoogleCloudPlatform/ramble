@@ -29,6 +29,12 @@ def _or(a, b):
     return a or b
 
 
+def _re_search(regex, s):
+    import re
+
+    return re.search(regex, s) is not None
+
+
 supported_math_operators = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
@@ -60,6 +66,7 @@ supported_scalar_function_pointers = {
     "randrange": random.randrange,
     "randint": random.randint,
     "simplify_str": spack.util.naming.simplify_name,
+    "re_search": _re_search,
 }
 
 

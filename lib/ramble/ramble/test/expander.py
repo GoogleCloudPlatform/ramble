@@ -73,6 +73,8 @@ def exp_dict():
         ('"2.1.1" in ["2.1.1", "3.1.1", "4.2.1"]', "True", set(), 1),
         ('"2.1.2" in ["2.1.1", "3.1.1", "4.2.1"]', "False", set(), 1),
         ("{test_mask}", "0x0", {"test_mask"}, 1),
+        ('re_search(r"bz$", {experiment_name})', "False", set(), 1),
+        ('re_search("o+\\\\.b", {env_name})', "True", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
