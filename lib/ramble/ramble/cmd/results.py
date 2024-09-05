@@ -98,9 +98,12 @@ def setup_parser(subparser):
         required=False
     )
 
-    # TODO: should this make it into the final cut?
+    # TODO: should this make it into the final cut? Only applies to multi line -- remove
     report_parser.add_argument(
         "--split-by", dest="split_by",
+        #nargs="+",
+        #action="append",
+        #default=["simplified_workload_namespace"],
         action="store",
         default="simplified_workload_namespace",
         help=("Ramble Variable to split out into different plots"),

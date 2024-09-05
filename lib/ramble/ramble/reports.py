@@ -283,72 +283,6 @@ class PlotGenerator:
         else:
             data.loc[:, to_col] = data.loc[:, from_col] / data[from_col].iloc[0]
 
-    def generate_plot_data(self):
-        for chart_spec in self.spec:
-            self.validate_spec(chart_spec)
-
-            perf_measure, scale_var, *additional_vars = chart_spec
-
-            # FOMs are by row, so select only rows with the perf_measure FOM
-            perf_measure_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
-
-            # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
-            better_direction = BetterDirection.INDETERMINATE
-            if len(perf_measure_results.loc[:, 'better_direction'].unique()) == 1:
-                better_direction = perf_measure_results.loc[:, 'better_direction'].unique()[0]
-
-            # TODO: this needs to support a list for split_by
-            perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, self.split_by]
-
-            if additional_vars:
-                # TODO: this would be nicer as a group by
-                perf_measure_results.loc[:, 'series'] = perf_measure_results.loc[:, 'series'] + '_x_' + perf_measure_results[additional_vars].agg('_x_'.join, axis=1)
-
-
-            for series in perf_measure_results.loc[:, 'series'].unique():
-
-                # TODO: this needs to account for repeats in a more elegant way
-                series_results = perf_measure_results.query(f'series == "{series}" and (fom_origin_type == "application" or fom_origin_type == "summary::mean")')
-
-                series_results.loc[:, 'fom_value'] = to_numeric_if_possible(series_results['fom_value'])
-                series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
-                series_results = series_results.set_index(scale_var)
-
-                self.validate_data(series_results)
-
-                series_min = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::min"')
-                series_max = perf_measure_results.query(f'series == "{series}" and fom_origin_type == "summary::max"')
-
-                # TODO: We interpret this as requesting speedup, which isn't strictly true
-                # We need a more clear semantic for this
-                if self.normalize:
-                    self.normalize_data(series_results)
-
-                if not series_min.empty:
-                    self.have_statistics = True
-
-                    # TODO: fix copy semantics
-                    # "A value is trying to be set on a copy of a slice from a DataFrame."
-                    # there might be some accidentally copy semantics with series_results
-                    series_min = series_min.set_index(scale_var)
-                    series_max = series_max.set_index(scale_var)
-
-                    minmax = pd.DataFrame()
-                    minmax['fom_value_min'] = series_min['fom_value']
-                    minmax['fom_value_max'] = series_max['fom_value']
-                    minmax.index = to_numeric_if_possible(series_min.index)
-
-                    if self.normalize:
-                        self.normalize_data(minmax, to_col='fom_value_min', from_col='fom_value_min', speedup=True)
-                        self.normalize_data(minmax, to_col='fom_value_max', from_col='fom_value_max', speedup=True)
-
-                    self.minmax = minmax
-
-                series_results = self.add_idealized_data(perf_measure_results, series_results)
-
-                self.output_df = series_results
-                self.draw(perf_measure, scale_var, series)
-
 
     # TODO: these args come from the spec, so don't need to be passed and could be stored at init
     def draw(self, perf_measure, scale_var, series, y_label):
@@ -363,8 +297,9 @@ class PlotGenerator:
             ax.plot(self.output_df.index, 'fom_value', data=self.output_df, marker='o')
             ymin, ymax = ax.get_ylim()
 
-        # TODO: help plot fit in bounds
-        #plt.ylim(0, ymax*1.1)
+        # TODO: the plot can get very compressed for log weak scaling plots
+        if not self.logy:
+            plt.ylim(0, ymax*1.1)
 
         ax.set_ylabel(y_label)
         ax.set_xlabel(scale_var)
@@ -405,6 +340,71 @@ class PlotGenerator:
 
 
 class ScalingPlotGenerator(PlotGenerator):
+    def generate_plot_data(self):
+        for chart_spec in self.spec:
+            self.validate_spec(chart_spec)
+
+            perf_measure, scale_var, *additional_vars = chart_spec
+
+            # FOMs are by row, so select only rows with the perf_measure FOM
+            results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
+
+            # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
+            better_direction = BetterDirection.INDETERMINATE
+            if len(results.loc[:, 'better_direction'].unique()) == 1:
+                better_direction = results.loc[:, 'better_direction'].unique()[0]
+
+            # TODO: this needs to support a list for split_by
+            results.loc[:, 'series'] = results.loc[:, self.split_by]
+
+            if additional_vars:
+                # TODO: this would be nicer as a group by
+                results.loc[:, 'series'] = results.loc[:, 'series'] + '_x_' + results[additional_vars].agg('_x_'.join, axis=1)
+
+            for series in results.loc[:, 'series'].unique():
+
+                # TODO: this needs to account for repeats in a more elegant way
+                series_results = results.query(f'series == "{series}" and (fom_origin_type == "application" or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")').copy()
+
+                series_results.loc[:, 'fom_value'] = to_numeric_if_possible(series_results['fom_value'])
+                series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+                series_results = series_results.set_index(scale_var)
+
+                self.validate_data(series_results)
+
+                series_min = results.query(f'series == "{series}" and fom_origin_type == "summary::min"')
+                series_max = results.query(f'series == "{series}" and fom_origin_type == "summary::max"')
+
+                # TODO: We interpret this as requesting speedup, which isn't strictly true
+                # We need a more clear semantic for this
+                if self.normalize:
+                    self.normalize_data(series_results)
+
+                if not series_min.empty:
+                    self.have_statistics = True
+
+                    # TODO: fix copy semantics
+                    # "A value is trying to be set on a copy of a slice from a DataFrame."
+                    # there might be some accidentally copy semantics with series_results
+                    series_min = series_min.set_index(scale_var)
+                    series_max = series_max.set_index(scale_var)
+
+                    minmax = pd.DataFrame()
+                    minmax['fom_value_min'] = series_min['fom_value']
+                    minmax['fom_value_max'] = series_max['fom_value']
+                    minmax.index = to_numeric_if_possible(series_min.index)
+
+                    if self.normalize:
+                        self.normalize_data(minmax, to_col='fom_value_min', from_col='fom_value_min', speedup=True)
+                        self.normalize_data(minmax, to_col='fom_value_max', from_col='fom_value_max', speedup=True)
+
+                    self.minmax = minmax
+
+                series_results = self.add_idealized_data(results, series_results)
+
+                self.output_df = series_results
+                self.draw(perf_measure, scale_var, series)
+
     def add_idealized_data(self, raw_results, selected_data, better_direction):
 
         if self.normalize:
@@ -433,6 +433,7 @@ class ScalingPlotGenerator(PlotGenerator):
     def validate_data(self, data):
         has_duplicate_index = any(data.index.duplicated())
         if has_duplicate_index:
+            logger.debug(data)
             logger.die(f"Attempting to plot none-unique data. Please reduce data and try again")
 
     def default_better(self):
@@ -500,13 +501,92 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
 class FomPlot(PlotGenerator):
     def generate_plot_data(self):
-        super().generate_plot_data()
+        #super().generate_plot_data()
         # TODO: what is this for?
         # this one doesn't have a chart spec, it's just a flag
         # first divide results into series based on workload namespace
         # then iterate over each fom in each series and create 1 bar chart per fom
         # comparing fom_value (y) by experiment (x)
-        pass
+        results = self.results_df
+        all_foms = results.loc[:, 'fom_name'].unique()
+        for fom in all_foms:
+            print('fom name')
+            print(fom)
+            # TODO: this exludes modifier foms
+            series_results = results.query(f'fom_name == "{fom}" and (fom_origin_type == "application" or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")').copy()
+            print(series_results)
+
+            scale_var = 'simplified_experiment_namespace'
+
+            # TODO: dry with ScalingPlot code
+            series_results.loc[:, 'fom_value'] = to_numeric_if_possible(series_results['fom_value'])
+            series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+
+            series_results = series_results.set_index(scale_var)
+            print("post index")
+            print(series_results)
+
+            #self.validate_data(series_results)
+
+            series_min = results.query(f'fom_name == "{fom}" and fom_origin_type == "summary::min"')
+            series_max = results.query(f'fom_name == "{fom}" and fom_origin_type == "summary::max"')
+            if self.normalize:
+                self.normalize_data(series_results)
+                print(series_results)
+
+            if not series_min.empty:
+                self.have_statistics = True
+
+                # TODO: fix copy semantics
+                # "A value is trying to be set on a copy of a slice from a DataFrame."
+                # there might be some accidentally copy semantics with series_results
+                series_min = series_min.set_index(scale_var)
+                series_max = series_max.set_index(scale_var)
+
+                minmax = pd.DataFrame()
+                minmax['fom_value_min'] = series_min['fom_value']
+                minmax['fom_value_max'] = series_max['fom_value']
+                minmax.index = to_numeric_if_possible(series_min.index)
+
+                if self.normalize:
+                    self.normalize_data(minmax, to_col='fom_value_min', from_col='fom_value_min', speedup=True)
+                    self.normalize_data(minmax, to_col='fom_value_max', from_col='fom_value_max', speedup=True)
+
+                self.minmax = minmax
+
+            self.output_df = series_results
+
+            # TODO: there is probably a more efficient way to get this
+            unit = series_results.loc[:, 'fom_units'].unique()
+
+            perf_measure = fom
+            #scale_var = ""
+            series = 'experiment_name'
+            self.draw(perf_measure, scale_var, series) #, y_label=unit)
+
+    # TODO: dry bar plot drawing
+    def draw(self, perf_measure, scale_var, series):
+        # TODO: this will also turn ints to floats, which is not ideal
+        try:
+            self.output_df['fom_value'] = self.output_df['fom_value'].astype(float)
+        except ValueError as e:
+            logger.warn(f'Skipping drawing of non numeric FOM: {perf_measure}')
+            return
+
+        ax = self.output_df.plot(y='fom_value', kind="bar")
+        fig = ax.get_figure()
+
+        # FIXME: this has a hard time fitting well on screen
+        #plt.tight_layout()
+        #plt.autoscale()
+        #ax.set_label('Label via method')
+        ax.legend([perf_measure])
+
+        # If all FOMs are either higher or lower is better, add it to chart title
+        ax.set_title(f'{perf_measure} by experimnet', wrap=True)
+
+        chart_filename = f'foms_{perf_measure}_by_experiments.png'
+        self.write(fig, chart_filename)
 
 
 class ComparisonPlot(PlotGenerator):
@@ -514,7 +594,9 @@ class ComparisonPlot(PlotGenerator):
         ax = self.output_df.plot(kind="bar")
         fig = ax.get_figure()
 
-        plt.tight_layout()
+        # FIXME: this has a hard time fitting well on screen
+        #plt.tight_layout()
+        plt.autoscale()
 
         # If all FOMs are either higher or lower is better, add it to chart title
         title_suffix = ''
@@ -524,7 +606,7 @@ class ComparisonPlot(PlotGenerator):
         self.write(fig, chart_filename)
 
     def generate_plot_data(self):
-        super().generate_plot_data()
+        #super().generate_plot_data()
 
         for chart_spec in self.spec:
             # Break out input args into FOMs and dimensions
@@ -559,7 +641,7 @@ class ComparisonPlot(PlotGenerator):
 
             # Pivot table aggregates values by mean. Check if results were aggregated and label them
             # Raw results have FOMs by row, pivot by columns, so multiply the pivot rows x cols
-            print(f'raw values = {len(raw_results)}  vs pivot values = {len(compare_pivot)} x {len(compare_pivot.columns)} ={len(compare_pivot) * len(compare_pivot.columns)}')
+            #print(f'raw values = {len(raw_results)}  vs pivot values = {len(compare_pivot)} x {len(compare_pivot.columns)} ={len(compare_pivot) * len(compare_pivot.columns)}')
 
             # TODO: empty is silly here.. as is changing types
             perf_measure = foms
@@ -617,7 +699,8 @@ class MultiLinePlot(ScalingPlotGenerator):
             # FOMs are by row, so select only rows with the perf_measure FOM
             #raw_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
             # TODO this wont work for non-repeats
-            raw_results = self.results_df.query(f'fom_name == "{perf_measure}" and fom_origin_type == "summary::mean"').copy()
+            #raw_results = self.results_df.query(f'fom_name == "{perf_measure}" and fom_origin_type == "summary::mean"').copy()
+            raw_results = self.results_df.query(f'fom_name == "{fom}" and (fom_origin_type == "application" or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")').copy()
 
             raw_results.loc[:, 'series'] = raw_results.loc[:, self.split_by]
 
@@ -625,8 +708,8 @@ class MultiLinePlot(ScalingPlotGenerator):
             for series in raw_results.loc[:, 'series'].unique():
                 # TODO: query should support fom_origin_type
                 selected = raw_results.query(f'series == "{series}"')
-                pretty_results = selected.groupby(additional_vars + [self.split_by] + ['series'] + ['fom_name']).agg({'fom_value': [np.min, np.max]})
-                group_results = selected.groupby(additional_vars + [self.split_by] + ['series'] + ['fom_name'])
+                pretty_results = selected.groupby(additional_vars + ['series'] + ['fom_name']).agg({'fom_value': [np.min, np.max]})
+                group_results = selected.groupby(additional_vars + ['series'] + ['fom_name'])
                 for name, group in group_results:
                     group['fom_value'] = to_numeric_if_possible(pd.to_numeric(group['fom_value']))
                     group[scale_var] = to_numeric_if_possible(pd.to_numeric(group[scale_var]))

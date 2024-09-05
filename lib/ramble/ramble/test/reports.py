@@ -168,6 +168,9 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
         assert(plot.output_df.equals(ideal_df))
         assert(os.path.isfile(pdf_path))
 
+# TODO: test fom plot
+# TODO: test compare plot
+
 # TODO: test where query
 # TODO: test multiple groupby
 # TODO: test multiple splitby
