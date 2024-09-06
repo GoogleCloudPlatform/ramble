@@ -29,6 +29,17 @@ def _or(a, b):
     return a or b
 
 
+def _re_search(regex, s):
+    import re
+
+    return re.search(regex, s) is not None
+
+
+def _safe_str_node_check(node):
+    # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
+    return hasattr(ast, "Str") and isinstance(node, ast.Str)
+
+
 supported_math_operators = {
     ast.Add: operator.add,
     ast.Sub: operator.sub,
@@ -60,6 +71,7 @@ supported_scalar_function_pointers = {
     "randrange": random.randrange,
     "randint": random.randint,
     "simplify_str": spack.util.naming.simplify_name,
+    "re_search": _re_search,
 }
 
 
@@ -821,7 +833,7 @@ class Expander:
         Perform extraction of `<variable> in <experiment>` syntax.
         Raises an exception if the experiment does not exist.
 
-        Also, evaluated `<value> in [list, of, values]` syntax.
+        Also, evaluated `<value> in [list, of, values]` and `<value> in "str"` syntaxes.
         """
         if isinstance(node.left, ast.Name):
             var_name = self._ast_name(node.left)
@@ -836,11 +848,8 @@ class Expander:
                     )
                     self.__raise_syntax_error(node)
                 return val
-        # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
         # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
-        elif isinstance(node.left, ast.Constant) or (
-            hasattr(ast, "Str") and isinstance(node.left, ast.Str)
-        ):
+        elif isinstance(node.left, ast.Constant) or _safe_str_node_check(node.left):
             lhs_value = self.eval_math(node.left)
 
             found = False
@@ -850,6 +859,11 @@ class Expander:
                         rhs_value = self.eval_math(elt)
                         if lhs_value == rhs_value:
                             found = True
+                elif isinstance(comp, ast.Constant) or _safe_str_node_check(comp):
+                    # Attempt evaluating `"str" in "string"`
+                    rhs_value = self.eval_math(comp)
+                    if isinstance(rhs_value, str) and lhs_value in rhs_value:
+                        found = True
             return found
 
         self.__raise_syntax_error(node)

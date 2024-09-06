@@ -174,6 +174,7 @@ Supported functions are:
 * ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
 * ``randrange`` (from `random.randrange`)
 * ``randint`` (from `random.randint`)
+* ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
 
 .. _ramble-escaped-variables:
 
