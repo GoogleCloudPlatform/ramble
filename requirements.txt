@@ -1,10 +1,5 @@
-pytest
-flake8
-black
 google-cloud-storage # for gcs fetch test
 google-api-core # for gcs fetch error .execptions
-coverage
-pre-commit
 graphlib-backport;python_version<"3.9"
 urllib3==1.26.18;python_version<="3.6"
 protobuf;python_version>"3.6"
