@@ -59,6 +59,7 @@ class namespace:
     indentation = "indentation"
     prefix = "prefix"
     join_separator = "join_separator"
+    commands = "commands"
 
     # For variants
     package_manager = "package_manager"

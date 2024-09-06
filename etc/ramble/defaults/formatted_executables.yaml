@@ -1,3 +1,5 @@
 formatted_executables:
   command:
     join_separator: '\n'
+    commands:
+    - '{unformatted_command}'

@@ -47,6 +47,7 @@ default_keys = {
     "batch_submit": {"type": key_type.required, "level": output_level.variable},
     "mpi_command": {"type": key_type.required, "level": output_level.variable},
     "experiment_template_name": {"type": key_type.reserved, "level": output_level.key},
+    "unformatted_command": {"type": key_type.reserved, "level": output_level.variable},
 }
 
 
