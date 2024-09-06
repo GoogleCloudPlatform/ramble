@@ -38,6 +38,7 @@ default_keys = {
     "err_file": {"type": key_type.reserved, "level": output_level.variable},
     "env_path": {"type": key_type.reserved, "level": output_level.variable},
     "input_name": {"type": key_type.reserved, "level": output_level.variable},
+    "repeat_index": {"type": key_type.reserved, "level": output_level.variable},
     "spec_name": {"type": key_type.optional, "level": output_level.variable},
     "env_name": {"type": key_type.optional, "level": output_level.variable},
     "n_ranks": {"type": key_type.required, "level": output_level.key},

@@ -272,6 +272,9 @@ class ExperimentSet:
         # After generating the base experiment, append the index to repeat experiments
         if repeats.repeat_index:
             experiment_suffix = f".{repeats.repeat_index}"
+            variables[self.keywords.repeat_index] = repeats.repeat_index
+        else:
+            variables[self.keywords.repeat_index] = 0
 
         expander = ramble.expander.Expander(variables, self)
         self._compute_mpi_vars(expander, variables)
