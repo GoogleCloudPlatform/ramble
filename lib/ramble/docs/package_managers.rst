@@ -75,6 +75,11 @@ into each experiment, to prepare the execution environment.
 The :ref:`software configuration section <software-config>` is used to
 determine what modules to load within the resulting environment.
 
+The use of this package manager requires an installation of
+``environment-modules`` outside of Ramble. This is handled by system
+administrators on several clusters, but for more information see
+`environment-modules's documentation <https://modules.readthedocs.io/en/latest/INSTALL.html>`.
+
 ^^^^^^^^^^^^^^^^^^^^^
 EESSI Package Manager
 ^^^^^^^^^^^^^^^^^^^^^
@@ -86,6 +91,10 @@ EESSI, and load the correct module files for the execution environment.
 
 The :ref:`software configuration section <software-config>` is used to
 determine what modules to load within the resulting environment.
+
+The use of this package manager requires an installation of EESSI outside of
+Ramble. For more information, see
+`EESSI's documentation <https://www.eessi.io/docs/getting_access/native_installation/>`.
 
 ^^^^^^^^^^^^^^^^^^^
 Pip Package Manager
@@ -100,6 +109,11 @@ manager.
 
 The :ref:`software configuration section <software-config>` is used to
 determine what packages to install within the resulting virtual environment.
+
+The use of this package manager requires ``pip`` to be installed outside of
+Ramble. This happens automatically in several Python installations. For more
+information see
+`pip's documentation<https://pip.pypa.io/en/stable/installation/>`.
 
 ^^^^^^^^^^^^^^^^^^^^^
 Spack Package Manager
@@ -117,6 +131,10 @@ determine what packages to install within the resulting environment.
 When using the Spack package manager, workspaces can also use the
 ``push-to-cache`` and ``mirror`` pipelines to cache compiled binaies, and
 mirror software source.
+
+The use of this package manager requires an external installation of Spack. For
+instructions on installing Spack, see
+`Spack's documentation <https://github.com/spack/spack#-spack>`.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -137,3 +155,6 @@ When using the Spack package manager, workspaces can also use the
 ``push-to-cache`` and ``mirror`` pipelines to cache compiled binaies, and
 mirror software source.
 
+The use of this package manager requires an external installation of Spack. For
+instructions on installing Spack, see
+`Spack's documentation <https://github.com/spack/spack#-spack>`.
