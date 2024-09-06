@@ -18,61 +18,73 @@ class InstallSpack(BasicModifier):
 
     maintainers("douglasjacobsen")
 
-    mode("standard", description="Standard execution mode for spack")
-    default_mode("standard")
+    mode("standard", description="Standard execution mode for install-spack")
+    mode(
+        "quiet",
+        description="Quiet execution mode for install-spack. Does not "
+        + "auto inject commands into experiments.",
+    )
+    default_mode("quiet")
 
     modifier_variable(
         "spack_url",
         default="https://github.com/spack/spack",
         description="URL to clone spack from",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "spack_ref",
         default="develop",
         description="Ref to checkout for spack",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "spack_install_dir",
         default="${HOME}/.ramble/spack",
         description="Directory to install spack into",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     install_spack_full = """
 if [ ! -d {spack_install_dir} ]; then
-git clone {spack_url} {spack_install_dir}
-cd {spack_install_dir}
-git checkout {spack_ref}
-cd -
+  git clone {spack_url} {spack_install_dir}
+  cd {spack_install_dir}
+  git checkout {spack_ref}
+  cd -
 fi
 """
 
     install_spack_shallow = """
 if [ ! -d {spack_install_dir} ]; then
-git init {spack_install_dir}
-cd {spack_install_dir}
-git remote add origin {spack_url}
-git fetch --depth 1 origin {spack_ref}
-git checkout FETCH_HEAD
-cd -
+  git init {spack_install_dir}
+  cd {spack_install_dir}
+  git remote add origin {spack_url}
+  git fetch --depth 1 origin {spack_ref}
+  git checkout FETCH_HEAD
+  cd -
 fi
 """
     modifier_variable(
         "install_spack_full",
         default=install_spack_full,
         description="Install script for full spack history",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "install_spack_shallow",
         default=install_spack_shallow,
         description="Install script for shallow spack history",
-        mode="standard",
+        modes=["standard", "quiet"],
+    )
+
+    modifier_variable(
+        "source_spack",
+        default=". {spack_install_dir}/share/spack/setup-env.sh",
+        description="Command for sourcing spack into an environment",
+        modes=["standard", "quiet"],
     )
 
     executable_modifier("source_installed_spack")
@@ -85,12 +97,15 @@ fi
         pre_exec = []
         post_exec = []
 
+        if self._usage_mode == "quiet":
+            return pre_exec, post_exec
+
         if not hasattr(self, "_already_applied"):
             pre_exec.append(
                 CommandExecutable(
                     "source-installed-spack",
                     template=[
-                        ". {spack_install_dir}/share/spack/setup-env.sh"
+                        "{source_spack}",
                     ],
                 )
             )
