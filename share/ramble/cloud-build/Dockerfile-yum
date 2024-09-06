@@ -17,7 +17,8 @@ RUN cd /opt &&  \
     . spack/share/spack/setup-env.sh && \
     spack load py-pip ^python@${PYTHON_VER} && \
     wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements.txt && \
-    python -m pip install -r /opt/requirements.txt
+    wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements-dev.txt && \
+    python -m pip install -r /opt/requirements-dev.txt
 
 FROM ${BASE_IMG}:${BASE_VER}
 
