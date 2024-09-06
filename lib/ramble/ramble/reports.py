@@ -77,12 +77,18 @@ def load_results(args):
 
 
 def is_repeat_child(experiment):
-    # TODO: find a more robust way to do this
-    ends_in_number = re.search(r'\.\d+$', experiment['name'])
-    if ends_in_number:
-        return True
-    else:
-        return False
+    try:
+        if int(experiment['RAMBLE_VARIABLES']['repeat_index']) > 0:
+            return True
+        else:
+            return False
+    except:
+        # TODO: Remove this old implemention. I keep it here since the JSON update was so recent
+        ends_in_number = re.search(r'\.\d+$', experiment['name'])
+        if ends_in_number:
+            return True
+        else:
+            return False
 
 def prepare_data(results: dict, where_query) -> pd.DataFrame:
     """Creates a Pandas DataFrame from the results dictionary to use for reports.
@@ -330,6 +336,7 @@ class PlotGenerator:
         """Validates that the FOMs and variables in the chart spec are in the results data."""
         for var in chart_spec:
             if var not in self.results_df.columns and var not in self.results_df.loc[:, 'fom_name'].values:
+                logger.debug(f"Available options: {self.results_df.loc[:, 'fom_name'].unique()}")
                 logger.die(f'{var} was not found in the results data.')
 
     def write(self, fig, filename):
