@@ -24,6 +24,7 @@ import ramble.workspace
 import ramble.workspace.shell
 import ramble.pipeline
 import ramble.filters
+from ramble.main import RambleCommand
 
 
 description = "(experimental) manage workspace deployments"
@@ -134,6 +135,13 @@ def deployment_pull(args):
                 fs.force_remove(dest)
 
             pull_file(src, dest)
+
+        obj_repo_path = os.path.join(
+            ws.root, ramble.pipeline.PushDeploymentPipeline.object_repo_name
+        )
+        if os.path.exists(obj_repo_path):
+            repo_cmd = RambleCommand("repo")
+            repo_cmd("add", obj_repo_path, global_args=["-D", ws.root])
 
 
 def deployment_run_pipeline(args, pipeline):
