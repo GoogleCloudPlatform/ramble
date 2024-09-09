@@ -1639,6 +1639,24 @@ class Workspace:
         """Iterator over each file in $workspace/configs/auxiliary_software_files"""
         yield from self._auxiliary_software_files.items()
 
+    def workspace_paths(self):
+        """Dictionary of path replacements for workspace"""
+        if not hasattr(self, "_workspace_path_replacements"):
+            self._workspace_path_replacements = {
+                "workspace_root": self.root,
+                "workspace": self.root,
+                "workspace_configs": self.config_dir,
+                "workspace_software": self.software_dir,
+                "workspace_logs": self.log_dir,
+                "workspace_inputs": self.input_dir,
+                "workspace_experiments": self.experiment_dir,
+                "workspace_shared": self.shared_dir,
+                "workspace_archives": self.archive_dir,
+                "workspace_deployments": self.deployments_dir,
+            }
+
+        return self._workspace_path_replacements
+
     def included_config_scopes(self):
         """List of included configuration scopes from the environment.
 
@@ -1657,7 +1675,9 @@ class Workspace:
         missing = []
         for i, config_path in enumerate(reversed(includes)):
             # allow paths to contain ramble config/environment variables, etc.
-            config_path = substitute_path_variables(config_path)
+            config_path = substitute_path_variables(
+                config_path, local_replacements=self.workspace_paths()
+            )
 
             # treat relative paths as relative to the environment
             if not os.path.isabs(config_path):
