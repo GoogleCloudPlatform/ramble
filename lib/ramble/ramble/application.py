@@ -1138,6 +1138,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         based on the formatting requested.
         """
 
+        self.variables[self.keywords.unformatted_command] = "\n".join(self._command_list)
+
         for var_name, formatted_conf in self._formatted_executables.items():
             if var_name in self.variables:
                 raise FormattedExecutableError(
@@ -1159,13 +1161,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             indentation = " " * n_indentation
 
-            formatted_str = ""
-            for cmd in self._command_list:
-                if formatted_str:
-                    formatted_str += join_separator
-                formatted_str += indentation + prefix + cmd
+            commands_to_format = self._command_list
+            if namespace.commands in formatted_conf:
+                commands_to_format = formatted_conf[namespace.commands].copy()
 
-            self.variables[var_name] = formatted_str
+            formatted_lines = []
+            for command in commands_to_format:
+                expanded = self.expander.expand_var(command)
+                for out_line in expanded.split("\n"):
+                    formatted_lines.append(indentation + prefix + out_line)
+
+            self.variables[var_name] = join_separator.join(formatted_lines)
 
     def _derive_variables_for_template_path(self, workspace):
         """Define variables for template paths (for add_expand_vars)"""
@@ -2135,7 +2141,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         repo_path = os.path.join(workspace.named_deployment, "object_repo")
 
-        repo_lock = lk.Lock(repo_path)
+        repo_lock = lk.Lock(os.path.join(repo_path, ".ramble-obj-repo.lock"))
 
         with lk.WriteTransaction(repo_lock):
             _copy_files(self, ramble.repository.ObjectTypes.applications, repo_path)

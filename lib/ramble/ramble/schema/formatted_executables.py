@@ -26,6 +26,13 @@ properties = {
                 "prefix": {"type": "string", "default": ""},
                 "indentation": {"type": "number", "default": 0},
                 "join_separator": {"type": "string", "default": "\n"},
+                "commands": {
+                    "type": "array",
+                    "default": ["{unformatted_command}"],
+                    "items": {
+                        "type": "string",
+                    },
+                },
             },
         },
     }
