@@ -13,6 +13,7 @@
 """
 
 import spack.schema.config
+import spack.schema.concretizer
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -103,6 +104,7 @@ properties["config"]["spack"] = {
             },
             "additionalProperties": False,
         },
+        "concretizer": spack.schema.concretizer.properties["concretizer"],
     },
     "additionalProperties": False,
 }

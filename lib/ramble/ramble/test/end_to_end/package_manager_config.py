@@ -26,6 +26,11 @@ def test_package_manager_config_zlib(mock_applications):
 ramble:
   variants:
     package_manager: spack
+  config:
+    spack:
+      concretizer:
+        targets:
+          host_compatible: false
   variables:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'
@@ -68,3 +73,8 @@ ramble:
             data = f.read()
             assert "config:" in data
             assert "debug: true" in data
+
+            # assert on concretizer settings
+            # unify true is the default
+            assert "unify: true" in data
+            assert "host_compatible: false" in data

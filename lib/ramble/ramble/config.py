@@ -143,7 +143,10 @@ config_defaults = {
         "concretizer": "clingo",
         "license_dir": spack.paths.default_license_dir,
         "shell": "sh",
-        "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
+        "spack": {
+            "flags": {"install": "--reuse", "concretize": "--reuse"},
+            "concretizer": {"unify": True},
+        },
         "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
         "workspace_dirs": "$ramble/var/ramble/workspaces",

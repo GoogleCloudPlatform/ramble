@@ -521,6 +521,7 @@ class SpackRunner(object):
     buildcache_config_name = "config:spack:buildcache"
     concretize_config_name = "config:spack:concretize"
     env_create_config_name = "config:spack:env_create"
+    concretizer_config_name = "config:spack:concretizer"
 
     env_create_args = ["env", "create", "-d", "."]
 
@@ -995,8 +996,9 @@ class SpackRunner(object):
         """Construct a dictionary with the env file contents in it"""
         env_file = syaml.syaml_dict()
         env_file[spack_namespace] = syaml.syaml_dict()
-        env_file[spack_namespace]["concretizer"] = syaml.syaml_dict()
-        env_file[spack_namespace]["concretizer"]["unify"] = True
+        env_file[spack_namespace]["concretizer"] = syaml.syaml_dict(
+            ramble.config.get(self.concretizer_config_name)
+        )
 
         env_file[spack_namespace]["specs"] = syaml.syaml_list()
         # Ensure the specs content are consistently sorted.
