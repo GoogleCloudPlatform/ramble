@@ -745,6 +745,39 @@ These tags are propagated into a workspace's results file, and can be used to
 filter pipeline commands, as show in the
 :ref:`filtering experiments documentation <filter-experiments>`.
 
+.. _workspace_including_external_files:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Including External Configuration Files
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble workspace configuration files support referring to external
+configuration files. This allows a workspace to be composed of external files
+and directories.
+
+.. code-block::
+   YAML
+
+  ramble:
+    include:
+    - /absolute/path/to/applications.yaml
+    - $workspace_root/directory/in/workspace/
+
+Supported path variables include:
+
+ * ``$workspace_root`` - Root directory of workspace
+ * ``$workspace`` - Root directory of workspace
+ * ``$workspace_configs`` - Configs directory in workspace
+ * ``$workspace_software`` - Software directory in workspace
+ * ``$workspace_logs`` - Logs directory in workspace
+ * ``$workspace_inputs`` - Experiments directory in workspace
+ * ``$workspace_shared`` - Shared directory in workspace
+ * ``$workspace_archives`` - Archives directory in workspace
+ * ``$workspace_deployments`` - Deployments directory in workspace
+
+For more information, see the relevant portion of Spack's documentation on
+`including configurations <https://spack.readthedocs.io/en/latest/environments.html#included-configurations>`_.
+
 .. _workspace_internals:
 
 ^^^^^^^^^^^^^^^^^^^^^
