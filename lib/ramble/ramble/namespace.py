@@ -12,7 +12,6 @@ class namespace:
 
     # For experiments
     ramble = "ramble"
-    application_dir = "application_directories"
     application = "applications"
     workload = "workloads"
     experiment = "experiments"

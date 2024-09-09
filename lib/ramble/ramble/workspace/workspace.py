@@ -590,26 +590,6 @@ class Workspace:
                 template_name = workspace_execution_template[0:-ext_len]
                 self._read_template(template_name, template_execute_script)
 
-            self._read_all_application_configs()
-
-    def _read_all_application_configs(self):
-        path_replacements = {"workspace": self.root, "workspace_config": self.config_dir}
-        ramble_dict = self._get_workspace_dict()[namespace.ramble]
-        if namespace.application_dir in ramble_dict:
-            app_dirs = ramble_dict[namespace.application_dir]
-            for raw_dir in app_dirs:
-                app_dir = substitute_path_variables(raw_dir, path_replacements)
-                if not os.path.exists(app_dir):
-                    raise RambleMissingApplicationDirError(
-                        "Application directory %s does not exist" % app_dir
-                    )
-                for dirpath, _, filenames in os.walk(app_dir):
-                    for file in filenames:
-                        if file.endswith(".yaml"):
-                            full_path = f"{dirpath}/{file}"
-                            with open(full_path) as f:
-                                self._read_application_config(full_path, f)
-
     def _read_application_config(self, path, f, raw_yaml=None):
         """Read an application configuration file"""
         if path not in self.application_configs:
