@@ -8,6 +8,8 @@
 
 from ramble.modkit import *
 
+import ramble.util.shell_utils
+
 
 class Lscpu(BasicModifier):
     """Define a modifier for lspcu
@@ -96,3 +98,40 @@ class Lscpu(BasicModifier):
 
     def lscpu_exec(self):
         return ["lscpu >> {lscpu_log}"]
+
+    register_builtin("get_detected_arch", injection_method="append")
+
+    def get_detected_arch(self):
+        """Collect detected arch from both Spack and GCC, if they are available."""
+        shell = ramble.config.get("config:shell")
+        spack_arch = ramble.util.shell_utils.cmd_sub_str(shell, "spack arch")
+        gcc_arch = ramble.util.shell_utils.cmd_sub_str(
+            shell,
+            "gcc -march=native -Q --help=target | grep -- '-march=  ' | cut -f3",
+        )
+        return [
+            f"""
+if which spack > /dev/null; then
+    spack_arch={spack_arch}
+    echo "Spack detected arch=$spack_arch" >> {{lscpu_log}}
+fi
+
+if which gcc > /dev/null; then
+    gcc_arch={gcc_arch}
+    echo "GCC detected arch=$gcc_arch" >> {{lscpu_log}}
+fi\n"""
+        ]
+
+    figure_of_merit(
+        "spack_arch",
+        fom_regex=r"^\s*Spack detected arch=\s*(?P<spack_arch>.*)",
+        group_name="spack_arch",
+        log_file="{lscpu_log}",
+    )
+
+    figure_of_merit(
+        "gcc_arch",
+        fom_regex=r"^\s*GCC detected arch=\s*(?P<gcc_arch>.*)",
+        group_name="gcc_arch",
+        log_file="{lscpu_log}",
+    )
