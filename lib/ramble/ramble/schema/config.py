@@ -13,7 +13,9 @@
 """
 
 import spack.schema.config
-import spack.schema.concretizer
+
+import ramble.schema.util.import_util as import_util
+
 
 #: Properties for inclusion in other schemas
 properties = {
@@ -22,6 +24,9 @@ properties = {
 
 properties["config"]["shell"] = {"type": "string", "enum": ["sh", "bash", "csh", "tcsh", "fish"]}
 
+# Get the concretizer schema from the external spack instead of the one included in ramble src.
+# This aligns since the concretizer settings are fed into the external spack instance.
+spack_concretizer = import_util.import_external_spack_schema("spack.schema.concretizer")
 properties["config"]["spack"] = {
     "type": "object",
     "default": {"install": {"flags": "--reuse"}, "concretize": {"flags": "--reuse"}},
@@ -104,7 +109,7 @@ properties["config"]["spack"] = {
             },
             "additionalProperties": False,
         },
-        "concretizer": spack.schema.concretizer.properties["concretizer"],
+        "concretizer": spack_concretizer.properties["concretizer"],
     },
     "additionalProperties": False,
 }
