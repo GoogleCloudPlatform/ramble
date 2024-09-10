@@ -68,7 +68,7 @@ Environment Modules Package Manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Setting the package manager config option to ``environment-modules`` enables
-the use of `Environment Modules <https://modules.readthedocs.io/en/latest/>`
+the use of `Environment Modules <https://modules.readthedocs.io/en/latest/>`_
 within the resulting experiments. Ramble will inject ``module load`` commands
 into each experiment, to prepare the execution environment.
 
@@ -78,14 +78,14 @@ determine what modules to load within the resulting environment.
 The use of this package manager requires an installation of
 ``environment-modules`` outside of Ramble. This is handled by system
 administrators on several clusters, but for more information see
-`environment-modules's documentation <https://modules.readthedocs.io/en/latest/INSTALL.html>`.
+`environment-modules's documentation <https://modules.readthedocs.io/en/latest/INSTALL.html>`_.
 
 ^^^^^^^^^^^^^^^^^^^^^
 EESSI Package Manager
 ^^^^^^^^^^^^^^^^^^^^^
 
 Setting the package manager config option to ``eessi`` enables the use of
-`the European Environment for Scientific Software Installations (EESSI) <https://www.eessi.io/docs/>`
+`the European Environment for Scientific Software Installations (EESSI) <https://www.eessi.io/docs/>`_
 for each experiment. Ramble will then inject commands to initialize the use of
 EESSI, and load the correct module files for the execution environment.
 
@@ -94,7 +94,7 @@ determine what modules to load within the resulting environment.
 
 The use of this package manager requires an installation of EESSI outside of
 Ramble. For more information, see
-`EESSI's documentation <https://www.eessi.io/docs/getting_access/native_installation/>`.
+`EESSI's documentation <https://www.eessi.io/docs/getting_access/native_installation/>`_.
 
 ^^^^^^^^^^^^^^^^^^^
 Pip Package Manager
@@ -113,14 +113,14 @@ determine what packages to install within the resulting virtual environment.
 The use of this package manager requires ``pip`` to be installed outside of
 Ramble. This happens automatically in several Python installations. For more
 information see
-`pip's documentation<https://pip.pypa.io/en/stable/installation/>`.
+`pip's documentation<https://pip.pypa.io/en/stable/installation/>`_.
 
 ^^^^^^^^^^^^^^^^^^^^^
 Spack Package Manager
 ^^^^^^^^^^^^^^^^^^^^^
 
 Setting the package manager config option to ``spack`` enables the use of
-`Spack <https://spack.io/>` for each experiment. During the ``setup`` pipeline,
+`Spack <https://spack.io/>`_ for each experiment. During the ``setup`` pipeline,
 Ramble will construct Spack environments and install the requested software.
 The experiments using Spack will automatically load the environment to prepare
 the experiment for execution.
@@ -134,7 +134,7 @@ mirror software source.
 
 The use of this package manager requires an external installation of Spack. For
 instructions on installing Spack, see
-`Spack's documentation <https://github.com/spack/spack#-spack>`.
+`Spack's documentation <https://github.com/spack/spack#-spack>`_.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -142,7 +142,7 @@ Spack Lightweight Package Manager
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Setting the package manager config option to ``spack-lightweight`` enables the
-use of a lightweight version of `Spack <https://spack.io/>` for each
+use of a lightweight version of `Spack <https://spack.io/>`_ for each
 experiment. During the ``setup`` pipeline, Ramble will construct Spack
 environments, however installation is deferred. This allows experiments to
 install their own software, enabling parallel installation, rather than
@@ -157,4 +157,4 @@ mirror software source.
 
 The use of this package manager requires an external installation of Spack. For
 instructions on installing Spack, see
-`Spack's documentation <https://github.com/spack/spack#-spack>`.
+`Spack's documentation <https://github.com/spack/spack#-spack>`_.

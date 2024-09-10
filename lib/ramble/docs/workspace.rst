@@ -398,7 +398,7 @@ the installation and generate software environments for each experiment.
 
 As an example, if the applications and workspace configuration file provide a
 configuration for Spack, Ramble will generate
-`Spack environments<https://spack.readthedocs.io/en/latest/environments.html>`.
+`Spack environments<https://spack.readthedocs.io/en/latest/environments.html>`_.
 
 By default, Ramble uses the following format for creating a spack environment file:
 

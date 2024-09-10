@@ -16,7 +16,7 @@ In this tutorial, you will set up and run a benchmark simulation using
 `GROMACS <https://www.gromacs.org/>`_, a free and open-source application
 for molecular dynamics. The execution environment will be created and managed
 using the
-`European Environment for Scientific Software Installations (EESSI) package manager <https://www.eessi.io/docs/>`.
+`European Environment for Scientific Software Installations (EESSI) package manager <https://www.eessi.io/docs/>`_.
 
 This tutorial builds off of concepts introduced in previous tutorials. Please
 make sure you review those before starting with this tutorial's content,
@@ -256,7 +256,7 @@ contents of ``$RAMBLE_ROOT/examples/eessi_gromacs_config.yaml``:
 
 **NOTE**: This workspace utilizes the ``eessi`` package manager. As a result, it
 requires ``eessi`` is installed following
-`EESSI installation instructions <https://www.eessi.io/docs/getting_access/native_installation/>`.
+`EESSI installation instructions <https://www.eessi.io/docs/getting_access/native_installation/>`_.
 Modifications to the ``package_manager`` variant will change this behavior.
 
 .. literalinclude:: ../../../../examples/gromacs_eessi_config.yaml
