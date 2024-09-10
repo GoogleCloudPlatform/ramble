@@ -590,26 +590,6 @@ class Workspace:
                 template_name = workspace_execution_template[0:-ext_len]
                 self._read_template(template_name, template_execute_script)
 
-            self._read_all_application_configs()
-
-    def _read_all_application_configs(self):
-        path_replacements = {"workspace": self.root, "workspace_config": self.config_dir}
-        ramble_dict = self._get_workspace_dict()[namespace.ramble]
-        if namespace.application_dir in ramble_dict:
-            app_dirs = ramble_dict[namespace.application_dir]
-            for raw_dir in app_dirs:
-                app_dir = substitute_path_variables(raw_dir, path_replacements)
-                if not os.path.exists(app_dir):
-                    raise RambleMissingApplicationDirError(
-                        "Application directory %s does not exist" % app_dir
-                    )
-                for dirpath, _, filenames in os.walk(app_dir):
-                    for file in filenames:
-                        if file.endswith(".yaml"):
-                            full_path = f"{dirpath}/{file}"
-                            with open(full_path) as f:
-                                self._read_application_config(full_path, f)
-
     def _read_application_config(self, path, f, raw_yaml=None):
         """Read an application configuration file"""
         if path not in self.application_configs:
@@ -1639,6 +1619,24 @@ class Workspace:
         """Iterator over each file in $workspace/configs/auxiliary_software_files"""
         yield from self._auxiliary_software_files.items()
 
+    def workspace_paths(self):
+        """Dictionary of path replacements for workspace"""
+        if not hasattr(self, "_workspace_path_replacements"):
+            self._workspace_path_replacements = {
+                "workspace_root": self.root,
+                "workspace": self.root,
+                "workspace_configs": self.config_dir,
+                "workspace_software": self.software_dir,
+                "workspace_logs": self.log_dir,
+                "workspace_inputs": self.input_dir,
+                "workspace_experiments": self.experiment_dir,
+                "workspace_shared": self.shared_dir,
+                "workspace_archives": self.archive_dir,
+                "workspace_deployments": self.deployments_dir,
+            }
+
+        return self._workspace_path_replacements
+
     def included_config_scopes(self):
         """List of included configuration scopes from the environment.
 
@@ -1657,7 +1655,9 @@ class Workspace:
         missing = []
         for i, config_path in enumerate(reversed(includes)):
             # allow paths to contain ramble config/environment variables, etc.
-            config_path = substitute_path_variables(config_path)
+            config_path = substitute_path_variables(
+                config_path, local_replacements=self.workspace_paths()
+            )
 
             # treat relative paths as relative to the environment
             if not os.path.isabs(config_path):
