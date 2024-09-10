@@ -18,7 +18,7 @@ This document describes each config section and its purpose. This document
 does not cover the :ref:`workspace configuration file<workspace-config>`, which has its own document.
 
 Ramble's configuration logic closely follows
-`Spack's configuration logic <https://spack.readthedocs.io/en/latest/configuration.html>`.
+`Spack's configuration logic <https://spack.readthedocs.io/en/latest/configuration.html>`_.
 
 -----------------------
 Configuration Sections:
@@ -98,7 +98,7 @@ this command with an active workspace will include configuration sections
 defined within a workspace scope.
 
 Ramble's merging logic closely follows `Spack's configuration scope logic
-<https://spack.readthedocs.io/en/latest/configuration.html#configuration-scopes>`.
+<https://spack.readthedocs.io/en/latest/configuration.html#configuration-scopes>`_.
 
 .. _application-config:
 

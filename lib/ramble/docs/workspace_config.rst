@@ -1248,7 +1248,7 @@ In the above example, the chained experiment would have a namespace of:
 ``hostname.serial.test_exp2.chain.0.hostname.serial.test_exp1``
 
 The ``name`` attribute can use `globbing
-syntax<https://docs.python.org/3/library/fnmatch.html#module-fnmatch>` to chain
+syntax<https://docs.python.org/3/library/fnmatch.html#module-fnmatch>`_ to chain
 multiple experiments at once.
 
 The ``order`` keyword is optional. Valid options include:
