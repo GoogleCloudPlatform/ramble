@@ -1908,6 +1908,26 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "display_name": _get_context_display_name(context),
             }
 
+            if context == _NULL_CONTEXT:
+                n_total_dict = {
+                    "value": self.repeats.n_repeats,
+                    "units": "repeats",
+                    "origin": list(fom_dict.keys())[0][2],
+                    "origin_type": "summary::n_total_repeats",
+                    "name": "Experiment Summary",
+                }
+                context_map["foms"].append(n_total_dict)
+
+                # Use the first FOM to count how many successful repeats values are present
+                n_success_dict = {
+                    "value": len(list(fom_dict.values())[0]),
+                    "units": "repeats",
+                    "origin": list(fom_dict.keys())[0][2],
+                    "origin_type": "summary::n_successful_repeats",
+                    "name": "Experiment Summary",
+                }
+                context_map["foms"].append(n_success_dict)
+
             for fom_key, fom_values in fom_dict.items():
                 fom_name = fom_key[0]
                 fom_units = fom_key[1]
@@ -1919,7 +1939,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     calcs.append(statistic.report(fom_values, fom_units))
 
                 for calc in calcs:
-                    fom_dict = {
+                    fom_calc_dict = {
                         "value": calc[0],
                         "units": calc[1],
                         "origin": fom_origin,
@@ -1927,7 +1947,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         "name": fom_name,
                     }
 
-                    context_map["foms"].append(fom_dict)
+                    context_map["foms"].append(fom_calc_dict)
 
             results.append(context_map)
 
