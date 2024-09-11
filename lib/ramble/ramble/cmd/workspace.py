@@ -508,6 +508,14 @@ def workspace_analyze_setup_parser(subparser):
         help="print out the analysis result",
     )
 
+    subparser.add_argument(
+        "-s",
+        "--summary-only",
+        dest="summary_only",
+        action="store_true",
+        help="print out only the summary stats for repeated experiments",
+    )
+
     arguments.add_common_arguments(
         subparser,
         ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
@@ -535,6 +543,7 @@ def workspace_analyze(args):
         output_formats=args.output_formats,
         upload=args.upload,
         print_results=args.print_results,
+        summary_only=args.summary_only,
     )
 
     with ws.write_transaction():

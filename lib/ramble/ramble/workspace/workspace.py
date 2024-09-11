@@ -1297,7 +1297,7 @@ class Workspace:
 
         os.symlink(out_file, latest_file)
 
-    def dump_results(self, output_formats=["text"], print_results=False):
+    def dump_results(self, output_formats=["text"], print_results=False, summary_only=False):
         """
         Write out result file in desired format
 
@@ -1309,6 +1309,8 @@ class Workspace:
 
         if not self.results:
             self.results = {}
+
+        results = _filter_results(self.results, summary_only=summary_only)
 
         results_written = []
 
@@ -1325,9 +1327,9 @@ class Workspace:
             results_written.append(out_file)
 
             with open(out_file, "w+") as f:
-                f.write(f"From Workspace: {self.name} (hash: {self.results['workspace_hash']})\n")
-                if "experiments" in self.results:
-                    for exp in self.results["experiments"]:
+                f.write(f"From Workspace: {self.name} (hash: {results['workspace_hash']})\n")
+                if "experiments" in results:
+                    for exp in results["experiments"]:
                         f.write("Experiment %s figures of merit:\n" % exp["name"])
                         f.write("  Status = %s\n" % exp["RAMBLE_STATUS"])
                         if "TAGS" in exp:
@@ -1376,7 +1378,7 @@ class Workspace:
             out_file = os.path.join(self.root, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, "w+") as f:
-                sjson.dump(self.results, f)
+                sjson.dump(results, f)
             self.simlink_result(filename_base, latest_base, file_extension)
 
         if "yaml" in output_formats:
@@ -1384,7 +1386,7 @@ class Workspace:
             out_file = os.path.join(self.root, filename_base + file_extension)
             results_written.append(out_file)
             with open(out_file, "w+") as f:
-                syaml.dump(self.results, stream=f)
+                syaml.dump(results, stream=f)
             self.simlink_result(filename_base, latest_base, file_extension)
 
         if not results_written:
@@ -1893,6 +1895,14 @@ def no_active_workspace():
         if ws:
             os.environ[ramble_workspace_var] = env_var
             activate(ws)
+
+
+def _filter_results(results, summary_only):
+    if not summary_only or "experiments" not in results:
+        return results
+    results = copy.deepcopy(results)
+    results["experiments"] = [r for r in results["experiments"] if r["N_REPEATS"] > 0]
+    return results
 
 
 class RambleWorkspaceError(ramble.error.RambleError):

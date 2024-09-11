@@ -24,6 +24,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.long
 def test_gromacs_repeats(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:
@@ -181,3 +182,12 @@ ramble:
                 assert "Core Time = 22.222 s" in data
                 assert "summary::mean = 16.666 s" in data
                 assert "summary::variance = 61.727 s^2" in data
+
+        # When --summary-only, only the base experiments are included
+        workspace("analyze", "-s", global_args=["-w", workspace_name])
+        result_file = glob.glob(os.path.join(ws1.root, "results.latest.txt"))[0]
+        with open(result_file) as f:
+            data = f.read()
+            assert "gromacs.water_bare.pme_single_rank" in data
+            assert "gromacs.water_bare.pme_single_rank.1" not in data
+            assert "gromacs.water_bare.pme_single_rank.2" not in data
