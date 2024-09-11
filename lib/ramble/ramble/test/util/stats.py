@@ -22,12 +22,6 @@ import ramble.util.stats
         (ramble.util.stats.StatsVar(), [3], "s", ("NA", "", "summary::variance")),
         (ramble.util.stats.StatsStdev(), [-2, 0, 2, 5.5], "s", (3.2, "s", "summary::stdev")),
         (ramble.util.stats.StatsStdev(), [3], "s", ("NA", "", "summary::stdev")),
-        (
-            ramble.util.stats.StatsCountValues(),
-            [-2, 0, 2, 5.5],
-            "s",
-            (4, "repeats", "summary::n_successful_repeats"),
-        ),
         (ramble.util.stats.StatsCoefficientOfVariation(), [3], "s", ("NA", "", "summary::cv")),
         (ramble.util.stats.StatsCoefficientOfVariation(), [3, -3], "s", ("NA", "", "summary::cv")),
         (

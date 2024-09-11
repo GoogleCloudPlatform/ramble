@@ -113,16 +113,6 @@ class StatsCoefficientOfVariation(StatsBase):
         return ""
 
 
-class StatsCountValues(StatsBase):
-    name = "n_successful_repeats"
-
-    def compute(self, values):
-        return len(values)
-
-    def get_unit(self, unit):
-        return "repeats"
-
-
 all_stats = [
     StatsMin(),
     StatsMax(),
@@ -131,5 +121,4 @@ all_stats = [
     StatsVar(),
     StatsStdev(),
     StatsCoefficientOfVariation(),
-    StatsCountValues(),
 ]
