@@ -222,7 +222,13 @@ class AnalyzePipeline(Pipeline):
     name = "analyze"
 
     def __init__(
-        self, workspace, filters, output_formats=["text"], upload=False, print_results=False
+        self,
+        workspace,
+        filters,
+        output_formats=["text"],
+        upload=False,
+        print_results=False,
+        summary_only=False,
     ):
         workspace_success = {namespace.success: ramble.config.config.get_config(namespace.success)}
 
@@ -234,6 +240,7 @@ class AnalyzePipeline(Pipeline):
         self.require_inventory = True
         self.upload_results = upload
         self.print_results = print_results
+        self.summary_only = summary_only
 
     def _prepare(self):
 
@@ -263,7 +270,9 @@ class AnalyzePipeline(Pipeline):
             if app_inst.repeats.n_repeats > 0:
                 app_inst.calculate_statistics(self.workspace)
         self.workspace.dump_results(
-            output_formats=self.output_formats, print_results=self.print_results
+            output_formats=self.output_formats,
+            print_results=self.print_results,
+            summary_only=self.summary_only,
         )
 
         if self.upload_results:
