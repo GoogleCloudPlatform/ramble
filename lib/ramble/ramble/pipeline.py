@@ -248,12 +248,26 @@ class AnalyzePipeline(Pipeline):
         # - At least one expeirment is set up
         # - `--dry-run` is enabled
         found_valid_experiment = False
-        for exp, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
+        # Record how many non-analyzable experiments are encountered
+        no_analyze_cnt = 0
+        for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
                 if app_inst.get_status() != ramble.application.experiment_status.UNKNOWN.name:
                     found_valid_experiment = True
+            else:
+                no_analyze_cnt += 1
 
-        if not found_valid_experiment and self._experiment_set.num_experiments():
+        num_total_exps = self._experiment_set.num_experiments()
+        num_filtered_exps = self._experiment_set.num_filtered_experiments(self.filters)
+        if not found_valid_experiment and num_total_exps:
+            if not num_filtered_exps:
+                logger.die("No experiment left for analysis after filtering.")
+            if num_filtered_exps == no_analyze_cnt:
+                logger.die(
+                    "No analyzeable experiment detected."
+                    " All selected ones are either templates or the base of"
+                    " repeated experiments."
+                )
             logger.die(
                 "No analyzeable experiment detected."
                 " Make sure your workspace is setup with\n"
