@@ -344,6 +344,68 @@ ramble:
     assert "- basic.test_wl2.test_experiment.chain.0.basic.test_wl.test_experiment" in output
 
 
+def test_workspace_info_with_where_filter():
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+  software:
+    packages:
+      zlib:
+        pkg_spec: 'zlib'
+    environments:
+      zlib:
+        packages:
+        - zlib
+"""
+
+    workspace_name = "test_info"
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace(
+        "info",
+        "--software",
+        "--where",
+        '"{experiment_index}" == "1"',
+        global_args=["-w", workspace_name],
+    )
+
+    assert "basic.test_wl.test_experiment" in output
+    assert "basic.test_wl2.test_experiment" not in output
+    assert "zlib.ensure_installed.test_experiment" not in output
+
+
 def test_workspace_dir(tmpdir):
     with tmpdir.as_cwd():
         workspace("create", "-d", ".")
