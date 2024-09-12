@@ -672,13 +672,12 @@ def workspace_info(args):
                 print_experiment_set.build_experiment_chains()
 
                 # Reindex the experiments in the print set to match the overall set
-                for exp_name, _, _ in print_experiment_set.all_experiments():
+                for exp_name, print_app_inst, _ in print_experiment_set.all_experiments():
                     app_inst = experiment_set.get_experiment(exp_name)
                     experiment_index = app_inst.expander.expand_var_name(
                         app_inst.keywords.experiment_index
                     )
 
-                    print_app_inst = print_experiment_set.get_experiment(exp_name)
                     print_app_inst.define_variable(
                         print_app_inst.keywords.experiment_index, experiment_index
                     )
