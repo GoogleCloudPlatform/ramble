@@ -150,10 +150,11 @@ class GcpMetadata(BasicModifier):
             ),
             "w+",
         ) as f:
-            f.write(f"Level 0 groups = {len(level0_groups)}\n")
-            f.write(f"Level 1 groups = {len(level1_groups)}\n")
-            f.write(f"Level 2 groups = {len(level2_groups)}\n")
-            f.write(f'All hosts = {",".join(all_hosts)}\n')
+            if len(level0_groups) > 0:
+                f.write(f"Level 0 groups = {len(level0_groups)}\n")
+                f.write(f"Level 1 groups = {len(level1_groups)}\n")
+                f.write(f"Level 2 groups = {len(level2_groups)}\n")
+                f.write(f'All hosts = {",".join(all_hosts)}\n')
 
     def _prepare_analysis(self, workspace):
         self._process_id_list()
