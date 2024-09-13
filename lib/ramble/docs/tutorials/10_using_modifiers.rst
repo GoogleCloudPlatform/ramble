@@ -65,7 +65,7 @@ To discover which modifiers are available, execute:
 
 .. code-block:: console
 
-    $ ramble mods list
+    $ ramble list --type modifiers
 
 Which might output the following:
 
@@ -82,7 +82,7 @@ about the ``lscpu`` modifier, execute:
 
 .. code-block:: console
 
-    $ ramble mods info lscpu
+    $ ramble info --type modifiers lscpu
 
 This modifier adds the execution of ``lscpu`` to each experiment in a workspace
 (to capture additional platform level details, such as the CPU model), and
@@ -157,7 +157,7 @@ To get information about the ``intel-aps`` modifier, execute:
 
 .. code-block:: console
 
-    $ ramble mods info intel-aps
+    $ ramble info --type modifiers intel-aps
 
 In the output from this command, you should see a ``mode`` named ``mpi``. One
 additional difference relateive to ``lscpu`` is that the ``Software Specs:``
