@@ -18,77 +18,97 @@ class InstallRamble(BasicModifier):
 
     maintainers("douglasjacobsen")
 
-    mode("standard", description="Standard execution mode for ramble")
-    default_mode("standard")
+    mode("standard", description="Standard execution mode for install-ramble")
+    mode(
+        "quiet",
+        description="Standard execution mode for install-ramble. "
+        + "Does not auto-inject commands into experiments",
+    )
+    default_mode("quiet")
 
     modifier_variable(
         "ramble_url",
         default="https://github.com/GoogleCloudPlatform/ramble",
         description="URL to clone ramble from",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "ramble_ref",
         default="develop",
         description="Ref to checkout for ramble",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "ramble_install_dir",
         default="${HOME}/.ramble/ramble",
         description="Directory to install ramble into",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "ramble_venv_path",
         default="${HOME}/.ramble/ramble-venv",
         description="Virtual environment path for ramble",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     create_ramble_venv = """
 if [ ! -d {ramble_venv_path} ]; then
-python -m venv {ramble_venv_path}
-. {ramble_venv_path}/bin/activate
-pip install --upgrade pip
-pip install -r {ramble_install_dir}/requirements.txt
+  python -m venv {ramble_venv_path}
+  . {ramble_venv_path}/bin/activate
+  pip install --upgrade pip
+  pip install -r {ramble_install_dir}/requirements.txt
+  pip install -r {ramble_install_dir}/requirements-dev.txt
 fi
 """
 
     install_ramble_full = """
 if [ ! -d {ramble_install_dir} ]; then
-git clone {ramble_url} {ramble_install_dir}
-cd {ramble_install_dir}
-git checkout {ramble_ref}
-cd -
+  git clone {ramble_url} {ramble_install_dir}
+  cd {ramble_install_dir}
+  git checkout {ramble_ref}
+  cd -
 fi
 """
 
     install_ramble_shallow = """
 if [ ! -d {ramble_install_dir} ]; then
-git init {ramble_install_dir}
-cd {ramble_install_dir}
-git remote add origin {ramble_url}
-git fetch --depth 1 origin {ramble_ref}
-git checkout FETCH_HEAD
-cd -
+  git init {ramble_install_dir}
+  cd {ramble_install_dir}
+  git remote add origin {ramble_url}
+  git fetch --depth 1 origin {ramble_ref}
+  git checkout FETCH_HEAD
+  cd -
 fi
 """
     modifier_variable(
         "install_ramble_full",
         default=install_ramble_full + create_ramble_venv,
         description="Install script for full ramble history",
-        mode="standard",
+        modes=["standard", "quiet"],
     )
 
     modifier_variable(
         "install_ramble_shallow",
         default=install_ramble_shallow + create_ramble_venv,
         description="Install script for shallow ramble history",
-        mode="standard",
+        modes=["standard", "quiet"],
+    )
+
+    modifier_variable(
+        "activate_ramble_venv",
+        default=". {ramble_venv_path}/bin/activate",
+        description="Command for activating the virtual environment for ramble",
+        modes=["standard", "quiet"],
+    )
+
+    modifier_variable(
+        "source_ramble",
+        default=". {ramble_install_dir}/share/ramble/setup-env.sh",
+        description="Command for sourcing ramble into an environment",
+        modes=["standard", "quiet"],
     )
 
     executable_modifier("source_installed_ramble")
@@ -101,12 +121,15 @@ fi
         pre_exec = []
         post_exec = []
 
+        if self._usage_mode == "quiet":
+            return pre_exec, post_exec
+
         if not hasattr(self, "_already_applied"):
             pre_exec.append(
                 CommandExecutable(
                     "source-installed-ramble",
                     template=[
-                        ". {ramble_install_dir}/share/ramble/setup-env.sh"
+                        "{source_ramble}",
                     ],
                 )
             )
