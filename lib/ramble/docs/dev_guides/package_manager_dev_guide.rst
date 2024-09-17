@@ -141,6 +141,9 @@ the experiments. Builtins are written as class methods that return a list of
 strings which are explicit commands to add into an experiment. The
 ``register_builtin`` directive can be used to add a builtin into an experiment.
 
+For more information on builtins, see the advanced topic documentation on
+:ref:`ramble-builtins`.
+
 ^^^^^^^^^^^^^^^^^^
 Phase Registration
 ^^^^^^^^^^^^^^^^^^
@@ -154,6 +157,9 @@ automatically executed as part of the pipeline they belong to.
 
 Package managers will primarily define new phases, and register them into
 specific experiments to modify the behavior of the different pipelines.
+
+For more information on phases and pipelines, see documentation for
+:ref:`ramble-pipelines-and-phases`.
 
 -------------------------
 Testing a Package Manager
