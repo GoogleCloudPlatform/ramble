@@ -1522,8 +1522,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
 
-    register_phase("write_inventory", pipeline="setup", run_after=["make_experiments"])
-
     def _write_inventory(self, workspace, app_inst=None):
         """Build and write an inventory of an experiment
 

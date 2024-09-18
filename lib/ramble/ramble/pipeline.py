@@ -76,6 +76,7 @@ class Pipeline:
                 force_compute=self.force_inventory,
                 require_exist=self.require_inventory,
             )
+            app_inst._write_inventory(self.workspace)
 
         workspace_inventory = os.path.join(self.workspace.root, self.workspace.inventory_file_name)
         workspace_hash_file = os.path.join(self.workspace.root, self.workspace.hash_file_name)
@@ -273,7 +274,6 @@ class AnalyzePipeline(Pipeline):
                 " Make sure your workspace is setup with\n"
                 "    ramble workspace setup"
             )
-
         super()._construct_hash()
         super()._prepare()
 

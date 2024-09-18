@@ -10,6 +10,7 @@ from ramble.namespace import namespace
 
 
 _DICT_MAPPING = {
+    "experiment_hash": "experiment_hash",
     "name": "name",
     "status": "RAMBLE_STATUS",
     "experiment_chain": "EXPERIMENT_CHAIN",
@@ -28,6 +29,7 @@ class ExperimentResult:
     def __init__(self, app_inst):
         """Build up the result from the given app instance"""
         self.name = app_inst.expander.experiment_namespace
+        self.experiment_hash = app_inst.experiment_hash
         self.status = app_inst.get_status()
         self.n_repeats = app_inst.repeats.n_repeats
         self.experiment_chain = app_inst.chain_order.copy()
