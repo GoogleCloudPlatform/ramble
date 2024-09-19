@@ -831,6 +831,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 exp_inst.chain_order = self.chain_order.copy()
 
     def define_variable(self, var_name, var_value):
+        self.variables[var_name] = var_value
         self.expander._variables[var_name] = var_value
         for mod_inst in self._modifier_instances:
             mod_inst.expander._variables[var_name] = var_value
