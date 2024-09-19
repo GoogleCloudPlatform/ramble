@@ -208,7 +208,7 @@ def repo_remove(args):
                 break
 
         if obj_complete:
-            break
+            continue
 
         # If it is a namespace, remove corresponding repo
         for path in repos:
