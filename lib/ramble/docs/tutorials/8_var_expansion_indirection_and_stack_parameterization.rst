@@ -213,7 +213,7 @@ resulting configuration might look like the following:
 system if you require additional arguments. To be able to execute these on your
 system, make sure you modify these appropriately.
 
-At this point, you have described the 12 experiments you want to run, however
+At this point, you have described the 8 experiments you want to run, however
 they are still not completely defined. Running:
 
 .. code-block:: console
