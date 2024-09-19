@@ -831,6 +831,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 exp_inst.chain_order = self.chain_order.copy()
 
     def define_variable(self, var_name, var_value):
+        self.variables[var_name] = var_value
         self.expander._variables[var_name] = var_value
         for mod_inst in self._modifier_instances:
             mod_inst.expander._variables[var_name] = var_value
@@ -993,7 +994,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for var_set in var_sets:
             for var, val in var_set.items():
                 if var not in self.variables.keys():
-                    self.variables[var] = val.default
+                    self.define_variable(var, val.default)
 
         if self.expander.workload_name in self.workloads:
             workload = self.workloads[self.expander.workload_name]
