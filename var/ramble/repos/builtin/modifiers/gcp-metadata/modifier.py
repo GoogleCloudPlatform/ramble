@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 from ramble.modkit import *
 
 
@@ -123,16 +125,20 @@ class GcpMetadata(BasicModifier):
                 f.write(", ".join(sorted(ids)))
 
     def _process_physical_hosts(self):
+        run_dir = self.expander.expand_var("{experiment_run_dir}")
+        log_path = os.path.join(
+            run_dir,
+            "gcp-metadata.physical_host.log",
+        )
+        if not os.path.isfile(log_path):
+            return
+
         level0_groups = set()
         level1_groups = set()
         level2_groups = set()
         all_hosts = set()
 
-        with open(
-            self.expander.expand_var(
-                "{experiment_run_dir}/gcp-metadata.physical_host.log"
-            )
-        ) as f:
+        with open(log_path) as f:
             for raw_host in f.readlines():
                 physical_host = raw_host[1:].strip()
                 tty.debug(f"  Host line: {physical_host}")
@@ -145,9 +151,7 @@ class GcpMetadata(BasicModifier):
                     level2_groups.add(levels[2])
 
         with open(
-            self.expander.expand_var(
-                "{experiment_run_dir}/gcp-metadata.topology_summary.log"
-            ),
+            os.path.join(run_dir, "gcp-metadata.topology_summary.log"),
             "w+",
         ) as f:
             if len(level0_groups) > 0:
