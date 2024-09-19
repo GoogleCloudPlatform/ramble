@@ -393,7 +393,7 @@ experiment definition to perform a basic rank based scaling study.
 
 Edit the ``ramble.yaml`` file, and perform the following steps:
 
- #. Update the value for ``n_ranks`` to be ``[1, 2, 4]``
+ #. Update the value for ``n_ranks`` to be ``[1, 2]``
  #. Add the ``n_ranks`` variable to the matrix definition
  #. Ensure your experiment name uses the ``{n_ranks}`` placeholder
 
@@ -422,16 +422,12 @@ Which should contain the following output:
         Workload: {app_workload}
           Experiment: gromacs.water_bare.pme_1ranks
           Experiment: gromacs.water_bare.pme_2ranks
-          Experiment: gromacs.water_bare.pme_4ranks
           Experiment: gromacs.water_bare.rf_1ranks
           Experiment: gromacs.water_bare.rf_2ranks
-          Experiment: gromacs.water_bare.rf_4ranks
           Experiment: gromacs.water_gmx50.pme_1ranks
           Experiment: gromacs.water_gmx50.pme_2ranks
-          Experiment: gromacs.water_gmx50.pme_4ranks
           Experiment: gromacs.water_gmx50.rf_1ranks
           Experiment: gromacs.water_gmx50.rf_2ranks
-          Experiment: gromacs.water_gmx50.rf_4ranks
 
 .. include:: shared/gromacs_execute.rst
 
