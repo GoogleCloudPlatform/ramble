@@ -124,11 +124,14 @@ class GcpMetadata(BasicModifier):
             ) as f:
                 f.write(", ".join(sorted(ids)))
 
-    def _process_physical_hosts(self):
+    def _process_physical_hosts(self, workspace):
         run_dir = self.expander.expand_var("{experiment_run_dir}")
-        log_path = os.path.join(
-            run_dir,
-            "gcp-metadata.physical_host.log",
+        log_path = get_file_path(
+            os.path.join(
+                run_dir,
+                "gcp-metadata.physical_host.log",
+            ),
+            workspace,
         )
         if not os.path.isfile(log_path):
             return
@@ -162,7 +165,7 @@ class GcpMetadata(BasicModifier):
 
     def _prepare_analysis(self, workspace):
         self._process_id_list()
-        self._process_physical_hosts()
+        self._process_physical_hosts(workspace)
 
     figure_of_merit(
         "machine-type",
