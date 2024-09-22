@@ -60,7 +60,12 @@ class IntelAps(BasicModifier):
             pre_exec.append(
                 CommandExecutable(
                     f"load-aps-{executable_name}",
-                    template=["spack load intel-oneapi-vtune"],
+                    template=[
+                        "spack load intel-oneapi-vtune",
+                        # Clean up previous aps logs to avoid the potential
+                        # of out-dated reports.
+                        "rm -rf {aps_log_dir}",
+                    ],
                 )
             )
             post_exec.append(
