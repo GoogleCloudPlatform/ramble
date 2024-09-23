@@ -46,6 +46,8 @@ Write the following configuration into the file, save, and exit:
 .. code-block:: yaml
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
@@ -74,6 +76,8 @@ will look something like this:
 .. code-block:: yaml
 
     ramble:
+      variants:
+        package_manager: spack
       env_vars:
         set:
           OMP_NUM_THREADS: '{n_threads}'
