@@ -166,14 +166,7 @@ explore using this after you perform experiments.
 To ensure the success criteria are checked and the experiments pass them,
 ensure ``SUCCESS`` is printed for the status of each experiment.
 
-When an experiment fails, you can force Ramble to print the figure of merit
-data using:
-
-.. code-block:: console
-
-    $ ramble workspace analyze --always-print-foms
-
-Also, running analyze in debug mode as:
+Running analyze in debug mode as:
 
 .. code-block:: console
 
