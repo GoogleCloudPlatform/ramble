@@ -77,7 +77,7 @@ Which might output the following:
 This shows there are four modifiers in this installation of Ramble. Two very
 general modifiers in this list are ``lscpu`` and ``intel-aps``. Modifiers are
 allowed to behave in different ways. Their functionality should be documented
-at a high-level through the ``ramble mods info`` command. To get information
+at a high-level through the ``ramble info --type modifiers`` command. To get information
 about the ``lscpu`` modifier, execute:
 
 .. code-block:: console
