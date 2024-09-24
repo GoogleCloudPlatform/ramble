@@ -42,7 +42,7 @@ class IntelHpl(ExecutableApplication):
     required_package("intel-oneapi-mkl", package_manager="spack*")
 
     # This step does a few things:
-    # - Set up the env variables expected by runme_intel64_prv
+    # - Prepare calling for the script runme_intel64_prv
     #   (We call this runner script instead of the underlying xhpl_intel64_dynamic
     #    since it sets up derived env var HPL_HOST_NODE for numa placement control.)
     # - Link in the xhpl_intel64_dynamic binary to the running dir
@@ -52,10 +52,6 @@ class IntelHpl(ExecutableApplication):
         "prepare",
         template=[
             r"""
-export MPI_PROC_NUM="{n_ranks}"
-export MPI_PER_NODE="{processes_per_node}"
-export NUMA_PER_MPI="{numa_per_mpi}"
-export HPL_EXE=xhpl_intel64_dynamic
 hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack"
 if [ ! -d ${hpl_bench_dir} ]; then
     hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/share/mkl/benchmarks/mp_linpack"
@@ -77,6 +73,34 @@ hpl_run="${hpl_bench_dir}/runme_intel64_prv"
 
     workload("standard", executables=["prepare", "execute"])
     workload("calculator", executables=["prepare", "execute"])
+
+    environment_variable(
+        "MPI_PROC_NUM",
+        value="{n_ranks}",
+        description="Number of total ranks",
+        workloads=["*"],
+    )
+
+    environment_variable(
+        "MPI_PER_NODE",
+        value="{processes_per_node}",
+        description="Number of ranks per node",
+        workloads=["*"],
+    )
+
+    environment_variable(
+        "NUMA_PER_MPI",
+        value="{numa_per_mpi}",
+        description="Number of NUMA nodes per rank",
+        workloads=["*"],
+    )
+
+    environment_variable(
+        "HPL_EXE",
+        value="xhpl_intel64_dynamic",
+        description="HPL executable name",
+        workloads=["*"],
+    )
 
     workload_variable(
         "numa_per_mpi",
