@@ -518,9 +518,14 @@ For example, using the  mirror directories we created above,
 
 .. code-block:: console
 
-    $ ramble mirror add --scope={site,user} ramble_mirror $HOME/wrfv4_mirror/inputs
+    $ ramble mirror add --scope=site ramble_mirror $HOME/wrfv4_mirror/inputs
 
     $ spack mirror add spack_mirror $HOME/wrfv4_mirror/software
+
+**NOTE**: The ``--scope`` argument controls at what level Ramble is configured to use this mirror. The default scope
+is ``user`` which places the config within the ``~/.ramble`` directory, and it only applies to the user that executed
+this comment. Using ``--scope=site`` applies the config to the installation directory for Ramble, and all users that
+use this same installation would have the config option applied to them.
 
 To validate that the mirrors were installed correctly, try something like the following,
 
