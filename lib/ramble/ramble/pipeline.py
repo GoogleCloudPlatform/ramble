@@ -146,6 +146,11 @@ class Pipeline:
 
             phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
 
+            if not phase_list:
+                logger.warn("Not valid phases selected, please verify requested phases")
+            else:
+                logger.debug(f"Selected phases: {phase_list}")
+
             disable_progress = (
                 ramble.config.get("config:disable_progress_bar", False)
                 or self.suppress_per_experiment_prints
