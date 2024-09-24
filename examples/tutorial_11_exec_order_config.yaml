@@ -37,8 +37,8 @@ ramble:
                     use_mpi: false
                 executables:
                 - builtin::env_vars
-                - builtin::spack_source
-                - builtin::spack_activate
+                - package_manager_builtin::spack::spack_source
+                - package_manager_builtin::spack::spack_activate
                 - cleanup
                 - copy
                 - fix_12km
