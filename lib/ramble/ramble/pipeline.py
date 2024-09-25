@@ -129,6 +129,8 @@ class Pipeline:
             logger.all_msg(f"  Log files for experiments are stored in: {self.log_dir}")
 
         count = 1
+        phase_total = 0
+
         for exp, app_inst, idx in self._experiment_set.filtered_experiments(self.filters):
             exp_log_path = app_inst.experiment_log_file(self.log_dir)
 
@@ -166,6 +168,7 @@ class Pipeline:
                         f"Processing phase {phase} ({phase_idx}/{len(phase_list)})"
                     )
                 app_inst.run_phase(self.name, phase, self.workspace)
+                phase_total += 1
                 if not disable_progress:
                     progress.update()
             app_inst.print_phase_times(self.name, self.filters.phases)
@@ -176,7 +179,11 @@ class Pipeline:
             logger.remove_log()
             if not self.suppress_per_experiment_prints:
                 logger.all_msg(f"  Returning to log file: {logger.active_log()}")
+
             count += 1
+
+        if phase_total == 0:
+            logger.warn("No valid phases were selected, please verify requested phases")
 
     def _complete(self):
         """Hook for performing pipeline actions after execution is complete"""
