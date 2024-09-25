@@ -253,7 +253,7 @@ def mutable_mock_pkg_mans_repo(mock_mods_repo_path):
         yield mock_repo_path
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
 def default_config():
     """Isolates the default configuration from the user configs.
 
