@@ -142,7 +142,7 @@ config_defaults = {
         "build_stage": "$tempdir/ramble-stage",
         "concretizer": "clingo",
         "license_dir": spack.paths.default_license_dir,
-        "shell": "sh",
+        "shell": "bash",
         "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
         "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
