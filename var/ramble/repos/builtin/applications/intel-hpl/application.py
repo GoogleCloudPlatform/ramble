@@ -26,27 +26,90 @@ class IntelHpl(ExecutableApplication):
 
     tags("benchmark-app", "benchmark", "linpack", "optimized", "intel", "mkl")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    define_compiler("gcc13p2", pkg_spec="gcc@13.2.0", package_manager="spack*")
     software_spec(
-        "imkl_2023p1",
-        pkg_spec="intel-oneapi-mkl@2023.1.0 threads=openmp",
-        compiler="gcc9",
+        "imkl_2024p2",
+        pkg_spec="intel-oneapi-mkl@2024.2.0 threads=openmp",
+        compiler="gcc13p2",
         package_manager="spack*",
     )
     software_spec(
-        "impi_2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
+        "impi2021p11",
+        pkg_spec="intel-oneapi-mpi@2021.11.0",
+        package_manager="spack*",
     )
 
     required_package("intel-oneapi-mkl", package_manager="spack*")
 
+    # This step does a few things:
+    # - Prepare calling for the script runme_intel64_prv
+    #   (We call this runner script instead of the underlying xhpl_intel64_dynamic
+    #    since it sets up derived env var HPL_HOST_NODE for numa placement control.)
+    # - Link in the xhpl_intel64_dynamic binary to the running dir
+    #   (This is needed due to runme_intel64_prv invoking it using "./")
+    # - Account for newer directory layout from mkl 2024
+    executable(
+        "prepare",
+        template=[
+            r"""
+hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack"
+if [ ! -d ${hpl_bench_dir} ]; then
+    hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/share/mkl/benchmarks/mp_linpack"
+fi
+ln -sf ${hpl_bench_dir}/xhpl_intel64_dynamic {experiment_run_dir}/.
+hpl_run="${hpl_bench_dir}/runme_intel64_prv"
+    """.strip()
+        ],
+        mpi=False,
+        redirect="",
+        output_capture="",
+    )
+
     executable(
         "execute",
-        "{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack/xhpl_intel64_dynamic",
+        "${hpl_run}",
         use_mpi=True,
     )
 
-    workload("standard", executables=["execute"])
-    workload("calculator", executables=["execute"])
+    workload("standard", executables=["prepare", "execute"])
+    workload("calculator", executables=["prepare", "execute"])
+
+    environment_variable(
+        "MPI_PROC_NUM",
+        value="{n_ranks}",
+        description="Number of total ranks",
+        workloads=["*"],
+    )
+
+    environment_variable(
+        "MPI_PER_NODE",
+        value="{processes_per_node}",
+        description="Number of ranks per node",
+        workloads=["*"],
+    )
+
+    environment_variable(
+        "NUMA_PER_MPI",
+        value="{numa_per_mpi}",
+        description="Number of NUMA nodes per rank",
+        workloads=["*"],
+    )
+
+    environment_variable(
+        "HPL_EXE",
+        value="xhpl_intel64_dynamic",
+        description="HPL executable name",
+        workloads=["*"],
+    )
+
+    workload_variable(
+        "numa_per_mpi",
+        description="numa per mpi process",
+        default="1",
+        workloads=["*"],
+    )
+
+    # standard workload-specific variables:
 
     workload_variable(
         "output_file",
