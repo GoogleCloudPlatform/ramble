@@ -15,6 +15,7 @@ import re
 import getpass
 import subprocess
 import tempfile
+import urllib.parse
 
 from llnl.util.lang import memoized
 
@@ -98,4 +99,12 @@ def canonicalize_path(path):
     path = substitute_path_variables(path)
     path = os.path.abspath(path)
 
+    return path
+
+
+def get_maybe_local_path(path):
+    """Convert a scheme-less path to absolute local path"""
+    parsed = urllib.parse.urlparse(path)
+    if not parsed.scheme:
+        return os.path.abspath(path)
     return path

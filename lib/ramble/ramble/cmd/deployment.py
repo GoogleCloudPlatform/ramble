@@ -25,6 +25,7 @@ import ramble.workspace.shell
 import ramble.pipeline
 import ramble.filters
 from ramble.main import RambleCommand
+import ramble.util.path
 
 
 description = "(experimental) manage workspace deployments"
@@ -118,8 +119,11 @@ def deployment_pull(args):
         # Fetch deployment index first:
         push_cls = ramble.pipeline.PushDeploymentPipeline
 
+        # Handle local relative path
+        deployment_path = ramble.util.path.get_maybe_local_path(args.deployment_path)
+
         remote_index_path = surl.join(
-            args.deployment_path, ramble.pipeline.PushDeploymentPipeline.index_filename
+            deployment_path, ramble.pipeline.PushDeploymentPipeline.index_filename
         )
         local_index_path = os.path.join(ws.root, push_cls.index_filename)
 
@@ -129,7 +133,7 @@ def deployment_pull(args):
             index_data = sjson.load(f)
 
         for file in index_data[push_cls.index_namespace]:
-            src = surl.join(args.deployment_path, file)
+            src = surl.join(deployment_path, file)
             dest = os.path.join(ws.root, file)
             if os.path.exists(dest):
                 fs.force_remove(dest)
