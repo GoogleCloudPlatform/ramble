@@ -268,6 +268,15 @@ context. Each context represents a grouping of figures of merit that are
 collected together. A figure of merit context can be defined using
 :py:meth:`ramble.language.shared_language.figure_of_merit_context`.
 
+^^^^^^^^^^^^^^^^^^
+File path handling
+^^^^^^^^^^^^^^^^^^
+
+Ramble provides a utility function :py:meth:`ramble.util.file_util.get_file_path`
+that should be used when referencing file paths in application definitions. This
+helps with Ramble to properly mock out these paths during unit testing, where the
+files may not exist under the dry-run setting.
+
 --------------------------
 Package Manager Directives
 --------------------------
