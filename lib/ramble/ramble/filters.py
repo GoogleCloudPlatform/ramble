@@ -8,13 +8,15 @@
 
 import itertools
 
+ALL_PHASES = ["*"]
+
 
 class Filters:
     """Object containing filters for limiting various operations in Ramble"""
 
     def __init__(
         self,
-        phase_filters=["*"],
+        phase_filters=ALL_PHASES,
         include_where_filters=None,
         exclude_where_filters=None,
         tags=None,

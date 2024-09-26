@@ -182,7 +182,7 @@ class Pipeline:
 
             count += 1
 
-        if phase_total == 0:
+        if phase_total == 0 and self.filters.phases != ramble.filters.ALL_PHASES:
             logger.warn("No valid phases were selected, please verify requested phases")
 
     def _complete(self):
