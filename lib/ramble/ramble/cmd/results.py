@@ -33,81 +33,87 @@ def setup_parser(subparser):
         "report", help=results_report.__doc__, description=results_report.__doc__
     )
     report_parser.add_argument(
-        "--workspace", dest="workspace",
+        "--workspace",
+        dest="workspace",
         metavar="WRKSPC",
         action="store",
-        help="the workspace to report on"
+        help="the workspace to report on",
     )
     report_parser.add_argument(
-        "--strong-scaling", dest="strong_scaling",
+        "--strong-scaling",
+        dest="strong_scaling",
         nargs="+",
         action="append",
         help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
-        required=False
+        required=False,
     )
     report_parser.add_argument(
-        "--weak-scaling", dest="weak_scaling",
+        "--weak-scaling",
+        dest="weak_scaling",
         nargs="+",
         action="append",
         help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
-        required=False
+        required=False,
     )
     report_parser.add_argument(
-        "--multi-line", dest="multi_line",
+        "--multi-line",
+        dest="multi_line",
         nargs="+",
         action="append",
         help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
-        required=False
+        required=False,
     )
     report_parser.add_argument(
-        "--where", dest="where",
+        "--where",
+        dest="where",
         action="store",
         help="Down select data to plot (useful for complex workspaces with collisions). Takes pandas query format",
-        required=False
+        required=False,
     )
     report_parser.add_argument(
-        "--compare", dest="compare",
+        "--compare",
+        dest="compare",
         nargs="+",
         action="append",
         help="generate a comparison report, requires at least two args: [FOM 1] [Additional FOMs] [optional: group by(s)]",
-        required=False
+        required=False,
     )
     report_parser.add_argument(
-        "--foms", dest="foms",
+        "--foms",
+        dest="foms",
         action="store_true",
         help="generate a FOM report, showing values of FOMs for each experiment",
-        required=False
+        required=False,
     )
     report_parser.add_argument(
-        "-n", "--normalize", dest="normalize",
+        "-n",
+        "--normalize",
+        dest="normalize",
         action="store_true",
-        help=("Normalize charts where possible. For scaling charts, this requires fom_type to be "
-              "specified as either 'time' or 'throughput'."),
-        required=False
+        help=(
+            "Normalize charts where possible. For scaling charts, this requires fom_type to be "
+            "specified as either 'time' or 'throughput'."
+        ),
+        required=False,
     )
     report_parser.add_argument(
-        "--logx", dest="logx",
-        action="store_true",
-        help=("Plot X axis as log"),
-        required=False
+        "--logx", dest="logx", action="store_true", help=("Plot X axis as log"), required=False
     )
     report_parser.add_argument(
-        "--logy", dest="logy",
-        action="store_true",
-        help=("Plot Y axis as log"),
-        required=False
+        "--logy", dest="logy", action="store_true", help=("Plot Y axis as log"), required=False
     )
 
     # TODO: should this make it into the final cut? Only applies to multi line -- remove
     report_parser.add_argument(
-        "--split-by", dest="split_by",
-        #nargs="+",
-        #action="append",
-        #default=["simplified_workload_namespace"],
+        "--split-by",
+        dest="split_by",
+        # nargs="+",
+        # action="append",
+        # default=["simplified_workload_namespace"],
         action="store",
         default="simplified_workload_namespace",
         help=("Ramble Variable to split out into different plots"),
-        required=False
+        required=False,
     )
     report_parser.add_argument("-f", "--file", help="path of results file")
 
@@ -159,13 +165,12 @@ def import_results_file(filename):
 
 
 def results_report(args):
-    """Create a report with charts from Ramble experiment results.
-    """
+    """Create a report with charts from Ramble experiment results."""
     results_dict = ramble.reports.load_results(args)
 
-    ws_name = results_dict['workspace_name']
+    ws_name = results_dict["workspace_name"]
     if not ws_name:
-        ws_name = 'unknown_workspace'
+        ws_name = "unknown_workspace"
 
     if args.workspace:
         ws_name = str(args.workspace)
@@ -175,8 +180,5 @@ def results_report(args):
 
 
 def results(parser, args):
-    action = {
-        "upload": results_upload,
-        "report": results_report
-    }
+    action = {"upload": results_upload, "report": results_report}
     action[args.results_command](args)
