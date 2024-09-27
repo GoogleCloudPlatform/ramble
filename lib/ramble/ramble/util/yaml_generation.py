@@ -107,7 +107,7 @@ def get_config_value(config_data: Dict, option_name: str):
     return None
 
 
-def set_config_value(config_data: Dict, option_name: str, option_value: Any):
+def set_config_value(config_data: Dict, option_name: str, option_value: Any, force: bool = False):
     """Set a config option based on dictionary attribute syntax
 
     Given an option_name of the format: attr1.attr2.attr3 set its value to
@@ -117,6 +117,8 @@ def set_config_value(config_data: Dict, option_name: str, option_value: Any):
         config_data (dict): A config dictionary representing data read from a YAML file.
         option_name (str): Name of config option to set
         option_value (any): Value to set config option to
+        force (bool): If true, all missing layers in the attribute list are created.
+                      If false, only sets existing attributes
     """
     option_parts = option_name.split(".")
 
@@ -125,10 +127,13 @@ def set_config_value(config_data: Dict, option_name: str, option_value: Any):
     while len(option_parts) > 1:
         cur_part = option_parts.pop(0)
         if cur_part not in option_scope:
-            return
+            if not force:
+                return
+            option_scope[cur_part] = {}
         option_scope = option_scope[cur_part]
 
-    if option_parts[0] in option_scope:
+    set_value = force or option_parts[0] in option_scope
+    if set_value:
         option_scope[option_parts[0]] = option_value
 
 
