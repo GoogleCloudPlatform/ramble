@@ -101,21 +101,22 @@ class GcpMetadata(BasicModifier):
 
         return pre_cmds, post_cmds
 
-    def _process_id_list(self):
-        import os.path
-
+    def get_vm_id_list(self):
         ids = set()
-        file_name = self.expander.expand_var(
-            "{experiment_run_dir}/gcp-metadata.id.log"
-        )
-
+        exp_run_dir = self.expander.expand_var_name("experiment_run_dir")
+        file_name = os.path.join(exp_run_dir, "gcp-metadata.id.log")
         if os.path.isfile(file_name):
             with open(file_name) as f:
                 for cur_id in f.readlines():
                     cur_id = cur_id.strip()
                     if cur_id.isnumeric():
                         ids.add(cur_id)
+        return sorted(ids)
 
+    def _process_id_list(self):
+        ids = self.get_vm_id_list()
+
+        if ids:
             with open(
                 self.expander.expand_var(
                     "{experiment_run_dir}/gcp-metadata.id_list.log"
@@ -206,14 +207,6 @@ class GcpMetadata(BasicModifier):
     figure_of_merit(
         "Level {level_num} Groups",
         fom_regex="Level (?P<level_num>[0-9]) groups = (?P<num_groups>[0-9]+)",
-        log_file="{experiment_run_dir}/gcp-metadata.topology_summary.log",
-        group_name="num_groups",
-        units="",
-    )
-
-    figure_of_merit(
-        "Level 0 Groups",
-        fom_regex="Level 0 groups = (?P<num_groups>.*)",
         log_file="{experiment_run_dir}/gcp-metadata.topology_summary.log",
         group_name="num_groups",
         units="",
