@@ -10,10 +10,9 @@ import deprecation
 
 from ramble.pkgmankit import *  # noqa: F403
 
-from ramble.pkg_man.builtin.spack_lightweight import (
-    SpackLightweight,
-    RunnerError,
-)
+from ramble.util.command_runner import RunnerError
+
+from ramble.pkg_man.builtin.spack_lightweight import SpackLightweight
 
 
 class Spack(SpackLightweight):

@@ -11,9 +11,9 @@ import pytest
 
 
 import ramble.config
+from ramble.util.command_runner import RunnerError
 from ramble.pkg_man.builtin.spack_lightweight import (
     SpackRunner,
-    RunnerError,
     InvalidExternalEnvironment,
 )
 
