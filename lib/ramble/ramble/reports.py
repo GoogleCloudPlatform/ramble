@@ -182,7 +182,7 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
                     # Remove context dict and add the current FOM values
                     # TODO: Can we clean this partial copy with a class?
                     exp_copy.pop("CONTEXTS")
-                    exp_copy["context"] = context["display_name"]
+                    exp_copy["context"] = context["name"]
                     exp_copy["fom_name"] = fom["name"]
                     exp_copy["fom_value"] = fom["value"]
                     exp_copy["fom_units"] = fom["units"]
@@ -285,6 +285,7 @@ class PlotGenerator:
         self.spec = spec
         self.report_dir_path = report_dir_path
         self.pdf_report = pdf_report
+        self.figsize = [12, 8]
 
         self.results_df = results_df
         self.output_df = pd.DataFrame()
@@ -303,31 +304,45 @@ class PlotGenerator:
         # FIXME: do we need to support more than normalizing by the first
         # value?
 
-        # Performs inplace edit on data, no need to return
-        if speedup:
-            data.loc[:, to_col] = data[from_col].iloc[0] / data.loc[:, from_col]
+        if data[from_col].iloc[0] == 0:
+            raise ArithmeticError("Unable to normalize data. The first value in the series cannot be zero.")
         else:
-            data.loc[:, to_col] = data.loc[:, from_col] / data[from_col].iloc[0]
+            # Performs inplace edit on data, no need to return
+            if speedup:
+                data.loc[:, to_col] = data[from_col].iloc[0] / data.loc[:, from_col]
+            else:
+                data.loc[:, to_col] = data.loc[:, from_col] / data[from_col].iloc[0]
 
     # TODO: these args come from the spec, so don't need to be passed and could be stored at init
     def draw(self, perf_measure, scale_var, series, y_label):
-        title = f"Generating plot for {perf_measure} vs {scale_var} for {series}"
-        logger.debug(title)
+        # TODO: add suffix 'higher/lower is better' to chart title based on better_direction
+        title = f"{perf_measure} vs {scale_var} for {series}"
+        logger.debug(f"Generating plot for {title}")
 
+        # TODO: prep_draw method in subclass ScalingPlotGenerator, not this class
         fig, ax = self.prep_draw(perf_measure, scale_var, series)
 
         if self.normalize:
-            ax.plot(self.output_df.index, "normalized_fom_value", data=self.output_df, marker="o")
+            ax.plot(
+                self.output_df.index,
+                "normalized_fom_value",
+                data=self.output_df,
+                marker="o",
+                label=f"{perf_measure} (Normalized)",
+            )
         else:
-            ax.plot(self.output_df.index, "fom_value", data=self.output_df, marker="o")
-            ymin, ymax = ax.get_ylim()
+            ax.plot(
+                self.output_df.index,
+                "fom_value",
+                data=self.output_df,
+                marker="o",
+                label=f"{perf_measure}",
+            )
+        ymin, ymax = ax.get_ylim()
 
         # TODO: the plot can get very compressed for log weak scaling plots
         if not self.logy:
             plt.ylim(0, ymax * 1.1)
-
-        ax.set_ylabel(y_label)
-        ax.set_xlabel(scale_var)
 
         if self.have_statistics:
             logger.debug("Adding fill lines for min and max")
@@ -335,13 +350,34 @@ class PlotGenerator:
                 self.minmax.index, "fom_value_min", "fom_value_max", data=self.minmax, alpha=0.2
             )
 
-        ax.plot(self.output_df.index, "ideal_perf_value", data=self.output_df)
+        try:
+            ax.plot(
+                self.output_df.index, "ideal_perf_value", data=self.output_df, label="Ideal Value"
+            )
+        except ValueError:
+            logger.debug("Failed to plot ideal_perf_value. Series not found.")
 
         plt.legend(loc="upper left")
 
         ax.set_xticks(self.output_df.index.unique().tolist())
         ax.set_title(title, wrap=True)
-        # plt.tight_layout()
+        ax.tick_params(axis='x', labelrotation=45)
+        ax.set_ylabel(y_label)
+        ax.set_xlabel(scale_var)
+
+
+        chart_filename = f"strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png"
+        self.write(fig, chart_filename)
+
+    def draw_filler(self, perf_measure, scale_var, series, exception):
+        """Draws a filler figure in cases where a chart cannot be drawn due to errors."""
+        title = f"{perf_measure} vs {scale_var} for {series}"
+        logger.debug(f"Generating filler figure for {title}")
+
+        fig, ax = plt.subplots(figsize=self.figsize)
+        fig.text(0.5, 0.5, exception, horizontalalignment="center", verticalalignment="center", transform=fig.gca().transAxes, fontsize=12)
+        ax.set_axis_off()
+        ax.set_title(title)
 
         chart_filename = f"strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png"
         self.write(fig, chart_filename)
@@ -416,7 +452,12 @@ class ScalingPlotGenerator(PlotGenerator):
                 # TODO: We interpret this as requesting speedup, which isn't strictly true
                 # We need a more clear semantic for this
                 if self.normalize:
-                    self.normalize_data(series_results)
+                    try:
+                        self.normalize_data(series_results)
+                    except ArithmeticError as e:
+                        logger.warn(e)
+                        self.draw_filler(perf_measure, scale_var, series, e)
+                        continue
 
                 if not series_min.empty:
                     self.have_statistics = True
@@ -442,7 +483,7 @@ class ScalingPlotGenerator(PlotGenerator):
 
                     self.minmax = minmax
 
-                series_results = self.add_idealized_data(results, series_results)
+                series_results = self.add_idealized_data(results, series_results, better_direction)
 
                 self.output_df = series_results
                 self.draw(perf_measure, scale_var, series)
@@ -454,17 +495,23 @@ class ScalingPlotGenerator(PlotGenerator):
         else:
             first_perf_value = selected_data["fom_value"].iloc[0]
 
+        if first_perf_value == 0:
+            logger.warn(
+                "Unable to calculate idealized data. The first value in the series cannot be zero."
+            )
+            return selected_data
+
         logger.debug(f"Normalizing data (by {first_perf_value})")
 
         selected_data.loc[:, "ideal_perf_value"] = first_perf_value
 
         if better_direction == "LOWER" or better_direction == BetterDirection.LOWER:
             selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] / (
-                selected_data.index
+                selected_data.index / selected_data.index[0]  # set baseline scaling var to 1
             )
         elif better_direction == "HIGHER" or better_direction == BetterDirection.HIGHER:
             selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] * (
-                selected_data.index
+                selected_data.index / selected_data.index[0]
             )
 
         return selected_data
@@ -487,7 +534,7 @@ class ScalingPlotGenerator(PlotGenerator):
         return BetterDirection.INDETERMINATE
 
     def prep_draw(self, perf_measure, scale_var, series):
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=self.figsize)
 
         if self.logx or self.logy:
             from matplotlib.ticker import ScalarFormatter
@@ -724,18 +771,18 @@ class MultiLinePlot(ScalingPlotGenerator):
     def default_better(self):
         return BetterDirection.LOWER
 
-    def draw(self, perf_measure, scale_var, series):
-        fig, ax = plt.subplots()
+    def draw(self, yvar, xvar, series):
+        fig, ax = plt.subplots(figsize=self.figsize)
 
         col_to_plot = "fom_value"
-        ax.set_ylabel(f"{perf_measure}")
+        ax.set_ylabel(f"{yvar}")
 
         ax.plot("ideal_perf_value", data=self.output_df)
 
         for name, this_series in self.series_to_plot:
             ax.plot(col_to_plot, data=this_series, marker="o", label=name)
 
-        ax.set_xlabel(scale_var)
+        ax.set_xlabel(xvar)
         plt.legend(loc="upper left")
 
         if self.logx or self.logy:
@@ -752,9 +799,9 @@ class MultiLinePlot(ScalingPlotGenerator):
             ax.set_yscale("log", base=2)
             ax.yaxis.set_major_formatter(formatter)
 
-        ax.set_title(f"Weak Scaling: {perf_measure} vs {scale_var} for {series}", wrap=True)
+        ax.set_title(f"Weak Scaling: {yvar} vs {xvar} for {series}", wrap=True)
 
-        chart_filename = f"weak-scaling_{perf_measure}_vs_{scale_var}_{series}.png"
+        chart_filename = f"weak-scaling_{yvar}_vs_{xvar}_{series}.png"
         self.write(fig, chart_filename)
 
         self.series_to_plot = []
