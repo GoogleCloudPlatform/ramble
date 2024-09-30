@@ -941,12 +941,6 @@ def set(path, value, scope=None):
     return config.set(path, value, scope)
 
 
-def add_default_platform_scope(platform):
-    plat_name = os.path.join("defaults", platform)
-    plat_path = os.path.join(configuration_paths["defaults"][1], platform)
-    config.push_scope(ConfigScope(plat_name, plat_path))
-
-
 def scopes():
     """Convenience function to get list of configuration scopes."""
     return config.scopes
