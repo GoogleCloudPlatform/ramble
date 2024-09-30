@@ -257,6 +257,7 @@ def modifier_variable(
     mode: Optional[str] = None,
     modes: Optional[list] = None,
     expandable: bool = True,
+    track_used: bool = False,
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -269,6 +270,9 @@ def modifier_variable(
         mode (str): Single mode this variable is used in
         modes (list): List of modes this variable is used in
         expandable (bool): True if the variable should be expanded, False if not.
+        track_used (bool): True if the variable should be tracked as used,
+                           False if not. Can help with allowing lists without vecotizing
+                           experiments.
     """
 
     def _define_modifier_variable(mod):
@@ -288,6 +292,7 @@ def modifier_variable(
                 description=description,
                 values=values,
                 expandable=expandable,
+                **kwargs,
             )
 
     return _define_modifier_variable
