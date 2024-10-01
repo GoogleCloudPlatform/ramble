@@ -86,6 +86,14 @@ class BetterDirection(Enum):
     INDETERMINATE = 3  # requires interpretation or FOM type not defined
     INAPPLICABLE = 4  # non-numerical or no direction is 'better', like strings or categories
 
+    def get_direction_str(self):
+        if self == BetterDirection.HIGHER:
+            return " (Higher is Better)"
+        if self == BetterDirection.LOWER:
+            return " (Lower is Better)"
+        else:
+            return ""
+
 
 class FomType(Enum):
     TIME = 1

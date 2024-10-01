@@ -300,6 +300,7 @@ class PlotGenerator:
 
         # TODO: enable more robustly
         self.have_statistics = False
+        self.better_direction = BetterDirection.INDETERMINATE
 
     def normalize_data(
         self, data, scale_to_index=False, to_col="normalized_fom_value", from_col="fom_value", speedup=False
@@ -328,7 +329,7 @@ class PlotGenerator:
         series_data = self.output_df.query(f'series == "{series}"').copy()
 
         # TODO: add suffix 'higher/lower is better' to chart title based on better_direction
-        title = f"{perf_measure} vs {scale_var} for {series}"
+        title = f"{perf_measure} vs {scale_var} for {series}{self.better_direction.get_direction_str()}"
         logger.debug(f"Generating plot for {title}")
 
         # TODO: prep_draw method in subclass ScalingPlotGenerator, not this class
@@ -432,9 +433,8 @@ class ScalingPlotGenerator(PlotGenerator):
         results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
-        better_direction = BetterDirection.INDETERMINATE
         if len(results.loc[:, "better_direction"].unique()) == 1:
-            better_direction = results.loc[:, "better_direction"].unique()[0]
+            self.better_direction = results.loc[:, "better_direction"].unique()[0]
 
         # TODO: this needs to support a list for split_by
         # TODO: this currently gets overwritten by series, below
@@ -520,12 +520,12 @@ class ScalingPlotGenerator(PlotGenerator):
 
                 # self.minmax = minmax
 
-            series_results = self.add_idealized_data(results, series_results, better_direction)
+            series_results = self.add_idealized_data(results, series_results)
             self.output_df = pd.concat([self.output_df, series_results])
 
             self.draw(perf_measure, scale_var, series)
 
-    def add_idealized_data(self, raw_results, selected_data, better_direction):
+    def add_idealized_data(self, raw_results, selected_data):
 
         if self.normalize:
             first_perf_value = selected_data["normalized_fom_value"].iloc[0]
@@ -542,11 +542,11 @@ class ScalingPlotGenerator(PlotGenerator):
 
         selected_data.loc[:, "ideal_perf_value"] = first_perf_value
 
-        if better_direction == "LOWER" or better_direction == BetterDirection.LOWER:
+        if self.better_direction == "LOWER" or self.better_direction == BetterDirection.LOWER:
             selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] / (
                 selected_data.index / selected_data.index[0]  # set baseline scaling var to 1
             )
-        elif better_direction == "HIGHER" or better_direction == BetterDirection.HIGHER:
+        elif self.better_direction == "HIGHER" or self.better_direction == BetterDirection.HIGHER:
             selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] * (
                 selected_data.index / selected_data.index[0]
             )
@@ -601,9 +601,8 @@ class WeakScalingPlot(ScalingPlotGenerator):
         super().draw(perf_measure, scale_var, series, y_label)
 
     def add_idealized_data(
-        self, raw_results, selected_data, better_direction=BetterDirection.INDETERMINATE
-    ):
-        selected_data = super().add_idealized_data(raw_results, selected_data, better_direction)
+        self, raw_results, selected_data):
+        selected_data = super().add_idealized_data(raw_results, selected_data)
 
         selected_data.loc[:, "ideal_perf_value"] = selected_data["ideal_perf_value"].iloc[0]
         return selected_data
@@ -617,13 +616,12 @@ class StrongScalingPlot(ScalingPlotGenerator):
             return BetterDirection.LOWER
 
     def add_idealized_data(
-        self, raw_results, selected_data, better_direction=BetterDirection.INDETERMINATE
-    ):
+        self, raw_results, selected_data):
         # TODO: we need to set the better direction to be the opposite when normalized
-        if better_direction is BetterDirection.INDETERMINATE:
-            better_direction = self.default_better()
+        if self.better_direction is BetterDirection.INDETERMINATE:
+            self.better_direction = self.default_better()
 
-        return super().add_idealized_data(raw_results, selected_data, better_direction)
+        return super().add_idealized_data(raw_results, selected_data)
 
     def normalize_data(
         self, data, scale_to_index=True, to_col="normalized_fom_value", from_col="fom_value", speedup=True
