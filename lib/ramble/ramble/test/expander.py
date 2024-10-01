@@ -31,6 +31,7 @@ def exp_dict():
         "decimal.06.var": "foo",
         "size": '"0000.96"',  # Escaped as a string
         "test_mask": '"0x0"',
+        "max_len": 9,
     }
 
 
@@ -77,6 +78,7 @@ def exp_dict():
         ('re_search("o+\\\\.b", {env_name})', "True", set(), 1),
         ('"foo" in "{env_name}"', "True", set(), 1),
         ('"c" in "{experiment_name}"', "False", set(), 1),
+        ('"{env_name}"[:{max_len}:1]', "spack_foo", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
