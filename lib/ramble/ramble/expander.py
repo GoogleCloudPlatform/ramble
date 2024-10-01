@@ -716,6 +716,8 @@ class Expander:
             return self._eval_unary_ops(node)
         elif isinstance(node, ast.Call):
             return self._eval_function_call(node)
+        elif isinstance(node, ast.Subscript):
+            return self._eval_susbscript_op(node)
         else:
             node_type = str(type(node))
             raise MathEvaluationError(
@@ -900,6 +902,27 @@ class Expander:
             raise SyntaxError("Unsupported operand type in unary operator")
         except KeyError:
             raise SyntaxError("Unsupported unary operator")
+
+    def _eval_susbscript_op(self, node):
+        """Evaluate subscript operation in the ast"""
+        try:
+            operand = self.eval_math(node.value)
+            if not isinstance(operand, str):
+                raise SyntaxError("Currently only string slicing is supported for subscript")
+            slice_node = node.slice
+
+            def _get_with_default(s_node, attr, default):
+                v_node = getattr(s_node, attr)
+                if v_node is None:
+                    return default
+                return self.eval_math(v_node)
+
+            lower = _get_with_default(slice_node, "lower", 0)
+            upper = _get_with_default(slice_node, "upper", len(operand))
+            step = _get_with_default(slice_node, "step", 1)
+            return operand[slice(lower, upper, step)]
+        except TypeError:
+            raise SyntaxError("Unsupported operand type in subscript operator")
 
 
 def raise_passthrough_error(in_str, out_str):
