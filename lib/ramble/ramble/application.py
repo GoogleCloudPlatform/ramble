@@ -545,7 +545,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         if self.package_manager is not None:
             # Add package manager variable defaults as placeholder
             for var in self.package_manager.package_manager_variables.values():
-                self.expander._variables[var.name] = var.default
+                self.variables[var.name] = var.default
 
         ##########################################
         # Expand used variables to track all usage
@@ -582,6 +582,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         ############################
         # Reset variable definitions
         ############################
+        for var in self.variables:
+            if var not in backup_variables:
+                del self.variables[var]
 
         for var, val in backup_variables.items():
             self.variables[var] = val
