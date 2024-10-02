@@ -176,6 +176,10 @@ Supported functions are:
 * ``randint`` (from `random.randint`)
 * ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
 
+Additionally, string slicing is supported:
+
+* ``str[start:end:step]`` (string slicing)
+
 .. _ramble-escaped-variables:
 
 ~~~~~~~~~~~~~~~~~
