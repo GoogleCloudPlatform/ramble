@@ -54,6 +54,14 @@ class ConditionalPsm3(BasicModifier):
         mode="standard",
     )
 
+    modifier_variable(
+        "psm3_identify",
+        # Default to only output identification info from rank 0
+        default="1:",
+        description="PSM3_IDENTIFY setting as documented at https://www.intel.com/content/www/us/en/docs/mpi-library/developer-guide-linux/2021-6/ofi-providers-support.html",
+        mode="standard",
+    )
+
     def apply_psm3(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
 
@@ -76,7 +84,7 @@ class ConditionalPsm3(BasicModifier):
                         'export FI_PROVIDER="psm3"',
                         "export PSM3_ALLOW_ROUTERS=1",
                         'export PSM3_HAL="sockets"',
-                        "export PSM3_IDENTIFY=1",
+                        'export PSM3_IDENTIFY="{psm3_identify}"',
                         "fi",
                     ],
                     mpi=False,
