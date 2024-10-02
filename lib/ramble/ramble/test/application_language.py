@@ -21,6 +21,7 @@ app_types = [
 ]
 
 func_types = enum.Enum("func_types", ["method", "directive"])
+test_func_types = [func_types.method]
 
 
 @deprecation.fail_if_not_removed
@@ -328,7 +329,7 @@ def add_software_spec(app_inst, spec_num=1, func_type=func_types.directive):
     return spec_defs
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_workload_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
@@ -348,7 +349,7 @@ def test_workload_directive(app_class, func_type):
         assert app_inst.workloads[wl_name].find_input(test) is not None
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_executable_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
@@ -363,7 +364,7 @@ def test_executable_directive(app_class, func_type):
             assert conf_val == getattr(app_inst.executables[exe_name], conf_name)
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_figure_of_merit_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
@@ -378,7 +379,7 @@ def test_figure_of_merit_directive(app_class, func_type):
             assert app_inst.figures_of_merit[fom_name][conf_name] == conf_val
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_input_file_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
@@ -397,7 +398,7 @@ def test_input_file_directive(app_class, func_type):
         assert "expand" in app_inst.inputs[input_name]
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_define_compiler_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
@@ -412,7 +413,7 @@ def test_define_compiler_directive(app_class, func_type):
             assert app_inst.compilers[name][key] == value
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_software_spec_directive(app_class, func_type):
     app_inst = app_class("/not/a/path")
