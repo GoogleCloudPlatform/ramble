@@ -374,11 +374,13 @@ class PlotGenerator:
 
         ax.set_xticks(series_data.index.unique().tolist())
         ax.set_title(title, wrap=True)
-        # Rotate to prevent x-axis labels overlapping. There's probably a better way
-        if series_data.index.astype(str).str.len().max() > 4:
-            ax.tick_params(axis="x", labelrotation=45)
         ax.set_ylabel(y_label)
         ax.set_xlabel(scale_var)
+
+        # Rotate to prevent long x-axis labels overlapping. There's probably a better way
+        if series_data.index.astype(str).str.len().max() > 4:
+            ax.tick_params(axis="x", labelrotation=45)
+            fig.tight_layout()
 
         chart_filename = f"strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png"
         self.write(fig, chart_filename)
@@ -860,12 +862,12 @@ class MultiLinePlot(ScalingPlotGenerator):
         # This is to prevent x-axis labels overlapping but there's probably a better way
         if series_data.index.astype(str).str.len().max() > 4:
             ax.tick_params(axis="x", labelrotation=45)
+            fig.tight_layout()
         ax.set_ylabel(y_label)
         ax.set_xlabel(scale_var)
 
         chart_filename = f"strong-scaling_{perf_measure}_vs_{scale_var}_all-series.png"
         self.write(fig, chart_filename)
-
 
     def generate_plot_data(self):
         super().generate_plot_data()
