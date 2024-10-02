@@ -86,7 +86,7 @@ def is_repeat_child(experiment):
             return True
         else:
             return False
-    except:
+    except KeyError:
         # TODO: Remove this old implemention. I keep it here since the JSON update was so recent
         ends_in_number = re.search(r"\.\d+$", experiment["name"])
         if ends_in_number:
@@ -148,7 +148,8 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
     # first unnest dictionaries
     for exp in results["experiments"]:
         # TODO: this does not work as expected for repeats since success is not clear
-        # TODO: how to handle success? Repeats make this tricky because some children might have status=success but parent might have status=failed
+        # TODO: how to handle success? Repeats make this tricky because some children might have
+        # status=success but parent might have status=failed
         # if exp['RAMBLE_STATUS'] != 'SUCCESS' or exp['name'] in skip_exps:
 
         # TODO: disable skip_exps in favor of a more explicit is_child or is_parent check
@@ -324,6 +325,7 @@ class PlotGenerator:
                     data.loc[:, to_col] = data[from_col].iloc[0] / data.loc[:, from_col]
                 else:
                     data.loc[:, to_col] = data.loc[:, from_col] / data[from_col].iloc[0]
+
     # TODO: these args come from the spec, so don't need to be passed and could be stored at init
     def draw(self, perf_measure, scale_var, series, y_label):
         series_data = self.output_df.query(f'series == "{series}"').copy()
@@ -491,9 +493,6 @@ class ScalingPlotGenerator(PlotGenerator):
                     continue
 
             if self.have_statistics:
-                # TODO: fix copy semantics
-                # "A value is trying to be set on a copy of a slice from a DataFrame."
-                # there might be some accidentally copy semantics with series_results
                 series_min.loc[:, scale_var] = to_numeric_if_possible(
                     series_min[scale_var]
                 )
@@ -506,23 +505,14 @@ class ScalingPlotGenerator(PlotGenerator):
                 series_results.loc[:, "fom_value_min"] = to_numeric_if_possible(series_min["fom_value"])
                 series_results.loc[:, "fom_value_max"] = to_numeric_if_possible(series_max["fom_value"])
 
-                # minmax = pd.DataFrame()
-                # minmax["fom_value_min"] = series_min["fom_value"]
-                # minmax["fom_value_max"] = series_max["fom_value"]
-                # minmax.index = to_numeric_if_possible(series_min.index)
-
                 if self.normalize:
                     self.normalize_data(
-                        series_results, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min", speedup=True
-                    )
+                        series_results, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min")
                     self.normalize_data(
-                        series_results, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max", speedup=True
-                    )
+                        series_results, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max")
 
-
-                # self.minmax = minmax
-
-            series_results = self.add_idealized_data(results, series_results)
+            if not (self.better_direction == "INDETERMINATE" or self.better_direction == BetterDirection.INDETERMINATE):
+                series_results = self.add_idealized_data(results, series_results)
             self.output_df = pd.concat([self.output_df, series_results])
 
             self.draw(perf_measure, scale_var, series)
@@ -663,8 +653,8 @@ class FomPlot(PlotGenerator):
             series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
 
             series_results = series_results.set_index(scale_var)
-            print("post index")
-            print(series_results)
+            # print("post index")
+            # print(series_results)
 
             # self.validate_data(series_results)
 
@@ -694,11 +684,9 @@ class FomPlot(PlotGenerator):
 
                 if self.normalize:
                     self.normalize_data(
-                        minmax, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min", speedup=True
-                    )
+                        minmax, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min")
                     self.normalize_data(
-                        minmax, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max", speedup=True
-                    )
+                        minmax, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max")
 
                 self.minmax = minmax
 
@@ -722,17 +710,20 @@ class FomPlot(PlotGenerator):
             return
 
         # TODO: this should leverage the available min/max to add candle sticks
-        ax = self.output_df.plot(y="fom_value", kind="bar")
+        ax = self.output_df.plot(y="fom_value", kind="bar", figsize=self.figsize)
         fig = ax.get_figure()
 
-        # FIXME: this has a hard time fitting well on screen
-        # plt.tight_layout()
-        # plt.autoscale()
         # ax.set_label('Label via method')
         ax.legend([perf_measure])
 
         # If all FOMs are either higher or lower is better, add it to chart title
         ax.set_title(f"{perf_measure} by experiment", wrap=True)
+
+        # FIXME: Rotate to prevent long x-axis labels overlapping. This can make the chart
+        # very small but experiment names are readable (for smaller number of experiments)
+        if self.output_df.index.astype(str).str.len().max() > 4:
+            ax.tick_params(axis="x", labelrotation=90)
+            fig.tight_layout()
 
         chart_filename = f"foms_{perf_measure}_by_experiments.png"
         self.write(fig, chart_filename)
@@ -740,18 +731,17 @@ class FomPlot(PlotGenerator):
 
 class ComparisonPlot(PlotGenerator):
     def draw(self, perf_measure, scale_var, series):
-        ax = self.output_df.plot(kind="bar")
+        ax = self.output_df.plot(kind="bar", figsize=self.figsize)
         fig = ax.get_figure()
-
-        # FIXME: this has a hard time fitting well on screen
-        # plt.tight_layout()
-        plt.autoscale()
 
         # If all FOMs are either higher or lower is better, add it to chart title
         title_suffix = ""
         ax.set_title(
             f'{" vs ".join(perf_measure)} by {" and ".join(series)} {title_suffix}', wrap=True
         )
+
+        # FIXME: this has a hard time fitting well on screen
+        fig.tight_layout()
 
         chart_filename = f'{"_vs_".join(perf_measure)}_by_{"_and_".join(series)}.png'
         self.write(fig, chart_filename)
@@ -806,7 +796,15 @@ class MultiLinePlot(ScalingPlotGenerator):
     series_to_plot = []
 
     def default_better(self):
-        return BetterDirection.LOWER
+        if self.normalize:
+            return BetterDirection.HIGHER
+        else:
+            return BetterDirection.LOWER
+
+    def normalize_data(
+        self, data, scale_to_index=True, to_col="normalized_fom_value", from_col="fom_value", speedup=True
+    ):
+        super().normalize_data(data, scale_to_index, to_col=to_col, from_col=from_col, speedup=speedup)
 
     def draw(self, perf_measure, scale_var, series):
         if self.normalize:
