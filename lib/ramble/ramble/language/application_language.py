@@ -197,7 +197,8 @@ def workload_variable(
     workload=None,
     workloads=None,
     workload_group=None,
-    expandable=True,
+    expandable: bool = True,
+    track_used: bool = True,
     **kwargs,
 ):
     """Define a new variable to be used in experiments
@@ -207,6 +208,19 @@ def workload_variable(
     an experiment.
 
     These are specific to each workload.
+
+    Args:
+        name (str): Name of variable to define
+        default: Default value of variable definition
+        description (str): Description of variable's purpose
+        values (list): Optional list of suggested values for this variable
+        workload (str): Single workload this variable is used in
+        workloads (list): List of modes this variable is used in
+        workload_group (str): Name of workload group this variable is used in
+        expandable (bool): True if the variable should be expanded, False if not.
+        track_used (bool): True if the variable should be tracked as used,
+                           False if not. Can help with allowing lists without vecotizing
+                           experiments.
     """
 
     def _execute_workload_variable(app):
@@ -216,7 +230,12 @@ def workload_variable(
         )
 
         workload_var = ramble.workload.WorkloadVariable(
-            name, default=default, description=description, values=values, expandable=expandable
+            name,
+            default=default,
+            description=description,
+            values=values,
+            expandable=expandable,
+            **kwargs,
         )
 
         for wl_name in all_workloads:

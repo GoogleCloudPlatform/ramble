@@ -530,22 +530,37 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.build_modifier_instances()
         self.add_expand_vars(workspace)
 
+        backup_variables = self.variables.copy()
+
+        ########################
+        # Define extra variables
+        ########################
+
+        # Add modifier mode variables defaults as a placeholder:
+        for mod_inst in self._modifier_instances:
+            for var in mod_inst.mode_variables().values():
+                if var.name not in self.variables:
+                    self.variables[var.name] = var.default
+
+        if self.package_manager is not None:
+            # Add package manager variable defaults as placeholder
+            for var in self.package_manager.package_manager_variables.values():
+                self.variables[var.name] = var.default
+
+        ##########################################
+        # Expand used variables to track all usage
+        ##########################################
+
         # Add all known keywords
         for key in self.keywords.keys:
-            self.expander._used_variables.add(key)
             self.expander.expand_var_name(key)
-
-        # Add modifier mode variables:
-        for mod_inst in self._modifier_instances:
-            for var in mod_inst.mode_variables().keys():
-                self.expander._used_variables.add(var)
-                self.expander.expand_var_name(var)
 
         if self.chained_experiments:
             for chained_exp in self.chained_experiments:
                 if namespace.inherit_variables in chained_exp:
                     for var in chained_exp[namespace.inherit_variables]:
                         self.expander._used_variables.add(var)
+                        self.expander.expand_var_name(var)
 
         # Add variables from success criteria
         criteria_list = workspace.success_list
@@ -557,12 +572,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
             elif criteria.mode == "application_function":
                 self.evaluate_success()
 
+        if self.package_manager is not None:
+            self.package_manager.build_used_variables(workspace)
+
         for template_name, template_conf in workspace.all_templates():
             self.expander._used_variables.add(template_name)
             self.expander.expand_var(template_conf["contents"])
 
-        if self.package_manager is not None:
-            self.package_manager.build_used_variables(workspace)
+        ############################
+        # Reset variable definitions
+        ############################
+        for var in self.variables:
+            if var not in backup_variables:
+                del self.variables[var]
+
+        for var, val in backup_variables.items():
+            self.variables[var] = val
 
         return self.expander._used_variables
 
