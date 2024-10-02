@@ -1903,6 +1903,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         # Iterate through the aggregated foms, calculate stats, and insert into results
         for context, fom_dict in repeat_foms.items():
+            if not fom_dict:
+                continue
+
             context_map = {
                 "name": context,
                 "foms": [],
