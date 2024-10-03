@@ -1091,7 +1091,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             for mod in self._modifier_instances:
                 if mod.applies_to_executable(exec_node.key):
-                    exec_vars.update(mod.modded_variables(self))
+                    exec_vars.update(mod.modded_variables(self, exec_vars))
 
             if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
                 # Process directive defined executables
@@ -1427,7 +1427,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             exec_vars = {}
 
             for mod in self._modifier_instances:
-                exec_vars.update(mod.modded_variables(self))
+                exec_vars.update(mod.modded_variables(self, exec_vars))
 
             for template_name, template_conf in workspace.all_templates():
                 expand_path = os.path.join(experiment_run_dir, template_name)
