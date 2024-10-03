@@ -64,7 +64,7 @@ intro_by_level = {
 }
 
 #: control top-level ramble options shown in basic vs. advanced help
-options_by_level = {"short": ["h", "k", "V", "color"], "long": "all"}
+options_by_level = {"short": ["h", "k", "V", "color", "d"], "long": "all"}
 
 #: Longer text for each section, to show in help
 section_descriptions = {
