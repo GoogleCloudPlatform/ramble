@@ -153,6 +153,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._exp_lock = None
         self._input_lock = None
         self._software_lock = None
+        self._experiment_graph = None
 
         self.hash_inventory = {
             "application_definition": None,
@@ -532,6 +533,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         backup_variables = self.variables.copy()
 
+        self._define_commands(self._executable_graph, workspace.success_list)
+        self._define_formatted_executables()
+
         ########################
         # Define extra variables
         ########################
@@ -582,12 +586,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
         ############################
         # Reset variable definitions
         ############################
+        to_remove = set()
         for var in self.variables:
             if var not in backup_variables:
-                del self.variables[var]
+                to_remove.add(var)
+
+        for var in to_remove:
+            del self.variables[var]
 
         for var, val in backup_variables.items():
             self.variables[var] = val
+
+        self._command_list = []
 
         return self.expander._used_variables
 
@@ -1230,11 +1240,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
         if not self._vars_are_expanded:
             self._validate_experiment()
-            exec_graph = self._get_executable_graph(self.expander.workload_name)
+            self._executable_graph = self._get_executable_graph(self.expander.workload_name)
             self._set_default_experiment_variables()
             self._set_input_path()
-            self._define_commands(exec_graph, workspace.success_list)
-            self._define_formatted_executables()
 
             self._derive_variables_for_template_path(workspace)
             self._vars_are_expanded = True
@@ -1419,6 +1427,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         _check_shell_support(self)
 
         exp_lock = self.experiment_lock()
+
+        self._define_commands(self._executable_graph, workspace.success_list)
+        self._define_formatted_executables()
 
         with lk.WriteTransaction(exp_lock):
             experiment_run_dir = self.expander.experiment_run_dir
