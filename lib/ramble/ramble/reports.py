@@ -326,6 +326,28 @@ class PlotGenerator:
                 else:
                     data.loc[:, to_col] = data.loc[:, from_col] / data[from_col].iloc[0]
 
+    def add_minmax_data(self, selected_data, min_data, max_data, scale_var):
+        """When using summary statistics from repeats, adds columns fom_value_min and fom_value_max
+        to the selected data.
+        """
+        min_data.loc[:, scale_var] = to_numeric_if_possible(
+            min_data[scale_var]
+        )
+        min_data = min_data.set_index(scale_var)
+        max_data.loc[:, scale_var] = to_numeric_if_possible(
+            max_data[scale_var]
+        )
+        max_data = max_data.set_index(scale_var)
+
+        selected_data.loc[:, "fom_value_min"] = to_numeric_if_possible(min_data["fom_value"])
+        selected_data.loc[:, "fom_value_max"] = to_numeric_if_possible(max_data["fom_value"])
+
+        if self.normalize:
+            self.normalize_data(
+                selected_data, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min")
+            self.normalize_data(
+                selected_data, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max")
+
     # TODO: these args come from the spec, so don't need to be passed and could be stored at init
     def draw(self, perf_measure, scale_var, series, y_label):
         series_data = self.output_df.query(f'series == "{series}"').copy()
@@ -470,18 +492,6 @@ class ScalingPlotGenerator(PlotGenerator):
 
             self.validate_data(series_results)
 
-            if series_results.loc[:, "fom_origin_type"].iloc[0] == "summary::mean":
-                self.have_statistics = True
-
-                # series_results.loc[:, "fom_min"] = results.query(
-                series_min = results.query(
-                    f'series == "{series}" and fom_origin_type == "summary::min"'
-                ).copy()
-                series_max = results.query(
-                # series_results.loc[:, "fom_max"] = results.query(
-                    f'series == "{series}" and fom_origin_type == "summary::max"'
-                ).copy()
-
             # TODO: We interpret this as requesting speedup, which isn't strictly true
             # We need a more clear semantic for this
             if self.normalize:
@@ -492,24 +502,17 @@ class ScalingPlotGenerator(PlotGenerator):
                     self.draw_filler(perf_measure, scale_var, series, e)
                     continue
 
+            if series_results.loc[:, "fom_origin_type"].iloc[0] == "summary::mean":
+                self.have_statistics = True
+
             if self.have_statistics:
-                series_min.loc[:, scale_var] = to_numeric_if_possible(
-                    series_min[scale_var]
-                )
-                series_min = series_min.set_index(scale_var)
-                series_max.loc[:, scale_var] = to_numeric_if_possible(
-                    series_max[scale_var]
-                )
-                series_max = series_max.set_index(scale_var)
-
-                series_results.loc[:, "fom_value_min"] = to_numeric_if_possible(series_min["fom_value"])
-                series_results.loc[:, "fom_value_max"] = to_numeric_if_possible(series_max["fom_value"])
-
-                if self.normalize:
-                    self.normalize_data(
-                        series_results, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min")
-                    self.normalize_data(
-                        series_results, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max")
+                series_min = results.query(
+                    f'series == "{series}" and fom_origin_type == "summary::min"'
+                ).copy()
+                series_max = results.query(
+                    f'series == "{series}" and fom_origin_type == "summary::max"'
+                ).copy()
+                self.add_minmax_data(series_results, series_min, series_max, scale_var)
 
             if not (self.better_direction == "INDETERMINATE" or self.better_direction == BetterDirection.INDETERMINATE):
                 series_results = self.add_idealized_data(results, series_results)
@@ -544,7 +547,6 @@ class ScalingPlotGenerator(PlotGenerator):
             )
 
         return selected_data
-
 
     def validate_spec(self, chart_spec):
         super().validate_spec(chart_spec)
@@ -658,37 +660,20 @@ class FomPlot(PlotGenerator):
 
             # self.validate_data(series_results)
 
-            series_min = results.query(
-                f'fom_name == "{fom}" and fom_origin_type == "summary::min"'
-            )
-            series_max = results.query(
-                f'fom_name == "{fom}" and fom_origin_type == "summary::max"'
-            )
             if self.normalize:
                 self.normalize_data(series_results, scale_to_index=True)
-                print(series_results)
 
-            if not series_min.empty:
+            if series_results.loc[:, "fom_origin_type"].iloc[0] == "summary::mean":
                 self.have_statistics = True
 
-                # TODO: fix copy semantics
-                # "A value is trying to be set on a copy of a slice from a DataFrame."
-                # there might be some accidentally copy semantics with series_results
-                series_min = series_min.set_index(scale_var)
-                series_max = series_max.set_index(scale_var)
-
-                minmax = pd.DataFrame()
-                minmax["fom_value_min"] = series_min["fom_value"]
-                minmax["fom_value_max"] = series_max["fom_value"]
-                minmax.index = to_numeric_if_possible(series_min.index)
-
-                if self.normalize:
-                    self.normalize_data(
-                        minmax, scale_to_index=True, to_col="fom_value_min", from_col="fom_value_min")
-                    self.normalize_data(
-                        minmax, scale_to_index=True, to_col="fom_value_max", from_col="fom_value_max")
-
-                self.minmax = minmax
+            if self.have_statistics:
+                series_min = results.query(
+                    f'fom_name == "{fom}" and fom_origin_type == "summary::min"'
+                ).copy()
+                series_max = results.query(
+                    f'fom_name == "{fom}" and fom_origin_type == "summary::max"'
+                ).copy()
+                self.add_minmax_data(series_results, series_min, series_max, scale_var)
 
             self.output_df = series_results
 
