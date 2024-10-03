@@ -1819,7 +1819,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             try:
                 float(value)
                 return True
-            except ValueError:
+            except (ValueError, TypeError):
                 return False
 
         if not self.repeats.is_repeat_base:
