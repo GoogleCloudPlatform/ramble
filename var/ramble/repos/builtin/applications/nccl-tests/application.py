@@ -124,6 +124,21 @@ class NcclTests(ExecutableApplication):
         workloads=all_workloads,
     )
 
+    workload_variable(
+        "nccl_tests_split_mask",
+        default="",
+        description='How NCCL communicators should be split, if at all. "0x7" for rail-aligned, "0x0" for world-level.',
+        workloads=all_workloads,
+        expandable=False,
+    )
+
+    environment_variable(
+        "NCCL_TESTS_SPLIT_MASK",
+        "{nccl_tests_split_mask}",
+        'How NCCL communicators should be split, if at all. "0x7" for rail-aligned, "0x0" for world-level.',
+        workloads=all_workloads,
+    )
+
     # (output_name, units, group_name, regex)
     regex_parts = [
         ("Size", "B", "size", "[0-9]+"),
