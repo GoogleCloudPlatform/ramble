@@ -44,8 +44,8 @@ class TunedAdm(BasicModifier):
 
     def set_tuning_profile(self):
         return [
-            "pdsh -w {hostlist} sudo tuned-adm profile {tuned-profile}",
-            "pdsh -w {hostlist} sudo tuned-adm active > {experiment_run_dir}/tuning_profile",
+            "pdsh -R ssh -w {hostlist} sudo tuned-adm profile {tuned-profile}",
+            "pdsh -R ssh -w {hostlist} sudo tuned-adm active > {experiment_run_dir}/tuning_profile",
         ]
 
     def _prepare_analysis(self, workspace):

@@ -74,7 +74,7 @@ class GcpMetadata(BasicModifier):
             prefix = ""
             suffix = ""
             if per_node:
-                prefix = "pdsh -N -w {hostlist} '"
+                prefix = "pdsh -R ssh -N -w {hostlist} '"
                 suffix = "'"
             log_name = end_point.split("/")[-1]
             pre_cmds.append(
