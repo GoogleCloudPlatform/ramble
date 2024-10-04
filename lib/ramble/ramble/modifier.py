@@ -252,11 +252,12 @@ class ModifierBase(metaclass=ModifierMeta):
 
         for var, var_mod in self.variable_modifications[self._usage_mode].items():
             if var_mod["method"] in ["append", "prepend"]:
-                # var_str = app.expander.expansion_str(var)
-                # prev_val = app.expander.expand_var(var_str)
-                prev_val = app.variables[var]
                 if var in extra_vars:
                     prev_val = extra_vars[var]
+                elif var in app.variables:
+                    prev_val = app.variables[var]
+                else:
+                    prev_val = ""
 
                 if var_mod["method"] == "append":
                     mods[var] = f'{prev_val}{var_mod["modification"]}'
