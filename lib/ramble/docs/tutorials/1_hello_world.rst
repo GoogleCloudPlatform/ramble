@@ -58,7 +58,7 @@ The ``ramble list`` command also accepts regular expressions. For example:
 
 .. code-block:: console
 
-    $ ramble list h*
+    $ ramble list "h*"
 
 might output the following:
 
@@ -67,6 +67,10 @@ might output the following:
 
     ==> 5 applications
     hmmer  hostname  hpcc  hpcg  hpl
+
+**NOTE**: The quotes around ``h*`` in the previous command avoid a potential
+issue where your shell matches files that begin with the later ``h``, can
+ramble prints no applications.
 
 Additionally, applications can be filtered by their tags, e.g.
 
