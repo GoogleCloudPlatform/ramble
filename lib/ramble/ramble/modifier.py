@@ -244,7 +244,7 @@ class ModifierBase(metaclass=ModifierMeta):
             results.write((" " * indent) + line + "\n")
         return results.getvalue()
 
-    def modded_variables(self, app):
+    def modded_variables(self, app, extra_vars={}):
         mods = {}
 
         if self._usage_mode not in self.variable_modifications:
@@ -252,13 +252,17 @@ class ModifierBase(metaclass=ModifierMeta):
 
         for var, var_mod in self.variable_modifications[self._usage_mode].items():
             if var_mod["method"] in ["append", "prepend"]:
-                # var_str = app.expander.expansion_str(var)
-                # prev_val = app.expander.expand_var(var_str)
-                prev_val = app.variables[var]
+                if var in extra_vars:
+                    prev_val = extra_vars[var]
+                elif var in app.variables:
+                    prev_val = app.variables[var]
+                else:
+                    prev_val = ""
+
                 if var_mod["method"] == "append":
-                    mods[var] = f'{prev_val} {var_mod["modification"]}'
+                    mods[var] = f'{prev_val}{var_mod["modification"]}'
                 else:  # method == prepend
-                    mods[var] = f'{var_mod["modification"]} {prev_val}'
+                    mods[var] = f'{var_mod["modification"]}{prev_val}'
             else:  # method == set
                 mods[var] = var_mod["modification"]
 
