@@ -78,8 +78,6 @@ class CommandRunner:
         """
         logger.msg(f"DRY-RUN: would run {executable}")
         logger.msg(f"         with args: {args}")
-        if return_output:
-            return None
 
     def _cmd_start(self, executable, args: List[str]):
         """Print a banner for the start of executing a command
