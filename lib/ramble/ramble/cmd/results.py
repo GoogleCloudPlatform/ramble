@@ -44,7 +44,8 @@ def setup_parser(subparser):
         dest="strong_scaling",
         nargs="+",
         action="append",
-        help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
+        help="generate a scaling report, requires two args: [performance metric] [scaling metric]"
+             "[optional: group by]",
         required=False,
     )
     report_parser.add_argument(
@@ -52,7 +53,8 @@ def setup_parser(subparser):
         dest="weak_scaling",
         nargs="+",
         action="append",
-        help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
+        help="generate a scaling report, requires two args: [performance metric] [scaling metric]"
+             "[optional: group by]",
         required=False,
     )
     report_parser.add_argument(
@@ -60,14 +62,16 @@ def setup_parser(subparser):
         dest="multi_line",
         nargs="+",
         action="append",
-        help="generate a scaling report, requires two args: [performance metric] [scaling metric] [optional: group by]",
+        help="generate a scaling report, requires two args: [performance metric] [scaling metric]"
+             "[optional: group by]",
         required=False,
     )
     report_parser.add_argument(
         "--where",
         dest="where",
         action="store",
-        help="Down select data to plot (useful for complex workspaces with collisions). Takes pandas query format",
+        help="Down select data to plot (useful for complex workspaces with collisions). Takes"
+             " pandas query format",
         required=False,
     )
     report_parser.add_argument(
@@ -75,7 +79,8 @@ def setup_parser(subparser):
         dest="compare",
         nargs="+",
         action="append",
-        help="generate a comparison report, requires at least two args: [FOM 1] [Additional FOMs] [optional: group by(s)]",
+        help="generate a comparison report, requires at least two args: [FOM 1] [Additional FOMs]"
+             "[optional: group by(s)]",
         required=False,
     )
     report_parser.add_argument(

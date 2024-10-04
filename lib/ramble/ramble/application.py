@@ -1928,21 +1928,20 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     if context_name not in repeat_foms.keys():
                         repeat_foms[context_name] = {}
 
-                    for foms in context["foms"]:
+                    for fom in context["foms"]:
                         fom_key = (
-                            foms["name"],
-                            foms["units"],
-                            foms["origin"],
-                            foms["origin_type"],
+                            fom["name"],
+                            fom["units"],
+                            fom["origin"],
+                            fom["origin_type"],
                         )
 
                         # Stats will not be calculated for non-numeric foms so they're skipped
-                        if is_numeric(foms["value"]):
+                        if is_numeric_fom(fom):
                             if fom_key not in repeat_foms[context_name].keys():
                                 repeat_foms[context_name][fom_key] = []
-                            repeat_foms[context_name][fom_key].append(float(foms["value"]))
+                            repeat_foms[context_name][fom_key].append(float(fom["value"]))
 
-<<<<<<< HEAD
         # Iterate through the aggregated foms, calculate stats, and insert into results
         for context, fom_dict in repeat_foms.items():
             if not fom_dict:
@@ -1953,21 +1952,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "foms": [],
                 "display_name": _get_context_display_name(context),
             }
-=======
-                        for fom in context["foms"]:
-                            fom_key = (
-                                fom["name"],
-                                fom["units"],
-                                fom["origin"],
-                                fom["origin_type"],
-                            )
-
-                            # Stats will not be calculated for non-numeric foms so they're skipped
-                            if is_numeric_fom(fom):
-                                if fom_key not in repeat_foms[context_name].keys():
-                                    repeat_foms[context_name][fom_key] = []
-                                repeat_foms[context_name][fom_key].append(float(fom["value"]))
->>>>>>> 75db938a (prevent calcuation of repeat statistics on INFO and CATEGORY fom types)
 
             if context == _NULL_CONTEXT:
                 n_total_dict = {

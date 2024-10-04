@@ -22,6 +22,8 @@
 # - data is summarized from repeats (n_repeats / 1 chart)
 # - mix of summarized and non-summarized data
 
+# Test normalization of data, and error when first value is zero
+
 # Test that PDF is generated and contains data (size > some value?)
 
 # Possible to test that a specific chart was correctly generated? Not sure...
@@ -39,8 +41,8 @@ results = {
             "RAMBLE_STATUS": "SUCCESS",
             "name": "exp_1",
             "n_nodes": 1,
-            #"application_namespace": "test_app",
-            #"workload_name": "test_workload",
+            # "application_namespace": "test_app",
+            # "workload_name": "test_workload",
             "simplified_workload_namespace": "test_app_test_workload",
             "RAMBLE_VARIABLES": {},
             "RAMBLE_RAW_VARIABLES": {},
@@ -72,8 +74,8 @@ results = {
             "RAMBLE_STATUS": "SUCCESS",
             "name": "exp_2",
             "n_nodes": 2,
-            #"application_namespace": "test_namespace",
-            #"workload_name": "test_workload",
+            # "application_namespace": "test_namespace",
+            # "workload_name": "test_workload",
             "simplified_workload_namespace": "test_app_test_workload",
             "RAMBLE_VARIABLES": {},
             "RAMBLE_RAW_VARIABLES": {},
