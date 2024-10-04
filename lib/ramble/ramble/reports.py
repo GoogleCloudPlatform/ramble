@@ -137,7 +137,7 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
     # first unnest dictionaries
     for exp in results['experiments']:
         # TODO: this does not work as expected for repeats since success is not clear
-        # TODO: how to handle success? Repeats make this tricky because some children migth have statu=success but parent might have status=failed
+        # TODO: how to handle success? Repeats make this tricky because some children might have status=success but parent might have status=failed
         #if exp['RAMBLE_STATUS'] != 'SUCCESS' or exp['name'] in skip_exps:
 
         # TODO: disable skip_exps in favor of a more explicit is_child or is_parent check
@@ -510,11 +510,7 @@ class FomPlot(PlotGenerator):
         results = self.results_df
         all_foms = results.loc[:, 'fom_name'].unique()
         for fom in all_foms:
-            print('fom name')
-            print(fom)
-            # TODO: this exludes modifier foms
             series_results = results.query(f'fom_name == "{fom}" and (fom_origin_type == "application" or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")').copy()
-            print(series_results)
 
             scale_var = 'simplified_experiment_namespace'
 
@@ -573,7 +569,7 @@ class FomPlot(PlotGenerator):
             logger.warn(f'Skipping drawing of non numeric FOM: {perf_measure}')
             return
 
-        # TODO: this should leverage the avaible min/max to add candle sticks
+        # TODO: this should leverage the available min/max to add candle sticks
         ax = self.output_df.plot(y='fom_value', kind="bar")
         fig = ax.get_figure()
 
@@ -584,7 +580,7 @@ class FomPlot(PlotGenerator):
         ax.legend([perf_measure])
 
         # If all FOMs are either higher or lower is better, add it to chart title
-        ax.set_title(f'{perf_measure} by experimnet', wrap=True)
+        ax.set_title(f'{perf_measure} by experiment', wrap=True)
 
         chart_filename = f'foms_{perf_measure}_by_experiments.png'
         self.write(fig, chart_filename)

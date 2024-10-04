@@ -1771,6 +1771,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                         "units": fom_conf["units"],
                                         "origin": fom_conf["origin"],
                                         "origin_type": fom_conf["origin_type"],
+                                        # TODO: do we really want to lose the typedness of the ENUM here?
                                         "fom_type": fom_conf["fom_type"].to_dict(),
                                     }
 
@@ -1825,11 +1826,14 @@ class ApplicationBase(metaclass=ApplicationMeta):
         namespace.
         """
 
-        def is_numeric(value):
-            """Returns true if a fom value is numeric"""
+        def is_numeric_fom(fom):
+            """Returns true if a fom value is numeric, and of an applicable type"""
 
+            value = fom['value']
             try:
-                float(value)
+                value = float(value)
+                if fom['fom_type']['name'] is FomType.CATEGORY.name or fom['fom_type']['name'] is FomType.INFO.name:
+                    return False
                 return True
             except (ValueError, TypeError):
                 return False
@@ -1938,6 +1942,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 repeat_foms[context_name][fom_key] = []
                             repeat_foms[context_name][fom_key].append(float(foms["value"]))
 
+<<<<<<< HEAD
         # Iterate through the aggregated foms, calculate stats, and insert into results
         for context, fom_dict in repeat_foms.items():
             if not fom_dict:
@@ -1948,6 +1953,21 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "foms": [],
                 "display_name": _get_context_display_name(context),
             }
+=======
+                        for fom in context["foms"]:
+                            fom_key = (
+                                fom["name"],
+                                fom["units"],
+                                fom["origin"],
+                                fom["origin_type"],
+                            )
+
+                            # Stats will not be calculated for non-numeric foms so they're skipped
+                            if is_numeric_fom(fom):
+                                if fom_key not in repeat_foms[context_name].keys():
+                                    repeat_foms[context_name][fom_key] = []
+                                repeat_foms[context_name][fom_key].append(float(fom["value"]))
+>>>>>>> 75db938a (prevent calcuation of repeat statistics on INFO and CATEGORY fom types)
 
             if context == _NULL_CONTEXT:
                 n_total_dict = {

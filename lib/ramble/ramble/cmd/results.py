@@ -62,7 +62,7 @@ def setup_parser(subparser):
     report_parser.add_argument(
         "--where", dest="where",
         action="store",
-        help="Down select data to plot (usefull for complex workspaces with collisions). Takes pandas query format",
+        help="Down select data to plot (useful for complex workspaces with collisions). Takes pandas query format",
         required=False
     )
     report_parser.add_argument(
