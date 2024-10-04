@@ -9,15 +9,16 @@
 from ramble.namespace import namespace
 
 
-_DICT_MAPPING = {
+_OUTPUT_MAPPING = {
     "name": "name",
     "status": "RAMBLE_STATUS",
-    "experiment_chain": "EXPERIMENT_CHAIN",
     namespace.n_repeats: "N_REPEATS",
-    namespace.tags: "TAGS",
+    "keys": "keys",
+    "contexts": "CONTEXTS",
     namespace.variables: "RAMBLE_VARIABLES",
     "raw_variables": "RAMBLE_RAW_VARIABLES",
-    "contexts": "CONTEXTS",
+    namespace.tags: "TAGS",
+    "experiment_chain": "EXPERIMENT_CHAIN",
 }
 
 
@@ -54,13 +55,18 @@ class ExperimentResult:
         """
         import copy
 
-        obj_dict = copy.deepcopy(self.__dict__)
-        if "keys" in obj_dict:
-            res = obj_dict["keys"]
-        else:
-            res = {}
-        for name, val in obj_dict.items():
-            if name in _DICT_MAPPING:
-                res[_DICT_MAPPING[name]] = val
+        output = {}
+        obj_keys = {}
 
-        return res
+        obj_dict = copy.deepcopy(self.__dict__)
+
+        if "keys" in obj_dict:
+            obj_keys = obj_dict["keys"]
+
+        for lookup_key, output_val in _OUTPUT_MAPPING.items():
+            if lookup_key == "keys":
+                output.update(obj_keys)
+            else:
+                output[output_val] = obj_dict[lookup_key]
+
+        return output
