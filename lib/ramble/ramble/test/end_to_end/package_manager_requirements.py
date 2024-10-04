@@ -15,9 +15,9 @@ import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
 
+from ramble.util.command_runner import RunnerError
 from ramble.pkg_man.builtin.spack_lightweight import (
     SpackRunner,
-    RunnerError,
     ValidationFailedError,
 )
 

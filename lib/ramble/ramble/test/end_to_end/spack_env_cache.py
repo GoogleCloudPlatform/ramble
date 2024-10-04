@@ -15,9 +15,7 @@ import ramble.config
 import ramble.software_environments
 from ramble.main import RambleCommand
 
-from ramble.pkg_man.builtin.spack_lightweight import (
-    RunnerError,
-)
+from ramble.util.command_runner import RunnerError
 
 
 # everything here uses the mock_workspace_path
