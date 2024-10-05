@@ -341,7 +341,7 @@ def _workspace_create(
     if config:
         with open(config) as f:
             workspace._read_config("workspace", f)
-            workspace._write_config("workspace")
+            workspace._write_config("workspace", force=True)
 
     if template_execute:
         with open(template_execute) as f:

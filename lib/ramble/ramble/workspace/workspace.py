@@ -680,14 +680,14 @@ class Workspace:
 
             self._write_templates()
 
-    def _write_config(self, section):
+    def _write_config(self, section, force=False):
         """Update YAML config file for this workspace, based on
         changes and write it"""
         config = self.config_sections[section]
 
         changed = not yaml_equivalent(config["raw_yaml"], config["yaml"])
         written = os.path.exists(config["path"])
-        if changed or not written:
+        if changed or not written or force:
             config["raw_yaml"] = copy.deepcopy(config["yaml"])
             with fs.write_tmp_and_move(config["path"]) as f:
                 _write_yaml(config["yaml"], f, config["schema"])
