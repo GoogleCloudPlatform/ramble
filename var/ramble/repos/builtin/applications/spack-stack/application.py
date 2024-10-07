@@ -69,7 +69,7 @@ class SpackStack(ExecutableApplication):
 
     workload_variable(
         "install_flags",
-        default="",
+        default="--fail-fast",
         description="Flags to use for `spack install`",
         workloads=["create"],
     )
