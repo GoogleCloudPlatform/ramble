@@ -159,9 +159,10 @@ class GcpMetadata(BasicModifier):
             "w+",
         ) as f:
             if len(level0_groups) > 0:
-                f.write(f"Level 0 groups = {len(level0_groups)}\n")
-                f.write(f"Level 1 groups = {len(level1_groups)}\n")
-                f.write(f"Level 2 groups = {len(level2_groups)}\n")
+                # The group level name comes from https://cloud.google.com/compute/docs/instances/use-compact-placement-policies#verify-vm-location.
+                f.write(f"Level 0 groups (cluster) = {len(level0_groups)}\n")
+                f.write(f"Level 1 groups (rack) = {len(level1_groups)}\n")
+                f.write(f"Level 2 groups (host) = {len(level2_groups)}\n")
                 f.write(f'All hosts = {",".join(all_hosts)}\n')
 
     def _prepare_analysis(self, workspace):
@@ -205,8 +206,8 @@ class GcpMetadata(BasicModifier):
     )
 
     figure_of_merit(
-        "Level {level_num} Groups",
-        fom_regex="Level (?P<level_num>[0-9]) groups = (?P<num_groups>[0-9]+)",
+        "Level {level_num} Groups ({level_name})",
+        fom_regex=r"Level (?P<level_num>[0-9]) groups \((?P<level_name>[\w]+)\) = (?P<num_groups>[0-9]+)",
         log_file="{experiment_run_dir}/gcp-metadata.topology_summary.log",
         group_name="num_groups",
         units="",
