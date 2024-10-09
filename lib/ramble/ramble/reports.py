@@ -8,6 +8,7 @@
 
 import copy
 import datetime
+from enum import Enum
 import os
 import re
 
@@ -47,11 +48,11 @@ class ReportVars(Enum):
 
 
 _FOM_DICT_MAPPING = {
-    "name": "fom_name",
-    "value": "fom_value",
-    "units": "fom_units",
-    "origin": "fom_origin",
-    "origin_type": "fom_origin_type",
+    "name": ReportVars.FOM_NAME.value,
+    "value": ReportVars.FOM_VALUE.value,
+    "units": ReportVars.FOM_UNITS.value,
+    "origin": ReportVars.FOM_ORIGIN.value,
+    "origin_type": ReportVars.FOM_ORIGIN_TYPE.value,
 }
 
 
@@ -217,20 +218,22 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
 
                     # Remove context dict and add the current FOM values
                     exp_copy.pop("CONTEXTS")
-                    exp_copy["context"] = context["name"]
+                    exp_copy[ReportVars.CONTEXT.value] = context["name"]
                     for name, val in fom.items():
                         if name in _FOM_DICT_MAPPING.keys():
                             exp_copy[_FOM_DICT_MAPPING[name]] = val
                         elif name == "fom_type":
                             exp_copy["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
-                            exp_copy["better_direction"] = BetterDirection.from_str(
-                                fom["fom_type"]["better_direction"]
+                            exp_copy[ReportVars.BETTER_DIRECTION.value] = BetterDirection.from_str(
+                                fom["fom_type"][ReportVars.BETTER_DIRECTION.value]
                             )
 
                         # older data exports may not have fom_type stored
                         if "fom_type" not in exp_copy:
                             exp_copy["fom_type"] = FomType.UNDEFINED
-                            exp_copy["better_direction"] = BetterDirection.INDETERMINATE
+                            exp_copy[ReportVars.BETTER_DIRECTION.value] = (
+                                BetterDirection.INDETERMINATE
+                            )
 
                     # Exclude vars that aren't needed for analysis, mainly paths and commands
                     dir_regex = r"_dir$"
@@ -339,8 +342,8 @@ class PlotGenerator:
         self,
         data,
         scale_to_index=False,
-        to_col="normalized_fom_value",
-        from_col="fom_value",
+        to_col=ReportVars.NORMALIZED_FOM_VALUE.value,
+        from_col=ReportVars.FOM_VALUE.value,
         speedup=False,
     ):
         # FIXME: do we need to support more than normalizing by the first
@@ -376,21 +379,25 @@ class PlotGenerator:
         max_data.loc[:, scale_var] = to_numeric_if_possible(max_data[scale_var])
         max_data = max_data.set_index(scale_var)
 
-        selected_data.loc[:, "fom_value_min"] = to_numeric_if_possible(min_data["fom_value"])
-        selected_data.loc[:, "fom_value_max"] = to_numeric_if_possible(max_data["fom_value"])
+        selected_data.loc[:, ReportVars.FOM_VALUE_MIN.value] = to_numeric_if_possible(
+            min_data[ReportVars.FOM_VALUE.value]
+        )
+        selected_data.loc[:, ReportVars.FOM_VALUE_MAX.value] = to_numeric_if_possible(
+            max_data[ReportVars.FOM_VALUE.value]
+        )
 
         if self.normalize:
             self.normalize_data(
                 selected_data,
                 scale_to_index=True,
-                to_col="fom_value_min",
-                from_col="fom_value_min",
+                to_col=ReportVars.FOM_VALUE_MIN.value,
+                from_col=ReportVars.FOM_VALUE_MIN.value,
             )
             self.normalize_data(
                 selected_data,
                 scale_to_index=True,
-                to_col="fom_value_max",
-                from_col="fom_value_max",
+                to_col=ReportVars.FOM_VALUE_MAX.value,
+                from_col=ReportVars.FOM_VALUE_MAX.value,
             )
 
     # TODO: these args come from the spec, so don't need to be passed and could be stored at init
@@ -409,7 +416,7 @@ class PlotGenerator:
         if self.normalize:
             ax.plot(
                 series_data.index,
-                "normalized_fom_value",
+                ReportVars.NORMALIZED_FOM_VALUE.value,
                 data=series_data,
                 marker="o",
                 label=f"{perf_measure} (Normalized)",
@@ -417,7 +424,7 @@ class PlotGenerator:
         else:
             ax.plot(
                 series_data.index,
-                "fom_value",
+                ReportVars.FOM_VALUE.value,
                 data=series_data,
                 marker="o",
                 label=f"{perf_measure}",
@@ -431,11 +438,20 @@ class PlotGenerator:
         if self.have_statistics:
             logger.debug("Adding fill lines for min and max")
             ax.fill_between(
-                series_data.index, "fom_value_min", "fom_value_max", data=series_data, alpha=0.2
+                series_data.index,
+                ReportVars.FOM_VALUE_MIN.value,
+                ReportVars.FOM_VALUE_MAX.value,
+                data=series_data,
+                alpha=0.2,
             )
 
         try:
-            ax.plot(series_data.index, "ideal_perf_value", data=series_data, label="Ideal Value")
+            ax.plot(
+                series_data.index,
+                ReportVars.IDEAL_PERF_VALUE.value,
+                data=series_data,
+                label="Ideal Value",
+            )
         except ValueError:
             logger.debug("Failed to plot ideal_perf_value. Series not found.")
 
@@ -481,7 +497,7 @@ class PlotGenerator:
         for var in chart_spec:
             if (
                 var not in self.results_df.columns
-                and var not in self.results_df.loc[:, "fom_name"].values
+                and var not in self.results_df.loc[:, ReportVars.FOM_NAME.value].values
             ):
                 logger.debug(f"Available options: {self.results_df.loc[:, 'fom_name'].unique()}")
                 logger.die(f"{var} was not found in the results data.")
@@ -505,20 +521,22 @@ class ScalingPlotGenerator(PlotGenerator):
         results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
-        if len(results.loc[:, "better_direction"].unique()) == 1:
-            self.better_direction = results.loc[:, "better_direction"].unique()[0]
+        if len(results.loc[:, ReportVars.BETTER_DIRECTION.value].unique()) == 1:
+            self.better_direction = results.loc[:, ReportVars.BETTER_DIRECTION.value].unique()[0]
 
         # TODO: this needs to support a list for split_by
         # TODO: this currently gets overwritten by series, below
-        results.loc[:, "series"] = results.loc[:, self.split_by]
+        results.loc[:, ReportVars.SERIES.value] = results.loc[:, self.split_by]
 
         if additional_vars:
             # TODO: this would be nicer as a group by
-            results.loc[:, "series"] = (
-                results.loc[:, "series"] + "_x_" + results[additional_vars].agg("_x_".join, axis=1)
+            results.loc[:, ReportVars.SERIES.value] = (
+                results.loc[:, ReportVars.SERIES.value]
+                + "_x_"
+                + results[additional_vars].agg("_x_".join, axis=1)
             )
 
-        for series in results.loc[:, "series"].unique():
+        for series in results.loc[:, ReportVars.SERIES.value].unique():
 
             # TODO: this needs to account for repeats in a more elegant way
             series_results = results.query(
@@ -526,8 +544,8 @@ class ScalingPlotGenerator(PlotGenerator):
                 'or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")'
             ).copy()
 
-            series_results.loc[:, "fom_value"] = to_numeric_if_possible(
-                series_results["fom_value"]
+            series_results.loc[:, ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+                series_results[ReportVars.FOM_VALUE.value]
             )
             series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
             series_results = series_results.set_index(scale_var)
@@ -544,7 +562,7 @@ class ScalingPlotGenerator(PlotGenerator):
                     self.draw_filler(perf_measure, scale_var, series, e)
                     continue
 
-            if series_results.loc[:, "fom_origin_type"].iloc[0] == "summary::mean":
+            if series_results.loc[:, ReportVars.FOM_ORIGIN_TYPE.value].iloc[0] == "summary::mean":
                 self.have_statistics = True
 
             if self.have_statistics:
@@ -570,9 +588,9 @@ class ScalingPlotGenerator(PlotGenerator):
             return selected_data
 
         if self.normalize:
-            first_perf_value = selected_data["normalized_fom_value"].iloc[0]
+            first_perf_value = selected_data[ReportVars.NORMALIZED_FOM_VALUE.value].iloc[0]
         else:
-            first_perf_value = selected_data["fom_value"].iloc[0]
+            first_perf_value = selected_data[ReportVars.FOM_VALUE.value].iloc[0]
 
         if first_perf_value == 0:
             logger.warn(
@@ -582,16 +600,18 @@ class ScalingPlotGenerator(PlotGenerator):
 
         logger.debug(f"Normalizing data (by {first_perf_value})")
 
-        selected_data.loc[:, "ideal_perf_value"] = first_perf_value
+        selected_data.loc[:, ReportVars.IDEAL_PERF_VALUE.value] = first_perf_value
 
         if self.better_direction == BetterDirection.LOWER:
-            selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] / (
+            selected_data[ReportVars.IDEAL_PERF_VALUE.value] = selected_data.loc[
+                :, ReportVars.IDEAL_PERF_VALUE.value
+            ] / (
                 selected_data.index / selected_data.index[0]  # set baseline scaling var to 1
             )
         elif self.better_direction == BetterDirection.HIGHER:
-            selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] * (
-                selected_data.index / selected_data.index[0]
-            )
+            selected_data[ReportVars.IDEAL_PERF_VALUE.value] = selected_data.loc[
+                :, ReportVars.IDEAL_PERF_VALUE.value
+            ] * (selected_data.index / selected_data.index[0])
 
         return selected_data
 
@@ -644,7 +664,10 @@ class WeakScalingPlot(ScalingPlotGenerator):
     def add_idealized_data(self, raw_results, selected_data):
         selected_data = super().add_idealized_data(raw_results, selected_data)
 
-        selected_data.loc[:, "ideal_perf_value"] = selected_data["ideal_perf_value"].iloc[0]
+        if ReportVars.IDEAL_PERF_VALUE.value in selected_data.columns:
+            selected_data.loc[:, ReportVars.IDEAL_PERF_VALUE.value] = selected_data[
+                ReportVars.IDEAL_PERF_VALUE.value
+            ].iloc[0]
         return selected_data
 
 
@@ -665,8 +688,8 @@ class StrongScalingPlot(ScalingPlotGenerator):
         self,
         data,
         scale_to_index=True,
-        to_col="normalized_fom_value",
-        from_col="fom_value",
+        to_col=ReportVars.NORMALIZED_FOM_VALUE.value,
+        from_col=ReportVars.FOM_VALUE.value,
         speedup=True,
     ):
         super().normalize_data(
@@ -685,17 +708,17 @@ class StrongScalingPlot(ScalingPlotGenerator):
 class FomPlot(PlotGenerator):
     def generate_plot_data(self):
         results = self.results_df
-        all_foms = results.loc[:, "fom_name"].unique()
+        all_foms = results.loc[:, ReportVars.FOM_NAME.value].unique()
         for fom in all_foms:
             series_results = results.query(
-                f'fom_name == "{fom}" and (fom_origin_type == "application" or'
+                f'fom_name == "{fom}" and (fom_origin_type == "application" or '
                 'fom_origin_type == "modifier" or fom_origin_type == "summary::mean")'
             ).copy()
 
             scale_var = "simplified_experiment_namespace"
 
-            series_results.loc[:, "fom_value"] = to_numeric_if_possible(
-                series_results["fom_value"]
+            series_results.loc[:, ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+                series_results[ReportVars.FOM_VALUE.value]
             )
             series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
 
@@ -704,7 +727,7 @@ class FomPlot(PlotGenerator):
             if self.normalize:
                 self.normalize_data(series_results, scale_to_index=True)
 
-            if series_results.loc[:, "fom_origin_type"].iloc[0] == "summary::mean":
+            if series_results.loc[:, ReportVars.FOM_ORIGIN_TYPE.value].iloc[0] == "summary::mean":
                 self.have_statistics = True
 
             if self.have_statistics:
@@ -718,7 +741,7 @@ class FomPlot(PlotGenerator):
 
             self.output_df = series_results
 
-            unit = series_results.loc[:, "fom_units"].iloc[0]
+            unit = series_results.loc[:, ReportVars.FOM_UNITS.value].iloc[0]
 
             perf_measure = fom
             series = "experiment_name"
@@ -727,13 +750,15 @@ class FomPlot(PlotGenerator):
     # TODO: dry bar plot drawing
     def draw(self, perf_measure, scale_var, series, unit):
         try:
-            self.output_df["fom_value"] = to_numeric_if_possible(self.output_df["fom_value"])
+            self.output_df[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+                self.output_df[ReportVars.FOM_VALUE.value]
+            )
         except ValueError:
             logger.warn(f"Skipping drawing of non numeric FOM: {perf_measure}")
             return
 
         # TODO: this should leverage the available min/max to add candle sticks
-        ax = self.output_df.plot(y="fom_value", kind="bar", figsize=self.figsize)
+        ax = self.output_df.plot(y=ReportVars.FOM_VALUE.value, kind="bar", figsize=self.figsize)
         fig = ax.get_figure()
 
         # ax.set_label('Label via method')
@@ -779,7 +804,7 @@ class ComparisonPlot(PlotGenerator):
         dimensions = []
 
         for input_spec in self.spec:
-            if input_spec in self.results_df.loc[:, "fom_name"].values:
+            if input_spec in self.results_df.loc[:, ReportVars.FOM_NAME.value].values:
                 foms.append(input_spec)
             else:
                 dimensions.append(input_spec)
@@ -787,18 +812,25 @@ class ComparisonPlot(PlotGenerator):
         if not dimensions:
             dimensions.append("experiment_name")
 
-        raw_results = self.results_df[self.results_df.loc[:, "fom_name"].isin(foms)].copy()
+        raw_results = self.results_df[
+            self.results_df.loc[:, ReportVars.FOM_NAME.value].isin(foms)
+        ].copy()
 
         raw_results.loc[:, "Figure of Merit"] = (
-            raw_results.loc[:, "fom_name"] + " (" + raw_results.loc[:, "fom_units"] + ")"
+            raw_results.loc[:, ReportVars.FOM_NAME.value]
+            + " ("
+            + raw_results.loc[:, ReportVars.FOM_UNITS.value]
+            + ")"
         )
 
-        raw_results["fom_value"] = to_numeric_if_possible(raw_results["fom_value"])
+        raw_results[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+            raw_results[ReportVars.FOM_VALUE.value]
+        )
 
-        plot_col = "fom_value"
+        plot_col = ReportVars.FOM_VALUE.value
         if self.normalize:
             self.normalize_data(raw_results)
-            plot_col = "normalized_fom_value"
+            plot_col = ReportVars.NORMALIZED_FOM_VALUE.value
 
         # TODO: remove pivot?
         compare_pivot = raw_results.pivot_table(
@@ -831,8 +863,8 @@ class MultiLinePlot(ScalingPlotGenerator):
         self,
         data,
         scale_to_index=True,
-        to_col="normalized_fom_value",
-        from_col="fom_value",
+        to_col=ReportVars.NORMALIZED_FOM_VALUE.value,
+        from_col=ReportVars.FOM_VALUE.value,
         speedup=True,
     ):
         super().normalize_data(
@@ -855,12 +887,12 @@ class MultiLinePlot(ScalingPlotGenerator):
         # TODO: prep_draw method in subclass ScalingPlotGenerator, not this class
         fig, ax = self.prep_draw(perf_measure, scale_var)
 
-        for series in self.output_df.loc[:, "series"].unique():
+        for series in self.output_df.loc[:, ReportVars.SERIES.value].unique():
             series_data = self.output_df.query(f'series == "{series}"').copy()
             if self.normalize:
                 ax.plot(
                     series_data.index,
-                    "normalized_fom_value",
+                    ReportVars.NORMALIZED_FOM_VALUE.value,
                     data=series_data,
                     marker="o",
                     label=f"{series} (Normalized)",
@@ -868,7 +900,7 @@ class MultiLinePlot(ScalingPlotGenerator):
             else:
                 ax.plot(
                     series_data.index,
-                    "fom_value",
+                    ReportVars.FOM_VALUE.value,
                     data=series_data,
                     marker="o",
                     label=f"{series}",
@@ -878,8 +910,8 @@ class MultiLinePlot(ScalingPlotGenerator):
                 logger.debug("Adding fill lines for min and max")
                 ax.fill_between(
                     series_data.index,
-                    "fom_value_min",
-                    "fom_value_max",
+                    ReportVars.FOM_VALUE_MIN.value,
+                    ReportVars.FOM_VALUE_MAX.value,
                     data=series_data,
                     alpha=0.2,
                 )
