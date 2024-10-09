@@ -71,7 +71,14 @@ class PyxisEnroot(BasicModifier):
     modifier_variable(
         "container_dir",
         default="{workload_input_dir}",
-        description="Directory where the container and extracted paths will be stored",
+        description="Directory where the container sqsh will be stored",
+        modes=["standard"],
+    )
+
+    modifier_variable(
+        "container_extract_dir",
+        default="{workload_input_dir}",
+        description="Directory where the extracted paths will be stored",
         modes=["standard"],
     )
 
@@ -244,13 +251,15 @@ class PyxisEnroot(BasicModifier):
             extract_paths = [extract_paths]
 
         if isinstance(extract_paths, list) and len(extract_paths) > 0:
-            container_dir = self.expander.expand_var_name("container_dir")
+            container_extract_dir = self.expander.expand_var_name(
+                "container_extract_dir"
+            )
             container_path = self.expander.expand_var_name("container_path")
 
             unsquash_args = [
                 "-f",
                 "-dest",
-                container_dir,
+                container_extract_dir,
                 container_path,
             ]
 
