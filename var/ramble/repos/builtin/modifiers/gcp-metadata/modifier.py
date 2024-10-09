@@ -27,11 +27,41 @@ class GcpMetadata(BasicModifier):
     maintainers("rfbgo")
 
     mode("standard", description="Standard execution mode")
+    mode(
+        "local", description="Local execution (disables parallel prefix/pdssh)"
+    )
     default_mode("standard")
 
     software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
 
     required_variable("hostlist")
+
+    modifier_variable(
+        "metadata_parallel_prefix",
+        default="pdsh -R ssh -N -w {hostlist} '",
+        modes=["standard"],
+        description="Express how parlalelism should be done between nodes",
+    )
+    modifier_variable(
+        "metadata_parallel_prefix",
+        default="",
+        modes=["local"],
+        description="Express how parlalelism should be done between nodes",
+    )
+
+    # Need to close any open `'` we leave in the prefix
+    modifier_variable(
+        "metadata_parallel_suffix",
+        default="'",
+        modes=["standard"],
+        description="Optional suffix for {metadata_parallel_prefix}",
+    )
+    modifier_variable(
+        "metadata_parallel_suffix",
+        default="",
+        modes=["local"],
+        description="Optional suffix for {metadata_parallel_prefix}",
+    )
 
     executable_modifier("gcp_metadata_exec")
 
@@ -46,15 +76,16 @@ class GcpMetadata(BasicModifier):
         post_cmds = []
         pre_cmds = []
 
-        pre_cmds.append(
-            CommandExecutable(
-                "save-old-loglevel",
-                template=[
-                    'old_pdsh_args="$PDSH_SSH_ARGS_APPEND"',
-                    'export PDSH_SSH_ARGS_APPEND="-q"',
-                ],
+        if self._usage_mode != "local":
+            pre_cmds.append(
+                CommandExecutable(
+                    "save-old-loglevel",
+                    template=[
+                        'old_pdsh_args="$PDSH_SSH_ARGS_APPEND"',
+                        'export PDSH_SSH_ARGS_APPEND="-q"',
+                    ],
+                )
             )
-        )
 
         payloads = [
             # type, end point, per_node
@@ -74,8 +105,8 @@ class GcpMetadata(BasicModifier):
             prefix = ""
             suffix = ""
             if per_node:
-                prefix = "pdsh -R ssh -N -w {hostlist} '"
-                suffix = "'"
+                prefix = self.expander.expand_var("{metadata_parallel_prefix}")
+                suffix = self.expander.expand_var("{metadata_parallel_suffix}")
             log_name = end_point.split("/")[-1]
             pre_cmds.append(
                 CommandExecutable(
@@ -92,12 +123,13 @@ class GcpMetadata(BasicModifier):
                 )
             )
 
-        pre_cmds.append(
-            CommandExecutable(
-                "restore-old-loglevel",
-                template=['export PDSH_SSH_ARGS_APPEND="$old_pdsh_args"'],
+        if self._usage_mode != "local":
+            pre_cmds.append(
+                CommandExecutable(
+                    "restore-old-loglevel",
+                    template=['export PDSH_SSH_ARGS_APPEND="$old_pdsh_args"'],
+                )
             )
-        )
 
         return pre_cmds, post_cmds
 
