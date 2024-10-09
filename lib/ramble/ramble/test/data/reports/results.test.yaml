@@ -13,7 +13,7 @@ experiments:
   workload_name: water_gmx50
   workload_namespace: gromacs.water_gmx50
   simplified_workload_namespace: gromacs-water-gmx50
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_1nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_gmx50.pme_single_rank_1nodes
@@ -24,22 +24,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_1nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '1'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -48,24 +48,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -73,20 +73,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_gmx50
     experiment_name: pme_single_rank_1nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_gmx50
     experiment_namespace: gromacs.water_gmx50.pme_single_rank_1nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 1
     experiment_template_name: pme_single_rank_1nodes
     experiment_index: 1
@@ -104,19 +104,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_gmx50_bare}/{size}'
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_1nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -173,7 +173,7 @@ experiments:
   workload_name: water_gmx50
   workload_namespace: gromacs.water_gmx50
   simplified_workload_namespace: gromacs-water-gmx50
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_2nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_gmx50.pme_single_rank_2nodes
@@ -184,22 +184,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_2nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '2'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -208,24 +208,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -233,20 +233,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_gmx50
     experiment_name: pme_single_rank_2nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_gmx50
     experiment_namespace: gromacs.water_gmx50.pme_single_rank_2nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 2
     experiment_template_name: pme_single_rank_2nodes
     experiment_index: 2
@@ -264,19 +264,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_gmx50_bare}/{size}'
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_2nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -333,7 +333,7 @@ experiments:
   workload_name: water_gmx50
   workload_namespace: gromacs.water_gmx50
   simplified_workload_namespace: gromacs-water-gmx50
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_4nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_gmx50.pme_single_rank_4nodes
@@ -344,22 +344,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_4nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '3'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -368,24 +368,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -393,20 +393,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_gmx50
     experiment_name: pme_single_rank_4nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_gmx50
     experiment_namespace: gromacs.water_gmx50.pme_single_rank_4nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 4
     experiment_template_name: pme_single_rank_4nodes
     experiment_index: 3
@@ -424,19 +424,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_gmx50_bare}/{size}'
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_4nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -493,7 +493,7 @@ experiments:
   workload_name: water_gmx50
   workload_namespace: gromacs.water_gmx50
   simplified_workload_namespace: gromacs-water-gmx50
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_8nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_gmx50.pme_single_rank_8nodes
@@ -504,22 +504,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_8nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '4'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -528,24 +528,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -553,20 +553,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_gmx50
     experiment_name: pme_single_rank_8nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_gmx50
     experiment_namespace: gromacs.water_gmx50.pme_single_rank_8nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 8
     experiment_template_name: pme_single_rank_8nodes
     experiment_index: 4
@@ -584,19 +584,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_gmx50_bare}/{size}'
-    water_gmx50_bare: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare
+    water_gmx50_bare: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_gmx50/water_gmx50_bare/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_gmx50/pme_single_rank_8nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -653,7 +653,7 @@ experiments:
   workload_name: water_bare
   workload_namespace: gromacs.water_bare
   simplified_workload_namespace: gromacs-water-bare
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_1nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_bare.pme_single_rank_1nodes
@@ -664,22 +664,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_1nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '5'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -688,24 +688,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -713,20 +713,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_bare
     experiment_name: pme_single_rank_1nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_bare
     experiment_namespace: gromacs.water_bare.pme_single_rank_1nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 1
     experiment_template_name: pme_single_rank_1nodes
     experiment_index: 5
@@ -744,19 +744,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_bare_hbonds}/{size}'
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_1nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/pme_single_rank_1nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_1nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -813,7 +813,7 @@ experiments:
   workload_name: water_bare
   workload_namespace: gromacs.water_bare
   simplified_workload_namespace: gromacs-water-bare
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_2nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_bare.pme_single_rank_2nodes
@@ -824,22 +824,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_2nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '6'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -848,24 +848,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -873,20 +873,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_bare
     experiment_name: pme_single_rank_2nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_bare
     experiment_namespace: gromacs.water_bare.pme_single_rank_2nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 2
     experiment_template_name: pme_single_rank_2nodes
     experiment_index: 6
@@ -904,19 +904,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_bare_hbonds}/{size}'
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_2nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/pme_single_rank_2nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_2nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -973,7 +973,7 @@ experiments:
   workload_name: water_bare
   workload_namespace: gromacs.water_bare
   simplified_workload_namespace: gromacs-water-bare
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_4nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_bare.pme_single_rank_4nodes
@@ -984,22 +984,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_4nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '7'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -1008,24 +1008,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -1033,20 +1033,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_bare
     experiment_name: pme_single_rank_4nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_bare
     experiment_namespace: gromacs.water_bare.pme_single_rank_4nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 4
     experiment_template_name: pme_single_rank_4nodes
     experiment_index: 7
@@ -1064,19 +1064,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_bare_hbonds}/{size}'
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_4nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/pme_single_rank_4nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_4nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:
@@ -1133,7 +1133,7 @@ experiments:
   workload_name: water_bare
   workload_namespace: gromacs.water_bare
   simplified_workload_namespace: gromacs-water-bare
-  experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+  experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
   experiment_name: pme_single_rank_8nodes
   experiment_status: SUCCESS
   experiment_namespace: gromacs.water_bare.pme_single_rank_8nodes
@@ -1144,22 +1144,22 @@ experiments:
   n_threads: '1'
   experiment_template_name: pme_single_rank_8nodes
   RAMBLE_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: gromacs
     mpi_command: mpirun -n 1 -ppn 16
-    batch_submit: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/execute_experiment
+    batch_submit: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/execute_experiment
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs
-    workload_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare
-    workload_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/gromacs
-    experiment_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+    workspace_name: gromacs_fake_test_data
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs
+    workload_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare
+    workload_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/gromacs
+    experiment_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
     experiment_index: '8'
-    log_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out
+    log_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out
     gmx: gmx_mpi
     grompp: gmx_mpi grompp
     mdrun: gmx_mpi mdrun
@@ -1168,24 +1168,24 @@ experiments:
     verbose: ''
     notunepme: -notunepme
     dlb: yes
-    input_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
-    command: 'rm -f "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
+    input_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
+    command: 'rm -f "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
 
-      touch "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
+      touch "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/execute_experiment
   RAMBLE_RAW_VARIABLES:
-    log_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/logs
+    log_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/logs
     env_name: '{application_name}'
-    experiments_file: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/all_experiments
+    experiments_file: /ramble/var/ramble/workspaces/gromacs_fake_test_data/all_experiments
     processes_per_node: 16
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
@@ -1193,20 +1193,20 @@ experiments:
     n_threads: '1'
     size: '0003'
     type: pme
-    workspace_name: basic_gromacs
+    workspace_name: gromacs_fake_test_data
     application_name: gromacs
     workload_name: water_bare
     experiment_name: pme_single_rank_8nodes
     application_namespace: gromacs
     workload_namespace: gromacs.water_bare
     experiment_namespace: gromacs.water_bare.pme_single_rank_8nodes
-    application_run_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/{application_name}
-    application_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/{application_name}
+    application_run_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/{application_name}
+    application_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/{application_name}
     workload_run_dir: '{application_run_dir}/{workload_name}'
     workload_input_dir: '{application_input_dir}/{workload_name}'
-    license_input_dir: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/shared/licenses/{application_name}
+    license_input_dir: /ramble/var/ramble/workspaces/gromacs_fake_test_data/shared/licenses/{application_name}
     experiment_run_dir: '{workload_run_dir}/{experiment_name}'
-    env_path: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/{env_name}
+    env_path: /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/{env_name}
     n_nodes: 8
     experiment_template_name: pme_single_rank_8nodes
     experiment_index: 83
@@ -1224,19 +1224,19 @@ experiments:
     notunepme: -notunepme
     dlb: yes
     input_path: '{water_bare_hbonds}/{size}'
-    water_bare_hbonds: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds
+    water_bare_hbonds: /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds
     command: 'rm -f "{log_file}"
 
       touch "{log_file}"
 
-      . /usr/local/home/spack/share/spack/setup-env.sh
+      . /spack/share/spack/setup-env.sh
 
-      spack env activate /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/software/gromacs
+      spack env activate /ramble/var/ramble/workspaces/gromacs_fake_test_data/software/gromacs
 
-      gmx_mpi grompp -f /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
+      gmx_mpi grompp -f /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/pme.mdp -c /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/conf.gro -p /ramble/var/ramble/workspaces/gromacs_fake_test_data/inputs/gromacs/water_bare/water_bare_hbonds/0003/topol.top -o exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1
 
-      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
-    execute_experiment: /usr/local/home/ramble/var/ramble/workspaces/basic_gromacs/experiments/gromacs/water_bare/pme_single_rank_8nodes/execute_experiment
+      mpirun -n 1 -ppn 16 gmx_mpi mdrun -notunepme -dlb yes  -resetstep 18000 -noconfout -nsteps 20000 -s exp_input.tpr &> "/ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/pme_single_rank_8nodes.out" 2>&1'
+    execute_experiment: /ramble/var/ramble/workspaces/gromacs_fake_test_data/experiments/gromacs/water_bare/pme_single_rank_8nodes/execute_experiment
   CONTEXTS:
   - name: 'null'
     foms:

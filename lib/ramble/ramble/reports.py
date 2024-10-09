@@ -11,22 +11,48 @@ import datetime
 import os
 import re
 
-import pandas as pd
-
-# import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_pdf import PdfPages
-
 import llnl.util.filesystem as fs
 
 import ramble.cmd.results
 import ramble.cmd.workspace
 import ramble.config
 import ramble.filters
-from ramble.language.shared_language import BetterDirection
+from ramble.keywords import keywords
+from ramble.language.shared_language import BetterDirection, FomType
 import ramble.pipeline
 import ramble.util.path
 from ramble.util.logger import logger
+
+try:
+    import matplotlib.pyplot as plt
+    from matplotlib.backends.backend_pdf import PdfPages
+    import pandas as pd
+except ImportError:
+    logger.die("matplotlib or pandas was not found. Ensure requirements.txt are installed.")
+
+
+class ReportVars(Enum):
+    BETTER_DIRECTION = "better_direction"
+    CONTEXT = "context"
+    FOM_NAME = "fom_name"
+    FOM_ORIGIN = "fom_origin"
+    FOM_ORIGIN_TYPE = "fom_origin_type"
+    FOM_UNITS = "fom_units"
+    FOM_VALUE = "fom_value"
+    FOM_VALUE_MIN = "fom_value_min"
+    FOM_VALUE_MAX = "fom_value_max"
+    IDEAL_PERF_VALUE = "ideal_perf_value"
+    NORMALIZED_FOM_VALUE = "normalized_fom_value"
+    SERIES = "series"
+
+
+_FOM_DICT_MAPPING = {
+    "name": "fom_name",
+    "value": "fom_value",
+    "units": "fom_units",
+    "origin": "fom_origin",
+    "origin_type": "fom_origin_type",
+}
 
 
 def to_numeric_if_possible(series):
@@ -35,6 +61,15 @@ def to_numeric_if_possible(series):
         return pd.to_numeric(series)
     except (ValueError, TypeError):
         return series
+
+
+def get_direction_suffix(self):
+    if self == BetterDirection.HIGHER:
+        return " (Higher is Better)"
+    if self == BetterDirection.LOWER:
+        return " (Lower is Better)"
+    else:
+        return ""
 
 
 def load_results(args):
@@ -82,7 +117,7 @@ def load_results(args):
 
 def is_repeat_child(experiment):
     try:
-        if int(experiment["RAMBLE_VARIABLES"]["repeat_index"]) > 0:
+        if int(experiment["RAMBLE_VARIABLES"][keywords.repeat_index]) > 0:
             return True
         else:
             return False
@@ -181,26 +216,28 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
                     exp_copy = copy.deepcopy(exp)
 
                     # Remove context dict and add the current FOM values
-                    # TODO: Can we clean this partial copy with a class?
                     exp_copy.pop("CONTEXTS")
                     exp_copy["context"] = context["name"]
-                    exp_copy["fom_name"] = fom["name"]
-                    exp_copy["fom_value"] = fom["value"]
-                    exp_copy["fom_units"] = fom["units"]
-                    exp_copy["fom_origin"] = fom["origin"]
-                    exp_copy["fom_origin_type"] = fom["origin_type"]
+                    for name, val in fom.items():
+                        if name in _FOM_DICT_MAPPING.keys():
+                            exp_copy[_FOM_DICT_MAPPING[name]] = val
+                        elif name == "fom_type":
+                            exp_copy["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
+                            exp_copy["better_direction"] = BetterDirection.from_str(
+                                fom["fom_type"]["better_direction"]
+                            )
 
-                    if "fom_type" in fom.keys():
-                        exp_copy["better_direction"] = fom["fom_type"]["better_direction"]
-                    else:  # if using older data file without fom_type
-                        exp_copy["better_direction"] = BetterDirection.INDETERMINATE
+                        # older data exports may not have fom_type stored
+                        if "fom_type" not in exp_copy:
+                            exp_copy["fom_type"] = FomType.UNDEFINED
+                            exp_copy["better_direction"] = BetterDirection.INDETERMINATE
 
                     # Exclude vars that aren't needed for analysis, mainly paths and commands
                     dir_regex = r"_dir$"
                     path_regex = r"_path$"
                     vars_to_ignore = [
-                        "batch_submit",
-                        "log_file",
+                        keywords.batch_submit,
+                        keywords.log_file,
                         "command",
                         "execute_experiment",
                     ]
@@ -360,9 +397,10 @@ class PlotGenerator:
     def draw(self, perf_measure, scale_var, series, y_label=None):
         series_data = self.output_df.query(f'series == "{series}"').copy()
 
-        # TODO: add suffix 'higher/lower is better' to chart title based on better_direction
-        title = (f"{perf_measure} vs {scale_var} for {series}"
-                 f"{self.better_direction.get_direction_str()}")
+        title = (
+            f"{perf_measure} vs {scale_var} for {series}"
+            f"{get_direction_suffix(self.better_direction)}"
+        )
         logger.debug(f"Generating plot for {title}")
 
         # TODO: prep_draw method in subclass ScalingPlotGenerator, not this class
@@ -518,16 +556,18 @@ class ScalingPlotGenerator(PlotGenerator):
                 ).copy()
                 self.add_minmax_data(series_results, series_min, series_max, scale_var)
 
-            if not (
-                self.better_direction == "INDETERMINATE"
-                or self.better_direction == BetterDirection.INDETERMINATE
-            ):
-                series_results = self.add_idealized_data(results, series_results)
+            series_results = self.add_idealized_data(results, series_results)
             self.output_df = pd.concat([self.output_df, series_results])
 
             self.draw(perf_measure, scale_var, series)
 
     def add_idealized_data(self, raw_results, selected_data):
+        # Skip if no better direction, but override in subclasses when there's a default_better
+        if (
+            self.better_direction == BetterDirection.INDETERMINATE
+            or self.better_direction == BetterDirection.INAPPLICABLE
+        ):
+            return selected_data
 
         if self.normalize:
             first_perf_value = selected_data["normalized_fom_value"].iloc[0]
@@ -544,11 +584,11 @@ class ScalingPlotGenerator(PlotGenerator):
 
         selected_data.loc[:, "ideal_perf_value"] = first_perf_value
 
-        if self.better_direction == "LOWER" or self.better_direction == BetterDirection.LOWER:
+        if self.better_direction == BetterDirection.LOWER:
             selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] / (
                 selected_data.index / selected_data.index[0]  # set baseline scaling var to 1
             )
-        elif self.better_direction == "HIGHER" or self.better_direction == BetterDirection.HIGHER:
+        elif self.better_direction == BetterDirection.HIGHER:
             selected_data["ideal_perf_value"] = selected_data.loc[:, "ideal_perf_value"] * (
                 selected_data.index / selected_data.index[0]
             )
@@ -616,7 +656,6 @@ class StrongScalingPlot(ScalingPlotGenerator):
             return BetterDirection.LOWER
 
     def add_idealized_data(self, raw_results, selected_data):
-        # TODO: we need to set the better direction to be the opposite when normalized
         if self.better_direction is BetterDirection.INDETERMINATE:
             self.better_direction = self.default_better()
 
@@ -645,12 +684,6 @@ class StrongScalingPlot(ScalingPlotGenerator):
 
 class FomPlot(PlotGenerator):
     def generate_plot_data(self):
-        # super().generate_plot_data()
-        # TODO: what is this for?
-        # this one doesn't have a chart spec, it's just a flag
-        # first divide results into series based on workload namespace
-        # then iterate over each fom in each series and create 1 bar chart per fom
-        # comparing fom_value (y) by experiment (x)
         results = self.results_df
         all_foms = results.loc[:, "fom_name"].unique()
         for fom in all_foms:
@@ -661,17 +694,12 @@ class FomPlot(PlotGenerator):
 
             scale_var = "simplified_experiment_namespace"
 
-            # TODO: dry with ScalingPlot code
             series_results.loc[:, "fom_value"] = to_numeric_if_possible(
                 series_results["fom_value"]
             )
             series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
 
             series_results = series_results.set_index(scale_var)
-            # print("post index")
-            # print(series_results)
-
-            # self.validate_data(series_results)
 
             if self.normalize:
                 self.normalize_data(series_results, scale_to_index=True)
@@ -693,7 +721,6 @@ class FomPlot(PlotGenerator):
             unit = series_results.loc[:, "fom_units"].iloc[0]
 
             perf_measure = fom
-            # scale_var = ""
             series = "experiment_name"
             self.draw(perf_measure, scale_var, series, unit)
 
@@ -888,35 +915,6 @@ class MultiLinePlot(ScalingPlotGenerator):
             y_label = perf_measure
 
         self.draw_multiline(perf_measure, scale_var, y_label)
-
-        # perf_measure, scale_var, *additional_vars = self.spec
-
-        # # FOMs are by row, so select only rows with the perf_measure FOM
-        # # raw_results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
-        # # TODO this wont work for non-repeats
-        # # raw_results = self.results_df.query(f'fom_name == "{perf_measure}" and
-        #   fom_origin_type == "summary::mean"').copy()
-        # raw_results = self.results_df.query(
-        #     f'fom_name == "{fom}" and (fom_origin_type == "application" or
-        #     fom_origin_type == "modifier" or fom_origin_type == "summary::mean")'
-        # ).copy()
-
-        # raw_results.loc[:, "series"] = raw_results.loc[:, self.split_by]
-
-        # # TODO: check this does what we want and generates unique results/groups
-        # for series in raw_results.loc[:, "series"].unique():
-        #     # TODO: query should support fom_origin_type
-        #     selected = raw_results.query(f'series == "{series}"')
-        #     pretty_results = selected.groupby(additional_vars + ["series"] + ["fom_name"]).agg(
-        #         {"fom_value": [np.min, np.max]}
-        #     )
-        #     group_results = selected.groupby(additional_vars + ["series"] + ["fom_name"])
-        #     for name, group in group_results:
-        #         group["fom_value"] = to_numeric_if_possible(group["fom_value"])
-        #         group[scale_var] = to_numeric_if_possible(group[scale_var])
-        #         group = group.set_index(scale_var)
-        #         self.series_to_plot.append((name, group))
-        #     self.draw(perf_measure, scale_var, series)
 
 
 def get_reports_path():

@@ -1771,8 +1771,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                         "units": fom_conf["units"],
                                         "origin": fom_conf["origin"],
                                         "origin_type": fom_conf["origin_type"],
-                                        # TODO: do we really want to lose the typedness of the ENUM here?
-                                        "fom_type": fom_conf["fom_type"].to_dict(),
+                                        "fom_type": fom_conf["fom_type"],
                                     }
 
         # Test all non-file based success criteria
@@ -1829,10 +1828,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
         def is_numeric_fom(fom):
             """Returns true if a fom value is numeric, and of an applicable type"""
 
-            value = fom['value']
+            value = fom["value"]
             try:
                 value = float(value)
-                if fom['fom_type']['name'] is FomType.CATEGORY.name or fom['fom_type']['name'] is FomType.INFO.name:
+                if (
+                    fom["fom_type"]["name"] is FomType.CATEGORY.name
+                    or fom["fom_type"]["name"] is FomType.INFO.name
+                ):
                     return False
                 return True
             except (ValueError, TypeError):
@@ -2128,7 +2130,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "units": conf["units"],
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
-                "fom_type": conf["fom_type"],
+                "fom_type": conf["fom_type"].to_dict(),
             }
             if conf["contexts"]:
                 foms[fom]["contexts"].extend(conf["contexts"])

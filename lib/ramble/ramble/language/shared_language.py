@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import copy
+
 from enum import Enum
 
 import ramble.language.language_base
@@ -86,13 +88,12 @@ class BetterDirection(Enum):
     INDETERMINATE = 3  # requires interpretation or FOM type not defined
     INAPPLICABLE = 4  # non-numerical or no direction is 'better', like strings or categories
 
-    def get_direction_str(self):
-        if self == BetterDirection.HIGHER:
-            return " (Higher is Better)"
-        if self == BetterDirection.LOWER:
-            return " (Lower is Better)"
-        else:
-            return ""
+    @classmethod
+    def from_str(cls, string):
+        try:
+            return cls[string.upper()]
+        except KeyError:
+            return None
 
 
 class FomType(Enum):
@@ -116,20 +117,30 @@ class FomType(Enum):
         return direction[self]
 
     def copy(self):
-        import copy
-        return copy.copy(self)
+        return copy.deepcopy(self)
+
+    @classmethod
+    def from_str(cls, string):
+        try:
+            return cls[string.upper()]
+        except KeyError:
+            return None
 
     def to_dict(self):
         """Converts the FomType enum member to a dictionary representation."""
-        return {
-            "name": self.name,
-            "better_direction": self.better_direction().name
-        }
+        return {"name": self.name, "better_direction": self.better_direction().name}
 
 
 @shared_directive("figures_of_merit")
-def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units="", contexts=[],
-                    fom_type: FomType = FomType.UNDEFINED):
+def figure_of_merit(
+    name,
+    fom_regex,
+    group_name,
+    log_file="{log_file}",
+    units="",
+    contexts=[],
+    fom_type: FomType = FomType.UNDEFINED,
+):
     """Adds a figure of merit to track for this object
 
     Defines a new figure of merit.

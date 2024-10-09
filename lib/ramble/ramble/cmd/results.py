@@ -45,7 +45,7 @@ def setup_parser(subparser):
         nargs="+",
         action="append",
         help="generate a scaling report, requires two args: [performance metric] [scaling metric]"
-             "[optional: group by]",
+        "[optional: group by]",
         required=False,
     )
     report_parser.add_argument(
@@ -54,7 +54,7 @@ def setup_parser(subparser):
         nargs="+",
         action="append",
         help="generate a scaling report, requires two args: [performance metric] [scaling metric]"
-             "[optional: group by]",
+        "[optional: group by]",
         required=False,
     )
     report_parser.add_argument(
@@ -63,7 +63,7 @@ def setup_parser(subparser):
         nargs="+",
         action="append",
         help="generate a scaling report, requires two args: [performance metric] [scaling metric]"
-             "[optional: group by]",
+        "[optional: group by]",
         required=False,
     )
     report_parser.add_argument(
@@ -71,7 +71,7 @@ def setup_parser(subparser):
         dest="where",
         action="store",
         help="Down select data to plot (useful for complex workspaces with collisions). Takes"
-             " pandas query format",
+        " pandas query format",
         required=False,
     )
     report_parser.add_argument(
@@ -80,7 +80,7 @@ def setup_parser(subparser):
         nargs="+",
         action="append",
         help="generate a comparison report, requires at least two args: [FOM 1] [Additional FOMs]"
-             "[optional: group by(s)]",
+        "[optional: group by(s)]",
         required=False,
     )
     report_parser.add_argument(
@@ -140,33 +140,32 @@ def import_results_file(filename):
     logger.debug("File to import:")
     logger.debug(filename)
 
-    # TODO: this isn't very safe checking
-    imported_file = open(filename)
-    ext = os.path.splitext(filename)[1]
+    with open(filename) as imported_file:
+        logger.msg(f"Importing {filename}")
 
-    logger.msg(f"Importing {filename}")
-    if ext.lower() == ".json":
-        try:
-            results_dict = json.load(imported_file)
-            # Check if data contains an experiment
-            if results_dict.get("experiments"):
-                return results_dict
-            else:
-                logger.die("Unable to parse file: Does not contain valid data to import.")
-        except ValueError:
-            logger.die("Unable to parse file: Invalid JSON formatting.")
-    elif ext.lower() in (".yml", ".yaml"):
-        try:
-            results_dict = syaml.load(imported_file)
-            # Check if data contains an experiment
-            if results_dict.get("experiments"):
-                return results_dict
-            else:
-                logger.die("Unable to parse file: Does not contain valid data to import.")
-        except ValueError:
-            logger.die("Unable to parse file: Invalid YAML formatting.")
-    else:
-        logger.die("Unable to parse file: Please provide a valid JSON or YAML results file.")
+        ext = os.path.splitext(filename)[1]
+        if ext.lower() == ".json":
+            try:
+                results_dict = json.load(imported_file)
+                # Check if data contains an experiment
+                if results_dict.get("experiments"):
+                    return results_dict
+                else:
+                    logger.die("Unable to parse file: Does not contain valid data to import.")
+            except ValueError:
+                logger.die("Unable to parse file: Invalid JSON formatting.")
+        elif ext.lower() in (".yml", ".yaml"):
+            try:
+                results_dict = syaml.load(imported_file)
+                # Check if data contains an experiment
+                if results_dict.get("experiments"):
+                    return results_dict
+                else:
+                    logger.die("Unable to parse file: Does not contain valid data to import.")
+            except ValueError:
+                logger.die("Unable to parse file: Invalid YAML formatting.")
+        else:
+            logger.die("Unable to parse file: Please provide a valid JSON or YAML results file.")
 
 
 def results_report(args):
