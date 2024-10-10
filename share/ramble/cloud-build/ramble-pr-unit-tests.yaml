@@ -26,6 +26,8 @@ steps:
 
         spack load py-pip ^python
 
+        python -m pip install -r requirements.txt
+
         echo "Spack version is $(spack --version)"
         echo "Python version is $(python3 --version)"
 

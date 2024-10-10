@@ -18,8 +18,9 @@ RUN cd /opt &&  \
     spack load py-pip ^python@${PYTHON_VER} && \
     wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements.txt && \
     wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements-dev.txt && \
-    python -m pip install -r /opt/requirements-dev.txt
-
+    python -m pip install -r /opt/requirements-dev.txt \
+    python -m pip install pandas \
+    python -m pip install matplotlib
 FROM ${BASE_IMG}:${BASE_VER}
 
 COPY --from=builder / /
