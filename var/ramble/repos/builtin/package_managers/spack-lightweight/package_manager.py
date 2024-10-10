@@ -1128,11 +1128,17 @@ class SpackRunner(ramble.util.command_runner.CommandRunner):
             name_match = name_regex.match(name)
             if name_match:
                 name = name_match.group("name")
+        else:
+            # Remove newlines and whitespace from name
+            name = name.replace("\n", "").strip()
 
         if location is None:
             location = os.path.join(
                 "dry-run", "path", "to", shlex.split(package_spec)[0]
             )
+        else:
+            # Remove newlines and whitespace from location
+            location = location.replace("\n", "").strip()
 
         return (name, location)
 
