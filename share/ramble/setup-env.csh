@@ -60,6 +60,18 @@ set _ramble_share_dir = $RAMBLE_ROOT/share/ramble
 alias ramble          'set _rmb_args = (\!*); source $_ramble_share_dir/csh/ramble.csh'
 alias _ramble_pathadd 'set _pa_args = (\!*) && source $_ramble_share_dir/csh/pathadd.csh'
 
+# Identify and lock the python interpreter
+if (! $?RAMBLE_PYTHON) then
+    setenv RAMBLE_PYTHON ""
+endif
+foreach cmd ("$RAMBLE_PYTHON" python3 python python2)
+    command -v "$cmd" >& /dev/null
+    if ($status == 0) then
+        setenv RAMBLE_PYTHON `command -v "$cmd"`
+        break
+    endif
+end
+
 # Set variables needed by this script
 _ramble_pathadd PATH "$RAMBLE_ROOT/bin"
 eval `ramble --print-shell-vars csh`

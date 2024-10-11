@@ -308,6 +308,14 @@ if [ "$_rmb_shell" = bash ]; then
     export -f _ramble_shell_wrapper
 fi
 
+# Identify and lock the python interpreter
+for cmd in "${RAMBLE_PYTHON:-}" python3 python python2; do
+    if command -v > /dev/null "$cmd"; then
+        export RAMBLE_PYTHON="$(command -v "$cmd")"
+        break
+    fi
+done
+
 # Add programmable tab completion for Bash
 #
 if [ "$_rmb_shell" = bash ]; then
