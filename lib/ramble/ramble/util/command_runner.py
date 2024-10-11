@@ -25,15 +25,13 @@ class CommandRunner:
         Ensure required command is found in the path
         """
         self.name = name
-        self.command = None
         self.dry_run = dry_run
-        if command is not None:
-            try:
-                self.command = which(command, required=True)
-            except CommandNotFoundError:
-                raise RunnerError(f"Command {name} is not found in path")
-
         self.shell = shell
+        required = not self.dry_run
+        try:
+            self.command = which(command, required=required)
+        except CommandNotFoundError:
+            raise RunnerError(f"Command {name} is not found in path")
 
     def get_version(self):
         """Hook to get the version of the executable
