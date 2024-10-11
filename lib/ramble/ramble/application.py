@@ -1939,10 +1939,19 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         )
 
                         # Stats will not be calculated for non-numeric foms so they're skipped
-                        if is_numeric_fom(fom):
-                            if fom_key not in repeat_foms[context_name].keys():
-                                repeat_foms[context_name][fom_key] = []
-                            repeat_foms[context_name][fom_key].append(float(fom["value"]))
+                        if fom_key not in repeat_foms[context_name].keys():
+                            repeat_foms[context_name][fom_key] = {
+                                "fom_type": fom["fom_type"],
+                                "fom_values": []}
+                            if is_numeric_fom(fom):
+                                repeat_foms[context_name][fom_key]["fom_is_numeric"] = True
+                            else:
+                                repeat_foms[context_name][fom_key]["fom_is_numeric"] = False
+                            fom_contents = (False, fom["value"], fom["fom_type"])
+                        if repeat_foms[context_name][fom_key]["fom_is_numeric"]:
+                            repeat_foms[context_name][fom_key]["fom_values"].append(float(fom["value"]))
+                        else:
+                            repeat_foms[context_name][fom_key]["fom_values"].append(fom["value"])
 
         # Iterate through the aggregated foms, calculate stats, and insert into results
         for context, fom_dict in repeat_foms.items():
@@ -1962,39 +1971,60 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     "origin": list(fom_dict.keys())[0][2],
                     "origin_type": "summary::n_total_repeats",
                     "name": "Experiment Summary",
+                    "fom_type": FomType.MEASURE.to_dict(),
                 }
                 context_map["foms"].append(n_total_dict)
 
                 # Use the first FOM to count how many successful repeats values are present
                 n_success_dict = {
-                    "value": len(list(fom_dict.values())[0]),
+                    "value": exp_success.count(experiment_status.SUCCESS.name),
                     "units": "repeats",
                     "origin": list(fom_dict.keys())[0][2],
                     "origin_type": "summary::n_successful_repeats",
                     "name": "Experiment Summary",
+                    "fom_type": FomType.MEASURE.to_dict(),
                 }
                 context_map["foms"].append(n_success_dict)
 
-            for fom_key, fom_values in fom_dict.items():
-                fom_name = fom_key[0]
-                fom_units = fom_key[1]
-                fom_origin = fom_key[2]
+            for fom_key, fom_contents in fom_dict.items():
+                fom_name, fom_units, fom_origin, fom_origin_type = fom_key
 
-                calcs = []
+                fom_type = fom_contents["fom_type"]
+                fom_values = fom_contents["fom_values"]
 
-                for statistic in ramble.util.stats.all_stats:
-                    calcs.append(statistic.report(fom_values, fom_units))
+                if fom_contents["fom_is_numeric"]:
+                    calcs = []
 
-                for calc in calcs:
-                    fom_calc_dict = {
-                        "value": calc[0],
-                        "units": calc[1],
-                        "origin": fom_origin,
-                        "origin_type": calc[2],
-                        "name": fom_name,
-                    }
+                    for statistic in ramble.util.stats.all_stats:
+                        calcs.append(statistic.report(fom_values, fom_units))
 
-                    context_map["foms"].append(fom_calc_dict)
+                    for calc in calcs:
+                        fom_calc_dict = {
+                            "value": calc[0],
+                            "units": calc[1],
+                            "origin": fom_origin,
+                            "origin_type": calc[2],
+                            "name": fom_name,
+                            "fom_type": fom_type,
+                        }
+
+                        context_map["foms"].append(fom_calc_dict)
+                else:
+                    # Only elevate non-numeric FOMs when they have the same value for all repeats
+                    if len(set(fom_values)) == 1:
+
+                        fom_str_dict = {
+                            "value": fom_values[0],
+                            "units": fom_units,
+                            "origin": fom_origin,
+                            "origin_type": fom_origin_type,
+                            "name": fom_name,
+                            "fom_type": fom_type,
+                        }
+
+                        context_map["foms"].append(fom_str_dict)
+                    else:
+                        continue
 
             results.append(context_map)
 

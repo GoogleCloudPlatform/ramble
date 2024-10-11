@@ -627,7 +627,7 @@ class ScalingPlotGenerator(PlotGenerator):
         has_duplicate_index = any(data.index.duplicated())
         if has_duplicate_index:
             logger.debug(data)
-            logger.die("Attempting to plot none-unique data. Please reduce data and try again")
+            logger.die("Attempting to plot non-unique data. Please reduce data and try again")
 
     def default_better(self):
         return BetterDirection.INDETERMINATE
