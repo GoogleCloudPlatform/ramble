@@ -62,7 +62,6 @@ ramble:
 
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
-            print(data)
             assert "FAILED" not in data
             assert "summary::n_total_repeats = 2 repeats" in data
             assert "summary::n_successful_repeats = 2 repeats" in data
@@ -78,7 +77,6 @@ ramble:
 
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
-            print(data)
             assert "SUCCESS" in data
             assert "FAILED" in data
             assert "summary::n_total_repeats = 2 repeats" in data
@@ -95,7 +93,6 @@ ramble:
 
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
-            print(data)
             assert "SUCCESS" not in data
             assert "summary::n_total_repeats" not in data
             assert "summary::n_successful_repeats" not in data

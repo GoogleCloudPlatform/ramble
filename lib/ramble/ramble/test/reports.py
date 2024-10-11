@@ -14,14 +14,6 @@
 # - non-repeated experiments
 # - repeated experiments
 
-# Test conversion from nested dict to dataframe
-
-# Test conversion from dataframe to chart-ready pivot
-# - data is not summarized (1 experiment / 1 chart)
-# - data is summarized / not repeats (n experiments / 1 chart)
-# - data is summarized from repeats (n_repeats / 1 chart)
-# - mix of summarized and non-summarized data
-
 # Test normalization of data, and error when first value is zero
 
 # Test that PDF is generated and contains data (size > some value?)
@@ -56,6 +48,7 @@ results = {
                             "units": "",
                             "origin": "dummy_app",
                             "origin_type": "application",
+                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                         },
                         {
                             "name": "fom_2",
@@ -63,6 +56,7 @@ results = {
                             "units": "",
                             "origin": "dummy_app",
                             "origin_type": "application",
+                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                         },
                     ],
                 },
@@ -88,6 +82,7 @@ results = {
                             "units": "",
                             "origin": "dummy_app",
                             "origin_type": "application",
+                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                         },
                         {
                             "name": "fom_2",
@@ -95,6 +90,7 @@ results = {
                             "units": "",
                             "origin": "dummy_app",
                             "origin_type": "application",
+                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                         },
                     ],
                 },
@@ -104,7 +100,7 @@ results = {
 }
 
 
-def prep_dict(
+def create_test_exp(
     success,
     name,
     n_nodes,
@@ -117,12 +113,13 @@ def prep_dict(
     units,
     origin,
     origin_type,
+    fom_type,
     better_direction,
     fv,
     ifv,
     normalized=False,
 ):
-    return {
+    test_exp_dict = {
         "RAMBLE_STATUS": success,
         "name": name,
         "n_nodes": n_nodes,
@@ -135,11 +132,15 @@ def prep_dict(
         "fom_units": units,
         "fom_origin": origin,
         "fom_origin_type": origin_type,
+        "fom_type": fom_type,
         "better_direction": better_direction,
         "series": ns,
         "normalized_fom_value" if normalized else "fom_value": fv,
-        "ideal_perf_value": ifv,
     }
+    # ideal_perf_value is not calculated for plots without better_direction
+    if ifv:
+        test_exp_dict["ideal_perf_value"] = ifv
+    return test_exp_dict
 
 
 @pytest.mark.parametrize(
@@ -147,8 +148,8 @@ def prep_dict(
     [
         (StrongScalingPlot, "fom_1", 42.0, 42.0, 42.0, 28.0, 28.0, 21.0, False),
         (StrongScalingPlot, "fom_1", 42.0, 1.0, 1.0, 28.0, 1.5, 2.0, True),
-        (WeakScalingPlot, "fom_2", 50, 50, 50.0, 55, 55.0, 50.0, False),
-        (WeakScalingPlot, "fom_2", 50.0, 1.0, 1.0, 55.0, 1.1, 1.0, True),
+        (WeakScalingPlot, "fom_2", 50, 50, None, 55, 55.0, None, False),
+        (WeakScalingPlot, "fom_2", 50.0, 1.0, None, 55.0, 1.1, None, True),
     ],
 )
 def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
@@ -159,11 +160,11 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
 
     plot_type, fom_name, fom1, nfv1, ideal1, fom2, nfv2, ideal2, normalize = values
 
-    test_spec = [[fom_name, "n_nodes"]]
+    test_spec = [fom_name, "n_nodes"]
 
     ideal_data = []
     ideal_data.append(
-        prep_dict(
+        create_test_exp(
             "SUCCESS",
             "exp_1",
             1,
@@ -176,6 +177,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
             "",
             "dummy_app",
             "application",
+            FomType.MEASURE,
             BetterDirection.INDETERMINATE,
             nfv1,
             ideal1,
@@ -183,7 +185,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
         )
     )
     ideal_data.append(
-        prep_dict(
+        create_test_exp(
             "SUCCESS",
             "exp_2",
             2,
@@ -196,6 +198,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
             "",
             "dummy_app",
             "application",
+            FomType.MEASURE,
             BetterDirection.INDETERMINATE,
             nfv2,
             ideal2,
@@ -225,6 +228,10 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
         )
         plot.generate_plot_data()
 
+        # Sort columns alphabetically, order is not important
+        plot.output_df.sort_index(axis=1, inplace=True)
+        ideal_df.sort_index(axis=1, inplace=True)
+
         assert plot.output_df.equals(ideal_df)
         assert os.path.isfile(pdf_path)
 
@@ -252,6 +259,7 @@ repeat_results = {
                             "origin": "dummy_app",
                             "origin_type": "summary::n_total_repeats",
                             "name": "Experiment Summary",
+                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                         },
                         {
                             "value": 2,
@@ -259,6 +267,7 @@ repeat_results = {
                             "origin": "dummy_app",
                             "origin_type": "summary::n_successful_repeats",
                             "name": "Experiment Summary",
+                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                         },
                         {
                             "value": 28.0,
@@ -266,6 +275,7 @@ repeat_results = {
                             "origin": "dummy_app",
                             "origin_type": "summary::min",
                             "name": "fom_1",
+                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
                         },
                         {
                             "value": 30.0,
@@ -273,6 +283,7 @@ repeat_results = {
                             "origin": "dummy_app",
                             "origin_type": "summary::max",
                             "name": "fom_1",
+                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
                         },
                         {
                             "value": 29.0,
@@ -281,34 +292,6 @@ repeat_results = {
                             "origin_type": "summary::mean",
                             "name": "fom_1",
                             "fom_type": {"name": "TIME", "better_direction": "LOWER"},
-                        },
-                        {
-                            "value": 29.0,
-                            "units": "s",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::median",
-                            "name": "fom_1",
-                        },
-                        {
-                            "value": 2.0,
-                            "units": "s^2",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::variance",
-                            "name": "fom_1",
-                        },
-                        {
-                            "value": 1.4,
-                            "units": "s",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::stdev",
-                            "name": "fom_1",
-                        },
-                        {
-                            "value": 0.0,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::cv",
-                            "name": "fom_1",
                         },
                     ],
                 },
@@ -384,14 +367,60 @@ repeat_results = {
                 },
             ],
         },
+        {
+            "RAMBLE_STATUS": "SUCCESS",
+            "name": "single_exp_1",
+            "n_nodes": 1,
+            # "application_namespace": "test_app",
+            # "workload_name": "test_workload",
+            "simplified_workload_namespace": "test_app_test_workload",
+            "RAMBLE_VARIABLES": {},
+            "RAMBLE_RAW_VARIABLES": {},
+            "CONTEXTS": [
+                {
+                    "name": "null",
+                    "display_name": "null",
+                    "foms": [
+                        {
+                            "name": "fom_1",
+                            "value": 42.0,
+                            "units": "",
+                            "origin": "dummy_app",
+                            "origin_type": "application",
+                        },
+                        {
+                            "name": "fom_2",
+                            "value": 50,
+                            "units": "",
+                            "origin": "dummy_app",
+                            "origin_type": "application",
+                        },
+                    ],
+                },
+            ],
+        },
     ]
 }
 
 
-def test_repeated_import(mutable_mock_workspace_path):
+def test_repeat_import(mutable_mock_workspace_path):
     where_query = None
     results_df = prepare_data(repeat_results, where_query)
-    print(results_df.shape)
+
+    print(results_df)
+    # DF contains only summary exp and not individual repeats
+    assert "repeat_exp_1" in results_df.values
+    assert "repeat_exp_1.1" not in results_df.values
+    assert "single_exp_1" in results_df.values
+
+    # Summary FOMs are present in DF, types converted to objects
+    row_mean = results_df.query("fom_origin_type == 'summary::mean'")
+    assert row_mean["fom_value"].values == [29.0]
+    assert row_mean["fom_type"].values == [FomType.TIME]
+    assert row_mean["better_direction"].values == [BetterDirection.LOWER]
+
+    single_exp_rows = results_df.query("name == 'single_exp_1' and fom_name == 'fom_1'")
+    assert single_exp_rows["fom_value"].values == [42.0]
 
 
 # TODO: test fom plot
