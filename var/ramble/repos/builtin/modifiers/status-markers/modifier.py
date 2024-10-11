@@ -37,7 +37,8 @@ class StatusMarkers(BasicModifier):
 
     def write_started_marker(self):
         cmds = [
-            'echo "Started" &> {experiment_run_dir}/' + self._started_marker
+            'echo "Started" &> {experiment_run_dir}/' + self._started_marker,
+            "rm -f {experiment_run_dir}/" + self.finished_marker,
         ]
 
         return cmds
