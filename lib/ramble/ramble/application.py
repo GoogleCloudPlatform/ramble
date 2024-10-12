@@ -48,6 +48,7 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 import ramble.util.lock as lk
+from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
 from ramble.util.naming import NS_SEPARATOR
@@ -56,7 +57,7 @@ from ramble.workspace import namespace
 from ramble.experiment_result import ExperimentResult
 
 from ramble.language.application_language import ApplicationMeta
-from ramble.language.shared_language import SharedMeta, FomType, register_builtin, register_phase
+from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.error import RambleError
 from ramble.util.output_capture import output_mapper
 
@@ -1825,6 +1826,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         namespace.
         """
 
+        # TODO: Think about if this should move to FomType class or new FOM class
         def is_numeric_fom(fom):
             """Returns true if a fom value is numeric, and of an applicable type"""
 
@@ -2160,6 +2162,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "units": conf["units"],
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
+                # FIXME: this 'to_dict' is getting something strange passed into it and I'm not sure where it came from
                 "fom_type": conf["fom_type"].to_dict(),
             }
             if conf["contexts"]:

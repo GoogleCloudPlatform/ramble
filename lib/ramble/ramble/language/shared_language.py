@@ -6,14 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import copy
-
-from enum import Enum
-
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
 from ramble.util.logger import logger
+from ramble.util.foms import FomType
 
 
 """This module contains directives directives that are shared between multiple object types
@@ -79,56 +76,6 @@ def figure_of_merit_context(name, regex, output_format):
         obj.figure_of_merit_contexts[name] = {"regex": regex, "output_format": output_format}
 
     return _execute_figure_of_merit_context
-
-
-# For a FOM, the direction that is 'better' e.g., faster is better
-class BetterDirection(Enum):
-    HIGHER = 1
-    LOWER = 2
-    INDETERMINATE = 3  # requires interpretation or FOM type not defined
-    INAPPLICABLE = 4  # non-numerical or no direction is 'better', like strings or categories
-
-    @classmethod
-    def from_str(cls, string):
-        try:
-            return cls[string.upper()]
-        except KeyError:
-            return None
-
-
-class FomType(Enum):
-    TIME = 1
-    THROUGHPUT = 2
-    MEASURE = 3
-    CATEGORY = 4
-    INFO = 5
-    UNDEFINED = 6
-
-    def better_direction(self):
-        direction = {
-            FomType.TIME: BetterDirection.LOWER,
-            FomType.THROUGHPUT: BetterDirection.HIGHER,
-            FomType.MEASURE: BetterDirection.INDETERMINATE,
-            FomType.CATEGORY: BetterDirection.INAPPLICABLE,
-            FomType.INFO: BetterDirection.INAPPLICABLE,
-            FomType.UNDEFINED: BetterDirection.INDETERMINATE,
-        }
-
-        return direction[self]
-
-    def copy(self):
-        return copy.deepcopy(self)
-
-    @classmethod
-    def from_str(cls, string):
-        try:
-            return cls[string.upper()]
-        except KeyError:
-            return None
-
-    def to_dict(self):
-        """Converts the FomType enum member to a dictionary representation."""
-        return {"name": self.name, "better_direction": self.better_direction().name}
 
 
 @shared_directive("figures_of_merit")

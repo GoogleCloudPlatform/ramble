@@ -19,9 +19,9 @@ import ramble.cmd.workspace
 import ramble.config
 import ramble.filters
 from ramble.keywords import keywords
-from ramble.language.shared_language import BetterDirection, FomType
 import ramble.pipeline
 import ramble.util.path
+from ramble.util.foms import BetterDirection, FomType
 from ramble.util.logger import logger
 
 try:
