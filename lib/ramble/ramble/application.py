@@ -48,6 +48,7 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 import ramble.util.lock as lk
+from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
 from ramble.util.naming import NS_SEPARATOR
@@ -1762,16 +1763,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                     else:
                                         fom_contexts.append(_NULL_CONTEXT)
 
-                                    for context in fom_contexts:
-                                        if context not in fom_values:
-                                            fom_values[context] = {}
-                                        fom_val = fom_match.group(fom_conf["group"])
-                                        fom_values[context][fom_name] = {
-                                            "value": fom_val,
-                                            "units": fom_conf["units"],
-                                            "origin": fom_conf["origin"],
-                                            "origin_type": fom_conf["origin_type"],
-                                        }
+                                for context in fom_contexts:
+                                    if context not in fom_values:
+                                        fom_values[context] = {}
+                                    fom_val = fom_match.group(fom_conf["group"])
+                                    fom_values[context][fom_name] = {
+                                        "value": fom_val,
+                                        "units": fom_conf["units"],
+                                        "origin": fom_conf["origin"],
+                                        "origin_type": fom_conf["origin_type"],
+                                        "fom_type": fom_conf["fom_type"],
+                                    }
 
         # Test all non-file based success criteria
         for criteria_obj in criteria_list.all_criteria():
@@ -1824,11 +1826,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
         namespace.
         """
 
-        def is_numeric(value):
-            """Returns true if a fom value is numeric"""
+        # TODO: Think about if this should move to FomType class or new FOM class
+        def is_numeric_fom(fom):
+            """Returns true if a fom value is numeric, and of an applicable type"""
 
+            value = fom["value"]
             try:
-                float(value)
+                value = float(value)
+                if (
+                    fom["fom_type"]["name"] is FomType.CATEGORY.name
+                    or fom["fom_type"]["name"] is FomType.INFO.name
+                ):
+                    return False
                 return True
             except (ValueError, TypeError):
                 return False
@@ -1923,19 +1932,28 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     if context_name not in repeat_foms.keys():
                         repeat_foms[context_name] = {}
 
-                    for foms in context["foms"]:
+                    for fom in context["foms"]:
                         fom_key = (
-                            foms["name"],
-                            foms["units"],
-                            foms["origin"],
-                            foms["origin_type"],
+                            fom["name"],
+                            fom["units"],
+                            fom["origin"],
+                            fom["origin_type"],
                         )
 
                         # Stats will not be calculated for non-numeric foms so they're skipped
-                        if is_numeric(foms["value"]):
-                            if fom_key not in repeat_foms[context_name].keys():
-                                repeat_foms[context_name][fom_key] = []
-                            repeat_foms[context_name][fom_key].append(float(foms["value"]))
+                        if fom_key not in repeat_foms[context_name].keys():
+                            repeat_foms[context_name][fom_key] = {
+                                "fom_type": fom["fom_type"],
+                                "fom_values": []}
+                            if is_numeric_fom(fom):
+                                repeat_foms[context_name][fom_key]["fom_is_numeric"] = True
+                            else:
+                                repeat_foms[context_name][fom_key]["fom_is_numeric"] = False
+                            fom_contents = (False, fom["value"], fom["fom_type"])
+                        if repeat_foms[context_name][fom_key]["fom_is_numeric"]:
+                            repeat_foms[context_name][fom_key]["fom_values"].append(float(fom["value"]))
+                        else:
+                            repeat_foms[context_name][fom_key]["fom_values"].append(fom["value"])
 
         # Iterate through the aggregated foms, calculate stats, and insert into results
         for context, fom_dict in repeat_foms.items():
@@ -1955,39 +1973,60 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     "origin": list(fom_dict.keys())[0][2],
                     "origin_type": "summary::n_total_repeats",
                     "name": "Experiment Summary",
+                    "fom_type": FomType.MEASURE.to_dict(),
                 }
                 context_map["foms"].append(n_total_dict)
 
                 # Use the first FOM to count how many successful repeats values are present
                 n_success_dict = {
-                    "value": len(list(fom_dict.values())[0]),
+                    "value": exp_success.count(experiment_status.SUCCESS.name),
                     "units": "repeats",
                     "origin": list(fom_dict.keys())[0][2],
                     "origin_type": "summary::n_successful_repeats",
                     "name": "Experiment Summary",
+                    "fom_type": FomType.MEASURE.to_dict(),
                 }
                 context_map["foms"].append(n_success_dict)
 
-            for fom_key, fom_values in fom_dict.items():
-                fom_name = fom_key[0]
-                fom_units = fom_key[1]
-                fom_origin = fom_key[2]
+            for fom_key, fom_contents in fom_dict.items():
+                fom_name, fom_units, fom_origin, fom_origin_type = fom_key
 
-                calcs = []
+                fom_type = fom_contents["fom_type"]
+                fom_values = fom_contents["fom_values"]
 
-                for statistic in ramble.util.stats.all_stats:
-                    calcs.append(statistic.report(fom_values, fom_units))
+                if fom_contents["fom_is_numeric"]:
+                    calcs = []
 
-                for calc in calcs:
-                    fom_calc_dict = {
-                        "value": calc[0],
-                        "units": calc[1],
-                        "origin": fom_origin,
-                        "origin_type": calc[2],
-                        "name": fom_name,
-                    }
+                    for statistic in ramble.util.stats.all_stats:
+                        calcs.append(statistic.report(fom_values, fom_units))
 
-                    context_map["foms"].append(fom_calc_dict)
+                    for calc in calcs:
+                        fom_calc_dict = {
+                            "value": calc[0],
+                            "units": calc[1],
+                            "origin": fom_origin,
+                            "origin_type": calc[2],
+                            "name": fom_name,
+                            "fom_type": fom_type,
+                        }
+
+                        context_map["foms"].append(fom_calc_dict)
+                else:
+                    # Only elevate non-numeric FOMs when they have the same value for all repeats
+                    if len(set(fom_values)) == 1:
+
+                        fom_str_dict = {
+                            "value": fom_values[0],
+                            "units": fom_units,
+                            "origin": fom_origin,
+                            "origin_type": fom_origin_type,
+                            "name": fom_name,
+                            "fom_type": fom_type,
+                        }
+
+                        context_map["foms"].append(fom_str_dict)
+                    else:
+                        continue
 
             results.append(context_map)
 
@@ -2097,7 +2136,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             for fom, fom_def in mod.figures_of_merit.items():
                 fom_definitions[fom] = {"origin": f"{mod}", "origin_type": "modifier"}
                 for attr in fom_def.keys():
-                    if isinstance(fom_def[attr], list):
+                    if isinstance(fom_def[attr], (list, FomType)):
                         fom_definitions[fom][attr] = fom_def[attr].copy()
                     else:
                         fom_definitions[fom][attr] = self.expander.expand_var(
@@ -2123,6 +2162,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "units": conf["units"],
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
+                # FIXME: this 'to_dict' is getting something strange passed into it and I'm not sure where it came from
+                "fom_type": conf["fom_type"].to_dict(),
             }
             if conf["contexts"]:
                 foms[fom]["contexts"].extend(conf["contexts"])

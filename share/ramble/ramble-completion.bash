@@ -598,7 +598,7 @@ _ramble_results() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="upload"
+        RAMBLE_COMPREPLY="upload report"
     fi
 }
 
@@ -609,6 +609,10 @@ _ramble_results_upload() {
     else
         RAMBLE_COMREPLY=""
     fi
+}
+
+_ramble_results_report() {
+    RAMBLE_COMPREPLY="-h --help --workspace --strong-scaling --weak-scaling --multi-line --where --compare --foms -n --normalize --logx --logy --split-by -f --file"
 }
 
 _ramble_software_definitions() {

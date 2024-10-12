@@ -1335,38 +1335,38 @@ class Workspace:
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
 
-                        if exp["N_REPEATS"] > 0:  # this is a base exp with summary of repeats
                             for context in exp["CONTEXTS"]:
                                 f.write(f'  {context["display_name"]} figures of merit:\n')
 
-                                fom_summary = {}
+                                summary_foms = {}
+                                single_foms = []
                                 for fom in context["foms"]:
                                     name = fom["name"]
-                                    if name not in fom_summary.keys():
-                                        fom_summary[name] = []
-                                    stat_name = fom["origin_type"]
-                                    value = fom["value"]
-                                    units = fom["units"]
+                                    if fom["origin_type"].startswith("summary::"):
+                                        if name not in summary_foms.keys():
+                                            summary_foms[name] = []
+                                        stat_name = fom["origin_type"]
+                                        value = fom["value"]
+                                        units = fom["units"]
 
-                                    output = f"{stat_name} = {value} {units}\n"
-                                    fom_summary[name].append(output)
+                                        output = f"{stat_name} = {value} {units}\n"
+                                        summary_foms[name].append(output)
+                                    else:
+                                        if fom["origin_type"] == "modifier":
+                                            delim = "::"
+                                            mod = fom["origin"]
+                                            name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                for fom_name, fom_val_list in fom_summary.items():
+                                        output = "{} = {} {}".format(name, fom["value"], fom["units"])
+                                        single_foms.append(output)
+
+                                for fom_name, fom_val_list in summary_foms.items():
                                     f.write(f"    {fom_name}:\n")
                                     for fom_val in fom_val_list:
                                         f.write(f"      {fom_val.strip()}\n")
-                        else:
-                            for context in exp["CONTEXTS"]:
-                                f.write(f'  {context["display_name"]} figures of merit:\n')
-                                for fom in context["foms"]:
-                                    name = fom["name"]
-                                    if fom["origin_type"] == "modifier":
-                                        delim = "::"
-                                        mod = fom["origin"]
-                                        name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                    output = "{} = {} {}".format(name, fom["value"], fom["units"])
-                                    f.write("    %s\n" % (output.strip()))
+                                for fom_output in single_foms:
+                                    f.write("    %s\n" % (fom_output.strip()))
 
                 else:
                     logger.msg("No results to write")

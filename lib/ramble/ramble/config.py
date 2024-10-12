@@ -148,6 +148,7 @@ config_defaults = {
         "input_cache": "$ramble/var/ramble/cache",
         "workspace_dirs": "$ramble/var/ramble/workspaces",
         "upload": {"push_failed": True},
+        "report_dirs": "~/.ramble/reports",
     }
 }
 

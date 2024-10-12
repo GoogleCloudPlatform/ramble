@@ -22,6 +22,7 @@ config:
   shell: bash
   input_cache: $ramble/var/ramble/cache
   workspace_dirs: $ramble/var/ramble/workspaces
+  report_dirs: ~/.ramble/reports
   include_phase_dependencies: false
   spack:
     install:
