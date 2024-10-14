@@ -9,6 +9,24 @@
 from ramble.modkit import *  # noqa: F403
 
 
+# Pre-defined charts and graphs
+# The per-mode value is a tuple of (options_for_aps, min_stat_level)
+_PREDEFINED_REPORTS = {
+    "mpi": {
+        # rank-to-rank communication time graph, requires APS_STAT_LEVEL >= 4
+        "transfer-graph": ("-x --format html", 4),
+        # rank-to-rank communication volume graph, requires APS_STAT_LEVEL >= 4
+        "transfer-vgraph": ("-x -v --format html", 4),
+        # message-size summary, requires APS_STAT_LEVEL >= 2
+        "message-sizes": ("-m", 2),
+    }
+}
+
+_CUSTOM_PREFIX = "custom:"
+
+_REPORT_PREFIX = "aps_report_"
+
+
 class IntelAps(BasicModifier):
     """Define a modifier for Intel's Application Performance Snapshot
 
@@ -39,6 +57,33 @@ class IntelAps(BasicModifier):
         "mpi_command", " aps {aps_flags} ", method="append", modes=["mpi"]
     )
 
+    modifier_variable(
+        "aps_stat_level",
+        default="1",
+        description="Used to define the APS_STAT_LEVEL env variable",
+        mode="mpi",
+    )
+
+    modifier_variable(
+        "aps_extra_reports",
+        default="",
+        description=f"""
+        Comma-separated descriptors specifying extra reports (besides the summary) to generate.
+        Syntax definition:
+            aps_extra_reports = spec {{ "," spec }}
+            spec = pre_defined_spec | custom_spec | "all"
+            pre_defined_spec = {",".join(_PREDEFINED_REPORTS["mpi"].keys())}
+            custom_spec = "custom" ":" options
+            options = <letters>
+        Examples:
+        * "transfer-graph,message-sizes,custom:-t"
+          Generates transfer comm. graph, message-size summary and MPI time per rank chart
+        * "all"
+          Generates all graphs defined in _PREDEFINED_REPORTS
+        """,
+        mode="mpi",
+    )
+
     archive_pattern("aps_*_results_dir/*")
 
     software_spec(
@@ -61,10 +106,12 @@ class IntelAps(BasicModifier):
                 CommandExecutable(
                     f"load-aps-{executable_name}",
                     template=[
+                        "export APS_STAT_LEVEL={aps_stat_level}",
                         "spack load intel-oneapi-vtune",
                         # Clean up previous aps logs to avoid the potential
                         # of out-dated reports.
                         "rm -rf {aps_log_dir}",
+                        f"rm -f {{experiment_run_dir}}/{_REPORT_PREFIX}*",
                     ],
                 )
             )
@@ -79,12 +126,65 @@ class IntelAps(BasicModifier):
                     f"gen-aps-{executable_name}",
                     template=[
                         'echo "APS Results for executable {executable_name}"',
-                        "aps-report -s -D {aps_log_dir}",
+                        # Prints text summary as well as generating an html report
+                        "aps-report -D {aps_log_dir}",
                     ],
                     mpi=False,
                     redirect="{log_file}",
                 )
             )
+
+            extra_reports = self.expander.expand_var_name("aps_extra_reports")
+            if extra_reports:
+                predefined_reports = _PREDEFINED_REPORTS[self._usage_mode]
+                specs = [item.strip() for item in extra_reports.split(",")]
+                stat_level = self.expander.expand_var_name(
+                    "aps_stat_level", typed=True
+                )
+                cmds = set()
+
+                def _add_cmd(report, opts, min_level=0):
+                    if stat_level < min_level:
+                        logger.warn(
+                            f"Report {report} is skipped as APS_STAT_LEVEL"
+                            f" {stat_level} is less than {min_level}"
+                        )
+                    else:
+                        report_path = f'"{{experiment_run_dir}}/{_REPORT_PREFIX}{report}.txt"'
+                        cmds.add(
+                            f"aps-report {opts} {{aps_log_dir}} > {report_path} 2>&1"
+                        )
+
+                for spec in specs:
+                    if spec.startswith(_CUSTOM_PREFIX):
+                        custom = spec[len(_CUSTOM_PREFIX) :]
+                        _add_cmd(
+                            f"custom_{custom.replace('-', '').replace(' ', '_')}",
+                            custom,
+                        )
+                    elif spec == "all":
+                        for report, (
+                            opts,
+                            min_level,
+                        ) in predefined_reports.items():
+                            _add_cmd(report, opts, min_level)
+                    else:
+                        if spec not in predefined_reports:
+                            logger.warn(f"Report {spec} is not defined")
+                        else:
+                            opts, min_level = predefined_reports[spec]
+                            _add_cmd(spec, opts, min_level)
+
+                for i, cmd in enumerate(cmds):
+                    post_exec.append(
+                        CommandExecutable(
+                            f"gen-report{i}",
+                            template=cmd,
+                            mpi=False,
+                            output_capture="",
+                            redirect="",
+                        )
+                    )
 
         return pre_exec, post_exec
 
