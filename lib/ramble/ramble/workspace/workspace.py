@@ -469,7 +469,6 @@ class Workspace:
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
         self.repeat_success_strict = True
-        self.force_concretize = False
 
         self.read_default_template = read_default_template
         self.configs = ramble.config.ConfigScope("workspace", self.config_dir)
@@ -1106,25 +1105,19 @@ class Workspace:
             workspace_dict[namespace.ramble][namespace.application] = apps_dict
             print(f"\n{syaml.dump(workspace_dict)}")
 
-    def concretize(self):
+    def concretize(self, force=False, quiet=False):
+        """Concretize software definitions for defined experiments
+
+        Extract suggested software for experiments defined in a workspace, and
+        ensure the software environments are defined properly.
+
+        Args:
+            force (bool): Whether to overwrite conflicting definitions of named packages or not
+            quiet (bool): Whether to silently ignore conflicts or not
+
+
+        """
         full_software_dict = self.get_software_dict()
-
-        if not self.force_concretize:
-            try:
-                if (
-                    full_software_dict[namespace.packages]
-                    or full_software_dict[namespace.environments]
-                ):
-                    raise RambleWorkspaceError(
-                        "Cannot concretize an already concretized "
-                        "workspace. To overwrite the current configuration "
-                        "with the default software configuration, use "
-                        "'ramble workspace concretize -f'."
-                    )
-            except KeyError:
-                pass
-
-        full_software_dict = syaml.syaml_dict()
 
         if (
             namespace.packages not in full_software_dict
@@ -1159,7 +1152,7 @@ class Workspace:
             for compiler_dict in compiler_dicts:
                 for comp, info in compiler_dict.items():
                     if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
-                        if comp not in packages_dict:
+                        if comp not in packages_dict or force:
                             packages_dict[comp] = syaml.syaml_dict()
                             packages_dict[comp]["pkg_spec"] = info["pkg_spec"]
                             ramble.config.add(
@@ -1183,20 +1176,19 @@ class Workspace:
                                 ramble.config.add(
                                     config_path, scope=self.ws_file_config_scope_name()
                                 )
-                        elif not specs_equiv(info, packages_dict[comp]):
+                        elif not quiet and not specs_equiv(info, packages_dict[comp]):
                             logger.debug(f"  Spec 1: {str(info)}")
                             logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
                             raise RambleConflictingDefinitionError(
-                                f"Compiler {comp} defined in multiple conflicting ways"
+                                f"Compiler {comp} would be defined defined "
+                                "in multiple conflicting ways"
                             )
 
-            add_env = False
-            if env_name not in environments_dict:
-                new_env = syaml.syaml_dict()
-                new_env[namespace.packages] = []
-
             logger.debug(f"Trying to define packages for {env_name}")
-            app_packages = new_env[namespace.packages]
+            app_packages = []
+            if env_name in environments_dict:
+                if namespace.packages in environments_dict[env_name]:
+                    app_packages = environments_dict[env_name][namespace.packages].copy()
 
             software_dicts = [app_inst.software_specs]
             for mod_inst in app_inst._modifier_instances:
@@ -1206,8 +1198,7 @@ class Workspace:
                 for spec_name, info in software_dict.items():
                     if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
                         logger.debug(f"    Found spec: {spec_name}")
-                        if spec_name not in packages_dict:
-                            add_env = True
+                        if spec_name not in packages_dict or force:
                             packages_dict[spec_name] = syaml.syaml_dict()
                             packages_dict[spec_name]["pkg_spec"] = info["pkg_spec"]
                             if "compiler_spec" in info and info["compiler_spec"]:
@@ -1215,18 +1206,22 @@ class Workspace:
                             if "compiler" in info and info["compiler"]:
                                 packages_dict[spec_name]["compiler"] = info["compiler"]
 
-                        elif not specs_equiv(info, packages_dict[spec_name]):
+                        elif not quiet and not specs_equiv(info, packages_dict[spec_name]):
                             logger.debug(f"  Spec 1: {str(info)}")
                             logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
                             raise RambleConflictingDefinitionError(
-                                f"Package {spec_name} defined in multiple conflicting ways"
+                                f"Package {spec_name} would be defined in multiple "
+                                "conflicting ways"
                             )
 
                         if spec_name not in app_packages:
                             app_packages.append(spec_name)
 
-            if add_env:
-                environments_dict[env_name] = new_env.copy()
+            if app_packages:
+                if env_name not in environments_dict:
+                    environments_dict[env_name] = syaml.syaml_dict()
+
+                environments_dict[env_name][namespace.packages] = app_packages.copy()
 
         ramble.config.config.update_config(
             "software", full_software_dict, scope=self.ws_file_config_scope_name()

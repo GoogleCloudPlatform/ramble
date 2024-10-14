@@ -414,6 +414,14 @@ def workspace_concretize_setup_parser(subparser):
         help="Remove unused software and experiment templates from workspace config",
         required=False,
     )
+    subparser.add_argument(
+        "--quiet",
+        "-q",
+        dest="quiet",
+        action="store_true",
+        help="Silently ignore conflicting package definitions",
+        required=False,
+    )
 
 
 def workspace_concretize(args):
@@ -423,11 +431,8 @@ def workspace_concretize(args):
         logger.debug("Simplifying workspace config")
         ws.simplify()
     else:
-        if args.force_concretize:
-            ws.force_concretize = True
-
         logger.debug("Concretizing workspace")
-        ws.concretize()
+        ws.concretize(force=args.force_concretize, quiet=args.quiet)
 
 
 def workspace_run_pipeline(args, pipeline):
