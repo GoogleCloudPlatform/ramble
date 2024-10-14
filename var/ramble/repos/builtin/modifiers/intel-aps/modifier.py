@@ -10,14 +10,16 @@ from ramble.modkit import *  # noqa: F403
 
 
 # Pre-defined charts and graphs
-# The value is a tuple of (options_for_aps, min_stat_level)
+# The per-mode value is a tuple of (options_for_aps, min_stat_level)
 _PREDEFINED_REPORTS = {
-    # rank-to-rank communication time graph, requires APS_STAT_LEVEL >= 4
-    "transfer-graph": ("-x --format html", 4),
-    # rank-to-rank communication volume graph, requires APS_STAT_LEVEL >= 4
-    "transfer-vgraph": ("-x -v --format html", 4),
-    # message-size summary, requires APS_STAT_LEVEL >= 2
-    "message-sizes": ("-m", 2),
+    "mpi": {
+        # rank-to-rank communication time graph, requires APS_STAT_LEVEL >= 4
+        "transfer-graph": ("-x --format html", 4),
+        # rank-to-rank communication volume graph, requires APS_STAT_LEVEL >= 4
+        "transfer-vgraph": ("-x -v --format html", 4),
+        # message-size summary, requires APS_STAT_LEVEL >= 2
+        "message-sizes": ("-m", 2),
+    }
 }
 
 _CUSTOM_PREFIX = "custom:"
@@ -134,6 +136,7 @@ class IntelAps(BasicModifier):
 
             extra_reports = self.expander.expand_var_name("aps_extra_reports")
             if extra_reports:
+                predefined_reports = _PREDEFINED_REPORTS[self._usage_mode]
                 specs = [item.strip() for item in extra_reports.split(",")]
                 stat_level = self.expander.expand_var_name(
                     "aps_stat_level", typed=True
@@ -163,13 +166,13 @@ class IntelAps(BasicModifier):
                         for report, (
                             opts,
                             min_level,
-                        ) in _PREDEFINED_REPORTS.items():
+                        ) in predefined_reports.items():
                             _add_cmd(report, opts, min_level)
                     else:
-                        if spec not in _PREDEFINED_REPORTS:
+                        if spec not in predefined_reports:
                             logger.warn(f"Report {spec} is not defined")
                         else:
-                            opts, min_level = _PREDEFINED_REPORTS[spec]
+                            opts, min_level = predefined_reports[spec]
                             _add_cmd(spec, opts, min_level)
 
                 for i, cmd in enumerate(cmds):
