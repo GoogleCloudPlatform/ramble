@@ -669,7 +669,7 @@ _ramble_workspace_create() {
 }
 
 _ramble_workspace_concretize() {
-    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify"
+    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify --quiet -q"
 }
 
 _ramble_workspace_setup() {
