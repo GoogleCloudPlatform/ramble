@@ -198,7 +198,6 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     """
     internal_attr_name = _map_attr_name(attr)
     internal_attr = getattr(obj, internal_attr_name, None)
-
     if attr == "registered_phases":
         _print_phases(obj, attr, verbose, pattern, format=format)
         return
@@ -259,7 +258,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                 color.cprint(colified(to_print, tty=True, indent=4))
             color.cprint("")
         else:
-            color.cprint(f"{indentation}" + str(to_print))
+            color.cprint(f"{indentation}" + str(internal_attr))
 
 
 def print_attribute_header(attr, verbose=False):
