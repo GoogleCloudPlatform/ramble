@@ -20,7 +20,6 @@ from typing import List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty.color as color
-from llnl.util.tty.colify import colified
 
 import spack.util.executable
 import spack.util.spack_json
@@ -304,77 +303,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 for phase, phase_node in self.package_manager.all_pipeline_phases(pipeline):
                     self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
 
-    def _long_print(self):
-        out_str = ""
-        if hasattr(self, "maintainers"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Maintainers:\n"))
-            out_str.append(colified(self.maintainers, tty=True))
-            out_str.append("\n")
-
-        if hasattr(self, "tags"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Tags:\n"))
-            out_str.append(colified(self.tags, tty=True))
-            out_str.append("\n")
-
-        for pipeline in self._pipelines:
-            out_str.append("\n")
-            out_str.append(rucolor.section_title(f'Pipeline "{pipeline}" Phases:\n'))
-            out_str.append(colified(self.get_pipeline_phases(pipeline), tty=True))
-
-        # Print all FOMs without a context
-        if hasattr(self, "figures_of_merit"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Figure of merit contexts:\n"))
-            out_str.append(rucolor.nested_1(f"\t({_NULL_CONTEXT}) context (default):\n"))
-            for name, conf in self.figures_of_merit.items():
-                if len(conf["contexts"]) == 0:
-                    out_str.append(rucolor.nested_2(f"\t\t{name}\n"))
-                    out_str.append(f'\t\t\tunits = {conf["units"]}\n')
-                    out_str.append(f'\t\t\tlog file = {conf["log_file"]}\n')
-
-            if hasattr(self, "figure_of_merit_contexts"):
-                for context_name, context_conf in self.figure_of_merit_contexts.items():
-                    out_str.append(rucolor.nested_1(f"\t{context_name} context:\n"))
-                    for name, conf in self.figures_of_merit.items():
-                        if context_name in conf["contexts"]:
-                            out_str.append(rucolor.nested_2(f"\t\t{name}\n"))
-                            out_str.append(f'\t\t\tunits = {conf["units"]}\n')
-                            out_str.append(f'\t\t\tlog file = {conf["log_file"]}\n')
-
-        if hasattr(self, "workloads"):
-            out_str.append("\n")
-            for workload in self.workloads.values():
-                out_str.append(workload.as_str())
-            out_str.append("\n")
-
-        if hasattr(self, "builtins"):
-            out_str.append(rucolor.section_title("Builtin Executables:\n"))
-            out_str.append("\t" + colified(self.builtins.keys(), tty=True) + "\n")
-
-        if hasattr(self, "package_manager_configs"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Package Manager Configs:\n"))
-            for name, config in self.package_manager_configs.items():
-                out_str.append(f"\t{name} = {config}\n")
-
-        spec_groups = [
-            ("compilers", "Compilers"),
-            ("software_specs", "Software Specs"),
-        ]
-        for group in spec_groups:
-            if hasattr(self, group[0]):
-                out_str.append("\n")
-                out_str.append(rucolor.section_title("%s:\n" % group[1]))
-                for name, info in getattr(self, group[0]).items():
-                    out_str.append(rucolor.nested_1("  %s:\n" % name))
-                    for key, val in info.items():
-                        if val:
-                            out_str.append("    {} = {}\n".format(key, val.replace("@", "@@")))
-
-        return out_str
-
     def set_env_variable_sets(self, env_variable_sets):
         """Set internal reference to environment variable sets"""
 
@@ -491,14 +419,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 phase_order.append(node.key)
         return phase_order
 
-    def _short_print(self):
-        return [self.name]
-
     def __str__(self):
-        if self._verbosity == "long":
-            return "".join(self._long_print())
-        elif self._verbosity == "short":
-            return "".join(self._short_print())
         return self.name
 
     def print_vars(self, header="", vars_to_print=None, indent=""):

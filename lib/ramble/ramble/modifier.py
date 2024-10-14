@@ -13,12 +13,9 @@ import textwrap
 import fnmatch
 from typing import List
 
-from llnl.util.tty.colify import colified
-
 from ramble.language.modifier_language import ModifierMeta
 from ramble.language.shared_language import SharedMeta
 from ramble.error import RambleError
-import ramble.util.colors as rucolor
 import ramble.util.directives
 import ramble.util.class_attributes
 from ramble.util.logger import logger
@@ -121,113 +118,7 @@ class ModifierBase(metaclass=ModifierMeta):
         """
         pass
 
-    def _long_print(self):
-        out_str = []
-        out_str.append(rucolor.section_title("Modifier: ") + f"{self.name}\n")
-        out_str.append("\n")
-
-        out_str.append(rucolor.section_title("Description:\n"))
-        if self.__doc__:
-            out_str.append(f"\t{self.__doc__}\n")
-        else:
-            out_str.append("\tNone\n")
-
-        if hasattr(self, "tags"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Tags:\n"))
-            out_str.append(colified(self.tags, tty=True))
-            out_str.append("\n")
-
-        if hasattr(self, "modes"):
-            out_str.append("\n")
-            for mode_name, wl_conf in self.modes.items():
-                out_str.append(rucolor.section_title("Mode:") + f" {mode_name}\n")
-
-                if mode_name in self.modifier_variables:
-                    out_str.append(rucolor.nested_1("\tVariables:\n"))
-                    indent = "\t\t"
-                    for var, conf in self.modifier_variables[mode_name].items():
-                        out_str.append(rucolor.nested_2(f"{indent}{var}:\n"))
-                        out_str.append(f"{indent}\tDescription: {conf.description}\n")
-                        out_str.append(f"{indent}\tDefault: {conf.default}\n")
-                        if conf.values:
-                            out_str.append(f"{indent}\tSuggested Values: {conf.values}\n")
-
-                if mode_name in self.variable_modifications:
-                    out_str.append(rucolor.nested_1("\tVariable Modifications:\n"))
-                    indent = "\t\t"
-                    for var, conf in self.variable_modifications[mode_name].items():
-                        out_str.append(rucolor.nested_2(f"{indent}{var}:\n"))
-                        out_str.append(f'{indent}\tMethod: {conf["method"]}\n')
-                        out_str.append(f'{indent}\tModification: {conf["modification"]}\n')
-
-            out_str.append("\n")
-
-        if hasattr(self, "builtins"):
-            out_str.append(rucolor.section_title("Builtin Executables:\n"))
-            out_str.append("\t" + colified(self.builtins.keys(), tty=True) + "\n")
-
-        if hasattr(self, "executable_modifiers"):
-            out_str.append(rucolor.section_title("Executable Modifiers:\n"))
-            out_str.append("\t" + colified(self.executable_modifiers.keys(), tty=True) + "\n")
-
-        if hasattr(self, "package_manager_configs"):
-            out_str.append(rucolor.section_title("Package Manager Configs:\n"))
-            for name, config in self.package_manager_configs.items():
-                out_str.append(f"\t{name} = {config}\n")
-            out_str.append("\n")
-
-        if hasattr(self, "compilers"):
-            out_str.append(rucolor.section_title("Default Compilers:\n"))
-            for comp_name, comp_def in self.compilers.items():
-                out_str.append(rucolor.nested_2(f"\t{comp_name}:\n"))
-                out_str.append(
-                    rucolor.nested_3("\t\tSpack Spec:")
-                    + f'{comp_def["pkg_spec"].replace("@", "@@")}\n'
-                )
-
-                if "compiler_spec" in comp_def and comp_def["compiler_spec"]:
-                    out_str.append(
-                        rucolor.nested_3("\t\tCompiler Spec:\n")
-                        + f'{comp_def["compiler_spec"].replace("@", "@@")}\n'
-                    )
-
-                if "compiler" in comp_def and comp_def["compiler"]:
-                    out_str.append(
-                        rucolor.nested_3("\t\tCompiler:\n") + f'{comp_def["compiler"]}\n'
-                    )
-            out_str.append("\n")
-
-        if hasattr(self, "software_specs"):
-            out_str.append(rucolor.section_title("Software Specs:\n"))
-            for spec_name, spec_def in self.software_specs.items():
-
-                out_str.append(rucolor.nested_2(f"\t{spec_name}:\n"))
-                out_str.append(
-                    rucolor.nested_3("\t\tSpack Spec:")
-                    + f'{spec_def["pkg_spec"].replace("@", "@@")}\n'
-                )
-
-                if "compiler_spec" in spec_def and spec_def["compiler_spec"]:
-                    out_str.append(
-                        rucolor.nested_3("\t\tCompiler Spec:")
-                        + f'{spec_def["compiler_spec"].replace("@", "@@")}\n'
-                    )
-
-                if "compiler" in spec_def and spec_def["compiler"]:
-                    out_str.append(rucolor.nested_3("\t\tCompiler:") + f'{spec_def["compiler"]}\n')
-            out_str.append("\n")
-
-        return out_str
-
-    def _short_print(self):
-        return [self.name]
-
     def __str__(self):
-        if self._verbosity == "long":
-            return "".join(self._long_print())
-        elif self._verbosity == "short":
-            return "".join(self._short_print())
         return self.name
 
     def format_doc(self, **kwargs):

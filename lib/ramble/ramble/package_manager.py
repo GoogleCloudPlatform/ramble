@@ -13,12 +13,9 @@ import fnmatch
 import textwrap
 from typing import List
 
-from llnl.util.tty.colify import colified
-
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta
 from ramble.error import RambleError
-import ramble.util.colors as rucolor
 import ramble.util.directives
 import ramble.util.class_attributes
 from ramble.util.naming import NS_SEPARATOR
@@ -108,59 +105,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         prefix = self._spec_prefix or self.name
         return spack.util.naming.spack_module_to_python_module(prefix)
 
-    def _long_print(self):
-        out_str = []
-        out_str.append(rucolor.section_title("Package Manager: ") + f"{self.name}\n")
-        out_str.append("\n")
-
-        simplified_name = spack.util.naming.spack_module_to_python_module(self.name)
-        out_str.append(rucolor.section_title("Spec prefix: ") + f"{simplified_name}\n")
-        out_str.append("\n")
-
-        out_str.append(rucolor.section_title("Description:\n"))
-        if self.__doc__:
-            out_str.append(f"\t{self.__doc__}\n")
-        else:
-            out_str.append("\tNone\n")
-
-        if hasattr(self, "tags"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Tags:\n"))
-            out_str.append(colified(self.tags, tty=True))
-            out_str.append("\n")
-
-        if hasattr(self, "builtins"):
-            out_str.append(rucolor.section_title("Builtin Executables:\n"))
-            out_str.append("\t" + colified(self.builtins.keys(), tty=True) + "\n")
-
-        if hasattr(self, "package_manager_configs"):
-            out_str.append("\n")
-            out_str.append(rucolor.section_title("Package Manager Configs:\n"))
-            for name, config in self.package_manager_configs.items():
-                out_str.append(f"\t{name} = {config}\n")
-
-        for group in self._spec_groups:
-            if hasattr(self, group[0]):
-                out_str.append("\n")
-                out_str.append(rucolor.section_title("%s:\n" % group[1]))
-                for name, info in getattr(self, group[0]).items():
-                    out_str.append(rucolor.nested_1("  %s:\n" % name))
-                    for key in self._spec_keys:
-                        if key in info and info[key]:
-                            out_str.append(
-                                "    {} = {}\n".format(key, info[key].replace("@", "@@"))
-                            )
-
-        return out_str
-
-    def _short_print(self):
-        return [self.name]
-
     def __str__(self):
-        if self._verbosity == "long":
-            return "".join(self._long_print())
-        elif self._verbosity == "short":
-            return "".join(self._short_print())
         return self.name
 
     def format_doc(self, **kwargs):
