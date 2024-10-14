@@ -67,12 +67,12 @@ class IntelAps(BasicModifier):
     modifier_variable(
         "aps_extra_reports",
         default="",
-        description="""
+        description=f"""
         Comma-separated descriptors specifying extra reports (besides the summary) to generate.
         Syntax definition:
-            aps_extra_reports = spec { "," spec }
+            aps_extra_reports = spec {{ "," spec }}
             spec = pre_defined_spec | custom_spec | "all"
-            pre_defined_spec = <keys in _PREDEFINED_REPORTS>
+            pre_defined_spec = {",".join(_PREDEFINED_REPORTS["mpi"].keys())}
             custom_spec = "custom" ":" options
             options = <letters>
         Examples:
