@@ -30,6 +30,8 @@ class Pip(PackageManagerBase):
 
     name = "pip"
 
+    _spec_prefix = "pip"
+
     def __init__(self, file_path):
         super().__init__(file_path)
 
@@ -206,6 +208,31 @@ class Pip(PackageManagerBase):
             f"Mirroring software using {self.name} is not currently supported. "
             "If a software mirror is required, it needs to be set up outside of Ramble"
         )
+
+    def _add_software_to_results(self, workspace, app_inst=None):
+        """Augment the owning experiment's results with software stack information
+
+        This is a registered phase by the base package manager class, so here
+        we only override its base definition.
+
+        Args:
+            workspace (Workspace): A reference to the workspace that owns the
+                                   current pipeline
+            app_inst (Application): A reference to the application instance for
+                                    the current experiment
+        """
+
+        env_path = self.app_inst.expander.env_path
+        self.runner.set_dry_run(workspace.dry_run)
+        self.runner.configure_env(env_path)
+
+        if self._spec_prefix not in app_inst.result.software:
+            app_inst.result.software[self._spec_prefix] = []
+
+        package_list = app_inst.result.software[self._spec_prefix]
+
+        for info in self.runner.package_provenance():
+            package_list.append(info)
 
 
 package_name_regex = re.compile(
@@ -486,6 +513,60 @@ class PipRunner:
                     if "==" in req:
                         pkgs.add(req.split("==")[0].strip())
         return pkgs
+
+    def _package_dict_from_str(self, in_str):
+        """Construct a package dictionary from a package string
+
+        Args:
+            in_str (str): String representing a package, as output from `pip freeze`
+
+        Returns:
+            (dict): Dictionary representing the package information
+        """
+
+        if not in_str:
+            return None
+
+        parts = in_str.replace("\n", "").split("==")
+
+        if len(parts) <= 1:
+            return None
+
+        version = parts[1]
+
+        if "[" in parts[0]:
+            name_parts = parts[0].replace("]", "").split("[")
+            name = name_parts[0]
+            variants = name_parts[1]
+        else:
+            name = parts[0]
+            variants = ""
+
+        info_dict = {"name": name, "version": version, "variants": variants}
+
+        return info_dict
+
+    def package_provenance(self):
+        """Iterator over package information dictionaries
+
+        Examine the package definitions in the environment lock file. Yield
+        each valid package dictionary created from lines in the lock file.
+
+        Yields:
+            (dict): Package information dictionary
+        """
+
+        lock_file = os.path.join(self.env_path, self._lock_file_name)
+
+        if os.path.exists(lock_file):
+            with open(lock_file) as f:
+                for line in f.readlines():
+                    info_dict = self._package_dict_from_str(
+                        line.replace("\n", "")
+                    )
+
+                    if info_dict:
+                        yield info_dict
 
     def _dry_run_print(self, executable, args):
         logger.msg(f"DRY-RUN: would run {executable}")

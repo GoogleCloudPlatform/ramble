@@ -72,19 +72,3 @@ class ExperimentResult:
                 output[output_val] = obj_dict[lookup_key]
 
         return output
-
-
-def build_software_map(package_manager):
-    """Create a software map dictionary, for housing software stack results
-
-    Returns:
-        (dict): Software map dictionary
-    """
-    software_map = {
-        "name": "software_stack",
-        "packages": [],
-        "package_manager": package_manager._spec_prefix,
-        "display_name": package_manager._spec_prefix,
-    }
-
-    return software_map
