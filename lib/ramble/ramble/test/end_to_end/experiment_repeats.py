@@ -127,12 +127,6 @@ ramble:
                 file_path = os.path.join(software_path, file)
                 assert os.path.exists(file_path)
 
-            lock_file = os.path.join(software_path, "spack.lock")
-            with open(lock_file, "w+") as f:
-                f.write("{\n")
-                f.write('\t"test_key": "val"\n')
-                f.write("}\n")
-
         # Each tuple (workload, exp base, n_repeats) expands to 1 base exp plus n_repeats exps
         expected_experiments = [
             ("water_gmx50", "pme_single_rank", 2),

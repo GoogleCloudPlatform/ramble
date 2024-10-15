@@ -170,13 +170,6 @@ licenses:
                 file_path = os.path.join(software_path, file)
                 assert os.path.exists(file_path)
 
-            # Create a mock spack.lock file
-            lock_file = os.path.join(software_path, "spack.lock")
-            with open(lock_file, "w+") as f:
-                f.write("{\n")
-                f.write('\t"test_key": "val"\n')
-                f.write("}\n")
-
         expected_experiments = [
             "scaling_1_part1_wrfv4",
             "scaling_2_part1_wrfv4",
