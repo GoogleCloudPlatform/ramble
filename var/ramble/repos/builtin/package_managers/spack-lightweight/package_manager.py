@@ -495,6 +495,28 @@ class SpackLightweight(PackageManagerBase):
             out_str += f" (built with {pkg.compiler})"
         return out_str
 
+    def _add_software_to_results(self, workspace, app_inst=None):
+        """Augment the owning experiment's results with software stack information
+
+        This is a registered phase by the base package manager class, so here
+        we only override its base definition.
+
+        Args:
+            workspace (Workspace): A reference to the workspace that owns the
+                                   current pipeline
+            app_inst (Application): A reference to the application instance for
+                                    the current experiment
+        """
+        if self._spec_prefix not in app_inst.result.software:
+            app_inst.result.software[self._spec_prefix] = []
+
+        package_list = app_inst.result.software[self._spec_prefix]
+
+        self.runner.activate()
+        for info in self.runner.package_provenance():
+            package_list.append(info)
+        self.runner.deactivate()
+
 
 spack_namespace = "spack"
 
@@ -1253,6 +1275,83 @@ class SpackRunner(ramble.util.command_runner.CommandRunner):
             path = self.execute(self.spack, args, return_output=True)
             if path is not None:
                 yield pkg, os.path.join(path, package_def_name)
+
+    def _package_dict_from_str(self, in_str):
+        """Construct a package dictionary from a comma delimited spec string
+
+        Args:
+            in_str (str): Comma delimited string from spack about a package spec.
+                          It is assumed to be of the format:
+                          {name},{version},{compiler_name},{compiler_version},{variants}
+
+        Returns:
+            (dict): Dictionary representing the package information
+        """
+        parts = in_str.split(",")
+
+        info_dict = {
+            "name": "",
+            "version": "",
+            "compiler": "",
+            "compiler_version": "",
+            "variants": "",
+        }
+
+        if len(parts) >= 1:
+            # Remove status markers
+            name = (
+                parts[0]
+                .replace("[+]", "")
+                .replace(" - ", "")
+                .replace("[e]", "")
+                .strip()
+            )
+
+            info_dict["name"] = name
+
+        if len(parts) >= 2:
+            info_dict["version"] = parts[1]
+
+        if len(parts) >= 3:
+            info_dict["compiler"] = parts[2]
+
+        if len(parts) >= 4:
+            info_dict["compiler_version"] = parts[3]
+
+        if len(parts) >= 5:
+            info_dict["variants"] = ",".join(parts[4:]).strip()
+
+        if info_dict["name"]:
+            return info_dict
+        return None
+
+    def package_provenance(self):
+        """Iterator over package information dictionaries
+
+        Call spack to determine the package information in the current
+        environment. Yield each valid package dictionary.
+
+        Yields:
+            (dict): Package information dictionary
+        """
+        find_args = [
+            "find",
+            '--format="{name},{version},{compiler.name},{compiler.version},{variants}"',
+            "-c",
+        ]
+
+        lock_file = os.path.join(self.env_path, "spack.lock")
+        if os.path.exists(lock_file):
+            all_info = self.execute(
+                self.spack, find_args, return_output=True
+            ).replace('"', "")
+
+            if all_info:
+                for info in all_info.split("\n"):
+                    info_dict = self._package_dict_from_str(info)
+
+                    if info_dict:
+                        yield info_dict
 
 
 class NoActiveEnvironmentError(ramble.util.command_runner.RunnerError):
