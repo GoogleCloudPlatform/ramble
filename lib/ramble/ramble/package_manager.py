@@ -14,7 +14,7 @@ import textwrap
 from typing import List
 
 from ramble.language.package_manager_language import PackageManagerMeta
-from ramble.language.shared_language import SharedMeta
+from ramble.language.shared_language import SharedMeta, register_phase
 from ramble.error import RambleError
 import ramble.util.directives
 import ramble.util.class_attributes
@@ -185,6 +185,25 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
             require_exist (boolean): Whether to require environment hashes exist or not.
         """
 
+        pass
+
+    register_phase(
+        "add_software_to_results",
+        pipeline="analyze",
+        run_after=["analyze_experiments"],
+        run_before=["append_results_to_workspace"],
+    )
+
+    def _add_software_to_results(self, workspace, app_inst=None):
+        """Stub class method for injecting software information into results
+
+        Args:
+            workspace (Workspace): Reference to the workspace that is currently
+                                   being acted on.
+            app_inst (Application): Reference to the application instance that
+            owns the results.
+
+        """
         pass
 
 

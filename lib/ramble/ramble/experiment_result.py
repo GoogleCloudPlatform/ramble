@@ -15,6 +15,7 @@ _OUTPUT_MAPPING = {
     namespace.n_repeats: "N_REPEATS",
     "keys": "keys",
     "contexts": "CONTEXTS",
+    "software": "SOFTWARE",
     namespace.variables: "RAMBLE_VARIABLES",
     "raw_variables": "RAMBLE_RAW_VARIABLES",
     namespace.tags: "TAGS",
@@ -34,6 +35,7 @@ class ExperimentResult:
         self.experiment_chain = app_inst.chain_order.copy()
         self.tags = list(app_inst.experiment_tags)
         self.contexts = []
+        self.software = {}
 
         self.keys = {}
         for key in app_inst.keywords.keys:
@@ -70,3 +72,19 @@ class ExperimentResult:
                 output[output_val] = obj_dict[lookup_key]
 
         return output
+
+
+def build_software_map(package_manager):
+    """Create a software map dictionary, for housing software stack results
+
+    Returns:
+        (dict): Software map dictionary
+    """
+    software_map = {
+        "name": "software_stack",
+        "packages": [],
+        "package_manager": package_manager._spec_prefix,
+        "display_name": package_manager._spec_prefix,
+    }
+
+    return software_map
