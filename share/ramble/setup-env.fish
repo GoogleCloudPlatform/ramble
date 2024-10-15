@@ -635,6 +635,17 @@ end
 #
 set -l rmb_source_file (status -f)  # name of current file
 
+#
+# Identify and lock the python interpreter
+#
+for cmd in "$RAMBLE_PYTHON" python3 python python2
+    set -l _rmb_python (command -v "$cmd")
+    if test $status -eq 0
+        set -x RAMBLE_PYTHON $_rmb_python
+        break
+    end
+end
+
 
 
 #
