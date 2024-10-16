@@ -68,8 +68,11 @@ class Pipeline:
         self.workspace.software_environments = self._software_environments
         self._experiment_set = workspace.build_experiment_set()
 
-    def _construct_hash(self):
-        """Hash all of the experiments, construct workspace inventory"""
+    def _construct_experiment_hashes(self):
+        """Hash all of the experiments.
+
+        Populate the workspace inventory information with experiment hash data.
+        """
         for exp, app_inst, _ in self._experiment_set.all_experiments():
             app_inst.populate_inventory(
                 self.workspace,
@@ -77,6 +80,12 @@ class Pipeline:
                 require_exist=self.require_inventory,
             )
 
+    def _construct_workspace_hash(self):
+        """Construct workspace inventory
+
+        Assumes experiment hashes are already constructed and populated into
+        the workspace.
+        """
         workspace_inventory = os.path.join(self.workspace.root, self.workspace.inventory_file_name)
         workspace_hash_file = os.path.join(self.workspace.root, self.workspace.hash_file_name)
 
@@ -280,7 +289,8 @@ class AnalyzePipeline(Pipeline):
                 " Make sure your workspace is setup with\n"
                 "    ramble workspace setup"
             )
-        super()._construct_hash()
+        super()._construct_experiment_hashes()
+        super()._construct_workspace_hash()
         super()._prepare()
 
     def _complete(self):
@@ -328,7 +338,8 @@ class ArchivePipeline(Pipeline):
             )
 
     def _prepare(self):
-        super()._construct_hash()
+        super()._construct_experiment_hashes()
+        super()._construct_workspace_hash()
         super()._prepare()
 
         date_str = self.workspace.date_string()
@@ -488,6 +499,10 @@ class SetupPipeline(Pipeline):
         self.action_string = "Setting up"
 
     def _prepare(self):
+        # Check if the selected phases require the inventory is successful
+        if "write_inventory" in self.filters.phases or "*" in self.filters.phases:
+            self.require_inventory = True
+
         super()._prepare()
         experiment_file = open(self.workspace.all_experiments_path, "w+")
         shell = ramble.config.get("config:shell")
@@ -495,13 +510,11 @@ class SetupPipeline(Pipeline):
         experiment_file.write(f"#!{shell_path}\n")
         self.workspace.experiments_script = experiment_file
 
-    def _complete(self):
-        # Check if the selected phases require the inventory is successful
-        if "write_inventory" in self.filters.phases or "*" in self.filters.phases:
-            self.require_inventory = True
+        super()._construct_experiment_hashes()
 
+    def _complete(self):
         try:
-            super()._construct_hash()
+            super()._construct_workspace_hash()
         except FileNotFoundError as e:
             tty.warn("Unable to construct workspace hash due to missing file")
             tty.warn(e)
