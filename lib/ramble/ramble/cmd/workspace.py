@@ -873,7 +873,10 @@ def workspace_edit(args):
         for f in edit_files:
             print(f)
     else:
-        editor(*edit_files)
+        try:
+            editor(*edit_files)
+        except TypeError:
+            logger.die("No valid editor was found.")
 
 
 def workspace_archive_setup_parser(subparser):
