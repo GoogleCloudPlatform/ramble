@@ -598,7 +598,7 @@ ramble:
   software:
     packages:
       zlib:
-        pkg_spec: 'zlib'
+        pkg_spec: 'zlib@1.3'
     environments:
       zlib:
         packages:
@@ -618,7 +618,7 @@ ramble:
 
     with pytest.raises(ramble.workspace.RambleWorkspaceError) as e:
         workspace("concretize", global_args=["-w", workspace_name])
-        assert "Cannot concretize an already concretized workspace." in e
+        assert "Package zlib would be defined in multiple conflicting ways" in e
 
 
 def test_force_concretize():
@@ -672,11 +672,12 @@ ramble:
 
     ws1._re_read()
 
-    with pytest.raises(ramble.workspace.RambleWorkspaceError) as e:
-        workspace("concretize", global_args=["-w", workspace_name])
-        assert "Cannot concretize an already concretized workspace." in e
-
     workspace("concretize", "-f", global_args=["-w", workspace_name])
+
+    assert search_files_for_string([config_path], "zlib:") is True
+    assert search_files_for_string([config_path], "zlib-test") is True
+
+    workspace("concretize", "--simplify", global_args=["-w", workspace_name])
 
     assert search_files_for_string([config_path], "zlib:") is True
     assert search_files_for_string([config_path], "zlib-test") is False
