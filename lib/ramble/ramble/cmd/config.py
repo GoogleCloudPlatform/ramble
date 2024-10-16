@@ -186,7 +186,10 @@ def config_edit(args):
         if not os.path.isdir(os.path.dirname(config_file)):
             fs.mkdirp(os.path.dirname(config_file))
 
-        return ramble.util.editor.editor(config_file)
+        try:
+            return ramble.util.editor.editor(config_file)
+        except TypeError:
+            logger.die("No valid editor was found.")
 
 
 def config_list(args):
