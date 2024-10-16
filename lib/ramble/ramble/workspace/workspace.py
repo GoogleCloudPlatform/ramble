@@ -1180,8 +1180,7 @@ class Workspace:
                             logger.debug(f"  Spec 1: {str(info)}")
                             logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
                             raise RambleConflictingDefinitionError(
-                                f"Compiler {comp} would be defined defined "
-                                "in multiple conflicting ways"
+                                f"Compiler {comp} would be defined " "in multiple conflicting ways"
                             )
 
             logger.debug(f"Trying to define packages for {env_name}")
