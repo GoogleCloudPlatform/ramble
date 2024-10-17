@@ -1608,6 +1608,11 @@ class Workspace:
         """Path to the shared license directory"""
         return os.path.join(self.shared_dir, workspace_shared_license_path)
 
+    def package_manager_dir(self, package_manager):
+        if package_manager is not None:
+            return os.path.join(self.software_dir, package_manager.name)
+        return os.path.join(self.software_dir, "no-package-manager")
+
     def template_path(self, name):
         if name in self._templates.keys():
             return os.path.join(self.config_dir, name + workspace_template_extension)
