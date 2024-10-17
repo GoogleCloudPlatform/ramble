@@ -7,6 +7,7 @@
 # except according to those terms.
 """Define base classes for package manager definitions"""
 
+import os
 import re
 import six
 import fnmatch
@@ -72,6 +73,18 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         new_copy._verbosity = self._verbosity
 
         return new_copy
+
+    def package_manager_dir(self, workspace):
+        """Get the path to the package manager's software environment directory
+
+        Args:
+            workspace (Workspace): Reference to workspace that owns a software directory
+
+        Returns:
+            (str) Path to package manager directory within workspace's software directory
+
+        """
+        return os.path.join(workspace.software_dir, self.name)
 
     def environment_required(self):
         app_inst = self.app_inst
