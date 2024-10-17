@@ -25,7 +25,7 @@ class TestMod2(BasicModifier):
 
     variable_modification(
         "test_var_mod",
-        " test-mod-2-append",
+        "test-mod-2-append",
         method="append",
         modes=["test"],
     )
