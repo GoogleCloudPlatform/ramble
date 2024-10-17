@@ -192,6 +192,7 @@ class PyxisEnroot(BasicModifier):
                         "container_mounts",
                         modification=prefix + exp_mount,
                         method="append",
+                        separator=",",
                         mode=self._usage_mode,
                     )
 
