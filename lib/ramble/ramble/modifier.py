@@ -150,10 +150,14 @@ class ModifierBase(metaclass=ModifierMeta):
                 else:
                     prev_val = ""
 
+                sep = ""
+                if prev_val != "" and prev_val is not None:
+                    sep = var_mod["separator"]
+
                 if var_mod["method"] == "append":
-                    mods[var] = f'{prev_val}{var_mod["modification"]}'
+                    mods[var] = f'{prev_val}{sep}{var_mod["modification"]}'
                 else:  # method == prepend
-                    mods[var] = f'{var_mod["modification"]}{prev_val}'
+                    mods[var] = f'{var_mod["modification"]}{sep}{prev_val}'
             else:  # method == set
                 mods[var] = var_mod["modification"]
 

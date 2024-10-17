@@ -54,7 +54,7 @@ class IntelAps(BasicModifier):
         "aps_flags", "-c mpi -r {aps_log_dir}", method="set", modes=["mpi"]
     )
     variable_modification(
-        "mpi_command", " aps {aps_flags} ", method="append", modes=["mpi"]
+        "mpi_command", "aps {aps_flags} ", method="append", modes=["mpi"]
     )
 
     modifier_variable(
