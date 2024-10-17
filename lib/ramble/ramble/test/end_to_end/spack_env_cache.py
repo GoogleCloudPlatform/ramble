@@ -91,9 +91,9 @@ ramble:
         )
 
         # spack env should be present only at the env_name level.
-        assert os.path.exists(os.path.join(ws.software_dir, "gromacs"))
-        assert os.path.exists(os.path.join(ws.software_dir, "g2"))
-        assert not os.path.exists(os.path.join(ws.software_dir, "g2.water_bare"))
+        assert os.path.exists(os.path.join(ws.software_dir, "spack", "gromacs"))
+        assert os.path.exists(os.path.join(ws.software_dir, "spack", "g2"))
+        assert not os.path.exists(os.path.join(ws.software_dir, "spack", "g2.water_bare"))
 
         # First encounter of an env_name (test1 -> gromacs, test2 -> g2) requires spack usage.
         test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
