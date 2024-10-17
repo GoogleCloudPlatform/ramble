@@ -85,7 +85,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, request)
     assert len(expected_templates) == 0
 
     # Test software environments
-    expected_envs = {"software/gromacs"}
+    expected_envs = {"software/spack/gromacs"}
     assert "software" in data
     for env in data["software"]:
         if env["name"] in expected_envs:

@@ -115,10 +115,10 @@ ramble:
 
         # Test software directories
         software_dirs = ["gromacs"]
-        software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
+        software_base_dir = ws1.software_dir
         assert os.path.exists(software_base_dir)
         for software_dir in software_dirs:
-            software_path = os.path.join(software_base_dir, software_dir)
+            software_path = os.path.join(software_base_dir, "spack", software_dir)
             assert os.path.exists(software_path)
 
             spack_file = os.path.join(software_path, "spack.yaml")
