@@ -88,26 +88,34 @@ class GcpMetadata(BasicModifier):
             )
 
         payloads = [
-            # type, end point, per_node
-            ("instance", "machine-type", False),
-            ("instance", "image", False),
-            ("instance", "hostname", False),
+            # type, end point, per_node, log_name
+            ("instance", "machine-type", False, None),
+            ("instance", "image", False, None),
+            ("instance", "hostname", False, None),
             (
                 "instance",
                 "id",
                 True,
+                None,
             ),  # True since we want the gid of every node
-            ("project", "numeric-project-id", False),
-            ("instance", "attributes/physical_host", True),
+            ("project", "numeric-project-id", False, None),
+            ("instance", "attributes/physical_host", True, None),
         ]
 
-        for type, end_point, per_node in payloads:
+        n_nodes = int(self.expander.expand_var_name("n_nodes"))
+        if n_nodes > 1 and self._usage_mode != "local":
+            # Single-out the vm_id of the executing-node
+            payloads.append(("instance", "id", False, "main-gid"))
+
+        for type, end_point, per_node, log_name in payloads:
             prefix = ""
             suffix = ""
             if per_node:
                 prefix = self.expander.expand_var("{metadata_parallel_prefix}")
                 suffix = self.expander.expand_var("{metadata_parallel_suffix}")
-            log_name = end_point.split("/")[-1]
+            log_name = (
+                log_name if log_name is not None else end_point.split("/")[-1]
+            )
             pre_cmds.append(
                 CommandExecutable(
                     "machine-type",
@@ -220,6 +228,12 @@ class GcpMetadata(BasicModifier):
         fom_regex=r"(?P<ghostname>.*internal)",
         group_name="ghostname",
         log_file="{experiment_run_dir}/gcp-metadata.hostname.log",
+    )
+    figure_of_merit(
+        "main-gid",
+        fom_regex=r"(?P<gid>.*)",
+        group_name="gid",
+        log_file="{experiment_run_dir}/gcp-metadata.main-gid.log",
     )
 
     # This returns a list of all known gids in the job
