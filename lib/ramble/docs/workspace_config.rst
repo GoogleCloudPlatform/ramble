@@ -964,7 +964,9 @@ Ramble automatically generates definitions for the following variables:
 * ``experiment_index`` - Index, in set, of experiment. If part of a chain,
   shares a value with its root.
 * ``env_path`` - Absolute path to
-  ``$workspace_root/software/{env_name}.{workload_name}``
+  ``$workspace_root/software/{package_manager_name}/{env_name}.{workload_name}``
+  if no package manager is used, ``{package_manager_name}`` is replaced with
+  ``no-package-manager``.
 * ``log_dir`` - Absolute path to ``$workspace_root/logs``
 * ``log_file`` - Absolute path to
   ``{experiment_run_dir}/{experiment_name}.out``
