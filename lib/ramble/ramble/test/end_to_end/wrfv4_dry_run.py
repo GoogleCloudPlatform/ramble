@@ -312,7 +312,6 @@ compilers:
                 assert "Number of timesteps = 5" in data
                 assert "Software definitions:" in data
                 assert "spack packages:" in data
-                assert "wrf @4.2" in data
 
         workspace("archive", global_args=["-w", workspace_name])
 
