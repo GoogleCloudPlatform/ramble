@@ -14,7 +14,7 @@ ramble:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
     processes_per_node: 16
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
   applications:
     gromacs: # Application name
@@ -23,11 +23,11 @@ ramble:
           experiments:
             '{type}_{n_ranks}ranks': # Arbitrary experiment name
               variables:
-                app_workloads: ['water_gmx50', 'water_bare']
+                app_workloads: [water_gmx50, water_bare]
                 n_ranks: [1, 2]
-                n_threads: '1'
+                n_threads: 1
                 size: '0003'
-                type: ['pme', 'rf']
+                type: [pme, rf]
               matrix:
               - app_workloads
               - type

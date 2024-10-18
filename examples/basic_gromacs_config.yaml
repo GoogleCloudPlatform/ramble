@@ -14,7 +14,7 @@ ramble:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
     processes_per_node: 16
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
   applications:
     gromacs: # Application name
@@ -23,30 +23,30 @@ ramble:
           experiments:
             pme_single_rank: # Arbitrary experiment name
               variables:
-                n_ranks: '1'
-                n_threads: '1'
+                n_ranks: 1
+                n_threads: 1
                 size: '0003'
-                type: 'pme'
+                type: pme
             rf_single_rank:
               variables:
-                n_ranks: '1'
-                n_threads: '1'
+                n_ranks: 1
+                n_threads: 1
                 size: '0003'
-                type: 'rf'
+                type: rf
         water_bare:
           experiments:
             pme_single_rank:
               variables:
-                n_ranks: '1'
-                n_threads: '1'
+                n_ranks: 1
+                n_threads: 1
                 size: '0003'
-                type: 'pme'
+                type: pme
             rf_single_rank:
               variables:
-                n_ranks: '1'
-                n_threads: '1'
+                n_ranks: 1
+                n_threads: 1
                 size: '0003'
-                type: 'rf'
+                type: rf
   software:
     packages:
       gcc9:

@@ -27,12 +27,12 @@ ramble:
                 custom_executables:
                   start_time:
                     template:
-                    - 'date +%s'
+                    - date +%s
                     redirect: '{experiment_run_dir}/start_time'
                     use_mpi: false
                   end_time:
                     template:
-                    - 'date +%s'
+                    - date +%s
                     redirect: '{experiment_run_dir}/end_time'
                     use_mpi: false
               variables:

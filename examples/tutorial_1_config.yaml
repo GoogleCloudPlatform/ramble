@@ -18,7 +18,7 @@ ramble:
           experiments:
             test: # Arbitrary experiment name
               variables:
-                n_ranks: '1'
+                n_ranks: 1
   software:
     packages: {}
     environments: {}
