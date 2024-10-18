@@ -1742,6 +1742,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
             else:
                 self.result.contexts.append(context_map)
 
+    register_phase(
+        "append_results_to_workspace", pipeline="analyze", run_after=["analyze_experiments"]
+    )
+
+    def _append_results_to_workspace(self, workspace, app_inst=None):
+        """Phase for injected experiment results into workspace results
+
+        This allows an experiment to register its results into the workspace,
+        so when the workspace dumps results they are included.
+        """
+
         workspace.append_result(self.result.to_dict())
 
     def calculate_statistics(self, workspace):

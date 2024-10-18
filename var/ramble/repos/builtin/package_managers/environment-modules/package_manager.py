@@ -29,6 +29,8 @@ class EnvironmentModules(PackageManagerBase):
 
     maintainers("douglasjacobsen")
 
+    _spec_prefix = "environment_modules"
+
     register_phase(
         "write_module_commands",
         pipeline="setup",
@@ -98,3 +100,31 @@ class EnvironmentModules(PackageManagerBase):
     def module_load(self):
         shell = ramble.config.get("config:shell")
         return [f"{source_str(shell)} " + "{env_path}/module_loads"]
+
+    def _add_software_to_results(self, workspace, app_inst=None):
+        app_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
+
+        require_env = self.environment_required()
+
+        software_envs = workspace.software_environments
+        software_env = software_envs.render_environment(
+            app_context, self.app_inst.expander, self, require=require_env
+        )
+
+        if self._spec_prefix not in app_inst.result.software:
+            app_inst.result.software[self._spec_prefix] = []
+
+        package_list = app_inst.result.software[self._spec_prefix]
+
+        if software_env is not None:
+            for spec in software_envs.package_specs_for_environment(
+                software_env
+            ):
+                parts = spec.split("/")
+                name = parts[0]
+                version = "/".join(parts[1:]) if len(parts) > 1 else ""
+                package_list.append(
+                    {"name": name, "version": version, "variants": ""}
+                )
