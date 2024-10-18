@@ -8,7 +8,6 @@
 """Perform tests of the Application class"""
 
 import pytest
-import enum
 import deprecation
 
 from ramble.appkit import *  # noqa
@@ -19,27 +18,12 @@ app_types = [
     ExecutableApplication,  # noqa: F405
 ]
 
-func_types = enum.Enum("func_types", ["method", "directive"])
-test_func_types = [func_types.method]
-
-
-def generate_app_class(base_class):
-
-    class GeneratedClass(base_class):
-        _language_classes = base_class._language_classes.copy()
-
-        def __init__(self, file_path):
-            super().__init__(file_path)
-
-    return GeneratedClass
-
 
 @deprecation.fail_if_not_removed
 @pytest.mark.parametrize("app_class", app_types)
 def test_application_type_features(app_class):
-    test_class = generate_app_class(app_class)
     app_path = "/path/to/app"
-    test_app = test_class(app_path)
+    test_app = app_class(app_path)
     assert hasattr(test_app, "workloads")
     assert hasattr(test_app, "executables")
     assert hasattr(test_app, "figures_of_merit")
@@ -51,31 +35,20 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, "package_manager_configs")
 
 
-def add_workload(app_inst, wl_num=1, func_type=func_types.directive):
+def add_workload(app_inst, wl_num=1):
     wl_name = "TestWorkload%s" % wl_num
     exec_list = ["Workload%sExec1" % wl_num]
     exec_var = "Workload%sExec2" % wl_num
     inpt_list = ["Workload%sInput1" % wl_num]
     inpt_var = "Workload%sInput2" % wl_num
 
-    if func_type == func_types.directive:
-        workload(
-            wl_name,
-            executables=exec_list,
-            executable=exec_var,  # noqa: F405
-            inputs=inpt_list,
-            input=inpt_var,
-        )(app_inst)
-    elif func_type == func_types.method:
-        app_inst.workload(
-            wl_name,
-            executables=exec_list,
-            executable=exec_var,  # noqa: F405
-            inputs=inpt_list,
-            input=inpt_var,
-        )
-    else:
-        assert False
+    app_inst.workload(
+        wl_name,
+        executables=exec_list,
+        executable=exec_var,  # noqa: F405
+        inputs=inpt_list,
+        input=inpt_var,
+    )
 
     workload_def = {"name": wl_name, "executables": exec_list.copy(), "inputs": inpt_list.copy()}
 
@@ -85,7 +58,7 @@ def add_workload(app_inst, wl_num=1, func_type=func_types.directive):
     return workload_def
 
 
-def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
+def add_executable(app_inst, exe_num=1):
     nompi_bg_exec_name = "SerialExe%s" % exe_num
     mpi_exec_name = "MpiExe%s" % exe_num
     nompi_list_exec_name = "MultiLineSerialExe%s" % exe_num
@@ -94,58 +67,30 @@ def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
     redirect_test = "{output_file}"
     output_capture = ">>"
 
-    if func_type == func_types.directive:
-        executable(
-            nompi_bg_exec_name,
-            template,  # noqa: F405
-            use_mpi=False,
-            redirect=redirect_test,
-            output_capture=output_capture,
-            run_in_background=True,
-        )(app_inst)
+    app_inst.executable(
+        nompi_bg_exec_name,
+        template,  # noqa: F405
+        use_mpi=False,
+        redirect=redirect_test,
+        output_capture=output_capture,
+        run_in_background=True,
+    )
 
-        executable(mpi_exec_name, template, use_mpi=True)(app_inst)  # noqa: F405
+    app_inst.executable(mpi_exec_name, template, use_mpi=True)  # noqa: F405
 
-        executable(
-            nompi_list_exec_name,  # noqa: F405
-            template=[template, template, template],
-            use_mpi=False,
-            redirect=None,
-        )(app_inst)
+    app_inst.executable(
+        nompi_list_exec_name,  # noqa: F405
+        template=[template, template, template],
+        use_mpi=False,
+        redirect=None,
+    )
 
-        executable(
-            mpi_list_exec_name,
-            template=[template, template],  # noqa: F405
-            use_mpi=True,
-            redirect=redirect_test,
-        )(app_inst)
-    elif func_type == func_types.method:
-        app_inst.executable(
-            nompi_bg_exec_name,
-            template,  # noqa: F405
-            use_mpi=False,
-            redirect=redirect_test,
-            output_capture=output_capture,
-            run_in_background=True,
-        )
-
-        app_inst.executable(mpi_exec_name, template, use_mpi=True)  # noqa: F405
-
-        app_inst.executable(
-            nompi_list_exec_name,  # noqa: F405
-            template=[template, template, template],
-            use_mpi=False,
-            redirect=None,
-        )
-
-        app_inst.executable(
-            mpi_list_exec_name,
-            template=[template, template],  # noqa: F405
-            use_mpi=True,
-            redirect=redirect_test,
-        )
-    else:
-        assert False
+    app_inst.executable(
+        mpi_list_exec_name,
+        template=[template, template],  # noqa: F405
+        use_mpi=True,
+        redirect=redirect_test,
+    )
 
     exec_def = {
         nompi_bg_exec_name: {
@@ -176,31 +121,20 @@ def add_executable(app_inst, exe_num=1, func_type=func_types.directive):
     return exec_def
 
 
-def add_figure_of_merit(app_inst, fom_num=1, func_type=func_types.directive):
+def add_figure_of_merit(app_inst, fom_num=1):
     fom_name = "TestFom%s" % fom_num
     fom_log = "{log_file}"
     fom_regex = ".*(?P<fom%s_val>[0-9]+).*" % fom_num
     fom_group = "fom%s_val" % fom_num
     fom_units = "(s)"
 
-    if func_type == func_types.directive:
-        figure_of_merit(
-            fom_name,
-            log_file=fom_log,
-            fom_regex=fom_regex,  # noqa: F405
-            group_name=fom_group,
-            units=fom_units,
-        )(app_inst)
-    elif func_type == func_types.method:
-        app_inst.figure_of_merit(
-            fom_name,
-            log_file=fom_log,
-            fom_regex=fom_regex,  # noqa: F405
-            group_name=fom_group,
-            units=fom_units,
-        )
-    else:
-        assert False
+    app_inst.figure_of_merit(
+        fom_name,
+        log_file=fom_log,
+        fom_regex=fom_regex,  # noqa: F405
+        group_name=fom_group,
+        units=fom_units,
+    )
 
     fom_def = {
         fom_name: {
@@ -214,23 +148,14 @@ def add_figure_of_merit(app_inst, fom_num=1, func_type=func_types.directive):
     return fom_def
 
 
-def add_input_file(app_inst, input_num=1, func_type=func_types.directive):
+def add_input_file(app_inst, input_num=1):
     input_name = "MainTestInput%s" % input_num
     input_url = "https://input%s.com/file.tar.gz" % input_num
     input_desc = "This is a test input file #%s" % input_num
     input_target = "{application_input_dir}/test_dir%s" % input_num
 
     # Add an input with a target dir
-    if func_type == func_types.directive:
-        input_file(input_name, input_url, input_desc, target_dir=input_target)(  # noqa: F405
-            app_inst
-        )
-    elif func_type == func_types.method:
-        app_inst.input_file(
-            input_name, input_url, input_desc, target_dir=input_target  # noqa: F405
-        )
-    else:
-        assert False
+    app_inst.input_file(input_name, input_url, input_desc, target_dir=input_target)  # noqa: F405
 
     input_defs = {}
     input_defs[input_name] = {
@@ -244,12 +169,7 @@ def add_input_file(app_inst, input_num=1, func_type=func_types.directive):
     input_desc = "This is a test secondary input file #%s" % input_num
 
     # Add an input without a target dir
-    if func_type == func_types.directive:
-        input_file(input_name, input_url, input_desc)(app_inst)  # noqa: F405
-    elif func_type == func_types.method:
-        app_inst.input_file(input_name, input_url, input_desc)  # noqa: F405
-    else:
-        assert False
+    app_inst.input_file(input_name, input_url, input_desc)  # noqa: F405
 
     input_defs[input_name] = {
         "url": input_url,
@@ -262,7 +182,7 @@ def add_input_file(app_inst, input_num=1, func_type=func_types.directive):
 
 # TODO: can this be dried with the modifier language add_compiler?
 @deprecation.fail_if_not_removed
-def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
+def add_compiler(app_inst, spec_num=1):
     spec_name = "Compiler%spec_num"
     spec_pkg_spec = f"compiler_base@{spec_num}.0 +var1 ~var2"
     spec_compiler_spec = "compiler1_base@{spec_num}"
@@ -270,16 +190,9 @@ def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
     spec_defs = {}
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
-    if func_type == func_types.directive:
-        define_compiler(
-            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
-        )(app_inst)
-    elif func_type == func_types.method:
-        app_inst.define_compiler(
-            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
-        )
-    else:
-        assert False
+    app_inst.define_compiler(
+        spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
+    )
 
     spec_name = "OtherCompiler%spec_num"
     spec_pkg_spec = f"compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64"
@@ -287,21 +200,14 @@ def add_compiler(app_inst, spec_num=1, func_type=func_types.directive):
 
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
-    if func_type == func_types.directive:
-        define_compiler(
-            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: f405
-        )(app_inst)
-    elif func_type == func_types.method:
-        app_inst.define_compiler(
-            spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
-        )
-    else:
-        assert False
+    app_inst.define_compiler(
+        spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
+    )
 
     return spec_defs
 
 
-def add_software_spec(app_inst, spec_num=1, func_type=func_types.directive):
+def add_software_spec(app_inst, spec_num=1):
     spec_name = "NoMPISpec%s" % spec_num
     spec_pkg_spec = f"NoMPISpec@{spec_num} +var1 ~var2 target=x86_64"
     spec_compiler = "spec_compiler1@1.1"
@@ -309,16 +215,7 @@ def add_software_spec(app_inst, spec_num=1, func_type=func_types.directive):
     spec_defs = {}
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler": spec_compiler}
 
-    if func_type == func_types.directive:
-        software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)(  # noqa: F405
-            app_inst
-        )
-    elif func_type == func_types.method:
-        app_inst.software_spec(
-            spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler  # noqa: F405
-        )
-    else:
-        assert False
+    app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)  # noqa: F405
 
     spec_name = "MPISpec%s" % spec_num
     spec_pkg_spec = f"MPISpec@{spec_num} +var1 ~var2 target=x86_64"
@@ -326,27 +223,17 @@ def add_software_spec(app_inst, spec_num=1, func_type=func_types.directive):
 
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler": spec_compiler}
 
-    if func_type == func_types.directive:
-        software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)(  # noqa: F405
-            app_inst
-        )
-    elif func_type == func_types.method:
-        app_inst.software_spec(
-            spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler  # noqa: F405
-        )
-    else:
-        assert False
+    app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)  # noqa: F405
 
     return spec_defs
 
 
-@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
-def test_workload_directive(app_class, func_type):
-    test_class = generate_app_class(app_class)
-    app_inst = test_class("/not/a/path")
+def test_workload_directive(app_class):
     test_defs = {}
-    test_defs.update(add_workload(app_inst, func_type=func_type))
+
+    app_inst = app_class("/not/a/path")
+    test_defs.update(add_workload(app_inst))
 
     wl_name = test_defs["name"]
 
@@ -361,13 +248,12 @@ def test_workload_directive(app_class, func_type):
         assert app_inst.workloads[wl_name].find_input(test) is not None
 
 
-@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
-def test_executable_directive(app_class, func_type):
-    test_class = generate_app_class(app_class)
-    app_inst = test_class("/not/a/path")
+def test_executable_directive(app_class):
     test_defs = {}
-    test_defs.update(add_executable(app_inst, func_type=func_type))
+
+    app_inst = app_class("/not/a/path")
+    test_defs.update(add_executable(app_inst))
 
     assert hasattr(app_inst, "executables")
     for exe_name, conf in test_defs.items():
@@ -377,13 +263,12 @@ def test_executable_directive(app_class, func_type):
             assert conf_val == getattr(app_inst.executables[exe_name], conf_name)
 
 
-@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
-def test_figure_of_merit_directive(app_class, func_type):
-    test_class = generate_app_class(app_class)
-    app_inst = test_class("/not/a/path")
+def test_figure_of_merit_directive(app_class):
     test_defs = {}
-    test_defs.update(add_figure_of_merit(app_inst, func_type=func_type))
+
+    app_inst = app_class("/not/a/path")
+    test_defs.update(add_figure_of_merit(app_inst))
 
     assert hasattr(app_inst, "figures_of_merit")
     for fom_name, conf in test_defs.items():
@@ -393,13 +278,12 @@ def test_figure_of_merit_directive(app_class, func_type):
             assert app_inst.figures_of_merit[fom_name][conf_name] == conf_val
 
 
-@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
-def test_input_file_directive(app_class, func_type):
-    test_class = generate_app_class(app_class)
-    app_inst = test_class("/not/a/path")
+def test_input_file_directive(app_class):
     test_defs = {}
-    test_defs.update(add_input_file(app_inst, func_type=func_type))
+
+    app_inst = app_class("/not/a/path")
+    test_defs.update(add_input_file(app_inst))
 
     assert hasattr(app_inst, "inputs")
     for input_name, conf in test_defs.items():
@@ -413,14 +297,13 @@ def test_input_file_directive(app_class, func_type):
         assert "expand" in app_inst.inputs[input_name]
 
 
-@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
-def test_define_compiler_directive(app_class, func_type):
-    test_class = generate_app_class(app_class)
-    app_inst = test_class("/not/a/path")
+def test_define_compiler_directive(app_class):
     test_defs = {}
-    test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
-    test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
+
+    app_inst = app_class("/not/a/path")
+    test_defs.update(add_compiler(app_inst, 1))
+    test_defs.update(add_compiler(app_inst, 2))
 
     assert hasattr(app_inst, "compilers")
     for name, info in test_defs.items():
@@ -429,14 +312,13 @@ def test_define_compiler_directive(app_class, func_type):
             assert app_inst.compilers[name][key] == value
 
 
-@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
-def test_software_spec_directive(app_class, func_type):
-    test_class = generate_app_class(app_class)
-    app_inst = test_class("/not/a/path")
+def test_software_spec_directive(app_class):
     test_defs = {}
-    test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
-    test_defs.update(add_software_spec(app_inst, 2, func_type=func_type))
+
+    app_inst = app_class("/not/a/path")
+    test_defs.update(add_software_spec(app_inst, 1))
+    test_defs.update(add_software_spec(app_inst, 2))
 
     assert hasattr(app_inst, "software_specs")
     for name, info in test_defs.items():
