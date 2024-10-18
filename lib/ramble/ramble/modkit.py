@@ -20,7 +20,6 @@ from ramble.util.logger import logger as tty
 
 from ramble.modifier import ModifierBase
 from ramble.modifier_types.basic import BasicModifier
-from ramble.modifier_types.spack import SpackModifier
 from ramble.spec import Spec
 
 import ramble.language.modifier_language

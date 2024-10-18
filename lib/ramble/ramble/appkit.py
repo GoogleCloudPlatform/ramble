@@ -17,7 +17,6 @@ from llnl.util.filesystem import *
 
 from ramble.application import ApplicationBase
 from ramble.application_types.executable import ExecutableApplication
-from ramble.application_types.spack import SpackApplication
 from ramble.spec import Spec
 
 import ramble.language.application_language
