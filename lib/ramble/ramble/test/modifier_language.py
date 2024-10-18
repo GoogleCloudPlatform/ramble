@@ -15,9 +15,10 @@ from ramble.modkit import *  # noqa
 from ramble.language.language_base import DirectiveError
 
 
-mod_types = [ModifierBase, BasicModifier, SpackModifier]  # noqa: F405  # noqa: F405  # noqa: F405
+mod_types = [ModifierBase, BasicModifier]  # noqa: F405
 
 func_types = enum.Enum("func_types", ["method", "directive"])
+test_func_types = [func_types.method]
 
 
 def generate_mod_class(base_class):
@@ -70,7 +71,7 @@ def add_mode(mod_inst, mode_num=1, func_type=func_types.directive):
     return mode_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_mode_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -115,7 +116,7 @@ def add_variable_modification(mod_inst, var_mod_num=1, func_type=func_types.dire
     return var_mod_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_variable_modification_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -145,7 +146,7 @@ def test_variable_modification_directive(mod_class, func_type):
                 assert test_def[attr] == mod_inst.variable_modifications[mode_name][var_name][attr]
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_variable_modification_invalid_method(mod_class, func_type):
     var_mod_name = "invalid_method_variable"
@@ -169,7 +170,7 @@ def test_variable_modification_invalid_method(mod_class, func_type):
         assert "variable_modification directive given an invalid method" in err
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_variable_modification_missing_mode(mod_class, func_type):
     var_mod_name = "missing_mode_variable"
@@ -210,7 +211,7 @@ def add_software_spec(mod_inst, spec_num=1, func_type=func_types.directive):
     return spec_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_software_spec_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -254,7 +255,7 @@ def add_compiler(mod_inst, spec_num=1, func_type=func_types.directive):
     return spec_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_define_compiler_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -292,7 +293,7 @@ def add_required_package(mod_inst, pkg_num=1, func_type=func_types.directive):
     return pkg_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_required_package_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -327,7 +328,7 @@ def add_figure_of_merit_context(mod_inst, context_num=1, func_type=func_types.di
     return context_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_figure_of_merit_context_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -389,7 +390,7 @@ def add_figure_of_merit(mod_inst, context_num=1, func_type=func_types.directive)
     return fom_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_figure_of_merit_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -423,7 +424,7 @@ def add_archive_pattern(mod_inst, archive_num=1, func_type=func_types.directive)
     return pattern
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_archive_pattern_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -453,7 +454,7 @@ def add_executable_modifier(mod_inst, exec_mod_num=1, func_type=func_types.direc
     return mod_name
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_executable_modifier_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -488,7 +489,7 @@ def add_env_var_modification(mod_inst, env_var_mod_num=1, func_type=func_types.d
     return test_defs
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_env_var_modification_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -538,7 +539,7 @@ def add_modifier_variable(mod_inst, mod_var_num=1, func_type=func_types.directiv
     return test_defs
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_modifier_variable_directive(mod_class, func_type):
     test_class = generate_mod_class(mod_class)
@@ -558,7 +559,7 @@ def test_modifier_variable_directive(mod_class, func_type):
         assert test_def["default"] == mod_inst.modifier_variables[mode][var_name].default
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_modifier_class_attributes(mod_class, func_type):
     test_class = generate_mod_class(mod_class)

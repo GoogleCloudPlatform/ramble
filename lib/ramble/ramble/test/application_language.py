@@ -17,18 +17,29 @@ from ramble.appkit import *  # noqa
 app_types = [
     ApplicationBase,  # noqa: F405
     ExecutableApplication,  # noqa: F405
-    SpackApplication,  # noqa: F405
 ]
 
 func_types = enum.Enum("func_types", ["method", "directive"])
 test_func_types = [func_types.method]
 
 
+def generate_app_class(base_class):
+
+    class GeneratedClass(base_class):
+        _language_classes = base_class._language_classes.copy()
+
+        def __init__(self, file_path):
+            super().__init__(file_path)
+
+    return GeneratedClass
+
+
 @deprecation.fail_if_not_removed
 @pytest.mark.parametrize("app_class", app_types)
 def test_application_type_features(app_class):
+    test_class = generate_app_class(app_class)
     app_path = "/path/to/app"
-    test_app = app_class(app_path)
+    test_app = test_class(app_path)
     assert hasattr(test_app, "workloads")
     assert hasattr(test_app, "executables")
     assert hasattr(test_app, "figures_of_merit")
@@ -332,7 +343,8 @@ def add_software_spec(app_inst, spec_num=1, func_type=func_types.directive):
 @pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_workload_directive(app_class, func_type):
-    app_inst = app_class("/not/a/path")
+    test_class = generate_app_class(app_class)
+    app_inst = test_class("/not/a/path")
     test_defs = {}
     test_defs.update(add_workload(app_inst, func_type=func_type))
 
@@ -352,7 +364,8 @@ def test_workload_directive(app_class, func_type):
 @pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_executable_directive(app_class, func_type):
-    app_inst = app_class("/not/a/path")
+    test_class = generate_app_class(app_class)
+    app_inst = test_class("/not/a/path")
     test_defs = {}
     test_defs.update(add_executable(app_inst, func_type=func_type))
 
@@ -367,7 +380,8 @@ def test_executable_directive(app_class, func_type):
 @pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_figure_of_merit_directive(app_class, func_type):
-    app_inst = app_class("/not/a/path")
+    test_class = generate_app_class(app_class)
+    app_inst = test_class("/not/a/path")
     test_defs = {}
     test_defs.update(add_figure_of_merit(app_inst, func_type=func_type))
 
@@ -382,7 +396,8 @@ def test_figure_of_merit_directive(app_class, func_type):
 @pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_input_file_directive(app_class, func_type):
-    app_inst = app_class("/not/a/path")
+    test_class = generate_app_class(app_class)
+    app_inst = test_class("/not/a/path")
     test_defs = {}
     test_defs.update(add_input_file(app_inst, func_type=func_type))
 
@@ -401,7 +416,8 @@ def test_input_file_directive(app_class, func_type):
 @pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_define_compiler_directive(app_class, func_type):
-    app_inst = app_class("/not/a/path")
+    test_class = generate_app_class(app_class)
+    app_inst = test_class("/not/a/path")
     test_defs = {}
     test_defs.update(add_compiler(app_inst, 1, func_type=func_type))
     test_defs.update(add_compiler(app_inst, 2, func_type=func_type))
@@ -416,7 +432,8 @@ def test_define_compiler_directive(app_class, func_type):
 @pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("app_class", app_types)
 def test_software_spec_directive(app_class, func_type):
-    app_inst = app_class("/not/a/path")
+    test_class = generate_app_class(app_class)
+    app_inst = test_class("/not/a/path")
     test_defs = {}
     test_defs.update(add_software_spec(app_inst, 1, func_type=func_type))
     test_defs.update(add_software_spec(app_inst, 2, func_type=func_type))

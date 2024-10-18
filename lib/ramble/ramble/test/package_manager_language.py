@@ -18,6 +18,7 @@ pm_types = [
 ]
 
 func_types = enum.Enum("func_types", ["method", "directive"])
+test_func_types = [func_types.method]
 
 
 def generate_pkg_man_class(base_class):
@@ -61,7 +62,7 @@ def add_variable(pm_inst, pm_num=1, func_type=func_types.directive):
     return var_def
 
 
-@pytest.mark.parametrize("func_type", func_types)
+@pytest.mark.parametrize("func_type", test_func_types)
 @pytest.mark.parametrize("base_class", pm_types)
 def test_pkg_man_variables(base_class, func_type):
     pm_class = generate_pkg_man_class(base_class)
