@@ -53,7 +53,9 @@ def default_mode(name, **kwargs):
 
 
 @modifier_directive("variable_modifications")
-def variable_modification(name, modification, method="set", mode=None, modes=None, **kwargs):
+def variable_modification(
+    name, modification, method="set", mode=None, modes=None, separator=" ", **kwargs
+):
     """Define a new variable modification for a mode in this modifier.
 
     A variable modification will apply a change to a defined variable within an experiment.
@@ -64,6 +66,8 @@ def variable_modification(name, modification, method="set", mode=None, modes=Non
         method: How the modification should be applied
         mode: Single mode to group this modification into
         modes: List of modes to group this modification into
+        separator: Optional separator to use when modifying with 'append' or
+                   'prepend' methods.
 
     Supported values are 'append', 'prepend', and 'set':
 
@@ -94,6 +98,7 @@ def variable_modification(name, modification, method="set", mode=None, modes=Non
             mod.variable_modifications[mode_name][name] = {
                 "modification": modification,
                 "method": method,
+                "separator": separator,
             }
 
     return _execute_variable_modification

@@ -34,14 +34,14 @@ class TestMod(BasicModifier):
 
     variable_modification(
         "test_var_mod",
-        " test-mod-append",
+        "test-mod-append",
         method="append",
         modes=["test"],
     )
 
     variable_modification(
         "mpi_command",
-        'echo "prefix_mpi_command" >> {log_file}; ',
+        'echo "prefix_mpi_command" >> {log_file};',
         method="prepend",
         modes=["test"],
     )
