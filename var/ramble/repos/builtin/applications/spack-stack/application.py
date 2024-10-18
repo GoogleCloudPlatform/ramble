@@ -49,6 +49,7 @@ class SpackStack(ExecutableApplication):
         "create",
         executables=[
             "builtin::remove_env_files",
+            "builtin::find_externals",
             "configure",
             "install",
             "builtin::remove_packages",
@@ -68,8 +69,15 @@ class SpackStack(ExecutableApplication):
 
     workload_variable(
         "install_flags",
-        default="",
+        default="--fail-fast",
         description="Flags to use for `spack install`",
+        workloads=["create"],
+    )
+
+    workload_variable(
+        "external_packages",
+        default=[],
+        description="List of packages to `spack external find` and mark not buildable",
         workloads=["create"],
     )
 
@@ -144,6 +152,28 @@ class SpackStack(ExecutableApplication):
 
     def remove_env_files(self):
         cmds = ["rm -f {env_path}/spack.lock", "rm -rf {env_path}/.spack-env"]
+        return cmds
+
+    register_builtin("find_externals", required=False)
+
+    def find_externals(self):
+        """Inject commands to find external non buildable packages
+
+        This allows spack find external system packages before building,
+        to ensure system packages are used for some dependencies.
+        """
+        cmds = []
+
+        # Package finding is only supported in bash or sh
+        if ramble.config.get("config:shell") in ["sh", "bash"]:
+            # Do not expand the `external_packages` variable, so it will not be
+            # used to render experiments.
+            external_packages = self.expander.expand_var_name(
+                "external_packages", merge_used_stage=False, typed=True
+            )
+            self.expander.flush_used_variable_stage()
+            for pkg in external_packages:
+                cmds.append(f"spack external find --not-buildable {pkg}")
         return cmds
 
     register_builtin("remove_packages", required=False)
