@@ -21,7 +21,7 @@ definition to modify the object, for example:
 
       class Gromacs(ExecutableApplication):
           # Required package directive
-          required_package("zlib", package_manager="spack")
+          required_package("gromacs", package_manager="spack")
 
 In the above example, "required_package" is a ramble directive
 
@@ -48,7 +48,7 @@ def archive_pattern(pattern):
     is being performed.
 
     Args:
-      pattern: Pattern that refers to files to archive
+      pattern (str): Pattern that refers to files to archive
     """
 
     def _execute_archive_pattern(obj):
@@ -64,11 +64,11 @@ def figure_of_merit_context(name, regex, output_format):
     Defines a new context to contain figures of merit.
 
     Args:
-      name: High level name of the context. Can be referred to in
-            the figure of merit
-      regex: Regular expression, using group names, to match a context.
-      output_format: String, using python keywords {group_name} to extract
-                     group names from context regular expression.
+      name (str): High level name of the context. Can be referred to in
+                  the figure of merit
+      regex (str): Regular expression, using group names, to match a context.
+      output_format (str): String, using python keywords {group_name} to extract
+                           group names from context regular expression.
     """
 
     def _execute_figure_of_merit_context(obj):
@@ -84,11 +84,14 @@ def figure_of_merit(name, fom_regex, group_name, log_file="{log_file}", units=""
     Defines a new figure of merit.
 
     Args:
-      name: High level name of the figure of merit
-      log_file: File the figure of merit can be extracted from
-      fom_regex: A regular expression using named groups to extract the FOM
-      group_name: The name of the group that the FOM should be pulled from
-      units: The units associated with the FOM
+      name (str): High level name of the figure of merit
+      log_file (str): File the figure of merit can be extracted from
+      fom_regex (str): A regular expression using named groups to extract the FOM
+      group_name (str): The name of the group that the FOM should be pulled from
+      units (str): The units associated with the FOM
+      contexts (list(str)): List of contexts (defined by
+                            figure_of_merit_context) this figure of merit
+                            should exist in.
     """
 
     def _execute_figure_of_merit(obj):
@@ -223,21 +226,21 @@ def success_criteria(
 
     These will be checked during the analyze step to see if a job exited properly.
 
-    Arguments:
-      name: The name of this success criteria
-      mode: The type of success criteria that will be validated
-            Valid values are: 'string', 'application_function', and 'fom_comparison'
-      match: For mode='string'. Value to check indicate success (if found, it
-             would mark success)
-      file: For mode='string'. File success criteria should be located in
-      fom_name: For mode='fom_comparison'. Name of fom for a criteria.
-                Accepts globbing.
-      fom_context: For mode='fom_comparison'. Context the fom is contained
-                   in. Accepts globbing.
-      formula: For mode='fom_comparison'. Formula to use to evaluate success.
-               '{value}' keyword is set as the value of the FOM.
-      anti_match: For mode='string'. Value to check indicate failure.
-                  This setting and `match` are mutually exclusive.
+    Args:
+      name (str): The name of this success criteria
+      mode (str): The type of success criteria that will be validated
+                  Valid values are: 'string', 'application_function', and 'fom_comparison'
+      match (str): For mode='string'. Value to check indicate success (if found, it
+                   would mark success)
+      file (str): For mode='string'. File success criteria should be located in
+      fom_name (str): For mode='fom_comparison'. Name of fom for a criteria.
+                      Accepts globbing.
+      fom_context (str): For mode='fom_comparison'. Context the fom is contained
+                         in. Accepts globbing.
+      formula (str): For mode='fom_comparison'. Formula to use to evaluate success.
+                     '{value}' keyword is set as the value of the FOM.
+      anti_match (str): For mode='string'. Value to check indicate failure.
+                        This setting and `match` are mutually exclusive.
     """
 
     def _execute_success_criteria(obj):
@@ -302,6 +305,14 @@ def register_builtin(name, required=True, injection_method="prepend", depends_on
     Options are:
     - 'prepend' -- This builtin will be injected at the beginning of the executable list
     - 'append' -- This builtin will be injected at the end of the executable list
+
+    Args:
+        name (str): Name of builtin (should be the name of a class method) to register
+        required (boolean): Whether the builtin will be auto-injected or not
+        injection_method (str): The method of injecting the builtin. Can be
+                                'prepend' or 'append'
+        depends_on (list(str)): The names of builtins this builtin depends on
+                                (and must execute after).
     """
     supported_injection_methods = ["prepend", "append"]
 
@@ -339,10 +350,10 @@ def register_phase(name, pipeline=None, run_before=[], run_after=[]):
     instance of a phase will show up in the resulting dependency list for a phase.
 
     Args:
-    - name: The name of the phase. Phases are functions named '_<phase>'.
-    - pipeline: The name of the pipeline this phase should be registered into.
-    - run_before: A list of phase names this phase should run before
-    - run_after: A list of phase names this phase should run after
+      name (str): The name of the phase. Phases are functions named '_<phase>'.
+      pipeline (str): The name of the pipeline this phase should be registered into.
+      run_before (list(str)): A list of phase names this phase should run before
+      run_after (list(str)): A list of phase names this phase should run after
     """
 
     def _execute_register_phase(obj):
@@ -403,7 +414,8 @@ def maintainers(*names: str):
     """Add a new maintainer directive, to specify maintainers in a declarative way.
 
     Args:
-        names: GitHub username for the maintainer
+        names (str(s)): GitHub username(s) for the maintainer. Can provide
+                        multiple names as separate arguments.
     """
 
     def _execute_maintainer(obj):
@@ -419,7 +431,8 @@ def tags(*values: str):
     """Add a new tag directive, to specify tags in a declarative way.
 
     Args:
-        values: Value to mark as a tag
+        values (str(s)): Values to mark as a tag. Can provide multiple values
+                         as separate arguments.
     """
 
     def _execute_tag(obj):
@@ -438,7 +451,8 @@ def target_shells(shell_support_pattern=None):
     then it assumes all shells are supported.
 
     Args:
-        shell_support_pattern: The glob pattern that is used to match with the configured shell
+        shell_support_pattern (str): The glob pattern that is used to match
+                                     with the configured shell
     """
 
     def _execute_target_shells(obj):

@@ -63,12 +63,12 @@ def workload(
     its application.
 
     Args:
-        executable: The name of an executable to be used
-        executables: A list of executable names to be used
-        input (Optional): The name of an input be used
-        inputs (Optional): A list of input names that will be used
+        executable (str): The name of an executable to be used
+        executables (str): A list of executable names to be used
+        input (str): Optional, name of an input be used
+        inputs (str): Optional, A list of input names that will be used
 
-    Either executable, or executables is a required input argument.
+    One of executable, or executables is required as an input argument.
     """
 
     def _execute_workload(app):
@@ -93,8 +93,8 @@ def workload_group(name, workloads=[], mode=None, **kwargs):
     application.
 
     Args:
-        name: The name of the group
-        workloads: A list of workloads to be grouped
+        name (str): The name of the group
+        workloads (list(str)): A list of workloads to be grouped
     """
 
     def _execute_workload_groups(app):
@@ -126,16 +126,17 @@ def executable(name, template, **kwargs):
         template (list[str] or str): The template command this executable should generate from
 
     Optional Args:
-        use_mpi or mpi: (Boolean) determines if this executable should be
+        use_mpi or mpi (boolean): determines if this executable should be
                         wrapped with an `mpirun` like command or not.
 
-        variables (dict): dictionary of variable definitions to use for this executable only
-        redirect (Optional): Sets the path for outputs to be written to.
+        variables (dict): Dictionary of variable definitions to use for this
+                          executable only
+        redirect (str): Optional, sets the path for outputs to be written to.
                              defaults to {log_file}
-        output_capture (Optional): Declare which ouptu (stdout, stderr, both) to
-                                   capture. Defaults to stdout
-        run_in_background (Optional): Declare if the command should run in the background.
-                                      Defaults to False
+        output_capture (str): Optional, Declare which output (stdout, stderr,
+                              both) to capture. Defaults to stdout
+        run_in_background (boolean): Optional, Declare if the command should
+                                     run in the background. Defaults to False
     """
 
     def _execute_executable(app):
@@ -164,15 +165,15 @@ def input_file(
     fetched from.
 
     Args:
-        url: Path to the input file / archive
-        description: Description of this input file
-        target_dir (Optional): The directory where the archive will be
+        url (str): Path to the input file / archive
+        description (str): Description of this input file
+        target_dir (str): Optional, the directory where the archive will be
                                expanded. Defaults to the '{workload_input_dir}'
                                + os.sep + '{input_name}'
-        sha256 (Optional): The expected sha256 checksum for the input file
-        extension (Optional): The extension to use for the input, if it isn't part of the
+        sha256 (str): Optional, the expected sha256 checksum for the input file
+        extension (str): Optiona, the extension to use for the input, if it isn't part of the
                               file name.
-        expand (Optional): Whether the input should be expanded or not. Defaults to True
+        expand (boolean): Optional. Whether the input should be expanded or not. Defaults to True
     """
 
     def _execute_input_file(app):
@@ -264,7 +265,13 @@ def workload_variable(
 def environment_variable(name, value, description, workload=None, workloads=None, **kwargs):
     """Define an environment variable to be used in experiments
 
-    These can be specific to workloads.
+    Args:
+        name (str): Name of environment variable to define
+        value (str): Value to set env-var to
+        description (str): Description of the env-var
+        workload (str): Name of workload this env-var should be added to
+        workloads (list(str)): List of workload names this env-var should be
+                               added to
     """
 
     def _execute_environment_variable(app):
@@ -280,76 +287,3 @@ def environment_variable(name, value, description, workload=None, workloads=None
             )
 
     return _execute_environment_variable
-
-
-@application_directive("phase_definitions")
-def register_phase(name, pipeline=None, run_before=[], run_after=[]):
-    """Register a phase
-
-    Phases are portions of a pipeline that will execute when
-    executing a full pipeline.
-
-    Registering a phase allows an application to know what the phases
-    dependencies are, to ensure the execution order is correct.
-
-    If called multiple times, the dependencies are combined together. Only one
-    instance of a phase will show up in the resulting dependency list for a phase.
-
-    Args:
-    - name: The name of the phase. Phases are functions named '_<phase>'.
-    - pipeline: The name of the pipeline this phase should be registered into.
-    - run_before: A list of phase names this phase should run before
-    - run_after: A list of phase names this phase should run after
-    """
-
-    def _execute_register_phase(app):
-        import ramble.util.graph
-
-        if pipeline not in app._pipelines:
-            raise DirectiveError(
-                "Directive register_phase was "
-                f'given an invalid pipeline "{pipeline}"\n'
-                "Available pipelines are: "
-                f" {app._pipelines}"
-            )
-
-        if not isinstance(run_before, list):
-            raise DirectiveError(
-                "Directive register_phase was "
-                "given an invalid type for "
-                "the run_before attribute in application "
-                f"{app.name}"
-            )
-
-        if not isinstance(run_after, list):
-            raise DirectiveError(
-                "Directive register_phase was "
-                "given an invalid type for "
-                "the run_after attribute in application "
-                f"{app.name}"
-            )
-
-        if not hasattr(app, f"_{name}"):
-            raise DirectiveError(
-                "Directive register_phase was "
-                f"given an undefined phase {name} "
-                f"in application {app.name}"
-            )
-
-        if pipeline not in app.phase_definitions:
-            app.phase_definitions[pipeline] = {}
-
-        if name in app.phase_definitions[pipeline]:
-            phase_node = app.phase_definitions[pipeline][name]
-        else:
-            phase_node = ramble.util.graph.GraphNode(name, attribute=pipeline)
-
-        for before in run_before:
-            phase_node.order_before(before)
-
-        for after in run_after:
-            phase_node.order_after(after)
-
-        app.phase_definitions[pipeline][name] = phase_node
-
-    return _execute_register_phase
