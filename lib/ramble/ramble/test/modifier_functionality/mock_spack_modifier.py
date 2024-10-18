@@ -71,6 +71,6 @@ def test_gromacs_dry_run_mock_spack_mod(
         assert search_files_for_string(out_files, expected_str)
 
         # Test software directories
-        software_base_dir = ws1.software_dir
+        software_base_dir = os.path.join(ws1.software_dir, "spack")
 
         modifier_helpers.check_software_env(software_base_dir, software_tests)

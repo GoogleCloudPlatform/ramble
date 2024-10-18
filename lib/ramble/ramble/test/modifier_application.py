@@ -78,7 +78,7 @@ ramble:
 
         workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-        software_path = os.path.join(ws1.software_dir, "wrfv4", "spack.yaml")
+        software_path = os.path.join(ws1.software_dir, "spack", "wrfv4", "spack.yaml")
         with open(software_path) as f:
             assert "intel-oneapi-vtune" in f.read()
 
