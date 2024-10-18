@@ -317,11 +317,51 @@ class Lammps(ExecutableApplication):
         "Hours per nanosecond",
         fom_regex=r"Performance.*\s+(?P<hpns>[0-9\.]+) hours/ns",
         group_name="hpns",
-        units="timesteps/s",
+        units="hours/ns",
     )
     figure_of_merit(
         "Timesteps per second",
         fom_regex=r"Performance.*\s+(?P<tsps>[0-9\.]+) timesteps/s",
         group_name="tsps",
-        units="hours/ns",
+        units="timesteps/s",
     )
+
+    for func_name in ["Pair", "Neigh", "Comm", "Output", "Modifier"]:
+        func_time_regex = (
+            func_name
+            + r"\s+\|\s+(?P<min_time>\S+)\s+\|\s+(?P<avg_time>\S+)\s+\|\s+(?P<max_time>\S+)\s+\|\s+(?P<avg_var>\S+)\s+\|\s+(?P<total_pct>\S+)"
+        )
+        figure_of_merit(
+            f"{func_name} min time",
+            fom_regex=func_time_regex,
+            group_name="min_time",
+            units="s",
+        )
+
+        figure_of_merit(
+            f"{func_name} avg time",
+            fom_regex=func_time_regex,
+            group_name="avg_time",
+            units="s",
+        )
+
+        figure_of_merit(
+            f"{func_name} max time",
+            fom_regex=func_time_regex,
+            group_name="max_time",
+            units="s",
+        )
+
+        figure_of_merit(
+            f"{func_name} avg. variance",
+            fom_regex=func_time_regex,
+            group_name="avg_var",
+            units="",
+        )
+
+        figure_of_merit(
+            f"{func_name} percent of runtime",
+            fom_regex=func_time_regex,
+            group_name="total_pct",
+            units="%",
+        )
