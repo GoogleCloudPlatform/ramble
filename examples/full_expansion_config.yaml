@@ -11,11 +11,11 @@ ramble:
     package_manager: spack
   env_vars:
     set:
-      I_MPI_DEBUG: '5'
+      I_MPI_DEBUG: 5
   variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
-    processes_per_node: '16'
+    processes_per_node: 16
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
     openfoam:
@@ -27,11 +27,11 @@ ramble:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
               variables:
-                partition: ['part1', 'part2']
-                processes_per_node: ['16', '32']
-                env_name: ['openfoam-skx', 'openfoam-zen2']
+                partition: [part1, part2]
+                processes_per_node: [16, 32]
+                env_name: [openfoam-skx, openfoam-zen2]
                 #^-- (partition, processes_per_node) -> (part1, 16, openfoam-skx), (part2, 32, openfoam-zen2)
-                n_nodes: ['2', '4']
+                n_nodes: [2, 4]
               matrices:
                 - matrix_a:
                   - n_nodes

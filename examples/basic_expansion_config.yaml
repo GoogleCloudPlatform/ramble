@@ -10,7 +10,7 @@ ramble:
   variants:
     package_manager: spack
   variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
     n_ranks: '{processes_per_node}*{n_nodes}'
   applications:
@@ -20,10 +20,10 @@ ramble:
           experiments:
             test_{partition}_{processes_per_node}_{n_nodes}:
               variables:
-                partition: ['part1', 'part2']
-                processes_per_node: ['16', '32']
+                partition: [part1, part2]
+                processes_per_node: [16, 32]
                 #^-- (partition, processes_per_node) -> (part1, 16), (part2, 32)
-                n_nodes: ['2', '4']
+                n_nodes: [2, 4]
                 wrf_path: execute_experiment in wrfv4.CONUS_2p5km.new_test
               matrices:
                 - - n_nodes
@@ -36,8 +36,8 @@ ramble:
           experiments:
             new_test:
               variables:
-                n_ranks: '1'
-                n_nodes: '1'
+                n_ranks: 1
+                n_nodes: 1
   software:
     packages:
       gcc9:
