@@ -434,16 +434,9 @@ class ArchivePipeline(Pipeline):
                 _upload_file(tar_path, remote_tar_path)
                 logger.all_msg(f"Archive Uploaded to {remote_tar_path}")
 
-                # Record upload URL to the filesystem
-                url_extension = ".url"
-                tar_url_path = tar_path + url_extension
-                with open(tar_url_path, "w") as f:
-                    f.write(remote_tar_path)
-
-                tar_url_path_latest = os.path.join(
-                    self.workspace.archive_dir, "archive.latest" + url_extension
-                )
-                self.create_simlink(tar_url_path, tar_url_path_latest)
+                # Record upload URL to workspace metadata
+                self.workspace.update_metadata("archive_url", remote_tar_path)
+                self.workspace._write_metadata()
 
 
 class MirrorPipeline(Pipeline):
