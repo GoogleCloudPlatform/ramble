@@ -120,7 +120,7 @@ def deployment_pull(args):
         push_cls = ramble.pipeline.PushDeploymentPipeline
 
         # Handle local relative path
-        deployment_path = ramble.util.path.get_maybe_local_path(args.deployment_path)
+        deployment_path = ramble.util.path.normalize_path_or_url(args.deployment_path)
 
         remote_index_path = surl.join(
             deployment_path, ramble.pipeline.PushDeploymentPipeline.index_filename

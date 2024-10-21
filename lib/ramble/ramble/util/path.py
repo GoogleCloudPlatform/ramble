@@ -102,9 +102,21 @@ def canonicalize_path(path):
     return path
 
 
-def get_maybe_local_path(path):
-    """Convert a scheme-less path to absolute local path"""
-    parsed = urllib.parse.urlparse(path)
+def normalize_path_or_url(path):
+    """Convert a scheme-less path to absolute local path
+    Also, remove trailing back-slashes from the input path
+
+    Args:
+        path (str): Input path
+
+    Returns:
+        (str): Absolute local path or cleaned remote url
+    """
+
+    # Remove trailing back-slashes from path
+    real_path = path.rstrip("/")
+
+    parsed = urllib.parse.urlparse(real_path)
     if not parsed.scheme:
-        return os.path.abspath(path)
-    return path
+        return os.path.abspath(real_path)
+    return real_path

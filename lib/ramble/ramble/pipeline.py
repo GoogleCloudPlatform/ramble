@@ -30,6 +30,8 @@ import ramble.expander
 
 import ramble.experimental.uploader
 
+import ramble.util.path
+
 from ramble.namespace import namespace
 from ramble.util.logger import logger
 
@@ -608,7 +610,8 @@ class PushDeploymentPipeline(Pipeline):
         self.action_string = "Pushing deployment of"
         self.require_inventory = True
         self.create_tar = create_tar
-        self.upload_url = workspace_expander.expand_var(upload_url)
+        expanded_url = workspace_expander.expand_var(upload_url)
+        self.upload_url = ramble.util.path.normalize_path_or_url(expanded_url)
 
         if deployment_name:
             expanded_name = workspace_expander.expand_var(deployment_name)
