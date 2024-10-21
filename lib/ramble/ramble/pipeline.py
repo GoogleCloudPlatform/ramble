@@ -120,6 +120,9 @@ class Pipeline:
             with open(os.path.join(self.workspace.root, self.workspace.hash_file_name), "w+") as f:
                 f.write(self.workspace.workspace_hash + "\n")
 
+            self.workspace.update_metadata("workspace_digest", self.workspace.workspace_hash)
+            self.workspace._write_metadata()
+
     def _prepare(self):
         """Perform preparation for pipeline execution"""
         pass
