@@ -71,15 +71,24 @@ highest) Ramble contains the following scopes:
 5. **custom**: Stored in a custom directory, specified by ``--config-scope``.
    If multiple scopes are listed on the command line, they are ordered from lowest
    to highest precedence. Settings here override all previously defined scoped.
-6. **workspace configs dir**: Stored in ``$(workspace_root)/configs``
-   generally as a ``<config_section>.yaml`` file (i.e. ``variables.yaml``). These
-   settings apply to a specific workspace, and override all previous configuration
-   scopes.
+6. **included files in workspace configuration file**: Paths referred to in the
+   file from #7 above. For more information see the
+   :ref:`documentation for including external configuration files<workspace_including_external_files>`.
 7. **workspace configuration file**: Stored in
    ``$(workspace_root)/configs/ramble.yaml``. Configuration scopes defined within
    this config file override all previously defined configuration scopes.
-8. **command line**: Configuration options defined on the command line take
+8. **workspace configs dir**: Stored in ``$(workspace_root)/configs``
+   generally as a ``<config_section>.yaml`` file (i.e. ``variables.yaml``). These
+   settings apply to a specific workspace, and override all previous configuration
+   scopes.
+9. **command line**: Configuration options defined on the command line take
    precedence over all other scopes.
+10. **application / workload / experiment scope sections**: Several
+    configuration sections can be defined within the ``application``,
+    ``workload``, and ``experiment`` portions of the ``applications``
+    configuration section. These will override all other scopes. See the
+    :ref:`application section documentation<application-config>` for more
+    details.
 
 Each configuration directory may contain several configuration files, such as
 ``config.yaml``, ``variables.yaml``, or ``modifiers.yaml``. When configurations
