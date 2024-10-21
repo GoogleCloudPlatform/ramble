@@ -607,9 +607,9 @@ An archive can be automatically uploaded to a mirror using:
     $ ramble workspace archive -t --upload-url <mirror_url>
 
 When Ramble creates an archive, it will collect the following files:
-* All files in ``$workspace/configs``
-* Generated files for each software environment. (i.e. Each ``spack.yaml`` for spack environments)
-* For each experiment, the following are collected:
+  * All files in ``$workspace/configs``
+  * Generated files for each software environment. (i.e. Each ``spack.yaml`` for spack environments)
+  * For each experiment, the following are collected:
   * Every rendered template (created from a ``$workspace/configs/*.tpl`` file)
   * Every file a success criteria or figure of merit would be extract from
   * Every file that matches an ``archive_pattern`` from the ``application.py``
