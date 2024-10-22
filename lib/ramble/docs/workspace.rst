@@ -267,6 +267,29 @@ And upload the deployment to a remote URL using:
 
   $ ramble deployment push -u <remote_url>
 
+The arguments ``-d`` and ``-u`` can refer to ``variables`` defined within any
+configuration scope that is workspace level or lower (i.e. site, user, etc..).
+This does not include variables defined within the ``applications``
+configuration section.
+
+For example:
+
+.. code-block:: yaml
+
+  ramble:
+    variables:
+      test_name: test
+      test_url: gs://test-bucket/test-dir
+    ...
+
+When paired with
+
+.. code-block:: console
+
+  $ ramble deployment push -d '{test_name}' -u '{test_url}'
+
+Would attempt to create a deployment in ``gs://test-bucket/test-dir/test``.
+
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Pulling a Workspace Deployment

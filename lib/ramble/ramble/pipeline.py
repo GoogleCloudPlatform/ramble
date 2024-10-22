@@ -26,8 +26,11 @@ import ramble.util.hashing
 import ramble.fetch_strategy
 import ramble.stage
 import ramble.workspace
+import ramble.expander
 
 import ramble.experimental.uploader
+
+import ramble.util.path
 
 from ramble.namespace import namespace
 from ramble.util.logger import logger
@@ -601,14 +604,19 @@ class PushDeploymentPipeline(Pipeline):
         self, workspace, filters, create_tar=False, upload_url=None, deployment_name=None
     ):
         super().__init__(workspace, filters)
+
+        workspace_expander = ramble.expander.Expander(workspace.get_workspace_vars(), None)
+
         self.action_string = "Pushing deployment of"
         self.require_inventory = True
         self.create_tar = create_tar
-        self.upload_url = upload_url
+        expanded_url = workspace_expander.expand_var(upload_url)
+        self.upload_url = ramble.util.path.normalize_path_or_url(expanded_url)
 
         if deployment_name:
-            workspace.deployment_name = deployment_name
-            self.deployment_name = deployment_name
+            expanded_name = workspace_expander.expand_var(deployment_name)
+            workspace.deployment_name = expanded_name
+            self.deployment_name = expanded_name
         else:
             self.deployment_name = workspace.name
 
