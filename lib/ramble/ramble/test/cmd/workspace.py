@@ -2055,3 +2055,60 @@ software:
     # ensure apps/pkgs/envs are not merged into workspace config from other config files
     assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
     assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
+
+
+def write_variables_config_file(file_path, levels, value):
+    with open(file_path, "w+") as f:
+        f.write("variables:\n")
+        for i in range(0, levels):
+            f.write(f"  scope{i}: {value}\n")
+
+
+def test_workspace_config_precedence(request, tmpdir):
+    workspace_name = request.node.name
+    ws = ramble.workspace.create(workspace_name)
+
+    global_args = ["-w", workspace_name]
+
+    # Highest precedence, experiment scope
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "--wf",
+        "test_wl",
+        "-e",
+        "unit-test",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "n_ranks=1",
+        "-v",
+        "scope0=experiment",
+        global_args=global_args,
+    )
+
+    # 2nd highest precedence, included (in an included path)
+    included_path = os.path.join(ws.root, "variables.yaml")
+    with open(ws.config_file_path, "a") as f:
+        f.write("  include:\n")
+        f.write(f"  - {included_path}\n")
+
+    write_variables_config_file(included_path, 2, "include_path")
+
+    # 3rd highest precedence, workspace overrides (in configs/variables.yaml)
+    workspace_overrides = os.path.join(ws.config_dir, "variables.yaml")
+    write_variables_config_file(workspace_overrides, 3, "workspace_overrides")
+
+    # 4th highest precedence, workspace (in ramble.yaml)
+    config("add", "variables:scope0:workspace", global_args=global_args)
+    config("add", "variables:scope1:workspace", global_args=global_args)
+    config("add", "variables:scope2:workspace", global_args=global_args)
+    config("add", "variables:scope3:workspace", global_args=global_args)
+
+    output = workspace("info", "-vv", global_args=global_args)
+
+    assert "scope0 = experiment" in output
+    assert "scope1 = include_path" in output
+    assert "scope2 = workspace_override" in output
+    assert "scope3 = workspace" in output

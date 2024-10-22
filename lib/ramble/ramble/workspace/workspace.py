@@ -106,73 +106,9 @@ config_section = "workspace"
 config_file_name = "ramble.yaml"
 licenses_file_name = "licenses.yaml"
 
-
-def default_config_yaml():
-    """default ramble.yaml file to put in new workspaces"""
-    return """\
-# This is a ramble workspace config file.
-#
-# It describes the experiments, the software stack
-# and all variables required for ramble to configure
-# experiments.
-# As an example, experiments can be defined as follows.
-# applications:
-#   hostname: # Application name, as seen in `ramble list`
-#     variables:
-#       iterations: '5'
-#     workloads:
-#       serial: # Workload name, as seen in `ramble info <app>`
-#         variables:
-#           type: 'test'
-#         experiments:
-#           single_node: # Arbitrary experiment name
-#             variables:
-#               n_ranks: '{processes_per_node}'
-
-ramble:
-  env_vars:
-    set:
-      OMP_NUM_THREADS: '{n_threads}'
-  variables:
-    mpi_command: mpirun -n {n_ranks}
-    batch_submit: '{execute_experiment}'
-    processes_per_node: 1
-  applications: {}
-  software:
-    packages: {}
-    environments: {}
-"""
-
-
 workspace_all_experiments_file = "all_experiments"
 
 workspace_execution_template = "execute_experiment" + workspace_template_extension
-
-shell = ramble.config.get("config:shell")
-shell_path = os.path.join("/bin/", shell)
-template_execute_script = (
-    f"#!{shell_path}\n"
-    + """\
-# This is a template execution script for
-# running the execute pipeline.
-#
-# Variables surrounded by curly braces will be expanded
-# when generating a specific execution script.
-# Some example variables are:
-#   - experiment_run_dir (Will be replaced with the experiment directory)
-#   - command (Will be replaced with the command to run the experiment)
-#   - log_dir (Will be replaced with the logs directory)
-#   - experiment_name (Will be replaced with the name of the experiment)
-#   - workload_run_dir (Will be replaced with the directory of the workload
-#   - application_name (Will be repalced with the name of the application)
-#   - n_nodes (Will be replaced with the required number of nodes)
-#   Any experiment parameters will be available as variables as well.
-
-cd "{experiment_run_dir}"
-
-{command}
-"""
-)
 
 #: Name of lockfile within a workspace
 lockfile_name = "ramble.lock"
@@ -557,7 +493,7 @@ class Workspace:
 
             read_default = not os.path.exists(self.config_file_path)
             if read_default:
-                self._read_config(config_section, default_config_yaml())
+                self._read_config(config_section, self._default_config_yaml())
             else:
                 with open(self.config_file_path) as f:
                     self._read_config(config_section, f)
@@ -588,7 +524,73 @@ class Workspace:
 
             if read_default_script:
                 template_name = workspace_execution_template[0:-ext_len]
-                self._read_template(template_name, template_execute_script)
+                self._read_template(template_name, self._template_execute_script())
+
+    @classmethod
+    def _template_execute_script(self):
+        shell = ramble.config.get("config:shell")
+        shell_path = os.path.join("/bin/", shell)
+        script = (
+            f"#!{shell_path}\n"
+            + """\
+# This is a template execution script for
+# running the execute pipeline.
+#
+# Variables surrounded by curly braces will be expanded
+# when generating a specific execution script.
+# Some example variables are:
+#   - experiment_run_dir (Will be replaced with the experiment directory)
+#   - command (Will be replaced with the command to run the experiment)
+#   - log_dir (Will be replaced with the logs directory)
+#   - experiment_name (Will be replaced with the name of the experiment)
+#   - workload_run_dir (Will be replaced with the directory of the workload
+#   - application_name (Will be repalced with the name of the application)
+#   - n_nodes (Will be replaced with the required number of nodes)
+#   Any experiment parameters will be available as variables as well.
+
+cd "{experiment_run_dir}"
+
+{command}
+"""
+        )
+
+        return script
+
+    @classmethod
+    def _default_config_yaml(self):
+        return """\
+# This is a ramble workspace config file.
+#
+# It describes the experiments, the software stack
+# and all variables required for ramble to configure
+# experiments.
+# As an example, experiments can be defined as follows.
+# applications:
+#   hostname: # Application name, as seen in `ramble list`
+#     variables:
+#       iterations: '5'
+#     workloads:
+#       serial: # Workload name, as seen in `ramble info <app>`
+#         variables:
+#           type: 'test'
+#         experiments:
+#           single_node: # Arbitrary experiment name
+#             variables:
+#               n_ranks: '{processes_per_node}'
+
+ramble:
+  env_vars:
+    set:
+      OMP_NUM_THREADS: '{n_threads}'
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: '{execute_experiment}'
+    processes_per_node: 1
+  applications: {}
+  software:
+    packages: {}
+    environments: {}
+"""
 
     def _read_application_config(self, path, f, raw_yaml=None):
         """Read an application configuration file"""
