@@ -332,10 +332,9 @@ class ArchivePipeline(Pipeline):
         self.archive_name = None
 
         if self.upload_url and not self.create_tar:
-            logger.warn(
-                "Upload URL is currently only supported when using tar format (-t)\n"
-                "Archive will not be uploaded."
-            )
+            logger.warn("Upload URL is currently only supported when using tar format (-t)")
+            logger.warn("Forcing `-t` on to enable archive upload.\n")
+            self.create_tar = True
 
     def _prepare(self):
         super()._construct_experiment_hashes()
