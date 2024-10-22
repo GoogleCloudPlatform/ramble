@@ -20,8 +20,11 @@ import pytest
         ("rel/path", os.path.abspath("rel/path")),
         ("/abs/path", "/abs/path"),
         ("file:/abs/path", "file:/abs/path"),
+        ("file:/abs/path/", "file:/abs/path"),
         ("gs://my-bucket", "gs://my-bucket"),
+        ("gs://my-bucket/", "gs://my-bucket"),
+        ("gs://my-bucket///", "gs://my-bucket"),
     ],
 )
-def test_get_maybe_local_path(path, expect):
-    assert ramble.util.path.get_maybe_local_path(path) == expect
+def test_normalize_path_or_url(path, expect):
+    assert ramble.util.path.normalize_path_or_url(path) == expect
