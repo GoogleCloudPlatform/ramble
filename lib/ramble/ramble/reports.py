@@ -28,8 +28,10 @@ try:
     import matplotlib.pyplot as plt
     from matplotlib.backends.backend_pdf import PdfPages
     import pandas as pd
-except ImportError:
-    logger.die("matplotlib or pandas was not found. Ensure requirements.txt are installed.")
+except ImportError as e:
+    #logger.die("matplotlib or pandas was not found. Ensure requirements.txt are installed.")
+    print(e)
+    raise e
 
 
 class ReportVars(Enum):
