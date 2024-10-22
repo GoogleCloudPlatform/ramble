@@ -638,7 +638,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror list ls remove rm generate-config"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror list ls remove rm generate-config manage"
     fi
 }
 
@@ -669,7 +669,7 @@ _ramble_workspace_create() {
 }
 
 _ramble_workspace_concretize() {
-    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify"
+    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify --quiet -q"
 }
 
 _ramble_workspace_setup() {
@@ -729,4 +729,26 @@ _ramble_workspace_generate_config() {
     else
         _all_applications
     fi
+}
+
+_ramble_workspace_manage() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help"
+    else
+        RAMBLE_COMPREPLY="experiments software"
+    fi
+}
+
+_ramble_workspace_manage_experiments() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help --workload-filter --wf --variable-filter --vf --variable-definition -v --experiment-name -e --package-manager -p --dry-run --print --overwrite --include-default-variables -i --workload-name-variable -w --zip -z --matrix -m"
+    else
+        _all_applications
+    fi
+}
+
+_ramble_workspace_manage_software() {
+    RAMBLE_COMPREPLY="-h --help --environment-name --env --environment-packages --external-env --package-name --pkg --package-spec --pkg-spec --spec --compiler-package --compiler-pkg --compiler --compiler-spec --package-manager-prefix --prefix --remove --delete --overwrite -o --dry-run --print"
 }

@@ -162,6 +162,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             "software": [],
             "templates": [],
             "package_manager": [],
+            "modifier_artifacts": [],
         }
         self.experiment_hash = None
 
@@ -1491,6 +1492,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         experiment_run_dir = self.expander.experiment_run_dir
         inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
+
+        # Populate modifier artifacts portion of inventory
+        # This happens here to allow modifiers to hash files
+        # that are downloaded within phases earlier than this.
+        for mod_inst in self._modifier_instances:
+            inventory = mod_inst.artifact_inventory(workspace, app_inst)
+            if inventory:
+                self.hash_inventory["modifier_artifacts"].append(
+                    {"name": mod_inst.name, "mode": mod_inst._usage_mode, "artifacts": inventory}
+                )
 
         with lk.WriteTransaction(self.experiment_lock()):
             with open(inventory_file, "w+") as f:

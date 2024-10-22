@@ -17,9 +17,9 @@ ramble:
   variables:
     processes_per_node: 16
     # OpenMPI flags
-    mpi_command: 'mpirun -n {n_ranks} --map-by ppr:{processes_per_node}:node'
+    mpi_command: mpirun -n {n_ranks} --map-by ppr:{processes_per_node}:node
     batch_submit: '{execute_experiment}'
-    arch_name: ['generic', 'haswell', 'skylake_avx512']
+    arch_name: [generic, haswell, skylake_avx512]
     eessi_arch_dir: [x86_64/generic, x86_64/intel/haswell, x86_64/intel/skylake_avx512]
   zips:
     arch_conf:
@@ -32,11 +32,11 @@ ramble:
           experiments:
             '{type}_{n_ranks}ranks-{arch_name}': # Arbitrary experiment name
               variables:
-                app_workloads: ['water_gmx50', 'water_bare']
+                app_workloads: [water_gmx50, water_bare]
                 n_ranks: [1, 2]
-                n_threads: '1'
+                n_threads: 1
                 size: '0003'
-                type: ['pme', 'rf']
+                type: [pme, rf]
                 eessi_version: '2023.06'
               matrix:
               - app_workloads

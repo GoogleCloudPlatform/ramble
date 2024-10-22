@@ -54,7 +54,10 @@ subcommands = [
     ["list", "ls"],
     ["remove", "rm"],
     "generate-config",
+    "manage",
 ]
+
+manage_commands = ["experiments", "software"]
 
 
 def workspace_activate_setup_parser(subparser):
@@ -414,6 +417,14 @@ def workspace_concretize_setup_parser(subparser):
         help="Remove unused software and experiment templates from workspace config",
         required=False,
     )
+    subparser.add_argument(
+        "--quiet",
+        "-q",
+        dest="quiet",
+        action="store_true",
+        help="Silently ignore conflicting package definitions",
+        required=False,
+    )
 
 
 def workspace_concretize(args):
@@ -423,11 +434,8 @@ def workspace_concretize(args):
         logger.debug("Simplifying workspace config")
         ws.simplify()
     else:
-        if args.force_concretize:
-            ws.force_concretize = True
-
         logger.debug("Concretizing workspace")
-        ws.concretize()
+        ws.concretize(force=args.force_concretize, quiet=args.quiet)
 
 
 def workspace_run_pipeline(args, pipeline):
@@ -979,9 +987,8 @@ def workspace_mirror(args):
     pipeline.run()
 
 
-def workspace_generate_config_setup_parser(subparser):
-    """generate current workspace config"""
-
+def workspace_manage_experiments_setup_parser(subparser):
+    """manage experiment definitions"""
     arguments.add_common_arguments(subparser, ["application"])
 
     subparser.add_argument(
@@ -1075,8 +1082,8 @@ def workspace_generate_config_setup_parser(subparser):
     )
 
 
-def workspace_generate_config(args):
-    """Generate a configuration file for this ramble workspace"""
+def workspace_manage_experiments(args):
+    """Perform experiment management"""
     ws = ramble.cmd.find_workspace(args)
 
     if ws is None:
@@ -1124,6 +1131,153 @@ def workspace_generate_config(args):
         args.overwrite,
     )
 
+    if ws.dry_run:
+        ws.print_config()
+
+
+def workspace_manage_software_setup_parser(subparser):
+    """manage workspace software definitions"""
+
+    subparser.add_argument(
+        "--environment-name",
+        "--env",
+        dest="environment_name",
+        metavar="ENV",
+        help="Name of environment to define",
+    )
+
+    env_types = subparser.add_mutually_exclusive_group()
+    env_types.add_argument(
+        "--environment-packages",
+        dest="environment_packages",
+        help="Comma separated list of packages to add into environment",
+        metavar="PKG1,PKG2,PKG2",
+    )
+
+    env_types.add_argument(
+        "--external-env",
+        dest="external_env_path",
+        help="Path to external environment description",
+        metavar="PATH",
+    )
+
+    subparser.add_argument(
+        "--package-name",
+        "--pkg",
+        dest="package_name",
+        metavar="NAME",
+        help="Name of package to define",
+    )
+
+    subparser.add_argument(
+        "--package-spec",
+        "--pkg-spec",
+        "--spec",
+        dest="package_spec",
+        metavar="SPEC",
+        help="Value for the pkg_spec attribute in the defined package",
+    )
+
+    subparser.add_argument(
+        "--compiler-package",
+        "--compiler-pkg",
+        "--compiler",
+        dest="compiler_package",
+        metavar="PKG",
+        help="Value for the compiler attribute in the defined package",
+    )
+
+    subparser.add_argument(
+        "--compiler-spec",
+        dest="compiler_spec",
+        metavar="SPEC",
+        help="Value for the compiler_spec attribute in the defined package",
+    )
+
+    subparser.add_argument(
+        "--package-manager-prefix",
+        "--prefix",
+        dest="package_manager_prefix",
+        metavar="PREFIX",
+        help="Prefix for defined package attributes. "
+        "Resulting attributes will be {prefix}_pkg_spec.",
+    )
+
+    modify_types = subparser.add_mutually_exclusive_group()
+    modify_types.add_argument(
+        "--remove",
+        "--delete",
+        action="store_true",
+        help="Whether to remove named package and environment definitions if they exist.",
+    )
+
+    modify_types.add_argument(
+        "--overwrite",
+        "-o",
+        action="store_true",
+        help="Whether to overwrite existing definitions or not.",
+    )
+
+    subparser.add_argument(
+        "--dry-run",
+        "--print",
+        dest="dry_run",
+        action="store_true",
+        help="perform a dry run. Print resulting config to screen and not "
+        + "to the workspace configuration file",
+    )
+
+
+def workspace_manage_software(args):
+    """Execute workspace manage software command"""
+
+    ws = ramble.cmd.find_workspace(args)
+
+    if ws is None:
+        import tempfile
+
+        logger.warn("No active workspace found. Defaulting to `--dry-run`")
+
+        root = tempfile.TemporaryDirectory()
+        ws = ramble.workspace.Workspace(str(root))
+        ws.dry_run = True
+    else:
+        ws.dry_run = args.dry_run
+
+    if args.package_name:
+        ws.manage_packages(
+            args.package_name,
+            args.package_spec,
+            args.compiler_package,
+            args.compiler_spec,
+            args.package_manager_prefix,
+            args.remove,
+            args.overwrite,
+        )
+        logger.all_msg("Need to manipulate package definitions")
+
+    if args.environment_name:
+        ws.manage_environments(
+            args.environment_name,
+            args.environment_packages,
+            args.external_env_path,
+            args.remove,
+            args.overwrite,
+        )
+
+    if ws.dry_run:
+        ws.print_config()
+
+
+def workspace_generate_config_setup_parser(subparser):
+    """generate current workspace config"""
+    workspace_manage_experiments_setup_parser(subparser)
+
+
+def workspace_generate_config(args):
+    """Generate a configuration file for this ramble workspace"""
+    workspace_manage_experiments(args)
+
 
 #: Dictionary mapping subcommand names and aliases to functions
 subcommand_functions = {}
@@ -1168,3 +1322,42 @@ def workspace(parser, args):
     """Look for a function called workspace_<name> and call it."""
     action = subcommand_functions[args.workspace_command]
     action(args)
+
+
+manage_subcommand_functions = {}
+
+
+def workspace_manage(args):
+    """Look for a function for the manage subcommand, and execute it."""
+    action = manage_subcommand_functions[args.manage_command]
+    action(args)
+
+
+def workspace_manage_setup_parser(subparser):
+    """manage workspace definitions"""
+    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="manage_command")
+
+    for name in manage_commands:
+        if isinstance(name, (list, tuple)):
+            name, aliases = name[0], name[1:]
+        else:
+            aliases = []
+
+        # add commands to subcommands dict
+        function_name = sanitize_arg_name("workspace_manage_%s" % name)
+
+        function = globals()[function_name]
+        for alias in [name] + aliases:
+            manage_subcommand_functions[alias] = function
+
+        # make a subparser and run the command's setup function on it
+        setup_parser_cmd_name = sanitize_arg_name("workspace_manage_%s_setup_parser" % name)
+        setup_parser_cmd = globals()[setup_parser_cmd_name]
+
+        subsubparser = sp.add_parser(
+            name,
+            aliases=aliases,
+            help=setup_parser_cmd.__doc__,
+            description=setup_parser_cmd.__doc__,
+        )
+        setup_parser_cmd(subsubparser)

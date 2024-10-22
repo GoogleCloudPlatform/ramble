@@ -244,6 +244,20 @@ class ModifierBase(metaclass=ModifierMeta):
 
                 phase_func(workspace)
 
+    def artifact_inventory(self, workspace, app_inst=None):
+        """Return an inventory of modifier artifacts
+
+        Artifact inventories are up to the individual modifier to define the
+        format of.
+
+        This will then show up in an experiment inventory.
+
+        Returns:
+            (Any) Artifact inventory for this modifier
+        """
+
+        return None
+
     def _prepare_analysis(self, workspace):
         """Hook to perform analysis that a modifier defines.
 

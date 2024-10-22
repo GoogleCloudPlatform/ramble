@@ -17,9 +17,9 @@ ramble:
   applications:
     wrfv4:
       success_criteria:
-      - name: 'timing-present'
-        mode: 'string'
-        match: 'Timing for main.*'
+      - name: timing-present
+        mode: string
+        match: Timing for main.*
         file: '{experiment_run_dir}/rsl.out.0000'
       workloads:
         CONUS_12km:

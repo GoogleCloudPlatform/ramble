@@ -9,6 +9,7 @@
 import os
 
 from ramble.modkit import *
+from ramble.util.hashing import hash_file, hash_string
 
 import llnl.util.filesystem as fs
 
@@ -269,6 +270,41 @@ class PyxisEnroot(BasicModifier):
                     self.unsquashfs_runner.command,
                     unsquash_args + [expanded_path],
                 )
+
+    def artifact_inventory(self, workspace, app_inst=None):
+        """Return hash of container uri and sqsh file if they exist
+
+        Args:
+            workspace (Workspace): Reference to workspace
+            app_inst (ApplicationBase): Reference to application instance
+
+        Returns:
+            (dict): Artifact inventory for container attributes
+        """
+        container_name = self.expander.expand_var_name("container_name")
+        container_path = self.expander.expand_var_name("container_path")
+        container_uri = self.expander.expand_var_name("container_uri")
+        inventory = []
+
+        if self._usage_mode == "disabled":
+            return inventory
+
+        inventory.append(
+            {
+                "container_uri": container_uri,
+                "digest": hash_string(container_uri),
+            }
+        )
+
+        if os.path.isfile(container_path):
+            inventory.append(
+                {
+                    "container_name": container_name,
+                    "digest": hash_file(container_path),
+                }
+            )
+
+        return inventory
 
     # TODO: Decide on backing up sqsh files.
     #       The following code works. But there's not a nice way to auto-extract the sqsh file out of the mirror

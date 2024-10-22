@@ -51,6 +51,7 @@ from ramble.namespace import namespace
 import ramble.util.matrices
 import ramble.util.env
 from ramble.util.logger import logger
+from ramble.util.conversions import list_str_to_list
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = "RAMBLE_WORKSPACE"
@@ -469,7 +470,6 @@ class Workspace:
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
         self.repeat_success_strict = True
-        self.force_concretize = False
 
         self.read_default_template = read_default_template
         self.configs = ramble.config.ConfigScope("workspace", self.config_dir)
@@ -835,6 +835,149 @@ class Workspace:
 
             yield contents, experiment_context
 
+    def print_config(self):
+        workspace_dict = self._get_workspace_dict()
+        print(f"\n{syaml.dump(workspace_dict)}")
+
+    def manage_environments(
+        self,
+        env_name,
+        env_packages="",
+        external_path=None,
+        remove=False,
+        overwrite=False,
+    ):
+        """Manipulate software environments
+
+        Create, change, remove, and augment software environment definitions.
+
+        Args:
+            env_name (str): Name of environment to manipulate
+            env_packages (str): (Optional) Comma delimited list of packages to add into
+                                this environment
+            external_path (str): (Optional) Path to external environment definition
+            remove (bool): Whether the named environment should be removed from the workspace
+            overwrite (bool): Whether new definition should overwrite existing definitions
+        """
+
+        package_list = []
+        if env_packages:
+            package_list = env_packages.split(",")
+
+        if package_list and external_path is not None:
+            logger.die("Can only manage environments with one of package_list or external_path")
+
+        software_dict = self.get_software_dict().copy()
+
+        environments = software_dict[namespace.environments]
+
+        if remove:
+            if env_name in environments:
+                del environments[env_name]
+        else:
+            if env_name in environments:
+                conflicting_type = (
+                    namespace.external_env in environments[env_name]
+                    and package_list
+                    or namespace.packages in environments[env_name]
+                    and external_path
+                )
+
+                if overwrite:
+                    del environments[env_name]
+                elif conflicting_type:
+                    logger.die(
+                        "Cannot convert between internal and "
+                        "external environments without --overwrite"
+                    )
+
+            if env_name not in environments:
+                environments[env_name] = syaml.syaml_dict()
+
+            if package_list:
+                environments[env_name][namespace.packages] = package_list.copy()
+
+            elif external_path:
+                environments[env_name][namespace.external_env] = external_path
+
+        if not self.dry_run:
+            ramble.config.config.update_config(
+                namespace.software, software_dict, scope=self.ws_file_config_scope_name()
+            )
+        else:
+            workspace_dict = self._get_workspace_dict()
+            workspace_dict[namespace.software] = software_dict
+
+    def manage_packages(
+        self,
+        pkg_name,
+        pkg_spec="",
+        compiler_pkg=None,
+        compiler_spec=None,
+        package_manager_prefix=None,
+        remove=False,
+        overwrite=False,
+    ):
+        """Manage workspace package definitions
+
+        Create, remove, update, or augment package definitions.
+
+        Args:
+            pkg_name (str): Name of package to manipulate
+            pkg_spec (str): Package spec for the package manager
+            compiler_pkg (str): Name of the package to use as a compiler for this package
+            compiler_spec (str): When this package is used as a compiler for
+                                 another, the string to refer to this package.
+            package_manager_prefix (str): A package manager specific prefix to
+                                          apply to package attribute definitions
+            remove (bool): Whether the named package should be removed from the workspace
+            overwrite (bool): Whether colliding definitions should be overwritten
+        """
+
+        software_dict = self.get_software_dict().copy()
+
+        packages = software_dict[namespace.packages]
+
+        if remove:
+            if pkg_name in packages:
+                del packages[pkg_name]
+        else:
+            if not pkg_spec:
+                logger.die("Cannot define a package without a --pkg-spec attribute")
+
+            pkg_def = syaml.syaml_dict()
+            prefix = ""
+            if package_manager_prefix:
+                prefix = f"{package_manager_prefix}_"
+
+            pkg_def[f"{prefix}{namespace.pkg_spec}"] = pkg_spec
+            if compiler_pkg:
+                pkg_def[f"{prefix}{namespace.compiler}"] = compiler_pkg
+
+            if compiler_spec:
+                pkg_def[f"{prefix}{namespace.compiler_spec}"] = compiler_spec
+
+            if pkg_name in packages:
+                for attr, val in packages[pkg_name].items():
+                    if attr in pkg_def and pkg_def[attr] != val and not overwrite:
+                        logger.warn(
+                            f"Cannot overwrite existing value of {attr} without --overwrite"
+                        )
+                        del pkg_def[attr]
+            else:
+                packages[pkg_name] = syaml.syaml_dict()
+
+            for attr, val in pkg_def.items():
+                packages[pkg_name][attr] = val
+
+        if not self.dry_run:
+            ramble.config.config.update_config(
+                namespace.software, software_dict, scope=self.ws_file_config_scope_name()
+            )
+        else:
+            workspace_dict = self._get_workspace_dict()
+            workspace_dict[namespace.software] = software_dict
+
     def add_experiments(
         self,
         application,
@@ -874,19 +1017,6 @@ class Workspace:
             overwrite (bool): Whether to overwrite existing definitions that
                               collide with new definitions or not.
         """
-
-        def create_valid_list(in_str):
-            if "[" not in in_str and "]" not in in_str:
-                return in_str
-
-            temp = in_str.replace("[", "").replace("]", "")
-            out_value = []
-            for part in temp.split(","):
-                if part[0] == " ":
-                    out_value.append(part[1:])
-                else:
-                    out_value.append(part)
-            return out_value
 
         def yaml_add_comment_before_key(
             base, key, comment, column=None, clear=False, start_char="#"
@@ -948,7 +1078,7 @@ class Workspace:
             m = def_regex.match(definition)
             if m:
                 key = m.group("key")
-                value = create_valid_list(m.group("value"))
+                value = list_str_to_list(m.group("value"))
                 var_def_dict[key] = value
             else:
                 logger.die(
@@ -967,7 +1097,7 @@ class Workspace:
             m = def_regex.match(zip_def)
             if m:
                 key = m.group("key")
-                value = create_valid_list(m.group("value"))
+                value = list_str_to_list(m.group("value"))
                 exp_zips[key] = value
             else:
                 logger.die(
@@ -1102,29 +1232,22 @@ class Workspace:
                 namespace.application, apps_dict, scope=self.ws_file_config_scope_name()
             )
         else:
-            workspace_dict = self._get_workspace_dict().copy()
+            workspace_dict = self._get_workspace_dict()
             workspace_dict[namespace.ramble][namespace.application] = apps_dict
-            print(f"\n{syaml.dump(workspace_dict)}")
 
-    def concretize(self):
+    def concretize(self, force=False, quiet=False):
+        """Concretize software definitions for defined experiments
+
+        Extract suggested software for experiments defined in a workspace, and
+        ensure the software environments are defined properly.
+
+        Args:
+            force (bool): Whether to overwrite conflicting definitions of named packages or not
+            quiet (bool): Whether to silently ignore conflicts or not
+
+
+        """
         full_software_dict = self.get_software_dict()
-
-        if not self.force_concretize:
-            try:
-                if (
-                    full_software_dict[namespace.packages]
-                    or full_software_dict[namespace.environments]
-                ):
-                    raise RambleWorkspaceError(
-                        "Cannot concretize an already concretized "
-                        "workspace. To overwrite the current configuration "
-                        "with the default software configuration, use "
-                        "'ramble workspace concretize -f'."
-                    )
-            except KeyError:
-                pass
-
-        full_software_dict = syaml.syaml_dict()
 
         if (
             namespace.packages not in full_software_dict
@@ -1159,7 +1282,7 @@ class Workspace:
             for compiler_dict in compiler_dicts:
                 for comp, info in compiler_dict.items():
                     if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
-                        if comp not in packages_dict:
+                        if comp not in packages_dict or force:
                             packages_dict[comp] = syaml.syaml_dict()
                             packages_dict[comp]["pkg_spec"] = info["pkg_spec"]
                             ramble.config.add(
@@ -1183,20 +1306,18 @@ class Workspace:
                                 ramble.config.add(
                                     config_path, scope=self.ws_file_config_scope_name()
                                 )
-                        elif not specs_equiv(info, packages_dict[comp]):
+                        elif not quiet and not specs_equiv(info, packages_dict[comp]):
                             logger.debug(f"  Spec 1: {str(info)}")
                             logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
                             raise RambleConflictingDefinitionError(
-                                f"Compiler {comp} defined in multiple conflicting ways"
+                                f"Compiler {comp} would be defined " "in multiple conflicting ways"
                             )
 
-            add_env = False
-            if env_name not in environments_dict:
-                new_env = syaml.syaml_dict()
-                new_env[namespace.packages] = []
-
             logger.debug(f"Trying to define packages for {env_name}")
-            app_packages = new_env[namespace.packages]
+            app_packages = []
+            if env_name in environments_dict:
+                if namespace.packages in environments_dict[env_name]:
+                    app_packages = environments_dict[env_name][namespace.packages].copy()
 
             software_dicts = [app_inst.software_specs]
             for mod_inst in app_inst._modifier_instances:
@@ -1206,8 +1327,7 @@ class Workspace:
                 for spec_name, info in software_dict.items():
                     if fnmatch.fnmatch(app_inst.package_manager.name, info["package_manager"]):
                         logger.debug(f"    Found spec: {spec_name}")
-                        if spec_name not in packages_dict:
-                            add_env = True
+                        if spec_name not in packages_dict or force:
                             packages_dict[spec_name] = syaml.syaml_dict()
                             packages_dict[spec_name]["pkg_spec"] = info["pkg_spec"]
                             if "compiler_spec" in info and info["compiler_spec"]:
@@ -1215,18 +1335,22 @@ class Workspace:
                             if "compiler" in info and info["compiler"]:
                                 packages_dict[spec_name]["compiler"] = info["compiler"]
 
-                        elif not specs_equiv(info, packages_dict[spec_name]):
+                        elif not quiet and not specs_equiv(info, packages_dict[spec_name]):
                             logger.debug(f"  Spec 1: {str(info)}")
                             logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
                             raise RambleConflictingDefinitionError(
-                                f"Package {spec_name} defined in multiple conflicting ways"
+                                f"Package {spec_name} would be defined in multiple "
+                                "conflicting ways"
                             )
 
                         if spec_name not in app_packages:
                             app_packages.append(spec_name)
 
-            if add_env:
-                environments_dict[env_name] = new_env.copy()
+            if app_packages:
+                if env_name not in environments_dict:
+                    environments_dict[env_name] = syaml.syaml_dict()
+
+                environments_dict[env_name][namespace.packages] = app_packages.copy()
 
         ramble.config.config.update_config(
             "software", full_software_dict, scope=self.ws_file_config_scope_name()

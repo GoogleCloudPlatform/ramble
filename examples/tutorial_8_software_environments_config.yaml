@@ -14,17 +14,17 @@ ramble:
       OMP_NUM_THREADS: '{n_threads}'
   variables:
     n_ranks: '{processes_per_node}*{n_nodes}'
-    platform: ['platform1', 'platform2']
-    processes_per_node: ['16', '18']
+    platform: [platform1, platform2]
+    processes_per_node: [16, 18]
 
     # Execution Template
     batch_submit: '{execute_experiment}'
-    mpi_command: 'mpirun {{mpi_name}_args}'
+    mpi_command: mpirun {{mpi_name}_args}
 
     # Experiment Expansions
-    mpi_name: ['intel-mpi', 'openmpi']
-    intel-mpi_args: '-n {n_ranks} -ppn {processes_per_node}'
-    openmpi_args: '--np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS'
+    mpi_name: [intel-mpi, openmpi]
+    intel-mpi_args: -n {n_ranks} -ppn {processes_per_node}
+    openmpi_args: --np {n_ranks} --map-by ppr:{processes_per_node}:node -x OMP_NUM_THREADS
   zips:
     platform_config:
     - platform
@@ -37,7 +37,7 @@ ramble:
             scaling_{n_nodes}_{platform}_{mpi_name}:
               variables:
                 n_nodes: [1, 2]
-                env_name: 'wrfv4-{mpi_name}'
+                env_name: wrfv4-{mpi_name}
               matrix:
               - platform_config
               - n_nodes
