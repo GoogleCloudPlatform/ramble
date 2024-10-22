@@ -1357,7 +1357,9 @@ class Workspace:
                                             mod = fom["origin"]
                                             name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                        output = "{} = {} {}".format(name, fom["value"], fom["units"])
+                                        output = "{} = {} {}".format(
+                                            name, fom["value"], fom["units"]
+                                        )
                                         single_foms.append(output)
 
                                 for fom_name, fom_val_list in summary_foms.items():

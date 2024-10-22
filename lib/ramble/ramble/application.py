@@ -1944,14 +1944,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         if fom_key not in repeat_foms[context_name].keys():
                             repeat_foms[context_name][fom_key] = {
                                 "fom_type": fom["fom_type"],
-                                "fom_values": []}
+                                "fom_values": [],
+                            }
                             if is_numeric_fom(fom):
                                 repeat_foms[context_name][fom_key]["fom_is_numeric"] = True
                             else:
                                 repeat_foms[context_name][fom_key]["fom_is_numeric"] = False
                             fom_contents = (False, fom["value"], fom["fom_type"])
                         if repeat_foms[context_name][fom_key]["fom_is_numeric"]:
-                            repeat_foms[context_name][fom_key]["fom_values"].append(float(fom["value"]))
+                            repeat_foms[context_name][fom_key]["fom_values"].append(
+                                float(fom["value"])
+                            )
                         else:
                             repeat_foms[context_name][fom_key]["fom_values"].append(fom["value"])
 
@@ -2162,7 +2165,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "units": conf["units"],
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
-                # FIXME: this 'to_dict' is getting something strange passed into it and I'm not sure where it came from
+                # FIXME: this 'to_dict' is getting something strange passed
+                # into it and I'm not sure where it came from
                 "fom_type": conf["fom_type"].to_dict(),
             }
             if conf["contexts"]:
