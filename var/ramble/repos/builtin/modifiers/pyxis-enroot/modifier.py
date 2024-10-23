@@ -49,7 +49,6 @@ class PyxisEnroot(BasicModifier):
     maintainers("douglasjacobsen")
 
     mode("standard", description="Standard execution mode for pyxis-enroot")
-    mode("disabled", description="Disabled execution mode for pyxis-enroot")
     default_mode("standard")
 
     required_variable("container_name")
@@ -209,9 +208,6 @@ class PyxisEnroot(BasicModifier):
         (using enroot) into the target container_dir.
         """
 
-        if self._usage_mode == "disabled":
-            return
-
         self._build_commands(workspace.dry_run)
 
         uri = self.expander.expand_var_name("container_uri")
@@ -237,9 +233,6 @@ class PyxisEnroot(BasicModifier):
 
     def _extract_from_sqsh(self, workspace, app_inst=None):
         """Extract paths from the sqsh file into the workload inputs path"""
-
-        if self._usage_mode == "disabled":
-            return
 
         self._build_commands(workspace.dry_run)
 
@@ -285,9 +278,6 @@ class PyxisEnroot(BasicModifier):
         container_path = self.expander.expand_var_name("container_path")
         container_uri = self.expander.expand_var_name("container_uri")
         inventory = []
-
-        if self._usage_mode == "disabled":
-            return inventory
 
         inventory.append(
             {
