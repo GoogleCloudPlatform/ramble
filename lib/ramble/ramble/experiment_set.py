@@ -264,10 +264,6 @@ class ExperimentSet:
         Returns:
             (Application): Instance of an application class for this experiment
         """
-        variables[self.keywords.env_path] = os.path.join(
-            self._workspace.software_dir, Expander.expansion_str(self.keywords.env_name)
-        )
-
         experiment_suffix = ""
         # After generating the base experiment, append the index to repeat experiments
         if repeats.repeat_index:
@@ -294,6 +290,12 @@ class ExperimentSet:
         app_inst.set_modifiers(context.modifiers)
         app_inst.set_tags(context.tags)
         app_inst.set_formatted_executables(context.formatted_executables)
+
+        if app_inst.package_manager is not None:
+            variables[self.keywords.env_path] = os.path.join(
+                app_inst.package_manager.package_manager_dir(self._workspace),
+                Expander.expansion_str(self.keywords.env_name),
+            )
 
         final_wl_name = expander.expand_var_name(
             self.keywords.workload_name, allow_passthrough=False
