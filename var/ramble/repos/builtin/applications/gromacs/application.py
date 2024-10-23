@@ -241,7 +241,7 @@ class Gromacs(ExecutableApplication):
     workload_variable(
         "dlb",
         default="yes",
-        values=["yes", "no"],
+        values=["yes", "no", "auto"],
         description="Whether to use dynamic load balancing for mdrun",
         workload_group="all_workloads",
     )
