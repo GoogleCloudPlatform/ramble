@@ -62,3 +62,5 @@ class namespace:
 
     # For variants
     package_manager = "package_manager"
+
+    metadata = "metadata"
