@@ -13,7 +13,7 @@ import textwrap
 import fnmatch
 from typing import List
 
-from ramble.language.modifier_language import ModifierMeta
+from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
 from ramble.error import RambleError
 import ramble.util.directives
@@ -35,6 +35,10 @@ class ModifierBase(metaclass=ModifierMeta):
     #: Do not include @ here in order not to unnecessarily ping the users.
     maintainers: List[str] = []
     tags: List[str] = []
+
+    disabled = False
+
+    mode("disabled", description="Mode to disable all modifier functionality")
 
     def __init__(self, file_path):
         super().__init__()
@@ -75,16 +79,21 @@ class ModifierBase(metaclass=ModifierMeta):
                     f"    Using default usage mode {self._usage_mode} on modifier {self.name}"
                 )
         else:
-            if len(self.modes) > 1 or len(self.modes) == 0:
+            non_disabled_modes = set(self.modes)
+            non_disabled_modes.remove("disabled")
+            if len(non_disabled_modes) > 1 or len(non_disabled_modes) == 0:
                 raise InvalidModeError(
                     "Cannot auto determine usage " f"mode for modifier {self.name}"
                 )
 
-            self._usage_mode = list(self.modes.keys())[0]
+            self._usage_mode = non_disabled_modes.pop()
             if len(logger.log_stack) >= 1:
                 logger.msg(
                     f"    Using default usage mode {self._usage_mode} on modifier {self.name}"
                 )
+
+        if self._usage_mode == "disabled":
+            self.disabled = True
 
     def set_on_executables(self, on_executables):
         """Set the executables this modifier applies to.
@@ -108,6 +117,10 @@ class ModifierBase(metaclass=ModifierMeta):
         self.expander = app.expander.copy()
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
+
+    def define_variable(self, var_name, var_value):
+        """Define a variable within this modifier's expander instance"""
+        self.expander._variables[var_name] = var_value
 
     def modify_experiment(self, app):
         """Stubbed method to allow modification of experiment variables before

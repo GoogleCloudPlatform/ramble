@@ -13,8 +13,8 @@ from ramble.modifier import ModifierBase
 class BasicModifier(ModifierBase):
     """Specialized class for basic modifiers.
 
-    This class can be used to set up a modifier that does not need additional
-    software to be installed.
+    This class can be used to set up a modifier that can be composed into
+    experiment definitions.
     """
 
     modifier_class = "BasicModifier"

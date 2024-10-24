@@ -28,12 +28,19 @@ def mode(name, description, **kwargs):
 
     Modes allow a modifier to bundle a set of modifications together.
 
+    NOTE: A mode 'disabled' is defined by default for all modifiers.
+
     Args:
         name (str): Name of the mode to define
         description (str): Description of the new mode
     """
 
     def _execute_mode(mod):
+        if name in mod.modes:
+            raise DirectiveError(
+                f"mode directive given an already defined mode for modifier "
+                f"{mod.name}. Provided mode is {name}."
+            )
         mod.modes[name] = {"description": description}
 
     return _execute_mode
@@ -54,6 +61,12 @@ def default_mode(name, **kwargs):
             raise DirectiveError(
                 f"default_mode directive given an invalid mode for modifier "
                 f"{mod.name}. Valid modes are {str(list(mod.modes.keys()))}"
+            )
+
+        if name == "disabled":
+            raise DirectiveError(
+                f"default_mode directive given an invalid mode for modifier "
+                f"{mod.name}. The disabled mode cannot be set as the default mode"
             )
         mod._default_usage_mode = name
 
