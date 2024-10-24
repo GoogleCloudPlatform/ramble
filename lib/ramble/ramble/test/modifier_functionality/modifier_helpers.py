@@ -40,9 +40,11 @@ def check_execute_script(script_path, tests):
             assert test in data
 
 
-def named_modifier(name):
+def named_modifier(name, mode=None):
     modifier_def = syaml.syaml_dict()
     modifier_def["name"] = name
+    if mode is not None:
+        modifier_def["mode"] = mode
     return modifier_def
 
 

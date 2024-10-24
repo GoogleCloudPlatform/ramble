@@ -459,6 +459,9 @@ experiments ramble generates. Its format is as follows:
       - executables to apply
       - modifier to
 
+**NOTE**: Every modifier has a ``disabled`` mode by default that can be set
+(only explicitly) to turn off all of the modifier's functionality.
+
 
 .. _repos-config:
 

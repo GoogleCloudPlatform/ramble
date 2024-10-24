@@ -30,13 +30,19 @@ workspace = RambleCommand("workspace")
         SCOPES.experiment,
     ],
 )
+@pytest.mark.parametrize("modifier_mode", [None, "disabled"])  # Default mode
 def test_gromacs_dry_run_mock_mods(
-    mutable_mock_workspace_path, mutable_applications, mock_modifier, mock_modifiers, scope
+    mutable_mock_workspace_path,
+    mutable_applications,
+    mock_modifier,
+    mock_modifiers,
+    scope,
+    modifier_mode,
 ):
     workspace_name = "test_gromacs_dry_run_mock_mods"
 
     test_modifiers = [
-        (scope, modifier_helpers.named_modifier(mock_modifier)),
+        (scope, modifier_helpers.named_modifier(mock_modifier, modifier_mode)),
     ]
 
     expected_failures = {
@@ -56,7 +62,7 @@ def test_gromacs_dry_run_mock_mods(
 
         ws1._re_read()
 
-        if mock_modifier in expected_failures:
+        if modifier_mode != "disabled" and mock_modifier in expected_failures:
             with pytest.raises(expected_failures[mock_modifier]["error"]) as err:
                 workspace("concretize", global_args=["-D", ws1.root])
                 assert expected_failures[mock_modifier]["msg"] in err

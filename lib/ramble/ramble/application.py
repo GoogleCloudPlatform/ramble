@@ -36,6 +36,7 @@ import ramble.keywords
 import ramble.repeats
 import ramble.repository
 import ramble.modifier
+import ramble.modifier_types.disabled
 import ramble.pipeline
 import ramble.success_criteria
 import ramble.util.executable
@@ -791,7 +792,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.variables[var_name] = var_value
         self.expander._variables[var_name] = var_value
         for mod_inst in self._modifier_instances:
-            mod_inst.expander._variables[var_name] = var_value
+            mod_inst.define_variable(var_name, var_value)
 
     def build_modifier_instances(self):
         """Built a map of modifier names to modifier instances needed for this
@@ -819,8 +820,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
             else:
                 mod_inst.set_usage_mode(None)
 
-            mod_inst.inherit_from_application(self)
-            mod_inst.modify_experiment(self)
+            if not mod_inst.disabled:
+                mod_inst.inherit_from_application(self)
+                mod_inst.modify_experiment(self)
+            else:
+                mod_inst = ramble.modifier_types.disabled.DisabledModifier(mod_inst)
 
             self._modifier_instances.append(mod_inst)
 

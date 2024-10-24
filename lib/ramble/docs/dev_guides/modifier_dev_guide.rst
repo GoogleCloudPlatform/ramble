@@ -141,6 +141,10 @@ some aspects of the modifier change under different usage models.
 If a modifier only has a single ``mode`` defined, this becomes the default
 mode. The default mode can be specified using the ``default_mode`` directive.
 
+Every modifier has a ``disabled`` mode added by default, which cannot be passed
+into the ``default_mode`` directive. This mode allows turning off modifiers
+without having to remove them from the workspace configuration file.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Modifier Variables and Variable Modifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
