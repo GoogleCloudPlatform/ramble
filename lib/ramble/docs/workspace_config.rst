@@ -696,6 +696,11 @@ If it is not set, modifiers will attempt to determine their own ``mode``
 attribute. This will succeed if the modifier has a single mode of operation. If
 there are multiple modes, this will raise an exception.
 
+Every modifier has a ``disabled`` mode that is defined by default. This mode
+will never be automatically enabled, but it will allow experiments to turn off
+the modifier without having to remove the modifier from the experiment
+definitions.
+
 If the ``on_executable`` attribute is not set, it will default to ``'*'`` which
 will match all executables. Modifier classes can (and should) be implemented to
 only act on the correct executable types (i.e. executables with ``use_mpi=true``).
