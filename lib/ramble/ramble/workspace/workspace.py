@@ -1537,6 +1537,15 @@ ramble:
                                     f.write(f"    {fom_name}:\n")
                                     for fom_val in fom_val_list:
                                         f.write(f"      {fom_val.strip()}\n")
+
+                            # Print software section if it contains info
+                            if "SOFTWARE" in exp and exp["SOFTWARE"]:
+                                f.write("  Software definitions:\n")
+                                for package_manager, packages in exp["SOFTWARE"].items():
+                                    f.write(f"    {package_manager} packages:\n")
+                                    for pkg in packages:
+                                        f.write(f"      {pkg['name']} @{pkg['version']}\n")
+
                         else:
                             for context in exp["CONTEXTS"]:
                                 f.write(f'  {context["display_name"]} figures of merit:\n')
@@ -1549,6 +1558,14 @@ ramble:
 
                                     output = "{} = {} {}".format(name, fom["value"], fom["units"])
                                     f.write("    %s\n" % (output.strip()))
+
+                            # Print software section if it contains info
+                            if "SOFTWARE" in exp and exp["SOFTWARE"]:
+                                f.write("  Software definitions:\n")
+                                for package_manager, packages in exp["SOFTWARE"].items():
+                                    f.write(f"    {package_manager} packages:\n")
+                                    for pkg in packages:
+                                        f.write(f"      {pkg['name']} @{pkg['version']}\n")
 
                 else:
                     logger.msg("No results to write")
