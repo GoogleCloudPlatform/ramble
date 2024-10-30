@@ -36,6 +36,8 @@ class GcpMetadata(BasicModifier):
 
     required_variable("hostlist")
 
+    target_platforms("GCP")
+
     modifier_variable(
         "metadata_parallel_prefix",
         default="pdsh -R ssh -N -w {hostlist} '",

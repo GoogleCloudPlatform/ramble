@@ -54,37 +54,30 @@ def test_gromacs_dry_run_mock_mod_phase(
 
         out_file = os.path.join(ws1.log_dir, "setup.latest", "gromacs.water_bare.test_exp.out")
 
-        found_phase = False
         found_make_experiments = False
         found_after_phase = False
-        found_first_phase = False
-        phase_regex = re.compile("Executing phase.*")
-        first_phase_regex = re.compile("Executing phase first_phase")
+        found_mod_phase = False
+        mod_phase_regex = re.compile("Executing phase mod_phase")
         make_experiments_regex = re.compile("Executing phase make_experiments")
         after_make_experiments_regex = re.compile("Executing phase after_make_experiments")
 
         with open(out_file) as f:
             for line in f.readlines():
-                if first_phase_regex.search(line):
-                    assert not found_phase
-                    found_first_phase = True
-
-                if phase_regex.search(line):
-                    found_phase = True
+                if mod_phase_regex.search(line):
+                    found_mod_phase = True
 
                 if make_experiments_regex.search(line):
-                    assert found_phase
+                    assert found_mod_phase
                     found_make_experiments = True
 
                 if after_make_experiments_regex.search(line):
                     assert found_make_experiments
                     found_after_phase = True
 
-        assert found_phase
-        assert found_first_phase
+        assert found_mod_phase
         assert found_after_phase
 
-        expected_str = "Inside a phase: first_phase"
+        expected_str = "Inside a phase: mod_phase"
 
         assert search_files_for_string(out_files, expected_str)
 

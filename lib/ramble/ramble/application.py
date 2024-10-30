@@ -47,6 +47,7 @@ import ramble.util.stats
 import ramble.util.graph
 import ramble.util.class_attributes
 import ramble.util.lock as lk
+import ramble.util.web as web_util
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
 from ramble.util.naming import NS_SEPARATOR
@@ -89,6 +90,45 @@ def _check_shell_support(app_inst):
     for mod_inst in app_inst._modifier_instances:
         _check_match(mod_inst, shell)
     _check_match(app_inst.package_manager, shell)
+
+
+def _is_gcp():
+    """GCP check based on https://cloud.google.com/compute/docs/instances/detect-compute-engine"""
+    try:
+        _, headers, _ = web_util.read_from_url("http://metadata.google.internal")
+        flavor = web_util.get_header(headers, "Metadata-Flavor")
+        return flavor == "Google"
+    except web_util.SpackWebError:
+        return False
+
+
+_KNOWN_PLATFORM_CHECKS = {"GCP": _is_gcp}
+
+
+def _check_platform_support(app_inst):
+    def _is_supported(inst):
+        if not inst or not inst.target_platforms_spec:
+            return True
+        platforms = inst.target_platforms_spec["platforms"]
+        abort = inst.target_platforms_spec["abort_on_unsupported"]
+        for plat in platforms:
+            if plat not in _KNOWN_PLATFORM_CHECKS:
+                # This indicates an object definition error, so abort regardless.
+                logger.die(f"{inst.name} specifies an unknown platform {plat}")
+            supported = _KNOWN_PLATFORM_CHECKS[plat]()
+            if supported:
+                return True
+        if abort:
+            log_func = logger.die
+        else:
+            log_func = logger.warn
+        log_func(f"{inst.name} needs to run on a supported platform: {platforms}")
+        return False
+
+    _is_supported(app_inst)
+    for mod_inst in app_inst._modifier_instances:
+        _is_supported(mod_inst)
+    _is_supported(app_inst.package_manager)
 
 
 class ApplicationBase(metaclass=ApplicationMeta):
@@ -1335,6 +1375,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 if cmd:
                                     f.write(cmd + "\n")
 
+    register_phase("verify_objects", pipeline="setup", run_before=["get_inputs"])
+
+    def _verify_objects(self, workspace, app_inst=None):
+        """Verify if any objects are not supported with the given config and run environment."""
+        logger.debug("Checking if objects are supported")
+        _check_shell_support(self)
+        if not workspace.dry_run:
+            # The platform check happens at setup time, so it's not always desirable
+            # as this may not align with the platform that executes the experiment.
+            # TODO: consider adding runtime checks in the execution script.
+            _check_platform_support(self)
+
     register_phase("make_experiments", pipeline="setup", run_after=["get_inputs"])
 
     def _make_experiments(self, workspace, app_inst=None):
@@ -1345,8 +1397,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         templates, and injecting the experiment into the workspace all
         experiments file.
         """
-
-        _check_shell_support(self)
 
         exp_lock = self.experiment_lock()
 

@@ -460,3 +460,26 @@ def target_shells(shell_support_pattern=None):
             obj.shell_support_pattern = shell_support_pattern
 
     return _execute_target_shells
+
+
+@shared_directive(dicts="target_platforms_spec")
+def target_platforms(platforms=None, abort_on_unsupported=False):
+    """Directive to specify supported platforms.
+
+    If not specified, then it assumes there is no limitation on platform support.
+    A platform is defined broadly, for instance it can mean a CSP, or a particular OS.
+    The given list of platforms is interpreted as a union set.
+
+    Args:
+        platforms (list[str] | None): A list of supported platforms.
+        abort_on_unsupported (bool): Whether to abort if the running environment is not supported.
+    """
+
+    def _execute_target_platforms(obj):
+        if platforms is not None:
+            obj.target_platforms_spec = {
+                "platforms": [platforms] if isinstance(platforms, str) else platforms,
+                "abort_on_unsupported": abort_on_unsupported,
+            }
+
+    return _execute_target_platforms
