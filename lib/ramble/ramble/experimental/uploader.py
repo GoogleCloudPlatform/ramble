@@ -47,10 +47,10 @@ class Experiment:
     Class representation of experiment data
     """
 
-    def __init__(self, name, workspace_hash, data, timestamp):
+    def __init__(self, name, workspace_hash, exp_hash, data, timestamp):
         self.name = name
         self.foms = []
-        self.id = None  # This is essentially the hash
+        self.id = exp_hash
         self.data = data
         self.application_name = data["application_name"]
         self.workspace_name = data["RAMBLE_VARIABLES"]["workspace_name"]
@@ -66,33 +66,17 @@ class Experiment:
         self.user = get_user()
 
         # FIXME: this is no longer strictly needed since it is just a concat of known properties
-        exps_hash = "{workspace_name}::{application}::{workload}::{date}".format(
+        self.bulk_hash = "{workspace_name}::{application}::{workload}::{date}".format(
             workspace_name=self.workspace_name,
             application=self.application_name,
             workload=self.workload_name,
             date=timestamp,
         )
 
-        self.bulk_hash = exps_hash
-
         self.timestamp = str(timestamp)
 
-        self.id = None
-        self.generate_hash()
-
-    def generate_hash(self):
-        # Avoid regenerating a hash when possible
-        # (The hash of an object must never change during its lifetime..)
-        if self.id is None:
-            #  TODO: this might be better as a hash of something we intuitively
-            # expect to be uniqie, like:
-            # "{RAMBLE_STATUS}-{application_name}-{experiment_name}-{time}-etc"
-            # If we don't want this, we can go back to this class just being a dict
-            self.id = hash(self)
-        return self.id
-
     def get_hash(self):
-        return self.generate_hash()
+        return self.id
 
     def to_json(self):
 
@@ -190,13 +174,18 @@ def format_data(data_in):
         upload_failed = ramble.config.get("config:upload:push_failed")
 
         if exp["RAMBLE_STATUS"] == "SUCCESS" or upload_failed:
-            e = Experiment(exp["name"], data_in["workspace_hash"], exp, current_dateTime)
+            e = Experiment(
+                exp["name"],
+                data_in["workspace_hash"],
+                exp["experiment_hash"],
+                exp,
+                current_dateTime,
+            )
             results.append(e)
             # experiment_id = exp.hash()
             # 'experiment_id': experiment_id,
             for context in exp["CONTEXTS"]:
                 for fom in context["foms"]:
-                    # TODO: check on value to make sure it's a number
                     e.foms.append(
                         {
                             "name": fom["name"],
@@ -295,27 +284,7 @@ class BigQueryUploader(Uploader):
     def perform_upload(self, uri, results):
         super().perform_upload(uri, results)
 
-        # import spack.util.spack_json as sjson
-        # json_str = sjson.dump(results)
-
         self.insert_data(uri, results)
-
-    # def get_max_current_id(uri, table):
-    # TODO: Generating an id based on the max in use id is dangerous, and
-    # technically gives a race condition in parallel, and should be done in
-    # a more graceful and scalable way..  like hashing the experiment? or
-    # generating a known unique id for it
-    # query = "SELECT MAX(id) FROM `{uri}.{table}` LIMIT 1".format(uri=uri, table=table)
-    # query_job = client.query(query)
-    # results = query_job.result()  # Waits for job to complete.
-    # return results[0]
-
-    def get_experiment_id(experiment):
-        # get_max_current_id(...) # Warning: dangerous..
-
-        # This should be stable per machine/python version, but is not
-        # guaranteed to be globally stable
-        return hash(json.dumps(experiment, sort_keys=True))
 
 
 class PrintOnlyUploader(Uploader):
