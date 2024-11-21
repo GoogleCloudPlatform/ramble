@@ -26,73 +26,207 @@ from ramble.reports import *
 from matplotlib.backends.backend_pdf import PdfPages
 import os
 
+
+single_experiments = [
+    {
+        "RAMBLE_STATUS": "SUCCESS",
+        "name": "single_exp_1",
+        "n_nodes": 1,
+        "simplified_workload_namespace": "test_app_test_workload",
+        "RAMBLE_VARIABLES": {"repeat_index": "0"},
+        "RAMBLE_RAW_VARIABLES": {},
+        "CONTEXTS": [
+            {
+                "name": "null",
+                "display_name": "null",
+                "foms": [
+                    {
+                        "name": "fom_1",
+                        "value": 42.0,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                    {
+                        "name": "fom_2",
+                        "value": 50,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        "RAMBLE_STATUS": "SUCCESS",
+        "name": "single_exp_2",
+        "n_nodes": 2,
+        "simplified_workload_namespace": "test_app_test_workload",
+        "RAMBLE_VARIABLES": {"repeat_index": "0"},
+        "RAMBLE_RAW_VARIABLES": {},
+        "CONTEXTS": [
+            {
+                "name": "null",
+                "display_name": "null",
+                "foms": [
+                    {
+                        "name": "fom_1",
+                        "value": 28.0,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                    {
+                        "name": "fom_2",
+                        "value": 55,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                ],
+            },
+        ],
+    },
+]
+
+repeat_experiments = [
+    {
+        "RAMBLE_STATUS": "SUCCESS",
+        "name": "repeat_exp_1",
+        "n_nodes": 1,
+        "simplified_workload_namespace": "test_app_test_workload",
+        "N_REPEATS": 2,
+        "RAMBLE_VARIABLES": {"repeat_index": 0},
+        "RAMBLE_RAW_VARIABLES": {},
+        "CONTEXTS": [
+            {
+                "name": "null",
+                "display_name": "null",
+                "foms": [
+                    {
+                        "value": 2,
+                        "units": "repeats",
+                        "origin": "dummy_app",
+                        "origin_type": "summary::n_total_repeats",
+                        "name": "Experiment Summary",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                    {
+                        "value": 2,
+                        "units": "repeats",
+                        "origin": "dummy_app",
+                        "origin_type": "summary::n_successful_repeats",
+                        "name": "Experiment Summary",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                    {
+                        "value": 28.0,
+                        "units": "s",
+                        "origin": "dummy_app",
+                        "origin_type": "summary::min",
+                        "name": "fom_1",
+                        "fom_type": {"name": "TIME", "better_direction": "LOWER"},
+                    },
+                    {
+                        "value": 30.0,
+                        "units": "s",
+                        "origin": "dummy_app",
+                        "origin_type": "summary::max",
+                        "name": "fom_1",
+                        "fom_type": {"name": "TIME", "better_direction": "LOWER"},
+                    },
+                    {
+                        "value": 29.0,
+                        "units": "s",
+                        "origin": "dummy_app",
+                        "origin_type": "summary::mean",
+                        "name": "fom_1",
+                        "fom_type": {"name": "TIME", "better_direction": "LOWER"},
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        "RAMBLE_STATUS": "SUCCESS",
+        "name": "repeat_exp_1.1",
+        "n_nodes": 2,
+        "simplified_workload_namespace": "test_app_test_workload",
+        "N_REPEATS": 0,
+        "RAMBLE_VARIABLES": {"repeat_index": 1},
+        "RAMBLE_RAW_VARIABLES": {},
+        "CONTEXTS": [
+            {
+                "name": "null",
+                "display_name": "null",
+                "foms": [
+                    {
+                        "name": "fom_1",
+                        "value": 28.0,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "TIME", "better_direction": "LOWER"},
+                    },
+                    {
+                        "name": "fom_2",
+                        "value": 55,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                ],
+            },
+        ],
+    },
+    {
+        "RAMBLE_STATUS": "SUCCESS",
+        "name": "repeat_exp_1.2",
+        "n_nodes": 2,
+        "simplified_workload_namespace": "test_app_test_workload",
+        "N_REPEATS": 0,
+        "RAMBLE_VARIABLES": {"repeat_index": 2},
+        "RAMBLE_RAW_VARIABLES": {},
+        "CONTEXTS": [
+            {
+                "name": "null",
+                "display_name": "null",
+                "foms": [
+                    {
+                        "name": "fom_1",
+                        "value": 30.0,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "TIME", "better_direction": "LOWER"},
+                    },
+                    {
+                        "name": "fom_2",
+                        "value": 55,
+                        "units": "",
+                        "origin": "dummy_app",
+                        "origin_type": "application",
+                        "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
+                    },
+                ],
+            },
+        ],
+    }
+]
+
 results = {
-    "experiments": [
-        {
-            "RAMBLE_STATUS": "SUCCESS",
-            "name": "exp_1",
-            "n_nodes": 1,
-            "simplified_workload_namespace": "test_app_test_workload",
-            "RAMBLE_VARIABLES": {"repeat_index": "0"},
-            "RAMBLE_RAW_VARIABLES": {},
-            "CONTEXTS": [
-                {
-                    "name": "null",
-                    "display_name": "null",
-                    "foms": [
-                        {
-                            "name": "fom_1",
-                            "value": 42.0,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                        {
-                            "name": "fom_2",
-                            "value": 50,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            "RAMBLE_STATUS": "SUCCESS",
-            "name": "exp_2",
-            "n_nodes": 2,
-            "simplified_workload_namespace": "test_app_test_workload",
-            "RAMBLE_VARIABLES": {"repeat_index": "0"},
-            "RAMBLE_RAW_VARIABLES": {},
-            "CONTEXTS": [
-                {
-                    "name": "null",
-                    "display_name": "null",
-                    "foms": [
-                        {
-                            "name": "fom_1",
-                            "value": 28.0,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                        {
-                            "name": "fom_2",
-                            "value": 55,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                    ],
-                },
-            ],
-        },
-    ]
+    "experiments": single_experiments
+}
+
+all_experiments = repeat_experiments + single_experiments
+repeat_results = {
+    "experiments": all_experiments
 }
 
 
@@ -164,7 +298,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     ideal_data.append(
         create_test_exp(
             "SUCCESS",
-            "exp_1",
+            "single_exp_1",
             1,
             "test_app_test_workload",
             {"repeat_index": "0"},
@@ -185,7 +319,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     ideal_data.append(
         create_test_exp(
             "SUCCESS",
-            "exp_2",
+            "single_exp_2",
             2,
             "test_app_test_workload",
             {"repeat_index": "0"},
@@ -230,165 +364,6 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
 
         assert plot.output_df.equals(ideal_df)
         assert os.path.isfile(pdf_path)
-
-
-repeat_results = {
-    "experiments": [
-        {
-            "RAMBLE_STATUS": "SUCCESS",
-            "name": "repeat_exp_1",
-            "n_nodes": 1,
-            "simplified_workload_namespace": "test_app_test_workload",
-            "N_REPEATS": 2,
-            "RAMBLE_VARIABLES": {"repeat_index": 0},
-            "RAMBLE_RAW_VARIABLES": {},
-            "CONTEXTS": [
-                {
-                    "name": "null",
-                    "display_name": "null",
-                    "foms": [
-                        {
-                            "value": 2,
-                            "units": "repeats",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::n_total_repeats",
-                            "name": "Experiment Summary",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                        {
-                            "value": 2,
-                            "units": "repeats",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::n_successful_repeats",
-                            "name": "Experiment Summary",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                        {
-                            "value": 28.0,
-                            "units": "s",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::min",
-                            "name": "fom_1",
-                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
-                        },
-                        {
-                            "value": 30.0,
-                            "units": "s",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::max",
-                            "name": "fom_1",
-                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
-                        },
-                        {
-                            "value": 29.0,
-                            "units": "s",
-                            "origin": "dummy_app",
-                            "origin_type": "summary::mean",
-                            "name": "fom_1",
-                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            "RAMBLE_STATUS": "SUCCESS",
-            "name": "repeat_exp_1.1",
-            "n_nodes": 2,
-            "simplified_workload_namespace": "test_app_test_workload",
-            "N_REPEATS": 0,
-            "RAMBLE_VARIABLES": {"repeat_index": 1},
-            "RAMBLE_RAW_VARIABLES": {},
-            "CONTEXTS": [
-                {
-                    "name": "null",
-                    "display_name": "null",
-                    "foms": [
-                        {
-                            "name": "fom_1",
-                            "value": 28.0,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
-                        },
-                        {
-                            "name": "fom_2",
-                            "value": 55,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            "RAMBLE_STATUS": "SUCCESS",
-            "name": "repeat_exp_1.2",
-            "n_nodes": 2,
-            "simplified_workload_namespace": "test_app_test_workload",
-            "N_REPEATS": 0,
-            "RAMBLE_VARIABLES": {"repeat_index": 2},
-            "RAMBLE_RAW_VARIABLES": {},
-            "CONTEXTS": [
-                {
-                    "name": "null",
-                    "display_name": "null",
-                    "foms": [
-                        {
-                            "name": "fom_1",
-                            "value": 30.0,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "TIME", "better_direction": "LOWER"},
-                        },
-                        {
-                            "name": "fom_2",
-                            "value": 55,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                            "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
-                        },
-                    ],
-                },
-            ],
-        },
-        {
-            "RAMBLE_STATUS": "SUCCESS",
-            "name": "single_exp_1",
-            "n_nodes": 1,
-            "simplified_workload_namespace": "test_app_test_workload",
-            "RAMBLE_VARIABLES": {"repeat_index": "0"},
-            "RAMBLE_RAW_VARIABLES": {},
-            "CONTEXTS": [
-                {
-                    "name": "null",
-                    "display_name": "null",
-                    "foms": [
-                        {
-                            "name": "fom_1",
-                            "value": 42.0,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                        },
-                        {
-                            "name": "fom_2",
-                            "value": 50,
-                            "units": "",
-                            "origin": "dummy_app",
-                            "origin_type": "application",
-                        },
-                    ],
-                },
-            ],
-        },
-    ]
-}
 
 
 def test_repeat_import(mutable_mock_workspace_path):
