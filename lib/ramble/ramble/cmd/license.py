@@ -1,4 +1,4 @@
-# Copyright 2022-2024 The Ramble Authors
+# Copyright 2022-2025 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -48,8 +48,10 @@ licensed_files = [
     r"^share/ramble/.*\.bash$",
     r"^share/ramble/.*\.csh$",
     r"^share/ramble/qa/run-[^/]*$",
-    # all applications
-    r"^var/ramble/repos/.*/application.py$",
+    # all objects
+    r"^var/ramble/repos/.*/(base_)?application.py$",
+    r"^var/ramble/repos/.*/(base_)?modifier.py$",
+    r"^var/ramble/repos/.*/(base_)?package_manager.py$",
 ]
 
 #: licensed files that can have LGPL language in them
@@ -131,7 +133,7 @@ def _check_license(lines, path):
     # The years are hard-coded in the license header to allow them to be out-dated.
     # The `strict_copyright_date` below issues warnings as reminders for refreshing.
     license_lines = [
-        r"Copyright 2022-2024 The Ramble Authors",
+        r"Copyright 2022-2025 The Ramble Authors",
         r"Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",
         r"https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",
         r"<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",
