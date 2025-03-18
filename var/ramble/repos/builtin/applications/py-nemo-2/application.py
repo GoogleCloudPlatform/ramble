@@ -11,11 +11,6 @@ import os
 import re
 from ramble.appkit import *
 
-import ruamel.yaml as yaml
-import spack.util.spack_yaml as syaml
-
-import ramble.util.yaml_generation
-
 from spack.util.path import canonicalize_path
 
 
@@ -23,6 +18,8 @@ class PyNemo2(ExecutableApplication):
     """A scalable generative AI framework built for researchers and
     developers working on Large Language Models, Multimodal, and
     Speech AI (Automatic Speech Recognition and Text-to-Speech)
+
+    NeMo 2.0 requires NeMo container version >= 24.12.
     """
 
     name = "py-nemo-2"
@@ -31,13 +28,8 @@ class PyNemo2(ExecutableApplication):
 
     tags("ml-framework", "machine-learning")
 
-    archive_pattern("{experiment_run_dir}/{nemo_config_path}")
-
-    executable(
-        "setup_transformer_cache",
-        'bash -c "python3 -c \\"from transformers import AutoTokenizer; AutoTokenizer.from_pretrained(\\"gpt2\\")\\""',
-        use_mpi=True,
-    )
+    # Add Nemo 2.0 config to archive.
+    archive_pattern("{experiment_run_dir}/{nemo_2_config_name}")
 
     executable(
         "pretraining_exec",
@@ -50,12 +42,9 @@ class PyNemo2(ExecutableApplication):
     workload(
         "pretraining",
         executables=[
-            "setup_transformer_cache",
             "pretraining_exec",
         ],
     )
-
-    default_config_string = "{default_config_value}"
 
     workload_group("all_workloads", workloads=["pretraining"])
     workload_group("pretraining", workloads=["pretraining"])
@@ -331,16 +320,26 @@ class PyNemo2(ExecutableApplication):
     )
 
     def _copy_config(self, workspace, app_inst):
-        """Copies user provided NeMo 2.0 python config to the experiment run directory."""
+        """Copies user provided NeMo 2.0 python config to the experiment's
+        run directory."""
+
         source_path = get_file_path(
             canonicalize_path(
-                os.path.join(self.expander.expand_var_name("nemo_2_config_dir_path"), self.expander.expand_var_name("nemo_2_config_name"))
+                os.path.join(
+                    self.expander.expand_var_name("nemo_2_config_dir_path"),
+                    self.expander.expand_var_name("nemo_2_config_name")
+                )
             ),
             workspace,
         )
-        config_name = os.path.basename(source_path)
-        
-        dest_path = os.path.join(app_inst.expander.expand_var_name("experiment_run_dir"), app_inst.expander.expand_var_name("nemo_2_config_name"))
+
+        if not os.path.exists(source_path):
+            return
+
+        dest_path = os.path.join(
+            app_inst.expander.expand_var_name("experiment_run_dir"),
+            app_inst.expander.expand_var_name("nemo_2_config_name")
+        )
 
         self.expander.flush_used_variable_stage()
 
@@ -402,4 +401,3 @@ class PyNemo2(ExecutableApplication):
             )
             with open(sec_file_path, "w+") as f:
                 f.write(f"Elapsed seconds: {elapsed_s}")
-
