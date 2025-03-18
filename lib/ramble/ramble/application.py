@@ -2355,12 +2355,48 @@ class ApplicationBase(metaclass=ApplicationMeta):
     register_phase("deploy_artifacts", pipeline="pushdeployment")
 
     def _deploy_artifacts(self, workspace, app_inst=None):
+        """Copy all relevant ramble objects to the deployment directory.
 
-        def _copy_files(obj_inst, obj_type, repo_root):
+        All the ramble objects are grouped under a "ramble" directory, and
+        further organized based on the object's original repo namespace.
+
+        Package manager (like Spack) may also create its own repos.
+
+        An example:
+
+        object_repos/
+        ├── ramble
+        │   ├── builtin
+        │   │   ├── modifiers
+        │   │   │   ├── gcp-metadata
+        │   │   │   │   └── modifier.py
+        │   │   ├── package_managers
+        │   │   │   ├── spack
+        │   │   │   │   └── package_manager.py
+        │   │   │   └── spack-lightweight
+        │   │   │       └── package_manager.py
+        │   │   ├── repo.yaml
+        │   └── googleaux
+        │       ├── applications
+        │       │   ├── base-app
+        │       │   │   └── application.py
+        │       │   └── derived-app
+        │       │       └── application.py
+        │       └── repo.yaml
+        └── spack
+            └── obj_repo
+                ├── packages
+                │   └── my-package
+                │       └── package.py
+                └── repo.yaml
+        """
+
+        def _copy_files(obj_inst, obj_type, root_path):
             flist = ramble.repository.list_object_files(obj_inst, obj_type)
-            for type_dir_name, obj_path in flist:
+            for type_dir_name, obj_path, repo_namespace in flist:
                 obj_src_dir_path = os.path.dirname(obj_path)
                 obj_dir_name = os.path.basename(obj_src_dir_path)
+                repo_root = os.path.join(root_path, "ramble", repo_namespace)
                 obj_dest_dir = os.path.join(repo_root, type_dir_name, obj_dir_name)
                 shutil.rmtree(obj_dest_dir, ignore_errors=True)
                 shutil.copytree(
@@ -2368,10 +2404,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     obj_dest_dir,
                     ignore=shutil.ignore_patterns("*.pyc", "__pycache__"),
                 )
+                config_path = os.path.join(repo_root, ramble.repository.unified_config)
+                if not os.path.exists(config_path):
+                    with open(config_path, "w+") as f:
+                        f.write("repo:\n")
+                        f.write(f"  namespace: {repo_namespace}\n")
 
-        repo_path = os.path.join(workspace.named_deployment, "object_repo")
+        repo_path = workspace.deployment_repos_dir
 
-        repo_lock = lk.Lock(os.path.join(repo_path, ".ramble-obj-repo.lock"))
+        repo_lock = lk.Lock(os.path.join(repo_path, ".ramble-obj-repos.lock"))
 
         with lk.WriteTransaction(repo_lock):
             for obj_type, obj in self._objects():

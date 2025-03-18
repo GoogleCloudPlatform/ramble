@@ -1931,6 +1931,11 @@ ramble:
         return os.path.join(self.deployments_dir, self.deployment_name)
 
     @property
+    def deployment_repos_dir(self):
+        """Path to the specific deployment directory that contains all the repos"""
+        return os.path.join(self.named_deployment, "object_repos")
+
+    @property
     def shared_license_dir(self):
         """Path to the shared license directory"""
         return os.path.join(self.shared_dir, workspace_shared_license_path)
