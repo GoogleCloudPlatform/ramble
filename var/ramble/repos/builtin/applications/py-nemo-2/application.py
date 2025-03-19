@@ -24,7 +24,7 @@ class PyNemo2(ExecutableApplication):
 
     name = "py-nemo-2"
 
-    maintainers("douglasjacobsen")
+    maintainers("duncanspani")
 
     tags("ml-framework", "machine-learning")
 
