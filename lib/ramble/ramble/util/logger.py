@@ -192,9 +192,10 @@ class Logger:
         Pass all args and kwargs to tty.debug (which will concatenate and
         print). Perform this action for the active log only.
         """
-        st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        with self.configure_colors(**st_kwargs):
-            tty.debug(*args, **st_kwargs)
+        if tty._debug:
+            st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
+            with self.configure_colors(**st_kwargs):
+                tty.debug(*args, **st_kwargs)
 
     def error(self, *args, **kwargs):
         """Print an error message
