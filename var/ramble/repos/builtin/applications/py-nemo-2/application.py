@@ -29,13 +29,13 @@ class PyNemo2(ExecutableApplication):
     tags("ml-framework", "machine-learning")
 
     # Add Nemo 2.0 config to archive.
-    archive_pattern("{experiment_run_dir}/{nemo_2_config_name}")
+    archive_pattern("{experiment_run_dir}/{nemo_config_name}/*")
 
     executable(
         "pretraining_exec",
         'bash -c "'
         "{custom_injected_string}; "
-        'python3 -u {experiment_run_dir}/{nemo_2_config_name};"',
+        'python3 -u {experiment_run_dir}/{nemo_config_name};"',
         use_mpi=True,
     )
 
@@ -79,16 +79,16 @@ class PyNemo2(ExecutableApplication):
     )
 
     workload_variable(
-        "nemo_2_config_dir_path",
+        "nemo_config_dir_path",
         default="",
         description="Path to dir containing Nemo 2.0 python configs to be used.",
         workload_group="all_workloads",
     )
 
     workload_variable(
-        "nemo_2_config_name",
+        "nemo_config_name",
         default="",
-        description="Name of NeMo 2.0 config under {nemo_2_config_dir_path}.",
+        description="Name of NeMo 2.0 config under {nemo_config_dir_path}.",
         workload_group="all_workloads",
     )
 
