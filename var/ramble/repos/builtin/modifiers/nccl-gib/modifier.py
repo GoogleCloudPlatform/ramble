@@ -28,17 +28,6 @@ class NcclGib(BasicModifier):
         return "/usr/local/gib/scripts/set_nccl_env.sh"
 
     register_builtin("source_gib", injection_method="prepend")
-    register_builtin(
-        "overwrite_nccl_socket_env_var",
-        injection_method="prepend",
-        depends_on=["source_gib"],
-    )
-
-    def overwrite_nccl_socket_env_var(self):
-        env_var_injection = ["export NCCL_SOCKET_IFNAME=enp0s19,enp192s20;"]
-        cmds = []
-        cmds.extend(env_var_injection)
-        return cmds
 
     def source_gib(self):
         import ramble.util.shell_utils
