@@ -6,3 +6,4 @@ coverage
 pre-commit
 pytest-xdist
 pytest-cov
+line_profiler

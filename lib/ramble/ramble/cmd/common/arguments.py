@@ -149,6 +149,19 @@ def include_phase_dependencies():
 
 
 @arg
+def profile_phases():
+    return Args(
+        "--profile-phase",
+        nargs="+",
+        action="append",
+        default=None,
+        dest="profile_phases",
+        help="phases to be profiled by line_profiler",
+        required=False,
+    )
+
+
+@arg
 def where():
     return Args(
         "--where",

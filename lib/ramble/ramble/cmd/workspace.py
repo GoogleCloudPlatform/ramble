@@ -10,6 +10,7 @@ import os
 import sys
 import tempfile
 import argparse
+import itertools
 
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
@@ -443,12 +444,25 @@ def workspace_concretize(args):
 
 
 def workspace_run_pipeline(args, pipeline):
-    include_phase_dependencies = getattr(args, "include_phase_dependencies", None)
-    if include_phase_dependencies:
-        with ramble.config.override("config:include_phase_dependencies", True):
+    profile_phases = getattr(args, "profile_phases", None)
+    if profile_phases:
+        import line_profiler
+
+        profiler = line_profiler.LineProfiler()
+        profiler.enable()
+        p_phases = set(itertools.chain.from_iterable(profile_phases))
+        pipeline.workspace.profile_config = (profiler, p_phases)
+    try:
+        include_phase_dependencies = getattr(args, "include_phase_dependencies", None)
+        if include_phase_dependencies:
+            with ramble.config.override("config:include_phase_dependencies", True):
+                pipeline.run()
+        else:
             pipeline.run()
-    else:
-        pipeline.run()
+    finally:
+        if profile_phases:
+            profiler.disable()
+            profiler.print_stats()
 
 
 def workspace_setup_setup_parser(subparser):
@@ -464,7 +478,14 @@ def workspace_setup_setup_parser(subparser):
 
     arguments.add_common_arguments(
         subparser,
-        ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
+        [
+            "phases",
+            "include_phase_dependencies",
+            "where",
+            "exclude_where",
+            "filter_tags",
+            "profile_phases",
+        ],
     )
 
 
@@ -530,7 +551,14 @@ def workspace_analyze_setup_parser(subparser):
 
     arguments.add_common_arguments(
         subparser,
-        ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
+        [
+            "phases",
+            "include_phase_dependencies",
+            "where",
+            "exclude_where",
+            "filter_tags",
+            "profile_phases",
+        ],
     )
 
 
@@ -587,7 +615,9 @@ def workspace_push_to_cache_setup_parser(subparser):
         "-d", dest="cache_path", default=None, required=True, help="Path to cache."
     )
 
-    arguments.add_common_arguments(subparser, ["where", "exclude_where", "filter_tags"])
+    arguments.add_common_arguments(
+        subparser, ["where", "exclude_where", "filter_tags", "profile_phases"]
+    )
 
 
 def workspace_info_setup_parser(subparser):
@@ -981,7 +1011,8 @@ def workspace_archive_setup_parser(subparser):
     )
 
     arguments.add_common_arguments(
-        subparser, ["phases", "include_phase_dependencies", "where", "exclude_where"]
+        subparser,
+        ["phases", "include_phase_dependencies", "where", "exclude_where", "profile_phases"],
     )
 
 
@@ -1024,7 +1055,8 @@ def workspace_mirror_setup_parser(subparser):
     )
 
     arguments.add_common_arguments(
-        subparser, ["phases", "include_phase_dependencies", "where", "exclude_where"]
+        subparser,
+        ["phases", "include_phase_dependencies", "where", "exclude_where", "profile_phases"],
     )
 
 
