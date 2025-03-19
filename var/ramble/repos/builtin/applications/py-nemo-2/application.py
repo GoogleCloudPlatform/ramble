@@ -327,7 +327,7 @@ class PyNemo2(ExecutableApplication):
             canonicalize_path(
                 os.path.join(
                     self.expander.expand_var_name("nemo_2_config_dir_path"),
-                    self.expander.expand_var_name("nemo_2_config_name")
+                    self.expander.expand_var_name("nemo_2_config_name"),
                 )
             ),
             workspace,
@@ -338,7 +338,7 @@ class PyNemo2(ExecutableApplication):
 
         dest_path = os.path.join(
             app_inst.expander.expand_var_name("experiment_run_dir"),
-            app_inst.expander.expand_var_name("nemo_2_config_name")
+            app_inst.expander.expand_var_name("nemo_2_config_name"),
         )
 
         self.expander.flush_used_variable_stage()
