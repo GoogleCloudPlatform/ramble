@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import contextlib
 from typing import Optional
 
 import ramble.language.language_base
@@ -590,3 +591,21 @@ def register_validator(name: str, predicate: str, message: str, fail_on_invalid:
         }
 
     return _define_validator
+
+
+@contextlib.contextmanager
+def when(condition):
+    from ramble.language.language_base import DirectiveMeta
+
+    DirectiveMeta.push_to_context(condition)
+    yield
+    DirectiveMeta.pop_from_context()
+
+
+@contextlib.contextmanager
+def default_args(**kwargs):
+    from ramble.language.language_base import DirectiveMeta
+
+    DirectiveMeta.push_default_args(kwargs)
+    yield
+    DirectiveMeta.pop_default_args()

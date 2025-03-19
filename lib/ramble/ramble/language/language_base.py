@@ -10,6 +10,7 @@
 directives, which are to allow functions to be invoked at class level
 """
 
+from typing import List, Dict, Any
 import functools
 from collections.abc import Sequence  # novm
 
@@ -47,6 +48,8 @@ class DirectiveMeta(type):
     _directives_to_be_executed = []
     _directive_functions = {}
     _directive_classes = {}
+    _when_constraints_from_context = []
+    _default_args: List[dict] = []
 
     def __new__(cls, name, bases, attr_dict):
         # Initialize the attribute containing the list of directives
@@ -78,6 +81,22 @@ class DirectiveMeta(type):
             DirectiveMeta._directives_to_be_executed = []
 
         return super().__new__(cls, name, bases, attr_dict)
+
+    @staticmethod
+    def push_to_context(when_condition: str) -> None:
+        DirectiveMeta._when_constraints_from_context.append(when_condition)
+
+    @staticmethod
+    def pop_from_context() -> str:
+        return DirectiveMeta._when_constraints_from_context.pop()
+
+    @staticmethod
+    def push_default_args(default_args: Dict[str, Any]) -> None:
+        DirectiveMeta._default_args.append(default_args)
+
+    @staticmethod
+    def pop_default_args() -> dict:
+        return DirectiveMeta._default_args.pop()
 
     def __init__(cls, name, bases, attr_dict):
         # The instance is being initialized: if it is a package we must ensure
@@ -174,7 +193,33 @@ class DirectiveMeta(type):
         # This decorator just returns the directive functions
         def _decorator(decorated_function):
             @functools.wraps(decorated_function)
-            def _wrapper(*args, **kwargs):
+            def _wrapper(*args, **_kwargs):
+                # First merge default args with kwargs
+                kwargs = dict()
+                for default_args in DirectiveMeta._default_args:
+                    kwargs.update(default_args)
+                kwargs.update(_kwargs)
+
+                # Inject when arguments from the context
+                if DirectiveMeta._when_constraints_from_context:
+                    # Check that directives not yet supporting the when= argument
+                    # are not used inside the context manager
+                    if decorated_function.__name__ == "version":
+                        msg = (
+                            'directive "{0}" cannot be used within a "when"'
+                            ' context since it does not support a "when=" '
+                            "argument"
+                        )
+                        msg = msg.format(decorated_function.__name__)
+                        raise DirectiveError(msg)
+
+                    when_constraints = DirectiveMeta._when_constraints_from_context.copy()
+
+                    if kwargs.get("when"):
+                        when_constraints.extend(kwargs["when"])
+
+                    kwargs["when"] = when_constraints.copy()
+
                 # If any of the arguments are executors returned by a
                 # directive passed as an argument, don't execute them
                 # lazily. Instead, let the called directive handle them.
