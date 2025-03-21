@@ -1754,10 +1754,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                 with open(file) as f:
                     for line in f.readlines():
-                        logger.debug(f"Line: {line}")
                         new_per_file_crit_objs = []
                         for crit_obj in per_file_crit_objs:
-                            logger.debug(f"Looking for criteria {crit_obj.name}")
                             if crit_obj.passed(line, self):
                                 crit_obj.mark_found()
                             elif crit_obj.anti_matched(line):
@@ -1783,7 +1781,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                     fom_values[context_name] = {}
 
                         for fom in file_conf["foms"]:
-                            logger.debug(f"  Testing for fom {fom}")
                             fom_conf = foms[fom]
                             fom_match = fom_conf["regex"].match(line)
 
