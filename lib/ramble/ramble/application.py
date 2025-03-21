@@ -120,8 +120,17 @@ def _run_phase_hook(obj, workspace, pipeline, hook):
 
     hook_func_name = f"_{hook}"
     if hasattr(obj, hook_func_name):
-        phase_func = getattr(obj, hook_func_name)
+        phase_func = _get_phase_func_wrapper(workspace, getattr(obj, hook_func_name), hook)
         phase_func(workspace)
+
+
+def _get_phase_func_wrapper(workspace, phase_func, phase_name):
+    if workspace.profile_config is None:
+        return phase_func
+    (profiler, profile_phases) = workspace.profile_config
+    if phase_name not in profile_phases:
+        return phase_func
+    return profiler(phase_func)
 
 
 class ApplicationBase(metaclass=ApplicationMeta):
@@ -648,7 +657,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
             _run_phase_hook(obj, workspace, pipeline, phase)
-        phase_func = phase_node.attribute
+        phase_func = _get_phase_func_wrapper(workspace, phase_node.attribute, phase)
         phase_func(workspace, app_inst=self)
         self._phase_times[phase] = time.time() - start_time
 

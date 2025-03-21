@@ -646,7 +646,7 @@ _ramble_workspace_activate() {
 }
 
 _ramble_workspace_archive() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --phases --include-phase-dependencies --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --phases --include-phase-dependencies --where --exclude-where --profile-phase"
 }
 
 _ramble_workspace_deactivate() {
@@ -667,15 +667,15 @@ _ramble_workspace_concretize() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase"
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase"
 }
 
 _ramble_workspace_push_to_cache() {
-    RAMBLE_COMPREPLY="-h --help -d --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help -d --where --exclude-where --filter-tags --profile-phase"
 }
 
 _ramble_workspace_info() {
@@ -692,7 +692,7 @@ _ramble_workspace_edit() {
 }
 
 _ramble_workspace_mirror() {
-    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --include-phase-dependencies --where --exclude-where"
+    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --include-phase-dependencies --where --exclude-where --profile-phase"
 }
 
 _ramble_workspace_experiment_logs() {

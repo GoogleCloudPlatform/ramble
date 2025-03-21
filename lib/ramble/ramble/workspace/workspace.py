@@ -487,6 +487,9 @@ class Workspace:
 
         self.deployment_name = self.name
 
+        # Used by profiling phases
+        self.profile_config = None
+
     def _re_read(self):
         """Reinitialize the workspace object if it has been written (this
         may not be true if the workspace was just created in this running
