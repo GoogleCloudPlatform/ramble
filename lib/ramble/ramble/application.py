@@ -1788,7 +1788,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 fom_vars = {}
                                 for k, v in fom_match.groupdict().items():
                                     fom_vars[k] = v
-                                fom_name = self.expander.expand_var(fom, extra_vars=fom_vars)
+                                if fom_conf["fom_name_expanded"] is not None:
+                                    fom_name = fom_conf["fom_name_expanded"]
+                                else:
+                                    fom_name = self.expander.expand_var(fom, extra_vars=fom_vars)
 
                                 if fom_conf["group"] in fom_conf["regex"].groupindex:
                                     logger.debug(" --- Matched fom %s" % fom_name)
@@ -1808,9 +1811,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                     if context not in fom_values:
                                         fom_values[context] = {}
                                     fom_val = fom_match.group(fom_conf["group"])
-                                    fom_unit = self.expander.expand_var(
-                                        fom_conf["units"], extra_vars=fom_vars
-                                    )
+                                    if fom_conf["units_expanded"] is not None:
+                                        fom_unit = fom_conf["units"]
+                                    else:
+                                        fom_unit = self.expander.expand_var(
+                                            fom_conf["units"], extra_vars=fom_vars
+                                        )
                                     fom_values[context][fom_name] = {
                                         "value": fom_val,
                                         "units": fom_unit,
@@ -2250,6 +2256,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 files[log_path]["contexts"].extend(conf["contexts"])
             files[log_path]["foms"].append(fom)
 
+            def _try_expand_var_or_none(var: str, expander):
+                try:
+                    return expander.expand_var(var, allow_passthrough=False)
+                except ramble.expander.RambleSyntaxError:
+                    return None
+
             foms[fom] = {
                 "regex": re.compile(r"%s" % self.expander.expand_var(conf["regex"])),
                 "contexts": [],
@@ -2258,6 +2270,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "origin": conf["origin"],
                 "origin_type": conf["origin_type"],
                 "fom_type": conf["fom_type"].to_dict(),
+                # If expansion works (i.e., it doesn't rely on the matched fom groups),
+                # then cache it here to avoid repeated expansion later.
+                "units_expanded": _try_expand_var_or_none(conf["units"], self.expander),
+                "fom_name_expanded": _try_expand_var_or_none(fom, self.expander),
             }
             if conf["contexts"]:
                 foms[fom]["contexts"].extend(conf["contexts"])
