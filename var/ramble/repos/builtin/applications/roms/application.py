@@ -81,12 +81,12 @@ class Roms(ExecutableApplication):
     success_criteria(
         "prints_done",
         mode="string",
-        match=r".*ROMS/TOMS: DONE.*",
+        match=r".*?ROMS/TOMS: DONE",
     )
 
     figure_of_merit(
         "Total Time",
-        fom_regex=r"\s*All percentages are with respect to total time =\s+(?P<time>\d+\.\d+).*",
+        fom_regex=r"\s*All percentages are with respect to total time =\s+(?P<time>\d+\.\d+)",
         group_name="time",
         units="s",
     )

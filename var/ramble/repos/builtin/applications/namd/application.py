@@ -166,7 +166,7 @@ class Namd(ExecutableApplication):
     success_criteria(
         "Completion",
         mode="string",
-        match=r".*End of program.*",
+        match=r".*?End of program",
         file=log_file_str,
     )
 
@@ -174,7 +174,7 @@ class Namd(ExecutableApplication):
     timing_regex = (
         r"TIMING:\s+(?P<itr>[0-9]+)\s+CPU:\s+(?P<cpu>[0-9]+\.[0-9]+),\s+(?P<cpu_per_step>[0-9]+\.[0-9]+)/step\s+"
         + r"Wall:\s+(?P<wall>[0-9]+\.[0-9]+),\s+(?P<wall_per_step>[0-9]+\.[0-9]+)/step,\s+(?P<remaining>[0-9]+\.*[0-9]*)\s+"
-        + r"hours\s+remaining,\s+(?P<mem>[0-9]+\.[0-9]+)\s+MB.*"
+        + r"hours\s+remaining,\s+(?P<mem>[0-9]+\.[0-9]+)\s+MB"
     )
     figure_of_merit_context(
         "Perf iteration",

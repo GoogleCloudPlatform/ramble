@@ -145,7 +145,7 @@ class ConditionalPsm3(BasicModifier):
 
         return pre_cmds, post_cmds
 
-    psm3_build_info_regex = r".*\sPSM3_IDENTIFY PSM3\s+(?P<version>v[\d.]+)\s+built for\s+(?P<target>.*)$"
+    psm3_build_info_regex = r".*?\sPSM3_IDENTIFY PSM3\s+(?P<version>v[\d.]+)\s+built for\s+(?P<target>.*)$"
 
     figure_of_merit(
         "PSM3 version",

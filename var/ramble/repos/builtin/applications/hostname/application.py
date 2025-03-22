@@ -57,7 +57,7 @@ class Hostname(ExecutableApplication):
 
     figure_of_merit(
         "possible hostname",
-        fom_regex=r"(?P<hostname>\S+)\s*",
+        fom_regex=r"(?P<hostname>\S+)",
         group_name="hostname",
         units="",
     )

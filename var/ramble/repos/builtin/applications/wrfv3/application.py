@@ -99,7 +99,7 @@ class Wrfv3(ExecutableApplication):
     figure_of_merit(
         "Average Timestep Time",
         log_file=log_str,
-        fom_regex=r"Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Average time:\s+(?P<avg_time>[0-9]+\.[0-9]*)",
         group_name="avg_time",
         units="s",
         fom_type=FomType.TIME,
@@ -108,7 +108,7 @@ class Wrfv3(ExecutableApplication):
     figure_of_merit(
         "Cumulative Timestep Time",
         log_file=log_str,
-        fom_regex=r"Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Cumulative time:\s+(?P<total_time>[0-9]+\.[0-9]*)",
         group_name="total_time",
         units="s",
         fom_type=FomType.TIME,
@@ -117,7 +117,7 @@ class Wrfv3(ExecutableApplication):
     figure_of_merit(
         "Minimum Timestep Time",
         log_file=log_str,
-        fom_regex=r"Min time:\s+(?P<min_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Min time:\s+(?P<min_time>[0-9]+\.[0-9]*)",
         group_name="min_time",
         units="s",
         fom_type=FomType.TIME,
@@ -126,7 +126,7 @@ class Wrfv3(ExecutableApplication):
     figure_of_merit(
         "Maximum Timestep Time",
         log_file=log_str,
-        fom_regex=r"Max time:\s+(?P<max_time>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Max time:\s+(?P<max_time>[0-9]+\.[0-9]*)",
         group_name="max_time",
         units="s",
         fom_type=FomType.TIME,
@@ -144,7 +144,7 @@ class Wrfv3(ExecutableApplication):
     figure_of_merit(
         "Avg. Max Ratio Time",
         log_file=log_str,
-        fom_regex=r"Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*).*",
+        fom_regex=r"Avg time / Max time:\s+(?P<avg_max_ratio>[0-9]+\.[0-9]*)",
         group_name="avg_max_ratio",
         units="",
         fom_type=FomType.MEASURE,
@@ -153,7 +153,7 @@ class Wrfv3(ExecutableApplication):
     success_criteria(
         "Complete",
         mode="string",
-        match=r".*wrf: SUCCESS COMPLETE WRF.*",
+        match=r".*?wrf: SUCCESS COMPLETE WRF",
         file="{experiment_run_dir}/rsl.out.0000",
     )
 

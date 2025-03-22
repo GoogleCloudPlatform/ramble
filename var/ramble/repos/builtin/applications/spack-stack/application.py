@@ -103,21 +103,21 @@ class SpackStack(ExecutableApplication):
     )
 
     success_criteria(
-        "view-updated", mode="string", match=r".*==> Updating view at.*"
+        "view-updated", mode="string", match=r".*?==> Updating view at"
     )
 
-    pkg_regex = r"\s*==\> (?P<name>.*) Successfully installed (?P<spec>.*)"
+    pkg_regex = r"\s*==\> (?P<name>.*?) Successfully installed (?P<spec>.*)"
 
     figure_of_merit(
         "Previously installed packages",
-        fom_regex=r"\s*==\> (?P<quant>.*) of the packages are already installed",
+        fom_regex=r"\s*==\> (?P<quant>.*?) of the packages are already installed",
         group_name="quant",
         units="",
     )
 
     figure_of_merit(
         "{pkg_name} installed",
-        fom_regex=r"\s*==\> (?P<pkg_name>.*): Successfully installed (?P<spec>.*)",
+        fom_regex=r"\s*==\> (?P<pkg_name>.*?): Successfully installed (?P<spec>.*)",
         group_name="spec",
         units="",
     )
@@ -139,7 +139,7 @@ class SpackStack(ExecutableApplication):
         "Total",
     ]
     for i, fom_part in enumerate(fom_parts):
-        full_regex = r".*\s*" + fom_part + r":\s+(?P<fom>[0-9\.]+)s.*"
+        full_regex = r".*?\s*" + fom_part + r":\s+(?P<fom>[0-9\.]+)s"
         figure_of_merit(
             fom_part,
             fom_regex=full_regex,

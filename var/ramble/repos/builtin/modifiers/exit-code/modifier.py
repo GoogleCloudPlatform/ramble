@@ -112,7 +112,9 @@ class ExitCode(BasicModifier):
 
         return pre_exec, post_exec
 
-    exit_code_regex = r"Exit code for (?P<exec_name>.*): (?P<exit_code>[0-9]+)"
+    exit_code_regex = (
+        r"Exit code for (?P<exec_name>.*?): (?P<exit_code>[0-9]+)"
+    )
 
     figure_of_merit_context(
         "Executable Exit Code",

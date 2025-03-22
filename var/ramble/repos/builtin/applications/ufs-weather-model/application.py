@@ -88,7 +88,7 @@ class UfsWeatherModel(ExecutableApplication):
         "Total wall clock time",
         fom_regex=(
             r"^\s*The total amount of wall time\s+=\s+"
-            r"(?P<walltime>[0-9]+\.[0-9]+).*"
+            r"(?P<walltime>[0-9]+\.[0-9]+)"
         ),
         group_name="walltime",
         log_file=log_str,
@@ -99,7 +99,7 @@ class UfsWeatherModel(ExecutableApplication):
         "Total user mode time",
         fom_regex=(
             r"^\s*The total amount of time in user mode\s+=\s+"
-            r"(?P<usertime>[0-9]+\.[0-9]+).*"
+            r"(?P<usertime>[0-9]+\.[0-9]+)"
         ),
         group_name="usertime",
         log_file=log_str,
@@ -110,7 +110,7 @@ class UfsWeatherModel(ExecutableApplication):
         "Total sys mode time",
         fom_regex=(
             r"^\s*The total amount of time in sys mode\s+=\s+"
-            r"(?P<systime>[0-9]+\.[0-9]+).*"
+            r"(?P<systime>[0-9]+\.[0-9]+)"
         ),
         group_name="systime",
         log_file=log_str,
@@ -120,8 +120,8 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Maximum resident set size",
         fom_regex=(
-            r"^\s*The maximum resident set size.*\s+=\s+"
-            r"(?P<res_set_size>[0-9]+).*"
+            r"^\s*The maximum resident set size.*?\s+=\s+"
+            r"(?P<res_set_size>[0-9]+)"
         ),
         group_name="res_set_size",
         log_file=log_str,
@@ -131,8 +131,8 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Mean specific humidity above 75mb",
         fom_regex=(
-            r"^\s*Mean specific humidity.*=\s+"
-            r"(?P<mean_sp_hum>[0-9]+\.[0-9]+).*"
+            r"^\s*Mean specific humidity.*?=\s+"
+            r"(?P<mean_sp_hum>[0-9]+\.[0-9]+)"
         ),
         group_name="mean_sp_hum",
         log_file=log_str,
@@ -142,8 +142,8 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Total surface pressure",
         fom_regex=(
-            r"^\s*Total surface pressure.*=\s+"
-            r"(?P<tot_surf_press>[0-9]+\.[0-9]+).*"
+            r"^\s*Total surface pressure.*?=\s+"
+            r"(?P<tot_surf_press>[0-9]+\.[0-9]+)"
         ),
         group_name="tot_surf_press",
         log_file=log_str,
@@ -153,10 +153,10 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "mean dry surface pressure",
         fom_regex=(
-            r"^\s*mean dry surface pressure.*=\s+"
+            r"^\s*mean dry surface pressure.*?=\s+"
             r"(?P<mean_dry_surf_press>"
             r"[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*"
-            r").*"
+            r")"
         ),
         group_name="mean_dry_surf_press",
         log_file=log_str,
@@ -166,10 +166,10 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Total water vapor",
         fom_regex=(
-            r"^\s*Total Water Vapor.*=\s+"
+            r"^\s*Total Water Vapor.*?=\s+"
             r"(?P<tot_h2o_vapor>"
             r"[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*"
-            r").*"
+            r")"
         ),
         group_name="tot_h2o_vapor",
         log_file=log_str,
@@ -179,10 +179,10 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Total cloud water",
         fom_regex=(
-            r"^\s*Total cloud water.*=\s+"
+            r"^\s*Total cloud water.*?=\s+"
             r"(?P<tot_cloud_h2o>"
             r"[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*"
-            r").*"
+            r")"
         ),
         group_name="tot_cloud_h2o",
         log_file=log_str,
@@ -192,10 +192,10 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Total rain water",
         fom_regex=(
-            r"^\s*Total rain water.*=\s+"
+            r"^\s*Total rain water.*?=\s+"
             r"(?P<tot_rain_h2o>"
             r"[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*"
-            r").*"
+            r")"
         ),
         group_name="tot_rain_h2o",
         log_file=log_str,
@@ -205,10 +205,10 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Total snow",
         fom_regex=(
-            r"^\s*Total snow.*=\s+"
+            r"^\s*Total snow.*?=\s+"
             r"(?P<tot_snow>"
             r"[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*"
-            r").*"
+            r")"
         ),
         group_name="tot_snow",
         log_file=log_str,
@@ -218,10 +218,10 @@ class UfsWeatherModel(ExecutableApplication):
     figure_of_merit(
         "Total graupel",
         fom_regex=(
-            r"^\s*Total graupel.*=\s+"
+            r"^\s*Total graupel.*?=\s+"
             r"(?P<tot_graupel>"
             r"[\+\-]*[0-9]*\.*[0-9]+E*[\+\-]*[0-9]*"
-            r").*"
+            r")"
         ),
         group_name="tot_graupel",
         log_file=log_str,
@@ -231,6 +231,6 @@ class UfsWeatherModel(ExecutableApplication):
     success_criteria(
         "program_ended",
         mode="string",
-        match=r"^\s+PROGRAM.*HAS ENDED\..*",
+        match=r"^\s+PROGRAM.*?HAS ENDED\.",
         file=log_str,
     )

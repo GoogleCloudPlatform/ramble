@@ -97,7 +97,7 @@ class Hmmer(ExecutableApplication):
 
     figure_of_merit(
         "Elapsed time",
-        fom_regex=r"# CPU.*Elapsed:\s+(?P<elapsed_time>[0-9]+:[0-9]+:[0-9]+\.*[0-9]*)\s*$",
+        fom_regex=r"# CPU.*?Elapsed:\s+(?P<elapsed_time>[0-9]+:[0-9]+:[0-9]+\.*[0-9]*)\s*$",
         group_name="elapsed_time",
         log_file=out_file,
         units="hms",
