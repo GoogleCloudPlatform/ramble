@@ -273,5 +273,5 @@ class IntelMpiBenchmarks(ExecutableApplication):
     success_criteria(
         "run_to_completion",
         mode="string",
-        match=r".*All processes entering MPI_Finalize",
+        match=r".*?All processes entering MPI_Finalize",
     )

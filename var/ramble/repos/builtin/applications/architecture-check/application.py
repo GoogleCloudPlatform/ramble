@@ -74,7 +74,7 @@ fi
 
     workload_group("all_workloads", workloads=["standard"])
 
-    spack_regex = r"Spack tuple: (?P<platform>\S+)-(?P<os>\S+)-(?P<arch>\S+)"
+    spack_regex = r"Spack tuple: (?P<platform>\S+?)-(?P<os>\S+?)-(?P<arch>\S+)"
 
     figure_of_merit(
         "Spack Platform",

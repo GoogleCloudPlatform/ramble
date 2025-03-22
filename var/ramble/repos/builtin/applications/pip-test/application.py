@@ -40,7 +40,7 @@ class PipTest(ExecutableApplication):
 
     figure_of_merit(
         "return_code",
-        fom_regex=r"return code is (?P<code>[0-9]+)\s*",
+        fom_regex=r"return code is (?P<code>[0-9]+)",
         group_name="code",
         units="",
     )

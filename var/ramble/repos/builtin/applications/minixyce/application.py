@@ -153,7 +153,7 @@ class Minixyce(ExecutableApplication):
     floating_point_regex = r"\d+\.\d+"
     scientific_number_regex = r"[\+\-]*\d+\.\d+[eE][\+\-]*\d+"
 
-    success_regex = r"^\s*TIME.*num_GMRES_iters\s*num_GMRES_restarts"
+    success_regex = r"^\s*TIME.*?num_GMRES_iters\s*num_GMRES_restarts"
     success_criteria("valid", mode="string", match=success_regex, file=log_str)
 
     figure_of_merit(

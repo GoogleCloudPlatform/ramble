@@ -106,7 +106,7 @@ class Iperf2(ExecutableApplication):
     figure_of_merit(
         "Total BW",
         log_file=log_str,
-        fom_regex=r"\[SUM\]\s.*sec\s.*GBytes\s(?P<bw>.*)\sGbits/sec.*",
+        fom_regex=r"\[SUM\]\s.*?sec\s.*?GBytes\s(?P<bw>.*)\sGbits/sec",
         group_name="bw",
         units="Gbits/sec",
     )

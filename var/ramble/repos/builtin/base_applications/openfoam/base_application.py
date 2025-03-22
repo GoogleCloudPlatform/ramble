@@ -390,7 +390,7 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "Number of cells",
         log_file=(log_prefix + "snappyHexMesh"),
-        fom_regex=r"Layer mesh\s+:\s+cells:(?P<ncells>[0-9]+)\s+.*",
+        fom_regex=r"Layer mesh\s+:\s+cells:(?P<ncells>[0-9]+)\s+",
         group_name="ncells",
         units="",
     )
@@ -398,7 +398,7 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "snappyHexMesh Time",
         log_file=(log_prefix + "snappyHexMesh"),
-        fom_regex=r"Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=r"Finished meshing in = (?P<mesh_time>[0-9]+\.?[0-9]*)",
         group_name="mesh_time",
         units="s",
     )
@@ -414,7 +414,7 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "simpleFoam Time",
         log_file=(log_prefix + "simpleFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)",
         group_name="foam_time",
         units="s",
     )
@@ -422,7 +422,7 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "simpleFoam Time",
         log_file=(log_prefix + "simpleFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)",
         group_name="foam_time",
         units="s",
     )
@@ -438,7 +438,7 @@ class Openfoam(ExecutableApplication):
     figure_of_merit(
         "potentialFoam Time",
         log_file=(log_prefix + "potentialFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*).*",
+        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)",
         group_name="foam_time",
         units="s",
     )

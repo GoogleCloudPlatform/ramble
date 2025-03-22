@@ -392,7 +392,7 @@ class Gromacs(ExecutableApplication):
     figure_of_merit(
         "Core Time",
         log_file=log_str,
-        fom_regex=r"\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s+Time:\s+(?P<core_time>[0-9]+\.[0-9]+)",
         group_name="core_time",
         units="s",
         fom_type=FomType.TIME,
@@ -402,7 +402,7 @@ class Gromacs(ExecutableApplication):
         "Wall Time",
         log_file=log_str,
         fom_regex=r"\s+Time:\s+[0-9]+\.[0-9]+\s+"
-        + r"(?P<wall_time>[0-9]+\.[0-9]+).*",
+        + r"(?P<wall_time>[0-9]+\.[0-9]+)",
         group_name="wall_time",
         units="s",
         fom_type=FomType.TIME,
@@ -412,7 +412,7 @@ class Gromacs(ExecutableApplication):
         "Percent Core Time",
         log_file=log_str,
         fom_regex=r"\s+Time:\s+[0-9]+\.[0-9]+\s+[0-9]+\.[0-9]+\s+"
-        + r"(?P<perc_core_time>[0-9]+\.[0-9]+).*",
+        + r"(?P<perc_core_time>[0-9]+\.[0-9]+)",
         group_name="perc_core_time",
         units="%",
         fom_type=FomType.MEASURE,
@@ -421,7 +421,7 @@ class Gromacs(ExecutableApplication):
     figure_of_merit(
         "Nanosecs per day",
         log_file=log_str,
-        fom_regex=r"Performance:\s+" + r"(?P<ns_per_day>[0-9]+\.[0-9]+).*",
+        fom_regex=r"Performance:\s+" + r"(?P<ns_per_day>[0-9]+\.[0-9]+)",
         group_name="ns_per_day",
         units="ns/day",
         fom_type=FomType.THROUGHPUT,
@@ -431,7 +431,7 @@ class Gromacs(ExecutableApplication):
         "Hours per nanosec",
         log_file=log_str,
         fom_regex=r"Performance:\s+[0-9]+\.[0-9]+\s+"
-        + r"(?P<hours_per_ns>[0-9]+\.[0-9]+).*",
+        + r"(?P<hours_per_ns>[0-9]+\.[0-9]+)",
         group_name="hours_per_ns",
         units="hours/ns",
         fom_type=FomType.INFO,

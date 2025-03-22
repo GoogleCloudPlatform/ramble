@@ -190,7 +190,7 @@ class Ethtool(BasicModifier):
 
     figure_of_merit(
         "adaptive_tx",
-        fom_regex=r"Adaptive RX:.*TX:\s*(?P<adaptive_tx>off|on)",
+        fom_regex=r"Adaptive RX:.*?TX:\s*(?P<adaptive_tx>off|on)",
         log_file="{experiment_run_dir}/ethtool_out",
         group_name="adaptive_tx",
         units="",

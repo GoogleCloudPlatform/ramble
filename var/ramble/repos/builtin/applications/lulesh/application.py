@@ -68,7 +68,7 @@ class Lulesh(ExecutableApplication):
     figure_of_merit(
         "Time",
         log_file=log_str,
-        fom_regex=r"\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*Elapsed time\s+=\s+(?P<time>[0-9]+\.[0-9]+)",
         group_name="time",
         units="s",
     )
@@ -76,7 +76,7 @@ class Lulesh(ExecutableApplication):
     figure_of_merit(
         "FOM",
         log_file=log_str,
-        fom_regex=r"\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*FOM\s+=\s+(?P<fom>[0-9]+\.[0-9]+)",
         group_name="fom",
         units="z/s",
     )
@@ -92,7 +92,7 @@ class Lulesh(ExecutableApplication):
     figure_of_merit(
         "Grind Time",
         log_file=log_str,
-        fom_regex=r"\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*Grind time \(us/z/c\)\s+=\s+(?P<grind>[0-9]+\.[0-9]+)",
         group_name="grind",
         units="s/element",
     )

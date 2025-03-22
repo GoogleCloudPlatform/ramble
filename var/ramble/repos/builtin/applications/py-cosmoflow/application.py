@@ -184,63 +184,63 @@ class PyCosmoflow(ExecutableApplication):
 
     figure_of_merit(
         "Best Epoch",
-        fom_regex=r".*INFO\s+epoch: (?P<idx>[0-9]+)",
+        fom_regex=r".*?INFO\s+epoch: (?P<idx>[0-9]+)",
         group_name="idx",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Loss",
-        fom_regex=r".*INFO\s+loss: (?P<loss>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+loss: (?P<loss>[0-9\.]+)",
         group_name="loss",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch LR",
-        fom_regex=r".*INFO\s+lr: (?P<lr>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+lr: (?P<lr>[0-9\.]+)",
         group_name="lr",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Mean Absolute Error",
-        fom_regex=r".*INFO\s+mean_absolute_error: (?P<abs_err>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+mean_absolute_error: (?P<abs_err>[0-9\.]+)",
         group_name="abs_err",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Time",
-        fom_regex=r".*INFO\s+time: (?P<time>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+time: (?P<time>[0-9\.]+)",
         group_name="time",
         units="s",
     )
 
     figure_of_merit(
         "Best Epoch Val Loss",
-        fom_regex=r".*INFO\s+val_loss: (?P<val_loss>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+val_loss: (?P<val_loss>[0-9\.]+)",
         group_name="val_loss",
         units="",
     )
 
     figure_of_merit(
         "Best Epoch Val Mean Absolute Error",
-        fom_regex=r".*INFO\s+val_mean_absolute_error: (?P<val_error>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+val_mean_absolute_error: (?P<val_error>[0-9\.]+)",
         group_name="val_error",
         units="",
     )
 
     figure_of_merit(
         "Total epoch time",
-        fom_regex=r".*INFO\s+Total epoch time: (?P<total_time>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+Total epoch time: (?P<total_time>[0-9\.]+)",
         group_name="total_time",
         units="s",
     )
 
     figure_of_merit(
         "Mean epoch time",
-        fom_regex=r".*INFO\s+Mean epoch time: (?P<mean_time>[0-9\.]+)",
+        fom_regex=r".*?INFO\s+Mean epoch time: (?P<mean_time>[0-9\.]+)",
         group_name="mean_time",
         units="s",
     )

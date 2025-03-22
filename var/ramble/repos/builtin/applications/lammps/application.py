@@ -316,21 +316,21 @@ class Lammps(ExecutableApplication):
     )
     figure_of_merit(
         "Nanoseconds per day",
-        fom_regex=r"Performance.*\s+(?P<nspd>[0-9\.]+) (ns|tau)/day",
+        fom_regex=r"Performance.*?\s+(?P<nspd>[0-9\.]+) (ns|tau)/day",
         group_name="nspd",
         units="ns/day",
         fom_type=FomType.THROUGHPUT,
     )
     figure_of_merit(
         "Hours per nanosecond",
-        fom_regex=r"Performance.*\s+(?P<hpns>[0-9\.]+) hours/ns",
+        fom_regex=r"Performance.*?\s+(?P<hpns>[0-9\.]+) hours/ns",
         group_name="hpns",
         units="hours/ns",
         fom_type=FomType.TIME,
     )
     figure_of_merit(
         "Timesteps per second",
-        fom_regex=r"Performance.*\s+(?P<tsps>[0-9\.]+) timesteps/s",
+        fom_regex=r"Performance.*?\s+(?P<tsps>[0-9\.]+) timesteps/s",
         group_name="tsps",
         units="timesteps/s",
         fom_type=FomType.THROUGHPUT,

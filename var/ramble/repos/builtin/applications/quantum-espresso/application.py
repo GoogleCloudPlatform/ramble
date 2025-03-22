@@ -194,7 +194,7 @@ class QuantumEspresso(ExecutableApplication):
     log_str = Expander.expansion_str("log_file")
     figure_of_merit(
         "Total CPU time",
-        fom_regex=r"\s*total cpu time spent up to now is\s+(?P<time>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*total cpu time spent up to now is\s+(?P<time>[0-9]+\.[0-9]+)",
         group_name="time",
         log_file=log_str,
         units="s",
@@ -202,7 +202,7 @@ class QuantumEspresso(ExecutableApplication):
 
     figure_of_merit(
         "Estimated SCF accuracy",
-        fom_regex=r"\s*estimated scf accuracy\s+<\s+(?P<energy>[0-9]+\.[0-9]+).*",
+        fom_regex=r"\s*estimated scf accuracy\s+<\s+(?P<energy>[0-9]+\.[0-9]+)",
         group_name="energy",
         log_file=log_str,
         units="Ry",
@@ -210,7 +210,7 @@ class QuantumEspresso(ExecutableApplication):
 
     profile_regex = (
         r"\s+(?P<section>[\w:]+)\s+:\s+(?P<cpu>[0-9]+\.[0-9]+)s CPU\s+"
-        + r"(?P<wall>[0-9]+\.[0-9]+)s WALL \(\s+(?P<calls>[0-9]+) calls\).*"
+        + r"(?P<wall>[0-9]+\.[0-9]+)s WALL \(\s+(?P<calls>[0-9]+) calls\)"
     )
     figure_of_merit_context(
         "Profile section", regex=profile_regex, output_format="{section}"
@@ -244,5 +244,5 @@ class QuantumEspresso(ExecutableApplication):
     )
 
     success_criteria(
-        "job_done", mode="string", match=r".*JOB DONE\..*", file=log_str
+        "job_done", mode="string", match=r".*?JOB DONE\.", file=log_str
     )

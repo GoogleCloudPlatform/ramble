@@ -302,7 +302,7 @@ class NvidiaHpl(HplBase, NvidiaHPCBase):
 
     figure_of_merit(
         "Per GPU GFlops",
-        fom_regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)"
+        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)"
         + r"\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+"
         + r"(?P<gflops>\S+)\s+\(\s+(?P<per_gpu_gflops>\S+)\)",
         group_name="per_gpu_gflops",

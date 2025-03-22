@@ -66,35 +66,35 @@ class Sleep(ExecutableApplication):
         workloads=["rand_sleep"],
     )
 
-    echo_regex = r".*Sleep for (?P<time>[0-9]+) seconds.*"
+    echo_regex = r"Sleep for (?P<time>[0-9]+) seconds"
     figure_of_merit(
         "Sleep time", fom_regex=echo_regex, group_name="time", units="s"
     )
 
     figure_of_merit(
         "User time",
-        fom_regex=r"(?P<user_time>[0-9]+\.[0-9]+)user.*",
+        fom_regex=r"(?P<user_time>[0-9]+\.[0-9]+)user",
         group_name="user_time",
         units="s",
     )
 
     figure_of_merit(
         "Elapsed minutes",
-        fom_regex=r".*(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed.*",
+        fom_regex=r".*?(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed",
         group_name="mins",
         units="minutes",
     )
 
     figure_of_merit(
         "Elapsed seconds",
-        fom_regex=r".*(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed.*",
+        fom_regex=r".*?(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed",
         group_name="secs",
         units="s",
     )
 
     figure_of_merit(
         "Elapsed milliseconds",
-        fom_regex=r".*(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed.*",
+        fom_regex=r".*?(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed",
         group_name="millisecs",
         units="ms",
     )

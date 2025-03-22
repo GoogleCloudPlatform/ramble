@@ -272,7 +272,7 @@ class Hpl(ExecutableApplication):
     # FOMs:
     figure_of_merit(
         "Time",
-        fom_regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
         group_name="time",
         units="s",
         contexts=["problem-name"],
@@ -281,7 +281,7 @@ class Hpl(ExecutableApplication):
 
     figure_of_merit(
         "GFlops",
-        fom_regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
         group_name="gflops",
         units="GFLOP/s",
         contexts=["problem-name"],
@@ -290,7 +290,7 @@ class Hpl(ExecutableApplication):
 
     figure_of_merit_context(
         "problem-name",
-        regex=r".*\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+        regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
         output_format="N-NB-P-Q = {N}-{NB}-{P}-{Q}",
     )
 

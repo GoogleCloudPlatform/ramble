@@ -69,7 +69,7 @@ class Elk(ExecutableApplication):
     success_criteria(
         "prints_done",
         mode="string",
-        match=r".*Elk code stopped.*",
+        match=r".*?Elk code stopped",
         file="{experiment_run_dir}/{experiment_name}.out",
     )
 
@@ -88,7 +88,7 @@ class Elk(ExecutableApplication):
         figure_of_merit(
             metric,
             log_file=output_file,
-            fom_regex=rf"\s*(?P<metric>{metric})\s+:\s+(?P<value>[0-9]+\.[0-9]*).*",
+            fom_regex=rf"\s*(?P<metric>{metric})\s+:\s+(?P<value>[0-9]+\.[0-9]*)",
             group_name="value",
             units="s",
         )
