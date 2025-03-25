@@ -2,7 +2,7 @@
 
 . {batch_helpers}
 
-job_id=$(get_job_id)
+job_id=$(get_job_id) || exit 0
 
 echo "Waiting for job {job_name} with id ${job_id} to complete..."
 

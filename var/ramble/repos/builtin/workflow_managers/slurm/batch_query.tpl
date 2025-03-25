@@ -2,7 +2,7 @@
 
 . {batch_helpers}
 
-job_id=$(get_job_id)
+job_id=$(get_job_id) || exit 0
 
 # Set up the status_map mapping between
 # sacct/squeue status to ramble counterpart
