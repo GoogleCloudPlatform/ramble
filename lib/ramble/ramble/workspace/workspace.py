@@ -466,6 +466,10 @@ class Workspace:
 
         self.results = self.default_results()
 
+        # A cache structured as {pkg_man: {env_name: pkg_list}}.
+        # It's used to cache package provenance info from different package managers.
+        self.pkg_prov_cache = defaultdict(dict)
+
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
 
         # Key for each application config should be it's filepath

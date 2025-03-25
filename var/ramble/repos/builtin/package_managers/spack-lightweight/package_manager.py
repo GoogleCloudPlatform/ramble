@@ -493,32 +493,19 @@ class SpackLightweight(PackageManagerBase):
             out_str += f" (built with {pkg.compiler})"
         return out_str
 
-    def _add_software_to_results(self, workspace, app_inst=None):
+    def get_package_list(self, workspace):
         """Augment the owning experiment's results with software stack information
 
-        This is a registered phase by the base package manager class, so here
-        we only override its base definition.
-
-        Args:
-            workspace (Workspace): A reference to the workspace that owns the
-                                   current pipeline
-            app_inst (Application): A reference to the application instance for
-                                    the current experiment
+        This is called by the `add_software_to_results` phase registered in the base
+        package manager class.
         """
-
-        # Do not manipulate null results
-        if app_inst.result is None:
-            return
-
-        if self._spec_prefix not in app_inst.result.software:
-            app_inst.result.software[self._spec_prefix] = []
-
-        package_list = app_inst.result.software[self._spec_prefix]
-
+        del workspace
+        pkg_list = []
         self.runner.activate()
         for info in self.runner.package_provenance():
-            package_list.append(info)
+            pkg_list.append(info)
         self.runner.deactivate()
+        return pkg_list
 
 
 spack_namespace = "spack"

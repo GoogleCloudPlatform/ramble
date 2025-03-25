@@ -220,7 +220,22 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
             owns the results.
 
         """
-        pass
+        if app_inst.result is None:
+            return
+        prov_cache = workspace.pkg_prov_cache
+        env_name = self.app_inst.expander.expand_var_name(self.keywords.env_name)
+        if env_name in prov_cache[self.name]:
+            # No copy done as this shouldn't be modified once written
+            pkg_list = prov_cache[self.name][env_name]
+        else:
+            pkg_list = self.get_package_list(workspace)
+            prov_cache[self.name][env_name] = pkg_list
+        self.app_inst.result.software[self._spec_prefix] = pkg_list
+
+    def get_package_list(self, workspace):
+        """Method used by add_software_to_results phase to get software provenance info"""
+        del workspace
+        return []
 
 
 class PackageManagerError(RambleError):

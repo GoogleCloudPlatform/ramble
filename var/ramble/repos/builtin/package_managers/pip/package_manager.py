@@ -213,30 +213,20 @@ class Pip(PackageManagerBase):
             "If a software mirror is required, it needs to be set up outside of Ramble"
         )
 
-    def _add_software_to_results(self, workspace, app_inst=None):
+    def get_package_list(self, workspace):
         """Augment the owning experiment's results with software stack information
 
-        This is a registered phase by the base package manager class, so here
-        we only override its base definition.
-
-        Args:
-            workspace (Workspace): A reference to the workspace that owns the
-                                   current pipeline
-            app_inst (Application): A reference to the application instance for
-                                    the current experiment
+        This is called by the `add_software_to_results` phase registered in the base
+        package manager class.
         """
-
         env_path = self.app_inst.expander.env_path
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        if self._spec_prefix not in app_inst.result.software:
-            app_inst.result.software[self._spec_prefix] = []
-
-        package_list = app_inst.result.software[self._spec_prefix]
-
+        pkg_list = []
         for info in self.runner.package_provenance():
-            package_list.append(info)
+            pkg_list.append(info)
+        return pkg_list
 
 
 package_name_regex = re.compile(
