@@ -17,6 +17,16 @@ force-exclude = '''
 )/
 '''
 
+[tool.isort]
+line_length = 99
+profile = "black"
+filter_files = true
+skip_glob = [
+  "**/lib/ramble/external/**",
+  "**/lib/ramble/llnl/**",
+  "**/lib/ramble/spack/**",
+]
+
 [tool.coverage.run]
 parallel = true
 data_file = "./tests-coverage/.coverage"

@@ -14,11 +14,10 @@ import shutil
 import sys
 import tempfile
 
-from llnl.util.filesystem import working_dir, mkdirp
+from llnl.util.filesystem import mkdirp, working_dir
+from spack.util.executable import ProcessError, which
 
 import ramble.paths
-from spack.util.executable import which, ProcessError
-
 
 description = "runs source code style checks on Ramble."
 section = "developer"
@@ -119,7 +118,7 @@ pattern_exemptions = {
 }
 
 # Tools run in the given order, with flake8 as the last check.
-tool_names = ["black", "flake8"]
+tool_names = ["isort", "black", "flake8"]
 
 tools = {}
 
@@ -470,6 +469,20 @@ def run_black(black_cmd, file_list, args):
 
     print_output(output, args)
     print_tool_result("black", returncode)
+    return returncode
+
+
+@tool("isort")
+def run_isort(isort_cmd, file_list, args):
+    isort_args = ("--sp", os.path.join(ramble.paths.prefix, "pyproject.toml"))
+    if not args.fix:
+        isort_args += ("--check", "--diff")
+    output = isort_cmd(
+        *(isort_args + tuple(file_list)), fail_on_error=False, output=str, error=str
+    )
+    returncode = isort_cmd.returncode
+    print_output(output, args)
+    print_tool_result("isort", returncode)
     return returncode
 
 
