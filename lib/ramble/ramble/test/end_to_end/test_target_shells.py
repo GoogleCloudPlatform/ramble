@@ -11,8 +11,8 @@ import os
 import pytest
 
 import ramble.workspace
-from ramble.main import RambleCommand
 from ramble.error import RambleCommandError
+from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",

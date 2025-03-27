@@ -8,8 +8,8 @@
 
 from typing import Optional
 
-import ramble.language.language_helpers
 import ramble.language.language_base
+import ramble.language.language_helpers
 import ramble.language.shared_language
 
 

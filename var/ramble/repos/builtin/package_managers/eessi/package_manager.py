@@ -6,9 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
-
 from ramble.pkg_man.builtin.environment_modules import EnvironmentModules
+from ramble.pkgmankit import *  # noqa: F403
 
 
 class Eessi(EnvironmentModules):

@@ -8,7 +8,6 @@
 
 from ramble.namespace import namespace
 
-
 _OUTPUT_MAPPING = {
     "name": "name",
     "status": "RAMBLE_STATUS",

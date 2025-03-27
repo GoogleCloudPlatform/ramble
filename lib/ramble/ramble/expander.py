@@ -6,12 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import string
 import ast
-import operator
 import math
+import operator
 import random
-
+import string
 from typing import Dict
 
 import ramble.error

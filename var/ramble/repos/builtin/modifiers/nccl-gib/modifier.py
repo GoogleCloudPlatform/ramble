@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.modkit import *
 
 
@@ -30,8 +31,8 @@ class NcclGib(BasicModifier):
     register_builtin("source_gib", injection_method="prepend")
 
     def source_gib(self):
-        import ramble.util.shell_utils
         import ramble.config
+        import ramble.util.shell_utils
 
         shell = ramble.config.get("config:shell")
         source_str = ramble.util.shell_utils.source_str(shell)

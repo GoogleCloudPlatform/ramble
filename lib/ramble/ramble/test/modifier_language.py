@@ -10,9 +10,8 @@
 import deprecation
 import pytest
 
-from ramble.modkit import *  # noqa
 from ramble.language.language_base import DirectiveError
-
+from ramble.modkit import *  # noqa
 
 mod_types = [ModifierBase, BasicModifier]  # noqa: F405
 

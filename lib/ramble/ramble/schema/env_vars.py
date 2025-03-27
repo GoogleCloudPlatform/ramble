@@ -14,7 +14,6 @@
 
 import ramble.schema.licenses
 
-
 #: Properties for inclusion in other schemas
 properties = {
     "env_vars": ramble.schema.licenses.env_var_actions,

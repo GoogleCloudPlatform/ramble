@@ -15,26 +15,22 @@ Everything in this module is automatically imported into Ramble application file
 import llnl.util.filesystem
 from llnl.util.filesystem import *
 
+import ramble.language.application_language
 from ramble.application import ApplicationBase
 from ramble.application_types.executable import ExecutableApplication
-from ramble.spec import Spec
-
-import ramble.language.application_language
 from ramble.language.application_language import *
 from ramble.language.shared_language import *
-from ramble.util.logger import logger
-
-# Import new logger as tty to preserve old behavior
-from ramble.util.logger import logger as tty
-
+from ramble.spec import Spec
+from ramble.util.command_runner import (
+    CommandRunner,
+    NoPathRunnerError,
+    RunnerError,
+    ValidationFailedError,
+)
 from ramble.util.file_util import get_file_path
 from ramble.util.foms import FomType
 
+# Import new logger as tty to preserve old behavior
+from ramble.util.logger import logger
+from ramble.util.logger import logger as tty
 from ramble.util.output_capture import OUTPUT_CAPTURE
-
-from ramble.util.command_runner import (
-    CommandRunner,
-    RunnerError,
-    NoPathRunnerError,
-    ValidationFailedError,
-)

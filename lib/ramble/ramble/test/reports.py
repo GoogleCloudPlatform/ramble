@@ -16,16 +16,16 @@
 
 # Test that PDF is generated and contains data (size > some value?)
 
-# Possible to test that a specific chart was correctly generated? Not sure...
-import pytest
-
-from ramble.util import foms
-import ramble.reports
-
-from matplotlib.backends.backend_pdf import PdfPages
 import os
+
 import pandas as pd
 
+# Possible to test that a specific chart was correctly generated? Not sure...
+import pytest
+from matplotlib.backends.backend_pdf import PdfPages
+
+import ramble.reports
+from ramble.util import foms
 
 single_experiments = [
     {

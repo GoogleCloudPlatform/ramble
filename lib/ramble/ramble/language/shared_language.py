@@ -11,9 +11,8 @@ from typing import Optional
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
-from ramble.util.logger import logger
 from ramble.util.foms import FomType
-
+from ramble.util.logger import logger
 
 """This module contains directives directives that are shared between multiple object types
 

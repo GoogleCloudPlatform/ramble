@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import sys
+
 from llnl.util.tty.color import colorize
 
 description = "get help on ramble and its commands"

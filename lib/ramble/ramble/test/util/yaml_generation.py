@@ -7,11 +7,12 @@
 # except according to those terms.
 
 import pytest
-
 import ruamel.yaml as yaml
-import ramble.util.yaml_generation
-import spack.util.spack_yaml as syaml
+
 import ramble.repository
+import ramble.util.yaml_generation
+
+import spack.util.spack_yaml as syaml
 
 
 @pytest.fixture(scope="session")

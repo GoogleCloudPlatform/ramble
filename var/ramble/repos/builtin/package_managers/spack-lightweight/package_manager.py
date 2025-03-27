@@ -6,22 +6,22 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
-
+import fnmatch
 import os
 import re
-import shutil
 import shlex
-import fnmatch
+import shutil
 
 import llnl.util.filesystem as fs
-from spack.util.executable import ProcessError
-import spack.util.spack_yaml as syaml
 
 import ramble.config
 import ramble.error
 import ramble.util.hashing
+from ramble.pkgmankit import *  # noqa: F403
 from ramble.util.logger import logger
+
+import spack.util.spack_yaml as syaml
+from spack.util.executable import ProcessError
 
 
 class SpackLightweight(PackageManagerBase):
@@ -621,8 +621,9 @@ class SpackRunner(CommandRunner):
 
     def get_version(self):
         """Get spack's version"""
-        from ramble.util.version import get_git_hash
         import importlib.util
+
+        from ramble.util.version import get_git_hash
 
         version_spec = importlib.util.spec_from_file_location(
             "spack_version",

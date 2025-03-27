@@ -7,26 +7,25 @@
 # except according to those terms.
 
 """Test that the Stage class works correctly."""
-import errno
-import os
 import collections
+import errno
+import getpass
+import os
 import shutil
 import stat
-import getpass
 
 import pytest
 
 from llnl.util.filesystem import mkdirp, partition_path, touch, working_dir
 
+import ramble.stage
+from ramble.stage import InputStage, ResourceStage, StageComposite
+
 import spack.paths
 import spack.stage
 import spack.util.executable
-
 from spack.resource import Resource
 from spack.util.path import canonicalize_path
-
-from ramble.stage import InputStage, StageComposite, ResourceStage
-import ramble.stage
 
 # The following values are used for common fetch and stage mocking fixtures:
 _archive_base = "test-files"

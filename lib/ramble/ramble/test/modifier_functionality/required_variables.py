@@ -10,8 +10,8 @@ import os
 
 import pytest
 
-import ramble.workspace
 import ramble.experiment_set
+import ramble.workspace
 from ramble.main import RambleCommand
 
 workspace = RambleCommand("workspace")

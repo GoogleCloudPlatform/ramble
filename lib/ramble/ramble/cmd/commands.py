@@ -14,15 +14,14 @@ import re
 import sys
 
 import llnl.util.filesystem as fs
-from llnl.util.argparsewriter import ArgparseWriter, ArgparseRstWriter, ArgparseCompletionWriter
+from llnl.util.argparsewriter import ArgparseCompletionWriter, ArgparseRstWriter, ArgparseWriter
 from llnl.util.tty.colify import colify
 
 import ramble.cmd
 import ramble.main
 import ramble.paths
-from ramble.util.logger import logger
 from ramble.main import section_descriptions
-
+from ramble.util.logger import logger
 
 description = "list available ramble commands"
 section = "developer"

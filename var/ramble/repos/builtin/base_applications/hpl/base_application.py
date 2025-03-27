@@ -6,9 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.appkit import *
-
 import math
+
+from ramble.appkit import *
 
 
 class Hpl(ExecutableApplication):

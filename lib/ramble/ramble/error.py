@@ -6,11 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import sys
 import inspect
+import sys
 
 from ramble.util.logger import logger
-
 
 #: whether we should write stack traces or short error messages
 #: this is module-scoped because it needs to be set very early

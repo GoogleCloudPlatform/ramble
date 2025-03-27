@@ -9,11 +9,13 @@
 import glob
 import json
 import os
+
 import ruamel.yaml as yaml
 
+import ramble.util.stats as stats
 from ramble.appkit import *
 from ramble.expander import Expander
-import ramble.util.stats as stats
+
 from spack.util.path import canonicalize_path
 
 

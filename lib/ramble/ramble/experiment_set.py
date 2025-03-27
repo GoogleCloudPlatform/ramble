@@ -6,21 +6,21 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from enum import Enum
-import os
-import math
 import fnmatch
+import math
+import os
+from enum import Enum
 
+import ramble.context
+import ramble.error
 import ramble.expander
+import ramble.keywords
+import ramble.renderer
+import ramble.repository
+import ramble.util.matrices
 from ramble.expander import Expander
 from ramble.namespace import namespace
-import ramble.repository
-import ramble.keywords
-import ramble.error
-import ramble.renderer
-import ramble.util.matrices
 from ramble.util.logger import logger
-import ramble.context
 
 import spack.util.naming
 

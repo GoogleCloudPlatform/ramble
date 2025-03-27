@@ -15,9 +15,10 @@ import sys
 import tempfile
 
 from llnl.util.filesystem import mkdirp, working_dir
-from spack.util.executable import ProcessError, which
 
 import ramble.paths
+
+from spack.util.executable import ProcessError, which
 
 description = "runs source code style checks on Ramble."
 section = "developer"
@@ -477,10 +478,22 @@ def run_isort(isort_cmd, file_list, args):
     isort_args = ("--sp", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         isort_args += ("--check", "--diff")
-    output = isort_cmd(
-        *(isort_args + tuple(file_list)), fail_on_error=False, output=str, error=str
-    )
-    returncode = isort_cmd.returncode
+    output = ""
+    returncode = 0
+    primary_files, obj_files = _split_file_list(file_list)
+    if primary_files:
+        output += isort_cmd(
+            *(isort_args + tuple(primary_files)), fail_on_error=False, output=str, error=str
+        )
+        returncode |= isort_cmd.returncode
+    if obj_files:
+        output += isort_cmd(
+            *(isort_args + ("-w", "79") + tuple(obj_files)),
+            fail_on_error=False,
+            output=str,
+            error=str,
+        )
+        returncode |= isort_cmd.returncode
     print_output(output, args)
     print_tool_result("isort", returncode)
     return returncode

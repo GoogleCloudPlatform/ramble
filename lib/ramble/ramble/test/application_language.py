@@ -7,11 +7,10 @@
 # except according to those terms.
 """Perform tests of the Application class"""
 
-import pytest
 import deprecation
+import pytest
 
 from ramble.appkit import *  # noqa
-
 
 app_types = [
     ApplicationBase,  # noqa: F405

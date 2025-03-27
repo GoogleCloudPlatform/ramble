@@ -9,10 +9,10 @@
 import os
 
 import ramble.workspace
-import spack.util.spack_json as sjson
-from ramble.main import RambleCommand
 from ramble.application import ApplicationBase
+from ramble.main import RambleCommand
 
+import spack.util.spack_json as sjson
 
 workspace = RambleCommand("workspace")
 

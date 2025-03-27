@@ -10,7 +10,6 @@ import os
 
 from ramble.modkit import *
 
-
 SUCCESS_STRING = "Status: SUCCESS"
 
 

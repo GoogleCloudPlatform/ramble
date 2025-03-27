@@ -11,14 +11,12 @@ directives, which are to allow functions to be invoked at class level
 """
 
 import functools
+from collections.abc import Sequence  # novm
 
 import llnl.util.lang
 import llnl.util.tty.color
 
 import ramble.error
-
-from collections.abc import Sequence  # novm
-
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
 

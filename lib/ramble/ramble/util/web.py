@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from html.parser import HTMLParser
-
 import codecs
 import errno
 import multiprocessing.pool
@@ -18,22 +16,23 @@ import shutil
 import ssl
 import sys
 import traceback
-
+from html.parser import HTMLParser
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
 import llnl.util.lang
 from llnl.util.filesystem import mkdirp, rename
 
-import spack
 import ramble.config
+from ramble.util.logger import logger
+
+import spack
 import spack.error
 import spack.url
 import spack.util.crypto
 import spack.util.gcs as gcs_util
 import spack.util.s3 as s3_util
 import spack.util.url as url_util
-from ramble.util.logger import logger
 from spack.util.compression import ALLOWED_ARCHIVE_TYPES
 from spack.util.path import convert_to_posix_path
 

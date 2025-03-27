@@ -8,43 +8,42 @@
 
 import abc
 import collections
-import os
-import sys
-import traceback
-import types
-import functools
 import contextlib
-import re
+import errno
+import functools
 import importlib
 import importlib.machinery
 import importlib.util
 import inspect
-import stat
+import os
+import re
 import shutil
-import errno
+import stat
+import sys
+import traceback
+import types
 
 try:
     from collections.abc import Mapping  # novm
 except ImportError:
     from collections.abc import Mapping
 
-
 from enum import Enum
 
 import ruamel.yaml as yaml
 
-import llnl.util.lang
 import llnl.util.filesystem as fs
+import llnl.util.lang
 
 import ramble.caches
 import ramble.config
 import ramble.spec
-import ramble.util.path
+import ramble.util.imp
 import ramble.util.naming as nm
+import ramble.util.path
 from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
-import ramble.util.imp
 
 global_namespace = "ramble"
 

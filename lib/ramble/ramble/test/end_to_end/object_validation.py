@@ -8,11 +8,10 @@
 
 import pytest
 
-import ramble.workspace
 import ramble.config
-from ramble.main import RambleCommand
+import ramble.workspace
 from ramble import application
-
+from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mock_applications"

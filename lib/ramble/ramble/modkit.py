@@ -13,25 +13,21 @@
 import llnl.util.filesystem
 from llnl.util.filesystem import *
 
-from ramble.util.logger import logger
-
-# Rename logger to tty to preserve old behavior
-from ramble.util.logger import logger as tty
-
-from ramble.modifier import ModifierBase
-from ramble.modifier_types.basic import BasicModifier
-from ramble.spec import Spec
-
 import ramble.language.modifier_language
 from ramble.language.modifier_language import *
 from ramble.language.shared_language import *
-from ramble.util.output_capture import OUTPUT_CAPTURE
-
-from ramble.util.file_util import get_file_path
-
+from ramble.modifier import ModifierBase
+from ramble.modifier_types.basic import BasicModifier
+from ramble.spec import Spec
 from ramble.util.command_runner import (
     CommandRunner,
-    RunnerError,
     NoPathRunnerError,
+    RunnerError,
     ValidationFailedError,
 )
+from ramble.util.file_util import get_file_path
+
+# Rename logger to tty to preserve old behavior
+from ramble.util.logger import logger
+from ramble.util.logger import logger as tty
+from ramble.util.output_capture import OUTPUT_CAPTURE

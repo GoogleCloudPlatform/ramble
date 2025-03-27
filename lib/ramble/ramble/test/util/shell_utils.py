@@ -6,16 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import pytest
+
 from ramble.util.shell_utils import (
-    last_pid_var,
-    source_str,
-    get_compatible_base_shell,
+    UnsupportedError,
     cmd_sub_str,
     gen_dict_definition,
-    UnsupportedError,
+    get_compatible_base_shell,
+    last_pid_var,
+    source_str,
 )
-
-import pytest
 
 
 @pytest.mark.parametrize(

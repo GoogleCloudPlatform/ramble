@@ -10,10 +10,10 @@ import os
 
 import pytest
 
-import ramble.workspace
 import ramble.config
-from ramble.namespace import namespace
+import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.namespace import namespace
 
 workspace = RambleCommand("workspace")
 

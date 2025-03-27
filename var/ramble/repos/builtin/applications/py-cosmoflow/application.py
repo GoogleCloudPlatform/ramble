@@ -6,13 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.appkit import *
 import os
 
 import ruamel.yaml as yaml
-import spack.util.spack_yaml as syaml
-import ramble.util.yaml_generation
 
+import ramble.util.yaml_generation
+from ramble.appkit import *
+
+import spack.util.spack_yaml as syaml
 from spack.util.path import canonicalize_path
 
 

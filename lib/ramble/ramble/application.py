@@ -7,64 +7,61 @@
 # except according to those terms.
 """Define base classes for application definitions"""
 
-import io
-import os
-import stat
-import re
-import textwrap
-import string
-import shutil
 import fnmatch
-import time
+import io
 import operator
+import os
+import re
+import shutil
+import stat
+import string
+import textwrap
+import time
+from enum import Enum
 from typing import List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty.color as color
 
-import spack.util.executable
-import spack.util.spack_json
-import spack.util.environment
-import spack.util.compression
-
 import ramble.config
-import ramble.graphs
-import ramble.stage
-import ramble.mirror
-import ramble.fetch_strategy
 import ramble.expander
+import ramble.fetch_strategy
+import ramble.graphs
 import ramble.keywords
-import ramble.repeats
-import ramble.repository
+import ramble.mirror
 import ramble.modifier
 import ramble.modifier_types.disabled
-import ramble.success_criteria
-import ramble.workflow_manager
 import ramble.paths
-import ramble.util.executable
-import ramble.util.colors as rucolor
-import ramble.util.hashing
-import ramble.util.env
-import ramble.util.directives
-import ramble.util.stats
-import ramble.util.graph
+import ramble.repeats
+import ramble.repository
+import ramble.stage
+import ramble.success_criteria
 import ramble.util.class_attributes
-import ramble.util.path
+import ramble.util.colors as rucolor
+import ramble.util.directives
+import ramble.util.env
+import ramble.util.executable
+import ramble.util.graph
+import ramble.util.hashing
 import ramble.util.lock as lk
-from ramble.util.foms import FomType
-from ramble.util.logger import logger
-from ramble.util.shell_utils import source_str
-from ramble.util.naming import NS_SEPARATOR
-
-from ramble.workspace import namespace
+import ramble.util.path
+import ramble.util.stats
+import ramble.workflow_manager
+from ramble.error import RambleError
 from ramble.experiment_result import ExperimentResult
-
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
-from ramble.error import RambleError
+from ramble.util.foms import FomType
+from ramble.util.logger import logger
+from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
+from ramble.util.shell_utils import source_str
+from ramble.workspace import namespace
 
-from enum import Enum
+import spack.util.compression
+import spack.util.environment
+import spack.util.executable
+import spack.util.spack_json
 
 experiment_status = Enum(
     "experiment_status",

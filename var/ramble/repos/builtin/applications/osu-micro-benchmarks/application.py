@@ -8,11 +8,10 @@
 
 import os
 import re
+from enum import Enum
 
 from ramble.appkit import *
 from ramble.expander import Expander
-
-from enum import Enum
 
 
 class OsuMicroBenchmarks(ExecutableApplication):

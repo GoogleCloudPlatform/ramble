@@ -7,7 +7,6 @@
 # except according to those terms.
 
 from ramble.appkit import *
-
 from ramble.base_app.builtin.openfoam import Openfoam as OpenfoamBase
 
 

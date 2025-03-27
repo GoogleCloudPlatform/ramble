@@ -8,11 +8,10 @@
 
 import os
 
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
 import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
-
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config
 
 workspace = RambleCommand("workspace")
 

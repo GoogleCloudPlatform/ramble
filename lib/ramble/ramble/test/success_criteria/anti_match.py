@@ -11,9 +11,8 @@ import os
 import pytest
 
 import ramble.workspace
-
 from ramble.main import RambleCommand
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config
 
 workspace = RambleCommand("workspace")
 

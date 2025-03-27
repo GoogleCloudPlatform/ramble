@@ -7,18 +7,18 @@
 # except according to those terms.
 """Define base classes for package manager definitions"""
 
+import fnmatch
+import io
 import os
 import re
-import io
-import fnmatch
 import textwrap
 from typing import List
 
+import ramble.util.class_attributes
+import ramble.util.directives
+from ramble.error import RambleError
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
-from ramble.error import RambleError
-import ramble.util.directives
-import ramble.util.class_attributes
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming

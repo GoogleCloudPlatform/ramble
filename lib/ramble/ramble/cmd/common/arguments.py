@@ -10,8 +10,9 @@
 import argparse
 import inspect
 
-from spack.util.pattern import Args
 from ramble.util.logger import logger
+
+from spack.util.pattern import Args
 
 __all__ = ["add_common_arguments", "allows_unknown_args", "validate_unknown_args"]
 
@@ -101,7 +102,7 @@ def specs():
 
 @arg
 def obj_type():
-    from ramble.repository import default_type, OBJECT_NAMES
+    from ramble.repository import OBJECT_NAMES, default_type
 
     return Args(
         "--type",
@@ -113,7 +114,7 @@ def obj_type():
 
 @arg
 def repo_type():
-    from ramble.repository import default_type, OBJECT_NAMES
+    from ramble.repository import OBJECT_NAMES, default_type
 
     return Args(
         "-t",

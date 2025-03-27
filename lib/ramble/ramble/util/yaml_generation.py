@@ -25,11 +25,13 @@ Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 """
 
-from typing import Dict, Any
+from typing import Any, Dict
+
 import ruamel.yaml as yaml
-import spack.util.spack_yaml as syaml
 
 from ramble.util.logger import logger
+
+import spack.util.spack_yaml as syaml
 
 
 def read_config_file(conf_path: str):

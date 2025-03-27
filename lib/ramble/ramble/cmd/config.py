@@ -16,11 +16,11 @@ import llnl.util.tty as tty
 
 import ramble.cmd.common.arguments
 import ramble.config
+import ramble.util.editor
 import ramble.workspace
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
-import ramble.util.editor
 
 description = "get and set configuration options"
 section = "config"

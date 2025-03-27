@@ -9,8 +9,9 @@ import os
 
 from llnl.util.tty.color import colorize
 
-import ramble.workspace
 import ramble.repository
+import ramble.workspace
+
 from spack.util.environment import EnvironmentModifications
 
 

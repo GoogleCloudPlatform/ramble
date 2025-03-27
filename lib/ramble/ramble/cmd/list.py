@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.repository
 import ramble.cmd.common.list
+import ramble.repository
 
 description = "list and search available objects"
 section = "basic"

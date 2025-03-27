@@ -7,17 +7,15 @@
 # except according to those terms.
 
 import deprecation
-
 import pytest
 
+import ramble.config
 import ramble.filters
 import ramble.pipeline
-import ramble.workspace
-import ramble.config
-import ramble.software_environments
 import ramble.repository
+import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")

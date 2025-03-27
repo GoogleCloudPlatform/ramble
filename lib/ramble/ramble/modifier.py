@@ -7,17 +7,17 @@
 # except according to those terms.
 """Define base classes for modifier definitions"""
 
+import fnmatch
 import io
 import re
 import textwrap
-import fnmatch
 from typing import List
 
+import ramble.util.class_attributes
+import ramble.util.directives
+from ramble.error import RambleError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
-from ramble.error import RambleError
-import ramble.util.directives
-import ramble.util.class_attributes
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 

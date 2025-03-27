@@ -9,19 +9,17 @@
 
 import argparse
 import fnmatch
+import math
 import os
 import re
 import sys
-import math
+from html import escape  # novm
 
 from llnl.util.tty.colify import colify
 
-import ramble.repository
 import ramble.cmd.common.arguments as arguments
+import ramble.repository
 from ramble.util.logger import logger
-
-from html import escape  # novm
-
 
 formatters = {}
 

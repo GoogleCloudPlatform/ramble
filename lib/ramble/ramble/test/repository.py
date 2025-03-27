@@ -8,8 +8,8 @@
 
 import pytest
 
-import ramble.repository
 import ramble.paths
+import ramble.repository
 
 
 @pytest.fixture(params=["applications", "", "foo"])

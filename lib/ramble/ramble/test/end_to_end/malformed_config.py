@@ -6,14 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import pytest
 import os
 
-import ramble.workspace
+import pytest
+
 import ramble.config
 import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(

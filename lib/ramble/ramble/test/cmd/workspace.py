@@ -6,22 +6,22 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 import glob
+import os
 
 import pytest
 
 import llnl.util.filesystem as fs
 
 import ramble.application
-import ramble.workspace
-from ramble.main import RambleCommand
-from ramble.error import RambleCommandError
-from ramble.test.dry_run_helpers import search_files_for_string
-from ramble.namespace import namespace
 import ramble.config
 import ramble.filters
 import ramble.pipeline
+import ramble.workspace
+from ramble.error import RambleCommandError
+from ramble.main import RambleCommand
+from ramble.namespace import namespace
+from ramble.test.dry_run_helpers import search_files_for_string
 
 import spack.util.spack_yaml as syaml
 

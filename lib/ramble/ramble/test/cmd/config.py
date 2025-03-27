@@ -14,9 +14,10 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.config
-import ramble.workspace
-import ramble.test.cmd.workspace
 import ramble.main
+import ramble.test.cmd.workspace
+import ramble.workspace
+
 import spack.util.spack_yaml as syaml
 
 config = ramble.main.RambleCommand("config")

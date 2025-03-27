@@ -20,8 +20,8 @@ import shlex
 
 import ramble.config
 from ramble.util.logger import logger
-from spack.util.executable import which_string
 
+from spack.util.executable import which_string
 
 #: editors to try if VISUAL and EDITOR are not set
 _default_editors = ["vim", "vi", "emacs", "nano"]

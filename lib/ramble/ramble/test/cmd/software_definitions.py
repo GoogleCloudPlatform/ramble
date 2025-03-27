@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.main import RambleCommand
 from ramble.error import RambleCommandError
+from ramble.main import RambleCommand
 
 software_defs = RambleCommand("software-definitions")
 

@@ -7,12 +7,13 @@
 # except according to those terms.
 
 import os
+
 import pytest
 
-import ramble.workspace
-import ramble.experiment_set
 import ramble.context
+import ramble.experiment_set
 import ramble.renderer
+import ramble.workspace
 from ramble.application import ChainCycleDetectedError, InvalidChainError
 from ramble.main import RambleCommand
 

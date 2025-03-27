@@ -10,17 +10,12 @@ import os
 
 import pytest
 
-import ramble.workspace
 import ramble.config
 import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
-
+from ramble.pkg_man.builtin.spack_lightweight import SpackRunner, ValidationFailedError
 from ramble.util.command_runner import RunnerError
-from ramble.pkg_man.builtin.spack_lightweight import (
-    SpackRunner,
-    ValidationFailedError,
-)
-
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 

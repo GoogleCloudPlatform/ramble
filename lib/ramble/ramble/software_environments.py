@@ -8,17 +8,16 @@
 
 from collections import defaultdict
 
-import ramble.repository
-import ramble.keywords
 import ramble.error
-import ramble.renderer
 import ramble.expander
-from ramble.namespace import namespace
-
-from ramble.util.logger import logger
-import ramble.util.matrices
+import ramble.keywords
+import ramble.renderer
+import ramble.repository
 import ramble.util.colors as rucolor
+import ramble.util.matrices
+from ramble.namespace import namespace
 from ramble.package_manager import PackageManagerBase
+from ramble.util.logger import logger
 
 SUB_INDENT = 2
 

@@ -7,12 +7,12 @@
 # except according to those terms.
 import ramble.cmd.common.arguments as arguments
 import ramble.config
-import ramble.spec
-import ramble.workspace
 import ramble.mirror
 import ramble.repository
-from ramble.util.logger import logger
+import ramble.spec
+import ramble.workspace
 from ramble.error import RambleError
+from ramble.util.logger import logger
 
 import spack.util.url as url_util
 import spack.util.web as web_util

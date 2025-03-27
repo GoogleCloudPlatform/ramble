@@ -8,10 +8,10 @@
 
 import pytest
 
-import ramble.workspace
-import ramble.software_environments
-import ramble.renderer
 import ramble.expander
+import ramble.renderer
+import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(

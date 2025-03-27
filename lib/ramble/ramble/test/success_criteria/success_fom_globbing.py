@@ -10,13 +10,12 @@ import os
 
 import pytest
 
-import ramble.workspace
 import ramble.config
-import ramble.software_environments
 import ramble.namespace
+import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
-from ramble.test.dry_run_helpers import dry_run_config, SCOPES
-
+from ramble.test.dry_run_helpers import SCOPES, dry_run_config
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")

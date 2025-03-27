@@ -9,10 +9,8 @@
 import shlex
 
 import ramble.error
-
-from ramble.util.output_capture import OUTPUT_CAPTURE
-
 import ramble.util.colors
+from ramble.util.output_capture import OUTPUT_CAPTURE
 
 import spack.util.executable
 from spack.util.path import system_path_filter

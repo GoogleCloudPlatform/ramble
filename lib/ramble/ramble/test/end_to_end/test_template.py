@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 import pytest
 
 import ramble.workspace

@@ -10,10 +10,10 @@ import os
 
 import pytest
 
-import ramble.workspace
-import ramble.test.cmd.workspace
-import ramble.pipeline
 import ramble.filters
+import ramble.pipeline
+import ramble.test.cmd.workspace
+import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path

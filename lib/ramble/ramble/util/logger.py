@@ -6,12 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty as tty
-import llnl.util.tty.log
-import llnl.util.tty.color
-
 from contextlib import contextmanager
 from pathlib import Path
+
+import llnl.util.tty as tty
+import llnl.util.tty.color
+import llnl.util.tty.log
 
 
 class Logger:

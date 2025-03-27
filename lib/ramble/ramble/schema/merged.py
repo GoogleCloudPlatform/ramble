@@ -15,17 +15,17 @@ from llnl.util.lang import union_dicts
 
 import ramble.schema.applications
 import ramble.schema.config
+import ramble.schema.env_vars
 import ramble.schema.formatted_executables
+import ramble.schema.internals
 import ramble.schema.licenses
+import ramble.schema.modifiers
 import ramble.schema.repos
-import ramble.schema.spack  # DEPRECATED: Remove when spack is removed
 import ramble.schema.software
+import ramble.schema.spack  # DEPRECATED: Remove when spack is removed
 import ramble.schema.success_criteria
 import ramble.schema.variables
 import ramble.schema.variants
-import ramble.schema.env_vars
-import ramble.schema.internals
-import ramble.schema.modifiers
 import ramble.schema.zips
 
 #: Properties for inclusion in other schemas

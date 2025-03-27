@@ -10,9 +10,9 @@ import os
 
 import pytest
 
-import ramble.workspace
 import ramble.config
 import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path

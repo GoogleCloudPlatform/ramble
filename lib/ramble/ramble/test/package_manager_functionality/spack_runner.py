@@ -7,15 +7,12 @@
 # except according to those terms.
 
 import os
+
 import pytest
 
-
 import ramble.config
+from ramble.pkg_man.builtin.spack_lightweight import InvalidExternalEnvironment, SpackRunner
 from ramble.util.command_runner import RunnerError
-from ramble.pkg_man.builtin.spack_lightweight import (
-    SpackRunner,
-    InvalidExternalEnvironment,
-)
 
 
 def test_env_create(tmpdir, request):

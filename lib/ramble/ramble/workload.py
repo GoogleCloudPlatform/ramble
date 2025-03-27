@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from typing import List, Optional
 import copy
+from typing import List, Optional
 
 import ramble.util.colors as rucolor
 

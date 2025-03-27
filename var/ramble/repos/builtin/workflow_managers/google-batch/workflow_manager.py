@@ -7,12 +7,13 @@
 # except according to those terms.
 
 import os
+
 import yaml
 
-from ramble.wmkit import *
 from ramble.application import experiment_status
-
 from ramble.util import shell_utils
+from ramble.wmkit import *
+
 from spack.util.executable import ProcessError
 
 # Mapping from batch status to Ramble status

@@ -6,8 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import spack.util.environment
 from ramble.util.shell_utils import get_compatible_base_shell
+
+import spack.util.environment
 
 
 def _get_env_set_commands(var_conf, expander, var_set, shell="sh"):

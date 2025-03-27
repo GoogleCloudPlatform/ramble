@@ -31,30 +31,30 @@ import os.path
 import re
 import shutil
 import sys
-
+import urllib.parse
 
 import llnl.util.tty as tty
-import urllib.parse
+from llnl.util.filesystem import (
+    get_single_file,
+    mkdirp,
+    rename,
+    temp_cwd,
+    temp_rename,
+    working_dir,
+)
+
+import ramble.config
+import ramble.util.web as web_util
+from ramble.util.logger import logger
+
 import spack.error
 import spack.util.crypto as crypto
 import spack.util.pattern as pattern
 import spack.util.url as url_util
-import ramble.util.web as web_util
-from llnl.util.filesystem import (
-    working_dir,
-    mkdirp,
-    temp_rename,
-    temp_cwd,
-    get_single_file,
-    rename,
-)
 from spack.util.compression import decompressor_for, extension
-from spack.util.executable import which, CommandNotFoundError
+from spack.util.executable import CommandNotFoundError, which
 from spack.util.string import comma_and, quote
 from spack.version import Version, ver
-
-import ramble.config
-from ramble.util.logger import logger
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
 all_strategies = []
