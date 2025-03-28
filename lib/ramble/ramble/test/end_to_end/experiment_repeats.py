@@ -185,3 +185,52 @@ ramble:
             assert "gromacs.water_bare.pme_single_rank" in data
             assert "gromacs.water_bare.pme_single_rank.1" not in data
             assert "gromacs.water_bare.pme_single_rank.2" not in data
+
+
+@pytest.mark.long
+def test_repeat_stats(mutable_config, mutable_mock_workspace_path, request):
+    test_config = """
+ramble:
+  variables:
+    n_nodes: 1
+    processes_per_node: 1
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+  applications:
+    sleep:
+      workloads:
+        sleep:
+          experiments:
+            sleep_test:
+              n_repeats: 3
+"""
+    workspace_name = request.node.name
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        with open(config_path, "w+") as f:
+            f.write(test_config)
+        ws._re_read()
+
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+        base_exp_dir = os.path.join(ws.root, "experiments", "sleep", "sleep", "sleep_test")
+        for r in range(1, 4):
+            dir = f"{base_exp_dir}.{r}"
+            log_path = os.path.join(dir, f"{os.path.basename(dir)}.out")
+            with open(log_path, "w+") as f:
+                f.write(f"{r}:0.0elapsed\n")
+                # Purposely fail the last experiment
+                if r != 3:
+                    f.write(f"Sleep for {60 * r} seconds\n")
+
+        workspace("analyze", "-s", global_args=["-w", workspace_name])
+        result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
+        with open(result_file) as f:
+            data = f.read()
+            assert "summary::n_total_repeats = 3 repeats" in data
+            assert "summary::n_successful_repeats = 2 repeats" in data
+            assert "summary::min = 1.0 minutes" in data
+            # Assert that the last experiment is not included in the stats
+            assert "summary::max = 2.0 minutes" in data
+            assert "summary::mean = 1.5 minutes" in data
