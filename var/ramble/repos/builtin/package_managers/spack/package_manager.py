@@ -6,11 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
-
-from ramble.util.command_runner import RunnerError
-
 from ramble.pkg_man.builtin.spack_lightweight import SpackLightweight
+from ramble.pkgmankit import *  # noqa: F403
+from ramble.util.command_runner import RunnerError
 
 
 class Spack(SpackLightweight):

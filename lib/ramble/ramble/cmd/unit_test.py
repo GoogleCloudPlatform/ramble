@@ -7,11 +7,11 @@
 # except according to those terms.
 
 
+import argparse
 import collections
 import io
-import sys
 import re
-import argparse
+import sys
 
 import llnl.util.tty.color as color
 from llnl.util.filesystem import working_dir

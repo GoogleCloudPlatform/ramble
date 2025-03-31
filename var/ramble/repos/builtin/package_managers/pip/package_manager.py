@@ -12,18 +12,18 @@ import shutil
 import sys
 import urllib.parse
 
-from ramble.application import ApplicationError
-from ramble.pkgmankit import *
+import llnl.util.filesystem as fs
 
 import ramble.config
+import ramble.fetch_strategy
+import ramble.stage
+from ramble.application import ApplicationError
+from ramble.pkgmankit import *
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
-import ramble.stage
-import ramble.fetch_strategy
 
 from spack.util.executable import Executable
-import llnl.util.filesystem as fs
 
 
 class Pip(PackageManagerBase):

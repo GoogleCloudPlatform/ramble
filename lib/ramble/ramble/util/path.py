@@ -10,9 +10,9 @@
 
 TODO: this is really part of ramble.config. Consolidate it.
 """
+import getpass
 import os
 import re
-import getpass
 import subprocess
 import tempfile
 import urllib.parse
@@ -21,7 +21,6 @@ from llnl.util.lang import memoized
 
 import ramble.paths
 from ramble.util.logger import logger
-
 
 __all__ = ["substitute_config_variables", "substitute_path_variables", "canonicalize_path"]
 

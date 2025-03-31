@@ -12,15 +12,16 @@ import os
 import shutil
 
 import llnl.util.tty as tty
-import spack.util.spack_yaml as syaml
 
 import ramble.caches
 import ramble.config
-import ramble.repository
 import ramble.reports
+import ramble.repository
 import ramble.stage
-from ramble.util.logger import logger
 from ramble.paths import lib_path, var_path
+from ramble.util.logger import logger
+
+import spack.util.spack_yaml as syaml
 
 description = "remove temporary files and/or downloaded archives"
 section = "cleanup"

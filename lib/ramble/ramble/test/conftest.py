@@ -26,8 +26,8 @@ from ramble.fetch_strategy import FetchError, FetchStrategyComposite, URLFetchSt
 from ramble.util.file_util import is_dry_run_path
 
 import spack.platforms
-import spack.util.spack_yaml as syaml
 import spack.util.executable
+import spack.util.spack_yaml as syaml
 
 
 def _can_access(path, perms):

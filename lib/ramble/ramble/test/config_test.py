@@ -6,9 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.config
-
 import pytest
+
+import ramble.config
 
 
 # A crude assertion to check there's no conflicting value.

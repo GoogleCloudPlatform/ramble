@@ -8,9 +8,8 @@
 
 import pytest
 
-from ramble.experimental.uploader import upload_results, ConfigError
 import ramble.config
-
+from ramble.experimental.uploader import ConfigError, upload_results
 
 _empty_results = {"experiments": []}
 

@@ -6,9 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 from typing import List
-from spack.util.executable import CommandNotFoundError, ProcessError
+
 from ramble.util.executable import which
 from ramble.util.logger import logger
+
+from spack.util.executable import CommandNotFoundError, ProcessError
 
 
 class CommandRunner:

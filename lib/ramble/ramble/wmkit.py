@@ -10,14 +10,8 @@
 """wmkit is a set of useful modules to import when writing workflow managers
 """
 
-from ramble.language.workflow_manager_language import *
 from ramble.language.shared_language import *
-
-from ramble.workflow_manager import WorkflowManagerBase
-
-from ramble.util.command_runner import (
-    CommandRunner,
-    RunnerError,
-)
-
+from ramble.language.workflow_manager_language import *
+from ramble.util.command_runner import CommandRunner, RunnerError
 from ramble.util.logger import logger
+from ramble.workflow_manager import WorkflowManagerBase

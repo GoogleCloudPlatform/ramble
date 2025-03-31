@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import re
 import fnmatch
+import re
 
 from ramble.util.logger import logger
 

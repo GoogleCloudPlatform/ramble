@@ -6,8 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import json
 import hashlib
+import json
+
 import spack.util.spack_json as sjson
 
 BLOCK_SIZE = 1024 * 1024

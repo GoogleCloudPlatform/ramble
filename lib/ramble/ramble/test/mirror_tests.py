@@ -7,19 +7,19 @@
 # except according to those terms.
 
 
+import hashlib
 import os
 import sys
-import hashlib
 
 import pytest
 
 from llnl.util.filesystem import resolve_link_target_relative_to_the_link
 
+import ramble.filters
 import ramble.mirror
+import ramble.pipeline
 import ramble.repository
 import ramble.workspace
-import ramble.pipeline
-import ramble.filters
 
 import spack.util.executable
 

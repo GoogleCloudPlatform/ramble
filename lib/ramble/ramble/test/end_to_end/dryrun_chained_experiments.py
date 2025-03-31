@@ -11,16 +11,15 @@ import re
 
 import pytest
 
-import spack.util.spack_yaml as syaml
-import spack.util.spack_json as sjson
-
+import ramble.config
 import ramble.filters
 import ramble.pipeline
-import ramble.workspace
-import ramble.config
 import ramble.software_environments
+import ramble.workspace
 from ramble.main import RambleCommand
 
+import spack.util.spack_json as sjson
+import spack.util.spack_yaml as syaml
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")

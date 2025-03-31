@@ -8,10 +8,10 @@
 
 import os
 
-from ramble.wmkit import *
 from ramble.application import experiment_status
-
 from ramble.util import shell_utils
+from ramble.wmkit import *
+
 from spack.util.executable import Executable, ProcessError
 
 # Mapping from squeue/sacct status to Ramble status

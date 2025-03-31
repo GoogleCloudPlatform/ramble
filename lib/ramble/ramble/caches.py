@@ -13,9 +13,9 @@ import llnl.util.lang
 from llnl.util.filesystem import mkdirp
 from llnl.util.symlink import symlink
 
+import ramble.config
 import ramble.error
 import ramble.paths
-import ramble.config
 import ramble.util.file_cache
 import ramble.util.path
 

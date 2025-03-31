@@ -15,8 +15,9 @@ import llnl.util.filesystem as fs
 
 import ramble.config
 import ramble.workspace
-from ramble.main import RambleCommand
 from ramble.error import RambleCommandError
+from ramble.main import RambleCommand
+
 import spack.util.url
 
 mirror = RambleCommand("mirror")

@@ -9,9 +9,9 @@
 import os
 import re
 
+from ramble.base_mod.builtin.container_base import ContainerBase
 from ramble.modkit import *
 from ramble.util.hashing import hash_string
-from ramble.base_mod.builtin.container_base import ContainerBase
 
 
 class Docker(ContainerBase):

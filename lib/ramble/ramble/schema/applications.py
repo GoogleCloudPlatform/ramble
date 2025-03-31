@@ -13,19 +13,18 @@
 """  # noqa E501
 
 from llnl.util.lang import union_dicts
-from ramble.schema.success_criteria import success_list_def
 
-import ramble.schema.formatted_executables
 import ramble.schema.env_vars
+import ramble.schema.formatted_executables
 import ramble.schema.internals
+import ramble.schema.licenses
+import ramble.schema.modifiers
+import ramble.schema.success_criteria
 import ramble.schema.types
 import ramble.schema.variables
 import ramble.schema.variants
-import ramble.schema.success_criteria
-import ramble.schema.licenses
-import ramble.schema.modifiers
 import ramble.schema.zips
-
+from ramble.schema.success_criteria import success_list_def
 
 matrix_def = {"type": "array", "default": [], "items": {"type": "string"}}
 

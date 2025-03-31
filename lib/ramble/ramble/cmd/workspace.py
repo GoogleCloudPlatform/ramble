@@ -6,38 +6,36 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import argparse
+import itertools
 import os
 import sys
 import tempfile
-import argparse
-import itertools
 
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
-from llnl.util.tty.colify import colify, colified
-
-import spack.util.string as string
-from spack.util.editor import editor
-import spack.util.environment
+from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
 import ramble.cmd.common.arguments
 import ramble.cmd.common.arguments as arguments
-
 import ramble.config
-import ramble.workspace
-import ramble.workspace.shell
+import ramble.context
 import ramble.expander
 import ramble.experiment_set
-import ramble.context
-import ramble.pipeline
-import ramble.filters
 import ramble.experimental.uploader
+import ramble.filters
+import ramble.pipeline
 import ramble.software_environments
 import ramble.util.colors as rucolor
-from ramble.util.logger import logger
+import ramble.workspace
+import ramble.workspace.shell
 from ramble.namespace import namespace
+from ramble.util.logger import logger
 
+import spack.util.environment
+import spack.util.string as string
+from spack.util.editor import editor
 
 description = "manage experiment workspaces"
 section = "workspaces"

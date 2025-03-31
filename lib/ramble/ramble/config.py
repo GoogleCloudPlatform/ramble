@@ -45,38 +45,37 @@ from ruamel.yaml.error import MarkedYAMLError
 import llnl.util.lang
 from llnl.util.filesystem import mkdirp, rename
 
-import spack.compilers
 import ramble.paths
-import spack.platforms
-
 import ramble.schema
-import ramble.schema.config
-import ramble.schema.env_vars
-import ramble.schema.formatted_executables
-import ramble.schema.workspace
 import ramble.schema.applications
-import ramble.schema.internals
-import ramble.schema.licenses
-import ramble.schema.mirrors
-import ramble.schema.modifiers
-import ramble.schema.spack
-import ramble.schema.software
-import ramble.schema.success_criteria
-import ramble.schema.variables
-import ramble.schema.variants
-
-# Objects
-import ramble.schema.repos
-import ramble.schema.modifier_repos
-import ramble.schema.package_manager_repos
-import ramble.schema.workflow_manager_repos
 import ramble.schema.base_application_repos
 import ramble.schema.base_modifier_repos
 import ramble.schema.base_package_manager_repos
 import ramble.schema.base_workflow_manager_repos
+import ramble.schema.config
+import ramble.schema.env_vars
+import ramble.schema.formatted_executables
+import ramble.schema.internals
+import ramble.schema.licenses
+import ramble.schema.mirrors
+import ramble.schema.modifier_repos
+import ramble.schema.modifiers
+import ramble.schema.package_manager_repos
 
+# Objects
+import ramble.schema.repos
+import ramble.schema.software
+import ramble.schema.spack
+import ramble.schema.success_criteria
+import ramble.schema.variables
+import ramble.schema.variants
+import ramble.schema.workflow_manager_repos
+import ramble.schema.workspace
 from ramble.error import RambleError
 from ramble.util.logger import logger
+
+import spack.compilers
+import spack.platforms
 
 # Hacked yaml for configuration files preserves line numbers.
 import spack.util.spack_yaml as syaml

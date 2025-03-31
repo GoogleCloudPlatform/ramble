@@ -6,9 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.appkit import *
-
 from ramble.app.builtin.mock.workload_groups import WorkloadGroups
+from ramble.appkit import *
 
 
 class WorkloadGroupsInherited(WorkloadGroups):

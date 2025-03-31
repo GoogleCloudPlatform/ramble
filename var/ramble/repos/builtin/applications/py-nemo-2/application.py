@@ -9,6 +9,7 @@
 
 import os
 import re
+
 from ramble.appkit import *
 
 from spack.util.path import canonicalize_path

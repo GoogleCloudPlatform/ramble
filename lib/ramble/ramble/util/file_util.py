@@ -8,7 +8,6 @@
 
 import os
 
-
 _DRY_RUN_PATH_PREFIX = os.path.join("dry-run", "path", "to")
 
 

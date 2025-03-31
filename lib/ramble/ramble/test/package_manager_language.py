@@ -11,7 +11,6 @@ import pytest
 
 from ramble.pkgmankit import *  # noqa
 
-
 pm_types = [
     PackageManagerBase,  # noqa: F405
 ]

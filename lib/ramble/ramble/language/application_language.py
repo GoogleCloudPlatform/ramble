@@ -6,13 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.workload
 import ramble.language.language_base
-from ramble.language.language_base import DirectiveError
-import ramble.language.shared_language
 import ramble.language.language_helpers
+import ramble.language.shared_language
 import ramble.success_criteria
-
+import ramble.workload
+from ramble.language.language_base import DirectiveError
 
 """This package contains directives that can be used within an application.
 

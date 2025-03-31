@@ -18,24 +18,28 @@ import sys
 
 import llnl.util.lang
 import llnl.util.tty as tty
-from llnl.util.filesystem import mkdirp, can_access, install, install_tree
-from llnl.util.filesystem import partition_path, remove_linked_tree
-
-import spack.paths
-import spack.config
-import spack.util.pattern as pattern
-import spack.util.path as sup
-import spack.util.url as url_util
-
-from spack.util.crypto import prefix_bits, bit_length
+from llnl.util.filesystem import (
+    can_access,
+    install,
+    install_tree,
+    mkdirp,
+    partition_path,
+    remove_linked_tree,
+)
 
 import ramble.caches
-import ramble.fetch_strategy as fs
-import ramble.util.lock
 import ramble.error
+import ramble.fetch_strategy as fs
 import ramble.mirror
+import ramble.util.lock
 from ramble.util.logger import logger
 
+import spack.config
+import spack.paths
+import spack.util.path as sup
+import spack.util.pattern as pattern
+import spack.util.url as url_util
+from spack.util.crypto import bit_length, prefix_bits
 
 # The well-known stage source subdirectory name.
 _input_subdir = "input"

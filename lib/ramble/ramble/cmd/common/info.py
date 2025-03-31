@@ -6,19 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import enum
 import fnmatch
 
 import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified
 
-import ramble.util.colors
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
-
+import ramble.util.colors
 from ramble.util.logger import logger
 from ramble.workload import WorkloadVariable
-
-import enum
 
 supported_formats = enum.Enum("formats", ["text", "lists"])
 

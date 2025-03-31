@@ -11,8 +11,8 @@ import os
 import pytest
 
 import ramble.workspace
-from ramble.main import RambleCommand
 from ramble.graphs import GraphNodeAmbiguousError
+from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",

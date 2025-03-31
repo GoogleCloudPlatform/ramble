@@ -7,8 +7,10 @@
 # except according to those terms.
 
 import os
-import llnl.util.filesystem as fs
+
 import pytest
+
+import llnl.util.filesystem as fs
 
 import ramble.workspace
 from ramble.main import RambleCommand

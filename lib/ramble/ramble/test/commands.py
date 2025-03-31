@@ -8,8 +8,8 @@
 
 import pytest
 
-from ramble.main import RambleCommand
 from ramble.error import RambleCommandError
+from ramble.main import RambleCommand
 from ramble.util.logger import logger  # noqa:  F401
 
 

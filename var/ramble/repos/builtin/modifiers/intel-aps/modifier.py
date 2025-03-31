@@ -10,7 +10,6 @@ import re
 
 from ramble.modkit import *  # noqa: F403
 
-
 # Pre-defined charts and graphs
 # The per-mode value is a tuple of (options_for_aps, min_stat_level)
 _PREDEFINED_REPORTS = {

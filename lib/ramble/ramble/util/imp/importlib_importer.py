@@ -10,8 +10,8 @@
 
 ``importlib`` is only fully implemented in Python 3.
 """
-from importlib.machinery import SourceFileLoader  # novm
 import types
+from importlib.machinery import SourceFileLoader  # novm
 
 
 class PrependFileLoader(SourceFileLoader):

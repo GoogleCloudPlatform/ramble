@@ -9,8 +9,8 @@
 import argparse
 
 import pytest
-import ramble.cmd.common.info
 
+import ramble.cmd.common.info
 from ramble.main import RambleCommand
 
 info = RambleCommand("info")

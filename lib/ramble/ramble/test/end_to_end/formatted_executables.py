@@ -10,12 +10,11 @@ import os
 
 import pytest
 
-from ramble.application import FormattedExecutableError
-import ramble.workspace
 import ramble.config
 import ramble.software_environments
+import ramble.workspace
+from ramble.application import FormattedExecutableError
 from ramble.main import RambleCommand
-
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(

@@ -7,7 +7,6 @@
 # except according to those terms.
 
 from ramble.appkit import *
-
 from ramble.base_app.builtin.hpl import Hpl as HplBase
 from ramble.base_app.builtin.nvidia_hpc_benchmarks import (
     NvidiaHpcBenchmarks as NvidiaHPCBase,

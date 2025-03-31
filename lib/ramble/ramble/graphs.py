@@ -6,16 +6,15 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from collections import defaultdict
 import enum
-import itertools
 import graphlib
+import itertools
+from collections import defaultdict
 
 import ramble.error
 import ramble.util.graph
-from ramble.util.naming import NS_SEPARATOR
-
 from ramble.util.logger import logger
+from ramble.util.naming import NS_SEPARATOR
 
 
 class AttributeGraph:

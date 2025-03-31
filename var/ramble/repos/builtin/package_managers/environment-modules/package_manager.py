@@ -6,15 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
-
 import os
 import re
+
 import llnl.util.filesystem as fs
 
-import ramble.util.hashing
-
 import ramble.config
+import ramble.util.hashing
+from ramble.pkgmankit import *  # noqa: F403
 from ramble.util.shell_utils import source_str
 
 

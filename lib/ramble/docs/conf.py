@@ -11,17 +11,16 @@ import subprocess
 import sys
 from glob import glob
 
+import pkg_resources
 from docutils.statemachine import StringList
-from sphinx.domains.python import PythonDomain
-from sphinx.ext.apidoc import main as sphinx_apidoc
-from sphinx.parsers import RSTParser
 
 # The name of the Pygments (syntax highlighting) style to use.
 # We use our own extension of the default style with a few modifications
 from pygments.styles.default import DefaultStyle
 from pygments.token import Generic
-
-import pkg_resources
+from sphinx.domains.python import PythonDomain
+from sphinx.ext.apidoc import main as sphinx_apidoc
+from sphinx.parsers import RSTParser
 
 # -- Ramble customizations -----------------------------------------------------
 # If extensions (or modules to document with autodoc) are in another directory,

@@ -8,14 +8,12 @@
 
 import sys
 
-from llnl.util.tty.colify import colify
 import llnl.util.tty.color as color
+from llnl.util.tty.colify import colify
 
 import ramble.repository
 import ramble.software_environments
-
 from ramble.util.spec_utils import specs_equiv
-
 
 description = "inspect software definitions in object definitions"
 section = "developer"

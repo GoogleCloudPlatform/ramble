@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+
 from ramble.appkit import *
 from ramble.expander import Expander
 

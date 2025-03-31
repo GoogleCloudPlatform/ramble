@@ -6,15 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from datetime import datetime, timezone
 import os
 import re
 from collections import defaultdict
+from datetime import datetime, timezone
 
 import ramble.paths
-from ramble.util.logger import logger
-from spack.util.executable import which
 import ramble.repository
+from ramble.util.logger import logger
+
+from spack.util.executable import which
 
 description = "list and check license headers on files in ramble"
 section = "developer"

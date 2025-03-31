@@ -7,14 +7,13 @@
 # except according to those terms.
 
 import json
-import sys
 import math
+import sys
 from enum import Enum
 
 import ramble.config
-from ramble.util.logger import logger
 from ramble.config import ConfigError
-
+from ramble.util.logger import logger
 
 default_node_type_val = "Not Specified"
 

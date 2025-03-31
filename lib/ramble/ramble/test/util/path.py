@@ -9,9 +9,9 @@
 
 import os
 
-import ramble.util.path
-
 import pytest
+
+import ramble.util.path
 
 
 @pytest.mark.parametrize(

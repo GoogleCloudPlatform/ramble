@@ -8,9 +8,9 @@
 
 # Need this because of ramble.util.string
 import io
-import string
 import itertools
 import re
+import string
 
 import ramble.error
 

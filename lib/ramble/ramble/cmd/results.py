@@ -6,15 +6,15 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 import json
+import os
 
-import spack.util.spack_yaml as syaml
-
-import ramble.experimental.uploader
 import ramble.cmd
+import ramble.experimental.uploader
 import ramble.reports
 from ramble.util.logger import logger
+
+import spack.util.spack_yaml as syaml
 
 description = "take actions on experiment results"
 section = "results"

@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.namespace import namespace
 import ramble.util.matrices
+from ramble.namespace import namespace
 
 import spack.util.spack_yaml as syaml
 

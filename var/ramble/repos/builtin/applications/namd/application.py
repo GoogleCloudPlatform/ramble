@@ -6,8 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import re
 import os
+import re
+
 from ramble.appkit import *
 from ramble.expander import Expander
 from ramble.keywords import keywords

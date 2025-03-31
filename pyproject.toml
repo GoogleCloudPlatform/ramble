@@ -17,6 +17,29 @@ force-exclude = '''
 )/
 '''
 
+[tool.isort]
+profile = "black"
+line_length = 99
+filter_files = true
+skip_glob = [
+  "**/lib/ramble/external/**",
+  "**/lib/ramble/llnl/**",
+  "**/lib/ramble/spack/**",
+]
+sections = [
+  "FUTURE",
+  "STDLIB",
+  "THIRDPARTY",
+  "LLNL",
+  "FIRSTPARTY",
+  "SPACK",
+  "LOCALFOLDER",
+]
+known_first_party = "ramble"
+known_spack = "spack"
+known_llnl = "llnl"
+known_third_party = ["ruamel", "jsonschema"]
+
 [tool.coverage.run]
 parallel = true
 data_file = "./tests-coverage/.coverage"

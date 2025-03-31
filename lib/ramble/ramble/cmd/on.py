@@ -6,14 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.config
-import ramble.workspace
-import ramble.expander
-import ramble.pipeline
-import ramble.filters
-
 import ramble.cmd.common.arguments as arguments
-
+import ramble.config
+import ramble.expander
+import ramble.filters
+import ramble.pipeline
+import ramble.workspace
 
 description = '"And now\'s the time, the time is now" (execute workspace experiments)'
 section = "workspaces"

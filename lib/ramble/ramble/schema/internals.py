@@ -18,7 +18,6 @@ import ramble.schema.types
 import ramble.schema.variables
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
-
 custom_executables_def = {
     "type": "object",
     "properties": {},

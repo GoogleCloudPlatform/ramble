@@ -8,27 +8,28 @@
 
 import copy
 import datetime
-from enum import Enum
 import os
 import re
+from enum import Enum
 
 import llnl.util.filesystem as fs
-import spack.util.spack_yaml as syaml
 
 import ramble.cmd.workspace
 import ramble.config
 import ramble.filters
-from ramble.keywords import keywords
 import ramble.pipeline
 import ramble.util.path
+from ramble.keywords import keywords
+from ramble.util.file_util import create_symlink
 from ramble.util.foms import BetterDirection, FomType
 from ramble.util.logger import logger
-from ramble.util.file_util import create_symlink
+
+import spack.util.spack_yaml as syaml
 
 try:
     import matplotlib.pyplot as plt
-    from matplotlib.backends.backend_pdf import PdfPages
     import pandas as pd
+    from matplotlib.backends.backend_pdf import PdfPages
 except ModuleNotFoundError:
     logger.die("matplotlib or pandas was not found. Ensure requirements.txt are installed.")
 

@@ -6,9 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.modkit import *
 import ramble.util.env
 import ramble.util.executable
+from ramble.modkit import *
 
 
 class NcclEnv(BasicModifier):

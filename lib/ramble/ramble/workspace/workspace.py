@@ -6,13 +6,13 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 import contextlib
 import copy
-import re
-import shutil
 import datetime
 import fnmatch
+import os
+import re
+import shutil
 from collections import defaultdict
 
 import llnl.util.filesystem as fs
@@ -20,39 +20,37 @@ import llnl.util.tty as tty
 import llnl.util.tty.log as log
 
 import ramble.config
-import ramble.paths
-import ramble.util.path
-import ramble.error
-import ramble.repository
-import ramble.experiment_set
 import ramble.context
-import ramble.util.web
+import ramble.error
+import ramble.experiment_set
 import ramble.fetch_strategy
-import ramble.util.install_cache
-import ramble.success_criteria
 import ramble.keywords
-import ramble.software_environments
-from ramble.mirror import MirrorStats
-
-import spack.util.spack_yaml as syaml
-import spack.util.spack_json as sjson
-import spack.util.url as url_util
-import spack.util.web as web_util
-
-import ramble.schema.workspace
+import ramble.paths
+import ramble.repository
 import ramble.schema.applications
 import ramble.schema.merged
-
+import ramble.schema.workspace
+import ramble.software_environments
+import ramble.success_criteria
+import ramble.util.env
+import ramble.util.hashing
+import ramble.util.install_cache
 import ramble.util.lock as lk
+import ramble.util.matrices
+import ramble.util.path
+import ramble.util.version
+import ramble.util.web
+from ramble.mirror import MirrorStats
+from ramble.namespace import namespace
+from ramble.util.conversions import list_str_to_list
+from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
 from ramble.util.spec_utils import specs_equiv
-import ramble.util.hashing
-from ramble.namespace import namespace
-import ramble.util.matrices
-import ramble.util.env
-from ramble.util.logger import logger
-from ramble.util.conversions import list_str_to_list
-import ramble.util.version
+
+import spack.util.spack_json as sjson
+import spack.util.spack_yaml as syaml
+import spack.util.url as url_util
+import spack.util.web as web_util
 
 #: Environment variable used to indicate the active workspace
 ramble_workspace_var = "RAMBLE_WORKSPACE"

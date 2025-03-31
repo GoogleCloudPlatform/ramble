@@ -6,13 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from enum import Enum
-import stat
-import os
-import shutil
-import py.path
-import shlex
 import glob
+import os
+import shlex
+import shutil
+import stat
+from enum import Enum
+
+import py.path
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -20,25 +21,22 @@ from llnl.util.tty.color import cprint
 
 import ramble.application
 import ramble.config
+import ramble.expander
 import ramble.experiment_set
+import ramble.experimental.uploader
+import ramble.fetch_strategy
 import ramble.repository
 import ramble.software_environments
-import ramble.util.hashing
-import ramble.fetch_strategy
 import ramble.stage
-import ramble.workspace
-import ramble.expander
-
-import ramble.experimental.uploader
-
+import ramble.util.hashing
 import ramble.util.path
-
+import ramble.workspace
 from ramble.namespace import namespace
-from ramble.util.logger import logger
 from ramble.util.file_util import create_symlink
+from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
-from spack.util.executable import which, Executable
+from spack.util.executable import Executable, which
 
 if not ramble.config.get("config:disable_progress_bar", False):
     try:

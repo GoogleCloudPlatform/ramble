@@ -11,9 +11,8 @@ import itertools
 import ramble.error
 import ramble.expander
 import ramble.repeats
-from ramble.namespace import namespace
-
 import ramble.util.matrices
+from ramble.namespace import namespace
 from ramble.util.logger import logger
 
 

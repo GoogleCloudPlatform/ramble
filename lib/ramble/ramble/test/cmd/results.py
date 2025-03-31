@@ -9,8 +9,8 @@
 import py
 import pytest
 
-import ramble.paths
 import ramble.cmd.results
+import ramble.paths
 
 INPUT_DATA = py.path.local(ramble.paths.test_path).join("data", "results_upload")
 

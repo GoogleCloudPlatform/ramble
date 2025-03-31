@@ -10,9 +10,9 @@
 import os
 import sys
 
+import ramble.cmd.common.arguments
 import ramble.config
 import ramble.repository
-import ramble.cmd.common.arguments
 from ramble.util.logger import logger
 
 description = "manage Ramble repositories"
