@@ -2471,8 +2471,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for obj, tpl_config in self._object_templates(workspace):
             extra_vars = extra_vars_origin.copy()
             src_path = tpl_config["src_path"]
-            with open(src_path) as f_in:
-                content = f_in.read()
+            content = workspace.read_file_content(src_path)
             extra_vars_dict = tpl_config.get("extra_vars")
             if extra_vars_dict is not None:
                 extra_vars.update(extra_vars_dict)

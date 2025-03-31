@@ -464,6 +464,10 @@ class Workspace:
         # This can be re-used by all experiments of the workspace.
         self.pkg_path_cache = defaultdict(dict)
 
+        # A simple dict mapping a file's src_path to its content.
+        # This is currently used as a cache for reading per-object template contents.
+        self._inmem_file_cache = {}
+
         self.results = self.default_results()
 
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
@@ -1787,6 +1791,19 @@ ramble:
     def date_string(self):
         now = datetime.datetime.now()
         return now.strftime("%Y-%m-%d_%H.%M.%S")
+
+    def read_file_content(self, file_path):
+        """Read and cache the file content
+
+        This should only be used on files that are not modified during the lifetime of the
+        workspace command execution.
+        """
+        if file_path in self._inmem_file_cache:
+            return self._inmem_file_cache[file_path]
+        with open(file_path) as f:
+            content = f.read()
+        self._inmem_file_cache[file_path] = content
+        return content
 
     @property
     def internal(self):

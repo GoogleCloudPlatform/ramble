@@ -30,3 +30,16 @@ def test_re_read(tmpdir):
         test_workspace = ramble.workspace.Workspace(os.getcwd(), True)
         test_workspace.clear()
         test_workspace._re_read()
+
+
+def test_read_file_content(tmpdir):
+    with tmpdir.as_cwd():
+        test_workspace = ramble.workspace.Workspace(os.getcwd(), True)
+        fname = "test.tpl"
+        with open(fname, "w+") as f:
+            f.write("test content read")
+        assert test_workspace.read_file_content(fname) == "test content read"
+        with open(fname, "w") as f:
+            f.write("test content read modified")
+        # The read is cached and does not reflect the latest content
+        assert test_workspace.read_file_content(fname) == "test content read"
