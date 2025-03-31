@@ -111,24 +111,18 @@ class EnvironmentModules(PackageManagerBase):
             f"module list &> {list_file}",
         ]
 
-    def _add_software_to_results(self, workspace, app_inst=None):
+    def get_package_list(self, workspace):
+        del workspace
+        app_inst = self.app_inst
         list_file = app_inst.expander.expand_var(
             f"{{experiment_run_dir}}/{self._list_file}"
         )
 
-        if app_inst.result is None:
-            return
-
         if not os.path.exists(list_file):
-            return
+            return []
 
-        if self._spec_prefix not in app_inst.result.software:
-            app_inst.result.software[self._spec_prefix] = []
-
-        package_list = app_inst.result.software[self._spec_prefix]
-
+        pkg_list = []
         pkg_regex = re.compile(r"\S+$")
-
         with open(list_file) as f:
             packages = re.split(r"[0-9]*\)", f.read())
             for spec in packages:
@@ -138,6 +132,7 @@ class EnvironmentModules(PackageManagerBase):
                     parts = cleaned.split("/")
                     name = parts[0]
                     version = "/".join(parts[1:]) if len(parts) > 1 else ""
-                    package_list.append(
+                    pkg_list.append(
                         {"name": name, "version": version, "variants": ""}
                     )
+        return pkg_list
