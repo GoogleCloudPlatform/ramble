@@ -1987,7 +1987,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 continue
 
             # When strict success is off for repeats (loose success), skip failed exps
-            if exp_inst.result.status == experiment_status.FAILED:
+            if exp_inst.result.status == experiment_status.FAILED.name:
                 continue
 
             if exp_inst.result.contexts:
