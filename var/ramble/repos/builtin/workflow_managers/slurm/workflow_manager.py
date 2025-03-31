@@ -199,7 +199,7 @@ class Slurm(WorkflowManagerBase):
         query_script = expander.expand_var_name("batch_query")
         query_cmd = Executable(query_script)
         try:
-            query_cmd()
+            query_cmd(output=os.devnull)
         except ProcessError as e:
             # Only log a warning as this is not considered a critical step
             logger.warn(f"batch_query returns error {e}")
