@@ -53,6 +53,7 @@ subprocess.call(
         "ramble",
         "commands",
         "--format=rst",
+        "--header=command_index.in",
         "--update=command_index.rst",
     ]
     + glob("*rst")
