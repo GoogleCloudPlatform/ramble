@@ -20,10 +20,12 @@ from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
+import ramble.variants
 
 
 class ModifierBase(metaclass=ModifierMeta):
     name = None
+    object_variants = None
     _builtin_name = NS_SEPARATOR.join(("modifier_builtin", "{obj_name}", "{name}"))
     _mod_prefix_builtin = f"modifier_builtin{NS_SEPARATOR}"
     _language_classes = [ModifierMeta, SharedMeta]
@@ -42,6 +44,9 @@ class ModifierBase(metaclass=ModifierMeta):
 
     def __init__(self, file_path):
         super().__init__()
+
+        if self.object_variants is None:
+            self.object_variants = ramble.variants.VariantSet()
 
         ramble.util.class_attributes.convert_class_attributes(self)
 

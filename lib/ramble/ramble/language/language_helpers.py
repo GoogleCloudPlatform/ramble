@@ -8,6 +8,8 @@
 
 import fnmatch
 
+from typing import List, Any
+
 from ramble.language.language_base import DirectiveError
 
 
@@ -153,3 +155,33 @@ def expand_patterns(multiple_type: list, multiple_pattern_match: list):
             expanded_patterns.append(input)
 
     return expanded_patterns
+
+
+def build_when_list(
+    when_arg: List[str], obj: Any, directive_id: str, directive_name: str
+) -> List[str]:
+    """Construct list of when conditions based on a directives input argument
+    Also, validate that when is passed in with the right type.
+
+    Args:
+        when_arg (list(str)): List of string conditions that were input into
+                              the calling directive.
+        obj: A ramble object (i.e. application, modifier, etc..)
+        directive_id (str): Directive identifier. The calling directive can
+                            define what is used here, but it should be
+                            something that can help users identify where errors
+                            from this method originate from.
+        directive_name (str): Name of the calling directive
+
+    Returns:
+        List of strings, for all of the when conditions.
+    """
+    when_list = []
+    if when_arg is not None:
+        if not isinstance(when_arg, list):
+            raise DirectiveError(
+                f"Object {obj.name} calls directive {directive_name} {directive_id} "
+                f"with an invalid `when` argument. The `when` argument must be input as a list."
+            )
+        when_list.extend(when_arg)
+    return when_list

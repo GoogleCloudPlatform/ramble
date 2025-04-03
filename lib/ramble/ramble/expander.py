@@ -11,7 +11,7 @@ import math
 import operator
 import random
 import string
-from typing import Dict
+from typing import Dict, List
 
 import ramble.error
 import ramble.keywords
@@ -649,6 +649,37 @@ class Expander:
                 f'a non-boolean string: "{evaluated}"'
             )
 
+    def satisfies(
+        self, reqs: List = None, variant_set=None, extra_vars=None, merge_used_stage: bool = True
+    ):
+        """Determine an experiment's variants satisfy a query
+
+        Args:
+            req: requirement to check if experiment satisfies
+            extra_vars: Variable definitions to use with highest precedence
+            merged_used_stage: Whether used variables are merged into the
+                               set of used variables or not.
+
+        Returns:
+            boolean: True or False, based if the experiment's variants satisfy
+                     the input requirement.
+        """
+
+        if variant_set is not None:
+            variant_definitions = variant_set.as_set()
+        else:
+            variant_definitions = set()
+
+        satisfied = True
+        if reqs is not None:
+            for req in reqs:
+                exp_req = self.expand_var(
+                    req, extra_vars=extra_vars, merge_used_stage=merge_used_stage
+                )
+
+                satisfied = satisfied and exp_req in variant_definitions
+        return satisfied
+
     @staticmethod
     def expansion_str(in_str):
         return f"{ExpansionDelimiter.left}{in_str}{ExpansionDelimiter.right}"
@@ -897,6 +928,11 @@ class Expander:
             found = False
             for comp in node.comparators:
                 if isinstance(comp, ast.List):
+                    for elt in comp.elts:
+                        rhs_value = self.eval_math(elt)
+                        if lhs_value == rhs_value:
+                            found = True
+                elif isinstance(comp, ast.Set):
                     for elt in comp.elts:
                         rhs_value = self.eval_math(elt)
                         if lhs_value == rhs_value:

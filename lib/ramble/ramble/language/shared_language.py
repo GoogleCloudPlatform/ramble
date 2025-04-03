@@ -7,8 +7,10 @@
 # except according to those terms.
 
 import contextlib
-from typing import Optional
+import collections
+from typing import Optional, Any, Union, Callable
 
+import ramble.variants
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
@@ -24,7 +26,7 @@ definition to modify the object, for example:
 
       class Gromacs(ExecutableApplication):
           # Required package directive
-          required_package("gromacs", package_manager="spack")
+          required_package("gromacs", when=["package_manager_family=spack"])
 
 In the above example, "required_package" is a ramble directive
 
@@ -120,7 +122,9 @@ def figure_of_merit(
 
 
 @shared_directive("compilers")
-def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None, package_manager="*"):
+def define_compiler(
+    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None
+):
     """Defines the compiler that will be used with this object
 
     Adds a new compiler spec to this object. Software specs should
@@ -136,23 +140,35 @@ def define_compiler(name, pkg_spec, compiler_spec=None, compiler=None, package_m
     """
 
     def _execute_define_compiler(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "define_compiler"
+        )
+
+        if package_manager is not None:
+            logger.warn(
+                "The `package_manager` argument of the define_compiler "
+                f"directive in object {obj.name} is depreacated. Please "
+                "transition this to use the `when` argument instead."
+            )
+
         obj.compilers[name] = {
             "pkg_spec": pkg_spec,
             "compiler_spec": compiler_spec,
             "compiler": compiler,
-            "package_manager": package_manager,
+            "when": when_list,
         }
 
     return _execute_define_compiler
 
 
 @shared_directive("software_specs")
-def software_spec(name, pkg_spec, compiler_spec=None, compiler=None, package_manager="*"):
+def software_spec(
+    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None
+):
     """Defines a new software spec needed for this object.
 
     Adds a new software spec (for spack to use) that this object
     needs to execute properly.
-
     Only adds specs to object that use spack.
 
     Specs can be described as an mpi spec, which means they
@@ -170,19 +186,30 @@ def software_spec(name, pkg_spec, compiler_spec=None, compiler=None, package_man
     """
 
     def _execute_software_spec(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "software_spec"
+        )
+
+        if package_manager is not None:
+            logger.warn(
+                "The `package_manager` argument of the define_compiler "
+                f"directive in object {obj.name} is depreacated. Please "
+                "transition this to use the `when` argument instead."
+            )
+
         # Define the spec
         obj.software_specs[name] = {
             "pkg_spec": pkg_spec,
             "compiler_spec": compiler_spec,
             "compiler": compiler,
-            "package_manager": package_manager,
+            "when": when_list,
         }
 
     return _execute_software_spec
 
 
 @shared_directive("package_manager_configs")
-def package_manager_config(name, config, package_manager="*", **kwargs):
+def package_manager_config(name, config, package_manager=None, when=None, **kwargs):
     """Defines a config option to set within a package manager
 
     Define a new config which will be passed to a package manager. The
@@ -196,16 +223,27 @@ def package_manager_config(name, config, package_manager="*", **kwargs):
     """
 
     def _execute_package_manager_config(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "package_manager_config"
+        )
+
+        if package_manager is not None:
+            logger.warn(
+                "The `package_manager` argument of the package_manager_config "
+                f"directive in object {obj.name} is depreacated. Please "
+                "transition this to use the `when` argument instead."
+            )
+
         obj.package_manager_configs[name] = {
             "config": config,
-            "package_manager": package_manager,
+            "when": when_list,
         }
 
     return _execute_package_manager_config
 
 
 @shared_directive("required_packages")
-def required_package(name, package_manager="*"):
+def required_package(name, package_manager=None, when=None):
     """Defines a new spack package that is required for this object
     to function properly.
 
@@ -215,9 +253,18 @@ def required_package(name, package_manager="*"):
     """
 
     def _execute_required_package(obj):
-        obj.required_packages[name] = {
-            "package_manager": package_manager,
-        }
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "package_manager_config"
+        )
+
+        if package_manager is not None:
+            logger.warn(
+                "The `package_manager` argument of the required_package "
+                f"directive in object {obj.name} is depreacated. Please "
+                "transition this to use the `when` argument instead."
+            )
+
+        obj.required_packages[name] = {"when": when_list}
 
     return _execute_required_package
 
@@ -591,6 +638,36 @@ def register_validator(name: str, predicate: str, message: str, fail_on_invalid:
         }
 
     return _define_validator
+
+
+@shared_directive(dicts=())
+def variant(
+    name: str,
+    default: Optional[Any] = None,
+    description: str = "",
+    values: Optional[Union[collections.abc.Sequence, Callable[[Any], bool]]] = None,
+):
+
+    def _define_variant(obj):
+        """Define a new variant in the input object
+
+        Args:
+            obj: Input ramble object to define variant inside.
+            name (str): Name of variant to define
+            default: Default value of the new variant
+            description (str): Description of the variant
+            values: Values for variant.
+        """
+        ramble.variants.validate_variant(name)
+
+        if obj.object_variants is None:
+            obj.object_variants = ramble.variants.VariantSet()
+
+        obj.object_variants.default_variant(
+            name, default=default, description=description, values=values
+        )
+
+    return _define_variant
 
 
 @contextlib.contextmanager
