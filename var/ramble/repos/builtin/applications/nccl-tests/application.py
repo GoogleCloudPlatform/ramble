@@ -65,8 +65,12 @@ class NcclTests(ExecutableApplication):
         "send-recv",
     ]
 
-    software_spec("nccl-test", pkg_spec="nccl-tests", package_manager="spack*")
-    required_package("nccl-tests")
+    software_spec(
+        "nccl-test",
+        pkg_spec="nccl-tests",
+        when=["package_manager_family=spack"],
+    )
+    required_package("nccl-tests", when=["package_manager_family=spack"])
 
     workload_variable(
         "num_gpus_per_task",

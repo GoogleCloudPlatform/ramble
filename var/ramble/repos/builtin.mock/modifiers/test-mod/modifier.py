@@ -54,7 +54,9 @@ class TestMod(BasicModifier):
     )
 
     software_spec(
-        "analysis_spec", pkg_spec="analysis_pkg@1.1", package_manager="spack*"
+        "analysis_spec",
+        pkg_spec="analysis_pkg@1.1",
+        when=["package_manager_family=spack"],
     )
 
     fom_regex = r"(?P<context>fom_context)(?P<fom>.*)"

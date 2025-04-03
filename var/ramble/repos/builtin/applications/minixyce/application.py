@@ -27,23 +27,22 @@ class Minixyce(ExecutableApplication):
         "mini-benchmark",
     )
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
-    software_spec(
-        "ompi415cxx",
-        pkg_spec="openmpi@4.1.5 +legacylaunchers +cxx",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+        software_spec(
+            "ompi415cxx",
+            pkg_spec="openmpi@4.1.5 +legacylaunchers +cxx",
+            compiler="gcc12",
+        )
 
-    software_spec(
-        "minixyce",
-        pkg_spec="minixyce@1.0 +mpi",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+        software_spec(
+            "minixyce",
+            pkg_spec="minixyce@1.0 +mpi",
+            compiler="gcc12",
+        )
 
-    required_package("minixyce", package_manager="spack*")
+        required_package("minixyce")
 
     executable(
         "execute",

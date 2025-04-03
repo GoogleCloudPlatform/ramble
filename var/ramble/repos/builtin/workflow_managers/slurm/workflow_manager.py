@@ -42,6 +42,8 @@ class Slurm(WorkflowManagerBase):
 
     tags("workflow", "slurm")
 
+    workflow_manager_family("slurm")
+
     def __init__(self, file_path):
         super().__init__(file_path)
 

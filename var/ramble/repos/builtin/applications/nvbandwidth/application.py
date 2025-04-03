@@ -18,11 +18,10 @@ class Nvbandwidth(ExecutableApplication):
 
     tags("synthetic-benchmarks")
 
-    software_spec(
-        "nvbandwidth", pkg_spec="nvbandwidth", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        software_spec("nvbandwidth", pkg_spec="nvbandwidth")
 
-    required_package("nvbandwidth", package_manager="spack*")
+        required_package("nvbandwidth")
 
     workload("all_benchmarks", executable="nvbandwidth")
 

@@ -61,13 +61,13 @@ class SysStat(BasicModifier):
     default_mode("custom")
 
     # sysstat contains common tools such as mpstat and iostat
-    software_spec(
-        "sysstat",
-        pkg_spec="sysstat",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        software_spec(
+            "sysstat",
+            pkg_spec="sysstat",
+        )
 
-    required_package("sysstat", package_manager="spack*")
+        required_package("sysstat")
 
     archive_pattern("{experiment_run_dir}/sampler_*")
 

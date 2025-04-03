@@ -39,6 +39,8 @@ class SpackLightweight(PackageManagerBase):
 
     _spec_prefix = "spack"
 
+    package_manager_family("spack")
+
     def __init__(self, file_path):
         super().__init__(file_path)
 
@@ -127,7 +129,10 @@ class SpackLightweight(PackageManagerBase):
 
         for config_dict in package_manager_config_dicts:
             for _, config in config_dict.items():
-                if fnmatch.fnmatch(self.name, config["package_manager"]):
+                keep_config = app_inst.expander.satisfies(
+                    config["when"], variant_set=app_inst.object_variants
+                )
+                if keep_config:
                     self.runner.add_config(config["config"])
 
         try:
@@ -175,8 +180,14 @@ class SpackLightweight(PackageManagerBase):
                     self.runner.generate_env_file()
 
                 added_packages = set(self.runner.added_packages())
-                for pkg in self.app_inst.required_packages.keys():
-                    if pkg not in added_packages:
+                for pkg, conf in self.app_inst.required_packages.items():
+
+                    if (
+                        app_inst.expander.satisfies(
+                            conf["when"], variant_set=app_inst.object_variants
+                        )
+                        and pkg not in added_packages
+                    ):
                         logger.die(
                             f"Software spec {pkg} is not defined "
                             f"in environment {env_context}, but is "
@@ -185,8 +196,14 @@ class SpackLightweight(PackageManagerBase):
                         )
 
                 for mod_inst in self.app_inst._modifier_instances:
-                    for pkg in mod_inst.required_packages.keys():
-                        if pkg not in added_packages:
+                    for pkg, conf in mod_inst.required_packages.items():
+                        if (
+                            app_inst.expander.satisfies(
+                                conf["when"],
+                                variant_set=app_inst.object_variants,
+                            )
+                            and pkg not in added_packages
+                        ):
                             logger.die(
                                 f"Software spec {pkg} is not defined "
                                 f"in environment {env_context}, but is "

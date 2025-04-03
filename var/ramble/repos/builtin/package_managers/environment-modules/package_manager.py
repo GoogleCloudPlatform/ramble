@@ -33,6 +33,8 @@ class EnvironmentModules(PackageManagerBase):
 
     _list_file = ".environment_modules_list"
 
+    package_manager_family("environment-modules")
+
     register_phase(
         "write_module_commands",
         pipeline="setup",

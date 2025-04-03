@@ -21,23 +21,22 @@ class Wrfv4(ExecutableApplication):
 
     tags("nwp", "weather")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec(
-        "intel-mpi",
-        pkg_spec="intel-mpi@2018.4.274",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-mpi@2018.4.274",
+            compiler="gcc9",
+        )
 
-    software_spec(
-        "wrfv4",
-        pkg_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "wrfv4",
+            pkg_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
+            compiler="gcc9",
+        )
 
-    required_package("wrf", package_manager="spack*")
+        required_package("wrf")
 
     input_file(
         "CONUS_2p5km",

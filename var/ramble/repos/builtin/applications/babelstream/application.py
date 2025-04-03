@@ -23,14 +23,14 @@ class Babelstream(ExecutableApplication):
 
     maintainers("rfbgo", "kaanolgu", "douglasjacobsen", "tomdeakin")
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
-    software_spec(
-        "babelstream",
-        pkg_spec="babelstream@5.0",
-        compiler="gcc12",
-        package_manager="spack*",
-    )
+        software_spec(
+            "babelstream",
+            pkg_spec="babelstream@5.0",
+            compiler="gcc12",
+        )
     executable(
         "get_bin",
         template=[

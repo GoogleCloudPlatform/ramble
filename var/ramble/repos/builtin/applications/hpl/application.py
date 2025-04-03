@@ -19,20 +19,18 @@ class Hpl(HplBase):
 
     tags("benchmark-app", "benchmark", "linpack")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec(
-        "impi_2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+        software_spec("impi_2018", pkg_spec="intel-mpi@2018.4.274")
 
-    software_spec(
-        "hpl",
-        pkg_spec="hpl@2.3 +openmp",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "hpl",
+            pkg_spec="hpl@2.3 +openmp",
+            compiler="gcc9",
+        )
 
-    required_package("hpl", package_manager="spack*")
+        required_package("hpl")
 
     executable("execute", "xhpl", use_mpi=True)
 

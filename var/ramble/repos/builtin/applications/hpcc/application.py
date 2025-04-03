@@ -29,20 +29,18 @@ class Hpcc(ExecutableApplication):
 
     tags("benchmark-app", "mini-app", "benchmark", "DGEMM")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+        software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
 
-    software_spec(
-        "hpcc",
-        pkg_spec="hpcc@1.5.0",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "hpcc",
+            pkg_spec="hpcc@1.5.0",
+            compiler="gcc9",
+        )
 
-    required_package("hpcc", package_manager="spack*")
+        required_package("hpcc")
 
     input_file(
         "hpccinf",
