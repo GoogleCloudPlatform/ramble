@@ -48,7 +48,7 @@ def which(*args, **kwargs):
         required (bool): If set to True, raise an error if executable not found
 
     Returns:
-        Executable: The first executable that is found in the path
+        (PrefixedExecutable): The first executable that is found in the path
     """
     exe = spack.util.executable.which_string(*args, **kwargs)
     return PrefixedExecutable(exe) if exe else None
@@ -83,7 +83,7 @@ class CommandExecutable:
         - use_mpi: Boolean value for if MPI should be applied to each
                    portion of this executable's template
         - mpi: Same as use_mpi
-        - variables (dict | None): dictionary of variable definitions
+        - variables (dict or None): dictionary of variable definitions
                                    to use for this executable only
         - redirect: File to redirect output of template into
         - output_capture: Operator to use when capturing output

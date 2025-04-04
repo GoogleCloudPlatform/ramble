@@ -13,7 +13,7 @@ def convert_class_attributes(obj):
     attribute.
 
     Args:
-        obj (Object): Input object instance to convert attributes in
+        obj (object): Input object instance to convert attributes in
     """
 
     if hasattr(obj, "_directive_names"):

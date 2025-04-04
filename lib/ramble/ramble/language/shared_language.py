@@ -99,7 +99,7 @@ def figure_of_merit(
       fom_regex (str): A regular expression using named groups to extract the FOM
       group_name (str): The name of the group that the FOM should be pulled from
       units (str): The units associated with the FOM
-      contexts (list(str) | None): List of contexts (defined by
+      contexts (list(str) or None): List of contexts (defined by
                                    figure_of_merit_context) this figure of merit
                                    should exist in.
       fom_type: The type of figure of merit
@@ -322,7 +322,7 @@ def register_builtin(
 
     Args:
         name (str): Name of builtin (should be the name of a class method) to register
-        required (boolean): Whether the builtin will be auto-injected or not
+        required (bool): Whether the builtin will be auto-injected or not
         injection_method (str): The method of injecting the builtin. Can be
                                 'prepend' or 'append'
         depends_on (list(str) | None): The names of builtins this builtin depends on
@@ -374,8 +374,8 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None):
     Args:
       name (str): The name of the phase. Phases are functions named '_<phase>'.
       pipeline (str): The name of the pipeline this phase should be registered into.
-      run_before (list(str) | None): A list of phase names this phase should run before
-      run_after (list(str) | None): A list of phase names this phase should run after
+      run_before (list(str) or None): A list of phase names this phase should run before
+      run_after (list(str) or None): A list of phase names this phase should run after
     """
     if run_before is None:
         run_before = []
@@ -440,7 +440,7 @@ def maintainers(*names: str):
     """Add a new maintainer directive, to specify maintainers in a declarative way.
 
     Args:
-        names (str(s)): GitHub username(s) for the maintainer. Can provide
+        names (str): GitHub username(s) for the maintainer. Can provide
                         multiple names as separate arguments.
     """
 
@@ -457,7 +457,7 @@ def tags(*values: str):
     """Add a new tag directive, to specify tags in a declarative way.
 
     Args:
-        values (str(s)): Values to mark as a tag. Can provide multiple values
+        values (str): Values to mark as a tag. Can provide multiple values
                          as separate arguments.
     """
 

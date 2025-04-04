@@ -16,7 +16,7 @@ def get_file_path(path: str, workspace) -> str:
 
     Args:
         path (str): A file path
-        workspace (Workspace): A ramble workspace
+        workspace (ramble.workspace.Workspace): A ramble workspace
 
     Returns:
         (str): A file path

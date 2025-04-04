@@ -201,8 +201,8 @@ nitpick_ignore = [
     ("py:class", "unittest.case.TestCase"),
     ("py:class", "_frozen_importlib_external.SourceFileLoader"),
     ("py:class", "clingo.Control"),
-    ("py:class", "six.moves.urllib.parse.ParseResult"),
     ("py:class", "TextIO"),
+    ("py:class", "func"),
 ]
 
 # The reST default role (used for this markup: `text`) to use for all documents.

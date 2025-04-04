@@ -30,7 +30,7 @@ final configuration from a previous tutorial.
 requires ``spack`` is installed and available in your path. Modifications to
 the ``package_manager`` variant will change this behavior.
 
-.. literalinclude:: ../../../../examples/wrf_scaling_config.yaml
+.. literalinclude:: /../../../examples/wrf_scaling_config.yaml
    :language: YAML
 
 The above configuration will execute 2 experiments, comprising a basic scaling

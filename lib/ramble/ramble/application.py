@@ -507,7 +507,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         variables referenced by any of them are tracked properly.
 
         Args:
-            workspace (Workspace): Workspace to extract templates from
+            workspace (ramble.workspace.Workspace): Workspace to extract templates from
 
         Returns:
             (set): All variable names used by this experiment.

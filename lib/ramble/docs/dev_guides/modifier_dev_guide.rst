@@ -23,7 +23,7 @@ This guide will provide general steps for creating a new modifier definition fil
 **NOTE:** Modifiers are considered a more advanced feature of Ramble. Writing a
 new modifier definition file in Ramble largely follows the same workflow as
 writing an application definition file, although the intent and behavior are
-different. It is recommended that you review :ref:`application-def-guide`
+different. It is recommended that you review :ref:`application-dev-guide`
 before writing a modifier.
 
 -----------

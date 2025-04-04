@@ -134,7 +134,6 @@ experiment. This experiment will also include definitions for
 
 .. _ramble-supported-functions:
 
-~~~~~~~~~~~~~~~~~~~
 Supported Functions
 ~~~~~~~~~~~~~~~~~~~
 
@@ -187,7 +186,6 @@ Dictionary references are supported:
 
 .. _ramble-escaped-variables:
 
-~~~~~~~~~~~~~~~~~
 Escaped Variables
 ~~~~~~~~~~~~~~~~~
 
@@ -340,7 +338,6 @@ there would be 4 experiments, each defined by a unique
 
 .. _ramble-explicit-zips:
 
-
 ^^^^^^^^^^^^^^^^^^^^^^
 Explicit Variable Zips
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -403,7 +400,7 @@ Variant Control
 Within a workspace configuration file, experiments are able to define variants.
 Variants are able to manipulate specific aspects of experiments and
 applications. More information on these configuration options can be seen in
-the :ref:`Variants Configuration Section<variants-config>` documentation. To
+the :ref:`Variants Configuration Section <variants-config>` documentation. To
 begin with, the only variant that can be specific is the ``package_manager``.
 
 The ``package_manager`` variant is used to define which package manager is used
@@ -613,6 +610,7 @@ Ramble. These can be seen in the :ref:`ramble-reserved-variables` section.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Cross Experiment Variable References
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 Variables can be defined to pull the value of a variable out of a different
 experiment. This is particularly useful when an experiment needs the path to
 something ramble automatically generates in a different experiment.
@@ -806,9 +804,8 @@ This config section is defined in the
 
 Below are examples of using this within a workspace config file.
 
-""""""""""""""""""
 Custom Executables
-""""""""""""""""""
+~~~~~~~~~~~~~~~~~~
 
 Custom executables can be created within the internals dictionary. Below is an
 example, showing how to create a ``lscpu`` executable at the application level.
@@ -831,9 +828,8 @@ The above example creates a custom executable, named ``lscpu`` that will inject
 the command ``lscpu`` into the command for an experiment when it is used. It is
 important to note that this only creates the executable, and does not use it.
 
-""""""""""""""""""""""""""""
 Controlling Executable Order
-""""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The internals dictionary allows the ability to control the order pre-defined
 executables (or custom executables) are pieced together to build an experiment.
@@ -862,10 +858,8 @@ The default for the hostname application is ``[builtin::env_vars,
 serial/parallel]`` but this changes the order and injects ``lscpu`` into the
 expansion.
 
-
-""""""""""""""""""""""""""
 Using Executable Injection
-""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Executable order can also be controlled via the ``executable_injection`` block
 within the ``internals`` block. Injecting the ``lscpu`` executable to the end of
@@ -890,9 +884,8 @@ This is a generic way to add the ``lscpu`` custom executable to the end of the
 list of executables for the experiment. For more information on this see the
 :ref:`internals config section<internals-config>` documentation.
 
-"""""""""""""""""""""""""""""""
 Overriding Variable Definitions
-"""""""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 When defining custom executables, sometimes it's useful to be able to override
 specific variable definitions for only this executable definition. As an
@@ -934,9 +927,8 @@ Reserved Variables
 There are several reserved, auto-generated, and required variables for Ramble
 to function properly. This section will describe them.
 
-""""""""""""""""""
 Required Variables
-""""""""""""""""""
+~~~~~~~~~~~~~~~~~~
 
 Ramble requires the following variables to be defined:
 
@@ -950,9 +942,9 @@ Ramble requires the following variables to be defined:
 * ``mpi_command`` - Template for generating an MPI command
 * ``batch_submit`` - Template for generating a batch system submit command
 
-"""""""""""""""""""
+
 Generated Variables
-"""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~
 
 Ramble automatically generates definitions for the following variables:
 
@@ -999,9 +991,9 @@ Ramble automatically generates definitions for the following variables:
 * ``unformatted_command_without_logs`` - The same as ``unformatted_command`` but
   has no log removal, creation, or redirection.
 
-""""""""""""""""""""""""""""""""""""""""""""
 Package Manager Specific Generated Variables
-""""""""""""""""""""""""""""""""""""""""""""
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
 Ramble also generates or requires the following variables, depending on the
 package manager used:
 

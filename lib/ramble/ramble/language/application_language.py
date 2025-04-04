@@ -92,7 +92,7 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
 
     Args:
         name (str): The name of the group
-        workloads (list(str) | None): A list of workloads to be grouped
+        workloads (list(str) or None): A list of workloads to be grouped
     """
     if workloads is None:
         workloads = []
@@ -130,7 +130,7 @@ def executable(name, template, **kwargs):
         template (list[str] or str): The template command this executable should generate from
 
     Optional Args:
-        use_mpi or mpi (boolean): determines if this executable should be
+        use_mpi or mpi (bool): determines if this executable should be
                         wrapped with an `mpirun` like command or not.
 
         variables (dict): Dictionary of variable definitions to use for this
@@ -139,7 +139,7 @@ def executable(name, template, **kwargs):
                              defaults to {log_file}
         output_capture (str): Optional, Declare which output (stdout, stderr,
                               both) to capture. Defaults to stdout
-        run_in_background (boolean): Optional, Declare if the command should
+        run_in_background (bool): Optional, Declare if the command should
                                      run in the background. Defaults to False
     """
 
@@ -177,7 +177,7 @@ def input_file(
         sha256 (str): Optional, the expected sha256 checksum for the input file
         extension (str): Optiona, the extension to use for the input, if it isn't part of the
                               file name.
-        expand (boolean): Optional. Whether the input should be expanded or not. Defaults to True
+        expand (bool): Optional. Whether the input should be expanded or not. Defaults to True
     """
 
     def _execute_input_file(app):

@@ -71,9 +71,9 @@ class SoftwarePackage:
         """Return a spec string for this software package
 
         Args:
-            all_packages (optional dict): Dictionary of all package definitions.
+            all_packages (dict, optional): Dictionary of all package definitions.
                                  Used to look up compiler packages.
-            compiler (boolean): True of this package is used as a compiler for
+            compiler (bool): True of this package is used as a compiler for
                                 another package. False if this is just a primary package.
                                 Toggles returning compiler_spec vs. spec in case they are
                                 different.
@@ -125,7 +125,7 @@ class SoftwarePackage:
             other (SoftwarePackage): Package to compare with self.
 
         Returns:
-            (boolean): True if packages are the same, False otherwise
+            (bool): True if packages are the same, False otherwise
         """
 
         return (
@@ -153,7 +153,8 @@ class RenderedPackage(SoftwarePackage):
         Args:
             name (str): Name of package
             pkg_info (dict): Package info containing specs for supported package managers
-            package_manager (PackageManagerBase): package manager tied to this package
+            package_manager (ramble.package_manager.PackageManagerBase):
+                package manager tied to this package
             spec (str): Package spec (used to install / load package)
             compiler (optional str): Name of package definition to use as compiler
                                      for this package
@@ -174,7 +175,7 @@ class RenderedPackage(SoftwarePackage):
         Args:
             all_packages (dict): Dictionary of all package definitions.
                                  Used to look up compiler packages.
-            compiler (boolean): True of this package is used as a compiler for
+            compiler (bool): True of this package is used as a compiler for
                                 another package. False if this is just a primary package.
                                 Toggles returning compiler_spec vs. spec in case they are
                                 different.
@@ -302,7 +303,8 @@ class TemplatePackage(SoftwarePackage):
         """Render a SoftwarePackage from this TemplatePackage
 
         Args:
-            expander (Expander): Expander to use to render a package from this template
+            expander (ramble.expander.Expander): Expander to use to render a
+                package from this template
 
         Returns:
             (SoftwarePackage): Rendered SoftwarePackage
@@ -376,7 +378,8 @@ class SoftwareEnvironment:
 
         Args:
             name (str): Name of the environment
-            package_manager (PackageManagerBase): Package manager associated with the environment
+            package_manager (ramble.package_manager.PackageManagerBase):
+                Package manager associated with the environment
         """
 
         self.name = name
@@ -455,7 +458,7 @@ class SoftwareEnvironment:
             other (SoftwareEnvironment): Environment to compare with self
 
         Returns:
-            (boolean): True if environments are equivalent, False otherwise
+            (bool): True if environments are equivalent, False otherwise
         """
         equal = self.name == other.name and len(self._packages) == len(other._packages)
 
@@ -582,7 +585,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         """String representation of this environment
 
         Returns:
-            (str): String representation of this environment (none of it's rendered environments)
+            (str): String representation of this environment (none of its rendered environments)
         """
 
         return super().info()
@@ -597,9 +600,10 @@ class TemplateEnvironment(SoftwareEnvironment):
         """Render a SoftwareEnvironment from this TemplateEnvironment
 
         Args:
-            expander (Expander): Expander object to use when rendering
+            expander (ramble.expander.Expander): Expander object to use when rendering
             all_packages (dict): All package definitions
-            package_manager (PackageManagerBase): Package manager the environment is rendered with
+            package_manager (ramble.package_manager.PackageManagerBase):
+                Package manager the environment is rendered with
 
         Returns:
             (RenderedEnvironment) Reference to the rendered SoftwareEnvironment
@@ -672,7 +676,8 @@ class SoftwareEnvironments:
         """SoftwareEnvironments constructor
 
         Args:
-            workspace (Workspace): Reference to workspace owning the software descriptions
+            workspace (ramble.workspace.Workspace): Reference to workspace
+                owning the software descriptions
         """
 
         self._workspace = workspace
@@ -718,7 +723,8 @@ class SoftwareEnvironments:
         information about used packages and environments.
 
         Args:
-            package_manager (PackageManagerBase): Reference to a package manager object
+            package_manager (ramble.package_manager.PackageManagerBase):
+                Reference to a package manager object
             env_name (str): Name of the rendered environment to mark as used
         """
 
@@ -786,9 +792,9 @@ class SoftwareEnvironments:
 
         Args:
             environment (RenderedEnvironment): Environment to extract necessary
-                                               compilers from
-            expander (Expander): Expander object to use when constructing
-                                 compiler package names
+                compilers from
+            expander (ramble.expander.Expander): Expander object to use when
+                constructing compiler package names
         """
         pm_name = environment.package_manager_name
         for pkg in environment._packages:
@@ -923,8 +929,9 @@ class SoftwareEnvironments:
 
         Args:
             env_name (str): Name of environment needed by the experiment
-            expander (Expander): Expander object from the experiment
-            package_manager (PackageManagerBase): Package manager the environment is rendered with
+            expander (ramble.expander.Expander): Expander object from the experiment
+            package_manager (ramble.package_manager.PackageManagerBase):
+                Package manager the environment is rendered with
 
         Returns:
             (SoftwareEnvironment): Reference to software environment for

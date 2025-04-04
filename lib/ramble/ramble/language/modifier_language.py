@@ -149,7 +149,7 @@ def executable_modifier(name):
             mpi=False,
             redirect='{log_file}',
             output_capture=OUTPUT_CAPTURE.DEFAULT
-        )]
+            )]
 
         return prepend_execs, append_execs
 
@@ -191,14 +191,13 @@ def env_var_modification(name, modification=None, method="set", mode=None, modes
         modes (list(str)): List of mode names this env_var_modification should apply in
 
     Supported values for method are:
-        set: Defines the variable to equal the modification value
-        unset: Removes any definition of the variable from the environment
-        prepend: Prepends the modification to the beginning of the variable.
-                 Always uses the separator ':'
-        append: Appends the modification value to the end of the value. Allows a
-                keyword argument of 'separator' to define the delimiter between
-                values.
 
+        - set: Defines the variable to equal the modification value
+        - unset: Removes any definition of the variable from the environment
+        - prepend: Prepends the modification to the beginning of the variable.
+          Always uses the separator ':'
+        - append: Appends the modification value to the end of the value. Allows a
+          keyword argument of 'separator' to define the delimiter between values.
     """
 
     def _env_var_modification(mod):

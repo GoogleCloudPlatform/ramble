@@ -22,18 +22,20 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    :maxdepth: 2
    :caption: Basics
 
-   ramble
    getting_started
    configuration_files
    workspace
    workspace_config
    package_managers
    success_criteria
+   results
+   mirror_config
 
 .. toctree::
    :maxdepth: 2
    :caption: Reference
 
+   ramble
    command_index
 
 .. toctree::

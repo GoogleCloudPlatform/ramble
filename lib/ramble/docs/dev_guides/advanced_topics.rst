@@ -24,9 +24,9 @@ types supported in Ramble.
 
 .. _ramble-pipelines-and-phases:
 
-------------------------------
+-------------------------------
 Experiment Pipelines and Phases
-------------------------------
+-------------------------------
 
 Ramble has a concept of ``pipeline``, which represent full actions that can
 be taken on a workspace. Some of the common ``pipelines`` that are used are the

@@ -27,7 +27,7 @@ definition file.
 Writing a new pcakage manager definition file in Ramble largely follows the
 same workflow as writing an application definition file, although the intent
 and behavior are different. It is recommended that you review
-:ref:`application-def-guide` before writing a modifier.
+:ref:`application-dev-guide` before writing a modifier.
 
 -----------
 Preparation

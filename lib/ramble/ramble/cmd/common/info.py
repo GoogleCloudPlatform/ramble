@@ -120,7 +120,7 @@ def all_object_attributes(obj):
     definitions in) and return a list of such attributes.
 
     Returns:
-        (list) all_attrs: List of all attributes the object contains
+        (list): List of all attributes the object contains
     """
     all_attrs = []
     for name in obj_attribute_map:
