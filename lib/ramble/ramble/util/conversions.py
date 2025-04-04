@@ -28,3 +28,12 @@ def list_str_to_list(in_str):
         else:
             out_value.append(part)
     return out_value
+
+
+def canonical_none(maybe_none):
+    """Convert a small set of "none-looking" inputs to None"""
+    if maybe_none == "":
+        return None
+    if isinstance(maybe_none, str) and maybe_none.lower() == "none":
+        return None
+    return maybe_none
