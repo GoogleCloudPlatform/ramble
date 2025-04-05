@@ -51,6 +51,7 @@ from ramble.error import RambleError
 from ramble.experiment_result import ExperimentResult
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
+from ramble.util import conversions
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -59,7 +60,6 @@ from ramble.util.shell_utils import source_str
 from ramble.workspace import namespace
 
 import spack.util.compression
-import spack.util.environment
 import spack.util.executable
 import spack.util.spack_json
 
@@ -280,8 +280,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def _set_package_manager(self):
         if namespace.package_manager in self.variants:
-            pkgman_name = self.expander.expand_var(
-                self.variants[namespace.package_manager], typed=True
+            pkgman_name = conversions.canonical_none(
+                self.expander.expand_var(self.variants[namespace.package_manager], typed=True)
             )
 
             if pkgman_name is not None:
@@ -310,18 +310,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def _set_workflow_manager(self):
         if namespace.workflow_manager in self.variants:
-            workflow_name = self.expander.expand_var(
-                self.variants[namespace.workflow_manager], typed=True
+            wm_name = conversions.canonical_none(
+                self.expander.expand_var(self.variants[namespace.workflow_manager], typed=True)
             )
 
-            if workflow_name is not None:
+            if wm_name is not None:
                 try:
                     wfman_type = ramble.repository.ObjectTypes.workflow_managers
-                    self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
+                    self.workflow_manager = ramble.repository.get(wm_name, wfman_type).copy()
                     self.workflow_manager.set_application(self)
                 except ramble.repository.UnknownObjectError:
                     logger.die(
-                        f"{workflow_name} is not a valid workflow manager. "
+                        f"{wm_name} is not a valid workflow manager. "
                         "Valid workflow managers can be listed via:\n"
                         "\tramble list --type workflow_managers"
                     )
