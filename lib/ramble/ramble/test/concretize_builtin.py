@@ -16,6 +16,7 @@ from ramble.main import RambleCommand
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
+config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
@@ -97,3 +98,45 @@ ramble:
                     req_test = False
                     break
             assert req_test
+
+
+def test_concretize_allows_invalid_experiment(
+    mutable_config, mutable_mock_workspace_path, request
+):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+
+        workspace(
+            "manage",
+            "experiments",
+            "gromacs",
+            "--wf",
+            "water_bare",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Remove variables, to create an invalid experiment
+        config(
+            "rm",
+            "applications:gromacs:workloads:water_bare:experiments:generated:n_ranks",
+            global_args=global_args,
+        )
+        config(
+            "rm",
+            "applications:gromacs:workloads:water_bare:experiments:generated:n_nodes",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+
+        workspace("concretize")
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+
+            assert "spack_gromacs" in data

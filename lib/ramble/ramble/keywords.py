@@ -168,7 +168,7 @@ class Keywords:
                     f'Keyword "{definition}" has been defined, ' + "but is reserved by ramble."
                 )
 
-    def check_required_keys(self, definitions):
+    def check_required_keys(self, definitions, warn_validation=True, die_on_validate_error=True):
         """Check a dictionary of variable definitions for all required keywords"""
         if not definitions:
             return
@@ -183,11 +183,14 @@ class Keywords:
                 required_set.remove(definition)
 
         if len(required_set) > 0:
-            for key in required_set:
-                logger.warn(f'Required key "{key}" is not defined')
-            raise RambleKeywordError(
-                "One or more required keys " + "are not defined within an experiment."
-            )
+            if warn_validation:
+                for key in required_set:
+                    logger.warn(f'Required key "{key}" is not defined')
+
+            if die_on_validate_error:
+                raise RambleKeywordError(
+                    "One or more required keys " + "are not defined within an experiment."
+                )
 
 
 class RambleKeywordError(ramble.error.RambleError):
