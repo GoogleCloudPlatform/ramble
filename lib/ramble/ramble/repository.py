@@ -1493,6 +1493,13 @@ class RepoLoader(_PrependFileLoader):
         self.fullname = fullname
         super().__init__(self.fullname, self.object_py, prepend=self._object_prepend)
 
+    def is_package(self, fullname):
+        parent_dir = os.path.dirname(self.path)
+        # Use the presence of __init__.py to determine if load it as a package.
+        # TODO: since every Ramble object already has a containing directory,
+        # it might make sense to treat all of them as python packages.
+        return os.path.isfile(os.path.join(parent_dir, "__init__.py"))
+
 
 class RepositoryNamespaceLoader:
     def create_module(self, spec):
