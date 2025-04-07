@@ -6,9 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from enum import Enum
 import collections.abc
-from typing import Optional, Any, Union, Callable
+from enum import Enum
+from typing import Any, Callable, Optional, Union
+
 import ramble.error
 
 reserved_variants = {"package_manager", "package_manager_prefix", "workflow_manager", "version"}

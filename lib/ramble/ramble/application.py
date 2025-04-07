@@ -46,6 +46,7 @@ import ramble.util.hashing
 import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
+import ramble.variants
 import ramble.workflow_manager
 from ramble.error import RambleError
 from ramble.experiment_result import ExperimentResult
@@ -57,7 +58,6 @@ from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
 from ramble.util.shell_utils import source_str
-import ramble.variants
 from ramble.workspace import namespace
 
 import spack.util.compression

@@ -10,9 +10,9 @@
 directives, which are to allow functions to be invoked at class level
 """
 
-from typing import List, Dict, Any
 import functools
 from collections.abc import Sequence  # novm
+from typing import Any, Dict, List
 
 import llnl.util.lang
 import llnl.util.tty.color

@@ -15,12 +15,12 @@ from typing import List
 
 import ramble.util.class_attributes
 import ramble.util.directives
+import ramble.variants
 from ramble.error import RambleError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
-import ramble.variants
 
 
 class ModifierBase(metaclass=ModifierMeta):

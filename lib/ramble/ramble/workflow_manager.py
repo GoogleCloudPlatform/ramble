@@ -11,6 +11,7 @@ from typing import List
 
 import ramble.util.class_attributes
 import ramble.util.directives
+import ramble.variants
 from ramble.expander import ExpanderError
 from ramble.language.shared_language import SharedMeta
 from ramble.language.workflow_manager_language import (
@@ -18,7 +19,6 @@ from ramble.language.workflow_manager_language import (
     workflow_manager_variable,
 )
 from ramble.util.naming import NS_SEPARATOR
-import ramble.variants
 
 
 class WorkflowManagerBase(metaclass=WorkflowManagerMeta):

@@ -7,8 +7,7 @@
 # except according to those terms.
 
 # flake8: noqa: F401
-"""pkgmankit is a set of useful modules to import when writing package managers
-"""
+"""pkgmankit is a set of useful modules to import when writing package managers"""
 
 import os
 

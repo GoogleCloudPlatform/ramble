@@ -6,14 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import contextlib
 import collections
-from typing import Optional, Any, Union, Callable
+import contextlib
+from typing import Any, Callable, Optional, Union
 
-import ramble.variants
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
+import ramble.variants
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 

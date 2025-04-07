@@ -7,8 +7,7 @@
 # except according to those terms.
 
 import fnmatch
-
-from typing import List, Any
+from typing import Any, List
 
 from ramble.language.language_base import DirectiveError
 
