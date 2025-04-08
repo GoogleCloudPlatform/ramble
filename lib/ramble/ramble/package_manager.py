@@ -80,7 +80,8 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """Get the path to the package manager's software environment directory
 
         Args:
-            workspace (Workspace): Reference to workspace that owns a software directory
+            workspace (ramble.workspace.Workspace): Reference to workspace that
+                owns a software directory
 
         Returns:
             (str) Path to package manager directory within workspace's software directory
@@ -105,9 +106,9 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         package spec.
 
         Args:
-            pkg (RenderedPackage): Reference to a rendered package
+            pkg (ramble.software_environments.RenderedPackage): Reference to a rendered package
             all_pkgs (dict): All related packages
-            compiler (boolean): True if this pkg is used as a compiler
+            compiler (bool): True if this pkg is used as a compiler
         """
         return pkg.spec
 
@@ -115,7 +116,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """Return this package manager's spec prefix
 
         Returns:
-            self._spec_prefix (str): Prefix for this package manager's specs
+            (str): Prefix for this package manager's specs
         """
         prefix = self._spec_prefix or self.name
         return spack.util.naming.spack_module_to_python_module(prefix)
@@ -138,7 +139,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         return results.getvalue()
 
     def all_pipeline_phases(self, pipeline):
-        """Iterator over all phases wtihin a specified pipeline
+        """Iterator over all phases within a specified pipeline
 
         Iterate over all phases (and their graph nodes) within a pipeline.
 
@@ -147,7 +148,8 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
         Yields:
             phase_name (str): Name of phase
-            phase_note (GraphNode): Object representing a node in the phase graph
+            phase_note (ramble.util.graph.GraphNode): Object representing a
+                node in the phase graph
         """
         if pipeline in self.phase_definitions:
             yield from self.phase_definitions[pipeline].items()
@@ -157,8 +159,8 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         manager instance is attached to.
 
         Args:
-            app_inst (ApplicationBase): The experiment this package
-                                        manager will act on.
+            app_inst (ramble.application.ApplicationBase): The experiment this
+                package manager will act on.
         """
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
@@ -174,7 +176,8 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         variables referenced by any of them are tracked properly.
 
         Args:
-            workspace (Workspace): Workspace to extract templates from
+            workspace (ramble.workspace.Workspace): Workspace to extract
+                templates from
 
         Returns:
             (set): All variable names used by this experiment.
@@ -195,10 +198,10 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         information to the workspace / experiment.
 
         Args:
-            workspace (Workspace): Reference to the workspace that is currently
+            workspace (ramble.workspace.Workspace): Reference to the workspace that is currently
                                    being acted on.
-            force_compute (boolean): Whether to force computation of hashes or not
-            require_exist (boolean): Whether to require environment hashes exist or not.
+            force_compute (bool): Whether to force computation of hashes or not
+            require_exist (bool): Whether to require environment hashes exist or not.
         """
 
         pass
@@ -214,10 +217,10 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """Stub class method for injecting software information into results
 
         Args:
-            workspace (Workspace): Reference to the workspace that is currently
-                                   being acted on.
-            app_inst (Application): Reference to the application instance that
-            owns the results.
+            workspace (ramble.workspace.Workspace): Reference to the workspace
+                that is currently being acted on.
+            app_inst (ramble.application.ApplicationBase): Reference to the
+                application instance that owns the results.
 
         """
         if app_inst.result is None:

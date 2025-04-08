@@ -75,7 +75,7 @@ contents of ``$RAMBLE_ROOT/examples/basic_gromacs_config.yaml``:
 requires ``spack`` is installed and available in your path. Modifications to
 the ``package_manager`` variant will change this behavior.
 
-.. literalinclude:: ../../../../examples/basic_gromacs_config.yaml
+.. literalinclude:: /../../../examples/basic_gromacs_config.yaml
    :language: YAML
 
 Note that specifying compilers that Spack doesn't have installed may take a while.

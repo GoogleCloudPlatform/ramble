@@ -13,13 +13,11 @@ These functions are intended to help read, write, and manipulate YAML based
 configuration files that an experiment might use as input.
 
 Workload variables that represent configuration files should be defined using a
-'.' delimiter between YAML object names. As an example:
+'.' delimiter between YAML object names. As an example::
 
-```
-foo:
-    bar:
-        baz: 1.0
-```
+    foo:
+        bar:
+            baz: 1.0
 
 Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
@@ -147,7 +145,7 @@ def set_config_value(config_data: Dict, option_name: str, option_value: Any, for
     Args:
         config_data (dict): A config dictionary representing data read from a YAML file.
         option_name (str): Name of config option to set
-        option_value (any): Value to set config option to
+        option_value (Any): Value to set config option to
         force (bool): If true, all missing layers in the attribute list are created.
                       If false, only sets existing attributes
     """
@@ -213,7 +211,8 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
 
     Args:
         config_data (dict): Dictionary of config data read from a YAML file
-        app_inst (application): Application instance representing an experiment
+        app_inst (ramble.application.ApplicationBase): Application instance
+            representing an experiment
         default_config_string (str): String that conveys the default config_data
                                      should be used in place of the current value.
     """

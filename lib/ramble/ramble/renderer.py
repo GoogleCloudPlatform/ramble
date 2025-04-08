@@ -81,15 +81,15 @@ class RenderGroup:
             'variables': {},
             'zips': {},
             'matrix': [],
-            'matrices': {} or [],
-        }
+            'matrices': {} or []
+            }
 
         Args:
             name_template: The name template for the objects this group represents
             in_dict: A dictionary representing the group definitions
 
         Returns:
-            boolean: True if anything was extracted from the dictionary
+            bool: True if anything was extracted from the dictionary
         """
 
         extracted = False

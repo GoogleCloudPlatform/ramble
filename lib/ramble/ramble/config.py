@@ -756,8 +756,8 @@ def override(path_or_scope, value=None):
     """Simple way to override config settings within a context.
 
     Arguments:
-        path_or_scope (ConfigScope or str): scope or single option to override
-        value (object or None): value for the single option
+        path_or_scope (ConfigScope | str): scope or single option to override
+        value (object | None): value for the single option
 
     Temporarily push a scope on the current configuration, then remove it
     after the context completes. If a single option is provided, create
@@ -963,8 +963,8 @@ def validate(data, schema, filename=None):
     """Validate data read in from a Ramble YAML file.
 
     Arguments:
-        data (dict or list): data read from a Ramble YAML file
-        schema (dict or list): jsonschema to validate data
+        data (dict | list): data read from a Ramble YAML file
+        schema (dict | list): jsonschema to validate data
 
     This leverages the line information (start_mark, end_mark) stored
     on Ramble YAML structures.

@@ -792,7 +792,7 @@ ramble:
             key (str): Name of metadata key to retrieve
 
         Returns:
-            (any): Value associated with key in metadata
+            (Any): Value associated with key in metadata
         """
         if key in self.metadata[namespace.metadata]:
             return self.metadata[namespace.metadata][key]
@@ -804,7 +804,7 @@ ramble:
 
         Args:
             key (str): Key of metadata to set
-            value (any): Value to set in the metadata object
+            value (Any): Value to set in the metadata object
         """
         self.metadata[namespace.metadata][key] = value
 
@@ -1954,8 +1954,8 @@ ramble:
         """Remove one or more includes from this workspace.
 
         Args:
-            index (optional): Numerical position of include to remove
-            pattern (optional): String or pattern of include to remove.
+            index (int): (Optional) Numerical position of include to remove
+            pattern (str): (Optional) String or pattern of include to remove.
                                 Removes all matching includes.
         """
 

@@ -298,7 +298,7 @@ def find_workspace_path(args):
         args (argparse.Namespace): argparse namespace with command arguments
 
     Returns:
-        (string): Path to workspace root, or None
+        (str): Path to workspace root, or None
     """
 
     # treat workspace as a name

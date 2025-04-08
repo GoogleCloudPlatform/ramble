@@ -6,7 +6,7 @@
    option. This file may not be copied, modified, or distributed
    except according to those terms.
 
-.. _modifying_an_experiment_tutorial:
+.. _modifying_a_gromacs_experiment_tutorial:
 
 =======================================
 3) Modifying A GROMACS Experiment
@@ -203,7 +203,7 @@ This command opens the ``ramble.yaml`` file, along with any ``*.tpl`` files in
 the workspace's ``configs`` directory. The root directory of the workspace can
 be seen in the ``Location`` attribute output from:
 
-.. code-blocks:: console
+.. code-block:: console
 
     $ ramble workspace info
 

@@ -99,24 +99,27 @@ def create_context_from_dict(context_name, in_dict):
 
     Dictionaries should follow the below format:
 
-    in_dict = {
-        'env_vars': [],
-        'variables': {},
-        'variants': {},
-        'internals': {},
-        'template': '',
-        'chained_experiments': [],
-        'modifiers': [],
-        'context_name': '',
-        'exclude': {},
-        'zips': {},
-        'matrices': {} or [],
-        'tags': []
-        'n_repeats': '',
+    .. code-block:: python
+
+        in_dict = {
+            'env_vars': [],
+            'variables': {},
+            'variants': {},
+            'internals': {},
+            'template': '',
+            'chained_experiments': [],
+            'modifiers': [],
+            'context_name': '',
+            'exclude': {},
+            'zips': {},
+            'matrices': {} or [],
+            'tags': [],
+            'n_repeats': ''
+        }
 
     Args:
-        context_name: The name of the context (e.g., application name)
-        in_dict: A dictionary representing the variable definitions
+        context_name (str): The name of the context (e.g., application name)
+        in_dict (dict): A dictionary representing the variable definitions
 
     Returns:
         Context(object)

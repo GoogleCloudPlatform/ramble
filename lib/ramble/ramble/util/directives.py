@@ -13,26 +13,25 @@ def define_directive_methods(obj_inst):
     Wrap each directive, and inject it into this class instance as a class
     method.
 
-    This allows:
+    This allows: `self.<directive_name>(<directive_args>)` to be called. As in::
 
-    self.<directive_name>(<directive_args>) to be called. As in:
-
-    self.archive_pattern('*.log')
+        self.archive_pattern('*.log')
 
     Which can be called within `def __init__(self, file_path)` instead of
-    having to call `archive_pattern('*.log')` at the class definition level.
+    having to call `archive_pattern()` at the class definition level.
 
     This function requires the object instance to have internal attributes:
-    - '_directive_classes' - Dictionary mapping a directive to the class the
-      directive is defined for
-    - '_directive_functions' - Dictionary mapping a directive to the decorated function
-      that defines the directive
-    - '_language_classes' - A list of classes that language features should be "imported" from
 
-    Both '_directive_classes' and '_directive_functions' are defined for all
+    - `_directive_classes` - Dictionary mapping a directive to the class the
+      directive is defined for
+    - `_directive_functions` - Dictionary mapping a directive to the decorated function
+      that defines the directive
+    - `_language_classes` - A list of classes that language features should be "imported" from
+
+    Both `_directive_classes` and `_directive_functions` are defined for all
     classes that use the DirectiveMeta meta-class.
 
-    The '_language_classes' attribute is defined in ApplicationBase and ModifierBase.
+    The `_language_classes` attribute is defined in ApplicationBase and ModifierBase.
     """
     if not hasattr(obj_inst, "_directive_classes") or not hasattr(
         obj_inst, "_directive_functions"

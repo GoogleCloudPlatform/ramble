@@ -135,7 +135,7 @@ class ExpansionNode:
         """Compute node indices relative to another node
 
         Args:
-            relative_to (node): node to shift current node's indices relative to
+            relative_to (ExpansionNode): node to shift current node's indices relative to
 
         Returns:
             (tuple) indices of shifted match set
@@ -146,7 +146,7 @@ class ExpansionNode:
         """Add children to this node
 
         Args:
-            children (node, or list): nodes to adds as children of self
+            children (ExpansionNode | list): nodes to adds as children of self
         """
         if isinstance(children, list):
             self.children.extend(children)
@@ -173,13 +173,15 @@ class ExpansionNode:
 
         Args:
             expansion_dict (dict): variable definitions to use for expanding
-            detected matches
+                detected matches
             allow_passthrough (bool): if true, expansion is allowed to fail. if
-            false, failed expansion raises an error.
+                false, failed expansion raises an error.
             expansion_func (func): function to use for expansion of nested
-            variable definitions
-            evaluation_func (func): function to use for evaluating math of strings
-            no_expand_vars (set): set of variable names that should never be expanded
+                variable definitions
+            evaluation_func (func): function to use for evaluating math of
+                strings
+            no_expand_vars (set): set of variable names that should never be
+                expanded
         """
         if no_expand_vars is None:
             no_expand_vars = set()
@@ -626,7 +628,7 @@ class Expander:
             extra_vars: Variable definitions to use with highest precedence
 
         Returns:
-            boolean: True or False, based on the evaluation of in_str
+            bool: True or False, based on the evaluation of in_str
         """
 
         evaluated = self.expand_var(

@@ -36,7 +36,7 @@ def load_source(full_name, path, prepend=None):
             loaded module; e.g., can be used to inject import statements
 
     Returns:
-        (ModuleType): the loaded module
+        (types.ModuleType): the loaded module
     """
     with import_lock():
         if prepend is None:

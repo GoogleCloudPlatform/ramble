@@ -4,5 +4,8 @@ sphinx_rtd_theme
 sphinxcontrib-programoutput
 sphinxcontrib-jquery
 sphinx-copybutton
-tdqm
+tqdm
 deprecation
+pytest
+pandas
+matplotlib

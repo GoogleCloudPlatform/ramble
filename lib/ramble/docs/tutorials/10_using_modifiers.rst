@@ -145,7 +145,7 @@ experiment run directories to see what changed after applying the ``lscpu``
 modifier.
 
 Advanced Modifiers
------------------
+------------------
 
 Some modifiers have additional functionality, which can include requiring
 specific software packages to be present. An example of this is the

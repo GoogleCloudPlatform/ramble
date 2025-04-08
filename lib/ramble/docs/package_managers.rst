@@ -7,7 +7,7 @@
    except according to those terms.
 
 
-.. _package_manager_control:
+.. _package-manager-control:
 
 ================
 Package Managers
@@ -113,7 +113,7 @@ determine what packages to install within the resulting virtual environment.
 The use of this package manager requires ``pip`` to be installed outside of
 Ramble. This happens automatically in several Python installations. For more
 information see
-`pip's documentation<https://pip.pypa.io/en/stable/installation/>`_.
+`pip's documentation <https://pip.pypa.io/en/stable/installation/>`_.
 
 ^^^^^^^^^^^^^^^^^^^^^
 Spack Package Manager

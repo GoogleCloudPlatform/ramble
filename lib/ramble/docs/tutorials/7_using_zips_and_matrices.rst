@@ -165,7 +165,7 @@ Your final configuration file should look something like:
 .. include:: shared/wrf_execute.rst
 
 **NOTE** Some of these experiments can take a while to execute. Experiments can
-be filtered using the :ref:`--where<filter-experiments>`` option to execute the
+be filtered using the :ref:`--where <filter-experiments>` option to execute the
 higher scale experiments if desired. To do this, try:
 
 .. code-block:: console

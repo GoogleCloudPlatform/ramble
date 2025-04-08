@@ -41,9 +41,10 @@ class AttributeGraph:
         graph. If the node is new, also construct a new phase node.
 
         Args:
-            node (GraphNode): Node to inject or modify
-            dep_nodes (list(GraphNode) | None): List of nodes that are dependencies
-            internal_order (Boolean): True to process internal dependencies,
+            node (ramble.util.graph.GraphNode): Node to inject or modify
+            dep_nodes (list(ramble.util.graph.GraphNode) | None): List of node
+                that are dependencies
+            internal_order (bool): True to process internal dependencies,
                                       False to skip
 
         """
@@ -58,7 +59,7 @@ class AttributeGraph:
         """Add a node to the graph
 
         Args:
-            node (GraphNode): Node to add into graph
+            node (ramble.util.graph.GraphNode): Node to add into graph
         """
 
         self._make_editable()
@@ -76,9 +77,10 @@ class AttributeGraph:
         to define new graph edges.
 
         Args:
-            node (GraphNode): Node to inject or modify
-            dep_nodes (list(GraphNode) | None): List of nodes that are dependencies
-            internal_order (Boolean): True to process internal dependencies,
+            node (ramble.util.graph.GraphNode): Node to inject or modify
+            dep_nodes (list(ramble.util.graph.GraphNode) | None): List of nodes
+                that are dependencies
+            internal_order (bool): True to process internal dependencies,
                                      False to skip
         """
 
@@ -106,7 +108,7 @@ class AttributeGraph:
         yield each node one by one.
 
         Yields:
-            node (GraphNode): Each node in the graph
+            node (ramble.util.graph.GraphNode): Each node in the graph
         """
         if not self._prepared:
             try:
@@ -139,8 +141,8 @@ class AttributeGraph:
             key (str): Name of key to find in the graph
 
         Returns:
-            (GraphNode): Node representing the key requested. Returns None if
-                         the key isn't found.
+            (ramble.util.graph.GraphNode): Node representing the key
+                requested. Returns None if the key isn't found.
         """
         for node in self.walk():
             if node.key == key:
@@ -162,7 +164,7 @@ class PhaseGraph(AttributeGraph):
         Args:
             phase_definitions (dict): Definitions of phases. Should be of the
                                       format {'phase_name': GraphNode}
-            obj_inst (obj): Object instance to extract phase functions from
+            obj_inst (object): Object instance to extract phase functions from
         """
 
         super().__init__(obj_inst)
@@ -185,11 +187,12 @@ class PhaseGraph(AttributeGraph):
     def add_node(self, node, obj_inst=None):
         """Add a new phase node to the graph
 
-        Extract the phase function from the object instance, and inject a new node into the graph.
+        Extract the phase function from the object instance, and inject a new
+        node into the graph.
 
         Args:
-            node (GraphNode): Phase node to add into graph
-            obj_inst (Object): Object that owns the phase
+            node (ramble.util.graph.GraphNode): Phase node to add into graph
+            obj_inst (object): Object that owns the phase
         """
 
         func_obj = obj_inst
@@ -209,10 +212,12 @@ class PhaseGraph(AttributeGraph):
 
         Args:
             phase_name (str): Name of the phase to inject or modify
-            dependencies (list(str) | None): List of phase names to inject dependencies on
-            internal_order (Boolean): True to process internal dependencies,
-                                      False to skip
-            obj_inst (object): Application or modifier instance to extract phase function from
+            dependencies (list(str) | None): List of phase names to inject
+                dependencies on
+            internal_order (bool): True to process internal dependencies,
+                False to skip
+            obj_inst (object): Application or modifier instance to extract
+                phase function from
         """
         if dependencies is None:
             dependencies = []

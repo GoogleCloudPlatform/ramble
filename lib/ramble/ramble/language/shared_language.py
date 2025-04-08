@@ -322,7 +322,7 @@ def register_builtin(
 
     Args:
         name (str): Name of builtin (should be the name of a class method) to register
-        required (boolean): Whether the builtin will be auto-injected or not
+        required (bool): Whether the builtin will be auto-injected or not
         injection_method (str): The method of injecting the builtin. Can be
                                 'prepend' or 'append'
         depends_on (list(str) | None): The names of builtins this builtin depends on
@@ -440,7 +440,7 @@ def maintainers(*names: str):
     """Add a new maintainer directive, to specify maintainers in a declarative way.
 
     Args:
-        names (str(s)): GitHub username(s) for the maintainer. Can provide
+        names (str): GitHub username(s) for the maintainer. Can provide
                         multiple names as separate arguments.
     """
 
@@ -457,7 +457,7 @@ def tags(*values: str):
     """Add a new tag directive, to specify tags in a declarative way.
 
     Args:
-        values (str(s)): Values to mark as a tag. Can provide multiple values
+        values (str): Values to mark as a tag. Can provide multiple values
                          as separate arguments.
     """
 
