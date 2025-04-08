@@ -555,6 +555,8 @@ class ExecutePipeline(Pipeline):
     def _execute(self):
         super()._execute()
 
+        resolve_env_vars = ramble.config.get("config:resolve_variables_in_subprocesses", False)
+
         if not self.suppress_run_header:
             logger.all_msg("Running executors...")
 
@@ -568,6 +570,8 @@ class ExecutePipeline(Pipeline):
 
             app_inst.add_expand_vars(self.workspace)
             exec_str = app_inst.expander.expand_var(self.executor)
+            if resolve_env_vars:
+                exec_str = os.path.expandvars(exec_str)
             exec_parts = shlex.split(exec_str)
             exec_name = exec_parts[0]
             exec_args = exec_parts[1:]

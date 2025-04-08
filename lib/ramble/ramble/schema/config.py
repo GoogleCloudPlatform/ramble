@@ -116,6 +116,11 @@ properties["config"]["spack"] = {
             },
             "additionalProperties": False,
         },
+        "resolve_variables_in_subprocesses": {
+            "type": "boolean",
+            "default": False,
+            "additionalProperties": False,
+        },
     },
     "additionalProperties": False,
 }
