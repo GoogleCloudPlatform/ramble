@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import collections.abc
+from collections.abc import Sequence
 from enum import Enum
 from typing import Any, Callable, Optional, Union
 
@@ -75,7 +75,7 @@ class VariantSet:
         name: str,
         default: Optional[Any] = None,
         description: str = "",
-        values: Optional[Union[collections.abc.Sequence, Callable[[Any], bool]]] = None,
+        values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         """Define a new default variant within this set.
 
@@ -148,7 +148,7 @@ class VariantSet:
         variant_type: int,
         default: Optional[Any] = None,
         description: str = "",
-        values: Optional[Union[collections.abc.Sequence, Callable[[Any], bool]]] = None,
+        values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         """Define a variant within this set.
 
@@ -240,7 +240,7 @@ class Variant:
         name: str,
         default: Optional[Any] = None,
         description: str = "",
-        values: Optional[Union[collections.abc.Sequence, Callable[[Any], bool]]] = None,
+        values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         self.name = name
         self.default = default

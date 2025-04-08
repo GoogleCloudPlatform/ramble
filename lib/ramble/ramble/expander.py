@@ -650,12 +650,16 @@ class Expander:
             )
 
     def satisfies(
-        self, reqs: List = None, variant_set=None, extra_vars=None, merge_used_stage: bool = True
+        self,
+        reqs: List[str] = None,
+        variant_set=None,
+        extra_vars=None,
+        merge_used_stage: bool = True,
     ):
         """Determine an experiment's variants satisfy a query
 
         Args:
-            req: requirement to check if experiment satisfies
+            reqs: List of string requirements to check if experiment satisfies
             extra_vars: Variable definitions to use with highest precedence
             merged_used_stage: Whether used variables are merged into the
                                set of used variables or not.
@@ -927,12 +931,7 @@ class Expander:
 
             found = False
             for comp in node.comparators:
-                if isinstance(comp, ast.List):
-                    for elt in comp.elts:
-                        rhs_value = self.eval_math(elt)
-                        if lhs_value == rhs_value:
-                            found = True
-                elif isinstance(comp, ast.Set):
+                if isinstance(comp, (ast.List, ast.Set)):
                     for elt in comp.elts:
                         rhs_value = self.eval_math(elt)
                         if lhs_value == rhs_value:
