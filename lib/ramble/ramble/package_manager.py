@@ -139,7 +139,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         return results.getvalue()
 
     def all_pipeline_phases(self, pipeline):
-        """Iterator over all phases wtihin a specified pipeline
+        """Iterator over all phases within a specified pipeline
 
         Iterate over all phases (and their graph nodes) within a pipeline.
 

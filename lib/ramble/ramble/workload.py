@@ -251,7 +251,7 @@ class Workload:
             exec_name (str): Name of executable to find
 
         Returns:
-            (str or None): Name of executable if it exists, None if it is not found
+            (str | None): Name of executable if it exists, None if it is not found
         """
         for executable in self.executables:
             if executable == exec_name:
@@ -265,7 +265,7 @@ class Workload:
             input_name (str): Name of input to find
 
         Returns:
-            (str or None): Name of input if it exists, None if it is not found
+            (str | None): Name of input if it exists, None if it is not found
         """
         for input in self.inputs:
             if input == input_name:
@@ -279,7 +279,7 @@ class Workload:
             var_name (str): Name of variable to find
 
         Returns:
-            (WorkloadVariable or None): Variable instance if it exists, None if it is not found
+            (WorkloadVariable | None): Variable instance if it exists, None if it is not found
         """
         if name in self.variables:
             return self.variables[name]
@@ -293,7 +293,7 @@ class Workload:
             env_var_name (str): Name of environment variable to find
 
         Returns:
-            (WorkloadEnvironmentVariable or None): Environment variable instance
+            (WorkloadEnvironmentVariable | None): Environment variable instance
                                                   if it exists, None if it is not found
         """
         if name in self.environment_variables:

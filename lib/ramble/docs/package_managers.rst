@@ -7,7 +7,7 @@
    except according to those terms.
 
 
-.. _package_manager_control:
+.. _package-manager-control:
 
 ================
 Package Managers

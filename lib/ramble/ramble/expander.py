@@ -135,8 +135,7 @@ class ExpansionNode:
         """Compute node indices relative to another node
 
         Args:
-            relative_to (ExpansionNode): node to shift current node's indices
-                relative to
+            relative_to (ExpansionNode): node to shift current node's indices relative to
 
         Returns:
             (tuple) indices of shifted match set
@@ -147,8 +146,7 @@ class ExpansionNode:
         """Add children to this node
 
         Args:
-            children (ExpansionNode, or list): nodes to adds as children of
-                self
+            children (ExpansionNode | list): nodes to adds as children of self
         """
         if isinstance(children, list):
             self.children.extend(children)

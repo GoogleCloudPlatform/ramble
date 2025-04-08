@@ -99,7 +99,7 @@ def figure_of_merit(
       fom_regex (str): A regular expression using named groups to extract the FOM
       group_name (str): The name of the group that the FOM should be pulled from
       units (str): The units associated with the FOM
-      contexts (list(str) or None): List of contexts (defined by
+      contexts (list(str) | None): List of contexts (defined by
                                    figure_of_merit_context) this figure of merit
                                    should exist in.
       fom_type: The type of figure of merit
@@ -374,8 +374,8 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None):
     Args:
       name (str): The name of the phase. Phases are functions named '_<phase>'.
       pipeline (str): The name of the pipeline this phase should be registered into.
-      run_before (list(str) or None): A list of phase names this phase should run before
-      run_after (list(str) or None): A list of phase names this phase should run after
+      run_before (list(str) | None): A list of phase names this phase should run before
+      run_after (list(str) | None): A list of phase names this phase should run after
     """
     if run_before is None:
         run_before = []

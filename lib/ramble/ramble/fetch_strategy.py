@@ -920,12 +920,12 @@ class GitFetchStrategy(VCSFetchStrategy):
         This method handles cloning from git, but does not require a stage.
 
         Arguments:
-            dest (str or None): The path into which the code is cloned. If None,
+            dest (str | None): The path into which the code is cloned. If None,
                 requires a stage and uses the stage's source path.
-            commit (str or None): A commit to fetch from the remote. Only one of
+            commit (str | None): A commit to fetch from the remote. Only one of
                 commit, branch, and tag may be non-None.
-            branch (str or None): A branch to fetch from the remote.
-            tag (str or None): A tag to fetch from the remote.
+            branch (str | None): A branch to fetch from the remote.
+            tag (str | None): A tag to fetch from the remote.
             bare (bool): Execute a "bare" git clone (--bare option to git)
         """
         # Default to spack source path

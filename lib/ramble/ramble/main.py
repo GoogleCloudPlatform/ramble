@@ -779,7 +779,7 @@ def _main(argv=None):
     3. Finding and executing a Ramble command.
 
     Args:
-        argv (list or None): command line arguments, NOT including
+        argv (list | None): command line arguments, NOT including
             the executable name. If None, parses from ``sys.argv``.
 
     """
@@ -944,7 +944,7 @@ def main(argv=None):
     The logic is all in ``_main()``.
 
     Args:
-        argv (list or None): command line arguments, NOT including
+        argv (list | None): command line arguments, NOT including
             the executable name. If None, parses from sys.argv.
 
     """

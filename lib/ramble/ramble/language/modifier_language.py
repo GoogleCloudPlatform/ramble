@@ -149,7 +149,7 @@ def executable_modifier(name):
             mpi=False,
             redirect='{log_file}',
             output_capture=OUTPUT_CAPTURE.DEFAULT
-            )]
+        )]
 
         return prepend_execs, append_execs
 

@@ -402,7 +402,7 @@ class InputStage:
 
         Args:
             mirror_only (bool): only fetch from a mirror
-            err_msg (str or None): the error message to display if all fetchers
+            err_msg (str | None): the error message to display if all fetchers
                 fail or ``None`` for the default fetch failure message
         """
         fetchers = []

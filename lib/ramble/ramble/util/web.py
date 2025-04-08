@@ -402,7 +402,7 @@ def spider(root_urls, depth=0, concurrency=32):
     up to <depth> levels of links from each root.
 
     Args:
-        root_urls (str or list): root urls used as a starting point
+        root_urls (str | list): root urls used as a starting point
             for spidering
         depth (int): level of recursion into links
         concurrency (int): number of simultaneous requests that can be sent
@@ -577,17 +577,17 @@ def find_versions_of_archive(
     archive_urls list is included for the version.
 
     Args:
-        archive_urls (str or list or tuple): URL or sequence of URLs for
+        archive_urls (str | list | tuple): URL or sequence of URLs for
             different versions of a package. Typically these are just the
             tarballs from the package file itself. By default, this searches
             the parent directories of archives.
-        list_url (str or None): URL for a listing of archives.
+        list_url (str | None): URL for a listing of archives.
             Spack will scrape these pages for download links that look
             like the archive URL.
         list_depth (int): max depth to follow links on list_url pages.
             Defaults to 0.
         concurrency (int): maximum number of concurrent requests
-        reference_package (spack.package.Package or None): a spack package
+        reference_package (spack.package.Package | None): a spack package
             used as a reference for url detection.  Uses the url_for_version
             method on the package to produce reference urls which, if found,
             are preferred.

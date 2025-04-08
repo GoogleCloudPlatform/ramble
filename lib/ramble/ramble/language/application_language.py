@@ -92,7 +92,7 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
 
     Args:
         name (str): The name of the group
-        workloads (list(str) or None): A list of workloads to be grouped
+        workloads (list(str) | None): A list of workloads to be grouped
     """
     if workloads is None:
         workloads = []
@@ -127,7 +127,7 @@ def executable(name, template, **kwargs):
 
     Required Args:
         name (str): Name of the executable
-        template (list[str] or str): The template command this executable should generate from
+        template (list[str] | str): The template command this executable should generate from
 
     Optional Args:
         use_mpi or mpi (bool): determines if this executable should be

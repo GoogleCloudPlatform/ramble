@@ -34,7 +34,7 @@ def _find_exe_from_env_var(var):
         var (str): environment variable name
 
     Returns:
-        (str or None, list): executable string (or None if not found) and
+        (str | None, list): executable string (or None if not found) and
             arguments parsed from the env var
     """
     # try to get the environment variable
