@@ -190,3 +190,92 @@ modifiers:
     with open(exec_path) as f:
         data = f.read()
         assert '    FROM_MOD echo "Test formatted exec"' in data
+
+
+def test_nested_formatted_executables_are_properly_formatted(request):
+    test_config = r"""
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: '{execute_experiment}'
+    processes_per_node: '16'
+    n_threads: '1'
+  formatted_executables:
+    level_one:
+      prefix: 'test_l1 '
+      indentation: 2
+      join_separator: '\n'
+      commands:
+      - 'l1line1'
+      - 'l1line2'
+      - 'l1line3'
+    level_two:
+      prefix: 'test_l2 '
+      join_separator: '\n'
+      indentation: 2
+      commands:
+      - 'l2line1'
+      - 'l2line2'
+      - '{level_one}'
+    level_three:
+      prefix: 'test_l3 '
+      join_separator: '\n'
+      indentation: 2
+      commands:
+      - 'l3line1'
+      - '{level_two}'
+  applications:
+    basic:
+      workloads:
+        working_wl:
+          experiments:
+            simple_test:
+              variables:
+                n_nodes: 1
+  software:
+    packages: {}
+    environments: {}
+"""
+    workspace_name = request.node.name
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, "w+") as f:
+            f.write(test_config)
+
+        with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+            f.write("{level_three}\n")
+            f.write("\n\n    {level_three}\n")
+        ws._re_read()
+
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+        experiment_root = ws.experiment_dir
+        exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
+        exp_script = os.path.join(exp_dir, "execute_experiment")
+
+        import re
+
+        test_regexes = [
+            re.compile(r"^  test_l3 l3line1$"),
+            re.compile(r"^  test_l3   test_l2 l2line1$"),
+            re.compile(r"^  test_l3   test_l2   test_l1 l1line1$"),
+            re.compile(r"^      test_l3 l3line1$"),
+        ]
+
+        tests = [
+            False,
+            False,
+            False,
+            False,
+        ]
+
+        with open(exp_script) as f:
+            for line in f.readlines():
+                for idx, regex in enumerate(test_regexes):
+                    if regex.search(line):
+                        tests[idx] = True
+
+        assert all(tests)
