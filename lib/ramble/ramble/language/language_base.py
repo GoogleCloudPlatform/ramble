@@ -14,7 +14,6 @@ import functools
 from collections.abc import Sequence  # novm
 
 import llnl.util.lang
-import llnl.util.tty.color
 
 import ramble.error
 

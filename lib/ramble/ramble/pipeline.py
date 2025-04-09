@@ -22,7 +22,6 @@ from llnl.util.tty.color import cprint
 import ramble.application
 import ramble.config
 import ramble.expander
-import ramble.experiment_set
 import ramble.experimental.uploader
 import ramble.fetch_strategy
 import ramble.repository

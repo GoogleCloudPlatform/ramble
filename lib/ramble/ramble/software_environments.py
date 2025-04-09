@@ -9,12 +9,7 @@
 from collections import defaultdict
 
 import ramble.error
-import ramble.expander
-import ramble.keywords
-import ramble.renderer
-import ramble.repository
 import ramble.util.colors as rucolor
-import ramble.util.matrices
 from ramble.namespace import namespace
 from ramble.package_manager import PackageManagerBase
 from ramble.util.logger import logger
