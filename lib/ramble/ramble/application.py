@@ -29,7 +29,6 @@ import ramble.fetch_strategy
 import ramble.graphs
 import ramble.keywords
 import ramble.mirror
-import ramble.modifier
 import ramble.modifier_types.disabled
 import ramble.paths
 import ramble.repeats
@@ -41,7 +40,6 @@ import ramble.util.colors as rucolor
 import ramble.util.directives
 import ramble.util.env
 import ramble.util.executable
-import ramble.util.graph
 import ramble.util.hashing
 import ramble.util.lock as lk
 import ramble.util.path

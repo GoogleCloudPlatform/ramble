@@ -15,7 +15,6 @@ from llnl.util.lock import *  # noqa
 
 import ramble.config
 import ramble.error
-import ramble.paths
 
 
 class Lock(llnl.util.lock.Lock):

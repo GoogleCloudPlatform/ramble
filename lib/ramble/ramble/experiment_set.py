@@ -17,7 +17,6 @@ import ramble.expander
 import ramble.keywords
 import ramble.renderer
 import ramble.repository
-import ramble.util.matrices
 from ramble.expander import Expander
 from ramble.namespace import namespace
 from ramble.util.logger import logger

@@ -16,7 +16,6 @@ import argparse
 import io
 import operator
 import os
-import os.path
 import pstats
 import re
 import shlex
@@ -47,7 +46,6 @@ from ramble.util.logger import logger
 
 import spack.util.debug
 import spack.util.environment
-import spack.util.path
 from spack.util.executable import CommandNotFoundError
 
 #: names of profile statistics
