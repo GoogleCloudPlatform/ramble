@@ -505,6 +505,19 @@ def make_argument_parser(**kwargs):
         help="lines of profile output or 'all' (default: 20)",
     )
     parser.add_argument(
+        "--profile-restrictions",
+        default="",
+        action="store",
+        help=(
+            "Comma-separated restrictions applied to the cProfiler. "
+            "When specified, it takes precedence over `--lines`. "
+            "Example: `--profile-restrictions 'logger,5'` limits the list to functions with "
+            "'logger' in the path, and then shows the first 5 of them. "
+            "See https://docs.python.org/3/library/profile.html#pstats.Stats.print_stats for more "
+            "details."
+        ),
+    )
+    parser.add_argument(
         "-v", "--verbose", action="store_true", help="print additional output during builds"
     )
     parser.add_argument(
@@ -716,12 +729,13 @@ class RambleCommand:
 def _profile_wrapper(command, parser, args, unknown_args):
     import cProfile
 
-    try:
-        nlines = int(args.lines)
-    except ValueError:
-        if args.lines != "all":
-            logger.die(f"Invalid number for --lines: {args.lines}")
-        nlines = -1
+    from ramble.util import conversions
+
+    if args.profile_restrictions:
+        restrictions_raw = args.profile_restrictions.split(",")
+    else:
+        restrictions_raw = [args.lines if args.lines != "all" else -1]
+    restrictions = [conversions.convert_to_number(v) for v in restrictions_raw]
 
     # allow comma-separated list of fields
     sortby = ["time"]
@@ -741,9 +755,9 @@ def _profile_wrapper(command, parser, args, unknown_args):
         pr.disable()
 
         # print out profile stats.
-        stats = pstats.Stats(pr)
+        stats = pstats.Stats(pr, stream=sys.stderr)
         stats.sort_stats(*sortby)
-        stats.print_stats(nlines)
+        stats.print_stats(*restrictions)
 
 
 def print_setup_info(*info):
