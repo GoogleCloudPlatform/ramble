@@ -55,8 +55,8 @@ def workflow_manager_family(*names: str):
         name (str): Name of family to apply to this workflow manager
     """
 
-    def _define_workflow_manager_family(pm):
-        families_from_base = getattr(pm, "families", [])
-        pm.families = list(sorted(set(families_from_base + list(names))))
+    def _define_workflow_manager_family(wm):
+        families_from_base = getattr(wm, "families", [])
+        wm.families = list(sorted(set(families_from_base + list(names))))
 
     return _define_workflow_manager_family
