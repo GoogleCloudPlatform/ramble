@@ -37,3 +37,16 @@ def canonical_none(maybe_none):
     if isinstance(maybe_none, str) and maybe_none.lower() == "none":
         return None
     return maybe_none
+
+
+def convert_to_number(val):
+    "Convert (in order of preference) to int, or float, or simply return itself"
+    if not isinstance(val, str):
+        return val
+    try:
+        f_val = float(val)
+        if f_val.is_integer():
+            return int(f_val)
+        return f_val
+    except ValueError:
+        return val

@@ -34,3 +34,19 @@ def test_list_str_to_list(input, expect):
 )
 def test_canonical_none(input, expect):
     assert conversions.canonical_none(input) == expect
+
+
+@pytest.mark.parametrize(
+    "input,expect",
+    [
+        (None, None),
+        ("foo", "foo"),
+        (1, 1),
+        (-1.2, -1.2),
+        ("-1.2", -1.2),
+        ("-10", -10),
+        ("1.0", 1),
+    ],
+)
+def test_convert_to_number(input, expect):
+    assert conversions.convert_to_number(input) == expect
