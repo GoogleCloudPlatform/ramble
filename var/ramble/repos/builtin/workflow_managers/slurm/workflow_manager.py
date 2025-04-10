@@ -182,7 +182,9 @@ class Slurm(WorkflowManagerBase):
         if partition:
             pragmas.append("#SBATCH -p {slurm_partition}")
         extra_headers = (
-            self.app_inst.variables["extra_sbatch_headers"].strip().split("\n")
+            expander.expand_var_name("extra_sbatch_headers")
+            .strip()
+            .split("\n")
         )
         pragmas = pragmas + extra_headers
         header_str = "\n".join(self.conditional_expand(pragmas))
