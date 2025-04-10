@@ -903,10 +903,14 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
-    def validate_experiment(self):
+    def validate_experiment(self, warn_validation=True, die_on_validate_error=True):
         # Validate the new modifiers variables exist
         # (note: the base ramble variables are checked earlier too)
-        self.keywords.check_required_keys(self.variables)
+        self.keywords.check_required_keys(
+            self.variables,
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+        )
         self._check_object_validators()
 
     def _check_object_validators(self):

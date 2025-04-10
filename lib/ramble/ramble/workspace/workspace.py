@@ -844,7 +844,7 @@ ramble:
     def all_experiments_path(self):
         return os.path.join(self.root, workspace_all_experiments_file)
 
-    def build_experiment_set(self):
+    def build_experiment_set(self, die_on_validate_error=True):
         """Create an experiment set representing this workspace"""
 
         experiment_set = ramble.experiment_set.ExperimentSet(self)
@@ -858,7 +858,9 @@ ramble:
                 experiment_set.set_workload_context(workload_context)
 
                 for _, experiment_context in self.all_experiments(experiments):
-                    experiment_set.set_experiment_context(experiment_context)
+                    experiment_set.set_experiment_context(
+                        experiment_context, die_on_validate_error=die_on_validate_error
+                    )
 
         experiment_set.build_experiment_chains()
 
@@ -1395,7 +1397,7 @@ ramble:
 
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
 
-        experiment_set = self.build_experiment_set()
+        experiment_set = self.build_experiment_set(die_on_validate_error=False)
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()

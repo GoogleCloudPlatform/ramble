@@ -7,8 +7,7 @@
 # except according to those terms.
 
 # flake8: noqa: F401
-"""wmkit is a set of useful modules to import when writing workflow managers
-"""
+"""wmkit is a set of useful modules to import when writing workflow managers"""
 
 from ramble.language.shared_language import *
 from ramble.language.workflow_manager_language import *

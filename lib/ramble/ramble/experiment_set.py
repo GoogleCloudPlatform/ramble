@@ -138,7 +138,7 @@ class ExperimentSet:
 
         self._set_context(self._contexts.workload, workload_context)
 
-    def set_experiment_context(self, experiment_context):
+    def set_experiment_context(self, experiment_context, die_on_validate_error=True):
         """Set up current experiment context"""
 
         try:
@@ -148,7 +148,7 @@ class ExperimentSet:
             raise RambleVariableDefinitionError(f"In experiment {namespace}: {e}")
 
         self._set_context(self._contexts.experiment, experiment_context)
-        self._ingest_experiments()
+        self._ingest_experiments(die_on_validate_error=die_on_validate_error)
 
     @property
     def application_namespace(self):
@@ -253,7 +253,15 @@ class ExperimentSet:
         if not n_threads:
             variables[self.keywords.n_threads] = 1
 
-    def _prepare_experiment(self, exp_template_name, variables, context, repeats):
+    def _prepare_experiment(
+        self,
+        exp_template_name,
+        variables,
+        context,
+        repeats,
+        die_on_validate_error=True,
+        warn_validation=True,
+    ):
         """Prepare an experiment instance
 
         Create an experiment instance based on the input variables, context,
@@ -268,6 +276,7 @@ class ExperimentSet:
         Returns:
             (Application): Instance of an application class for this experiment
         """
+
         experiment_suffix = ""
         # After generating the base experiment, append the index to repeat experiments
         if repeats.repeat_index:
@@ -348,14 +357,9 @@ class ExperimentSet:
         app_inst.add_expand_vars(self._workspace)
         app_inst.read_status()
 
-        try:
-            app_inst.validate_experiment()
-        except ramble.keywords.RambleKeywordError as e:
-            raise RambleVariableDefinitionError(str(e))
-
         return app_inst
 
-    def _ingest_experiments(self):
+    def _ingest_experiments(self, die_on_validate_error=True):
         """Ingest experiments based on the current context.
 
         Merge all contexts, and render individual experiments. Track these
@@ -463,7 +467,12 @@ class ExperimentSet:
             tracking_group, exclude_where=exclude_where, ignore_used=False, fatal=False
         ):
             app_inst = self._prepare_experiment(
-                experiment_template_name, tracking_vars, final_context, repeats
+                experiment_template_name,
+                tracking_vars,
+                final_context,
+                repeats,
+                warn_validation=False,
+                die_on_validate_error=die_on_validate_error,
             )
 
             final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
@@ -477,7 +486,12 @@ class ExperimentSet:
             render_group, exclude_where=exclude_where
         ):
             app_inst = self._prepare_experiment(
-                experiment_template_name, experiment_vars, final_context, repeats
+                experiment_template_name,
+                experiment_vars,
+                final_context,
+                repeats,
+                warn_validation=False,
+                die_on_validate_error=die_on_validate_error,
             )
 
             final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
@@ -526,11 +540,15 @@ class ExperimentSet:
                     logger.die(f"Experiment {final_exp_namespace} is not unique.")
 
                 try:
-                    self.keywords.check_required_keys(experiment_vars)
-                except ramble.keywords.RambleKeywordError as e:
-                    raise RambleVariableDefinitionError(
-                        f"In experiment {final_exp_namespace}: {e}"
+                    app_inst.validate_experiment(
+                        warn_validation=True, die_on_validate_error=die_on_validate_error
                     )
+                except ramble.keywords.RambleKeywordError as e:
+                    if die_on_validate_error:
+                        raise RambleVariableDefinitionError(
+                            f"In experiment {final_exp_namespace}: {e}"
+                        )
+                    pass
 
                 rendered_experiments.add(final_exp_namespace)
                 self.experiments[final_exp_namespace] = app_inst
