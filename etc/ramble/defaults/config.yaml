@@ -24,6 +24,7 @@ config:
   workspace_dirs: $ramble/var/ramble/workspaces
   report_dirs: ~/.ramble/reports
   include_phase_dependencies: false
+  resolve_variables_in_subprocesses: false
   spack:
     install:
       flags: --reuse

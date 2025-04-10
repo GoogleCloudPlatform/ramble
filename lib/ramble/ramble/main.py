@@ -442,6 +442,12 @@ def make_argument_parser(**kwargs):
     )
 
     parser.add_argument(
+        "--resolve-variables-in-subprocesses",
+        action="store_true",
+        help="Allow resolution of environment variables when launching subprocesses",
+    )
+
+    parser.add_argument(
         "-k",
         "--insecure",
         action="store_true",
@@ -611,6 +617,10 @@ def setup_main_options(args):
     if args.insecure:
         logger.warn("You asked for --insecure. Will NOT check SSL certificates.")
         ramble.config.set("config:verify_ssl", False, scope="command_line")
+
+    # If the user asked for it allow env-vars to resolve in subprocess calls
+    if args.resolve_variables_in_subprocesses:
+        ramble.config.set("config:resolve_variables_in_subprocesses", True, scope="command_line")
 
     # Use the ramble config command to handle parsing the config strings
     for config_var in args.config_vars or []:
