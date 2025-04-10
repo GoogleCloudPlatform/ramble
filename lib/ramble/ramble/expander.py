@@ -597,7 +597,7 @@ class Expander:
         try:
             value = self._partial_expand(
                 expansions, str(var), allow_passthrough=passthrough_setting
-            ).lstrip()
+            )
         except RamblePassthroughError as e:
             if not passthrough_setting:
                 raise RambleSyntaxError(
