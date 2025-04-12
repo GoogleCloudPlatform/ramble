@@ -203,10 +203,10 @@ class SuccessCriteria:
                 )
                 return False
 
+            fom_name_glob = app_inst.expander.expand_var(self.fom_name)
+
             for context in contexts:
-                fom_names = fnmatch.filter(
-                    fom_values[context].keys(), app_inst.expander.expand_var(self.fom_name)
-                )
+                fom_names = fnmatch.filter(fom_values[context].keys(), fom_name_glob)
 
                 for fom_name in fom_names:
                     comparison_vars = {
