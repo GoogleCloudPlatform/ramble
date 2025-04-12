@@ -95,6 +95,8 @@ def exp_dict():
         ("maybe(not_a_var, foo)", "foo", set(), 1),
         ("maybe(not_a_var)", "", set(), 1),
         ("2.1.a", "2.1.a", set(), 1),
+        ("{'key1': 'val1'}", "{'key1': 'val1'}", set(), 1),
+        ("{'key1': 'val1', 'key2': 'val2'}", "{'key1': 'val1', 'key2': 'val2'}", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
