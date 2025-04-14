@@ -197,3 +197,35 @@ def test_boolean_variants(request):
 
             assert "zlib@1.2.11" not in data
             assert "zlib@1.2.12" not in data
+
+
+def test_non_matched_variants_are_ignored(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "pip",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("concretize", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+
+            assert "zlib" not in data

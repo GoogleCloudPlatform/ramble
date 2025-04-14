@@ -37,12 +37,11 @@ class WhenVariants(ExecutableApplication):
         description="Test boolean variant",
     )
 
-    with when("package_manager_family=spack"):
-        with when("+inc_zlib"):
-            with when("zlib_type=preferred"):
-                software_spec("zlib-pref", pkg_spec="zlib@1.2.12")
+    with default_args(when=["package_manager_family=spack", "+inc_zlib"]):
+        with when("zlib_type=preferred"):
+            software_spec("zlib-pref", pkg_spec="zlib@1.2.12")
 
-            with when("zlib_type=testing"):
-                software_spec("zlib-test", pkg_spec="zlib@1.2.11")
+        with when("zlib_type=testing"):
+            software_spec("zlib-test", pkg_spec="zlib@1.2.11")
 
-            required_package("zlib")
+        required_package("zlib")
