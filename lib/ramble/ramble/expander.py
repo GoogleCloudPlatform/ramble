@@ -262,9 +262,9 @@ class ExpansionNode:
                         )
                         required_passthrough = False
                     except ValueError:
-                        self.value += f":{format_spec}"
+                        self.value = replaced_contents
                     except KeyError:
-                        self.value += f":{format_spec}"
+                        self.value = replaced_contents
 
                 if required_passthrough:
                     self.value = f"{{{self.value}}}"
