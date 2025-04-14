@@ -146,7 +146,7 @@ def upload_results(results):
         logger.warn("No data to upload")
         return
 
-    logger.msg(f"Uploading results to {uri} with {uploader_type} uploader")
+    logger.all_msg(f"Uploading results to {uri} with {uploader_type} uploader")
     if uploader_type == uploader_types.BigQuery:
         uploader = BigQueryUploader()
     else:
