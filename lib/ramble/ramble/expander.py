@@ -211,11 +211,6 @@ class ExpansionNode:
                     self.value = "{}"
                     return
 
-                # TODO:
-                # - Make sure there's only one format specifier
-                # - Detect it from the end backwards
-                # - Do not format broken format specifiers
-
                 keyword = replaced_contents[1:-1]
                 format_match = format_spec_regex.search(keyword)
                 required_passthrough = False
