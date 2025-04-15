@@ -10,6 +10,7 @@ import ast
 import math
 import operator
 import random
+import re
 import string
 from typing import Dict
 
@@ -79,6 +80,9 @@ supported_scalar_function_pointers = {
     "simplify_str": spack.util.naming.simplify_name,
     "re_search": _re_search,
 }
+
+# Format Spec Regex:
+format_spec_regex = re.compile(r"(?P<kw>.*):(?P<format_spec>\S+)$")
 
 # Functions that need to be supplied with the expander
 supported_scalar_function_with_self_arg_pointers = {
@@ -207,39 +211,44 @@ class ExpansionNode:
                     self.value = "{}"
                     return
 
-                format_kw = replaced_contents[1:-1]
-                kw_parts = format_kw.split(":")
+                keyword = replaced_contents[1:-1]
+                format_match = format_spec_regex.search(keyword)
                 required_passthrough = False
 
-                if kw_parts[0] in expansion_dict:
-                    used_vars.add(kw_parts[0])
+                if format_match:
+                    keyword = format_match.group("kw")
+                    format_spec = format_match.group("format_spec")
+
+                if keyword in expansion_dict:
+                    used_vars.add(keyword)
                     # Exit expansion for variables defined as no_expand
-                    if kw_parts[0] in no_expand_vars:
-                        self.value = expansion_dict[kw_parts[0]]
+                    if keyword in no_expand_vars:
+                        self.value = expansion_dict[keyword]
                         return
                     else:
                         self.value = expansion_func(
                             expansion_dict,
-                            expansion_dict[kw_parts[0]],
+                            expansion_dict[keyword],
                             allow_passthrough=allow_passthrough,
                         )
                 else:
-                    self.value = kw_parts[0]
+                    self.value = keyword
                     required_passthrough = True
 
                 # Evaluation should go here
                 try:
                     old_value = self.value
                     self.value = evaluation_func(self.value)
+                    logger.debug(f"  Expanded: {old_value} -> {self.value}")
                     if old_value != self.value:
                         required_passthrough = False
                 except SyntaxError:
                     pass
 
                 # If we had a format spec, add it
-                if len(kw_parts) > 1:
+                if format_match:
                     kw_dict = {"value": self.value}
-                    format_str = f"value:{kw_parts[1]}"
+                    format_str = f"value:{format_spec}"
                     try:
                         self.value = formatter.vformat(
                             VformatDelimiter.left + format_str + VformatDelimiter.right,
@@ -248,9 +257,9 @@ class ExpansionNode:
                         )
                         required_passthrough = False
                     except ValueError:
-                        self.value += f":{kw_parts[1]}"
+                        self.value = replaced_contents
                     except KeyError:
-                        self.value += f":{kw_parts[1]}"
+                        self.value = replaced_contents
 
                 if required_passthrough:
                     self.value = f"{{{self.value}}}"
