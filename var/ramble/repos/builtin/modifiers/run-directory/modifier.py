@@ -21,6 +21,7 @@ class RunDirectory(BasicModifier):
     maintainers("linsword13")
 
     mode("standard", description="Standard mode for the modifier.")
+    default_mode("standard")
 
     modifier_variable(
         "target_directory",
@@ -33,6 +34,13 @@ class RunDirectory(BasicModifier):
         "source_directory",
         default="{experiment_run_dir}",
         description="Directory where the experiment files should be copied from.",
+        mode="standard",
+    )
+
+    modifier_variable(
+        "cleanup_target_directory_before_run",
+        default="True",
+        description="If True, the target directory will be cleaned before the run.",
         mode="standard",
     )
 
@@ -53,6 +61,18 @@ class RunDirectory(BasicModifier):
         mode="standard",
     )
 
+    register_template(
+        "setup_target_dir",
+        src_path="setup_target_dir.sh.tpl",
+        dest_path="setup_target_dir.sh",
+    )
+
+    register_template(
+        "postrun_copy",
+        src_path="postrun_copy.sh.tpl",
+        dest_path="postrun_copy.sh",
+    )
+
     executable_modifier("apply_run_directory_change")
 
     def apply_run_directory_change(
@@ -71,14 +91,21 @@ class RunDirectory(BasicModifier):
 
         if not getattr(self, "_applied", False):
             self._applied = True
+            should_cleanup = self.expander.expand_var_name(
+                "cleanup_target_directory_before_run",
+                typed=True,
+            )
+            if should_cleanup:
+                pre_cmds.append(
+                    executable.CommandExecutable(
+                        "cleanup-target-dir",
+                        template=[f"rm -rf {target_dir}"],
+                    )
+                )
             pre_cmds.append(
                 executable.CommandExecutable(
                     "setup-target-dir-once",
-                    template=[
-                        f"rm -rf {target_dir}",
-                        f"mkdir -p {target_dir}",
-                        f"cp -r {source_dir}/. {target_dir}",
-                    ],
+                    template=["{setup_target_dir}"],
                 )
             )
         pre_cmds.append(
@@ -105,4 +132,4 @@ class RunDirectory(BasicModifier):
         source_dir = self.expander.expand_var_name("source_directory")
         if target_dir == source_dir:
             return []
-        return [f"cp -r {target_dir}/{glob_pattern} {source_dir}/"]
+        return ["{postrun_copy}"]
