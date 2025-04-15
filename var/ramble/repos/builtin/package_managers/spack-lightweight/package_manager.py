@@ -344,8 +344,23 @@ class SpackLightweight(PackageManagerBase):
             self.runner.set_env(env_path, require_exists=env_required)
             self.runner.activate()
 
-            self.runner.push_to_spack_cache(workspace.spack_cache_path)
+            app_context = self.app_inst.expander.expand_var_name(
+                self.keywords.env_name
+            )
+            software_envs = workspace.software_environments
+            require_env = self.environment_required()
+            software_env = software_envs.render_environment(
+                app_context, self.app_inst.expander, self, require=require_env
+            )
+            compiler_specs = software_envs.compiler_specs_for_environment(
+                software_env
+            )
 
+            self.runner.push_to_spack_cache(
+                workspace.spack_cache_path, compiler_specs
+            )
+
+            # push_to_spack_cache deactivates env, this is here for safety.
             self.runner.deactivate()
         except RunnerError as e:
             if self.environment_required():
@@ -1190,28 +1205,39 @@ class SpackRunner(CommandRunner):
         )
         return output
 
-    def push_to_spack_cache(self, spack_cache_path):
+    def push_to_spack_cache(self, spack_cache_path, compiler_specs):
         """Push packages for a given env to the spack cache"""
         self._check_active()
 
         hash_list = self.get_env_hash_list()
 
-        args = ["buildcache", "push"]
+        base_args = ["buildcache", "push"]
         user_flags = ramble.config.get(f"{self.buildcache_config_name}:flags")
 
         logger.debug(f"Running with user flags: {user_flags}")
 
         if user_flags is not None:
-            args.extend(shlex.split(user_flags))
+            base_args.extend(shlex.split(user_flags))
 
-        args.extend([spack_cache_path, hash_list])
+        base_args.extend([spack_cache_path])
 
-        out_str = self.execute(self.spack, args, return_output=True)
+        args = base_args.copy()
+        args.extend([hash_list])
 
-        if out_str is None:
-            out_str = "None"
+        self.execute(self.spack, args, return_output=True)
 
-        return out_str.strip()
+        # Attempt to push compilers too
+        self.deactivate()  # need to not be in env to find the user compiler
+
+        for compiler_spec in compiler_specs:
+            tty.debug("Pushing " + compiler_spec)
+            args = base_args.copy()
+            args.append(compiler_spec)
+
+            # We cannot push system/extern compilers, so this call must tolerate failures
+            self.execute(
+                self.spack, args, allow_failure=True, return_output=True
+            )
 
     def validate_command(
         self,
