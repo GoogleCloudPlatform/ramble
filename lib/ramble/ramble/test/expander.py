@@ -9,6 +9,7 @@
 import pytest
 
 import ramble.expander
+import ramble.variants
 
 
 def exp_dict():
@@ -34,6 +35,29 @@ def exp_dict():
         "max_len": 9,
         "test_dict": {"test_key1": "test_val1", "test_key2": "test_val2"},
     }
+
+
+def build_variant_set():
+    variant_set = ramble.variants.VariantSet()
+
+    variants = {
+        "test_variant": "defined",
+        "package_manager": "spack",
+        "workflow_manager": "slurm",
+    }
+
+    multi_value_variants = [
+        ("package_manager_family", "spack"),
+        ("workflow_manager_family", "slurm"),
+    ]
+
+    for name, value in variants.items():
+        variant_set.default_variant(name, value)
+
+    for name, value in multi_value_variants:
+        variant_set.multi_value_variant(name, value)
+
+    return variant_set
 
 
 @pytest.mark.parametrize(
@@ -200,3 +224,25 @@ def test_expansion_namespaces():
     assert expander.application_namespace == "foo"
     assert expander.workload_namespace == "foo.bar"
     assert expander.experiment_namespace == "foo.bar.baz"
+
+
+@pytest.mark.parametrize(
+    "input_list,output",
+    [
+        (["package_manager=spack"], True),
+        (["test_variant=defined", "package_manager=spack"], True),
+        (["test_variant=undefined", "package_manager=spack"], False),
+        (["test_variant=undefined", "package_manager=spack", "workflow_manager=slurm"], False),
+        (["test_variant=defined", "package_manager=spack", "workflow_manager=slurm"], True),
+    ],
+)
+def test_satisfies_works(input_list, output):
+    variants = build_variant_set()
+
+    expansion_vars = exp_dict()
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    satisfied = expander.satisfies(input_list, variant_set=variants)
+
+    assert satisfied == output

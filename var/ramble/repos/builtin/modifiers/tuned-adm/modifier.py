@@ -28,7 +28,9 @@ class TunedAdm(BasicModifier):
 
     mode("standard", description="Standard execution mode for tuned-adm")
 
-    software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
+    software_spec(
+        "pdsh", pkg_spec="pdsh", when=["package_manager_family=spack"]
+    )
 
     required_variable("hostlist")
 

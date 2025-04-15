@@ -69,7 +69,9 @@ class Ethtool(BasicModifier):
         mode="standard",
     )
 
-    software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
+    software_spec(
+        "pdsh", pkg_spec="pdsh", when=["package_manager_family=spack"]
+    )
 
     register_builtin("run_ethtool")
 

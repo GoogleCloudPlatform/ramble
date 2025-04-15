@@ -25,10 +25,9 @@ class Roms(ExecutableApplication):
 
     tags("ocean")
 
-    software_spec("roms", pkg_spec="roms@4.1", package_manager="spack*")
-    software_spec(
-        "openmpi412", pkg_spec="openmpi@4.1.2", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        software_spec("roms", pkg_spec="roms@4.1")
+        software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(
         "bm1",

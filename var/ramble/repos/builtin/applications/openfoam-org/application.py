@@ -19,20 +19,18 @@ class OpenfoamOrg(OpenfoamBase):
 
     tags("cfd", "fluid", "dynamics")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0", package_manager="spack*")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-    software_spec(
-        "impi2018", pkg_spec="intel-mpi@2018.4.274", package_manager="spack*"
-    )
+        software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
 
-    software_spec(
-        "openfoam-org",
-        pkg_spec="openfoam-org@10",
-        compiler="gcc9",
-        package_manager="spack*",
-    )
+        software_spec(
+            "openfoam-org",
+            pkg_spec="openfoam-org@10",
+            compiler="gcc9",
+        )
 
-    required_package("openfoam-org", package_manager="spack*")
+        required_package("openfoam-org")
 
     executable(
         "get_inputs",

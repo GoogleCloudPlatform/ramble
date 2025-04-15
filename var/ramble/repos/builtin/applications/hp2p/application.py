@@ -19,10 +19,9 @@ class Hp2p(ExecutableApplication):
     tags("benchmark", "mpi")
     maintainers("rfbgo")
 
-    software_spec("hp2p", pkg_spec="hp2p@4.1", package_manager="spack*")
-    software_spec(
-        "openmpi412", pkg_spec="openmpi@4.1.2", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        software_spec("hp2p", pkg_spec="hp2p@4.1")
+        software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     executable(
         "execute",

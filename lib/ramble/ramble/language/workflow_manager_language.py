@@ -45,3 +45,18 @@ def workflow_manager_variable(
         )
 
     return _define_wm_variable
+
+
+@workflow_manager_directive(dicts=())
+def workflow_manager_family(*names: str):
+    """Add a new family to this workflow manager
+
+    Args:
+        name (str): Name of family to apply to this workflow manager
+    """
+
+    def _define_workflow_manager_family(wm):
+        families_from_base = getattr(wm, "families", [])
+        wm.families = list(sorted(set(families_from_base + list(names))))
+
+    return _define_workflow_manager_family

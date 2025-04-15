@@ -19,20 +19,19 @@ class IntelHpl(HplBase):
 
     tags("benchmark-app", "benchmark", "linpack", "optimized", "intel", "mkl")
 
-    define_compiler("gcc13p2", pkg_spec="gcc@13.2.0", package_manager="spack*")
-    software_spec(
-        "imkl_2024p2",
-        pkg_spec="intel-oneapi-mkl@2024.2.0 threads=openmp",
-        compiler="gcc13p2",
-        package_manager="spack*",
-    )
-    software_spec(
-        "impi2021p11",
-        pkg_spec="intel-oneapi-mpi@2021.11.0",
-        package_manager="spack*",
-    )
+    with when("package_manager_family=spack"):
+        define_compiler("gcc13p2", pkg_spec="gcc@13.2.0")
+        software_spec(
+            "imkl_2024p2",
+            pkg_spec="intel-oneapi-mkl@2024.2.0 threads=openmp",
+            compiler="gcc13p2",
+        )
+        software_spec(
+            "impi2021p11",
+            pkg_spec="intel-oneapi-mpi@2021.11.0",
+        )
 
-    required_package("intel-oneapi-mkl", package_manager="spack*")
+        required_package("intel-oneapi-mkl")
 
     # This step does a few things:
     # - Prepare calling for the script runme_intel64_prv

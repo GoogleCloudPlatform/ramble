@@ -25,6 +25,9 @@ def specs_equiv(spec1, spec2):
     if "package_manager" in all_keys:
         all_keys.remove("package_manager")
 
+    if "when" in all_keys:
+        all_keys.remove("when")
+
     for key in all_keys:
         if key not in spec1:
             return False

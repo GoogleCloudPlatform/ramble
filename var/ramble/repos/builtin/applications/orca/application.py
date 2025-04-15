@@ -21,10 +21,9 @@ class Orca(ExecutableApplication):
 
     tags = ["quantum chemistry"]
 
-    software_spec("orca", pkg_spec="orca@5.0.4", package_manager="spack*")
-    software_spec(
-        "openmpi412", pkg_spec="openmpi@4.1.2", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        software_spec("orca", pkg_spec="orca@5.0.4")
+        software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(
         "orca_in",

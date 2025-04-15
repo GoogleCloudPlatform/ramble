@@ -44,6 +44,7 @@ import ramble.util.hashing
 import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
+import ramble.variants
 import ramble.workflow_manager
 from ramble.error import RambleError
 from ramble.experiment_result import ExperimentResult
@@ -130,6 +131,7 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
 
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
+    object_variants = None
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
@@ -155,6 +157,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def __init__(self, file_path):
         super().__init__()
+
+        if self.object_variants is None:
+            self.object_variants = ramble.variants.VariantSet()
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
@@ -272,31 +277,45 @@ class ApplicationBase(metaclass=ApplicationMeta):
             variants (dict): Dictionary of variant controls for this
                              experiment.
         """
+
         self.variants = variants.copy()
+        for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
+            obj_variants = getattr(obj, "object_variants", None)
+            if obj_variants is not None:
+                self.object_variants.merge_default_variants(getattr(obj, "object_variants"))
+
+        for name, value in variants.items():
+            expanded_value = self.expander.expand_var(value, typed=True)
+            self.object_variants.experiment_variant(name, expanded_value)
+
         self._set_package_manager()
         self._set_workflow_manager()
 
-    def _set_package_manager(self):
-        if namespace.package_manager in self.variants:
-            pkgman_name = conversions.canonical_none(
-                self.expander.expand_var(self.variants[namespace.package_manager], typed=True)
-            )
+        for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
+            obj_variants = getattr(obj, "object_variants", None)
+            if obj_variants is not None:
+                self.object_variants.merge_multi_value_variants(getattr(obj, "object_variants"))
 
-            if pkgman_name is not None:
-                try:
-                    pkgman_type = ramble.repository.ObjectTypes.package_managers
-                    self.package_manager = ramble.repository.get(pkgman_name, pkgman_type).copy()
-                    self.package_manager.set_application(self)
-                except ramble.repository.UnknownObjectError:
-                    logger.die(
-                        f"{pkgman_name} is not a valid package manager. "
-                        "Valid package managers can be listed via:\n"
-                        "\tramble list --type package_managers"
-                    )
+    def _set_package_manager(self):
+        pkgman_name = conversions.canonical_none(
+            self.object_variants.value(namespace.package_manager)
+        )
+
+        if pkgman_name is not None:
+            try:
+                pkgman_type = ramble.repository.ObjectTypes.package_managers
+                self.package_manager = ramble.repository.get(pkgman_name, pkgman_type).copy()
+                self.package_manager.set_application(self)
+            except ramble.repository.UnknownObjectError:
+                logger.die(
+                    f"{pkgman_name} is not a valid package manager. "
+                    "Valid package managers can be listed via:\n"
+                    "\tramble list --type package_managers"
+                )
 
         if self.package_manager is not None:
             for pkgname, config in self.required_packages.items():
-                if fnmatch.fnmatch(self.package_manager.name, config["package_manager"]):
+                if self.expander.satisfies(config["when"], variant_set=self.object_variants):
                     self.keywords.update_keys(
                         {
                             f"{pkgname}_path": {
@@ -307,22 +326,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     )
 
     def _set_workflow_manager(self):
-        if namespace.workflow_manager in self.variants:
-            wm_name = conversions.canonical_none(
-                self.expander.expand_var(self.variants[namespace.workflow_manager], typed=True)
-            )
+        workflow_name = conversions.canonical_none(
+            self.object_variants.value(namespace.workflow_manager)
+        )
 
-            if wm_name is not None:
-                try:
-                    wfman_type = ramble.repository.ObjectTypes.workflow_managers
-                    self.workflow_manager = ramble.repository.get(wm_name, wfman_type).copy()
-                    self.workflow_manager.set_application(self)
-                except ramble.repository.UnknownObjectError:
-                    logger.die(
-                        f"{wm_name} is not a valid workflow manager. "
-                        "Valid workflow managers can be listed via:\n"
-                        "\tramble list --type workflow_managers"
-                    )
+        if workflow_name is not None:
+            try:
+                wfman_type = ramble.repository.ObjectTypes.workflow_managers
+                self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
+                self.workflow_manager.set_application(self)
+            except ramble.repository.UnknownObjectError:
+                logger.die(
+                    f"{workflow_name} is not a valid workflow manager. "
+                    "Valid workflow managers can be listed via:\n"
+                    "\tramble list --type workflow_managers"
+                )
+
         if self.workflow_manager is None:
             base_path = os.path.join(ramble.paths.module_path, "workflow_manager.py")
             self.workflow_manager = ramble.workflow_manager.WorkflowManagerBase(base_path)

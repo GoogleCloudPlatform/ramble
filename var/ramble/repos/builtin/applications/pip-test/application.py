@@ -16,19 +16,18 @@ class PipTest(ExecutableApplication):
 
     tags("test-app")
 
-    software_spec(
-        "requests",
-        pkg_spec="requests>=2.31.0",
-        package_manager="pip",
-    )
+    with when("package_manager_family=pip"):
+        software_spec(
+            "requests",
+            pkg_spec="requests>=2.31.0",
+        )
 
-    software_spec(
-        "semver",
-        pkg_spec="semver",
-        package_manager="pip",
-    )
+        software_spec(
+            "semver",
+            pkg_spec="semver",
+        )
 
-    required_package("semver", package_manager="pip")
+        required_package("semver")
 
     executable(
         "import",

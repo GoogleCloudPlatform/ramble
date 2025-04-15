@@ -7,7 +7,6 @@
 # except according to those terms.
 """Define base classes for package manager definitions"""
 
-import fnmatch
 import io
 import os
 import re
@@ -16,6 +15,7 @@ from typing import List
 
 import ramble.util.class_attributes
 import ramble.util.directives
+import ramble.variants
 from ramble.error import RambleError
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
@@ -26,6 +26,7 @@ import spack.util.naming
 
 class PackageManagerBase(metaclass=PackageManagerMeta):
     name = None
+    object_variants = None
     _builtin_name = NS_SEPARATOR.join(("package_manager_builtin", "{obj_name}", "{name}"))
     _language_classes = [PackageManagerMeta, SharedMeta]
     _pipelines = [
@@ -53,9 +54,13 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     #: Do not include @ here in order not to unnecessarily ping the users.
     maintainers: List[str] = []
     tags: List[str] = []
+    families: List[str] = []
 
     def __init__(self, file_path):
         super().__init__()
+
+        if self.object_variants is None:
+            self.object_variants = ramble.variants.VariantSet()
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
@@ -68,6 +73,18 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         self.keywords = None
 
         ramble.util.directives.define_directive_methods(self)
+
+        self.object_variants.default_variant(
+            "package_manager",
+            default=self.name,
+            description="Name of package manager for an experiment",
+        )
+
+        for family in self.families:
+            self.object_variants.multi_value_variant(
+                "package_manager_family",
+                value=family,
+            )
 
     def copy(self):
         """Deep copy a package manager instance"""
@@ -93,7 +110,9 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         app_inst = self.app_inst
         if hasattr(app_inst, "software_specs"):
             for info in app_inst.software_specs.values():
-                if fnmatch.fnmatch(self.name, info["package_manager"]):
+                if self.app_inst.expander.satisfies(
+                    info["when"], variant_set=self.object_variants
+                ):
                     return True
 
         return False

@@ -33,6 +33,8 @@ class Pip(PackageManagerBase):
 
     _spec_prefix = "pip"
 
+    package_manager_family("pip")
+
     archive_pattern(os.path.join("{env_path}", "requirements.txt"))
     archive_pattern(os.path.join("{env_path}", "requirements.lock"))
 
@@ -125,8 +127,13 @@ class Pip(PackageManagerBase):
             self.runner.install()
 
             installed_pkgs = self.runner.installed_packages()
-            for pkg in self.app_inst.required_packages.keys():
-                if pkg not in installed_pkgs:
+            for pkg, conf in self.app_inst.required_packages.items():
+                if (
+                    app_inst.expander.satisfies(
+                        conf["when"], variant_set=app_inst.object_variants
+                    )
+                    and pkg not in installed_pkgs
+                ):
                     logger.die(
                         f"Package {pkg} is not installed "
                         f"in environment {env_context}, but is "
@@ -135,8 +142,13 @@ class Pip(PackageManagerBase):
                     )
 
             for mod_inst in self.app_inst._modifier_instances:
-                for pkg in mod_inst.required_packages.keys():
-                    if pkg not in installed_pkgs:
+                for pkg, conf in mod_inst.required_packages.items():
+                    if (
+                        app_inst.expander.satisfies(
+                            conf["when"], variant_set=app_inst.object_variants
+                        )
+                        and pkg not in installed_pkgs
+                    ):
                         logger.die(
                             f"Package {pkg} is not installed "
                             f"in environment {env_context}, but is "

@@ -32,6 +32,8 @@ class Eessi(EnvironmentModules):
         description="Version of EESSI to use",
     )
 
+    package_manager_family("eessi")
+
     register_builtin("eessi_init")
 
     def eessi_init(self):

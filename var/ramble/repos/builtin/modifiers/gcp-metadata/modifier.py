@@ -32,7 +32,9 @@ class GcpMetadata(BasicModifier):
     )
     default_mode("standard")
 
-    software_spec("pdsh", pkg_spec="pdsh", package_manager="spack*")
+    software_spec(
+        "pdsh", pkg_spec="pdsh", when=["package_manager_family=spack"]
+    )
 
     required_variable("hostlist", modes=["standard"])
 

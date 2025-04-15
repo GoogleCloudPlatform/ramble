@@ -52,3 +52,18 @@ def package_manager_variable(
         )
 
     return _define_package_manager_variable
+
+
+@package_manager_directive(dicts=())
+def package_manager_family(*names: str):
+    """Add a new family to this package manager
+
+    Args:
+        name (str): Name of family to apply to this package manager
+    """
+
+    def _define_package_manager_family(pm):
+        families_from_base = getattr(pm, "families", [])
+        pm.families = list(sorted(set(families_from_base + list(names))))
+
+    return _define_package_manager_family

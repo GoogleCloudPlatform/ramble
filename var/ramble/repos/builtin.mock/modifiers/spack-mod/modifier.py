@@ -18,30 +18,26 @@ class SpackMod(BasicModifier):
 
     mode("default", description="This is the default mode for the spack-mod")
 
-    package_manager_config(
-        "enable_debug", "config:debug:true", package_manager="spack*"
-    )
+    with when("package_manager_family=spack"):
+        package_manager_config("enable_debug", "config:debug:true")
 
-    define_compiler(
-        "mod_compiler",
-        pkg_spec="mod_compiler@1.1 target=x86_64",
-        compiler_spec="mod_compiler@1.1",
-        package_manager="spack*",
-    )
+        define_compiler(
+            "mod_compiler",
+            pkg_spec="mod_compiler@1.1 target=x86_64",
+            compiler_spec="mod_compiler@1.1",
+        )
 
-    software_spec(
-        "mod_package1",
-        pkg_spec="mod_package1@1.1",
-        compiler="mod_compiler",
-        package_manager="spack*",
-    )
+        software_spec(
+            "mod_package1",
+            pkg_spec="mod_package1@1.1",
+            compiler="mod_compiler",
+        )
 
-    software_spec(
-        "mod_package2",
-        pkg_spec="mod_package2@1.1",
-        compiler="mod_compiler",
-        package_manager="spack*",
-    )
+        software_spec(
+            "mod_package2",
+            pkg_spec="mod_package2@1.1",
+            compiler="mod_compiler",
+        )
 
     package_manager_requirement(
         "list not-a-package", validation_type="empty", modes=["default"]

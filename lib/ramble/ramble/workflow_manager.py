@@ -11,6 +11,7 @@ from typing import List
 
 import ramble.util.class_attributes
 import ramble.util.directives
+import ramble.variants
 from ramble.expander import ExpanderError
 from ramble.language.shared_language import SharedMeta
 from ramble.language.workflow_manager_language import (
@@ -22,6 +23,7 @@ from ramble.util.naming import NS_SEPARATOR
 
 class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     name = None
+    object_variants = None
     _builtin_name = NS_SEPARATOR.join(("workflow_manager_builtin", "{obj_name}", "{name}"))
     _language_classes = [WorkflowManagerMeta, SharedMeta]
     _pipelines = [
@@ -31,6 +33,7 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     ]
     maintainers: List[str] = []
     tags: List[str] = []
+    families: List[str] = []
 
     workflow_manager_variable(
         "workflow_banner",
@@ -63,11 +66,20 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     def __init__(self, file_path):
         super().__init__()
 
+        if self.object_variants is None:
+            self.object_variants = ramble.variants.VariantSet()
+
         ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
 
         ramble.util.directives.define_directive_methods(self)
+
+        self.object_variants.default_variant(
+            "workflow_manager",
+            default=self.name,
+            description="Name of workflow manager for an experiment",
+        )
 
         self.app_inst = None
         self.runner = None

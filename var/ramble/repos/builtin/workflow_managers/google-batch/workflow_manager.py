@@ -38,6 +38,8 @@ class GoogleBatch(WorkflowManagerBase):
 
     tags("workflow", "google", "batch")
 
+    workflow_manager_family("google-batch")
+
     def __init__(self, file_path):
         super().__init__(file_path)
 
