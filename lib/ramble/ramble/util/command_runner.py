@@ -51,7 +51,9 @@ class CommandRunner:
         """
         self.dry_run = dry_run
 
-    def execute(self, executable, args: List[str], return_output: bool = False):
+    def execute(
+        self, executable, args: List[str], allow_failure: bool = False, return_output: bool = False
+    ):
         """Wrapper around execution of a command
 
         Handles execution of a command when the execution path is dependent on
@@ -63,7 +65,9 @@ class CommandRunner:
             return_output (bool): Whether the output of the command should be returned or not
         """
         if not self.dry_run:
-            return self._run_command(executable, args, return_output=return_output)
+            return self._run_command(
+                executable, args, allow_failure=allow_failure, return_output=return_output
+            )
         else:
             return self._dry_run_print(executable, args, return_output=return_output)
 
@@ -115,12 +119,13 @@ class CommandRunner:
         logger.msg(banner)
         logger.msg("")
 
-    def _run_command(self, executable, args, return_output=False):
+    def _run_command(self, executable, args, allow_failure=False, return_output=False):
         """Perform execution of executable with args, and optionally return the output
 
         Args:
             executable (spack.util.executable.Executable): Executable to run with arguments
             args (list(str)): List of string arguments to pass into executable
+            allow_failure (bool): Whether a failure in the command should be tolerated
             return_output (bool): Whether the output of the command should be returned or not
 
         Returns:
@@ -144,8 +149,9 @@ class CommandRunner:
                 else:
                     executable(*args, output=active_stream, error=active_stream)
         except ProcessError as e:
-            logger.error(e)
-            error = True
+            if not allow_failure:
+                logger.error(e)
+                error = True
             pass
 
         if error:
