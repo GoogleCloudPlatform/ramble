@@ -257,9 +257,11 @@ class ExpansionNode:
                         )
                         required_passthrough = False
                     except ValueError:
-                        self.value = replaced_contents
+                        self.value = replaced_contents[1:-1]
+                        required_passthrough = True
                     except KeyError:
-                        self.value = replaced_contents
+                        self.value += replaced_contents[1:-1]
+                        required_passthrough = True
 
                 if required_passthrough:
                     self.value = f"{{{self.value}}}"
