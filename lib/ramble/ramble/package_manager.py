@@ -48,7 +48,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     _spec_prefix = ""
 
     package_manager_class = "PackageManagerBase"
-    uses_software_environment = True
+    requires_software_environment = True
 
     #: Lists of strings which contains GitHub usernames of attributes.
     #: Do not include @ here in order not to unnecessarily ping the users.
@@ -201,13 +201,12 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         Returns:
             (set): All variable names used by this experiment.
         """
-        if self.uses_software_environment:
-            app_context = self.app_inst.expander.expand_var_name(self.keywords.env_name)
+        app_context = self.app_inst.expander.expand_var_name(self.keywords.env_name)
 
-            software_environments = workspace.software_environments
-            software_environments.render_environment(
-                app_context, self.app_inst.expander, self, require=False
-            )
+        software_environments = workspace.software_environments
+        software_environments.render_environment(
+            app_context, self.app_inst.expander, self, require=False
+        )
 
         return self.app_inst.expander._used_variables
 

@@ -22,7 +22,7 @@ class UserManaged(PackageManagerBase):
 
     _spec_prefix = "user_managed"
 
-    uses_software_environment = False
+    requires_software_environment = False
 
     register_phase(
         "define_requirements",
@@ -55,3 +55,28 @@ class UserManaged(PackageManagerBase):
                 )
 
         app_inst.validate_experiment()
+
+    # TODO: do we already have this somewhere more generic?
+    def _spec_to_dict(self, spec):
+        parts = spec.split("@")
+
+        spec_dict = {}
+        spec_dict["name"] = parts[0]
+        spec_dict["version"] = parts[1]
+
+        return spec_dict
+
+    def get_package_list(self, workspace):
+        """Augment the owning experiment's results with software stack information
+
+        This is called by the `add_software_to_results` phase registered in the base
+        package manager class.
+        """
+        sw = workspace.get_software_dict()
+        pkg_list = []
+
+        if sw:
+            for key, package in sw["packages"].items():
+                pkg_list.append(self._spec_to_dict(package["pkg_spec"]))
+
+        return pkg_list

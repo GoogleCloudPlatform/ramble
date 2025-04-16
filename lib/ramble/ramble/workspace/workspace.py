@@ -1562,7 +1562,7 @@ ramble:
         for package_manager, packages in exp["SOFTWARE"].items():
             f.write(f"    {package_manager} packages:\n")
             if not packages:
-                f.write(f"      None\n")
+                f.write("      None\n")
             else:
                 for pkg in packages:
                     f.write(f"      {pkg['name']} @{pkg['version']}\n")
@@ -1610,6 +1610,8 @@ ramble:
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
 
+                        software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
+
                         if exp["N_REPEATS"] > 0:  # this is a base exp with summary of repeats
                             for context in exp["CONTEXTS"]:
                                 f.write(f'  {context["display_name"]} figures of merit:\n')
@@ -1631,7 +1633,6 @@ ramble:
                                     for fom_val in fom_val_list:
                                         f.write(f"      {fom_val.strip()}\n")
 
-                            software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
                             if software_key in exp and exp[software_key]:
                                 self.write_software_info(f, exp)
 
