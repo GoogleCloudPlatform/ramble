@@ -1565,7 +1565,7 @@ ramble:
                 f.write("      None\n")
             else:
                 for pkg in packages:
-                    f.write(f"      {pkg['name']} @{pkg['version']}\n")
+                    f.write(f"      {pkg.name} @{pkg.version}\n")
 
     def dump_results(self, output_formats=None, print_results=False, summary_only=False):
         """

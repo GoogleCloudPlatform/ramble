@@ -9,6 +9,16 @@
 from ramble.pkgmankit import *  # noqa: F403
 
 
+class UserManagedSoftwareInfo(ramble.package_manager.SoftwareInfo):
+    def parse_from_spec(self, spec):
+        parts = spec.split("@")
+
+        if len(parts) >= 1:
+            self.name = parts[0]
+        if len(parts) >= 2:
+            self.version = parts[1]
+
+
 class UserManaged(PackageManagerBase):
     """Package manager representing a user managed environment.
 
@@ -23,6 +33,9 @@ class UserManaged(PackageManagerBase):
     _spec_prefix = "user_managed"
 
     requires_software_environment = False
+
+    def __init__(self, file_path):
+        super().__init__(file_path)
 
     register_phase(
         "define_requirements",
@@ -56,16 +69,6 @@ class UserManaged(PackageManagerBase):
 
         app_inst.validate_experiment()
 
-    # TODO: do we already have this somewhere more generic?
-    def _spec_to_dict(self, spec):
-        parts = spec.split("@")
-
-        spec_dict = {}
-        spec_dict["name"] = parts[0]
-        spec_dict["version"] = parts[1]
-
-        return spec_dict
-
     def get_package_list(self, workspace):
         """Augment the owning experiment's results with software stack information
 
@@ -75,8 +78,23 @@ class UserManaged(PackageManagerBase):
         sw = workspace.get_software_dict()
         pkg_list = []
 
-        if sw:
-            for key, package in sw["packages"].items():
-                pkg_list.append(self._spec_to_dict(package["pkg_spec"]))
+        app_inst = self.app_inst
+
+        env_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
+        require_env = False
+        software_envs = workspace.software_environments
+        software_env = software_envs.render_environment(
+            env_context, self.app_inst.expander, self, require=require_env
+        )
+
+        if software_env:
+            for pkg_spec in software_envs.package_specs_for_environment(
+                software_env
+            ):
+                software_info = UserManagedSoftwareInfo()
+                software_info.parse_from_spec(pkg_spec)
+                pkg_list.append(software_info)
 
         return pkg_list

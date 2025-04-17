@@ -251,7 +251,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         else:
             pkg_list = self.get_package_list(workspace)
             prov_cache[self.name][env_name] = pkg_list
-        self.app_inst.result.software[self._spec_prefix] = pkg_list
+        self.app_inst.result.software[self.name] = pkg_list
 
     def get_package_list(self, workspace):
         """Method used by add_software_to_results phase to get software provenance info"""
@@ -263,3 +263,18 @@ class PackageManagerError(RambleError):
     """
     Exception that is raised by package managers
     """
+
+
+class SoftwareInfo:
+    """Represents information about a software build configuration (standard class)."""
+
+    def __init__(
+        self, name="", version="unknown", compiler="", compiler_version="", target="", variants=""
+    ):
+        """Initializes the BuildInfo object."""
+        self.name = name
+        self.version = version
+        self.compiler = compiler
+        self.compiler_version = compiler_version
+        self.target = target
+        self.variants = variants

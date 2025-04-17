@@ -119,6 +119,7 @@ class EnvironmentModules(PackageManagerBase):
         list_file = app_inst.expander.expand_var(
             f"{{experiment_run_dir}}/{self._list_file}"
         )
+        print(list_file)
 
         if not os.path.exists(list_file):
             return []
@@ -135,6 +136,8 @@ class EnvironmentModules(PackageManagerBase):
                     name = parts[0]
                     version = "/".join(parts[1:]) if len(parts) > 1 else ""
                     pkg_list.append(
-                        {"name": name, "version": version, "variants": ""}
+                        ramble.package_manager.SoftwareInfo(
+                            name=name, version=version
+                        )
                     )
         return pkg_list
