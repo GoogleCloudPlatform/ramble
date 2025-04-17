@@ -15,6 +15,12 @@ class Basic(ExecutableApplication):
     executable("foo", "bar", use_mpi=False)
     executable("bar", "baz", use_mpi=True)
     executable("echo", 'echo "0.25 seconds"', use_mpi=False)
+    executable(
+        "template",
+        template=["cat <<EOF> filename", "command", "EOF"],
+        redirect="",
+        output_capture="",
+    )
 
     input_file(
         "input",
@@ -26,6 +32,7 @@ class Basic(ExecutableApplication):
     workload("test_wl", executable="foo", input="input")
     workload("test_wl2", executable="bar", input="input")
     workload("working_wl", executable="echo")
+    workload("template_wl", executable="template")
 
     workload_variable(
         "my_base_var",
