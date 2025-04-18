@@ -86,6 +86,8 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
                 value=family,
             )
 
+        self.output_prefix = self.name
+
     def copy(self):
         """Deep copy a package manager instance"""
         new_copy = type(self)(self._file_path)
@@ -251,7 +253,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         else:
             pkg_list = self.get_package_list(workspace)
             prov_cache[self.name][env_name] = pkg_list
-        self.app_inst.result.software[self.name] = pkg_list
+        self.app_inst.result.software[self.output_prefix] = pkg_list
 
     def get_package_list(self, workspace):
         """Method used by add_software_to_results phase to get software provenance info"""
@@ -278,3 +280,6 @@ class SoftwareInfo:
         self.compiler_version = compiler_version
         self.target = target
         self.variants = variants
+
+    def to_version_text(self):
+        return f"{self.name} @{self.version}"

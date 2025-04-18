@@ -42,6 +42,7 @@ class SpackLightweight(PackageManagerBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
+        self.output_prefix = self._spec_prefix
 
         self.runner = SpackRunner()
 
@@ -179,6 +180,19 @@ class SpackLightweight(PackageManagerBase):
                     self.runner.generate_env_file()
 
                 added_packages = set(self.runner.added_packages())
+                for pkg, conf in self.app_inst.required_packages.items():
+                    if (
+                        app_inst.expander.satisfies(
+                            conf["when"], variant_set=app_inst.object_variants
+                        )
+                        and pkg not in added_packages
+                    ):
+                        logger.die(
+                            f"Software spec {pkg} is not defined "
+                            f"in environment {env_context}, but is "
+                            f"required by the {self.name} application "
+                            "definition"
+                        )
 
                 for mod_inst in self.app_inst._modifier_instances:
                     for pkg, conf in mod_inst.required_packages.items():
@@ -530,16 +544,7 @@ class SpackSoftwareInfo(ramble.package_manager.SoftwareInfo):
         parts = in_str.split(",")
 
         if len(parts) >= 1:
-            # Remove status markers
-            name = (
-                parts[0]
-                .replace("[+]", "")
-                .replace(" - ", "")
-                .replace("[e]", "")
-                .strip()
-            )
-
-            self.name = name
+            self.name = parts[0]
 
             if len(parts) >= 2:
                 self.version = parts[1]
@@ -1338,7 +1343,8 @@ class SpackRunner(CommandRunner):
                     if len(pkg_parts) == 1:
                         info = pkg_parts[0]
                     else:
-                        info = " ".join(pkg_parts[1:])
+                        # Remove status markers
+                        info = info_line[3:]
 
                     software_info = SpackSoftwareInfo()
                     software_info.parse_from_string(info)

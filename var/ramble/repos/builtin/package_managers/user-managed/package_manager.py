@@ -75,18 +75,15 @@ class UserManaged(PackageManagerBase):
         This is called by the `add_software_to_results` phase registered in the base
         package manager class.
         """
-        sw = workspace.get_software_dict()
         pkg_list = []
 
         app_inst = self.app_inst
 
-        env_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
         require_env = False
         software_envs = workspace.software_environments
         software_env = software_envs.render_environment(
-            env_context, self.app_inst.expander, self, require=require_env
+            env_context, app_inst.expander, self, require=require_env
         )
 
         if software_env:
