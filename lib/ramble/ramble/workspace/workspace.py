@@ -42,6 +42,7 @@ import ramble.util.version
 import ramble.util.web
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
+from ramble.util import constants
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
@@ -93,7 +94,7 @@ valid_workspace_name_re = r"^\w[\w-]*$"
 applications_schema = ramble.schema.applications.schema
 
 #: Extension for template files
-workspace_template_extension = ".tpl"
+workspace_template_extension = constants.TEMPLATE_EXTENSION
 
 #: Directory name for auxiliary software files
 auxiliary_software_dir_name = "auxiliary_software_files"

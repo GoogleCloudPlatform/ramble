@@ -13,6 +13,7 @@ import pytest
 import ramble.workspace
 from ramble.application import ApplicationError
 from ramble.main import RambleCommand
+from ramble.util import constants
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
@@ -158,6 +159,7 @@ ramble:
 
 def test_template_wrong_extension(mutable_mock_apps_repo):
     template_src_name = "template_wrong_extension.sh"
+    ext = constants.TEMPLATE_EXTENSION
     test_config = f"""
 ramble:
   variables:
@@ -181,16 +183,17 @@ ramble:
         f.write(test_config)
     ws._re_read()
 
-    # Create a template file without the correct .tpl extension
+    # Create a template file without the correct extension
     open(os.path.join(ws.config_dir, template_src_name), "w")
 
     with pytest.raises(
-        ApplicationError, match="Template file .*template_wrong_extension.sh.tpl does not exist"
+        ApplicationError,
+        match=f"Template file .*template_wrong_extension.sh{ext} does not exist",
     ):
         workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
     # It should pick up the correctly named template
-    open(os.path.join(ws.config_dir, template_src_name + ".tpl"), "w")
+    open(os.path.join(ws.config_dir, template_src_name + ext), "w")
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
     assert os.path.isfile(
         os.path.join(ws.experiment_dir, f"template/test_template/test/{template_src_name}")
