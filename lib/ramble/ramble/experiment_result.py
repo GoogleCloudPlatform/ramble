@@ -54,6 +54,9 @@ class ExperimentResult:
         if self.status != ExperimentStatus.SUCCESS:
             self.status = ExperimentStatus.FAILED
 
+        # Most libs can handle this str enum, but convert it to help out
+        self.status = self.status.value
+
         self.n_repeats = app_inst.repeats.n_repeats
         self.experiment_chain = app_inst.chain_order.copy()
         self.tags = list(app_inst.experiment_tags)

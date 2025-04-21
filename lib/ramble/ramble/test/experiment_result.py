@@ -18,7 +18,7 @@ def test_to_dict(mutable_mock_apps_repo):
     res_dict = exp_res.to_dict()
     assert "name" in res_dict
     assert "application_name" in res_dict
-    assert res_dict["RAMBLE_STATUS"] == "Unknown"
+    assert res_dict["RAMBLE_STATUS"] == "FAILED"
     assert res_dict["RAMBLE_RAW_VARIABLES"]["experiment_status"] == "Unknown"
     assert "EXPERIMENT_CHAIN" in res_dict
     assert "CONTEXTS" in res_dict

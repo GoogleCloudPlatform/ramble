@@ -210,9 +210,9 @@ OrderedLineDumper.add_representer(syaml_str, OrderedLineDumper.represent_str)
 maxint = 2 ** (ctypes.sizeof(ctypes.c_int) * 8 - 1) - 1
 
 
-def dump(obj, default_flow_style=False, stream=None):
+def dump(obj, default_flow_style=False, stream=None, Dumper=SafeDumper):
     return yaml.dump(obj, default_flow_style=default_flow_style, width=maxint,
-                     Dumper=SafeDumper, stream=stream)
+                     Dumper=Dumper, stream=stream)
 
 
 def file_line(mark):

@@ -2027,9 +2027,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                             repeat_foms[context_name][fom_key]["fom_values"].append(fom["value"])
 
         # Iterate through the aggregated foms, calculate stats, and insert into results
-        print(repeat_foms)
         for context, fom_dict in repeat_foms.items():
-            print(fom_dict)
             if not fom_dict:
                 continue
 
@@ -2054,7 +2052,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 summary_foms.append(n_total_dict)
 
                 n_success = exp_status_list.count(ExperimentStatus.SUCCESS)
-                print(n_success)
+
                 n_success_dict = {
                     "value": n_success,
                     "units": "repeats",
@@ -2306,9 +2304,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
-                self.variables[self.keywords.experiment_status] = status_data[
-                    self.keywords.experiment_status
-                ]
+                self.variables[self.keywords.experiment_status] = ExperimentStatus(
+                    status_data[self.keywords.experiment_status]
+                )
         else:
             self.set_status(ExperimentStatus.UNKNOWN)
 
