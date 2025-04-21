@@ -368,6 +368,11 @@ def register_builtin(
     - 'prepend' -- This builtin will be injected at the beginning of the executable list
     - 'append' -- This builtin will be injected at the end of the executable list
 
+    The 'depends_on' and 'dependents' attributes control explicit ordering
+    relative to other builtins and executables.
+
+    NOTE: Specifying dependencies disables the use of 'injection_method'
+
     Args:
         name (str): Name of builtin (should be the name of a class method) to register
         required (bool): Whether the builtin will be auto-injected or not
