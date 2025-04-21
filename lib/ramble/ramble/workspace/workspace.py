@@ -1606,7 +1606,7 @@ ramble:
                 if "experiments" in results:
                     for exp in results["experiments"]:
                         f.write("Experiment %s figures of merit:\n" % exp["name"])
-                        f.write("  Status = %s\n" % exp["RAMBLE_STATUS"])
+                        f.write("  Status = %s\n" % exp["RAMBLE_STATUS"].value)
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
 

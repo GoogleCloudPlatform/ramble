@@ -264,7 +264,7 @@ class AnalyzePipeline(Pipeline):
         no_analyze_cnt = 0
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
-                if app_inst.get_status() != ramble.application.experiment_status.UNKNOWN.name:
+                if app_inst.get_status() != ramble.application.ExperimentStatus.UNKNOWN:
                     found_valid_experiment = True
             else:
                 no_analyze_cnt += 1
