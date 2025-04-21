@@ -116,3 +116,40 @@ ramble:
 
     script_path = os.path.join(ws.shared_dir, "script.sh")
     assert os.path.isfile(script_path)
+
+
+def test_executable_templates_no_trailing_spaces(mutable_mock_apps_repo):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: mpirun -n {n_ranks}
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+  applications:
+    basic:
+      workloads:
+        template_wl:
+          experiments:
+            test:
+              variables:
+                n_ranks: '1'
+  software:
+    packages: {}
+    environments: {}
+"""
+    workspace_name = "test_executable_templates_no_trailing_spaces"
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+    ws._re_read()
+
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    run_dir = os.path.join(ws.experiment_dir, "basic/template_wl/test/")
+    execute_path = os.path.join(run_dir, "execute_experiment")
+
+    with open(execute_path) as f:
+        content = f.read()
+        assert "EOF" in content
+        assert "EOF " not in content

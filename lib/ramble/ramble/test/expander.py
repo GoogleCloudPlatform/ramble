@@ -122,6 +122,8 @@ def build_variant_set():
         ("{'key1':'val1'}", "{'key1':'val1'}", set(), 1),
         ("{'key1': 'val1'}", "{'key1': 'val1'}", set(), 1),
         ("{'key1': 'val1', 'key2': 'val2'}", "{'key1': 'val1', 'key2': 'val2'}", set(), 1),
+        ("${job_id}", "${job_id}", set(), 1),
+        ("${job_id:-}", "${job_id:-}", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):

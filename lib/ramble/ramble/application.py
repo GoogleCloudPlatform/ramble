@@ -1168,7 +1168,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         expanded_cmd = self.expander.expand_var(command_part, exec_vars)
                         suffix_cmd = self.expander.expand_var(suffix_part, exec_vars).lstrip()
 
-                        self._command_list.append(expanded_cmd + " " + suffix_cmd)
+                        self._command_list.append((expanded_cmd + " " + suffix_cmd).rstrip())
                         self._command_list_without_logs.append(expanded_cmd)
 
             else:  # All Builtins
