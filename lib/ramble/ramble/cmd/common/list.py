@@ -86,7 +86,7 @@ def github_url(objs, object_type):
     """Link to an object file on github."""
     obj_def = ramble.repository.type_definitions[object_type]
     url = (
-        "https://github.com/ramble/ramble/blob/develop/var/ramble/repos/builtina/"
+        "https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/"
         + f'{obj_def["dir_name"]}/'
         + "{0}"
         + f'/{obj_def["file_name"]}'
@@ -172,7 +172,10 @@ def html(obj_names, out, object_type):
         out.write('<tr class="row-odd">\n' if i % 2 == 0 else '<tr class="row-even">\n')
         for name in row:
             out.write("<td>\n")
-            out.write(f'<a class="reference internal" href="#{name}">{name}</a></td>\n')
+            if name is not None:
+                out.write(f'<a class="reference internal" href="#{name}">{name}</a></td>\n')
+            else:
+                out.write("</td>\n")
             out.write("</td>\n")
         out.write("</tr>\n")
     out.write("</tbody>\n")
