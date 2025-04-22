@@ -10,7 +10,7 @@ import os
 
 import yaml
 
-from ramble.application import experiment_status
+from ramble.application import ExperimentStatus
 from ramble.util import shell_utils
 from ramble.wmkit import *
 
@@ -222,7 +222,7 @@ class GoogleBatch(WorkflowManagerBase):
         expander = self.app_inst.expander
         run_dir = expander.expand_var_name("experiment_run_dir")
         job_file = os.path.join(run_dir, ".batch_job.yaml")
-        status = experiment_status.UNRESOLVED
+        status = ExperimentStatus.UNRESOLVED
         if not os.path.isfile(job_file):
             logger.warn(
                 f"{self.name} job file is missing in experiment {expander.experiment_namespace}"
@@ -239,9 +239,9 @@ class GoogleBatch(WorkflowManagerBase):
         location = expander.expand_var_name("batch_job_region")
         wm_status_raw = self.runner.get_status(project, location, job_name)
         wm_status = _STATUS_MAP.get(wm_status_raw)
-        if wm_status is not None and hasattr(experiment_status, wm_status):
-            status = getattr(experiment_status, wm_status)
-        if status == experiment_status.UNRESOLVED:
+        if wm_status is not None and hasattr(ExperimentStatus, wm_status):
+            status = getattr(ExperimentStatus, wm_status)
+        if status == ExperimentStatus.UNRESOLVED:
             logger.warn(
                 f"The {self.name} workflow manager failed to resolve the status of job {job_name}.\n "
                 "Enable debug mode (`ramble -d`) for more detailed error messages."

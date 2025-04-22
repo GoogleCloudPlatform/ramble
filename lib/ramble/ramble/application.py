@@ -1837,7 +1837,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        status = ExperimentStatus.SUCCESS if success else self.get_status()
+        status = self.get_status()
+        if status == ExperimentStatus.SUCCESS and not success:
+            status = ExperimentStatus.FAILED
+        elif success:
+            status = ExperimentStatus.SUCCESS
+
         # When workflow_manager is present, only use app_status when workflow is completed or
         # unresolved.
         if self.workflow_manager is not None:
