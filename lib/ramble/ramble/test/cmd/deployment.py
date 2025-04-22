@@ -11,14 +11,9 @@ import sys
 
 import pytest
 
-import llnl.util.filesystem as fs
-
 import ramble.config
 import ramble.workspace
-from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
-
-import spack.util.url
 
 deployment = RambleCommand("deployment")
 workspace = RambleCommand("workspace")
@@ -31,9 +26,31 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
-def test_local_push(mutable_config, mutable_mock_workspace_path):
+def check_deployment_files(root):
+    configs_dir = os.path.join(root, "configs")
+    tpl = os.path.join(configs_dir, "execute_experiment.tpl")
+    yaml = os.path.join(configs_dir, "ramble.yaml")
 
-    workspace_name = "test_manage_software"
+    object_dir = os.path.join(root, "object_repo")
+    spack_pm = os.path.join(
+        object_dir, "package_managers", "spack-lightweight", "package_manager.py"
+    )
+    wrf_app = os.path.join(object_dir, "applications", "wrfv4", "application.py")
+    wrf_pkg = os.path.join(object_dir, "packages", "wrf", "package.py")
+
+    dir_list = [root, root, configs_dir, object_dir]
+    for d in dir_list:
+        assert os.path.isdir(d)
+
+    file_list = [tpl, yaml, spack_pm, wrf_app, wrf_pkg]
+    for f in file_list:
+        assert os.path.isfile(f)
+
+
+def test_local_deployment(mutable_config, mutable_mock_workspace_path):
+
+    workspace_name = "test_local_deployment"
+    deployment_dir = ""
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -63,21 +80,22 @@ def test_local_push(mutable_config, mutable_mock_workspace_path):
         deployment_dir = os.path.join(ws.root, "deployments")
         this_deployment_dir = os.path.join(deployment_dir, workspace_name)
 
-        configs_dir = os.path.join(this_deployment_dir, "configs")
-        tpl = os.path.join(configs_dir, "execute_experiment.tpl")
-        yaml = os.path.join(configs_dir, "ramble.yaml")
+        check_deployment_files(this_deployment_dir)
 
-        object_dir = os.path.join(this_deployment_dir, "object_repo")
-        spack_pm = os.path.join(
-            object_dir, "package_managers", "spack-lightweight", "package_manager.py"
+    workspace_name = "test_local_pull"
+    with ramble.workspace.create(workspace_name) as ws:
+        deployment(
+            "pull",
+            "-p",
+            os.path.join(deployment_dir, "test_local_deployment"),
+            global_args=["-w", workspace_name],
         )
-        wrf_app = os.path.join(object_dir, "applications", "wrfv4", "application.py")
-        wrf_pkg = os.path.join(object_dir, "packages", "wrf", "package.py")
+        config_path = ws.config_file_path
 
-        dir_list = [deployment_dir, this_deployment_dir, configs_dir, object_dir]
-        for d in dir_list:
-            assert os.path.isdir(d)
+        with open(config_path) as f:
+            content = f.read()
+            # Check that wrf has a package, and the package is in an environment
+            assert "pkg_spec: wrf" in content
+            assert "- wrfv4" in content
 
-        file_list = [tpl, yaml, spack_pm, wrf_app, wrf_pkg]
-        for f in file_list:
-            assert os.path.isfile(f)
+        check_deployment_files(ws.root)
