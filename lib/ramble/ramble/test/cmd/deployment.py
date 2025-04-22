@@ -35,14 +35,14 @@ def check_deployment_files(root):
     spack_pm = os.path.join(
         object_dir, "package_managers", "spack-lightweight", "package_manager.py"
     )
-    wrf_app = os.path.join(object_dir, "applications", "wrfv4", "application.py")
-    wrf_pkg = os.path.join(object_dir, "packages", "wrf", "package.py")
+    app = os.path.join(object_dir, "applications", "gromacs", "application.py")
+    pkg = os.path.join(object_dir, "packages", "gromacs", "package.py")
 
     dir_list = [root, root, configs_dir, object_dir]
     for d in dir_list:
         assert os.path.isdir(d)
 
-    file_list = [tpl, yaml, spack_pm, wrf_app, wrf_pkg]
+    file_list = [tpl, yaml, spack_pm, app, pkg]
     for f in file_list:
         assert os.path.isfile(f)
 
@@ -59,7 +59,7 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path):
         workspace(
             "manage",
             "experiments",
-            "wrfv4",
+            "gromacs",
             "-v",
             "n_ranks=1",
             "-v",
@@ -94,8 +94,7 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path):
 
         with open(config_path) as f:
             content = f.read()
-            # Check that wrf has a package, and the package is in an environment
-            assert "pkg_spec: wrf" in content
-            assert "- wrfv4" in content
+            # Check that the app has a package, and the package is in an environment
+            assert "pkg_spec: gromacs" in content
 
         check_deployment_files(ws.root)
