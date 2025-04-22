@@ -40,6 +40,19 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 
 .. toctree::
    :maxdepth: 2
+   :caption: Object Lists
+
+   application_list
+   modifier_list
+   package_manager_list
+   workflow_manager_list
+   base_application_list
+   base_modifier_list
+   base_package_manager_list
+   base_workflow_manager_list
+
+.. toctree::
+   :maxdepth: 2
    :caption: Contributing
 
    Contributing Guidelines <https://github.com/GoogleCloudPlatform/ramble#contributing>

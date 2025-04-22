@@ -45,7 +45,21 @@ os.environ["COLIFY_SIZE"] = "25x120"
 os.environ["COLUMNS"] = "120"
 
 # Generate full package list if needed
-subprocess.call(["ramble", "list", "--format=html", "--update=package_list.html"])
+object_types = [
+    ("applications", "application"),
+    ("modifiers", "modifier"),
+    ("package_managers", "package_manager"),
+    ("workflow_managers", "workflow_manager"),
+    ("base_applications", "base_application"),
+    ("base_modifiers", "base_modifier"),
+    ("base_package_managers", "base_package_manager"),
+    ("base_workflow_managers", "base_workflow_manager"),
+]
+
+for obj, fn in object_types:
+    subprocess.call(
+        ["ramble", "list", f"--type={obj}", "--format=html", f"--update={fn}_list.html"]
+    )
 
 # Generate a command index if an update is needed
 subprocess.call(
