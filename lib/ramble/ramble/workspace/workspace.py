@@ -1565,8 +1565,8 @@ ramble:
             if not packages:
                 f.write("      None\n")
             else:
-                for pkg in packages:
-                    f.write(f"      {pkg['name']} @{pkg['version']}\n")
+                for pkg_info in packages:
+                    f.write(f"      {pkg_info.to_version_text()}\n")
 
     def dump_results(self, output_formats=None, print_results=False, summary_only=False):
         """

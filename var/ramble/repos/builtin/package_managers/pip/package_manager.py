@@ -257,6 +257,37 @@ def _extract_pkg_name(pkg_spec):
     return match.group("pkg_name") if match else None
 
 
+class PipSoftwareInfo(ramble.package_manager.SoftwareInfo):
+    # TODO: should this "parse" function have a unified interface?
+    def parse_from_string(self, in_str):
+        """Construct a package dictionary from a package string
+
+        Args:
+            in_str (str): String representing a package, as output from `pip freeze`
+
+        Returns:
+            (dict): Dictionary representing the package information
+        """
+
+        if not in_str:
+            return None
+
+        parts = in_str.replace("\n", "").split("==")
+
+        if len(parts) <= 1:
+            return None
+
+        self.version = parts[1]
+
+        if "[" in parts[0]:
+            name_parts = parts[0].replace("]", "").split("[")
+            self.name = name_parts[0]
+            self.variants = name_parts[1]
+        else:
+            self.name = parts[0]
+            self.variants = ""
+
+
 class PipRunner(CommandRunner):
     """Runner for executing pip+venv commands."""
 
@@ -525,38 +556,6 @@ class PipRunner(CommandRunner):
                         pkgs.add(req.split("==")[0].strip())
         return pkgs
 
-    def _package_dict_from_str(self, in_str):
-        """Construct a package dictionary from a package string
-
-        Args:
-            in_str (str): String representing a package, as output from `pip freeze`
-
-        Returns:
-            (dict): Dictionary representing the package information
-        """
-
-        if not in_str:
-            return None
-
-        parts = in_str.replace("\n", "").split("==")
-
-        if len(parts) <= 1:
-            return None
-
-        version = parts[1]
-
-        if "[" in parts[0]:
-            name_parts = parts[0].replace("]", "").split("[")
-            name = name_parts[0]
-            variants = name_parts[1]
-        else:
-            name = parts[0]
-            variants = ""
-
-        info_dict = {"name": name, "version": version, "variants": variants}
-
-        return info_dict
-
     def package_provenance(self):
         """Iterator over package information dictionaries
 
@@ -572,9 +571,8 @@ class PipRunner(CommandRunner):
         if os.path.exists(lock_file):
             with open(lock_file) as f:
                 for line in f.readlines():
-                    info_dict = self._package_dict_from_str(
-                        line.replace("\n", "")
-                    )
+                    software_info = PipSoftwareInfo()
+                    software_info.parse_from_string(line.replace("\n", ""))
 
-                    if info_dict:
-                        yield info_dict
+                    if software_info.name:
+                        yield software_info

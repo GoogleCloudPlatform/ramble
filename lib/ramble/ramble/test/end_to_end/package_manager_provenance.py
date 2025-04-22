@@ -65,3 +65,49 @@ def test_spack_package_manager_provenance_zlib(mock_applications, request):
         data = f.read()
         assert "Software definitions" in data
         assert "spack packages:" in data
+        assert "zlib" in data
+
+
+def test_usermanged_package_manager_provenance_zlib(mock_applications, request):
+    workspace_name = request.node.name
+
+    ws = ramble.workspace.create(workspace_name)
+
+    global_args = ["-w", workspace_name]
+
+    workspace("manage", "experiments", "zlib", "-p", "user-managed", global_args=global_args)
+
+    # Add Software
+    workspace(
+        "manage",
+        "software",
+        "--package-name",
+        "zlib",
+        "--package-spec",
+        "zlib@1.3.1",
+        global_args=global_args,
+    )
+
+    # Use software in env
+    workspace(
+        "manage",
+        "software",
+        "--environment-name",
+        "zlib",
+        "--environment-packages",
+        "zlib",
+        global_args=global_args,
+    )
+
+    workspace("setup", global_args=global_args)
+    workspace("analyze", global_args=global_args)
+
+    results_file = os.path.join(ws.root, "results.latest.txt")
+
+    assert os.path.isfile(results_file)
+
+    with open(results_file) as f:
+        data = f.read()
+        assert "Software definitions" in data
+        assert "user-managed packages:" in data
+        assert "zlib @1.3.1" in data

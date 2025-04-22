@@ -135,6 +135,8 @@ class EnvironmentModules(PackageManagerBase):
                     name = parts[0]
                     version = "/".join(parts[1:]) if len(parts) > 1 else ""
                     pkg_list.append(
-                        {"name": name, "version": version, "variants": ""}
+                        ramble.package_manager.SoftwareInfo(
+                            name=name, version=version
+                        )
                     )
         return pkg_list

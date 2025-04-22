@@ -752,14 +752,12 @@ def workspace_info(args):
 
                 for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
                     app_inst = experiment_set.get_experiment(exp_name)
-                    if (
-                        app_inst.package_manager is not None
-                        and app_inst.package_manager.uses_software_environment
-                    ):
+                    if app_inst.package_manager is not None:
                         software_environments.render_environment(
                             app_inst.expander.expand_var("{env_name}"),
                             app_inst.expander,
                             app_inst.package_manager,
+                            require=app_inst.package_manager.requires_software_environment,
                         )
                         # Track this env as used, for printing purposes
                         software_environments.use_environment(

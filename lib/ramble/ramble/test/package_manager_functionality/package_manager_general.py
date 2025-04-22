@@ -10,6 +10,7 @@ import os
 
 import pytest
 
+import ramble.package_manager
 import ramble.workspace
 from ramble.main import RambleCommand, RambleCommandError
 
@@ -60,3 +61,13 @@ def test_package_manager_names(pkgman_name, expect_success_setup):
     else:
         with pytest.raises(RambleCommandError):
             workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+
+def test_software_info_string():
+    package = "zlib"
+    version = "1.3.1"
+
+    info = ramble.package_manager.SoftwareInfo(name=package, version=version)
+    text = info.to_version_text()
+    assert package in text
+    assert version in text

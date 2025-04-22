@@ -42,6 +42,7 @@ class SpackLightweight(PackageManagerBase):
 
     def __init__(self, file_path):
         super().__init__(file_path)
+        self.output_prefix = self._spec_prefix
 
         self.runner = SpackRunner()
 
@@ -180,7 +181,6 @@ class SpackLightweight(PackageManagerBase):
 
                 added_packages = set(self.runner.added_packages())
                 for pkg, conf in self.app_inst.required_packages.items():
-
                     if (
                         app_inst.expander.satisfies(
                             conf["when"], variant_set=app_inst.object_variants
@@ -542,6 +542,39 @@ class SpackLightweight(PackageManagerBase):
 spack_namespace = "spack"
 
 package_name_regex = re.compile(r"[\s-]*(?P<package_name>[\w][\w-]+).*")
+
+
+class SpackSoftwareInfo(ramble.package_manager.SoftwareInfo):
+    def parse_from_string(self, in_str):
+        """Construct a package dictionary from a comma delimited spec string
+
+        Args:
+            in_str (str): Comma delimited string from spack about a package spec.
+                          It is assumed to be of the format:
+                          {name},{version},{compiler_name},{compiler_version},{variants}
+
+        Returns:
+            (dict): Dictionary representing the package information
+        """
+        parts = in_str.split(",")
+
+        if len(parts) >= 1:
+            self.name = parts[0]
+
+            if len(parts) >= 2:
+                self.version = parts[1]
+
+            if len(parts) >= 3:
+                self.compiler = parts[2]
+
+            if len(parts) >= 4:
+                self.compiler_version = parts[3]
+
+            if len(parts) >= 5:
+                self.target = parts[4]
+
+            if len(parts) >= 6:
+                self.variants = ",".join(parts[5:]).strip()
 
 
 class SpackRunner(CommandRunner):
@@ -1309,59 +1342,6 @@ class SpackRunner(CommandRunner):
             if path is not None:
                 yield pkg, os.path.join(path, package_def_name)
 
-    def _package_dict_from_str(self, in_str):
-        """Construct a package dictionary from a comma delimited spec string
-
-        Args:
-            in_str (str): Comma delimited string from spack about a package spec.
-                          It is assumed to be of the format:
-                          {name},{version},{compiler_name},{compiler_version},{variants}
-
-        Returns:
-            (dict): Dictionary representing the package information
-        """
-        parts = in_str.split(",")
-
-        info_dict = {
-            "name": "",
-            "version": "",
-            "compiler": "",
-            "compiler_version": "",
-            "target": "",
-            "variants": "",
-        }
-
-        if len(parts) >= 1:
-            # Remove status markers
-            name = (
-                parts[0]
-                .replace("[+]", "")
-                .replace(" - ", "")
-                .replace("[e]", "")
-                .strip()
-            )
-
-            info_dict["name"] = name
-
-        if len(parts) >= 2:
-            info_dict["version"] = parts[1]
-
-        if len(parts) >= 3:
-            info_dict["compiler"] = parts[2]
-
-        if len(parts) >= 4:
-            info_dict["compiler_version"] = parts[3]
-
-        if len(parts) >= 5:
-            info_dict["target"] = parts[4]
-
-        if len(parts) >= 6:
-            info_dict["variants"] = ",".join(parts[5:]).strip()
-
-        if info_dict["name"]:
-            return info_dict
-        return None
-
     def package_provenance(self):
         """Iterator over package information dictionaries
 
@@ -1389,12 +1369,14 @@ class SpackRunner(CommandRunner):
                     if len(pkg_parts) == 1:
                         info = pkg_parts[0]
                     else:
-                        info = " ".join(pkg_parts[1:])
+                        # Remove status markers
+                        info = info_line[3:]
 
-                    info_dict = self._package_dict_from_str(info)
+                    software_info = SpackSoftwareInfo()
+                    software_info.parse_from_string(info)
 
-                    if info_dict:
-                        yield info_dict
+                    if software_info.name:
+                        yield software_info
 
 
 class NoActiveEnvironmentError(RunnerError):

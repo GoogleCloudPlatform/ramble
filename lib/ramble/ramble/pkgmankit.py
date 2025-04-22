@@ -18,7 +18,6 @@ import ramble.language.package_manager_language
 from ramble.language.package_manager_language import *
 from ramble.language.shared_language import *
 from ramble.package_manager import PackageManagerBase
-from ramble.package_manager_types.runner import RunnerPackageManager
 from ramble.software_environments import ExternalEnvironment
 from ramble.spec import Spec
 from ramble.util.command_runner import (
