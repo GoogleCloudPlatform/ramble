@@ -119,7 +119,6 @@ class EnvironmentModules(PackageManagerBase):
         list_file = app_inst.expander.expand_var(
             f"{{experiment_run_dir}}/{self._list_file}"
         )
-        print(list_file)
 
         if not os.path.exists(list_file):
             return []
