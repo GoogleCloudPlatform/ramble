@@ -50,7 +50,7 @@ from ramble.error import RambleError
 from ramble.experiment_result import ExperimentResult
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
-from ramble.util import conversions
+from ramble.util import constants, conversions
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -2437,6 +2437,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         run_dir = self.expander.experiment_run_dir
         replacements = workspace.workspace_paths()
         expander = self.expander
+        tpl_ext = constants.TEMPLATE_EXTENSION
 
         def _expand_path(path):
             return ramble.util.path.substitute_path_variables(
@@ -2446,6 +2447,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         def _get_template_config(obj, tpl_config, obj_type):
             # Resolve the source path
             src_path_config = _expand_path(tpl_config["src_path"])
+            if not src_path_config.endswith(tpl_ext):
+                # Enforce the template extension to template's source path.
+                src_path_config = src_path_config + tpl_ext
             if not os.path.isabs(src_path_config):
                 # Search up the object chain to resolve source path
                 found = False
@@ -2468,14 +2472,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 src_path = src_path_config
 
             # Resolve the destination path
-            tpl_ext = ".tpl"
             dest_path_config = tpl_config["dest_path"]
             if dest_path_config is None:
                 dest_path = os.path.basename(src_path)
                 if dest_path.endswith(tpl_ext):
                     dest_path = dest_path[: -len(tpl_ext)]
             else:
-                dest_path = _expand_path(tpl_config["dest_path"])
+                dest_path = _expand_path(dest_path_config)
             if not os.path.isabs(dest_path):
                 dest_path = os.path.join(run_dir, dest_path)
 
