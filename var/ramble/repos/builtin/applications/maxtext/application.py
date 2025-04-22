@@ -123,7 +123,7 @@ class Maxtext(ExecutableApplication):
     )
 
     log_str = os.path.join("{experiment_run_dir}", "metrics.out")
-    float_or_sci_regex = r"[0-9\.]+(?:\.[0-9\.]*(?:[eE][+-]?[0-9]+)?)?"
+    float_or_sci_regex = r"[+-]?[0-9]+(?:\.[0-9]*(?:[eE][+-]?[0-9]+)?)?"
 
     # Summary FOMs over all steps
     figure_of_merit(
