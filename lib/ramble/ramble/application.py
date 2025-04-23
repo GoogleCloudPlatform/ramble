@@ -330,22 +330,20 @@ class ApplicationBase(metaclass=ApplicationMeta):
             self.object_variants.value(namespace.workflow_manager)
         )
 
-        if workflow_name is not None:
-            try:
-                wfman_type = ramble.repository.ObjectTypes.workflow_managers
-                self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
-                self.workflow_manager.set_application(self)
-            except ramble.repository.UnknownObjectError:
-                logger.die(
-                    f"{workflow_name} is not a valid workflow manager. "
-                    "Valid workflow managers can be listed via:\n"
-                    "\tramble list --type workflow_managers"
-                )
+        # Map None to the default of user-managed
+        if workflow_name is None:
+            workflow_name = "user-managed"
 
-        if self.workflow_manager is None:
-            base_path = os.path.join(ramble.paths.module_path, "workflow_manager.py")
-            self.workflow_manager = ramble.workflow_manager.WorkflowManagerBase(base_path)
+        try:
+            wfman_type = ramble.repository.ObjectTypes.workflow_managers
+            self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
             self.workflow_manager.set_application(self)
+        except ramble.repository.UnknownObjectError:
+            logger.die(
+                f"{workflow_name} is not a valid workflow manager. "
+                "Valid workflow managers can be listed via:\n"
+                "\tramble list --type workflow_managers"
+            )
 
     def build_phase_order(self):
         if self._pipeline_graphs is not None:
