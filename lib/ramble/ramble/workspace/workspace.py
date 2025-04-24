@@ -1565,8 +1565,14 @@ ramble:
             if not packages:
                 f.write("      None\n")
             else:
+                # Dedupe entries that have the same version texts.
+                # This can happen for instance if a package is built against different compilers.
+                pkg_info_set = set()
                 for pkg_info in packages:
-                    f.write(f"      {pkg_info.to_version_text()}\n")
+                    text = pkg_info.to_version_text()
+                    if text not in pkg_info_set:
+                        f.write(f"      {text}\n")
+                        pkg_info_set.add(text)
 
     def dump_results(self, output_formats=None, print_results=False, summary_only=False):
         """
