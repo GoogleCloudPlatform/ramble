@@ -33,8 +33,14 @@ class PyNemo2(ExecutableApplication):
     archive_pattern("{experiment_run_dir}/{nemo_config_name}/*")
 
     executable(
+        "setup_transformer_cache",
+        'bash -c "python3 -c \'from transformers import AutoTokenizer; AutoTokenizer.from_pretrained(\\"gpt2\\")\'"',
+        use_mpi=True,
+    )
+
+    executable(
         "pretraining_exec",
-        'bash -c "'
+        'bash -c "cd /opt/NeMo; git rev-parse HEAD; '
         "{custom_injected_string}; "
         'python3 -u {experiment_run_dir}/{nemo_config_name};"',
         use_mpi=True,
@@ -43,6 +49,7 @@ class PyNemo2(ExecutableApplication):
     workload(
         "pretraining",
         executables=[
+            "setup_transformer_cache",
             "pretraining_exec",
         ],
     )
@@ -327,8 +334,8 @@ class PyNemo2(ExecutableApplication):
         source_path = get_file_path(
             canonicalize_path(
                 os.path.join(
-                    self.expander.expand_var_name("nemo_2_config_dir_path"),
-                    self.expander.expand_var_name("nemo_2_config_name"),
+                    self.expander.expand_var_name("nemo_config_dir_path"),
+                    self.expander.expand_var_name("nemo_config_name"),
                 )
             ),
             workspace,
@@ -339,7 +346,7 @@ class PyNemo2(ExecutableApplication):
 
         dest_path = os.path.join(
             app_inst.expander.expand_var_name("experiment_run_dir"),
-            app_inst.expander.expand_var_name("nemo_2_config_name"),
+            app_inst.expander.expand_var_name("nemo_config_name"),
         )
 
         self.expander.flush_used_variable_stage()
