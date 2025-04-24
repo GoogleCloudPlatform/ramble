@@ -127,7 +127,7 @@ def variable_modification(
 
 
 @modifier_directive("executable_modifiers")
-def executable_modifier(name):
+def executable_modifier(name, **kwargs):
     """Register an executable modifier
 
     Executable modifiers can modify various aspects of non-builtin application
@@ -260,7 +260,7 @@ def env_var_modification(name, modification=None, method="set", mode=None, modes
 
 
 @modifier_directive("required_vars")
-def required_variable(var: str, results_level="variable", modes=None, description=None):
+def required_variable(var: str, results_level="variable", modes=None, description=None, **kwargs):
     """Mark a variable as being required by this modifier
 
     Args:

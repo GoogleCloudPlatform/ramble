@@ -25,6 +25,7 @@ def workflow_manager_variable(
     default,
     description: str,
     values: Optional[list] = None,
+    **kwargs,
 ):
     """Define a variable for this wm
     Args:
@@ -48,7 +49,7 @@ def workflow_manager_variable(
 
 
 @workflow_manager_directive(dicts=())
-def workflow_manager_family(*names: str):
+def workflow_manager_family(*names: str, **kwargs):
     """Add a new family to this workflow manager
 
     Args:
