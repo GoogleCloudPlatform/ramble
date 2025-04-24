@@ -312,9 +312,6 @@ class ExecutableGraph(AttributeGraph):
                 head_node = node
             tail_node = node
 
-        tail_prepend_builtin = None
-        tail_append_builtin = None
-
         # Add (missing) required builtins
         for builtins in builtin_groups:
             for builtin, blt_conf in builtins.items():
@@ -322,23 +319,12 @@ class ExecutableGraph(AttributeGraph):
                     blt_node = self.node_definitions[builtin]
                     super().update_graph(blt_node)
 
-                    # TODO: This should include `depends_on` as well.
-                    relative = bool(blt_conf["dependents"])
-
-                    if not relative and blt_conf["injection_method"] == "prepend":
+                    if blt_conf["injection_method"] == "prepend":
                         if head_node is not None:
                             super().update_graph(head_node, [blt_node])
-
-                        if tail_prepend_builtin is not None:
-                            super().update_graph(blt_node, [tail_prepend_builtin])
-                        tail_prepend_builtin = blt_node
-                    elif not relative and blt_conf["injection_method"] == "append":
+                    elif blt_conf["injection_method"] == "append":
                         if tail_node is not None:
                             super().update_graph(blt_node, [tail_node])
-
-                        if tail_append_builtin is not None:
-                            super().update_graph(blt_node, [tail_append_builtin])
-                        tail_append_builtin = blt_node
 
                     if blt_conf["depends_on"]:
                         deps = []
