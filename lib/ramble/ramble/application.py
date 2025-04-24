@@ -2309,19 +2309,29 @@ class ApplicationBase(metaclass=ApplicationMeta):
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
-                self.variables[self.keywords.experiment_status] = ExperimentStatus(
-                    status_data[self.keywords.experiment_status]
-                )
+                    self.set_status(ExperimentStatus(status_data[self.keywords.experiment_status]))
         else:
             self.set_status(ExperimentStatus.UNKNOWN)
 
     def set_status(self, status=ExperimentStatus.UNKNOWN):
         """Set the status of this experiment"""
         self.variables[self.keywords.experiment_status] = status
+        self.set_ramble_status(status)
 
     def get_status(self):
         """Get the status of this experiment"""
         return self.variables[self.keywords.experiment_status]
+
+    def get_ramble_status(self):
+        """Get the RAMBLE_STATUS of this experiment (boolifyied status)"""
+        return self.variables[self.keywords.RAMBLE_STATUS]
+
+    def set_ramble_status(self, status):
+        """Set the RAMBLE_STATUS (boolifyied status) of this experiment"""
+
+        self.variables[self.keywords.RAMBLE_STATUS] = status
+        if status != ExperimentStatus.SUCCESS:
+            self.variables[self.keywords.RAMBLE_STATUS] = ExperimentStatus.FAILED
 
     register_phase("write_status", pipeline="analyze", run_after=["analyze_experiments"])
     register_phase("write_status", pipeline="setup", run_after=["make_experiments"])

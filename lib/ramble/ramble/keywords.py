@@ -31,6 +31,7 @@ default_keys = {
     "experiment_hash": {"type": key_type.reserved, "level": output_level.key},
     "experiment_run_dir": {"type": key_type.reserved, "level": output_level.variable},
     "experiment_status": {"type": key_type.reserved, "level": output_level.key},
+    "RAMBLE_STATUS": {"type": key_type.reserved, "level": output_level.key},
     "experiment_index": {"type": key_type.reserved, "level": output_level.variable},
     "experiment_namespace": {"type": key_type.reserved, "level": output_level.key},
     "simplified_experiment_namespace": {"type": key_type.reserved, "level": output_level.key},

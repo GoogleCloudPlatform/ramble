@@ -28,7 +28,6 @@ class ExperimentStatus(str, Enum):
 
 _OUTPUT_MAPPING = {
     "name": "name",
-    "status": "RAMBLE_STATUS",
     namespace.n_repeats: "N_REPEATS",
     "keys": "keys",
     "contexts": "CONTEXTS",
@@ -48,11 +47,7 @@ class ExperimentResult:
         """Build up the result from the given app instance"""
         self.name = app_inst.expander.experiment_namespace
 
-        # This value is passed to us with an enum of values. Here we want to
-        # make it FAILED/SUCCESS
-        self.status = app_inst.get_status()
-        if self.status != ExperimentStatus.SUCCESS:
-            self.status = ExperimentStatus.FAILED
+        self.status = app_inst.get_ramble_status()
 
         # Most libs can handle this str enum, but convert it to help out
         self.status = self.status.value
