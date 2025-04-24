@@ -50,18 +50,3 @@ class RegisterBuiltin(ExecutableApplication):
 
     def test_builtin_pre(self):
         return ['echo "bar"']
-
-    register_builtin("builtin_cycle_test1", injection_method="append")
-
-    def builtin_cycle_test1(self):
-        return ["echo builtin_cycle_test1"]
-
-    register_builtin("builtin_cycle_test2", depends_on=["builtin_cycle_test1"])
-
-    def builtin_cycle_test2(self):
-        return ["echo builtin_cycle_test2"]
-
-    register_builtin("builtin_cycle_test3", dependents=["builtin_cycle_test1"])
-
-    def builtin_cycle_test3(self):
-        return ["echo builtin_cycle_test3"]
