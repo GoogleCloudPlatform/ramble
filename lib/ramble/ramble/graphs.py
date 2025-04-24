@@ -322,41 +322,40 @@ class ExecutableGraph(AttributeGraph):
                     blt_node = self.node_definitions[builtin]
                     super().update_graph(blt_node)
 
-                    # Determine if dependencies are defined. These supersede injection methods.
-                    relative = bool(blt_conf["dependents"]) or bool(blt_conf["depends_on"])
+                    # TODO: This should include `depends_on` as well.
+                    relative = bool(blt_conf["dependents"])
 
-                    if not relative:
-                        if blt_conf["injection_method"] == "prepend":
-                            if head_node is not None:
-                                super().update_graph(head_node, [blt_node])
+                    if not relative and blt_conf["injection_method"] == "prepend":
+                        if head_node is not None:
+                            super().update_graph(head_node, [blt_node])
 
-                            if tail_prepend_builtin is not None:
-                                super().update_graph(blt_node, [tail_prepend_builtin])
-                            tail_prepend_builtin = blt_node
-                        elif blt_conf["injection_method"] == "append":
-                            if tail_node is not None:
-                                super().update_graph(blt_node, [tail_node])
+                        if tail_prepend_builtin is not None:
+                            super().update_graph(blt_node, [tail_prepend_builtin])
+                        tail_prepend_builtin = blt_node
+                    elif not relative and blt_conf["injection_method"] == "append":
+                        if tail_node is not None:
+                            super().update_graph(blt_node, [tail_node])
 
-                            if tail_append_builtin is not None:
-                                super().update_graph(blt_node, [tail_append_builtin])
-                            tail_append_builtin = blt_node
-                    else:
-                        if blt_conf["depends_on"]:
-                            deps = []
-                            for dep in blt_conf["depends_on"]:
-                                dep_node = self._resolve_builtin_node(dep)
-                                super().update_graph(dep_node)
-                                deps.append(dep_node)
+                        if tail_append_builtin is not None:
+                            super().update_graph(blt_node, [tail_append_builtin])
+                        tail_append_builtin = blt_node
 
-                            exec_node = self.node_definitions[builtin]
-                            super().update_graph(exec_node, deps)
+                    if blt_conf["depends_on"]:
+                        deps = []
+                        for dep in blt_conf["depends_on"]:
+                            dep_node = self._resolve_builtin_node(dep)
+                            super().update_graph(dep_node)
+                            deps.append(dep_node)
 
-                        if blt_conf["dependents"]:
-                            exec_node = self.node_definitions[builtin]
-                            super().update_graph(exec_node)
-                            for dependent in blt_conf["dependents"]:
-                                dependent_node = self._resolve_builtin_node(dependent)
-                                super().update_graph(dependent_node, [exec_node])
+                        exec_node = self.node_definitions[builtin]
+                        super().update_graph(exec_node, deps)
+
+                    if blt_conf["dependents"]:
+                        exec_node = self.node_definitions[builtin]
+                        super().update_graph(exec_node)
+                        for dependent in blt_conf["dependents"]:
+                            dependent_node = self._resolve_builtin_node(dependent)
+                            super().update_graph(dependent_node, [exec_node])
 
     def inject_executable(self, exec_name, injection_order, relative):
         """Inject an executable into the graph
