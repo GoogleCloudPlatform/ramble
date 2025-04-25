@@ -101,7 +101,7 @@ class Experiment:
         j = copy.deepcopy(self.__dict__)
 
         j["foms"] = json.dumps(self.foms)
-        j["data"] = json.dumps(self.data)
+        j["data"] = json.dumps(self.data, default=vars)
         return j
 
 
