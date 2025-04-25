@@ -365,8 +365,18 @@ def register_builtin(
     The 'injection_method' attribute controls where the builtin will be
     injected into the executable list.
     Options are:
-    - 'prepend' -- This builtin will be injected at the beginning of the executable list
-    - 'append' -- This builtin will be injected at the end of the executable list
+    - 'prepend' -- This builtin will be injected before the executables for the experiment
+    - 'append' -- This builtin will be injected after the executables for the experiment
+
+    NOTE: When specifying explicit dependencies, cycles can be created which
+    will cause an error when trying to construct the final executable order.
+    One possible way to resolve those issues is to make sure that builtins
+    which depend on each other have the same injection method (or at least do
+    not have conflicting injection methods). As an example, if builtin `a` has
+    an injection method of prepend, and builtin `b` lists `a` as a dependent
+    but has an injection method of append, then this will create a cycle. If b
+    has it's injection method updated to be `prepend` the cycle will be
+    resolved.
 
     Args:
         name (str): Name of builtin (should be the name of a class method) to register
@@ -376,7 +386,7 @@ def register_builtin(
         depends_on (list(str) | None): The names of builtins this builtin depends on
                                        (and must execute after).
         dependents (list(str) | None): The names of builtins that should come
-                                       after the current one.
+                                       after this builtin
     """
     if depends_on is None:
         depends_on = []
