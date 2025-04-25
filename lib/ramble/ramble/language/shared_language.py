@@ -370,6 +370,13 @@ def register_builtin(
 
     NOTE: When specifying explicit dependencies, cycles can be created which
     will cause an error when trying to construct the final executable order.
+    One possible way to resolve those issues is to make sure that builtins
+    which depend on each other have the same injection method (or at least do
+    not have conflicting injection methods). As an example, if builtin `a` has
+    an injection method of prepend, and builtin `b` lists `a` as a dependent
+    but has an injection method of append, then this will create a cycle. If b
+    has it's injection method updated to be `prepend` the cycle will be
+    resolved.
 
     Args:
         name (str): Name of builtin (should be the name of a class method) to register
