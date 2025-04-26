@@ -210,26 +210,32 @@ class ExperimentSet:
             else None
         )
 
+        def _expand(var):
+            try:
+                return int(var)
+            except ValueError:
+                return int(expander.expand_var(var))
+
         if n_ranks:
-            n_ranks = int(expander.expand_var(n_ranks))
+            n_ranks = _expand(n_ranks)
             if n_ranks <= 0:
                 logger.error("n_ranks must be positive")
 
         if ppn:
-            ppn = int(expander.expand_var(ppn))
+            ppn = _expand(ppn)
             if ppn <= 0:
                 logger.error("processes_per_node must be positive")
 
         if n_nodes:
-            n_nodes = int(expander.expand_var(n_nodes))
+            n_nodes = _expand(n_nodes)
             if n_nodes <= 0:
                 logger.error("n_nodes must be positive")
 
         if n_threads:
-            n_threads = int(expander.expand_var(n_threads))
+            n_threads = _expand(n_threads)
 
         if n_ranks and ppn:
-            test_n_nodes = math.ceil(int(n_ranks) / int(ppn))
+            test_n_nodes = math.ceil(n_ranks / ppn)
 
             if n_nodes and n_nodes < test_n_nodes:
                 logger.error(
