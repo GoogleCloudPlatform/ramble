@@ -1165,7 +1165,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         command_part = f"{mpi_cmd}{part}"
                         suffix_part = f"{redirect}{bg_cmd}"
 
-                        expanded_cmd = self.expander.expand_var(command_part, exec_vars)
+                        expanded_cmd = self.expander.expand_var(command_part, exec_vars).lstrip()
                         suffix_cmd = self.expander.expand_var(suffix_part, exec_vars).lstrip()
 
                         self._command_list.append((expanded_cmd + " " + suffix_cmd).rstrip())
