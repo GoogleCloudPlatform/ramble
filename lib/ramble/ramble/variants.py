@@ -12,7 +12,13 @@ from typing import Any, Callable, Optional, Union
 
 import ramble.error
 
-reserved_variants = {"package_manager", "package_manager_prefix", "workflow_manager", "version"}
+reserved_variants = {
+    "modifier",
+    "package_manager",
+    "package_manager_prefix",
+    "version",
+    "workflow_manager",
+}
 
 variant_types = Enum("variant_types", ["default", "experiment"])
 

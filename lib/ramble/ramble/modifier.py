@@ -100,6 +100,20 @@ class ModifierBase(metaclass=ModifierMeta):
         if self._usage_mode == "disabled":
             self.disabled = True
 
+    def set_modifier_variants(self):
+        """Set the variants for this modifier.
+
+        Requires usage mode to be set first."""
+        self.object_variants.multi_value_variant(
+            "modifier",
+            value=self.name,
+        )
+
+        self.object_variants.multi_value_variant(
+            f"{self.name}_mode",
+            value=self._usage_mode,
+        )
+
     def set_on_executables(self, on_executables):
         """Set the executables this modifier applies to.
 
