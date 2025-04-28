@@ -8,6 +8,7 @@
 
 import glob
 import os
+import re
 
 import pytest
 
@@ -220,7 +221,7 @@ compilers:
                 # Test the expected portions of the execution command exist
                 assert "sed -i -e 's/ start_hour.*/ start_hour" in data
                 assert "sed -i -e 's/ restart .*/ restart" in data
-                assert "mpirun" in data
+                assert re.search("\nmpirun", data)
                 assert "wrf.exe" in data
 
                 # Test the run script has a reference to the experiment log file
