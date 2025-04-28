@@ -23,10 +23,10 @@ import ramble.config
 import ramble.context
 import ramble.expander
 import ramble.experiment_set
-import ramble.experimental.uploader
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
+import ramble.uploader
 import ramble.util.colors as rucolor
 import ramble.workspace
 import ramble.workspace.shell
