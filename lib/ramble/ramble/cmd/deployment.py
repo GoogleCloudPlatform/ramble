@@ -26,7 +26,7 @@ from ramble.util.logger import logger
 import spack.util.spack_json as sjson
 import spack.util.url as surl
 
-description = "(experimental) manage workspace deployments"
+description = "manage workspace deployments"
 section = "workspaces"
 level = "short"
 

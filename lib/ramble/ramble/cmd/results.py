@@ -10,8 +10,8 @@ import json
 import os
 
 import ramble.cmd
-import ramble.experimental.uploader
 import ramble.reports
+import ramble.uploader
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
@@ -127,7 +127,7 @@ def results_upload(args):
     specified in the upload block of Ramble's config file."""
     imported_results = import_results_file(args.filename)
 
-    ramble.experimental.uploader.upload_results(imported_results)
+    ramble.uploader.upload_results(imported_results)
 
 
 def import_results_file(filename):

@@ -22,11 +22,11 @@ from llnl.util.tty.color import cprint
 import ramble.application
 import ramble.config
 import ramble.expander
-import ramble.experimental.uploader
 import ramble.fetch_strategy
 import ramble.repository
 import ramble.software_environments
 import ramble.stage
+import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
@@ -302,7 +302,7 @@ class AnalyzePipeline(Pipeline):
         )
 
         if self.upload_results:
-            ramble.experimental.uploader.upload_results(self.workspace.results)
+            ramble.uploader.upload_results(self.workspace.results)
 
 
 class ArchivePipeline(Pipeline):
