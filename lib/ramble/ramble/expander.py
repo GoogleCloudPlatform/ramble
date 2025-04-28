@@ -593,6 +593,9 @@ class Expander:
                                      the used variable set or not.
         """
 
+        if var is None or var == "None":
+            return None if typed else "None"
+
         passthrough_setting = allow_passthrough
 
         # If disable_passthrough is set, override allow_passthrough from caller
