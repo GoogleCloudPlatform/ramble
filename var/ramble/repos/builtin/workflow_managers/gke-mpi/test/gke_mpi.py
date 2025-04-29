@@ -49,14 +49,22 @@ ramble:
 """
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(
+            ws.config_dir, ramble.workspace.config_file_name
+        )
         with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
-        run_path = os.path.join(ws.experiment_dir, "hostname", "parallel", "generated")
-        files = [f for f in os.listdir(run_path) if os.path.isfile(os.path.join(run_path, f))]
+        run_path = os.path.join(
+            ws.experiment_dir, "hostname", "parallel", "generated"
+        )
+        files = [
+            f
+            for f in os.listdir(run_path)
+            if os.path.isfile(os.path.join(run_path, f))
+        ]
         assert "batch_submit" in files
         assert "batch_query" in files
         assert "batch_cancel" in files
@@ -70,10 +78,15 @@ ramble:
             assert f"kubectl apply --kustomize {run_path}" in content
         with open(os.path.join(run_path, "batch_query")) as f:
             content = f.read()
-            assert "kubectl describe mpijobs hostname-parallel-generated" in content
+            assert (
+                "kubectl describe mpijobs hostname-parallel-generated"
+                in content
+            )
         with open(os.path.join(run_path, "batch_cancel")) as f:
             content = f.read()
-            assert "kubectl delete mpijobs hostname-parallel-generated" in content
+            assert (
+                "kubectl delete mpijobs hostname-parallel-generated" in content
+            )
         with open(os.path.join(run_path, "gke_mpi.yaml")) as f:
             content = f.read()
             assert "kind: MPIJob" in content

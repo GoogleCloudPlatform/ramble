@@ -10,8 +10,6 @@ import os
 
 import pytest
 
-import ramble.config
-import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
 
@@ -56,7 +54,9 @@ ramble:
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(
+        ws.config_dir, ramble.workspace.config_file_name
+    )
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -65,7 +65,9 @@ ramble:
 
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-    setup_out = os.path.join(ws.log_dir, "setup.latest", "pip-test.import.test_import.out")
+    setup_out = os.path.join(
+        ws.log_dir, "setup.latest", "pip-test.import.test_import.out"
+    )
     with open(setup_out) as f:
         content = f.read()
         assert "Executing phase software_create_env" in content

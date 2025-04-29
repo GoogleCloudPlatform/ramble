@@ -71,7 +71,11 @@ variants:
     workspace("setup", "--dry-run", global_args=global_args)
 
     exp_dir = os.path.join(ws.experiment_dir, "hostname", "local", "generated")
-    files = [f for f in os.listdir(exp_dir) if os.path.isfile(os.path.join(exp_dir, f))]
+    files = [
+        f
+        for f in os.listdir(exp_dir)
+        if os.path.isfile(os.path.join(exp_dir, f))
+    ]
     assert "batch_submit" in files
     assert "batch_query" in files
     assert "batch_cancel" in files
