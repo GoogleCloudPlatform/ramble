@@ -81,9 +81,7 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.create_env(env_path)
 
-        env_context = app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
         require_env = self.environment_required()
         software_envs = workspace.software_environments
         software_env = software_envs.render_environment(
@@ -118,9 +116,7 @@ class Pip(PackageManagerBase):
         else:
             workspace.add_to_cache(cache_tupl)
 
-        env_context = app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
         if self.environment_required():
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
