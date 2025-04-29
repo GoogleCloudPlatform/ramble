@@ -265,8 +265,6 @@ class ExperimentSet:
         variables,
         context,
         repeats,
-        die_on_validate_error=True,
-        warn_validation=True,
     ):
         """Prepare an experiment instance
 
@@ -477,11 +475,7 @@ class ExperimentSet:
                 tracking_vars,
                 final_context,
                 repeats,
-                warn_validation=False,
-                die_on_validate_error=die_on_validate_error,
             )
-
-            final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
 
             exp_used_variables = app_inst.build_used_variables(self._workspace)
             used_variables = used_variables.union(exp_used_variables)
@@ -496,8 +490,6 @@ class ExperimentSet:
                 experiment_vars,
                 final_context,
                 repeats,
-                warn_validation=False,
-                die_on_validate_error=die_on_validate_error,
             )
 
             final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
