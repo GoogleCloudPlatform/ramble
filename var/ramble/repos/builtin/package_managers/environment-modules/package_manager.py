@@ -88,7 +88,7 @@ class EnvironmentModules(PackageManagerBase):
         )
 
     def _write_module_commands(self, workspace, app_inst=None):
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
 
         module_file_path = os.path.join(env_path, "module_loads")
 

@@ -34,7 +34,7 @@ class Spack(SpackLightweight):
         """Install application's software using spack"""
 
         # See if we cached this already, and if so return
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
 
         cache_tupl = ("spack-install", env_path)
         if workspace.check_cache(cache_tupl):
@@ -83,13 +83,11 @@ class Spack(SpackLightweight):
         logger.msg("Defining Spack variables")
 
         cache = workspace.pkg_path_cache[self.name]
-        app_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
+        app_context = app_inst.expander.expand_var_name(self.keywords.env_name)
         require_env = self.environment_required()
         software_environments = workspace.software_environments
         software_environment = software_environments.render_environment(
-            app_context, self.app_inst.expander, self, require=require_env
+            app_context, app_inst.expander, self, require=require_env
         )
         if software_environment is not None:
             # Try to resolve using local cache first
@@ -101,9 +99,9 @@ class Spack(SpackLightweight):
             ):
                 if pkg_spec in cache:
                     spack_pkg_name, pkg_path = cache.get(pkg_spec)
-                    if spack_pkg_name not in self.app_inst.variables:
-                        self.app_inst.define_variable(spack_pkg_name, pkg_path)
-                        self.app_inst.define_variable(
+                    if spack_pkg_name not in app_inst.variables:
+                        app_inst.define_variable(spack_pkg_name, pkg_path)
+                        app_inst.define_variable(
                             f"{spack_pkg_name}_path", pkg_path
                         )
                     else:
@@ -119,7 +117,7 @@ class Spack(SpackLightweight):
             try:
                 logger.debug("Resolving package paths using Spack")
                 self.runner.set_dry_run(workspace.dry_run)
-                self.runner.set_env(self.app_inst.expander.env_path)
+                self.runner.set_env(app_inst.expander.env_path)
 
                 self.runner.activate()
 
@@ -127,9 +125,9 @@ class Spack(SpackLightweight):
                     spack_pkg_name, pkg_path = self.runner.get_package_path(
                         pkg_spec
                     )
-                    if f"{spack_pkg_name}_path" not in self.app_inst.variables:
-                        self.app_inst.define_variable(spack_pkg_name, pkg_path)
-                        self.app_inst.define_variable(
+                    if f"{spack_pkg_name}_path" not in app_inst.variables:
+                        app_inst.define_variable(spack_pkg_name, pkg_path)
+                        app_inst.define_variable(
                             f"{spack_pkg_name}_path", pkg_path
                         )
                         cache[pkg_spec] = (spack_pkg_name, pkg_path)

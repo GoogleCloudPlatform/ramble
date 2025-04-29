@@ -67,7 +67,7 @@ class Pip(PackageManagerBase):
 
         logger.msg("Creating venv + pip environment")
 
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
@@ -81,13 +81,11 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.create_env(env_path)
 
-        env_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
         require_env = self.environment_required()
         software_envs = workspace.software_environments
         software_env = software_envs.render_environment(
-            env_context, self.app_inst.expander, self, require=require_env
+            env_context, app_inst.expander, self, require=require_env
         )
         if software_env:
             if isinstance(software_env, ExternalEnvironment):
@@ -107,7 +105,7 @@ class Pip(PackageManagerBase):
         """Install packages using pip"""
         logger.msg("Installing packages")
 
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
@@ -118,16 +116,14 @@ class Pip(PackageManagerBase):
         else:
             workspace.add_to_cache(cache_tupl)
 
-        env_context = self.app_inst.expander.expand_var_name(
-            self.keywords.env_name
-        )
+        env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
         if self.environment_required():
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.install()
 
             installed_pkgs = self.runner.installed_packages()
-            for pkg, conf in self.app_inst.required_packages.items():
+            for pkg, conf in app_inst.required_packages.items():
                 if (
                     app_inst.expander.satisfies(
                         conf["when"], variant_set=app_inst.object_variants
@@ -141,7 +137,7 @@ class Pip(PackageManagerBase):
                         "definition"
                     )
 
-            for mod_inst in self.app_inst._modifier_instances:
+            for mod_inst in app_inst._modifier_instances:
                 for pkg, conf in mod_inst.required_packages.items():
                     if (
                         app_inst.expander.satisfies(
@@ -168,7 +164,7 @@ class Pip(PackageManagerBase):
 
         logger.msg("Defining pip package path variables")
 
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
@@ -176,7 +172,7 @@ class Pip(PackageManagerBase):
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.define_path_vars(
-                self.app_inst, workspace.pkg_path_cache[self.name]
+                app_inst, workspace.pkg_path_cache[self.name]
             )
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
