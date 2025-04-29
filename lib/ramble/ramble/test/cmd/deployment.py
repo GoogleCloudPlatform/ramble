@@ -31,14 +31,15 @@ def check_deployment_files(root, app_name):
     tpl = os.path.join(configs_dir, "execute_experiment.tpl")
     yaml = os.path.join(configs_dir, "ramble.yaml")
 
-    object_dir = os.path.join(root, "object_repo")
+    ramble_object_dir = os.path.join(root, "object_repos", "ramble", "builtin")
     spack_pm = os.path.join(
-        object_dir, "package_managers", "spack-lightweight", "package_manager.py"
+        ramble_object_dir, "package_managers", "spack-lightweight", "package_manager.py"
     )
-    app = os.path.join(object_dir, "applications", app_name, "application.py")
-    pkg = os.path.join(object_dir, "packages", app_name, "package.py")
+    app = os.path.join(ramble_object_dir, "applications", app_name, "application.py")
+    spack_object_dir = os.path.join(root, "object_repos", "spack", "obj_repo")
+    pkg = os.path.join(spack_object_dir, "packages", app_name, "package.py")
 
-    dir_list = [root, root, configs_dir, object_dir]
+    dir_list = [root, configs_dir, ramble_object_dir, spack_object_dir]
     for d in dir_list:
         assert os.path.isdir(d)
 
