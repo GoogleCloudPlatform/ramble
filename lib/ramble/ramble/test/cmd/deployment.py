@@ -26,7 +26,7 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
-def check_deployment_files(root):
+def check_deployment_files(root, app_name):
     configs_dir = os.path.join(root, "configs")
     tpl = os.path.join(configs_dir, "execute_experiment.tpl")
     yaml = os.path.join(configs_dir, "ramble.yaml")
@@ -35,8 +35,8 @@ def check_deployment_files(root):
     spack_pm = os.path.join(
         object_dir, "package_managers", "spack-lightweight", "package_manager.py"
     )
-    app = os.path.join(object_dir, "applications", "gromacs", "application.py")
-    pkg = os.path.join(object_dir, "packages", "gromacs", "package.py")
+    app = os.path.join(object_dir, "applications", app_name, "application.py")
+    pkg = os.path.join(object_dir, "packages", app_name, "package.py")
 
     dir_list = [root, root, configs_dir, object_dir]
     for d in dir_list:
@@ -50,6 +50,8 @@ def check_deployment_files(root):
 def test_local_deployment(mutable_config, mutable_mock_workspace_path):
 
     workspace_name = "test_local_deployment"
+    app_name = "namd"
+
     deployment_dir = ""
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
@@ -59,7 +61,7 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path):
         workspace(
             "manage",
             "experiments",
-            "gromacs",
+            app_name,
             "-v",
             "n_ranks=1",
             "-v",
@@ -80,7 +82,7 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path):
         deployment_dir = os.path.join(ws.root, "deployments")
         this_deployment_dir = os.path.join(deployment_dir, workspace_name)
 
-        check_deployment_files(this_deployment_dir)
+        check_deployment_files(this_deployment_dir, app_name)
 
     workspace_name = "test_local_pull"
     with ramble.workspace.create(workspace_name) as ws:
@@ -95,6 +97,6 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path):
         with open(config_path) as f:
             content = f.read()
             # Check that the app has a package, and the package is in an environment
-            assert "pkg_spec: gromacs" in content
+            assert f"pkg_spec: {app_name}" in content
 
-        check_deployment_files(ws.root)
+        check_deployment_files(ws.root, app_name)
