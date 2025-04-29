@@ -1680,8 +1680,22 @@ ramble:
             out_file = os.path.join(self.root, filename_base + file_extension)
             latest_file = os.path.join(self.root, latest_base + file_extension)
             results_written.append(out_file)
+
+            from ruamel.yaml import RoundTripDumper
+
+            class RambleSafeDumper(RoundTripDumper):
+
+                def ignore_aliases(self, _data):
+                    """Make the dumper NEVER print YAML aliases."""
+                    return True
+
+            def call_value(dumper, data):
+                return dumper.represent_data(data.value)
+
+            RambleSafeDumper.add_representer(ramble.experiment_result.ExperimentStatus, call_value)
+
             with open(out_file, "w+") as f:
-                syaml.dump(results, stream=f)
+                syaml.dump(results, stream=f, Dumper=RambleSafeDumper)
 
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)

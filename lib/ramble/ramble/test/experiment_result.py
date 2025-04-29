@@ -13,13 +13,15 @@ from ramble.experiment_result import ExperimentResult
 
 def test_to_dict(mutable_mock_apps_repo):
     basic_app_inst = mutable_mock_apps_repo.get("basic")
-    basic_app_inst.set_variables({"experiment_status": "Unknown", "test_var": "my_var"}, None)
+    basic_app_inst.set_variables({"experiment_status": "placeholder", "test_var": "my_var"}, None)
+    basic_app_inst.set_status("UNKNOWN")
     exp_res = ExperimentResult(basic_app_inst)
     res_dict = exp_res.to_dict()
+
     assert "name" in res_dict
     assert "application_name" in res_dict
-    assert res_dict["RAMBLE_STATUS"] == "Unknown"
-    assert res_dict["RAMBLE_RAW_VARIABLES"]["experiment_status"] == "Unknown"
+    assert res_dict["RAMBLE_STATUS"] == "FAILED"
+    assert res_dict["RAMBLE_RAW_VARIABLES"]["experiment_status"] == "UNKNOWN"
     assert "EXPERIMENT_CHAIN" in res_dict
     assert "CONTEXTS" in res_dict
     assert "TAGS" in res_dict

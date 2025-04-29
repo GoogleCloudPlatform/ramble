@@ -6,11 +6,28 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from enum import Enum
+
 from ramble.namespace import namespace
+
+
+# Can use auto() once we're at >= python 3.11
+class ExperimentStatus(str, Enum):
+    UNKNOWN = "UNKNOWN"
+    UNQUEUED = "UNQUEUED"
+    UNRESOLVED = "UNRESOLVED"  # unresolved means the status is not fetched successfully
+    SETUP = "SETUP"
+    SUBMITTED = "SUBMITTED"
+    RUNNING = "RUNNING"
+    COMPLETE = "COMPLETE"
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+    CANCELLED = "CANCELLED"
+    TIMEOUT = "TIMEOUT"
+
 
 _OUTPUT_MAPPING = {
     "name": "name",
-    "status": "RAMBLE_STATUS",
     namespace.n_repeats: "N_REPEATS",
     "keys": "keys",
     "contexts": "CONTEXTS",
@@ -29,7 +46,12 @@ class ExperimentResult:
     def __init__(self, app_inst):
         """Build up the result from the given app instance"""
         self.name = app_inst.expander.experiment_namespace
-        self.status = app_inst.get_status()
+
+        self.status = app_inst.get_ramble_status()
+
+        # Most libs can handle this str enum, but convert it to help out
+        self.status = self.status.value
+
         self.n_repeats = app_inst.repeats.n_repeats
         self.experiment_chain = app_inst.chain_order.copy()
         self.tags = list(app_inst.experiment_tags)

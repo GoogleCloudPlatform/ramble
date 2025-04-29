@@ -17,7 +17,6 @@ import stat
 import string
 import textwrap
 import time
-from enum import Enum
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -47,7 +46,7 @@ import ramble.util.stats
 import ramble.variants
 import ramble.workflow_manager
 from ramble.error import RambleError
-from ramble.experiment_result import ExperimentResult
+from ramble.experiment_result import ExperimentResult, ExperimentStatus
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.util import constants, conversions
@@ -61,24 +60,6 @@ from ramble.workspace import namespace
 import spack.util.compression
 import spack.util.executable
 import spack.util.spack_json
-
-experiment_status = Enum(
-    "experiment_status",
-    [
-        "UNKNOWN",
-        "UNQUEUED",
-        # unresolved means the status is not fetched successfully
-        "UNRESOLVED",
-        "SETUP",
-        "SUBMITTED",
-        "RUNNING",
-        "COMPLETE",
-        "SUCCESS",
-        "FAILED",
-        "CANCELLED",
-        "TIMEOUT",
-    ],
-)
 
 _NULL_CONTEXT = "null"
 
@@ -1496,7 +1477,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             experiment_script = workspace.experiments_script
             experiment_script.write(self.expander.expand_var("{batch_submit}\n"))
 
-        self.set_status(status=experiment_status.SETUP)
+        self.set_status(status=ExperimentStatus.SETUP)
 
     def _clean_hash_variables(self, workspace, variables):
         """Cleanup variables to hash before computing the hash
@@ -1728,7 +1709,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         injected in a workspace config.
         """
 
-        if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
+        if self.get_status() == ExperimentStatus.UNKNOWN and not workspace.dry_run:
             logger.warn(f"Experiment has status {self.get_status()}. Skipping analysis..\n")
             return
 
@@ -1854,16 +1835,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        status = experiment_status.SUCCESS if success else experiment_status.FAILED
+        status = self.get_status()
+        if status == ExperimentStatus.SUCCESS and not success:
+            status = ExperimentStatus.FAILED
+        elif success:
+            status = ExperimentStatus.SUCCESS
+
         # When workflow_manager is present, only use app_status when workflow is completed or
         # unresolved.
         if self.workflow_manager is not None:
             wm_status = self.workflow_manager.get_status(workspace)
             if not (
                 wm_status is None
-                or wm_status in [experiment_status.COMPLETE, experiment_status.UNRESOLVED]
+                or wm_status in [ExperimentStatus.COMPLETE, ExperimentStatus.UNRESOLVED]
             ):
                 status = wm_status
+
         self.set_status(status)
 
         self._init_result()
@@ -1973,20 +1960,20 @@ class ApplicationBase(metaclass=ApplicationMeta):
             exp_status_list.append(exp_inst.get_status())
 
         if workspace.repeat_success_strict:
-            if experiment_status.FAILED.name in exp_status_list:
+            if ExperimentStatus.FAILED in exp_status_list:
                 repeat_success = False
             else:
                 repeat_success = True
         else:
-            if experiment_status.SUCCESS.name in exp_status_list:
+            if ExperimentStatus.SUCCESS in exp_status_list:
                 repeat_success = True
             else:
                 repeat_success = False
 
         if repeat_success:
-            self.set_status(status=experiment_status.SUCCESS)
+            self.set_status(status=ExperimentStatus.SUCCESS)
         else:
-            self.set_status(status=experiment_status.FAILED)
+            self.set_status(status=ExperimentStatus.FAILED)
 
         self._init_result()
 
@@ -2006,7 +1993,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 continue
 
             # When strict success is off for repeats (loose success), skip failed exps
-            if exp_inst.result.status == experiment_status.FAILED.name:
+            if exp_inst.result.status == ExperimentStatus.FAILED:
                 continue
 
             if exp_inst.result.contexts:
@@ -2067,7 +2054,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 }
                 summary_foms.append(n_total_dict)
 
-                n_success = exp_status_list.count(experiment_status.SUCCESS.name)
+                n_success = exp_status_list.count(ExperimentStatus.SUCCESS)
+
                 n_success_dict = {
                     "value": n_success,
                     "units": "repeats",
@@ -2308,7 +2296,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         Set this experiment's status based on the status file in the experiment
         run directory, if it exists. If it doesn't exist, set its status to
-        experiment_status.UNKNOWN
+        ExperimentStatus.UNKNOWN
         """
         status_path = os.path.join(
             self.expander.expand_var_name(self.keywords.experiment_run_dir), self._status_file_name
@@ -2319,19 +2307,29 @@ class ApplicationBase(metaclass=ApplicationMeta):
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
-                self.variables[self.keywords.experiment_status] = status_data[
-                    self.keywords.experiment_status
-                ]
+                    self.set_status(ExperimentStatus(status_data[self.keywords.experiment_status]))
         else:
-            self.set_status(experiment_status.UNKNOWN)
+            self.set_status(ExperimentStatus.UNKNOWN)
 
-    def set_status(self, status=experiment_status.UNKNOWN):
+    def set_status(self, status=ExperimentStatus.UNKNOWN):
         """Set the status of this experiment"""
-        self.variables[self.keywords.experiment_status] = status.name
+        self.variables[self.keywords.experiment_status] = status
+        self.set_ramble_status(status)
 
     def get_status(self):
         """Get the status of this experiment"""
         return self.variables[self.keywords.experiment_status]
+
+    def get_ramble_status(self):
+        """Get the RAMBLE_STATUS of this experiment (boolifyied status)"""
+        return self.variables[self.keywords.RAMBLE_STATUS]
+
+    def set_ramble_status(self, status):
+        """Set the RAMBLE_STATUS (boolifyied status) of this experiment"""
+
+        self.variables[self.keywords.RAMBLE_STATUS] = status
+        if status != ExperimentStatus.SUCCESS:
+            self.variables[self.keywords.RAMBLE_STATUS] = ExperimentStatus.FAILED
 
     register_phase("write_status", pipeline="analyze", run_after=["analyze_experiments"])
     register_phase("write_status", pipeline="setup", run_after=["make_experiments"])
