@@ -461,10 +461,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         final_added_index = None
         if pipeline in self._pipeline_graphs:
             for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
-                for phase_filter in phase_filters:
-                    if fnmatch.fnmatch(phase.key, phase_filter):
-                        phases.add(phase)
-                        final_added_index = idx
+                if self.expander.satisfies(phase.when, variant_set=self.object_variants):
+                    for phase_filter in phase_filters:
+                        if fnmatch.fnmatch(phase.key, phase_filter):
+                            phases.add(phase)
+                            final_added_index = idx
 
         include_phase_deps = ramble.config.get("config:include_phase_dependencies")
         if include_phase_deps:
