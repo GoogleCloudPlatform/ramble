@@ -27,6 +27,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.maybeslow
 @pytest.mark.filterwarnings("ignore:invalid decimal literal")
 def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path):
     test_config = r"""
