@@ -275,7 +275,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
             obj_variants = getattr(obj, "object_variants", None)
             if obj_variants is not None:
-                self.object_variants.merge_multi_value_variants(getattr(obj, "object_variants"))
+                self.object_variants.merge_multi_value_variants(obj_variants)
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
@@ -887,6 +887,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if not mod_inst.disabled:
                 mod_inst.inherit_from_application(self)
                 mod_inst.modify_experiment(self)
+                mod_inst.set_modifier_variants()
             else:
                 mod_inst = ramble.modifier_types.disabled.DisabledModifier(mod_inst)
 
@@ -895,11 +896,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
             # Add this modifiers required variables for validation
             self.keywords.update_keys(mod_inst.get_required_variables())
 
-        # Ensure no expand vars are set correctly for modifiers
         for mod_inst in self._modifier_instances:
+            # Ensure no expand vars are set correctly for modifiers
             for var in mod_inst.no_expand_vars():
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
+
+            # Set standard variants for all modifiers
+            obj_variants = getattr(mod_inst, "object_variants", None)
+            if obj_variants is not None:
+                self.object_variants.merge_multi_value_variants(obj_variants)
 
     def validate_experiment(self, warn_validation=True, die_on_validate_error=True):
         # Validate the new modifiers variables exist

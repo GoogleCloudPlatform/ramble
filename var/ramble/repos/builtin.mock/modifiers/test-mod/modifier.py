@@ -59,6 +59,12 @@ class TestMod(BasicModifier):
         when=["package_manager_family=spack"],
     )
 
+    software_spec(
+        "mod_mode_spec",
+        pkg_spec="mod_mode_pkg@2.1",
+        when=["test-mod_mode=exp-scope"],
+    )
+
     fom_regex = r"(?P<context>fom_context)(?P<fom>.*)"
 
     figure_of_merit(

@@ -45,7 +45,7 @@ shared_directive = SharedMeta.directive
 
 
 @shared_directive("archive_patterns")
-def archive_pattern(pattern):
+def archive_pattern(pattern, **kwargs):
     """Adds a file pattern to be archived in addition to figure of merit logs
 
     Defines a new file pattern that will be archived during workspace archival.
@@ -63,7 +63,7 @@ def archive_pattern(pattern):
 
 
 @shared_directive("figure_of_merit_contexts")
-def figure_of_merit_context(name, regex, output_format):
+def figure_of_merit_context(name, regex, output_format, **kwargs):
     """Defines a context for figures of merit
 
     Defines a new context to contain figures of merit.
@@ -91,6 +91,7 @@ def figure_of_merit(
     units="",
     contexts=None,
     fom_type: FomType = FomType.UNDEFINED,
+    **kwargs,
 ):
     """Adds a figure of merit to track for this object
 
@@ -123,7 +124,7 @@ def figure_of_merit(
 
 @shared_directive("compilers")
 def define_compiler(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None
+    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
 ):
     """Defines the compiler that will be used with this object
 
@@ -163,7 +164,7 @@ def define_compiler(
 
 @shared_directive("software_specs")
 def software_spec(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None
+    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
 ):
     """Defines a new software spec needed for this object.
 
@@ -243,7 +244,7 @@ def package_manager_config(name, config, package_manager=None, when=None, **kwar
 
 
 @shared_directive("required_packages")
-def required_package(name, package_manager=None, when=None):
+def required_package(name, package_manager=None, when=None, **kwargs):
     """Defines a new spack package that is required for this object
     to function properly.
 
@@ -279,6 +280,7 @@ def success_criteria(
     fom_context="null",
     formula=None,
     anti_match=None,
+    **kwargs,
 ):
     """Defines a success criteria used by experiments of this object
 
@@ -323,7 +325,7 @@ def success_criteria(
 
 @shared_directive("builtins")
 def register_builtin(
-    name, required=True, injection_method="prepend", depends_on=None, dependents=None
+    name, required=True, injection_method="prepend", depends_on=None, dependents=None, **kwargs
 ):
     """Register a builtin
 
@@ -417,7 +419,7 @@ def register_builtin(
 
 
 @shared_directive("phase_definitions")
-def register_phase(name, pipeline=None, run_before=None, run_after=None):
+def register_phase(name, pipeline=None, run_before=None, run_after=None, **kwargs):
     """Register a phase
 
     Phases are portions of a pipeline that will execute when
@@ -494,7 +496,7 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None):
 
 
 @shared_directive(dicts=())
-def maintainers(*names: str):
+def maintainers(*names: str, **kwargs):
     """Add a new maintainer directive, to specify maintainers in a declarative way.
 
     Args:
@@ -511,7 +513,7 @@ def maintainers(*names: str):
 
 
 @shared_directive(dicts=())
-def tags(*values: str):
+def tags(*values: str, **kwargs):
     """Add a new tag directive, to specify tags in a declarative way.
 
     Args:
@@ -528,7 +530,7 @@ def tags(*values: str):
 
 
 @shared_directive(dicts=())
-def target_shells(shell_support_pattern=None):
+def target_shells(shell_support_pattern=None, **kwargs):
     """Directive to specify supported shells.
 
     If not specified, i.e., not directly specified or inherited from the base,
@@ -555,6 +557,7 @@ def register_template(
     extra_vars: Optional[dict] = None,
     extra_vars_func: Optional[str] = None,
     output_perm=None,
+    **kwargs,
 ):
     """Directive to define an object-specific template to be rendered into experiment run_dir.
 
@@ -604,7 +607,12 @@ def register_template(
 
 @shared_directive("formatted_executables")
 def formatted_executable(
-    name: str, commands: list, prefix: str = "", indentation: int = 0, join_separator: str = "\n"
+    name: str,
+    commands: list,
+    prefix: str = "",
+    indentation: int = 0,
+    join_separator: str = "\n",
+    **kwargs,
 ):
     """Define a new formatted execution for this object
 
@@ -627,7 +635,13 @@ def formatted_executable(
 
 
 @shared_directive("validators")
-def register_validator(name: str, predicate: str, message: str, fail_on_invalid: bool = True):
+def register_validator(
+    name: str,
+    predicate: str,
+    message: str,
+    fail_on_invalid: bool = True,
+    **kwargs,
+):
     """Directive to define a validator for the object.
 
     Args:
@@ -656,6 +670,7 @@ def variant(
     default: Optional[Any] = None,
     description: str = "",
     values: Optional[Union[collections.abc.Sequence, Callable[[Any], bool]]] = None,
+    **kwargs,
 ):
 
     def _define_variant(obj):

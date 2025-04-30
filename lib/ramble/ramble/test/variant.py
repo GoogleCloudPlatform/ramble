@@ -15,7 +15,7 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
+    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo", "mock_modifiers"
 )
 
 config = RambleCommand("config")
@@ -229,3 +229,62 @@ def test_non_matched_variants_are_ignored(request):
             data = f.read()
 
             assert "zlib" not in data
+
+
+@pytest.mark.parametrize(
+    "test_name,mode,expected_spec",
+    [
+        ("when_modifier", "test", "zlib@1.2.13"),
+        ("when_modifier_mode", "exp-scope", "mod_mode_pkg@2.1"),
+    ],
+)
+def test_modifier_variants_works_with_when(
+    test_name,
+    mode,
+    expected_spec,
+    mutable_mock_workspace_path,
+    mutable_mock_apps_repo,
+    mock_modifiers,
+):
+    workspace_name = test_name
+    global_args = ["-w", workspace_name]
+
+    test_config = f"""
+ramble:
+  variants:
+    package_manager: spack
+    zlib_type: modifier
+    inc_zlib: true
+  variables:
+    mpi_command: ''
+    batch_submit: 'batch_submit {{execute_experiment}}'
+    processes_per_node: 1
+  applications:
+    when-variants:
+      workloads:
+        test_wl:
+          experiments:
+            test:
+              variables:
+                n_ranks: 1
+                n_nodes: 1
+                processes_per_node: 1
+  modifiers:
+  - name: test-mod
+    mode: {mode}
+"""
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, "w+") as f:
+            f.write(test_config)
+
+        ws._re_read()
+        workspace("concretize", "-f", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert expected_spec in data
