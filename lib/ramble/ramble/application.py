@@ -1045,9 +1045,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             self._env_variable_sets.append({"set": new_env_vars})
 
-    def _define_commands(
-        self, exec_graph, success_list=ramble.success_criteria.ScopedCriteriaList()
-    ):
+    def _define_commands(self, exec_graph, success_list=None):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -1058,6 +1056,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._command_list = []
         self._command_list_without_logs = []
+
+        if success_list is None:
+            success_list = ramble.success_criteria.ScopedCriteriaList()
 
         # Inject all prepended chained experiments
         for chained_exp in self.chain_prepend:
