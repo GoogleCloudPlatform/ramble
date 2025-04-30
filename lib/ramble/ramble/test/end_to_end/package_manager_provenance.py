@@ -20,6 +20,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.maybeslow
 def test_spack_package_manager_provenance_zlib(mock_applications, request):
     workspace_name = request.node.name
 

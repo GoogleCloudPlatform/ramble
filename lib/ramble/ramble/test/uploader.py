@@ -36,6 +36,7 @@ def test_upload_results_errs(upload_uri, upload_type, results, expected_err_msg)
             upload_results(results)
 
 
+@pytest.mark.maybeslow
 def test_data_preparation(request, mock_applications):
     ws_name = request.node.name
 

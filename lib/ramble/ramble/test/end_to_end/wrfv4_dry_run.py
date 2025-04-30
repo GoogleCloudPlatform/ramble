@@ -315,6 +315,7 @@ compilers:
                 assert os.path.exists(os.path.join(exp_dir, f"rsl.error.000{i}"))
 
 
+@pytest.mark.maybeslow
 def test_wrfv4_no_pkg_man_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:

@@ -58,6 +58,7 @@ def test_gcsfetchstrategy_downloaded(tmpdir, _fetch_method):
             fetcher.fetch()
 
 
+@pytest.mark.network
 @pytest.mark.parametrize("_fetch_method", ["curl", "urllib"])
 def test_gcsfetchstrategy_download(tmpdir, _fetch_method):
     """Ensure fetch of fie."""

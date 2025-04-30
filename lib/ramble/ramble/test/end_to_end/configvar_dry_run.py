@@ -21,6 +21,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.maybeslow
 def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path):
     test_scopes = ["site", "system", "user"]
 

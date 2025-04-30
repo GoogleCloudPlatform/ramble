@@ -23,6 +23,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
+@pytest.mark.maybeslow
 def test_chained_experiment_variant_propagation(request):
     test_config = r"""
 ramble:
