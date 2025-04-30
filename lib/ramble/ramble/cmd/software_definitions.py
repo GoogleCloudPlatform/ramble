@@ -13,7 +13,8 @@ from llnl.util.tty.colify import colify
 
 import ramble.repository
 import ramble.software_environments
-from ramble.util.spec_utils import specs_equiv
+from ramble.util.logger import logger
+from ramble.util.spec_utils import specs_conflict
 
 description = "inspect software definitions in object definitions"
 section = "developer"
@@ -68,25 +69,29 @@ def collect_definitions():
 
             for top_level_attr in top_level_attrs:
                 if hasattr(obj_inst, top_level_attr):
-                    for pkg_name, pkg_def in getattr(obj_inst, top_level_attr).items():
-                        if pkg_name not in definitions:
-                            definitions[pkg_name] = pkg_def.copy()
-                            used_by[pkg_name] = [obj_namespace]
-                        else:
-                            if not specs_equiv(definitions[pkg_name], pkg_def):
-                                if pkg_name not in conflicts:
-                                    conflicts[pkg_name] = []
-                                conflicts[pkg_name].append(obj_namespace)
+                    for pkg_name, pkg_defs in getattr(obj_inst, top_level_attr).items():
+                        for pkg_def in pkg_defs:
+                            if pkg_name not in definitions:
+                                definitions[pkg_name] = pkg_def.copy()
+                                used_by[pkg_name] = [obj_namespace]
                             else:
-                                used_by[pkg_name].append(obj_namespace)
+                                logger.debug(f" Checking package: {pkg_name}")
+                                if specs_conflict(
+                                    definitions[pkg_name], pkg_def, skip_conflicting_when=True
+                                ):
+                                    if pkg_name not in conflicts:
+                                        conflicts[pkg_name] = []
+                                    conflicts[pkg_name].append(obj_namespace)
+                                else:
+                                    used_by[pkg_name].append(obj_namespace)
 
-                        for spec_name in specs:
-                            if spec_name in pkg_def:
-                                spec_def = pkg_def[spec_name]
-                                if spec_def:
-                                    if spec_def not in specs[spec_name]:
-                                        specs[spec_name][spec_def] = []
-                                    specs[spec_name][spec_def].append(obj_namespace)
+                            for spec_name in specs:
+                                if spec_name in pkg_def:
+                                    spec_def = pkg_def[spec_name]
+                                    if spec_def:
+                                        if spec_def not in specs[spec_name]:
+                                            specs[spec_name][spec_def] = []
+                                        specs[spec_name][spec_def].append(obj_namespace)
 
 
 def print_summary():

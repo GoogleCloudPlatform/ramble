@@ -31,12 +31,12 @@ class Gromacs(ExecutableApplication):
 
         with default_args(compiler="gcc9"):
             software_spec(
-                "spack_gromacs",
+                "gromacs",
                 pkg_spec="gromacs@2020.5",
             )
 
     software_spec(
-        "eessi_gromacs",
+        "gromacs",
         pkg_spec="GROMACS/2024.1-foss-2023b",
         when=["package_manager_family=eessi"],
     )

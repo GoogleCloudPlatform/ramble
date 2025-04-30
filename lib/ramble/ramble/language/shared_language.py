@@ -151,12 +151,17 @@ def define_compiler(
                 "transition this to use the `when` argument instead."
             )
 
-        obj.compilers[name] = {
-            "pkg_spec": pkg_spec,
-            "compiler_spec": compiler_spec,
-            "compiler": compiler,
-            "when": when_list,
-        }
+        if name not in obj.compilers:
+            obj.compilers[name] = []
+
+        obj.compilers[name].append(
+            {
+                "pkg_spec": pkg_spec,
+                "compiler_spec": compiler_spec,
+                "compiler": compiler,
+                "when": when_list,
+            }
+        )
 
     return _execute_define_compiler
 
@@ -197,13 +202,18 @@ def software_spec(
                 "transition this to use the `when` argument instead."
             )
 
+        if name not in obj.software_specs:
+            obj.software_specs[name] = []
+
         # Define the spec
-        obj.software_specs[name] = {
-            "pkg_spec": pkg_spec,
-            "compiler_spec": compiler_spec,
-            "compiler": compiler,
-            "when": when_list,
-        }
+        obj.software_specs[name].append(
+            {
+                "pkg_spec": pkg_spec,
+                "compiler_spec": compiler_spec,
+                "compiler": compiler,
+                "when": when_list,
+            }
+        )
 
     return _execute_software_spec
 

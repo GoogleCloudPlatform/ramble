@@ -7,33 +7,23 @@
 # except according to those terms.
 
 
-def specs_equiv(spec1, spec2):
-    all_keys = set()
-    for key in spec1.keys():
-        if spec1[key] is not None:
-            all_keys.add(key)
-    for key in spec2.keys():
-        if spec2[key] is not None:
-            all_keys.add(key)
+def specs_conflict(new, existing, prefix="", skip_conflicting_when=False):
+    # Short circuit check if when clauses conflict
+    # (so specs should not be applied at the same time)
+    # Used for printing conflicting software specs.
+    if skip_conflicting_when:
+        new_when = set(new["when"]) if "when" in new else None
+        existing_when = set(existing["when"]) if "when" in existing else None
 
-    if "application_name" in all_keys:
-        all_keys.remove("application_name")
-
-    if "spec_type" in all_keys:
-        all_keys.remove("spec_type")
-
-    if "package_manager" in all_keys:
-        all_keys.remove("package_manager")
-
-    if "when" in all_keys:
-        all_keys.remove("when")
-
-    for key in all_keys:
-        if key not in spec1:
-            return False
-        if key not in spec2:
-            return False
-        if spec1[key] != spec2[key]:
+        if new_when != existing_when:
             return False
 
-    return True
+    prefixed_keys = {}
+    for key in new.keys():
+        if new[key] is not None:
+            prefixed_keys[key] = f"{prefix}{key}"
+
+    for in_key, out_key in prefixed_keys.items():
+        if out_key in existing and new[in_key] != existing[out_key]:
+            return True
+    return False
