@@ -1395,6 +1395,7 @@ ramble:
 
         packages_dict = full_software_dict[namespace.packages]
         environments_dict = full_software_dict[namespace.environments]
+        newly_created_packages = set()
 
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
 
@@ -1432,8 +1433,8 @@ ramble:
                         )
                         if keep_comp:
                             if (
-                                comp in packages_dict
-                                and not quiet
+                                not quiet
+                                and comp in packages_dict
                                 and specs_conflict(info, packages_dict[comp], prefix=spec_prefix)
                             ):
                                 logger.debug(f"  Spec 1: {str(info)}")
@@ -1443,7 +1444,10 @@ ramble:
                                     "in multiple conflicting ways"
                                 )
 
-                            if comp not in packages_dict:
+                            if comp not in packages_dict or (
+                                force and comp not in newly_created_packages
+                            ):
+                                newly_created_packages.add(comp)
                                 packages_dict[comp] = syaml.syaml_dict()
 
                             packages_dict[comp][f"{spec_prefix}pkg_spec"] = info["pkg_spec"]
@@ -1492,8 +1496,8 @@ ramble:
                         if keep_pkg:
                             logger.debug(f"    Found spec: {spec_name}")
                             if (
-                                spec_name in packages_dict
-                                and not quiet
+                                not quiet
+                                and spec_name in packages_dict
                                 and specs_conflict(
                                     info, packages_dict[spec_name], prefix=spec_prefix
                                 )
@@ -1505,7 +1509,9 @@ ramble:
                                     "conflicting ways"
                                 )
 
-                            if spec_name not in packages_dict:
+                            if spec_name not in packages_dict or (
+                                force and spec_name not in newly_created_packages
+                            ):
                                 packages_dict[spec_name] = syaml.syaml_dict()
 
                             packages_dict[spec_name][f"{spec_prefix}pkg_spec"] = info["pkg_spec"]

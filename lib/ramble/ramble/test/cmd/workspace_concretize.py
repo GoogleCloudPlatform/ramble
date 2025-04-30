@@ -32,7 +32,7 @@ def test_workspace_concretize_additive(request):
 
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "spack_gromacs" in content
+        assert "gromacs" in content
         assert "gcc9" in content
         assert "wrfv4" not in content
         assert "intel-oneapi-vtune" not in content
@@ -42,7 +42,7 @@ def test_workspace_concretize_additive(request):
 
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "spack_gromacs" in content
+        assert "gromacs" in content
         assert "gcc9" in content
         assert "wrfv4" in content
         assert "intel-oneapi-vtune" not in content
@@ -59,7 +59,7 @@ def test_workspace_concretize_additive(request):
 
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "spack_gromacs" in content
+        assert "gromacs" in content
         assert "gcc9" in content
         assert "wrfv4" in content
         assert "intel-oneapi-vtune" in content

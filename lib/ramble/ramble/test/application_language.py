@@ -182,7 +182,7 @@ def add_input_file(app_inst, input_num=1):
 # TODO: can this be dried with the modifier language add_compiler?
 @deprecation.fail_if_not_removed
 def add_compiler(app_inst, spec_num=1):
-    spec_name = "Compiler%spec_num"
+    spec_name = f"Compiler{spec_num}"
     spec_pkg_spec = f"compiler_base@{spec_num}.0 +var1 ~var2"
     spec_compiler_spec = "compiler1_base@{spec_num}"
 
@@ -193,7 +193,7 @@ def add_compiler(app_inst, spec_num=1):
         spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
     )
 
-    spec_name = "OtherCompiler%spec_num"
+    spec_name = f"OtherCompiler{spec_num}"
     spec_pkg_spec = f"compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64"
     spec_compiler_spec = "compiler2_base@{spec_num}"
 
@@ -207,7 +207,7 @@ def add_compiler(app_inst, spec_num=1):
 
 
 def add_software_spec(app_inst, spec_num=1):
-    spec_name = "NoMPISpec%s" % spec_num
+    spec_name = f"NoMPISpec{spec_num}"
     spec_pkg_spec = f"NoMPISpec@{spec_num} +var1 ~var2 target=x86_64"
     spec_compiler = "spec_compiler1@1.1"
 
@@ -216,7 +216,7 @@ def add_software_spec(app_inst, spec_num=1):
 
     app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)  # noqa: F405
 
-    spec_name = "MPISpec%s" % spec_num
+    spec_name = f"MPISpec{spec_num}"
     spec_pkg_spec = f"MPISpec@{spec_num} +var1 ~var2 target=x86_64"
     spec_compiler = "spec_compiler1@1.1"
 
@@ -307,8 +307,10 @@ def test_define_compiler_directive(app_class):
     assert hasattr(app_inst, "compilers")
     for name, info in test_defs.items():
         assert name in app_inst.compilers
+        print(app_inst.compilers.keys())
+        assert len(app_inst.compilers[name]) == 1
         for key, value in info.items():
-            assert app_inst.compilers[name][key] == value
+            assert app_inst.compilers[name][0][key] == value
 
 
 @pytest.mark.parametrize("app_class", app_types)
@@ -323,4 +325,4 @@ def test_software_spec_directive(app_class):
     for name, info in test_defs.items():
         assert name in app_inst.software_specs
         for key, value in info.items():
-            assert app_inst.software_specs[name][key] == value
+            assert app_inst.software_specs[name][0][key] == value
