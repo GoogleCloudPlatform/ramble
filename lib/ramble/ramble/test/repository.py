@@ -69,23 +69,23 @@ def test_repo_unknown_app(mutable_mock_apps_repo):
             "openfoam-org",
             ramble.repository.ObjectTypes.applications,
             [
-                ("applications", "openfoam-org/application.py"),
-                ("base_applications", "openfoam/base_application.py"),
+                ("applications", "openfoam-org/application.py", "builtin"),
+                ("base_applications", "openfoam/base_application.py", "builtin"),
             ],
         ),
         (
             "lscpu",
             ramble.repository.ObjectTypes.modifiers,
             [
-                ("modifiers", "lscpu/modifier.py"),
+                ("modifiers", "lscpu/modifier.py", "builtin"),
             ],
         ),
         (
             "spack",
             ramble.repository.ObjectTypes.package_managers,
             [
-                ("package_managers", "spack/package_manager.py"),
-                ("package_managers", "spack-lightweight/package_manager.py"),
+                ("package_managers", "spack/package_manager.py", "builtin"),
+                ("package_managers", "spack-lightweight/package_manager.py", "builtin"),
             ],
         ),
     ],
@@ -108,8 +108,10 @@ def test_list_object_files(
     actual = ramble.repository.list_object_files(obj_inst, obj_type)
     assert len(expected) == len(actual)
     for i in range(len(expected)):
+        assert len(expected[i]) == len(actual[i])
         assert expected[i][0] == actual[i][0]
         assert actual[i][1].endswith(expected[i][1])
+        assert expected[i][2] == actual[i][2]
 
 
 #

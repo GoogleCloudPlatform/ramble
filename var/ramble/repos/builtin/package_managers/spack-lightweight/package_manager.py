@@ -452,11 +452,19 @@ class SpackLightweight(PackageManagerBase):
             self.runner.set_env(env_path)
             self.runner.activate()
 
-            repo_path = os.path.join(workspace.named_deployment, "object_repo")
+            # Hard-code a repo.yaml for spack packages
+            # TODO: Put spack packages based on their original namespaces
+            repo_root = os.path.join(
+                workspace.deployment_repos_dir, "spack", "obj_repo"
+            )
+            fs.mkdirp(repo_root)
+            with open(os.path.join(repo_root, "repo.yaml"), "w+") as f:
+                f.write("repo:\n")
+                f.write("  namespace: obj_repo\n")
 
-            for pkg, pkg_def in self.runner.package_definitions():
+            for _, pkg_def in self.runner.package_definitions():
                 pkg_dir_name = os.path.basename(os.path.dirname(pkg_def))
-                pkg_dir = os.path.join(repo_path, "packages", pkg_dir_name)
+                pkg_dir = os.path.join(repo_root, "packages", pkg_dir_name)
                 fs.mkdirp(pkg_dir)
                 shutil.copyfile(pkg_def, os.path.join(pkg_dir, "package.py"))
 

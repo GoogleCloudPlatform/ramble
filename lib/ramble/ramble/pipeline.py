@@ -657,7 +657,7 @@ class PushDeploymentPipeline(Pipeline):
     index_filename = "index.json"
     index_namespace = "deployment_files"
     tar_extension = ".tar.gz"
-    object_repo_name = "object_repo"
+    legacy_object_repo_name = "object_repo"
 
     def __init__(
         self, workspace, filters, create_tar=False, upload_url=None, deployment_name=None
@@ -693,15 +693,6 @@ class PushDeploymentPipeline(Pipeline):
 
         aux_software_dir = os.path.join(configs_dir, ramble.workspace.auxiliary_software_dir_name)
         fs.mkdirp(aux_software_dir)
-
-        repo_path = os.path.join(self.workspace.named_deployment, self.object_repo_name)
-        for object_type_def in ramble.repository.type_definitions.values():
-            fs.mkdirp(os.path.join(repo_path, object_type_def["dir_name"]))
-
-        # Write out only to the unified repo.yaml
-        with open(os.path.join(repo_path, ramble.repository.unified_config), "w+") as f:
-            f.write("repo:\n")
-            f.write(f"  namespace: deployment_{self.deployment_name}\n")
 
         super()._execute()
 
