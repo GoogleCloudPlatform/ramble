@@ -1115,7 +1115,7 @@ class Repo:
         """Check for a YAML config file in this db's root directory."""
         try:
             with open(self.config_file) as reponame_file:
-                yaml_data = yaml.load(reponame_file)
+                yaml_data = yaml.safe_load(reponame_file)
 
                 if (
                     not yaml_data
