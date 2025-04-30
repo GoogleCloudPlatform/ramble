@@ -35,6 +35,20 @@ def setup_parser(subparser):
         help="show full pytest help, with advanced options",
     )
 
+    limited = subparser.add_mutually_exclusive_group()
+    limited.add_argument(
+        "--lib",
+        action="store_true",
+        default=False,
+        help="run only tests under the lib directory",
+    )
+    limited.add_argument(
+        "--obj",
+        action="store_true",
+        default=False,
+        help="run only tests under the builtin object repo directory",
+    )
+
     # extra ramble arguments to list tests
     list_group = subparser.add_argument_group("listing tests")
     list_mutex = list_group.add_mutually_exclusive_group()
@@ -174,6 +188,10 @@ def add_back_pytest_args(args, unknown_args):
     they show up in the short help, so we have to reassemble things here.
     """
     result = args.parsed_args or []
+    if args.lib:
+        result += ["--ignore-glob", "var/ramble/repos/*"]
+    elif args.obj:
+        result += ["--ignore-glob", "lib/ramble/ramble/test/*"]
     result += unknown_args or []
     result += args.pytest_args or []
     if args.expression:
