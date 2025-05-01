@@ -310,7 +310,7 @@ def test_define_compiler_directive(app_class):
         print(app_inst.compilers.keys())
         assert len(app_inst.compilers[name]) == 1
         for key, value in info.items():
-            assert app_inst.compilers[name][0][key] == value
+            assert getattr(app_inst.compilers[name][0], key) == value
 
 
 @pytest.mark.parametrize("app_class", app_types)
@@ -325,4 +325,4 @@ def test_software_spec_directive(app_class):
     for name, info in test_defs.items():
         assert name in app_inst.software_specs
         for key, value in info.items():
-            assert app_inst.software_specs[name][0][key] == value
+            assert getattr(app_inst.software_specs[name][0], key) == value

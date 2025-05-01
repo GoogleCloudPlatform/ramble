@@ -16,6 +16,7 @@ import ramble.success_criteria
 import ramble.variants
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
+from ramble.util.spec_utils import SoftwareSpec
 
 """This module contains directives directives that are shared between multiple object types
 
@@ -155,12 +156,9 @@ def define_compiler(
             obj.compilers[name] = []
 
         obj.compilers[name].append(
-            {
-                "pkg_spec": pkg_spec,
-                "compiler_spec": compiler_spec,
-                "compiler": compiler,
-                "when": when_list,
-            }
+            SoftwareSpec(
+                name, pkg_spec, compiler=compiler, compiler_spec=compiler_spec, when=when_list
+            )
         )
 
     return _execute_define_compiler
@@ -207,12 +205,9 @@ def software_spec(
 
         # Define the spec
         obj.software_specs[name].append(
-            {
-                "pkg_spec": pkg_spec,
-                "compiler_spec": compiler_spec,
-                "compiler": compiler,
-                "when": when_list,
-            }
+            SoftwareSpec(
+                name, pkg_spec, compiler=compiler, compiler_spec=compiler_spec, when=when_list
+            )
         )
 
     return _execute_software_spec

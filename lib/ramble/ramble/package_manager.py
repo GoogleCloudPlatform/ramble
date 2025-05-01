@@ -114,7 +114,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
             for definitions in app_inst.software_specs.values():
                 for info in definitions:
                     if self.app_inst.expander.satisfies(
-                        info["when"], variant_set=self.object_variants
+                        info.when, variant_set=self.object_variants
                     ):
                         return True
 

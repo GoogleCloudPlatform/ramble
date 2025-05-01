@@ -261,6 +261,8 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                                 escaped_sub_val = sub_val.replace("@", "@@")
                                 color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
                         color.cprint("")
+                    elif hasattr(val, "as_str"):
+                        color.cprint(f"{val.as_str()}")
                     else:
                         color.cprint(f"{str(val)}")
         # If the attribute is not a dict, print using the existing format rules.

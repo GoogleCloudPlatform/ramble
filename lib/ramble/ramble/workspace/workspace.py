@@ -46,7 +46,6 @@ from ramble.util import constants
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
-from ramble.util.spec_utils import specs_conflict
 
 import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
@@ -1415,7 +1414,7 @@ ramble:
             env_name = app_inst.expander.expand_var(env_name_str)
 
             spec_prefix = (
-                f"{app_inst.package_manager.spec_prefix()}_" if len(pkgman_prefixes) > 1 else ""
+                f"{app_inst.package_manager.spec_prefix()}" if len(pkgman_prefixes) > 1 else ""
             )
 
             if app_inst.package_manager is None:
@@ -1429,13 +1428,13 @@ ramble:
                 for comp, definitions in compiler_dict.items():
                     for info in definitions:
                         keep_comp = app_inst.expander.satisfies(
-                            info["when"], variant_set=app_inst.object_variants
+                            info.when, variant_set=app_inst.object_variants
                         )
                         if keep_comp:
                             if (
                                 not quiet
                                 and comp in packages_dict
-                                and specs_conflict(info, packages_dict[comp], prefix=spec_prefix)
+                                and info.conflict_dict(packages_dict[comp])
                             ):
                                 logger.debug(f"  Spec 1: {str(info)}")
                                 logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
@@ -1450,32 +1449,9 @@ ramble:
                                 newly_created_packages.add(comp)
                                 packages_dict[comp] = syaml.syaml_dict()
 
-                            packages_dict[comp][f"{spec_prefix}pkg_spec"] = info["pkg_spec"]
-                            ramble.config.add(
-                                f"software:packages:{comp}:"
-                                + f'{spec_prefix}pkg_spec:{info["pkg_spec"]}',
-                                scope=self.ws_file_config_scope_name(),
-                            )
-                            if "compiler_spec" in info and info["compiler_spec"]:
-                                packages_dict[comp][f"{spec_prefix}compiler_spec"] = info[
-                                    "compiler_spec"
-                                ]
-                                config_path = (
-                                    f"software:packages:{comp}:"
-                                    + f'{spec_prefix}compiler_spec:{info["compiler_spec"]}'
-                                )
-                                ramble.config.add(
-                                    config_path, scope=self.ws_file_config_scope_name()
-                                )
-                            if "compiler" in info and info["compiler"]:
-                                packages_dict[comp][f"{spec_prefix}compiler"] = info["compiler"]
-                                config_path = (
-                                    f"software:packages:{comp}:"
-                                    + f"{spec_prefix}compiler:{info['compiler']}"
-                                )
-                                ramble.config.add(
-                                    config_path, scope=self.ws_file_config_scope_name()
-                                )
+                            packages_dict[comp].update(info.to_dict(prefix=spec_prefix))
+                            for conf in info.config_opts():
+                                ramble.config.add(conf, scope=self.ws_file_config_scope_name())
 
             logger.debug(f"Trying to define packages for {env_name}")
             app_packages = []
@@ -1491,16 +1467,14 @@ ramble:
                 for spec_name, definitions in software_dict.items():
                     for info in definitions:
                         keep_pkg = app_inst.expander.satisfies(
-                            info["when"], variant_set=app_inst.object_variants
+                            info.when, variant_set=app_inst.object_variants
                         )
                         if keep_pkg:
                             logger.debug(f"    Found spec: {spec_name}")
                             if (
                                 not quiet
                                 and spec_name in packages_dict
-                                and specs_conflict(
-                                    info, packages_dict[spec_name], prefix=spec_prefix
-                                )
+                                and info.conflict_dict(packages_dict[spec_name])
                             ):
                                 logger.debug(f"  Spec 1: {str(info)}")
                                 logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
@@ -1514,15 +1488,7 @@ ramble:
                             ):
                                 packages_dict[spec_name] = syaml.syaml_dict()
 
-                            packages_dict[spec_name][f"{spec_prefix}pkg_spec"] = info["pkg_spec"]
-                            if "compiler_spec" in info and info["compiler_spec"]:
-                                packages_dict[spec_name][f"{spec_prefix}compiler_spec"] = info[
-                                    "compiler_spec"
-                                ]
-                            if "compiler" in info and info["compiler"]:
-                                packages_dict[spec_name][f"{spec_prefix}compiler"] = info[
-                                    "compiler"
-                                ]
+                            packages_dict[spec_name].update(info.to_dict(prefix=spec_prefix))
 
                             if spec_name not in app_packages:
                                 app_packages.append(spec_name)
