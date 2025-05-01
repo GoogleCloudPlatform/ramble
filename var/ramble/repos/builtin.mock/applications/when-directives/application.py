@@ -24,13 +24,13 @@ class WhenDirectives(ExecutableApplication):
         )
 
     variant(
-        "when_phase",
+        "register_phase_when",
         default=False,
         values=[True, False],
         description="Register additional phase using when",
     )
 
-    with when("+when_phase"):
+    with when("+register_phase_when"):
         register_phase(
             "test_phase",
             pipeline="setup",

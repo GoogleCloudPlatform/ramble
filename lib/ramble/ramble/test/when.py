@@ -11,9 +11,7 @@ import pytest
 import ramble.workspace
 from ramble.main import RambleCommand
 
-pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo", "mock_modifiers"
-)
+pytestmark = pytest.mark.usefixtures("mutable_mock_workspace_path", "mutable_mock_apps_repo")
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
@@ -40,9 +38,17 @@ def test_register_phase_when(request):
             global_args=global_args,
         )
 
-        config("add", "variants:when_phase:true", global_args=global_args)
+        config("add", "variants:register_phase_when:true", global_args=global_args)
 
         ws._re_read()
         output = workspace("setup", "--dry-run", global_args=global_args)
 
         assert "Test Phase" in output
+
+        config("remove", "variants:register_phase_when:true", global_args=global_args)
+        config("add", "variants:register_phase_when:false", global_args=global_args)
+
+        ws._re_read()
+        output = workspace("setup", "--dry-run", global_args=global_args)
+
+        assert "Test Phase" not in output
