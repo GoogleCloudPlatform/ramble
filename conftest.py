@@ -720,6 +720,31 @@ def pytest_generate_tests(metafunc):
 
         metafunc.parametrize("mock_package_managers", all_package_managers)
 
+    if "workflow_manager" in metafunc.fixturenames:
+        from ramble.main import RambleCommand
+
+        list_cmd = RambleCommand("list")
+
+        all_workflow_managers = ["None"]
+        repo_pms = list_cmd("--type", "workflow_managers").split("\n")
+
+        for pm_str in repo_pms:
+            m = name_regex.match(pm_str)
+            if m:
+                all_workflow_managers.append(m.group("name"))
+
+        metafunc.parametrize("workflow_manager", all_workflow_managers)
+
+    if "mock_workflow_managers" in metafunc.fixturenames:
+        obj_type = ramble.repository.ObjectTypes.workflow_managers
+        repo_path = ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+        all_workflow_managers = ["None"]
+        for mod_name in repo_path.all_object_names():
+            all_workflow_managers.append(mod_name)
+
+        metafunc.parametrize("mock_workflow_managers", all_workflow_managers)
+
     if "config_section" in metafunc.fixturenames:
         from ramble.main import RambleCommand
 

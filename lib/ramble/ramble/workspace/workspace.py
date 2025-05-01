@@ -1115,6 +1115,7 @@ ramble:
         variable_definitions,
         experiment_name,
         package_manager=None,
+        workflow_manager=None,
         zips=None,
         matrix=None,
         overwrite=False,
@@ -1137,6 +1138,7 @@ ramble:
                                               within generated experiments
             experiment_name (str): The name of the experiments to add
             package_manager (str): Name of package manager to use for the generated experiments
+            workflow_manager (str): Name of workflow manager to use for the generated experiments
             zips (list(str) | None): List of strings representing zips to define, in the
                               format zipname=[var1,var2,var3]
             matrix (str): String representing a matrix to define within the
@@ -1286,10 +1288,15 @@ ramble:
             exps_dict[experiment_name] = syaml.syaml_dict()
             exp_dict = exps_dict[experiment_name]
 
-            if package_manager is not None:
+            if package_manager is not None or workflow_manager is not None:
                 exp_dict[namespace.variants] = syaml.syaml_dict()
                 variants_dict = exp_dict[namespace.variants]
-                variants_dict[namespace.package_manager] = package_manager
+
+                if package_manager is not None:
+                    variants_dict[namespace.package_manager] = package_manager
+
+                if workflow_manager is not None:
+                    variants_dict[namespace.workflow_manager] = workflow_manager
 
             if namespace.variables not in exp_dict:
                 exp_dict[namespace.variables] = yaml.comments.CommentedMap()
