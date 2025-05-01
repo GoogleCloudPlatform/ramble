@@ -21,6 +21,7 @@ from ramble.main import RambleCommand
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
 workspace = RambleCommand("workspace")
+config = RambleCommand("config")
 
 
 @pytest.mark.long
@@ -81,7 +82,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
 @pytest.mark.long
 @deprecation.fail_if_not_removed
 @pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
-def test_known_workflow_managers(workflow_manager, mock_file_auto_create, request):
+def test_known_workflow_managers(workflow_manager, mock_file_auto_create, mutable_config, request):
     setup_type = ramble.pipeline.pipelines.setup
     analyze_type = ramble.pipeline.pipelines.analyze
     archive_type = ramble.pipeline.pipelines.archive
@@ -113,6 +114,19 @@ def test_known_workflow_managers(workflow_manager, mock_file_auto_create, reques
         args.append(workflow_manager)
 
         workspace("manage", "experiments", *args, global_args=["-w", ws_name])
+
+        # Handle workflow manager. Remove variables defined in the workflow to
+        # ensure we catch invalid configurations.
+        if workflow_manager != "None":
+            ws._re_read()
+            wm_inst = ramble.repository.get(
+                workflow_manager, object_type=ramble.repository.ObjectTypes.workflow_managers
+            )
+            for var_name in wm_inst.wm_vars:
+                config("remove", f"variables:{var_name}", global_args=["-w", ws_name])
+
+            for var_name in wm_inst.templates:
+                config("remove", f"variables:{var_name}", global_args=["-w", ws_name])
 
         ws._re_read()
         ws.concretize()
