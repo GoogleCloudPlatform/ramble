@@ -567,7 +567,7 @@ class SpackSoftwareInfo(ramble.package_manager.SoftwareInfo):
         parts = in_str.split(",")
 
         if len(parts) >= 1:
-            self.name = parts[0]
+            self.name = parts[0].strip()
 
             if len(parts) >= 2:
                 self.version = parts[1]

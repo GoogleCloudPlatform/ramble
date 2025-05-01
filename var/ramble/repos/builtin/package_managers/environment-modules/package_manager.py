@@ -132,7 +132,7 @@ class EnvironmentModules(PackageManagerBase):
                 m = pkg_regex.match(cleaned)
                 if m:
                     parts = cleaned.split("/")
-                    name = parts[0]
+                    name = parts[0].strip()
                     version = "/".join(parts[1:]) if len(parts) > 1 else ""
                     pkg_list.append(
                         ramble.package_manager.SoftwareInfo(

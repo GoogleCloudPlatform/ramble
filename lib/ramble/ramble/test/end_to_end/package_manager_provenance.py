@@ -59,7 +59,6 @@ def test_spack_package_manager_provenance_zlib(mock_applications, request):
     workspace("analyze", global_args=global_args)
 
     results_file = os.path.join(ws.root, "results.latest.txt")
-
     assert os.path.isfile(results_file)
 
     with open(results_file) as f:
@@ -67,6 +66,22 @@ def test_spack_package_manager_provenance_zlib(mock_applications, request):
         assert "Software definitions" in data
         assert "spack packages:" in data
         assert "zlib" in data
+
+    workspace("analyze", "-f", "json", global_args=global_args)
+
+    results_file = os.path.join(ws.root, "results.latest.json")
+    assert os.path.isfile(results_file)
+
+    with open(results_file) as f:
+        import json
+
+        data = json.load(f)
+        for data in data["experiments"]:
+            pkg_list = data["SOFTWARE"]["spack"]
+            names = [pkg["name"] for pkg in pkg_list]
+            assert "SOFTWARE" in data
+            assert "spack" in data["SOFTWARE"]
+            assert "zlib" in names
 
 
 def test_usermanged_package_manager_provenance_zlib(mock_applications, request):

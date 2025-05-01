@@ -1600,6 +1600,8 @@ ramble:
         filename_base = "results" + inner_delim + dt
         latest_base = "results" + inner_delim + "latest"
 
+        software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
+
         if "text" in output_formats:
 
             file_extension = ".txt"
@@ -1616,8 +1618,6 @@ ramble:
                         f.write("  Status = %s\n" % exp["RAMBLE_STATUS"])
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
-
-                        software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
 
                         if exp["N_REPEATS"] > 0:  # this is a base exp with summary of repeats
                             for context in exp["CONTEXTS"]:
@@ -1664,6 +1664,11 @@ ramble:
 
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)
+
+        # Convert SoftwareInfo classes to dicts
+        for exp in results["experiments"]:
+            for key, pkg_list in exp[software_key].items():
+                exp[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
 
         if "json" in output_formats:
             file_extension = ".json"
