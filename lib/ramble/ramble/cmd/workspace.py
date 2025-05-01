@@ -1120,7 +1120,15 @@ def workspace_manage_experiments_setup_parser(subparser):
         "-p",
         dest="package_manager",
         default=None,
-        help="name of (optional) package to define within the experiment scope",
+        help="name of (optional) package manager to use within the experiment scope",
+    )
+
+    subparser.add_argument(
+        "--workflow-manager",
+        "--wm",
+        dest="workflow_manager",
+        default=None,
+        help="name of (optional) workflow manager to use within the experiment scope",
     )
 
     subparser.add_argument(
@@ -1215,6 +1223,7 @@ def workspace_manage_experiments(args):
         variable_definitions,
         args.experiment_name,
         args.package_manager,
+        args.workflow_manager,
         zips,
         matrix,
         args.overwrite,
