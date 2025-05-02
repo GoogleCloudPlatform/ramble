@@ -1207,12 +1207,13 @@ ramble:
         app_inst = ramble.repository.get(application)
 
         var_def_dict = {}
-        def_regex = re.compile(r"(?P<key>.*)=(?P<value>.*)")
+        def_regex = re.compile(r"\s*=\s*")
         for definition in variable_definitions:
-            m = def_regex.match(definition)
+            m = def_regex.search(definition)
+
             if m:
-                key = m.group("key")
-                value = list_str_to_list(m.group("value"))
+                key = definition[0 : m.start()]
+                value = list_str_to_list(definition[m.end() :])
                 var_def_dict[key] = value
             else:
                 logger.die(
