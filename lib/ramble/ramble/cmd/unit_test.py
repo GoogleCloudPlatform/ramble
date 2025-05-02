@@ -10,7 +10,9 @@
 import argparse
 import collections
 import io
+import os
 import re
+import shutil
 import sys
 
 import llnl.util.tty.color as color
@@ -47,6 +49,13 @@ def setup_parser(subparser):
         action="store_true",
         default=False,
         help="run only tests under the builtin object repo directory",
+    )
+    limited.add_argument(
+        "-r",
+        "--repo-path",
+        default=None,
+        dest="repo_path",
+        help="run tests under the given object repo root (used for testing external object repo)",
     )
 
     # extra ramble arguments to list tests
@@ -192,6 +201,8 @@ def add_back_pytest_args(args, unknown_args):
         result += ["--ignore-glob", "var/ramble/repos/*"]
     elif args.obj:
         result += ["--ignore-glob", "lib/ramble/ramble/test/*"]
+    elif args.repo_path:
+        result += ["--repo-path", args.repo_path]
     result += unknown_args or []
     result += args.pytest_args or []
     if args.expression:
@@ -213,20 +224,39 @@ def unit_test(parser, args, unknown_args):
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
 
-    pytest_root = ramble.paths.ramble_root
+    pytest_root = args.repo_path or ramble.paths.ramble_root
 
-    # pytest.ini lives in the root of the ramble repository.
-    with working_dir(pytest_root):
-        if args.list:
-            do_list(args, pytest_args)
-            return
+    # conftest.py and pytest.ini live in the root of the ramble repository.
+    # need to ensure the same when repo_path is specified.
+    copied_conftest_path = None
+    copied_ini_path = None
+    try:
+        with working_dir(pytest_root):
 
-        with ramble.workspace.no_active_workspace():
-            try:
-                import pytest
+            def _ensure_path_in_cwd(filename):
+                if not os.path.exists(filename):
+                    shutil.copyfile(os.path.join(ramble.paths.ramble_root, filename), filename)
+                    return os.path.join(pytest_root, filename)
+                return None
 
-                return pytest.main(pytest_args)
-            except ImportError:
-                logger.die(
-                    "Pytest python module not found. Ensure requirements.txt are installed."
-                )
+            copied_conftest_path = _ensure_path_in_cwd("conftest.py")
+            copied_ini_path = _ensure_path_in_cwd("pytest.ini")
+
+            if args.list:
+                do_list(args, pytest_args)
+                return
+
+            with ramble.workspace.no_active_workspace():
+                try:
+                    import pytest
+
+                    return pytest.main(pytest_args)
+                except ImportError:
+                    logger.die(
+                        "Pytest python module not found. Ensure requirements.txt are installed."
+                    )
+    finally:
+        if copied_conftest_path is not None:
+            os.remove(copied_conftest_path)
+        if copied_ini_path is not None:
+            os.remove(copied_ini_path)
