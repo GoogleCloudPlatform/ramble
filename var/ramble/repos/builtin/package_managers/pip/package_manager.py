@@ -277,10 +277,10 @@ class PipSoftwareInfo(ramble.package_manager.SoftwareInfo):
 
         if "[" in parts[0]:
             name_parts = parts[0].replace("]", "").split("[")
-            self.name = name_parts[0]
+            self.name = name_parts[0].strip()
             self.variants = name_parts[1]
         else:
-            self.name = parts[0]
+            self.name = parts[0].strip()
             self.variants = ""
 
 

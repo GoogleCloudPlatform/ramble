@@ -567,7 +567,7 @@ class SpackSoftwareInfo(ramble.package_manager.SoftwareInfo):
         parts = in_str.split(",")
 
         if len(parts) >= 1:
-            self.name = parts[0]
+            self.name = parts[0].strip()
 
             if len(parts) >= 2:
                 self.version = parts[1]
@@ -1377,8 +1377,14 @@ class SpackRunner(CommandRunner):
                     if len(pkg_parts) == 1:
                         info = pkg_parts[0]
                     else:
-                        # Remove status markers
-                        info = info_line[3:]
+                        # Remove status markers from first 3 if present
+                        info = (
+                            info_line[:3]
+                            .replace("[+]", "")
+                            .replace(" - ", "")
+                            .replace("[e]", "")
+                            + info_line[3:]
+                        )
 
                     software_info = SpackSoftwareInfo()
                     software_info.parse_from_string(info)
