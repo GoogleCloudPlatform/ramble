@@ -38,10 +38,18 @@ def test_manage_variable_multiple_equals(request, tmpdir):
         "test_var=foo=bar",
         "-v",
         "test_list_var=[ val1 = val2, val3=val4]",
+        "-v",
+        "test_other_var = test1=test2=test3",
         global_args=global_args,
     )
 
-    tests = ["test_var: foo=bar", "test_list_var:", "- val1 = val2", "- val3=val4"]
+    tests = [
+        "test_var: foo=bar",
+        "test_list_var:",
+        "- val1 = val2",
+        "- val3=val4",
+        "test_other_var: test1=test2=test3",
+    ]
 
     results = [False for _ in tests]
 
