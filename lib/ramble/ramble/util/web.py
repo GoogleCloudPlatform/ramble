@@ -23,13 +23,13 @@ from urllib.request import Request, urlopen
 import llnl.util.lang
 from llnl.util.filesystem import mkdirp, rename
 
+import ramble
 import ramble.config
 from ramble.util.logger import logger
 
 import spack
 import spack.error
 import spack.url
-import spack.util.crypto
 import spack.util.gcs as gcs_util
 import spack.util.s3 as s3_util
 import spack.util.url as url_util
@@ -37,7 +37,7 @@ from spack.util.compression import ALLOWED_ARCHIVE_TYPES
 from spack.util.path import convert_to_posix_path
 
 #: User-Agent used in Request objects
-SPACK_USER_AGENT = f"Spackbot/{spack.spack_version}"
+RAMBLE_USER_AGENT = f"Ramblebot/{ramble.ramble_version}"
 
 
 # Also, HTMLParseError is deprecated and never raised.
@@ -113,7 +113,7 @@ def read_from_url(url, accept_content_type=None):
     url = url_util.format(url)
     if sys.platform == "win32" and url_scheme == "file":
         url = convert_to_posix_path(url)
-    req = Request(url, headers={"User-Agent": SPACK_USER_AGENT})
+    req = Request(url, headers={"User-Agent": RAMBLE_USER_AGENT})
 
     content_type = None
     is_web_url = url_scheme in ("http", "https")
