@@ -236,7 +236,7 @@ def unit_test(parser, args, unknown_args):
             def _ensure_path_in_cwd(filename):
                 if not os.path.exists(filename):
                     shutil.copyfile(os.path.join(ramble.paths.ramble_root, filename), filename)
-                    return os.path.join(pytest_root, filename)
+                    return os.path.join(os.getcwd(), filename)
                 return None
 
             copied_conftest_path = _ensure_path_in_cwd("conftest.py")
