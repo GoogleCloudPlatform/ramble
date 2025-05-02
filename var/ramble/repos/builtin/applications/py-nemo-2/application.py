@@ -279,41 +279,61 @@ class PyNemo2(ExecutableApplication):
         log_file="{processed_log_file}",
         contexts=[epoch_context_name],
     )
+    per_step_regex=r"Training epoch\s(?P<epoch>[e0-9\.\-]+),\s.*iteration\s(?P<iteration>[e0-9\/\.\-]+)[\s|]+lr:\s(?P<learning_rate>[e0-9\.\-]+)[\s|]+global_batch_size:\s(?P<global_batch_size>[e0-9\.\-]+)[\s|]+global_step:\s(?P<global_step>[e0-9\.\-]+)[\s|]+reduced_train_loss:\s(?P<reduced_train_loss>[e0-9\.\-]+)[\s|]+train_step_timing in s:\s(?P<train_step_timing>[e0-9\.\-]+)"
+    step_context_name = "Global Step ID"
+    figure_of_merit_context(
+        step_context_name,
+        regex=per_step_regex,
+        output_format="{global_step}",
+    )
     figure_of_merit(
-        "v_num",
-        fom_regex=r"Epoch.*?v_num=(?P<v_num>\S+)[,\]]",
-        group_name="v_num",
+        "epoch",
+        #fom_regex=r"(Training )?[Ee]poch\s(?P<epoch>\S+)",
+        fom_regex=per_step_regex,
+        group_name="epoch",
         log_file="{processed_log_file}",
-        contexts=[epoch_context_name],
+        contexts=[step_context_name],
+    )
+    figure_of_merit(
+        "iteration",
+        #fom_regex=r"(Training )?[Ee]poch.*?iteration[=\s:]+(?P<iteration>\S+)",
+        fom_regex=per_step_regex,
+        group_name="iteration",
+        log_file="{processed_log_file}",
+        contexts=[step_context_name],
+    )
+    figure_of_merit(
+        "learning_rate",
+        #fom_regex=r"(Training )?[Ee]poch.*?lr[=\s:]+(?P<lr>\S+)",
+        fom_regex=per_step_regex,
+        group_name="learning_rate",
+        log_file="{processed_log_file}",
+        contexts=[step_context_name],
     )
     figure_of_merit(
         "reduced_train_loss",
-        fom_regex=r"Epoch.*?reduced_train_loss=(?P<reduced_train_loss>[0-9\.]+)[,\]]",
+        #fom_regex=r"(Training )?[Ee]poch.*?reduced_train_loss[=\s:]+(?P<reduced_train_loss>[0-9\.]+)",
+        fom_regex=per_step_regex,
         group_name="reduced_train_loss",
         log_file="{processed_log_file}",
-        contexts=[epoch_context_name],
+        contexts=[step_context_name],
     )
     figure_of_merit(
         "global_step",
-        fom_regex=r"Epoch.*?global_step=(?P<global_step>[0-9\.]+)[,\]]",
+        #fom_regex=r"(Training )?[Ee]poch.*?global_step[=\s:]+(?P<global_step>[0-9\.]+)",
+        fom_regex=per_step_regex,
         group_name="global_step",
         log_file="{processed_log_file}",
-        contexts=[epoch_context_name],
-    )
-    figure_of_merit(
-        "consumed_samples",
-        fom_regex=r"Epoch.*?consumed_samples=(?P<consumed_samples>[0-9\.]+)[,\]]",
-        group_name="consumed_samples",
-        log_file="{processed_log_file}",
-        contexts=[epoch_context_name],
+        contexts=[step_context_name],
     )
     figure_of_merit(
         "train_step_timing",
-        fom_regex=r"Epoch.*?train_step_timing in s=(?P<train_step_time>[0-9\.]+)[,\]]",
-        group_name="train_step_time",
+        #fom_regex=r"(Training )?[Ee]poch.*?train_step_timing in s[=\s:]+(?P<train_step_time>[0-9\.]+)",
+        fom_regex=per_step_regex,
+        group_name="train_step_timing",
         units="s",
         log_file="{processed_log_file}",
-        contexts=[epoch_context_name],
+        contexts=[step_context_name],
     )
 
     success_criteria(
