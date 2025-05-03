@@ -28,6 +28,7 @@ class GraphNode:
         self._order_before = []
         self._order_after = []
         self.obj_inst = obj_inst
+        self.when = []
 
     def set_attribute(self, attr):
         """Sets the attribute of a graph node

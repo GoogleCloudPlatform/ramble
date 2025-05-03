@@ -88,7 +88,7 @@ class EnvironmentModules(PackageManagerBase):
         )
 
     def _write_module_commands(self, workspace, app_inst=None):
-        env_path = self.app_inst.expander.env_path
+        env_path = app_inst.expander.env_path
 
         module_file_path = os.path.join(env_path, "module_loads")
 
@@ -132,7 +132,7 @@ class EnvironmentModules(PackageManagerBase):
                 m = pkg_regex.match(cleaned)
                 if m:
                     parts = cleaned.split("/")
-                    name = parts[0]
+                    name = parts[0].strip()
                     version = "/".join(parts[1:]) if len(parts) > 1 else ""
                     pkg_list.append(
                         ramble.package_manager.SoftwareInfo(

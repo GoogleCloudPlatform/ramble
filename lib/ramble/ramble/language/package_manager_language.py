@@ -55,7 +55,7 @@ def package_manager_variable(
 
 
 @package_manager_directive(dicts=())
-def package_manager_family(*names: str):
+def package_manager_family(*names: str, **kwargs):
     """Add a new family to this package manager
 
     Args:

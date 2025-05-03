@@ -37,13 +37,7 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
 
     workflow_manager_variable(
         "workflow_banner",
-        default="""# ****************************************************
-# * No workflow is used with this experiment
-# * Execution command: {batch_submit}
-# * If this file is not the same as the above path, it is unlikely that this script
-# * is used when `ramble on` executes experiments.
-# ****************************************************
-""",
+        default="",
         description="Banner to describe the workflow within execution templates",
     )
 

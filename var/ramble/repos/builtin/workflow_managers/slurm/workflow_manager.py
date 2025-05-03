@@ -8,7 +8,7 @@
 
 import os
 
-from ramble.application import experiment_status
+from ramble.application import ExperimentStatus
 from ramble.util import shell_utils
 from ramble.wmkit import *
 
@@ -212,7 +212,7 @@ class Slurm(WorkflowManagerBase):
         expander = self.app_inst.expander
         run_dir = expander.expand_var_name("experiment_run_dir")
         job_id_file = os.path.join(run_dir, ".slurm_job")
-        status = experiment_status.UNRESOLVED
+        status = ExperimentStatus.UNRESOLVED
         if not os.path.isfile(job_id_file):
             logger.warn("job_id file is missing")
             return status
@@ -221,9 +221,9 @@ class Slurm(WorkflowManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         wm_status_raw = self.runner.get_status(job_id)
         wm_status = _STATUS_MAP.get(wm_status_raw)
-        if wm_status is not None and hasattr(experiment_status, wm_status):
-            status = getattr(experiment_status, wm_status)
-        if status == experiment_status.UNRESOLVED:
+        if wm_status is not None and hasattr(ExperimentStatus, wm_status):
+            status = getattr(ExperimentStatus, wm_status)
+        if status == ExperimentStatus.UNRESOLVED:
             logger.warn(
                 f"The slurm workflow manager failed to resolve the status of job {job_id}. "
                 "Enable debug mode (`ramble -d`) for more detailed error messages."

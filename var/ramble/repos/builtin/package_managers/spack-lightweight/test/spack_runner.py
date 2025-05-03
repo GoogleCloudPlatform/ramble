@@ -11,7 +11,10 @@ import os
 import pytest
 
 import ramble.config
-from ramble.pkg_man.builtin.spack_lightweight import InvalidExternalEnvironment, SpackRunner
+from ramble.pkg_man.builtin.spack_lightweight import (
+    InvalidExternalEnvironment,
+    SpackRunner,
+)
 from ramble.util.command_runner import RunnerError
 
 
@@ -72,7 +75,9 @@ def test_env_concretize(tmpdir, request):
         pytest.skip("%s" % e)
 
 
-def test_env_concretize_skips_already_concretized_envs(tmpdir, capsys, request):
+def test_env_concretize_skips_already_concretized_envs(
+    tmpdir, capsys, request
+):
     import time
 
     try:
@@ -100,7 +105,8 @@ def test_env_concretize_skips_already_concretized_envs(tmpdir, capsys, request):
         output = capsys.readouterr()
         assert f"Environment {env_path} will not be regenerated" in output.out
         assert (
-            f"Environment {env_path} is already concretized. Skipping concretize..." in output.out
+            f"Environment {env_path} is already concretized. Skipping concretize..."
+            in output.out
         )
 
         sr.deactivate()
@@ -150,7 +156,9 @@ def test_env_configs_apply(tmpdir, capsys, request):
         sr.generate_env_file()
 
         captured = capsys.readouterr()
-        assert "with args: ['config', 'add', 'config:debug:true']" in captured.out
+        assert (
+            "with args: ['config', 'add', 'config:debug:true']" in captured.out
+        )
 
         sr.deactivate()
 
@@ -169,7 +177,9 @@ def test_env_configs_apply(tmpdir, capsys, request):
 
 @pytest.mark.parametrize("link_type", ["symlink", "hardlink", "copy"])
 def test_env_view_link_types(tmpdir, request, link_type, mutable_config):
-    with ramble.config.override("config:spack:", {"env_view": {"link_type": f"{link_type}"}}):
+    with ramble.config.override(
+        "config:spack:", {"env_view": {"link_type": f"{link_type}"}}
+    ):
         try:
             env_path = str(tmpdir.join(request.node.name))
             # Dry run so we don't actually install zlib
@@ -216,10 +226,14 @@ def test_default_concretize_flags(tmpdir, capsys, request):
         ("prefix", "time", "would run time"),
     ],
 )
-def test_config_concretize_attribute(tmpdir, capsys, attr, value, expected_str, request):
+def test_config_concretize_attribute(
+    tmpdir, capsys, attr, value, expected_str, request
+):
     try:
         env_path = tmpdir.join(request.node.name)
-        with ramble.config.override("config:spack", {"concretize": {attr: value}}):
+        with ramble.config.override(
+            "config:spack", {"concretize": {attr: value}}
+        ):
             sr = SpackRunner(dry_run=True)
             sr.create_env(env_path)
             sr.activate()
@@ -264,10 +278,14 @@ def test_default_install_flags(tmpdir, capsys, request):
         ("prefix", "time", "would run time"),
     ],
 )
-def test_config_install_attribute(tmpdir, capsys, attr, value, expected_str, request):
+def test_config_install_attribute(
+    tmpdir, capsys, attr, value, expected_str, request
+):
     try:
         env_path = tmpdir.join(request.node.name)
-        with ramble.config.override("config:spack", {"install": {attr: value}}):
+        with ramble.config.override(
+            "config:spack", {"install": {attr: value}}
+        ):
             sr = SpackRunner(dry_run=True)
             sr.create_env(env_path)
             sr.activate()
@@ -349,7 +367,9 @@ packages:
             f.write(compilers_config)
 
         config_path = os.getcwd()
-        with ramble.config.override("config:spack", {"global": {"flags": f"-C {config_path}"}}):
+        with ramble.config.override(
+            "config:spack", {"global": {"flags": f"-C {config_path}"}}
+        ):
             try:
                 sr = SpackRunner(dry_run=True)
                 sr.create_env(os.getcwd())
@@ -360,7 +380,10 @@ packages:
                 sr.install_compiler("gcc@12.1.0")
                 captured = capsys.readouterr()
 
-                assert "gcc@12.1.0 is already an available compiler" in captured.out
+                assert (
+                    "gcc@12.1.0 is already an available compiler"
+                    in captured.out
+                )
             except RunnerError as e:
                 pytest.skip("%s" % e)
 
@@ -496,7 +519,9 @@ def test_invalid_external_env_errors(tmpdir, request):
         ("flags", "--scope site", "'--scope', 'site'"),
     ],
 )
-def test_config_compiler_find_attribute(tmpdir, capsys, attr, value, expected_str, request):
+def test_config_compiler_find_attribute(
+    tmpdir, capsys, attr, value, expected_str, request
+):
 
     import os
 
@@ -524,8 +549,12 @@ compilers::
             f.write(compilers_config)
 
         config_path = os.getcwd()
-        with ramble.config.override("config:spack", {"global": {"flags": f"-C {config_path}"}}):
-            with ramble.config.override("config:spack", {"compiler_find": {attr: value}}):
+        with ramble.config.override(
+            "config:spack", {"global": {"flags": f"-C {config_path}"}}
+        ):
+            with ramble.config.override(
+                "config:spack", {"compiler_find": {attr: value}}
+            ):
                 try:
                     sr = SpackRunner(dry_run=True)
                     sr.create_env(os.getcwd())
@@ -544,12 +573,16 @@ def test_env_create_no_view(tmpdir, request):
     import os
 
     with tmpdir.as_cwd():
-        with ramble.config.override("config:spack", {"env_create": {"flags": "--without-view"}}):
+        with ramble.config.override(
+            "config:spack", {"env_create": {"flags": "--without-view"}}
+        ):
             try:
                 sr = SpackRunner()
                 sr.create_env(os.getcwd())
 
-                assert not os.path.exists(os.path.join(os.getcwd(), ".spack-env", "view"))
+                assert not os.path.exists(
+                    os.path.join(os.getcwd(), ".spack-env", "view")
+                )
             except RunnerError as e:
                 pytest.skip("%s" % e)
 

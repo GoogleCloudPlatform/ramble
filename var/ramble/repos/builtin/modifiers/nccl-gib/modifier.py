@@ -25,6 +25,13 @@ class NcclGib(BasicModifier):
     )
     default_mode("auto")
 
+    modifier_variable(
+        "nccl_socket_ifname",
+        default="",
+        description="Specification of which IP interfaces to use for communication",
+        modes=["auto"],
+    )
+
     def _nccl_env_script_path(self):
         return "/usr/local/gib/scripts/set_nccl_env.sh"
 
@@ -39,6 +46,7 @@ class NcclGib(BasicModifier):
         cmds = []
 
         path_funcs = [self._nccl_env_script_path]
+        ifname = self.expander.expand_var_name("nccl_socket_ifname")
 
         for path_func in path_funcs:
             script = path_func()
@@ -51,6 +59,9 @@ class NcclGib(BasicModifier):
                         "fi",
                     ]
                 )
+
+                if ifname != "":
+                    cmds.append(f"export NCCL_SOCKET_IFNAME={ifname}")
             elif shell == "csh":
                 cmds.extend(
                     [
@@ -59,6 +70,8 @@ class NcclGib(BasicModifier):
                         "endif",
                     ]
                 )
+                if ifname != "":
+                    cmds.append(f"setenv NCCL_SOCKET_IFNAME {ifname}")
             elif shell == "fish":
                 cmds.extend(
                     [
@@ -67,6 +80,8 @@ class NcclGib(BasicModifier):
                         "end",
                     ]
                 )
+                if ifname != "":
+                    cmds.append(f"set -x NCCL_SOCKET_IFNAME {ifname}")
             elif shell == "bat":
                 logger.die(
                     "The nccl-gib modifier is not currently supported for batch shell."

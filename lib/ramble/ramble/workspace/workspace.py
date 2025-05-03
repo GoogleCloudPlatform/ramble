@@ -1115,6 +1115,7 @@ ramble:
         variable_definitions,
         experiment_name,
         package_manager=None,
+        workflow_manager=None,
         zips=None,
         matrix=None,
         overwrite=False,
@@ -1137,6 +1138,7 @@ ramble:
                                               within generated experiments
             experiment_name (str): The name of the experiments to add
             package_manager (str): Name of package manager to use for the generated experiments
+            workflow_manager (str): Name of workflow manager to use for the generated experiments
             zips (list(str) | None): List of strings representing zips to define, in the
                               format zipname=[var1,var2,var3]
             matrix (str): String representing a matrix to define within the
@@ -1205,12 +1207,13 @@ ramble:
         app_inst = ramble.repository.get(application)
 
         var_def_dict = {}
-        def_regex = re.compile(r"(?P<key>.*)=(?P<value>.*)")
+        def_regex = re.compile(r"\s*=\s*")
         for definition in variable_definitions:
-            m = def_regex.match(definition)
+            m = def_regex.search(definition)
+
             if m:
-                key = m.group("key")
-                value = list_str_to_list(m.group("value"))
+                key = definition[0 : m.start()]
+                value = list_str_to_list(definition[m.end() :])
                 var_def_dict[key] = value
             else:
                 logger.die(
@@ -1286,10 +1289,15 @@ ramble:
             exps_dict[experiment_name] = syaml.syaml_dict()
             exp_dict = exps_dict[experiment_name]
 
-            if package_manager is not None:
+            if package_manager is not None or workflow_manager is not None:
                 exp_dict[namespace.variants] = syaml.syaml_dict()
                 variants_dict = exp_dict[namespace.variants]
-                variants_dict[namespace.package_manager] = package_manager
+
+                if package_manager is not None:
+                    variants_dict[namespace.package_manager] = package_manager
+
+                if workflow_manager is not None:
+                    variants_dict[namespace.workflow_manager] = workflow_manager
 
             if namespace.variables not in exp_dict:
                 exp_dict[namespace.variables] = yaml.comments.CommentedMap()
@@ -1565,8 +1573,14 @@ ramble:
             if not packages:
                 f.write("      None\n")
             else:
+                # Dedupe entries that have the same version texts.
+                # This can happen for instance if a package is built against different compilers.
+                pkg_info_set = set()
                 for pkg_info in packages:
-                    f.write(f"      {pkg_info.to_version_text()}\n")
+                    text = pkg_info.to_version_text()
+                    if text not in pkg_info_set:
+                        f.write(f"      {text}\n")
+                        pkg_info_set.add(text)
 
     def dump_results(self, output_formats=None, print_results=False, summary_only=False):
         """
@@ -1594,6 +1608,8 @@ ramble:
         filename_base = "results" + inner_delim + dt
         latest_base = "results" + inner_delim + "latest"
 
+        software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
+
         if "text" in output_formats:
 
             file_extension = ".txt"
@@ -1610,8 +1626,6 @@ ramble:
                         f.write("  Status = %s\n" % exp["RAMBLE_STATUS"])
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
-
-                        software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
 
                         if exp["N_REPEATS"] > 0:  # this is a base exp with summary of repeats
                             for context in exp["CONTEXTS"]:
@@ -1659,6 +1673,11 @@ ramble:
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)
 
+        # Convert SoftwareInfo classes to dicts
+        for exp in results["experiments"]:
+            for key, pkg_list in exp[software_key].items():
+                exp[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
+
         if "json" in output_formats:
             file_extension = ".json"
             out_file = os.path.join(self.root, filename_base + file_extension)
@@ -1674,8 +1693,22 @@ ramble:
             out_file = os.path.join(self.root, filename_base + file_extension)
             latest_file = os.path.join(self.root, latest_base + file_extension)
             results_written.append(out_file)
+
+            from ruamel.yaml import RoundTripDumper
+
+            class RambleSafeDumper(RoundTripDumper):
+
+                def ignore_aliases(self, _data):
+                    """Make the dumper NEVER print YAML aliases."""
+                    return True
+
+            def call_value(dumper, data):
+                return dumper.represent_data(data.value)
+
+            RambleSafeDumper.add_representer(ramble.experiment_result.ExperimentStatus, call_value)
+
             with open(out_file, "w+") as f:
-                syaml.dump(results, stream=f)
+                syaml.dump(results, stream=f, Dumper=RambleSafeDumper)
 
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)
@@ -1909,6 +1942,11 @@ ramble:
     def named_deployment(self):
         """Path to the specific deployment directory"""
         return os.path.join(self.deployments_dir, self.deployment_name)
+
+    @property
+    def deployment_repos_dir(self):
+        """Path to the specific deployment directory that contains all the repos"""
+        return os.path.join(self.named_deployment, "object_repos")
 
     @property
     def shared_license_dir(self):

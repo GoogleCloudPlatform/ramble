@@ -17,7 +17,6 @@ import stat
 import string
 import textwrap
 import time
-from enum import Enum
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -47,7 +46,7 @@ import ramble.util.stats
 import ramble.variants
 import ramble.workflow_manager
 from ramble.error import RambleError
-from ramble.experiment_result import ExperimentResult
+from ramble.experiment_result import ExperimentResult, ExperimentStatus
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
 from ramble.util import constants, conversions
@@ -61,24 +60,6 @@ from ramble.workspace import namespace
 import spack.util.compression
 import spack.util.executable
 import spack.util.spack_json
-
-experiment_status = Enum(
-    "experiment_status",
-    [
-        "UNKNOWN",
-        "UNQUEUED",
-        # unresolved means the status is not fetched successfully
-        "UNRESOLVED",
-        "SETUP",
-        "SUBMITTED",
-        "RUNNING",
-        "COMPLETE",
-        "SUCCESS",
-        "FAILED",
-        "CANCELLED",
-        "TIMEOUT",
-    ],
-)
 
 _NULL_CONTEXT = "null"
 
@@ -294,7 +275,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
             obj_variants = getattr(obj, "object_variants", None)
             if obj_variants is not None:
-                self.object_variants.merge_multi_value_variants(getattr(obj, "object_variants"))
+                self.object_variants.merge_multi_value_variants(obj_variants)
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
@@ -330,22 +311,20 @@ class ApplicationBase(metaclass=ApplicationMeta):
             self.object_variants.value(namespace.workflow_manager)
         )
 
-        if workflow_name is not None:
-            try:
-                wfman_type = ramble.repository.ObjectTypes.workflow_managers
-                self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
-                self.workflow_manager.set_application(self)
-            except ramble.repository.UnknownObjectError:
-                logger.die(
-                    f"{workflow_name} is not a valid workflow manager. "
-                    "Valid workflow managers can be listed via:\n"
-                    "\tramble list --type workflow_managers"
-                )
+        # Map None to the default of user-managed
+        if workflow_name is None:
+            workflow_name = "user-managed"
 
-        if self.workflow_manager is None:
-            base_path = os.path.join(ramble.paths.module_path, "workflow_manager.py")
-            self.workflow_manager = ramble.workflow_manager.WorkflowManagerBase(base_path)
+        try:
+            wfman_type = ramble.repository.ObjectTypes.workflow_managers
+            self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
             self.workflow_manager.set_application(self)
+        except ramble.repository.UnknownObjectError:
+            logger.die(
+                f"{workflow_name} is not a valid workflow manager. "
+                "Valid workflow managers can be listed via:\n"
+                "\tramble list --type workflow_managers"
+            )
 
     def build_phase_order(self):
         if self._pipeline_graphs is not None:
@@ -482,10 +461,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         final_added_index = None
         if pipeline in self._pipeline_graphs:
             for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
-                for phase_filter in phase_filters:
-                    if fnmatch.fnmatch(phase.key, phase_filter):
-                        phases.add(phase)
-                        final_added_index = idx
+                if self.expander.satisfies(phase.when, variant_set=self.object_variants):
+                    for phase_filter in phase_filters:
+                        if fnmatch.fnmatch(phase.key, phase_filter):
+                            phases.add(phase)
+                            final_added_index = idx
 
         include_phase_deps = ramble.config.get("config:include_phase_dependencies")
         if include_phase_deps:
@@ -908,6 +888,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if not mod_inst.disabled:
                 mod_inst.inherit_from_application(self)
                 mod_inst.modify_experiment(self)
+                mod_inst.set_modifier_variants()
             else:
                 mod_inst = ramble.modifier_types.disabled.DisabledModifier(mod_inst)
 
@@ -916,11 +897,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
             # Add this modifiers required variables for validation
             self.keywords.update_keys(mod_inst.get_required_variables())
 
-        # Ensure no expand vars are set correctly for modifiers
         for mod_inst in self._modifier_instances:
+            # Ensure no expand vars are set correctly for modifiers
             for var in mod_inst.no_expand_vars():
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
+
+            # Set standard variants for all modifiers
+            obj_variants = getattr(mod_inst, "object_variants", None)
+            if obj_variants is not None:
+                self.object_variants.merge_multi_value_variants(obj_variants)
 
     def validate_experiment(self, warn_validation=True, die_on_validate_error=True):
         # Validate the new modifiers variables exist
@@ -1066,9 +1052,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             self._env_variable_sets.append({"set": new_env_vars})
 
-    def _define_commands(
-        self, exec_graph, success_list=ramble.success_criteria.ScopedCriteriaList()
-    ):
+    def _define_commands(self, exec_graph, success_list=None):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -1079,6 +1063,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._command_list = []
         self._command_list_without_logs = []
+
+        if success_list is None:
+            success_list = ramble.success_criteria.ScopedCriteriaList()
 
         # Inject all prepended chained experiments
         for chained_exp in self.chain_prepend:
@@ -1165,7 +1152,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         command_part = f"{mpi_cmd}{part}"
                         suffix_part = f"{redirect}{bg_cmd}"
 
-                        expanded_cmd = self.expander.expand_var(command_part, exec_vars)
+                        expanded_cmd = self.expander.expand_var(command_part, exec_vars).lstrip()
                         suffix_cmd = self.expander.expand_var(suffix_part, exec_vars).lstrip()
 
                         self._command_list.append((expanded_cmd + " " + suffix_cmd).rstrip())
@@ -1498,7 +1485,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             experiment_script = workspace.experiments_script
             experiment_script.write(self.expander.expand_var("{batch_submit}\n"))
 
-        self.set_status(status=experiment_status.SETUP)
+        self.set_status(status=ExperimentStatus.SETUP)
 
     def _clean_hash_variables(self, workspace, variables):
         """Cleanup variables to hash before computing the hash
@@ -1730,7 +1717,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         injected in a workspace config.
         """
 
-        if self.get_status() == experiment_status.UNKNOWN.name and not workspace.dry_run:
+        if self.get_status() == ExperimentStatus.UNKNOWN and not workspace.dry_run:
             logger.warn(f"Experiment has status {self.get_status()}. Skipping analysis..\n")
             return
 
@@ -1856,16 +1843,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        status = experiment_status.SUCCESS if success else experiment_status.FAILED
+        status = self.get_status()
+        if status == ExperimentStatus.SUCCESS and not success:
+            status = ExperimentStatus.FAILED
+        elif success:
+            status = ExperimentStatus.SUCCESS
+
         # When workflow_manager is present, only use app_status when workflow is completed or
         # unresolved.
         if self.workflow_manager is not None:
             wm_status = self.workflow_manager.get_status(workspace)
             if not (
                 wm_status is None
-                or wm_status in [experiment_status.COMPLETE, experiment_status.UNRESOLVED]
+                or wm_status in [ExperimentStatus.COMPLETE, ExperimentStatus.UNRESOLVED]
             ):
                 status = wm_status
+
         self.set_status(status)
 
         self._init_result()
@@ -1975,20 +1968,20 @@ class ApplicationBase(metaclass=ApplicationMeta):
             exp_status_list.append(exp_inst.get_status())
 
         if workspace.repeat_success_strict:
-            if experiment_status.FAILED.name in exp_status_list:
+            if ExperimentStatus.FAILED in exp_status_list:
                 repeat_success = False
             else:
                 repeat_success = True
         else:
-            if experiment_status.SUCCESS.name in exp_status_list:
+            if ExperimentStatus.SUCCESS in exp_status_list:
                 repeat_success = True
             else:
                 repeat_success = False
 
         if repeat_success:
-            self.set_status(status=experiment_status.SUCCESS)
+            self.set_status(status=ExperimentStatus.SUCCESS)
         else:
-            self.set_status(status=experiment_status.FAILED)
+            self.set_status(status=ExperimentStatus.FAILED)
 
         self._init_result()
 
@@ -2008,7 +2001,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 continue
 
             # When strict success is off for repeats (loose success), skip failed exps
-            if exp_inst.result.status == experiment_status.FAILED.name:
+            if exp_inst.result.status == ExperimentStatus.FAILED:
                 continue
 
             if exp_inst.result.contexts:
@@ -2069,7 +2062,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 }
                 summary_foms.append(n_total_dict)
 
-                n_success = exp_status_list.count(experiment_status.SUCCESS.name)
+                n_success = exp_status_list.count(ExperimentStatus.SUCCESS)
+
                 n_success_dict = {
                     "value": n_success,
                     "units": "repeats",
@@ -2310,7 +2304,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         Set this experiment's status based on the status file in the experiment
         run directory, if it exists. If it doesn't exist, set its status to
-        experiment_status.UNKNOWN
+        ExperimentStatus.UNKNOWN
         """
         status_path = os.path.join(
             self.expander.expand_var_name(self.keywords.experiment_run_dir), self._status_file_name
@@ -2321,19 +2315,29 @@ class ApplicationBase(metaclass=ApplicationMeta):
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
-                self.variables[self.keywords.experiment_status] = status_data[
-                    self.keywords.experiment_status
-                ]
+                    self.set_status(ExperimentStatus(status_data[self.keywords.experiment_status]))
         else:
-            self.set_status(experiment_status.UNKNOWN)
+            self.set_status(ExperimentStatus.UNKNOWN)
 
-    def set_status(self, status=experiment_status.UNKNOWN):
+    def set_status(self, status=ExperimentStatus.UNKNOWN):
         """Set the status of this experiment"""
-        self.variables[self.keywords.experiment_status] = status.name
+        self.variables[self.keywords.experiment_status] = status
+        self.set_ramble_status(status)
 
     def get_status(self):
         """Get the status of this experiment"""
         return self.variables[self.keywords.experiment_status]
+
+    def get_ramble_status(self):
+        """Get the RAMBLE_STATUS of this experiment (boolifyied status)"""
+        return self.variables[self.keywords.RAMBLE_STATUS]
+
+    def set_ramble_status(self, status):
+        """Set the RAMBLE_STATUS (boolifyied status) of this experiment"""
+
+        self.variables[self.keywords.RAMBLE_STATUS] = status
+        if status != ExperimentStatus.SUCCESS:
+            self.variables[self.keywords.RAMBLE_STATUS] = ExperimentStatus.FAILED
 
     register_phase("write_status", pipeline="analyze", run_after=["analyze_experiments"])
     register_phase("write_status", pipeline="setup", run_after=["make_experiments"])
@@ -2359,12 +2363,48 @@ class ApplicationBase(metaclass=ApplicationMeta):
     register_phase("deploy_artifacts", pipeline="pushdeployment")
 
     def _deploy_artifacts(self, workspace, app_inst=None):
+        """Copy all relevant ramble objects to the deployment directory.
 
-        def _copy_files(obj_inst, obj_type, repo_root):
+        All the ramble objects are grouped under a "ramble" directory, and
+        further organized based on the object's original repo namespace.
+
+        Package manager (like Spack) may also create its own repos.
+
+        An example:
+
+        object_repos/
+        ├── ramble
+        │   ├── builtin
+        │   │   ├── modifiers
+        │   │   │   ├── gcp-metadata
+        │   │   │   │   └── modifier.py
+        │   │   ├── package_managers
+        │   │   │   ├── spack
+        │   │   │   │   └── package_manager.py
+        │   │   │   └── spack-lightweight
+        │   │   │       └── package_manager.py
+        │   │   ├── repo.yaml
+        │   └── googleaux
+        │       ├── applications
+        │       │   ├── base-app
+        │       │   │   └── application.py
+        │       │   └── derived-app
+        │       │       └── application.py
+        │       └── repo.yaml
+        └── spack
+            └── obj_repo
+                ├── packages
+                │   └── my-package
+                │       └── package.py
+                └── repo.yaml
+        """
+
+        def _copy_files(obj_inst, obj_type, root_path):
             flist = ramble.repository.list_object_files(obj_inst, obj_type)
-            for type_dir_name, obj_path in flist:
+            for type_dir_name, obj_path, repo_namespace in flist:
                 obj_src_dir_path = os.path.dirname(obj_path)
                 obj_dir_name = os.path.basename(obj_src_dir_path)
+                repo_root = os.path.join(root_path, "ramble", repo_namespace)
                 obj_dest_dir = os.path.join(repo_root, type_dir_name, obj_dir_name)
                 shutil.rmtree(obj_dest_dir, ignore_errors=True)
                 shutil.copytree(
@@ -2372,10 +2412,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     obj_dest_dir,
                     ignore=shutil.ignore_patterns("*.pyc", "__pycache__"),
                 )
+                config_path = os.path.join(repo_root, ramble.repository.unified_config)
+                if not os.path.exists(config_path):
+                    with open(config_path, "w+") as f:
+                        f.write("repo:\n")
+                        f.write(f"  namespace: {repo_namespace}\n")
 
-        repo_path = os.path.join(workspace.named_deployment, "object_repo")
+        repo_path = workspace.deployment_repos_dir
 
-        repo_lock = lk.Lock(os.path.join(repo_path, ".ramble-obj-repo.lock"))
+        repo_lock = lk.Lock(os.path.join(repo_path, ".ramble-obj-repos.lock"))
 
         with lk.WriteTransaction(repo_lock):
             for obj_type, obj in self._objects():

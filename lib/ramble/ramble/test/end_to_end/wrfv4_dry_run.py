@@ -8,6 +8,7 @@
 
 import glob
 import os
+import re
 
 import pytest
 
@@ -220,7 +221,7 @@ compilers:
                 # Test the expected portions of the execution command exist
                 assert "sed -i -e 's/ start_hour.*/ start_hour" in data
                 assert "sed -i -e 's/ restart .*/ restart" in data
-                assert "mpirun" in data
+                assert re.search("\nmpirun", data)
                 assert "wrf.exe" in data
 
                 # Test the run script has a reference to the experiment log file
@@ -314,6 +315,7 @@ compilers:
                 assert os.path.exists(os.path.join(exp_dir, f"rsl.error.000{i}"))
 
 
+@pytest.mark.maybeslow
 def test_wrfv4_no_pkg_man_dry_run(mutable_config, mutable_mock_workspace_path):
     test_config = """
 ramble:

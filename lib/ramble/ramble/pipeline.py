@@ -22,11 +22,11 @@ from llnl.util.tty.color import cprint
 import ramble.application
 import ramble.config
 import ramble.expander
-import ramble.experimental.uploader
 import ramble.fetch_strategy
 import ramble.repository
 import ramble.software_environments
 import ramble.stage
+import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
@@ -264,7 +264,7 @@ class AnalyzePipeline(Pipeline):
         no_analyze_cnt = 0
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
-                if app_inst.get_status() != ramble.application.experiment_status.UNKNOWN.name:
+                if app_inst.get_status() != ramble.application.ExperimentStatus.UNKNOWN:
                     found_valid_experiment = True
             else:
                 no_analyze_cnt += 1
@@ -302,7 +302,7 @@ class AnalyzePipeline(Pipeline):
         )
 
         if self.upload_results:
-            ramble.experimental.uploader.upload_results(self.workspace.results)
+            ramble.uploader.upload_results(self.workspace.results)
 
 
 class ArchivePipeline(Pipeline):
@@ -657,7 +657,7 @@ class PushDeploymentPipeline(Pipeline):
     index_filename = "index.json"
     index_namespace = "deployment_files"
     tar_extension = ".tar.gz"
-    object_repo_name = "object_repo"
+    legacy_object_repo_name = "object_repo"
 
     def __init__(
         self, workspace, filters, create_tar=False, upload_url=None, deployment_name=None
@@ -693,15 +693,6 @@ class PushDeploymentPipeline(Pipeline):
 
         aux_software_dir = os.path.join(configs_dir, ramble.workspace.auxiliary_software_dir_name)
         fs.mkdirp(aux_software_dir)
-
-        repo_path = os.path.join(self.workspace.named_deployment, self.object_repo_name)
-        for object_type_def in ramble.repository.type_definitions.values():
-            fs.mkdirp(os.path.join(repo_path, object_type_def["dir_name"]))
-
-        # Write out only to the unified repo.yaml
-        with open(os.path.join(repo_path, ramble.repository.unified_config), "w+") as f:
-            f.write("repo:\n")
-            f.write(f"  namespace: deployment_{self.deployment_name}\n")
 
         super()._execute()
 

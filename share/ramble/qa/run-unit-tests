@@ -67,7 +67,7 @@ fi
 if [[ "$LONG" == "true" ]]; then
   $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS}
 else
-  $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS} -m "not long"
+  $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS} --fast
 fi
 if [ $? != 0 ]; then
     ERROR=1

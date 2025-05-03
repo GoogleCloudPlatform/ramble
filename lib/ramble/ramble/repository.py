@@ -214,6 +214,10 @@ def _gen_path(repo_dirs=None, obj_type=default_type):
     return path
 
 
+def _get_repo_namespace(repo_path, obj_name):
+    return repo_path.repo_for_obj(obj_name).namespace
+
+
 def list_object_files(obj_inst, object_type):
     """List object file paths of the given object along the inheritance chain.
 
@@ -227,9 +231,15 @@ def list_object_files(obj_inst, object_type):
     repo_path = paths[object_type]
     base_repo_path = paths[base_type]
     obj_file = obj_inst._file_path
-    result = []
-    if repo_path.in_path(obj_file) or base_repo_path.in_path(obj_file):
-        result = [(type_def["dir_name"], obj_file)]
+    obj_name = os.path.basename(os.path.dirname(obj_file))
+    if repo_path.in_path(obj_file):
+        result = [(type_def["dir_name"], obj_file, _get_repo_namespace(repo_path, obj_name))]
+    elif base_repo_path.in_path(obj_file):
+        result = [
+            (base_type_def["dir_name"], obj_file, _get_repo_namespace(base_repo_path, obj_name))
+        ]
+    else:
+        result = []
     base_chain = obj_inst.__class__.__mro__[1:]
 
     for cls in base_chain:
@@ -240,10 +250,13 @@ def list_object_files(obj_inst, object_type):
             break
 
         basename = os.path.basename(path)
+        cls_name = os.path.basename(os.path.dirname(path))
         if basename == type_def["file_name"]:
-            result.append((type_def["dir_name"], path))
+            result.append((type_def["dir_name"], path, _get_repo_namespace(repo_path, cls_name)))
         elif basename == base_type_def["file_name"]:
-            result.append((base_type_def["dir_name"], path))
+            result.append(
+                (base_type_def["dir_name"], path, _get_repo_namespace(base_repo_path, cls_name))
+            )
         else:
             break
     return result
@@ -1102,7 +1115,7 @@ class Repo:
         """Check for a YAML config file in this db's root directory."""
         try:
             with open(self.config_file) as reponame_file:
-                yaml_data = yaml.load(reponame_file)
+                yaml_data = yaml.safe_load(reponame_file)
 
                 if (
                     not yaml_data

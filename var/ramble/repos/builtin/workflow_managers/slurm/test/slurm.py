@@ -40,14 +40,22 @@ ramble:
 """
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(
+            ws.config_dir, ramble.workspace.config_file_name
+        )
         with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
-        path = os.path.join(ws.experiment_dir, "hostname", "local", "test_default")
-        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        path = os.path.join(
+            ws.experiment_dir, "hostname", "local", "test_default"
+        )
+        files = [
+            f
+            for f in os.listdir(path)
+            if os.path.isfile(os.path.join(path, f))
+        ]
         assert "batch_submit" in files
         assert "batch_query" in files
         assert "batch_cancel" in files
@@ -93,7 +101,9 @@ ramble:
 """
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(
+            ws.config_dir, ramble.workspace.config_file_name
+        )
         with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
@@ -104,15 +114,25 @@ ramble:
         with open(all_exec_file) as f:
             content = f.read()
             batch_submit_path = os.path.join(
-                ws.experiment_dir, "hostname", "local", "test_slurm", "batch_submit"
+                ws.experiment_dir,
+                "hostname",
+                "local",
+                "test_slurm",
+                "batch_submit",
             )
             assert batch_submit_path in content
             # The sbatch is embedded in the batch_submit_path script instead
             assert f"sbatch {batch_submit_path}" not in content
 
         # Assert on no workflow manager
-        path = os.path.join(ws.experiment_dir, "hostname", "local", "test_None")
-        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        path = os.path.join(
+            ws.experiment_dir, "hostname", "local", "test_None"
+        )
+        files = [
+            f
+            for f in os.listdir(path)
+            if os.path.isfile(os.path.join(path, f))
+        ]
         assert "slurm_experiment_sbatch" not in files
         assert "batch_submit" not in files
         assert "batch_query" not in files
@@ -120,8 +140,14 @@ ramble:
         assert "batch_wait" not in files
 
         # Assert on slurm workflow manager
-        path = os.path.join(ws.experiment_dir, "hostname", "local", "test_slurm")
-        files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+        path = os.path.join(
+            ws.experiment_dir, "hostname", "local", "test_slurm"
+        )
+        files = [
+            f
+            for f in os.listdir(path)
+            if os.path.isfile(os.path.join(path, f))
+        ]
         assert "batch_submit" in files
         assert "batch_query" in files
         assert "batch_cancel" in files
@@ -147,14 +173,20 @@ ramble:
             assert "scancel" in content
 
         # Assert on the experiment with non-empty partition variable given
-        path = os.path.join(ws.experiment_dir, "hostname", "local", "test_slurm_2")
+        path = os.path.join(
+            ws.experiment_dir, "hostname", "local", "test_slurm_2"
+        )
         with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
             content = f.read()
             assert "#SBATCH -p h3" in content
 
         # Assert on the experiment with custom slurm execute template
-        path = os.path.join(ws.experiment_dir, "hostname", "local", "test_slurm_3")
-        assert not os.path.exists(os.path.join(path, "slurm_experiment_sbatch"))
+        path = os.path.join(
+            ws.experiment_dir, "hostname", "local", "test_slurm_3"
+        )
+        assert not os.path.exists(
+            os.path.join(path, "slurm_experiment_sbatch")
+        )
         with open(os.path.join(path, "execute_experiment")) as f:
             content = f.read()
             # Since it uses the default execute_experiment tpl, no slurm content is present

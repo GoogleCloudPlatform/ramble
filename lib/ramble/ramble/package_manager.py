@@ -283,3 +283,6 @@ class SoftwareInfo:
 
     def to_version_text(self):
         return f"{self.name} @{self.version}"
+
+    def to_dict(self):
+        return self.__dict__

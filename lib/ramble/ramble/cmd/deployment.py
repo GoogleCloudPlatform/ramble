@@ -16,6 +16,7 @@ import ramble.config
 import ramble.fetch_strategy
 import ramble.filters
 import ramble.pipeline
+import ramble.repository
 import ramble.stage
 import ramble.util.path
 import ramble.workspace
@@ -26,7 +27,7 @@ from ramble.util.logger import logger
 import spack.util.spack_json as sjson
 import spack.util.url as surl
 
-description = "(experimental) manage workspace deployments"
+description = "manage workspace deployments"
 section = "workspaces"
 level = "short"
 
@@ -152,12 +153,23 @@ def deployment_pull(args):
                     "Deployment may be corrupt or incomplete."
                 )
 
-        obj_repo_path = os.path.join(
-            ws.root, ramble.pipeline.PushDeploymentPipeline.object_repo_name
+        legacy_obj_repo_path = os.path.join(
+            ws.root, ramble.pipeline.PushDeploymentPipeline.legacy_object_repo_name
         )
-        if os.path.exists(obj_repo_path):
+        # Read in legacy deployment repo if it exists
+        if os.path.exists(legacy_obj_repo_path):
             repo_cmd = RambleCommand("repo")
-            repo_cmd("add", obj_repo_path, global_args=["-D", ws.root])
+            repo_cmd("add", legacy_obj_repo_path, global_args=["-D", ws.root])
+
+        ramble_repos_path = os.path.join(ws.root, "object_repos", "ramble")
+        if os.path.exists(ramble_repos_path):
+            repo_cmd = RambleCommand("repo")
+            for maybe_repo in os.listdir(ramble_repos_path):
+                maybe_repo_dir = os.path.join(ramble_repos_path, maybe_repo)
+                if os.path.isdir(maybe_repo_dir) and os.path.exists(
+                    os.path.join(maybe_repo_dir, ramble.repository.unified_config)
+                ):
+                    repo_cmd("add", maybe_repo_dir, global_args=["-D", ws.root])
 
 
 def deployment_run_pipeline(args, pipeline):

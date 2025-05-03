@@ -26,7 +26,7 @@ class WhenVariants(ExecutableApplication):
     variant(
         "zlib_type",
         default="preferred",
-        values=["preferred", "testing"],
+        values=["preferred", "testing", "modifier"],
         description="Type of zlib to use",
     )
 
@@ -43,5 +43,9 @@ class WhenVariants(ExecutableApplication):
 
         with when("zlib_type=testing"):
             software_spec("zlib-test", pkg_spec="zlib@1.2.11")
+
+        with when("zlib_type=modifier"):
+            with when("modifier=test-mod"):
+                software_spec("zlib-mod", pkg_spec="zlib@1.2.13")
 
         required_package("zlib")

@@ -45,7 +45,7 @@ shared_directive = SharedMeta.directive
 
 
 @shared_directive("archive_patterns")
-def archive_pattern(pattern):
+def archive_pattern(pattern, **kwargs):
     """Adds a file pattern to be archived in addition to figure of merit logs
 
     Defines a new file pattern that will be archived during workspace archival.
@@ -63,7 +63,7 @@ def archive_pattern(pattern):
 
 
 @shared_directive("figure_of_merit_contexts")
-def figure_of_merit_context(name, regex, output_format):
+def figure_of_merit_context(name, regex, output_format, **kwargs):
     """Defines a context for figures of merit
 
     Defines a new context to contain figures of merit.
@@ -91,6 +91,7 @@ def figure_of_merit(
     units="",
     contexts=None,
     fom_type: FomType = FomType.UNDEFINED,
+    **kwargs,
 ):
     """Adds a figure of merit to track for this object
 
@@ -123,7 +124,7 @@ def figure_of_merit(
 
 @shared_directive("compilers")
 def define_compiler(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None
+    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
 ):
     """Defines the compiler that will be used with this object
 
@@ -137,6 +138,7 @@ def define_compiler(
         compiler (str): Package name to use for compilation
         package_manager (str): Glob supported pattern to match package managers
                                this compiler applies to
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_define_compiler(obj):
@@ -163,7 +165,7 @@ def define_compiler(
 
 @shared_directive("software_specs")
 def software_spec(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None
+    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
 ):
     """Defines a new software spec needed for this object.
 
@@ -183,6 +185,7 @@ def software_spec(
         compiler (str): Package name to use as compiler for compiling this package
         package_manager (str): Glob supported pattern to match package managers
                                this package applies to
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_software_spec(obj):
@@ -220,6 +223,7 @@ def package_manager_config(name, config, package_manager=None, when=None, **kwar
         name (str): Name of this configuration
         config (str): Configuration option to set
         package_manager (str): Name of the package manager this config should be used with
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_package_manager_config(obj):
@@ -243,13 +247,14 @@ def package_manager_config(name, config, package_manager=None, when=None, **kwar
 
 
 @shared_directive("required_packages")
-def required_package(name, package_manager=None, when=None):
+def required_package(name, package_manager=None, when=None, **kwargs):
     """Defines a new spack package that is required for this object
     to function properly.
 
     Args:
         name (str): Name of required package
         package_manager (str): Glob package manager name to apply this required package to
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_required_package(obj):
@@ -279,6 +284,7 @@ def success_criteria(
     fom_context="null",
     formula=None,
     anti_match=None,
+    **kwargs,
 ):
     """Defines a success criteria used by experiments of this object
 
@@ -323,7 +329,7 @@ def success_criteria(
 
 @shared_directive("builtins")
 def register_builtin(
-    name, required=True, injection_method="prepend", depends_on=None, dependents=None
+    name, required=True, injection_method="prepend", depends_on=None, dependents=None, **kwargs
 ):
     """Register a builtin
 
@@ -365,13 +371,18 @@ def register_builtin(
     The 'injection_method' attribute controls where the builtin will be
     injected into the executable list.
     Options are:
-    - 'prepend' -- This builtin will be injected at the beginning of the executable list
-    - 'append' -- This builtin will be injected at the end of the executable list
+    - 'prepend' -- This builtin will be injected before the executables for the experiment
+    - 'append' -- This builtin will be injected after the executables for the experiment
 
-    The 'depends_on' and 'dependents' attributes control explicit ordering
-    relative to other builtins and executables.
-
-    NOTE: Specifying dependencies disables the use of 'injection_method'
+    NOTE: When specifying explicit dependencies, cycles can be created which
+    will cause an error when trying to construct the final executable order.
+    One possible way to resolve those issues is to make sure that builtins
+    which depend on each other have the same injection method (or at least do
+    not have conflicting injection methods). As an example, if builtin `a` has
+    an injection method of prepend, and builtin `b` lists `a` as a dependent
+    but has an injection method of append, then this will create a cycle. If b
+    has it's injection method updated to be `prepend` the cycle will be
+    resolved.
 
     Args:
         name (str): Name of builtin (should be the name of a class method) to register
@@ -381,7 +392,7 @@ def register_builtin(
         depends_on (list(str) | None): The names of builtins this builtin depends on
                                        (and must execute after).
         dependents (list(str) | None): The names of builtins that should come
-                                       after the current one.
+                                       after this builtin
     """
     if depends_on is None:
         depends_on = []
@@ -412,7 +423,7 @@ def register_builtin(
 
 
 @shared_directive("phase_definitions")
-def register_phase(name, pipeline=None, run_before=None, run_after=None):
+def register_phase(name, pipeline=None, run_before=None, run_after=None, when=None, **kwargs):
     """Register a phase
 
     Phases are portions of a pipeline that will execute when
@@ -429,6 +440,7 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None):
       pipeline (str): The name of the pipeline this phase should be registered into.
       run_before (list(str) | None): A list of phase names this phase should run before
       run_after (list(str) | None): A list of phase names this phase should run after
+      when (list | None): List of when conditions to apply to directive
     """
     if run_before is None:
         run_before = []
@@ -437,6 +449,10 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None):
 
     def _execute_register_phase(obj):
         import ramble.util.graph
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "register_phase"
+        )
 
         if pipeline not in obj._pipelines:
             raise ramble.language.language_base.DirectiveError(
@@ -483,13 +499,15 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None):
         for after in run_after:
             phase_node.order_after(after)
 
+        phase_node.when = when_list
+
         obj.phase_definitions[pipeline][name] = phase_node
 
     return _execute_register_phase
 
 
 @shared_directive(dicts=())
-def maintainers(*names: str):
+def maintainers(*names: str, **kwargs):
     """Add a new maintainer directive, to specify maintainers in a declarative way.
 
     Args:
@@ -506,7 +524,7 @@ def maintainers(*names: str):
 
 
 @shared_directive(dicts=())
-def tags(*values: str):
+def tags(*values: str, **kwargs):
     """Add a new tag directive, to specify tags in a declarative way.
 
     Args:
@@ -523,7 +541,7 @@ def tags(*values: str):
 
 
 @shared_directive(dicts=())
-def target_shells(shell_support_pattern=None):
+def target_shells(shell_support_pattern=None, **kwargs):
     """Directive to specify supported shells.
 
     If not specified, i.e., not directly specified or inherited from the base,
@@ -550,6 +568,7 @@ def register_template(
     extra_vars: Optional[dict] = None,
     extra_vars_func: Optional[str] = None,
     output_perm=None,
+    **kwargs,
 ):
     """Directive to define an object-specific template to be rendered into experiment run_dir.
 
@@ -599,7 +618,12 @@ def register_template(
 
 @shared_directive("formatted_executables")
 def formatted_executable(
-    name: str, commands: list, prefix: str = "", indentation: int = 0, join_separator: str = "\n"
+    name: str,
+    commands: list,
+    prefix: str = "",
+    indentation: int = 0,
+    join_separator: str = "\n",
+    **kwargs,
 ):
     """Define a new formatted execution for this object
 
@@ -622,7 +646,13 @@ def formatted_executable(
 
 
 @shared_directive("validators")
-def register_validator(name: str, predicate: str, message: str, fail_on_invalid: bool = True):
+def register_validator(
+    name: str,
+    predicate: str,
+    message: str,
+    fail_on_invalid: bool = True,
+    **kwargs,
+):
     """Directive to define a validator for the object.
 
     Args:
@@ -651,6 +681,7 @@ def variant(
     default: Optional[Any] = None,
     description: str = "",
     values: Optional[Union[collections.abc.Sequence, Callable[[Any], bool]]] = None,
+    **kwargs,
 ):
 
     def _define_variant(obj):
