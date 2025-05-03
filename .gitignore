@@ -3,3 +3,5 @@ __pycache__/
 *.txt
 var/ramble/cache
 var/ramble/workspaces
+*.vscode
+.vscode/
