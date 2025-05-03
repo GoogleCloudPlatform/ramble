@@ -138,6 +138,7 @@ def define_compiler(
         compiler (str): Package name to use for compilation
         package_manager (str): Glob supported pattern to match package managers
                                this compiler applies to
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_define_compiler(obj):
@@ -184,6 +185,7 @@ def software_spec(
         compiler (str): Package name to use as compiler for compiling this package
         package_manager (str): Glob supported pattern to match package managers
                                this package applies to
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_software_spec(obj):
@@ -221,6 +223,7 @@ def package_manager_config(name, config, package_manager=None, when=None, **kwar
         name (str): Name of this configuration
         config (str): Configuration option to set
         package_manager (str): Name of the package manager this config should be used with
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_package_manager_config(obj):
@@ -251,6 +254,7 @@ def required_package(name, package_manager=None, when=None, **kwargs):
     Args:
         name (str): Name of required package
         package_manager (str): Glob package manager name to apply this required package to
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_required_package(obj):
@@ -419,7 +423,7 @@ def register_builtin(
 
 
 @shared_directive("phase_definitions")
-def register_phase(name, pipeline=None, run_before=None, run_after=None, **kwargs):
+def register_phase(name, pipeline=None, run_before=None, run_after=None, when=None, **kwargs):
     """Register a phase
 
     Phases are portions of a pipeline that will execute when
@@ -436,6 +440,7 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None, **kwarg
       pipeline (str): The name of the pipeline this phase should be registered into.
       run_before (list(str) | None): A list of phase names this phase should run before
       run_after (list(str) | None): A list of phase names this phase should run after
+      when (list | None): List of when conditions to apply to directive
     """
     if run_before is None:
         run_before = []
@@ -444,6 +449,10 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None, **kwarg
 
     def _execute_register_phase(obj):
         import ramble.util.graph
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "register_phase"
+        )
 
         if pipeline not in obj._pipelines:
             raise ramble.language.language_base.DirectiveError(
@@ -489,6 +498,8 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None, **kwarg
 
         for after in run_after:
             phase_node.order_after(after)
+
+        phase_node.when = when_list
 
         obj.phase_definitions[pipeline][name] = phase_node
 

@@ -213,6 +213,7 @@ class DirectiveMeta(type):
                         "required_package",
                         "define_compiler",
                         "package_manager_config",
+                        "register_phase",
                     ]:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'
