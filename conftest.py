@@ -694,6 +694,8 @@ def pytest_generate_tests(metafunc):
 
         all_applications = []
         repo_apps = list_cmd().split("\n")
+        # Also list out base_apps, to populate repo paths
+        list_cmd("--type", "base_applications")
 
         for app_str in repo_apps:
             m = name_regex.match(app_str)
