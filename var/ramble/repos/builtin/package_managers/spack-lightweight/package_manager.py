@@ -546,6 +546,41 @@ class SpackLightweight(PackageManagerBase):
         self.runner.deactivate()
         return pkg_list
 
+    package_manager_variable(
+        "container_registry_name",
+        default="non-existent",
+        description="Name of the container registry to push image to",
+    )
+
+    package_manager_variable(
+        "container_base_image",
+        default="",
+        description="Base image for the container",
+    )
+
+    package_manager_variable(
+        "container_image_tag",
+        default="",
+        description="Tag for the container image",
+    )
+
+    register_template(
+        name="push_container_image",
+        src_path="push_container_image.sh.tpl",
+        dest_path="push_container_image.sh",
+        extra_vars_func="push_container_image_vars",
+    )
+
+    def _push_container_image_vars(self):
+        self.runner.activate()
+        source_cmd = "\n".join(self.runner.generate_source_command())
+        activate_cmd = "\n".join(self.runner.generate_activate_command())
+        self.runner.deactivate()
+        return {
+            "source_cmd": source_cmd,
+            "activate_cmd": activate_cmd,
+        }
+
 
 spack_namespace = "spack"
 
