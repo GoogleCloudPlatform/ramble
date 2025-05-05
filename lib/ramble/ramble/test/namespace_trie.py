@@ -22,6 +22,7 @@ def test_add_single(trie):
     assert trie.is_prefix("foo")
     assert trie.has_value("foo")
     assert trie["foo"] == "bar"
+    assert not trie.is_leaf("foo")
 
 
 def test_add_multiple(trie):
