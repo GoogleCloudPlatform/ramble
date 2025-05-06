@@ -77,6 +77,12 @@ exclude_lines = [
     'if 0:',
     'if False:',
     'if __name__ == .__main__.:',
+
+    # Ignore import statements:
+    # Imports (and defs) are not counted due to coverage being run after
+    # these modules are already initialized.
+    '^import .*',
+    '^from .* import .*',
 ]
 ignore_errors = true
 include = [
