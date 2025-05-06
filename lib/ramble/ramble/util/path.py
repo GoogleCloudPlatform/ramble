@@ -13,14 +13,10 @@ TODO: this is really part of ramble.config. Consolidate it.
 import getpass
 import os
 import re
-import subprocess
 import tempfile
 import urllib.parse
 
-from llnl.util.lang import memoized
-
 import ramble.paths
-from ramble.util.logger import logger
 
 __all__ = ["substitute_config_variables", "substitute_path_variables", "canonicalize_path"]
 
@@ -30,35 +26,6 @@ replacements = {
     "user": getpass.getuser(),
     "tempdir": tempfile.gettempdir(),
 }
-
-# This is intended to be longer than the part of the install path
-# ramble generates from the root path we give it.  Included in the
-# estimate:
-#
-#   os-arch      ->   30
-#   compiler     ->   30
-#   package name ->   50   (longest is currently 47 characters)
-#   version      ->   20
-#   hash         ->   32
-#   buffer       ->  138
-#  ---------------------
-#   total        ->  300
-
-
-@memoized
-def get_system_path_max():
-    # Choose a conservative default
-    sys_max_path_length = 256
-    try:
-        path_max_proc = subprocess.Popen(
-            ["getconf", "PATH_MAX", "/"], stdout=subprocess.PIPE, stderr=subprocess.STDOUT
-        )
-        proc_output = str(path_max_proc.communicate()[0].decode())
-        sys_max_path_length = int(proc_output)
-    except (ValueError, subprocess.CalledProcessError, OSError):
-        logger.msg(f"Unable to find system max path length, using: {sys_max_path_length}")
-
-    return sys_max_path_length
 
 
 def substitute_config_variables(path, local_replacements):
