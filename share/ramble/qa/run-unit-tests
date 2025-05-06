@@ -73,6 +73,10 @@ if [ $? != 0 ]; then
     ERROR=1
 fi
 
+if [[ "$PUSH_CODECOV" ]]; then
+    echo "Processing codecov upload"
+    codecovcli upload-process
+fi
 
 if [ $ERROR == 1 ]; then
     exit 1

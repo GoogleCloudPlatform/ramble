@@ -72,6 +72,9 @@ steps:
         exit $$error
     id: ramble-unit-tests
     entrypoint: /bin/bash
+    env:
+    - 'CODECOV_TOKEN=$_CODECOV_TOKEN'
+    - 'PUSH_CODECOV=$_PUSH_CODECOV'
 substitutions:
   _SPACK_REF: v0.21.2
   _PYTHON_VER: 3.11.6
