@@ -8,3 +8,4 @@ pytest-xdist
 pytest-cov
 line_profiler
 isort
+codecov-cli

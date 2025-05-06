@@ -73,13 +73,9 @@ if [ $? != 0 ]; then
     ERROR=1
 fi
 
-
-echo $PUSH_CODECOV
 if [[ "$PUSH_CODECOV" ]]; then
     echo "Processing codecov upload"
-    # TODO: this must be in path somehow. What is the best way?
-    export PATH=$PATH:/workspace/
-    codecov upload-process
+    codecovcli upload-process
 fi
 
 if [ $ERROR == 1 ]; then
