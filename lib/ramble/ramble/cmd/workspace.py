@@ -649,6 +649,10 @@ def workspace_info_setup_parser(subparser):
         "--phases", action="store_true", help="If set, phase information will be printed"
     )
 
+    subparser.add_argument(
+        "--variants", action="store_true", help="If set, experiment variants will be printed"
+    )
+
     arguments.add_common_arguments(subparser, ["where", "exclude_where", "filter_tags"])
 
     subparser.add_argument(
@@ -658,7 +662,7 @@ def workspace_info_setup_parser(subparser):
         default=0,
         help="level of verbosity. Add flags to "
         + "increase description of workspace\n"
-        + "level 1 enables software, tags, and templates\n"
+        + "level 1 enables software, tags, templates, and variants\n"
         + "level 2 enables expansions and phases\n",
     )
 
@@ -671,6 +675,7 @@ def workspace_info(args):
         args.software = True
         args.tags = True
         args.templates = True
+        args.variants = True
 
     if args.verbose >= 2:
         args.expansions = True
@@ -801,6 +806,11 @@ def workspace_info(args):
 
                     if args.tags:
                         color.cprint("        Experiment Tags: " + str(app_inst.experiment_tags))
+
+                    if args.variants:
+                        color.cprint(rucolor.nested_4("        Variants: "))
+                        for key, value in app_inst.variants.items():
+                            color.cprint(f"          {key}: {value}")
 
                     if args.expansions:
                         var_groups = [
