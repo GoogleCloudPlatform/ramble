@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import copy
 from typing import Dict, List
 
 import ramble.util.colors
@@ -87,16 +88,7 @@ class SoftwareSpec:
         return str(self_dict)
 
     def copy(self):
-        new_spec = SoftwareSpec(
-            self.name,
-            self.pkg_spec,
-            prefix=self.prefix,
-            compiler=self.compiler,
-            compiler_spec=self.compiler_spec,
-            when=self.when,
-        )
-
-        return new_spec
+        return copy.deepcopy(self)
 
     def conflict_spec(self, test, skip_conflicting_when: bool = True):
         if skip_conflicting_when:
