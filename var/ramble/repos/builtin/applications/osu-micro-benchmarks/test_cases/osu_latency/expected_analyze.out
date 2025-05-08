@@ -1,0 +1,121 @@
+Experiment osu-micro-benchmarks.osu_latency.test figures of merit:
+  Status = SUCCESS
+  Tags = ['synthetic-benchmarks']
+  default (null) context figures of merit:
+    OMB Version = v7.4
+    OMB Datatype = MPI_CHAR
+  Message Size: 1 context figures of merit:
+    Latency = 19.18 us
+    P50 Tail Latency = 18.81 us
+    P90 Tail Latency = 20.05 us
+    P99 Tail Latency = 25.24 us
+  Message Size: 2 context figures of merit:
+    Latency = 19.08 us
+    P50 Tail Latency = 18.77 us
+    P90 Tail Latency = 19.92 us
+    P99 Tail Latency = 24.44 us
+  Message Size: 4 context figures of merit:
+    Latency = 19.16 us
+    P50 Tail Latency = 18.84 us
+    P90 Tail Latency = 20.02 us
+    P99 Tail Latency = 24.42 us
+  Message Size: 8 context figures of merit:
+    Latency = 19.09 us
+    P50 Tail Latency = 18.77 us
+    P90 Tail Latency = 19.91 us
+    P99 Tail Latency = 24.81 us
+  Message Size: 16 context figures of merit:
+    Latency = 19.16 us
+    P50 Tail Latency = 18.83 us
+    P90 Tail Latency = 20.06 us
+    P99 Tail Latency = 25.13 us
+  Message Size: 32 context figures of merit:
+    Latency = 19.25 us
+    P50 Tail Latency = 18.91 us
+    P90 Tail Latency = 20.12 us
+    P99 Tail Latency = 24.74 us
+  Message Size: 64 context figures of merit:
+    Latency = 21.97 us
+    P50 Tail Latency = 21.66 us
+    P90 Tail Latency = 22.90 us
+    P99 Tail Latency = 27.02 us
+  Message Size: 128 context figures of merit:
+    Latency = 22.24 us
+    P50 Tail Latency = 21.87 us
+    P90 Tail Latency = 23.27 us
+    P99 Tail Latency = 27.76 us
+  Message Size: 256 context figures of merit:
+    Latency = 22.94 us
+    P50 Tail Latency = 22.67 us
+    P90 Tail Latency = 23.90 us
+    P99 Tail Latency = 26.59 us
+  Message Size: 512 context figures of merit:
+    Latency = 23.31 us
+    P50 Tail Latency = 22.99 us
+    P90 Tail Latency = 24.24 us
+    P99 Tail Latency = 30.26 us
+  Message Size: 1024 context figures of merit:
+    Latency = 23.93 us
+    P50 Tail Latency = 23.57 us
+    P90 Tail Latency = 24.90 us
+    P99 Tail Latency = 30.44 us
+  Message Size: 2048 context figures of merit:
+    Latency = 25.61 us
+    P50 Tail Latency = 25.22 us
+    P90 Tail Latency = 26.55 us
+    P99 Tail Latency = 32.52 us
+  Message Size: 4096 context figures of merit:
+    Latency = 28.90 us
+    P50 Tail Latency = 28.56 us
+    P90 Tail Latency = 30.06 us
+    P99 Tail Latency = 35.77 us
+  Message Size: 8192 context figures of merit:
+    Latency = 35.82 us
+    P50 Tail Latency = 35.21 us
+    P90 Tail Latency = 37.02 us
+    P99 Tail Latency = 43.77 us
+  Message Size: 16384 context figures of merit:
+    Latency = 48.90 us
+    P50 Tail Latency = 48.36 us
+    P90 Tail Latency = 50.68 us
+    P99 Tail Latency = 57.05 us
+  Message Size: 32768 context figures of merit:
+    Latency = 69.70 us
+    P50 Tail Latency = 69.10 us
+    P90 Tail Latency = 74.42 us
+    P99 Tail Latency = 80.35 us
+  Message Size: 65536 context figures of merit:
+    Latency = 104.26 us
+    P50 Tail Latency = 103.22 us
+    P90 Tail Latency = 108.77 us
+    P99 Tail Latency = 119.06 us
+  Message Size: 131072 context figures of merit:
+    Latency = 149.62 us
+    P50 Tail Latency = 148.29 us
+    P90 Tail Latency = 158.36 us
+    P99 Tail Latency = 168.15 us
+  Message Size: 262144 context figures of merit:
+    Latency = 221.93 us
+    P50 Tail Latency = 220.13 us
+    P90 Tail Latency = 232.01 us
+    P99 Tail Latency = 266.42 us
+  Message Size: 524288 context figures of merit:
+    Latency = 359.10 us
+    P50 Tail Latency = 357.12 us
+    P90 Tail Latency = 371.19 us
+    P99 Tail Latency = 438.25 us
+  Message Size: 1048576 context figures of merit:
+    Latency = 634.45 us
+    P50 Tail Latency = 632.86 us
+    P90 Tail Latency = 648.21 us
+    P99 Tail Latency = 715.90 us
+  Message Size: 2097152 context figures of merit:
+    Latency = 1167.77 us
+    P50 Tail Latency = 1164.47 us
+    P90 Tail Latency = 1180.45 us
+    P99 Tail Latency = 1283.38 us
+  Message Size: 4194304 context figures of merit:
+    Latency = 2230.57 us
+    P50 Tail Latency = 2225.22 us
+    P90 Tail Latency = 2249.89 us
+    P99 Tail Latency = 2360.58 us
