@@ -296,7 +296,7 @@ class ExperimentSet:
             self.keywords.application_name, allow_passthrough=False
         )
 
-        app_inst = ramble.repository.get(final_app_name).copy()
+        app_inst = ramble.repository.get(final_app_name).clone()
         app_inst.set_variables(variables, self)
         app_inst.set_variants(context.variants)
         app_inst.set_env_variable_sets(context.env_variables)

@@ -215,28 +215,28 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         return self._exp_lock
 
-    def copy(self):
-        """Deep copy an application instance"""
-        new_copy = type(self)(self._file_path)
-        self.generated_experiments.append(new_copy)
+    def clone(self):
+        """Deep clone an application instance"""
+        new_clone = type(self)(self._file_path)
+        self.generated_experiments.append(new_clone)
 
         if self._env_variable_sets:
-            new_copy.set_env_variable_sets(self._env_variable_sets.copy())
+            new_clone.set_env_variable_sets(self._env_variable_sets.copy())
         if self.variables:
-            new_copy.set_variables(self.variables.copy(), self.experiment_set)
+            new_clone.set_variables(self.variables.copy(), self.experiment_set)
         if self.internals:
-            new_copy.set_internals(self.internals.copy())
+            new_clone.set_internals(self.internals.copy())
         if self._formatted_executables:
-            new_copy.set_formatted_executables(self._formatted_executables.copy())
+            new_clone.set_formatted_executables(self._formatted_executables.copy())
 
-        new_copy.keywords = ramble.keywords.keywords.copy()
-        new_copy.set_template(False)
-        new_copy.repeats.set_repeats(False, 0)
-        new_copy.set_chained_experiments(None)
+        new_clone.keywords = ramble.keywords.keywords.copy()
+        new_clone.set_template(False)
+        new_clone.repeats.set_repeats(False, 0)
+        new_clone.set_chained_experiments(None)
         if self.variants:
-            new_copy.set_variants(self.variants)
+            new_clone.set_variants(self.variants)
 
-        return new_copy
+        return new_clone
 
     def is_actionable(self):
         """Determine if an experiment should be actioned in pipelines
@@ -781,7 +781,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 # of the experiment, so the base_inst command above
                 # doesn't get an application instance.
                 if base_inst:
-                    new_inst = base_inst.copy()
+                    new_inst = base_inst.clone()
 
                     if namespace.variables in cur_exp_def:
                         for var, val in cur_exp_def[namespace.variables].items():
