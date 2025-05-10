@@ -47,13 +47,12 @@ import ramble.config
 import ramble.util.web as web_util
 from ramble.util.logger import logger
 
-import spack.error
 import spack.util.crypto as crypto
 import spack.util.pattern as pattern
 import spack.util.url as url_util
+import spack.version
 from spack.util.compression import decompressor_for, extension
 from spack.util.executable import CommandNotFoundError, which
-from spack.util.string import comma_and, quote
 from spack.version import Version, ver
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
@@ -1512,138 +1511,6 @@ def from_kwargs(**kwargs):
     raise InvalidArgsError(**kwargs)
 
 
-def check_pkg_attributes(pkg):
-    """Find ambiguous top-level fetch attributes in a package.
-
-    Currently this only ensures that two or more VCS fetch strategies are
-    not specified at once.
-    """
-    # a single package cannot have URL attributes for multiple VCS fetch
-    # strategies *unless* they are the same attribute.
-    conflicts = {s.url_attr for s in all_strategies if hasattr(pkg, s.url_attr)}
-
-    # URL isn't a VCS fetch method. We can use it with a VCS method.
-    conflicts -= {"url"}
-
-    if len(conflicts) > 1:
-        raise FetcherConflict(
-            "Package %s cannot specify %s together. Pick at most one."
-            % (pkg.name, comma_and(quote(conflicts)))
-        )
-
-
-def _check_version_attributes(fetcher, pkg, version):
-    """Ensure that the fetcher for a version is not ambiguous.
-
-    This assumes that we have already determined the fetcher for the
-    specific version using ``for_package_version()``
-    """
-    all_optionals = {a for s in all_strategies for a in s.optional_attrs}
-
-    args = pkg.versions[version]
-    extra = set(args) - set(fetcher.optional_attrs) - {fetcher.url_attr, "no_cache"}
-    extra.intersection_update(all_optionals)
-
-    if extra:
-        legal_attrs = [fetcher.url_attr] + list(fetcher.optional_attrs)
-        raise FetcherConflict(
-            "%s version '%s' has extra arguments: %s"
-            % (pkg.name, version, comma_and(quote(extra))),
-            "Valid arguments for a %s fetcher are: \n    %s"
-            % (fetcher.url_attr, comma_and(quote(legal_attrs))),
-        )
-
-
-def _extrapolate(pkg, version):
-    """Create a fetcher from an extrapolated URL for this version."""
-    try:
-        return URLFetchStrategy(pkg.url_for_version(version), fetch_options=pkg.fetch_options)
-    except spack.package.NoURLError:
-        msg = "Can't extrapolate a URL for version %s " "because package %s defines no URLs"
-        raise ExtrapolationError(msg % (version, pkg.name))
-
-
-def _from_merged_attrs(fetcher, pkg, version):
-    """Create a fetcher from merged package and version attributes."""
-    if fetcher.url_attr == "url":
-        url = pkg.url_for_version(version)
-        # TODO: refactor this logic into its own method or function
-        # TODO: to avoid duplication
-        mirrors = [spack.url.substitute_version(u, version) for u in getattr(pkg, "urls", [])[1:]]
-        attrs = {fetcher.url_attr: url, "mirrors": mirrors}
-    else:
-        url = getattr(pkg, fetcher.url_attr)
-        attrs = {fetcher.url_attr: url}
-
-    attrs["fetch_options"] = pkg.fetch_options
-    attrs.update(pkg.versions[version])
-
-    if fetcher.url_attr == "git" and hasattr(pkg, "submodules"):
-        attrs.setdefault("submodules", pkg.submodules)
-
-    return fetcher(**attrs)
-
-
-def for_package_version(pkg, version):
-    """Determine a fetch strategy based on the arguments supplied to
-    version() in the package description."""
-
-    # No-code packages have a custom fetch strategy to work around issues
-    # with resource staging.
-    if not pkg.has_code:
-        return BundleFetchStrategy()
-
-    check_pkg_attributes(pkg)
-
-    if not isinstance(version, spack.version.Version):
-        version = spack.version.Version(version)
-
-    # if it's a commit, we must use a GitFetchStrategy
-    if version.is_commit and hasattr(pkg, "git"):
-        # Populate the version with comparisons to other commits
-        version.generate_commit_lookup(pkg.name)
-        kwargs = {"git": pkg.git, "commit": str(version)}
-        kwargs["submodules"] = getattr(pkg, "submodules", False)
-        fetcher = GitFetchStrategy(**kwargs)
-        return fetcher
-
-    # If it's not a known version, try to extrapolate one by URL
-    if version not in pkg.versions:
-        return _extrapolate(pkg, version)
-
-    # Set package args first so version args can override them
-    args = {"fetch_options": pkg.fetch_options}
-    # Grab a dict of args out of the package version dict
-    args.update(pkg.versions[version])
-
-    # If the version specifies a `url_attr` directly, use that.
-    for fetcher in all_strategies:
-        if fetcher.url_attr in args:
-            _check_version_attributes(fetcher, pkg, version)
-            if fetcher.url_attr == "git" and hasattr(pkg, "submodules"):
-                args.setdefault("submodules", pkg.submodules)
-            return fetcher(**args)
-
-    # if a version's optional attributes imply a particular fetch
-    # strategy, and we have the `url_attr`, then use that strategy.
-    for fetcher in all_strategies:
-        if hasattr(pkg, fetcher.url_attr) or fetcher.url_attr == "url":
-            optionals = fetcher.optional_attrs
-            if optionals and any(a in args for a in optionals):
-                _check_version_attributes(fetcher, pkg, version)
-                return _from_merged_attrs(fetcher, pkg, version)
-
-    # if the optional attributes tell us nothing, then use any `url_attr`
-    # on the package.  This prefers URL vs. VCS, b/c URLFetchStrategy is
-    # defined first in this file.
-    for fetcher in all_strategies:
-        if hasattr(pkg, fetcher.url_attr):
-            _check_version_attributes(fetcher, pkg, version)
-            return _from_merged_attrs(fetcher, pkg, version)
-
-    raise InvalidArgsError(pkg, version, **args)
-
-
 def from_url_scheme(url, *args, **kwargs):
     """Finds a suitable FetchStrategy by matching its url_attr with the scheme
     in the given url."""
@@ -1668,39 +1535,6 @@ def from_url_scheme(url, *args, **kwargs):
             return fetcher(url, *args, **kwargs)
 
     raise ValueError(f'No FetchStrategy found for url with scheme: "{parsed_url.scheme}"')
-
-
-def from_list_url(pkg):
-    """If a package provides a URL which lists URLs for resources by
-    version, this can can create a fetcher for a URL discovered for
-    the specified package's version."""
-
-    if pkg.list_url:
-        try:
-            versions = pkg.fetch_remote_versions()
-            try:
-                # get a URL, and a checksum if we have it
-                url_from_list = versions[pkg.version]
-                checksum = None
-
-                # try to find a known checksum for version, from the package
-                version = pkg.version
-                if version in pkg.versions:
-                    args = pkg.versions[version]
-                    checksum = next(
-                        (v for k, v in args.items() if k in crypto.hashes), args.get("checksum")
-                    )
-
-                # construct a fetcher
-                return URLFetchStrategy(url_from_list, checksum, fetch_options=pkg.fetch_options)
-            except KeyError as e:
-                logger.debug(e)
-                logger.msg(f"Cannot find version {pkg.version} in url_list")
-
-        except BaseException as e:
-            # TODO: Don't catch BaseException here! Be more specific.
-            logger.debug(e)
-            logger.msg("Could not determine url from list_url.")
 
 
 class FsCache:
