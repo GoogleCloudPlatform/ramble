@@ -41,9 +41,15 @@ def test_pytest_help():
     assert "--collect-only" in output
 
 
-def test_failed_import():
-    with pytest.raises(main.RambleCommandError):
-        ramble_test("-p", "fake-mod")
+@pytest.mark.parametrize(
+    "extra_flag",
+    [(""), ("--list")],
+    ids=["main", "list"],
+)
+def test_failed_import(extra_flag):
+    out = ramble_test(extra_flag, "-p", "fake-pytest", fail_on_error=False)
+    assert ramble_test.returncode == 1
+    assert "Ensure requirements-dev.txt are installed" in out
 
 
 def test_list_only_lib():

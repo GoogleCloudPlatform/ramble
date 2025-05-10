@@ -135,7 +135,9 @@ def do_list(args, extra_args):
 
             pytest.main(["--collect-only", "-q"] + extra_args)
         except ImportError:
-            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
+            logger.die(
+                "Pytest python module not found. Ensure requirements-dev.txt are installed."
+            )
     finally:
         sys.stdout = old_output
 
@@ -200,7 +202,9 @@ def unit_test(parser, args, unknown_args):
 
             return pytest.main(["-h"])
         except ImportError:
-            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
+            logger.die(
+                "Pytest python module not found. Ensure requirements-dev.txt are installed."
+            )
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
@@ -234,7 +238,8 @@ def unit_test(parser, args, unknown_args):
                     return pytest.main(pytest_args)
                 except ImportError:
                     logger.die(
-                        "Pytest python module not found. Ensure requirements.txt are installed."
+                        "Pytest python module not found. "
+                        "Ensure requirements-dev.txt are installed."
                     )
     finally:
         if copied_conftest_path is not None:
