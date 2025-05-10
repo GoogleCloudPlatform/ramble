@@ -1,0 +1,50 @@
+# Copyright 2022-2025 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+import pytest
+
+from ramble import main
+from ramble.cmd import style
+
+style_cmd = main.RambleCommand("style")
+
+
+@pytest.mark.parametrize("tool", style.tool_names)
+def test_style(tool):
+    out = style_cmd("--tool", tool, __file__)
+    assert f"{tool} checks were clean" in out
+
+
+@pytest.mark.parametrize(
+    "content,expected_err",
+    [
+        ("import b\nimport a", "Imports are incorrectly sorted"),
+        ("import a\nimport b", "No newline at end of file"),
+    ],
+)
+def test_style_with_error(tmpdir, content, expected_err):
+    with tmpdir.as_cwd():
+        new_file = "new_file.py"
+        with open(new_file, "w+") as f:
+            f.write(content)
+
+        out = style_cmd(new_file, fail_on_error=False)
+        assert style_cmd.returncode != 0
+        assert expected_err in out
+
+
+def test_changed_files_all():
+    files = style.changed_files(all_files=True)
+    # Currently there are more than 900 files checked for styling.
+    # Use a smaller number here.
+    assert len(files) > 500
+
+
+def test_skip_tools():
+    output = style_cmd("--skip", ",".join(style.tool_names))
+    assert "Nothing to run" in output
