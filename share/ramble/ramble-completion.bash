@@ -679,7 +679,7 @@ _ramble_workspace_push_to_cache() {
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --where --exclude-where --filter-tags -v --verbose"
+    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --where --exclude-where --filter-tags -v --verbose"
 }
 
 _ramble_workspace_edit() {
