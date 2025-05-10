@@ -236,6 +236,13 @@ class Pip(PackageManagerBase):
             pkg_list.append(info)
         return pkg_list
 
+    def environment_load_commands(self):
+        self.runner.configure_env(self.app_inst.expander.env_path)
+        return [self.runner.generate_activate_command()]
+
+    def environment_unload_commands(self):
+        return [self.runner.generate_deactivate_command()]
+
 
 package_name_regex = re.compile(
     r"\s*(?P<pkg_name>[A-Z0-9][A-Z0-9._-]*[A-Z0-9]|[A-Z0-9]).*", re.IGNORECASE
