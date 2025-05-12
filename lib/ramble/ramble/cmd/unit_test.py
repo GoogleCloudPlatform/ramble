@@ -11,7 +11,6 @@ import argparse
 import collections
 import io
 import os
-import re
 import shutil
 import sys
 
@@ -121,58 +120,43 @@ def setup_parser(subparser):
 
 def do_list(args, extra_args):
     """Print a lists of tests than what pytest offers."""
-    # Run test collection and get the tree out.
-    old_output = sys.stdout
-    try:
-        sys.stdout = output = io.StringIO()
-        try:
-            import pytest
-
-            pytest.main(["--collect-only"] + extra_args)
-        except ImportError:
-            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
-    finally:
-        sys.stdout = old_output
-
-    lines = output.getvalue().split("\n")
-    tests = collections.defaultdict(set)
-    prefix = []
-
-    print("All lines =")
-    print(lines)
-
-    # collect tests into sections
-    for line in lines:
-        match = re.match(r"(\s*)<([^ ]*) '([^']*)'", line)
-        if not match:
-            continue
-        indent, nodetype, name = match.groups()
-
-        # strip parametrized tests
-        if "[" in name:
-            name = name[: name.index("[")]
-
-        depth = len(indent) // 2
-
-        if nodetype.endswith("Function"):
-            key = tuple(prefix)
-            tests[key].add(name)
-            print(f"added test {key}={name} from {nodetype}")
-        else:
-            prefix = prefix[:depth]
-            prefix.append(name)
-            print(f"added prefix {name}")
 
     def colorize(c, prefix):
         if isinstance(prefix, tuple):
             return "::".join(color.colorize(f"@{c}{{{p}}}") for p in prefix if p != "()")
         return color.colorize(f"@{c}{{{prefix}}}")
 
+    # Run test collection with quiet mode, to extract a list of <path>::<test_name>.
+    old_output = sys.stdout
+    try:
+        sys.stdout = output = io.StringIO()
+        try:
+            import pytest
+
+            pytest.main(["--collect-only", "-q"] + extra_args)
+        except ImportError:
+            logger.die(
+                "Pytest python module not found. Ensure requirements-dev.txt are installed."
+            )
+    finally:
+        sys.stdout = old_output
+
+    lines = output.getvalue().split("\n")
+    tests = collections.defaultdict(set)
+    # collect tests into sections
+    for line in lines:
+        if "::" not in line:
+            continue
+        [path, test_name] = line.split("::", 1)
+        # dedupe parametrized tests
+        if "[" in test_name:
+            test_name = test_name[: test_name.index("[")]
+        tests[path].add(test_name)
+
     if args.list == "list":
-        files = {prefix[0] for prefix in tests}
+        files = tests.keys()
         color_files = [colorize("B", file) for file in sorted(files)]
         colify(color_files)
-
     elif args.list == "long":
         for prefix, functions in sorted(tests.items()):
             path = colorize("*B", prefix) + "::"
@@ -180,7 +164,6 @@ def do_list(args, extra_args):
             color.cprint(path)
             colify(functions, indent=4)
             print()
-
     else:  # args.list == "names"
         all_functions = [
             colorize("*B", prefix) + "::" + colorize("c", f)
@@ -219,7 +202,9 @@ def unit_test(parser, args, unknown_args):
 
             return pytest.main(["-h"])
         except ImportError:
-            logger.die("Pytest python module not found. Ensure requirements.txt are installed.")
+            logger.die(
+                "Pytest python module not found. Ensure requirements-dev.txt are installed."
+            )
 
     # add back any parsed pytest args we need to pass to pytest
     pytest_args = add_back_pytest_args(args, unknown_args)
@@ -253,7 +238,8 @@ def unit_test(parser, args, unknown_args):
                     return pytest.main(pytest_args)
                 except ImportError:
                     logger.die(
-                        "Pytest python module not found. Ensure requirements.txt are installed."
+                        "Pytest python module not found. "
+                        "Ensure requirements-dev.txt are installed."
                     )
     finally:
         if copied_conftest_path is not None:

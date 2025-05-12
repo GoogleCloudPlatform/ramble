@@ -160,10 +160,10 @@ _workspaces() {
     RAMBLE_COMPREPLY="$RAMBLE_WORKSPACES"
 }
 
-_tests() {
+_unit_tests() {
     if [[ -z "${RAMBLE_TESTS:-}" ]]
     then
-        RAMBLE_TESTS="$(ramble test -l)"
+        RAMBLE_TESTS="$(ramble unit-test -l)"
     fi
     RAMBLE_COMPREPLY="$RAMBLE_TESTS"
 }
@@ -623,7 +623,7 @@ _ramble_unit_test() {
     then
         RAMBLE_COMPREPLY="-h --help -H --pytest-help --lib --obj -r --repo-path -l --list -L --list-long -N --list-names -s -k --showlocals"
     else
-        _tests
+        _unit_tests
     fi
 }
 
@@ -679,7 +679,7 @@ _ramble_workspace_push_to_cache() {
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --where --exclude-where --filter-tags -v --verbose"
+    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --where --exclude-where --filter-tags -v --verbose"
 }
 
 _ramble_workspace_edit() {

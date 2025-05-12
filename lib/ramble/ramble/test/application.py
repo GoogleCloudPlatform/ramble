@@ -110,47 +110,47 @@ def test_application_copy_is_deep(mutable_mock_apps_repo, app_name):
     src_inst.set_env_variable_sets(defined_env_vars)
     src_inst.set_internals(defined_internals)
 
-    copy_inst = src_inst.copy()
+    clone_inst = src_inst.clone()
 
     # Test variables
     for var, val in src_inst.variables.items():
-        assert var in copy_inst.variables.keys()
-        assert copy_inst.variables[var] == val
+        assert var in clone_inst.variables.keys()
+        assert clone_inst.variables[var] == val
 
     # Test env-vars
     for var_set in src_inst._env_variable_sets.keys():
-        assert var_set in copy_inst._env_variable_sets.keys()
+        assert var_set in clone_inst._env_variable_sets.keys()
         # Test set sets
         if var_set == "set":
             for var, val in src_inst._env_variable_sets[var_set].items():
-                assert var in copy_inst._env_variable_sets[var_set]
-                assert copy_inst._env_variable_sets[var_set][var] == val
+                assert var in clone_inst._env_variable_sets[var_set]
+                assert clone_inst._env_variable_sets[var_set][var] == val
         elif var_set == "append" or var_set == "prepend":
             for idx, set_group in enumerate(src_inst._env_variable_sets[var_set]):
                 if "var-separator" in set_group:
-                    assert "var-separator" in copy_inst._env_variable_sets[var_set][idx]
+                    assert "var-separator" in clone_inst._env_variable_sets[var_set][idx]
                     assert (
-                        copy_inst._env_variable_sets[var_set][idx]["var-separator"]
+                        clone_inst._env_variable_sets[var_set][idx]["var-separator"]
                         == set_group["var-separator"]
                     )
                 if "vars" in set_group:
-                    assert "vars" in copy_inst._env_variable_sets[var_set][idx]
+                    assert "vars" in clone_inst._env_variable_sets[var_set][idx]
                     for var, val in set_group["vars"].items():
-                        assert var in copy_inst._env_variable_sets[var_set][idx]["vars"]
-                        assert copy_inst._env_variable_sets[var_set][idx]["vars"][var] == val
+                        assert var in clone_inst._env_variable_sets[var_set][idx]["vars"]
+                        assert clone_inst._env_variable_sets[var_set][idx]["vars"][var] == val
         elif var_set == "unset":
             for var in src_inst._env_variable_sets[var_set]:
-                assert var in copy_inst._env_variable_sets[var_set]
+                assert var in clone_inst._env_variable_sets[var_set]
 
     # Test internals:
     for internal, conf in src_inst.internals.items():
-        assert internal in copy_inst.internals
+        assert internal in clone_inst.internals
         if internal == "custom_executables":
             for exec_name, exec_conf in conf.items():
-                assert exec_name in copy_inst.internals[internal]
+                assert exec_name in clone_inst.internals[internal]
                 for option, value in exec_conf.items():
-                    assert option in copy_inst.internals[internal][exec_name]
-                    assert copy_inst.internals[internal][exec_name][option] == value
+                    assert option in clone_inst.internals[internal][exec_name]
+                    assert clone_inst.internals[internal][exec_name][option] == value
 
 
 @pytest.mark.parametrize(
@@ -498,16 +498,16 @@ ramble:
 
 def test_class_attributes(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get("basic")
-    basic_copy = basic_inst.copy()
+    basic_clone = basic_inst.clone()
 
-    instances = [basic_inst, basic_copy]
+    instances = [basic_inst, basic_clone]
     for inst in instances:
         assert hasattr(inst, "workloads")
         assert "test_wl" in inst.workloads
 
-    basic_copy.workload("added_workload", executables=["foo"])
+    basic_clone.workload("added_workload", executables=["foo"])
 
-    assert "added_workload" in basic_copy.workloads
+    assert "added_workload" in basic_clone.workloads
     assert "added_workload" not in basic_inst.workloads
 
 

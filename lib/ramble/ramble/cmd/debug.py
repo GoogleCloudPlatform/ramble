@@ -7,19 +7,11 @@
 # except according to those terms.
 
 
-import os
 import platform
-import re
-from datetime import datetime
 
-from llnl.util.filesystem import working_dir
-
-import ramble.config
-import ramble.paths
 import ramble.util.version
 
 import spack.platforms
-from spack.util.executable import which
 
 description = "debugging commands for troubleshooting Ramble"
 section = "developer"
@@ -29,31 +21,6 @@ level = "long"
 def setup_parser(subparser):
     sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="debug_command")
     sp.add_parser("report", help="print information useful for bug reports")
-
-
-def _debug_tarball_suffix():
-    now = datetime.now()
-    suffix = now.strftime("%Y-%m-%d-%H%M%S")
-
-    git = which("git")
-    if not git:
-        return "nobranch-nogit-%s" % suffix
-
-    with working_dir(ramble.paths.prefix):
-        if not os.path.isdir(".git"):
-            return "nobranch.nogit.%s" % suffix
-
-        # Get symbolic branch name and strip any special chars (mainly '/')
-        symbolic = git("rev-parse", "--abbrev-ref", "--short", "HEAD", output=str).strip()
-        symbolic = re.sub(r"[^\w.-]", "-", symbolic)
-
-        # Get the commit hash too.
-        commit = git("rev-parse", "--short", "HEAD", output=str).strip()
-
-        if symbolic == commit:
-            return f"nobranch.{commit}.{suffix}"
-        else:
-            return f"{symbolic}.{commit}.{suffix}"
 
 
 def report(args):

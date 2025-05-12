@@ -602,10 +602,17 @@ cd "{experiment_run_dir}"
 
         # Construct string for default variants
         variant_string = ""
-        variant_dict = ramble.config.get("variants")
-        variant_defs = []
 
-        for var, val in variant_dict.items():
+        all_variants = {}
+        for scope in ramble.config.scopes():
+            if "workspace" not in scope:
+                variant_dict = ramble.config.get("variants", scope=scope)
+
+                for var, val in variant_dict.items():
+                    all_variants[var] = val
+
+        variant_defs = []
+        for var, val in all_variants.items():
             variant_defs.append(f"    {var}: {val}")
 
         if variant_defs:

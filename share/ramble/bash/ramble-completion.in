@@ -160,10 +160,10 @@ _workspaces() {
     RAMBLE_COMPREPLY="$RAMBLE_WORKSPACES"
 }
 
-_tests() {
+_unit_tests() {
     if [[ -z "${RAMBLE_TESTS:-}" ]]
     then
-        RAMBLE_TESTS="$(ramble test -l)"
+        RAMBLE_TESTS="$(ramble unit-test -l)"
     fi
     RAMBLE_COMPREPLY="$RAMBLE_TESTS"
 }

@@ -508,6 +508,19 @@ class SpackLightweight(PackageManagerBase):
     def spack_deactivate(self):
         return self.runner.generate_deactivate_command()
 
+    def environment_load_commands(self):
+        commands = []
+        self.runner.activate()
+        commands.extend(self.runner.generate_source_command())
+        commands.extend(self.runner.generate_activate_command())
+        self.runner.deactivate()
+        return commands
+
+    def environment_unload_commands(self):
+        commands = []
+        commands.extend(self.runner.generate_deactiate_command())
+        return commands
+
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
 

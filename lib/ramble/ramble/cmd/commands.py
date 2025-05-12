@@ -131,7 +131,7 @@ _positional_to_subroutine = {
     "keys": "_keys",
     "help_command": "_subcommands",
     "namespace": "_repos",
-    "pytest": "_tests",
+    "pytest": "_unit_tests",
 }
 
 

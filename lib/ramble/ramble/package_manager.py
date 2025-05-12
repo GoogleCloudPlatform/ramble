@@ -260,6 +260,16 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         del workspace
         return []
 
+    def environment_load_commands(self) -> List[str]:
+        """Stub method for acquiring the commands to load
+        an experiment's execution environment"""
+        return []
+
+    def environment_unload_commands(self) -> List[str]:
+        """Stub method for acquiring the commands to unload an
+        experiment's execution environment"""
+        return []
+
 
 class PackageManagerError(RambleError):
     """

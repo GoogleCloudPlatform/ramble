@@ -2278,3 +2278,22 @@ def test_workspace_no_empty_workloads(request):
             data = f.read()
             assert "basic:" not in data
             assert "workloads: {}" not in data
+
+
+def test_no_inherit_active_workspace_variants(request):
+    workspace1_name = f"{request.node.name}_1"
+    workspace2_name = f"{request.node.name}_2"
+
+    global_args = ["-w", workspace1_name]
+
+    workspace("create", workspace1_name)
+    config("add", "variants:package_manager:spack", global_args=global_args)
+    config("add", "variants:workflow_manager:slurm", global_args=global_args)
+
+    workspace("create", workspace2_name, global_args=global_args)
+
+    with ramble.workspace.read(workspace2_name) as ws2:
+        with open(ws2.config_file_path) as f:
+            data = f.read()
+            assert "spack" not in data
+            assert "slurm" not in data
