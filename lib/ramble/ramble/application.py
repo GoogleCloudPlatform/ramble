@@ -134,6 +134,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
     maintainers: List[str] = []
     tags: List[str] = []
 
+    license_names: List[str] = []
+
     license_inc_name = "license.inc"
 
     def __init__(self, file_path):
@@ -178,6 +180,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._input_lock = None
         self._software_lock = None
         self._experiment_graph = None
+
+        if not self.license_names:
+            self.license_names.append(self.name)
 
         self.hash_inventory = {
             "application_definition": None,
@@ -1428,7 +1433,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for scope in config_scopes:
             license_conf = ramble.config.config.get_config("licenses", scope=scope)
             if license_conf:
-                app_licenses = license_conf[self.name] if self.name in license_conf else {}
+                # If we have multiple matches, the last entry should win (latest in hierarchy)
+                app_licenses = {}
+                for lic in self.license_names:
+                    if lic in license_conf:
+                        app_licenses = license_conf[lic]
 
                 for action, conf in app_licenses.items():
                     (env_cmds, var_set) = action_funcs[action](

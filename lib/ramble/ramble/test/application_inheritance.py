@@ -59,3 +59,5 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert "my_var" in app_inst.workloads["test_wl"].variables
     assert "Shadowed" in app_inst.workloads["test_wl"].variables["my_var"].description
     assert app_inst.workloads["test_wl"].variables["my_var"].default == "1.0"
+
+    assert app_inst.license_names == ["basic", "basic-inherited-extended"]

@@ -307,3 +307,21 @@ def environment_variable(
             raise DirectiveError("A workload or workload group is required")
 
     return _execute_environment_variable
+
+
+@application_directive(dicts=())
+def license_name(name, **kwargs):
+    """Add a new license name directive, to specify license name in a declarative way.
+
+    Args:
+        name (str): name to use during license lookup and propagation
+    """
+
+    def _execute_license_name(obj):
+        license_from_base = getattr(obj, "license_names", [])
+
+        # Here it is essential to copy, otherwise we might add to an empty list in the parent
+        # It is important that we preserve order
+        obj.license_names = list(dict.fromkeys(license_from_base + [name]))
+
+    return _execute_license_name

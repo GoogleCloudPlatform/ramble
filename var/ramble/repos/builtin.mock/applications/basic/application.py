@@ -12,6 +12,8 @@ from ramble.appkit import *
 class Basic(ExecutableApplication):
     name = "basic"
 
+    license_name("basic")
+
     executable("foo", "bar", use_mpi=False)
     executable("bar", "baz", use_mpi=True)
     executable("echo", 'echo "0.25 seconds"', use_mpi=False)

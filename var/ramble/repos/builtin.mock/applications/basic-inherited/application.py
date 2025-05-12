@@ -13,6 +13,8 @@ from ramble.appkit import *
 class BasicInherited(BaseBasic):
     name = "basic-inherited"
 
+    license_name("basic-inherited-extended")
+
     input_file(
         "inherited_input",
         url="file:///tmp/inherited_file.log",
