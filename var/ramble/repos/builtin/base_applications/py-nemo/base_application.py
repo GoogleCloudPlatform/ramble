@@ -11,7 +11,8 @@ class BasePyNemo(ExecutableApplication): """Define a base class for PyNemo appli
     workload_group("pretraining", workloads=[])
 
     workload_variable(
-        "custom_injected_string", default="tail /dev/null",
+        "custom_injected_string",
+        default="tail /dev/null",
         description="Custom string to inject before execution NeMo workload",
         workload_group="pretraining",
     )
@@ -22,7 +23,8 @@ class BasePyNemo(ExecutableApplication): """Define a base class for PyNemo appli
         workload_group="pretraining",
     )
     workload_variable(
-        "nemo_stage", default="training",
+        "nemo_stage",
+        default="training",
         description="Stage to run in NeMo",
         workload_group="pretraining",
     )
