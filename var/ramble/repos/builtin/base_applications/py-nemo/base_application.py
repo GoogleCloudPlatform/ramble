@@ -10,100 +10,98 @@ class BasePyNemo(ExecutableApplication):
 
     tags("ml-framework", "machine-learning")
 
-    all_workloads = ["pretraining"]
-    workload_group("all_workloads", workloads=all_workloads)
-    workload_group("pretraining", workloads=all_workloads)
+    workload_group("pretraining", workloads=[])
 
     workload_variable(
         "custom_injected_string",
         default="tail /dev/null",
         description="Custom string to inject before execution NeMo workload",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     workload_variable(
         "nemo_container_version",
         default="24.07",
         description="Version for NeMo container",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     workload_variable(
         "nemo_stage",
         default="training",
         description="Stage to run in NeMo",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     workload_variable(
         "cuda_visible_devices",
         default="0,1,2,3,4,5,6,7",
         description="Comma delimited list of CUDA device IDs.",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
-    environment_variable(
-        "CUDA_VISIBLE_DEVICES",
-        value="{cuda_visible_devices}",
-        description="Comma delimited list of CUDA device IDs",
-        workloads=all_workloads,
-    )
+    #environment_variable(
+    #    "CUDA_VISIBLE_DEVICES",
+    #    value="{cuda_visible_devices}",
+    #    description="Comma delimited list of CUDA device IDs",
+    #    workload_group="pretraining",
+    #)
     workload_variable(
         "transformers_offline",
         default="0",
         description="Whether transformers are offline (0) or not (1)",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
-    environment_variable(
-        "TRANSFORMERS_OFFLINE",
-        value="{transformers_offline}",
-        description="Whether transformers are offline (0) or not (1)",
-        workloads=all_workloads,
-    )
+    #environment_variable(
+    #    "TRANSFORMERS_OFFLINE",
+    #    value="{transformers_offline}",
+    #    description="Whether transformers are offline (0) or not (1)",
+    #    workload_group="pretraining",
+    #)
     workload_variable(
         "torch_nccl_avoid_record_streams",
         default="1",
         description="Avoid (1) recording streams for Torch NCCL, or not (0)",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
-    environment_variable(
-        "TORCH_NCCL_AVOID_RECORD_STREAMS",
-        value="{torch_nccl_avoid_record_streams}",
-        description="Avoid (1) recording streams for Torch NCCL, or not (0)",
-        workload_group="all_workloads",
-    )
+    #environment_variable(
+    #    "TORCH_NCCL_AVOID_RECORD_STREAMS",
+    #    value="{torch_nccl_avoid_record_streams}",
+    #    description="Avoid (1) recording streams for Torch NCCL, or not (0)",
+    #    workload_group="pretraining",
+    #)
     workload_variable(
         "nccl_nvls_enable",
         default="0",
         description="Enable (1) NCCL NVLS or not (0)",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
-    environment_variable(
-        "NCCL_NVLS_ENABLE",
-        value="{nccl_nvls_enable}",
-        description="Enable (1) NCCL NVLS or not (0)",
-        workloads=all_workloads,
-    )
+    #environment_variable(
+    #    "NCCL_NVLS_ENABLE",
+    #    value="{nccl_nvls_enable}",
+    #    description="Enable (1) NCCL NVLS or not (0)",
+    #    workload_group="pretraining",
+    #)
     workload_variable(
         "results_mount",
-        default="{experiment_run_dir}:{experiment_run_dir}",  # Changed:  simplified
+        default="{experiment_run_dir}:{experiment_run_dir}",
         description="Container mount for results data",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
-    environment_variable(
-        "NEMO_CONTAINER_MOUNTS",
-        value="{results_mount}",  # Changed:  simplified
-        description="All container mounts in an environment variable",
-        workloads=all_workloads,
-    )
+    #environment_variable(
+    #    "NEMO_CONTAINER_MOUNTS",
+    #    value="{results_mount}",
+    #    description="All container mounts in an environment variable",
+    #    workload_group="pretraining",
+    #)
     workload_variable(
         "container_mounts",
-        default="{results_mount}",  # Changed:  simplified
+        default="{results_mount}",
         description="All container mounts in a ramble variable",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
-    environment_variable(
-        "NEMO_HOST_VARS",
-        value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
-        description="Host variables for NeMo",
-        workloads=all_workloads,
-    )
+    #environment_variable(
+    #    "NEMO_HOST_VARS",
+    #    value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
+    #    description="Host variables for NeMo",
+    #    workload_group="pretraining",
+    #)
     workload_variable(
         "processed_log_file",
         default="{experiment_run_dir}/processed_{experiment_name}.out",

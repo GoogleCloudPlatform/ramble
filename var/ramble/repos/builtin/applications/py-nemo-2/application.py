@@ -29,10 +29,6 @@ class PyNemo2(BasePyNemo):
 
     tags("ml-framework", "machine-learning")
 
-    all_workloads = ["pretraining"]
-    workload_group("all_workloads", workloads=all_workloads)
-    workload_group("pretraining", workloads=all_workloads)
-
     # Add Nemo 2.0 config to archive.
     archive_pattern("{experiment_run_dir}/{nemo_config_name}/*")
 
@@ -58,43 +54,41 @@ class PyNemo2(BasePyNemo):
         ],
     )
 
-    register_validator(
-        "nemo_2_py_config_suffix",
-        predicate='re_search(r"\.py$", {nemo_config_name})',
-        message="nemo_config_name must have a '.py' suffix.",
-    )
+    all_workloads=["pretraining"]
+    workload_group("all_workloads", workloads=all_workloads)
+    workload_group("pretraining", workloads=all_workloads)
 
     workload_variable(
         "nemo_config_dir_path",
         default="",
         description="Path to Nemo 2.0 python config to be used.",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "nemo_config_name",
         default="",
         description="Name of NeMo 2.0 config under {nemo_config_dir_path}.",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "results_mount",
         default="{experiment_run_dir}:{experiment_run_dir}",
         description="Container mount for results data",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     environment_variable(
         "NEMO_CONTAINER_MOUNTS",
         value="{results_mount}",
         description="All container mounts in an environment variable",
-        workloads=all_workloads,
+        workload_group="pretraining",
     )
     workload_variable(
         "container_mounts",
         default="{results_mount}",
         description="All container mounts in a ramble variable",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     register_phase(

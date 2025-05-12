@@ -35,10 +35,6 @@ class PyNemo(BasePyNemo):
 
     tags("ml-framework", "machine-learning")
 
-    all_workloads = ["pretraining"]
-    workload_group("all_workloads", workloads=all_workloads)
-    workload_group("pretraining", workloads=all_workloads)
-
     archive_pattern("{experiment_run_dir}/{nemo_generated_config_name}")
 
     executable(
@@ -78,27 +74,30 @@ class PyNemo(BasePyNemo):
         inputs=["nemo_fetched_config"],
     )
 
+    workload_group("all_workloads", workloads=["pretraining"])
+    workload_group("pretraining", workloads=["pretraining"])
+
     default_config_string = "{default_config_value}"
 
     workload_variable(
         "model_inputs",
         default="{workload_input_dir}/{nemo_stage}/{nemo_model}",
         description="NeMo model input directory",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "nemo_launcher_tag",
         default="24.07",
         description="Tag of NeMo-Framework-Launcher repo to extract inputs from (1.0 only)",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "nemo_model",
         default="gpt3",
         description="Model to run in NeMo",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
@@ -107,7 +106,7 @@ class PyNemo(BasePyNemo):
         description="Configuration name to run in NeMo. This is the name of the input "
         + "yaml file without the extension. e.g. 5b.yaml -> 5b, while "
         + "mixtral_8x22b.yaml -> mixtral_8x22b",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
@@ -115,56 +114,56 @@ class PyNemo(BasePyNemo):
         default="{nemo_fetched_config}",
         description="Path to base config used for generating experiments. "
         + "Defaults to the fetched input, but can refer to a provided input.",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "nemo_generated_config_name",
         default="nemo.yaml",
         description="Name of nemo config file",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "nemo_generated_config_path",
         default="{experiment_run_dir}",
         description="Path where nemo config file is contained",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "nemo_remove_variables",
         default=[],
         description="Name of variables to remove from the base nemo config",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "logs_mount",
         default="{exp_manager.explicit_log_dir}:{exp_manager.explicit_log_dir}",
         description="Container mount for results data",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     workload_variable(
         "results_mount",
         default="{experiment_run_dir}:{experiment_run_dir}",
         description="Container mount for results data",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     environment_variable(
         "NEMO_CONTAINER_MOUNTS",
         value="{logs_mount},{results_mount}",
         description="All container mounts in an environment variable",
-        workloads=all_workloads,
+        workload_group="pretraining",
     )
 
     workload_variable(
         "container_mounts",
         default="{logs_mount},{results_mount}",
         description="All container mounts in a ramble variable",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     # Run parameters
@@ -172,25 +171,25 @@ class PyNemo(BasePyNemo):
         "run.name",
         default="{nemo_model}_{nemo_config_name}",
         description="Name of run",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     workload_variable(
         "run.results_dir",
         default="{experiment_run_dir}",
         description="Experiment results directory",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     workload_variable(
         "run.time_limit",
         default="6-00:00:00",
         description="Experiment time limit",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
     workload_variable(
         "run.dependency",
         default="singleton",
         description="Experiment dependency type",
-        workload_group="all_workloads",
+        workload_group="pretraining",
     )
 
     # Trainer parameters
