@@ -54,9 +54,8 @@ class PyNemo2(BasePyNemo):
         ],
     )
 
-    all_workloads=["pretraining"]
-    workload_group("all_workloads", workloads=all_workloads)
-    workload_group("pretraining", workloads=all_workloads)
+    workload_group("all_workloads", workloads=["pretraining"])
+    workload_group("pretraining", workloads=["pretraining"])
 
     workload_variable(
         "nemo_config_dir_path",
@@ -64,7 +63,6 @@ class PyNemo2(BasePyNemo):
         description="Path to Nemo 2.0 python config to be used.",
         workload_group="pretraining",
     )
-
     workload_variable(
         "nemo_config_name",
         default="",

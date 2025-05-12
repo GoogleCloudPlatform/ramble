@@ -1,20 +1,16 @@
 import os
 import re
 
-from ramble.appkit import *
-from spack.util.path import canonicalize_path
+from ramble.appkit import * from spack.util.path import canonicalize_path
 
 
-class BasePyNemo(ExecutableApplication):
-    """Define a base class for PyNemo applications."""
+class BasePyNemo(ExecutableApplication): """Define a base class for PyNemo applications."""
 
     tags("ml-framework", "machine-learning")
-
-    workload_group("pretraining", workloads=[])
+workload_group("pretraining", workloads=[])
 
     workload_variable(
-        "custom_injected_string",
-        default="tail /dev/null",
+        "custom_injected_string", default="tail /dev/null",
         description="Custom string to inject before execution NeMo workload",
         workload_group="pretraining",
     )
@@ -25,8 +21,7 @@ class BasePyNemo(ExecutableApplication):
         workload_group="pretraining",
     )
     workload_variable(
-        "nemo_stage",
-        default="training",
+        "nemo_stage", default="training",
         description="Stage to run in NeMo",
         workload_group="pretraining",
     )
@@ -36,72 +31,66 @@ class BasePyNemo(ExecutableApplication):
         description="Comma delimited list of CUDA device IDs.",
         workload_group="pretraining",
     )
-    #environment_variable(
-    #    "CUDA_VISIBLE_DEVICES",
-    #    value="{cuda_visible_devices}",
-    #    description="Comma delimited list of CUDA device IDs",
-    #    workload_group="pretraining",
-    #)
+    environment_variable(
+        "CUDA_VISIBLE_DEVICES", value="{cuda_visible_devices}",
+        description="Comma delimited list of CUDA device IDs",
+        workload_group="pretraining",
+    )
     workload_variable(
         "transformers_offline",
         default="0",
         description="Whether transformers are offline (0) or not (1)",
         workload_group="pretraining",
     )
-    #environment_variable(
-    #    "TRANSFORMERS_OFFLINE",
-    #    value="{transformers_offline}",
-    #    description="Whether transformers are offline (0) or not (1)",
-    #    workload_group="pretraining",
-    #)
+    environment_variable(
+        "TRANSFORMERS_OFFLINE", value="{transformers_offline}",
+        description="Whether transformers are offline (0) or not (1)",
+        workload_group="pretraining",
+    )
     workload_variable(
         "torch_nccl_avoid_record_streams",
         default="1",
         description="Avoid (1) recording streams for Torch NCCL, or not (0)",
         workload_group="pretraining",
     )
-    #environment_variable(
-    #    "TORCH_NCCL_AVOID_RECORD_STREAMS",
-    #    value="{torch_nccl_avoid_record_streams}",
-    #    description="Avoid (1) recording streams for Torch NCCL, or not (0)",
-    #    workload_group="pretraining",
-    #)
+    environment_variable(
+        "TORCH_NCCL_AVOID_RECORD_STREAMS", value="{torch_nccl_avoid_record_streams}",
+        description="Avoid (1) recording streams for Torch NCCL, or not (0)",
+        workload_group="pretraining",
+    )
     workload_variable(
         "nccl_nvls_enable",
         default="0",
         description="Enable (1) NCCL NVLS or not (0)",
         workload_group="pretraining",
     )
-    #environment_variable(
-    #    "NCCL_NVLS_ENABLE",
-    #    value="{nccl_nvls_enable}",
-    #    description="Enable (1) NCCL NVLS or not (0)",
-    #    workload_group="pretraining",
-    #)
+    environment_variable(
+        "NCCL_NVLS_ENABLE", value="{nccl_nvls_enable}",
+        description="Enable (1) NCCL NVLS or not (0)",
+        workload_group="pretraining",
+    )
     workload_variable(
         "results_mount",
         default="{experiment_run_dir}:{experiment_run_dir}",
         description="Container mount for results data",
         workload_group="pretraining",
     )
-    #environment_variable(
-    #    "NEMO_CONTAINER_MOUNTS",
-    #    value="{results_mount}",
-    #    description="All container mounts in an environment variable",
-    #    workload_group="pretraining",
-    #)
+    environment_variable(
+        "NEMO_CONTAINER_MOUNTS", value="{results_mount}",
+        description="All container mounts in an environment variable",
+        workload_group="pretraining",
+    )
     workload_variable(
         "container_mounts",
         default="{results_mount}",
         description="All container mounts in a ramble variable",
         workload_group="pretraining",
     )
-    #environment_variable(
-    #    "NEMO_HOST_VARS",
-    #    value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
-    #    description="Host variables for NeMo",
-    #    workload_group="pretraining",
-    #)
+    environment_variable(
+        "NEMO_HOST_VARS", value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
+        description="Host variables for NeMo",
+        workload_group="pretraining",
+    )
     workload_variable(
         "processed_log_file",
         default="{experiment_run_dir}/processed_{experiment_name}.out",
@@ -109,20 +98,16 @@ class BasePyNemo(ExecutableApplication):
         workload_group="pretraining",
     )
 
-    final_epoch_regex = (
-        r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%.*\s+"
+    final_epoch_regex = ( r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%.*\s+"
         + r"(?P<step_idx>[0-9]+)\/(?P<max_itr>[0-9]+) \[(?P<elapsed_time>[0-9]+:[0-9]+)<"
         + r"(?P<remaining_time>[0-9]+:[0-9]+),(\s+v_num=(?P<v_num>.*),)* reduced_train_loss="
-        + r"(?P<reduced_train_loss>[0-9]+\.[0-9]+), global_step=(?P<global_step>[0-9]+\.[0-9]+), "
-        + r"consumed_samples=(?P<consumed_samples>[0-9]+\.[0-9]+), train_step_timing in s="
+        + r"(?P<reduced_train_loss>[0-9]+\.[0-9]+), global_step=(?P<global_step>[0-9]+\.[0-9]+), " + r"consumed_samples=(?P<consumed_samples>[0-9]+\.[0-9]+), train_step_timing in s="
         + r"(?P<train_step_timing>[0-9]+\.[0-9]+)(, val_loss=(?P<val_loss>[0-9]+\.[0-9]+))*\]"
     )
-
     figure_of_merit(
         "Final Epoch ID",
         fom_regex=final_epoch_regex,
-        group_name="epoch_id",
-        log_file="{processed_log_file}",
+        group_name="epoch_id", log_file="{processed_log_file}",
     )
     figure_of_merit(
         "Final Step ID",
@@ -131,13 +116,13 @@ class BasePyNemo(ExecutableApplication):
         log_file="{processed_log_file}",
     )
     figure_of_merit(
-        "Final Elapsed Time",
+        "IFinal Elapsed Time",
         fom_regex=final_epoch_regex,
         group_name="elapsed_time",
         log_file="{processed_log_file}",
     )
     figure_of_merit(
-        "Final Elapsed Seconds",
+        "FiJnal Elapsed Seconds",
         fom_regex=r"Elapsed seconds: (?P<seconds>[0-9]+)",
         group_name="seconds",
         log_file="{experiment_run_dir}/elapsed_seconds",
