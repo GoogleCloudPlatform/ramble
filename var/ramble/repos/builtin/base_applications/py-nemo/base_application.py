@@ -1,13 +1,14 @@
 import os
 import re
 
-from ramble.appkit import * from spack.util.path import canonicalize_path
+from ramble.appkit import *
+from spack.util.path import canonicalize_path
 
 
 class BasePyNemo(ExecutableApplication): """Define a base class for PyNemo applications."""
 
     tags("ml-framework", "machine-learning")
-workload_group("pretraining", workloads=[])
+    workload_group("pretraining", workloads=[])
 
     workload_variable(
         "custom_injected_string", default="tail /dev/null",
@@ -32,12 +33,8 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
-<<<<<<< HEAD
-        "CUDA_VISIBLE_DEVICES", value="{cuda_visible_devices}",
-=======
         "CUDA_VISIBLE_DEVICES",
         value="{cuda_visible_devices}",
->>>>>>> e6e713fc (Merge upstream changes.)
         description="Comma delimited list of CUDA device IDs",
         workload_group="pretraining",
     )
@@ -48,12 +45,8 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
-<<<<<<< HEAD
-        "TRANSFORMERS_OFFLINE", value="{transformers_offline}",
-=======
         "TRANSFORMERS_OFFLINE",
         value="{transformers_offline}",
->>>>>>> e6e713fc (Merge upstream changes.)
         description="Whether transformers are offline (0) or not (1)",
         workload_group="pretraining",
     )
@@ -64,12 +57,8 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
-<<<<<<< HEAD
-        "TORCH_NCCL_AVOID_RECORD_STREAMS", value="{torch_nccl_avoid_record_streams}",
-=======
         "TORCH_NCCL_AVOID_RECORD_STREAMS",
         value="{torch_nccl_avoid_record_streams}",
->>>>>>> e6e713fc (Merge upstream changes.)
         description="Avoid (1) recording streams for Torch NCCL, or not (0)",
         workload_group="pretraining",
     )
@@ -80,12 +69,8 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
-<<<<<<< HEAD
-        "NCCL_NVLS_ENABLE", value="{nccl_nvls_enable}",
-=======
         "NCCL_NVLS_ENABLE",
         value="{nccl_nvls_enable}",
->>>>>>> e6e713fc (Merge upstream changes.)
         description="Enable (1) NCCL NVLS or not (0)",
         workload_group="pretraining",
     )
@@ -96,12 +81,8 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
-<<<<<<< HEAD
-        "NEMO_CONTAINER_MOUNTS", value="{results_mount}",
-=======
         "NEMO_CONTAINER_MOUNTS",
         value="{results_mount}",
->>>>>>> e6e713fc (Merge upstream changes.)
         description="All container mounts in an environment variable",
         workload_group="pretraining",
     )
@@ -112,12 +93,8 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
-<<<<<<< HEAD
-        "NEMO_HOST_VARS", value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
-=======
         "NEMO_HOST_VARS",
         value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
->>>>>>> e6e713fc (Merge upstream changes.)
         description="Host variables for NeMo",
         workload_group="pretraining",
     )
@@ -128,10 +105,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
 
-    final_epoch_regex = ( r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%.*\s+"
+    final_epoch_regex = (
+        r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%.*\s+"
         + r"(?P<step_idx>[0-9]+)\/(?P<max_itr>[0-9]+) \[(?P<elapsed_time>[0-9]+:[0-9]+)<"
         + r"(?P<remaining_time>[0-9]+:[0-9]+),(\s+v_num=(?P<v_num>.*),)* reduced_train_loss="
-        + r"(?P<reduced_train_loss>[0-9]+\.[0-9]+), global_step=(?P<global_step>[0-9]+\.[0-9]+), " + r"consumed_samples=(?P<consumed_samples>[0-9]+\.[0-9]+), train_step_timing in s="
+        + r"(?P<reduced_train_loss>[0-9]+\.[0-9]+), global_step=(?P<global_step>[0-9]+\.[0-9]+), "
+        + r"consumed_samples=(?P<consumed_samples>[0-9]+\.[0-9]+), train_step_timing in s="
         + r"(?P<train_step_timing>[0-9]+\.[0-9]+)(, val_loss=(?P<val_loss>[0-9]+\.[0-9]+))*\]"
     )
     figure_of_merit(
@@ -146,13 +125,13 @@ workload_group("pretraining", workloads=[])
         log_file="{processed_log_file}",
     )
     figure_of_merit(
-        "IFinal Elapsed Time",
+        "Final Elapsed Time",
         fom_regex=final_epoch_regex,
         group_name="elapsed_time",
         log_file="{processed_log_file}",
     )
     figure_of_merit(
-        "FiJnal Elapsed Seconds",
+        "Final Elapsed Seconds",
         fom_regex=r"Elapsed seconds: (?P<seconds>[0-9]+)",
         group_name="seconds",
         log_file="{experiment_run_dir}/elapsed_seconds",
