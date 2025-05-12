@@ -214,6 +214,8 @@ class DirectiveMeta(type):
                         "define_compiler",
                         "package_manager_config",
                         "register_phase",
+                        "figure_of_merit",
+                        "figure_of_merit_context",
                     ]:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'

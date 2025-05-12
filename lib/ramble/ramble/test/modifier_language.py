@@ -292,6 +292,8 @@ def add_figure_of_merit_context(mod_inst, context_num=1):
 def test_figure_of_merit_context_directive(mod_class):
     test_defs = []
 
+    _FS = frozenset()
+
     mod_inst = mod_class("/not/a/path")
     test_defs.append(add_figure_of_merit_context(mod_inst).copy())
 
@@ -302,10 +304,10 @@ def test_figure_of_merit_context_directive(mod_class):
     for test_def in test_defs:
         name = test_def["name"]
 
-        assert name in mod_inst.figure_of_merit_contexts
+        assert name in mod_inst.figure_of_merit_contexts[_FS]
         for attr in expected_attrs:
-            assert attr in mod_inst.figure_of_merit_contexts[name]
-            assert test_def[attr] == mod_inst.figure_of_merit_contexts[name][attr]
+            assert attr in mod_inst.figure_of_merit_contexts[_FS][name]
+            assert test_def[attr] == mod_inst.figure_of_merit_contexts[_FS][name][attr]
 
 
 def add_figure_of_merit(mod_inst, context_num=1):
@@ -325,14 +327,15 @@ def add_figure_of_merit(mod_inst, context_num=1):
         "contexts": contexts.copy(),
     }
 
-    mod_inst.figure_of_merit(
-        name,
-        fom_regex=fom_regex,
-        group_name=group_name,
-        units=units,
-        log_file=log_file,
-        contexts=contexts,
-    )
+    for context in contexts:
+        mod_inst.figure_of_merit(
+            name,
+            fom_regex=fom_regex,
+            group_name=group_name,
+            units=units,
+            log_file=log_file,
+            contexts=contexts,
+        )
 
     return fom_def
 
@@ -340,6 +343,8 @@ def add_figure_of_merit(mod_inst, context_num=1):
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_figure_of_merit_directive(mod_class):
     test_defs = []
+
+    _FS = frozenset()
 
     mod_inst = mod_class("/not/a/path")
     test_defs.append(add_figure_of_merit(mod_inst).copy())
@@ -350,11 +355,12 @@ def test_figure_of_merit_directive(mod_class):
 
     for test_def in test_defs:
         name = test_def["name"]
+        context_key = frozenset(test_def["contexts"])
 
-        assert name in mod_inst.figures_of_merit
+        assert name in mod_inst.figures_of_merit[_FS][context_key]
         for attr in expected_attrs:
-            assert attr in mod_inst.figures_of_merit[name]
-            assert test_def[attr] == mod_inst.figures_of_merit[name][attr]
+            assert attr in mod_inst.figures_of_merit[_FS][context_key][name]
+            assert test_def[attr] == mod_inst.figures_of_merit[_FS][context_key][name][attr]
 
 
 def add_archive_pattern(mod_inst, archive_num=1):

@@ -266,15 +266,17 @@ def test_executable_directive(app_class):
 def test_figure_of_merit_directive(app_class):
     test_defs = {}
 
+    _FS = frozenset()
+
     app_inst = app_class("/not/a/path")
     test_defs.update(add_figure_of_merit(app_inst))
 
     assert hasattr(app_inst, "figures_of_merit")
     for fom_name, conf in test_defs.items():
-        assert fom_name in app_inst.figures_of_merit
+        assert fom_name in app_inst.figures_of_merit[_FS][_FS]
         for conf_name, conf_val in conf.items():
-            assert conf_name in app_inst.figures_of_merit[fom_name]
-            assert app_inst.figures_of_merit[fom_name][conf_name] == conf_val
+            assert conf_name in app_inst.figures_of_merit[_FS][_FS][fom_name]
+            assert app_inst.figures_of_merit[_FS][_FS][fom_name][conf_name] == conf_val
 
 
 @pytest.mark.parametrize("app_class", app_types)

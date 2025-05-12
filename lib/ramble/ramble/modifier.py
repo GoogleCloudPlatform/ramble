@@ -26,6 +26,7 @@ from ramble.util.naming import NS_SEPARATOR
 class ModifierBase(metaclass=ModifierMeta):
     name = None
     object_variants = None
+    origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(("modifier_builtin", "{obj_name}", "{name}"))
     _mod_prefix_builtin = f"modifier_builtin{NS_SEPARATOR}"
     _language_classes = [ModifierMeta, SharedMeta]

@@ -156,6 +156,43 @@ def print_object_overview(obj):
         color.cprint(f"\t{name}")
 
 
+def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
+    to_print = fnmatch.filter(internal_attr, pattern)
+    if format == supported_formats.lists:
+        color.cprint("    " + str(list(to_print)))
+    elif format == supported_formats.text:
+        color.cprint(colified(to_print, tty=True, indent=4))
+
+
+def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
+    """With verbose output, and a dict attribute, we try to print all of the
+    sub items. These need to be iterated over, and we need to escape existing
+    characters that would normally be used to color strings.
+    """
+    for name, val in internal_attr.items():
+        if pattern and not fnmatch.fnmatch(name, pattern):
+            continue
+
+        if isinstance(val, dict):
+            color_name = ramble.util.colors.section_title(name)
+            color.cprint(f"{color_name}:")
+            for sub_name, sub_val in val.items():
+                # Avoid showing duplicate names for variables
+                if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
+                    to_print = f"{indentation}{sub_val}"
+                else:
+                    color_sub_name = ramble.util.colors.nested_1(sub_name)
+                    to_print = f"{indentation}{color_sub_name}: {sub_val}"
+                try:
+                    color.cprint(to_print)
+                except color.ColorParseError:
+                    escaped_sub_val = sub_val.replace("@", "@@")
+                    color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
+            color.cprint("")
+        else:
+            color.cprint(f"{str(val)}")
+
+
 # Attributes that need special print functions
 def _print_phases(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
     """Print registered phases
@@ -193,6 +230,33 @@ def _print_phases(obj, attr, verbose=False, pattern="*", format=supported_format
             color.cprint(colified(to_print, tty=True, indent=base_indent + 4))
 
 
+def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
+    """Print figures of merit
+
+    Figures of merit are stored in a nested dictionary.
+    """
+    internal_attr_name = _map_attr_name(attr)
+    internal_attr = getattr(obj, internal_attr_name)
+    print_attribute_header(attr, verbose)
+
+    indentation = " " * 4
+
+    for when_key, context_dict in internal_attr.items():
+        for context_key, fom_dict in context_dict.items():
+            if not verbose:
+                to_print = list(fom_dict.keys())
+
+                # If we are trying to print a list, filter it and print using the
+                # format specification
+                # Otherwise, print it as a raw string.
+                if isinstance(to_print, list):
+                    _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
+                else:
+                    color.cprint(f"    {str(to_print)}\n")
+            else:
+                _print_verbose_dict_attr(fom_dict, pattern=pattern, indentation=indentation)
+
+
 def print_single_attribute(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
     """Handle printing a single attribute
 
@@ -203,6 +267,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     internal_attr = getattr(obj, internal_attr_name, None)
     if attr == "registered_phases":
         _print_phases(obj, attr, verbose, pattern, format=format)
+        return
+    if attr == "figures_of_merit":
+        _print_figures_of_merit(obj, attr, verbose, pattern, format=format)
         return
 
     print_attribute_header(attr, verbose)
@@ -223,48 +290,12 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         # format specification
         # Otherwise, print it as a raw string.
         if isinstance(to_print, list):
-            to_print = fnmatch.filter(to_print, pattern)
-            if format == supported_formats.lists:
-                color.cprint("    " + str(list(to_print)))
-            elif format == supported_formats.text:
-                color.cprint(colified(to_print, tty=True, indent=4))
+            _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {str(to_print)}\n")
     else:
-        # With verbose output, and a dict attribute, we try to print all of the
-        # sub items. These need to be iterated over, and we need to escape
-        # existing characters that would normally be used to color strings.
         if isinstance(internal_attr, dict):
-            for name, vals in internal_attr.items():
-                if pattern and not fnmatch.fnmatch(name, pattern):
-                    continue
-
-                if not isinstance(vals, list):
-                    itr_vals = [vals]
-                else:
-                    itr_vals = vals
-
-                for val in itr_vals:
-                    if isinstance(val, dict):
-                        color_name = ramble.util.colors.section_title(name)
-                        color.cprint(f"{color_name}:")
-                        for sub_name, sub_val in val.items():
-                            # Avoid showing duplicate names for variables
-                            if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
-                                to_print = f"{indentation}{sub_val}"
-                            else:
-                                color_sub_name = ramble.util.colors.nested_1(sub_name)
-                                to_print = f"{indentation}{color_sub_name}: {sub_val}"
-                            try:
-                                color.cprint(to_print)
-                            except color.ColorParseError:
-                                escaped_sub_val = sub_val.replace("@", "@@")
-                                color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
-                        color.cprint("")
-                    elif hasattr(val, "as_str"):
-                        color.cprint(f"{val.as_str()}")
-                    else:
-                        color.cprint(f"{str(val)}")
+            _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
         # If the attribute is not a dict, print using the existing format rules.
         elif isinstance(internal_attr, list):
             to_print = fnmatch.filter(internal_attr, pattern)

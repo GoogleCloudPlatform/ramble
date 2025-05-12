@@ -113,6 +113,7 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
     object_variants = None
+    origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
@@ -1082,7 +1083,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     expanded_log = self.expander.expand_var(exec_cmd.redirect)
                     logs.append(expanded_log)
 
-        analysis_logs, _, _ = self._analysis_dicts(success_list)
+        analysis_logs, _ = self._analysis_dicts(success_list)
 
         for log in analysis_logs:
             logs.append(log)
@@ -1655,7 +1656,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             # Copy all figure of merit files
             criteria_list = workspace.success_list
-            analysis_files, _, _ = self._analysis_dicts(criteria_list)
+            analysis_files, _ = self._analysis_dicts(criteria_list)
             for file in analysis_files.keys():
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
@@ -1737,7 +1738,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         criteria_list = workspace.success_list
         criteria_list.reset()
 
-        files, contexts, foms = self._analysis_dicts(criteria_list)
+        files, definitions = self._analysis_dicts(criteria_list)
 
         exp_lock = self.experiment_lock()
 
@@ -1769,66 +1770,71 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 new_per_file_crit_objs.append(crit_obj)
                         per_file_crit_objs = new_per_file_crit_objs
 
-                        for context in file_conf["contexts"]:
-                            context_conf = contexts[context]
-                            context_match = context_conf["regex"].match(line)
+                        # Iterate over contexts and add matched contexts to active_contexts
+                        for context, foms in file_conf["contexts"].items():
+                            if not context == _NULL_CONTEXT:
+                                context_conf = definitions[context]["definition"]
+                                context_match = context_conf["regex"].match(line)
 
-                            if context_match:
-                                context_name = format_context(
-                                    context_match, context_conf["format"]
-                                )
-                                logger.debug("Line was: %s" % line)
-                                logger.debug(f" Context match {context} -- {context_name}")
+                                if context_match:
+                                    context_name = format_context(
+                                        context_match, context_conf["format"]
+                                    )
+                                    logger.debug("Line was: %s" % line)
+                                    logger.debug(f" Context match {context} -- {context_name}")
 
-                                active_contexts[context] = context_name
+                                    active_contexts[context] = context_name
 
-                                if context_name not in fom_values:
-                                    fom_values[context_name] = {}
+                                    if context_name not in fom_values:
+                                        fom_values[context_name] = {}
 
-                        for fom in file_conf["foms"]:
-                            fom_conf = foms[fom]
-                            fom_match = fom_conf["regex"].match(line)
+                            for fom in foms:
+                                fom_conf = definitions[context]["foms"][fom]
+                                fom_match = fom_conf["regex"].match(line)
 
-                            if fom_match:
-                                fom_vars = {}
-                                for k, v in fom_match.groupdict().items():
-                                    fom_vars[k] = v
-                                if fom_conf["fom_name_expanded"] is not None:
-                                    fom_name = fom_conf["fom_name_expanded"]
-                                else:
-                                    fom_name = self.expander.expand_var(fom, extra_vars=fom_vars)
-
-                                if fom_conf["group"] in fom_conf["regex"].groupindex:
-                                    logger.debug(" --- Matched fom %s" % fom_name)
-                                    fom_contexts = []
-                                    if fom_conf["contexts"]:
-                                        for context in fom_conf["contexts"]:
-                                            context_name = (
-                                                active_contexts[context]
-                                                if context in active_contexts
-                                                else _NULL_CONTEXT
-                                            )
-                                            fom_contexts.append(context_name)
+                                if fom_match:
+                                    fom_vars = {}
+                                    for k, v in fom_match.groupdict().items():
+                                        fom_vars[k] = v
+                                    if fom_conf["fom_name_expanded"] is not None:
+                                        fom_name = fom_conf["fom_name_expanded"]
                                     else:
-                                        fom_contexts.append(_NULL_CONTEXT)
-
-                                for context in fom_contexts:
-                                    if context not in fom_values:
-                                        fom_values[context] = {}
-                                    fom_val = fom_match.group(fom_conf["group"])
-                                    if fom_conf["units_expanded"] is not None:
-                                        fom_unit = fom_conf["units"]
-                                    else:
-                                        fom_unit = self.expander.expand_var(
-                                            fom_conf["units"], extra_vars=fom_vars
+                                        fom_name = self.expander.expand_var(
+                                            fom, extra_vars=fom_vars
                                         )
-                                    fom_values[context][fom_name] = {
-                                        "value": fom_val,
-                                        "units": fom_unit,
-                                        "origin": fom_conf["origin"],
-                                        "origin_type": fom_conf["origin_type"],
-                                        "fom_type": fom_conf["fom_type"],
-                                    }
+
+                                    if fom_conf["group"] in fom_conf["regex"].groupindex:
+                                        logger.debug(" --- Matched fom %s" % fom_name)
+                                        fom_contexts = []
+                                        # if a FOM has contexts, check if each is active
+                                        if fom_conf["contexts"]:
+                                            for fom_context in fom_conf["contexts"]:
+                                                context_name = (
+                                                    active_contexts[context]
+                                                    if context in active_contexts
+                                                    else _NULL_CONTEXT
+                                                )
+                                                fom_contexts.append(context_name)
+                                        else:
+                                            fom_contexts.append(_NULL_CONTEXT)
+
+                                        for fom_context in fom_contexts:
+                                            if fom_context not in fom_values:
+                                                fom_values[fom_context] = {}
+                                            fom_val = fom_match.group(fom_conf["group"])
+                                            if fom_conf["units_expanded"] is not None:
+                                                fom_unit = fom_conf["units"]
+                                            else:
+                                                fom_unit = self.expander.expand_var(
+                                                    fom_conf["units"], extra_vars=fom_vars
+                                                )
+                                            fom_values[fom_context][fom_name] = {
+                                                "value": fom_val,
+                                                "units": fom_unit,
+                                                "origin": fom_conf["origin"],
+                                                "origin_type": fom_conf["origin_type"],
+                                                "fom_type": fom_conf["fom_type"],
+                                            }
 
         # Test all non-file based success criteria
         for criteria_obj in criteria_list.all_criteria():
@@ -1986,7 +1992,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._init_result()
 
         logger.debug(
-            f"Calculating statistics for {self.repeats.n_repeats} repeats of " f"{base_exp_name}"
+            f"Calculating statistics for {self.repeats.n_repeats} repeats of {base_exp_name}"
         )
 
         results = []
@@ -2132,7 +2138,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""
-        return {"success_criteria": [], "contexts": [], "foms": []}
+        return {"success_criteria": [], "contexts": {}}
 
     def _analysis_dicts(self, criteria_list):
         """Extract files that need to be analyzed.
@@ -2149,8 +2155,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
 
         files = {}
-        contexts = {}
-        foms = {}
+        definitions = {}
 
         # Add the application defined criteria
         criteria_list.flush_scope("application_definition")
@@ -2216,88 +2221,111 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if log_path in files:
                 files[log_path]["success_criteria"].append(criteria.name)
 
-        # Remap fom / context / file data
         # Could push this into the language features in the future
-        fom_definitions = self.figures_of_merit.copy()
-        for fom, fom_def in fom_definitions.items():
-            fom_def["origin"] = self.name
-            fom_def["origin_type"] = "application"
-
-        fom_contexts = self.figure_of_merit_contexts.copy()
+        fom_sources = [self]
         for mod in self._modifier_instances:
-            fom_contexts.update(mod.figure_of_merit_contexts)
-
-            mod_vars = mod.modded_variables(self)
-
-            for fom, fom_def in mod.figures_of_merit.items():
-                fom_definitions[fom] = {"origin": f"{mod}", "origin_type": "modifier"}
-                for attr in fom_def.keys():
-                    if isinstance(fom_def[attr], (list, FomType)):
-                        fom_definitions[fom][attr] = fom_def[attr].copy()
-                    else:
-                        fom_definitions[fom][attr] = self.expander.expand_var(
-                            fom_def[attr], mod_vars
-                        )
-
+            fom_sources.append(mod)
         if self.workflow_manager is not None:
-            fom_contexts.update(self.workflow_manager.figure_of_merit_contexts)
-            for fom, fom_def in self.workflow_manager.figures_of_merit.items():
-                fom_definitions[fom] = {
-                    "origin": f"{self.workflow_manager}",
-                    "origin_type": "workflow_manager",
-                }
-                for attr in fom_def.keys():
-                    if isinstance(fom_def[attr], (list, FomType)):
-                        fom_definitions[fom][attr] = fom_def[attr].copy()
-                    else:
-                        fom_definitions[fom][attr] = self.expander.expand_var(fom_def[attr])
+            fom_sources.append(self.workflow_manager)
 
-        for fom, conf in fom_definitions.items():
-            log_path = self.expander.expand_var(conf["log_file"])
+        all_contexts = {}
+        for source in fom_sources:
+            for when_fs, source_context_defs in source.figure_of_merit_contexts.items():
+                if self.expander.satisfies(list(when_fs), variant_set=self.object_variants):
+                    for context, context_def in source_context_defs.items():
+                        all_contexts[context] = context_def
+            extra_vars = (
+                source.modded_variables(self) if source.origin_type == "modifier" else None
+            )
+            # figures_of_merit[frozenset(when_list)][frozenset(context_list)][fom_name]
+            for when_fs, source_contexts in source.figures_of_merit.items():
+                if not self.expander.satisfies(list(when_fs), variant_set=self.object_variants):
+                    continue
 
-            # Ensure log path is absolute. If not, prepend the experiment run directory
-            if not os.path.isabs(log_path) and self.expander.experiment_run_dir not in log_path:
-                log_path = os.path.join(self.expander.experiment_run_dir, log_path)
+                for context_fs, source_foms in source_contexts.items():
+                    if not context_fs:  # FOMs with no defined context are set to the null context
+                        context_fs = frozenset([_NULL_CONTEXT])
+                        all_contexts[_NULL_CONTEXT] = {}
+                    for context in context_fs:
+                        if context not in all_contexts:
+                            fom_list = str(list(source_foms.keys()))
+                            logger.die(
+                                f"Figure(s) of merit {fom_list} registered to context "
+                                f"'{context}', which is not found. Check FOM and FOM context "
+                                "definitions and 'when' conditions."
+                            )
 
-            if log_path not in files:
-                files[log_path] = self._new_file_dict()
+                        # Copy context definition for contexts used by a FOM
+                        if context not in definitions:
+                            definitions[context] = {
+                                "definition": {},
+                                "foms": {},
+                            }
+                            if context != _NULL_CONTEXT:
+                                regex_str = self.expander.expand_var(
+                                    all_contexts[context]["regex"]
+                                )
+                                definitions[context]["definition"] = {
+                                    "regex": re.compile(r"%s" % regex_str),
+                                    "format": all_contexts[context]["output_format"],
+                                }
 
-            logger.debug("Log = %s" % log_path)
-            logger.debug("Conf = %s" % conf)
-            if conf["contexts"]:
-                files[log_path]["contexts"].extend(conf["contexts"])
-            files[log_path]["foms"].append(fom)
+                        for fom, source_def in source_foms.items():
+                            if fom in definitions[context]["foms"]:
+                                logger.warn(
+                                    f"FOM {fom} already defined in context {context} by "
+                                    f"{definitions[context]['foms'][fom]['origin']}. "
+                                    f"Overwriting with new definition from {source.name}"
+                                )
+                            else:
+                                definitions[context]["foms"][fom] = {}
 
-            def _try_expand_var_or_none(var: str, expander):
-                try:
-                    return expander.expand_var(var, allow_passthrough=False)
-                except ramble.expander.RambleSyntaxError:
-                    return None
+                            def _expand_var(var):
+                                return self.expander.expand_var(var, extra_vars=extra_vars)
 
-            foms[fom] = {
-                "regex": re.compile(r"%s" % self.expander.expand_var(conf["regex"])),
-                "contexts": [],
-                "group": conf["group_name"],
-                "units": conf["units"],
-                "origin": conf["origin"],
-                "origin_type": conf["origin_type"],
-                "fom_type": conf["fom_type"].to_dict(),
-                # If expansion works (i.e., it doesn't rely on the matched fom groups),
-                # then cache it here to avoid repeated expansion later.
-                "units_expanded": _try_expand_var_or_none(conf["units"], self.expander),
-                "fom_name_expanded": _try_expand_var_or_none(fom, self.expander),
-            }
-            if conf["contexts"]:
-                foms[fom]["contexts"].extend(conf["contexts"])
-                for context in conf["contexts"]:
-                    regex_str = self.expander.expand_var(fom_contexts[context]["regex"])
-                    format_str = fom_contexts[context]["output_format"]
-                    contexts[context] = {
-                        "regex": re.compile(r"%s" % regex_str),
-                        "format": format_str,
-                    }
+                            def _try_expand_var_or_none(var: str, expander):
+                                try:
+                                    return expander.expand_var(var, allow_passthrough=False)
+                                except ramble.expander.RambleSyntaxError:
+                                    return None
 
-        return files, contexts, foms
+                            fom_def = {
+                                "origin": source.name,
+                                "origin_type": source.origin_type,
+                                "contexts": set(source_def["contexts"]),
+                                "group": _expand_var(source_def["group_name"]),
+                                "units": _expand_var(source_def["units"]),
+                                "regex": re.compile(r"%s" % _expand_var(source_def["regex"])),
+                                "fom_type": source_def["fom_type"].to_dict(),
+                                # If expansion works (i.e., it doesn't rely on the matched fom
+                                # groups), then cache it here to avoid repeated expansion later.
+                                "units_expanded": _try_expand_var_or_none(
+                                    source_def["units"], self.expander
+                                ),
+                                "fom_name_expanded": _try_expand_var_or_none(fom, self.expander),
+                            }
+
+                            definitions[context]["foms"][fom] = fom_def
+
+                            log_path = _expand_var(source_def["log_file"])
+                            # Ensure log path is absolute. If not, prepend the experiment run dir
+                            if (
+                                not os.path.isabs(log_path)
+                                and self.expander.experiment_run_dir not in log_path
+                            ):
+                                log_path = os.path.join(self.expander.experiment_run_dir, log_path)
+
+                            if log_path not in files:
+                                files[log_path] = self._new_file_dict()
+
+                            if context not in files[log_path]["contexts"]:
+                                files[log_path]["contexts"][context] = []
+                            files[log_path]["contexts"][context].append(fom)
+
+                            logger.debug("Log = %s" % log_path)
+                            logger.debug("Conf = %s" % fom_def)
+
+        return files, definitions
 
     def read_status(self):
         """Read status from an experiment's status file, if possible.
