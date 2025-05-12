@@ -60,7 +60,7 @@ class PyNemo2(BasePyNemo):
     workload_variable(
         "nemo_config_dir_path",
         default="",
-        description="Path to Nemo 2.0 python config to be used.",
+        description="Path to folder containing Nemo 2.0 python config to be used.",
         workload_group="pretraining",
     )
     workload_variable(
