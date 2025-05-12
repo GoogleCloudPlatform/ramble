@@ -2187,6 +2187,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for success_scope, success_list in success_lists:
             for criteria, conf in success_list.items():
+                if not self.expander.satisfies(conf["when"], variant_set=self.object_variants):
+                    continue
+
                 if conf["mode"] == "string":
                     match = (
                         self.expander.expand_var(conf["match"])

@@ -120,3 +120,18 @@ class WhenDirectives(ExecutableApplication):
             log_file=log_file,
             contexts=["test_context_when"],
         )
+
+    # For success_criteria()
+    variant(
+        "success_criteria_when",
+        default=False,
+        values=[True, False],
+        description="Register success criteria using when",
+    )
+
+    success_criteria(
+        "test_success_criteria_when",
+        mode="string",
+        match=r".*THIS TEXT NOT IN OUT FILE.*",
+        when=["+success_criteria_when"],
+    )
