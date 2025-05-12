@@ -181,8 +181,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._software_lock = None
         self._experiment_graph = None
 
-        if not self.license_names:
-            self.license_names.append(self.name)
+        # Ensure we always have the application name, and this is never empty
+        self.license_names = self.license_names + [self.name]
 
         self.hash_inventory = {
             "application_definition": None,
