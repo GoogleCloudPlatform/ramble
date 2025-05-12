@@ -32,7 +32,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
+<<<<<<< HEAD
         "CUDA_VISIBLE_DEVICES", value="{cuda_visible_devices}",
+=======
+        "CUDA_VISIBLE_DEVICES",
+        value="{cuda_visible_devices}",
+>>>>>>> e6e713fc (Merge upstream changes.)
         description="Comma delimited list of CUDA device IDs",
         workload_group="pretraining",
     )
@@ -43,7 +48,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
+<<<<<<< HEAD
         "TRANSFORMERS_OFFLINE", value="{transformers_offline}",
+=======
+        "TRANSFORMERS_OFFLINE",
+        value="{transformers_offline}",
+>>>>>>> e6e713fc (Merge upstream changes.)
         description="Whether transformers are offline (0) or not (1)",
         workload_group="pretraining",
     )
@@ -54,7 +64,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
+<<<<<<< HEAD
         "TORCH_NCCL_AVOID_RECORD_STREAMS", value="{torch_nccl_avoid_record_streams}",
+=======
+        "TORCH_NCCL_AVOID_RECORD_STREAMS",
+        value="{torch_nccl_avoid_record_streams}",
+>>>>>>> e6e713fc (Merge upstream changes.)
         description="Avoid (1) recording streams for Torch NCCL, or not (0)",
         workload_group="pretraining",
     )
@@ -65,7 +80,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
+<<<<<<< HEAD
         "NCCL_NVLS_ENABLE", value="{nccl_nvls_enable}",
+=======
+        "NCCL_NVLS_ENABLE",
+        value="{nccl_nvls_enable}",
+>>>>>>> e6e713fc (Merge upstream changes.)
         description="Enable (1) NCCL NVLS or not (0)",
         workload_group="pretraining",
     )
@@ -76,7 +96,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
+<<<<<<< HEAD
         "NEMO_CONTAINER_MOUNTS", value="{results_mount}",
+=======
+        "NEMO_CONTAINER_MOUNTS",
+        value="{results_mount}",
+>>>>>>> e6e713fc (Merge upstream changes.)
         description="All container mounts in an environment variable",
         workload_group="pretraining",
     )
@@ -87,7 +112,12 @@ workload_group("pretraining", workloads=[])
         workload_group="pretraining",
     )
     environment_variable(
+<<<<<<< HEAD
         "NEMO_HOST_VARS", value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
+=======
+        "NEMO_HOST_VARS",
+        value="TRANSFORMERS_OFFLINE,TORCH_NCCL_AVOID_RECORD_STREAMS,NCCL_NVLS_ENABLE,CUDA_VISIBLE_DEVICES",
+>>>>>>> e6e713fc (Merge upstream changes.)
         description="Host variables for NeMo",
         workload_group="pretraining",
     )
