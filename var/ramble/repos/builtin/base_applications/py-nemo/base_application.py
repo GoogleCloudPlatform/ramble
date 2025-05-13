@@ -5,9 +5,11 @@ from ramble.appkit import *
 from spack.util.path import canonicalize_path
 
 
-class BasePyNemo(ExecutableApplication): """Define a base class for PyNemo applications."""
+class BasePyNemo(ExecutableApplication):
+    """Define a base class for PyNemo applications."""
 
     tags("ml-framework", "machine-learning")
+
     workload_group("pretraining", workloads=[])
 
     workload_variable(
