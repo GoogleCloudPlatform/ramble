@@ -312,13 +312,17 @@ package manager variant:
         when=["package_manager_family=eessi"],
     )
 
-The `when` clause can also be used with modifier and modifier mode, using the
-following syntax:
+The following standard variant definitions can be used in the `when` clause,
+along with any variants created in definition files:
 
 .. code-block:: python
 
-    when=["modifier=modifier-name"]
-    when=["modifier-name_mode=mode"]
+    package_manager  
+    package_manager_family  
+    workflow_manager  
+    workflow_manager_family  
+    modifier  
+    <mod-name>_mode 
 
 --------------------------
 Package Manager Directives

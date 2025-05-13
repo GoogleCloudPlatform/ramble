@@ -27,7 +27,7 @@ class WhenDirectivesInherited(WhenDirectives):
 
     with when("+register_inherited_fom_when"):
         figure_of_merit_context(
-            "test_context",
+            "always_context",
             regex=always_on_fom_regex,
             output_format="{when_context}",
         )
@@ -38,5 +38,5 @@ class WhenDirectivesInherited(WhenDirectives):
             group_name="inherited_fom",
             units="integer",
             log_file=log_file,
-            contexts=["test_context"],
+            contexts=["always_context"],
         )

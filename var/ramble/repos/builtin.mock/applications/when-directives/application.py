@@ -67,14 +67,14 @@ class WhenDirectives(ExecutableApplication):
     always_on_fom_regex = (
         r".*(?P<context>test always)\s+(?P<always_fom>[0-9]+\.[0-9]+)"
     )
-    fom_regex = r"(?P<context>test context)\s+(?P<when_fom>[0-9]+\.[0-9]+)"
-    fom_regex_when = (
-        r"(?P<when_context>test when)\s+(?P<fom>[0-9]+\.[0-9]+).*"
+    fom_context_when_regex = r"(?P<when_context>test when context)\s+(?P<when_context_fom>[0-9]+\.[0-9]+).*"
+    addtl_fom_regex = (
+        r"test when fom\s+(?P<when_fom>[0-9]+\.[0-9]+).*"
         r"test always\s+(?P<always_when>[0-9]+)"
     )
 
     figure_of_merit_context(
-        "test_context", regex=fom_regex, output_format="{context}"
+        "always_context", regex=always_on_fom_regex, output_format="{context}"
     )
 
     figure_of_merit(
@@ -83,20 +83,20 @@ class WhenDirectives(ExecutableApplication):
         group_name="always_fom",
         units="",
         log_file=log_file,
-        contexts=["test_context"],
+        contexts=["always_context"],
     )
 
     with when("+register_fom_context_when"):
         figure_of_merit_context(
             "test_context_when",
-            regex=fom_regex_when,
-            output_format="{when_context}",
+            regex=fom_context_when_regex,
+            output_format="test when",
         )
 
         figure_of_merit(
             "test_fom",
-            fom_regex=fom_regex_when,
-            group_name="fom",
+            fom_regex=fom_context_when_regex,
+            group_name="when_context_fom",
             units="",
             log_file=log_file,
             contexts=["test_context_when"],
@@ -104,7 +104,7 @@ class WhenDirectives(ExecutableApplication):
 
         figure_of_merit(
             "test_always_on_fom",
-            fom_regex=fom_regex_when,
+            fom_regex=addtl_fom_regex,
             group_name="always_when",
             units="integer",
             log_file=log_file,
@@ -114,9 +114,9 @@ class WhenDirectives(ExecutableApplication):
     with when("+register_fom_when"):
         figure_of_merit(
             "test_fom_when",
-            fom_regex=fom_regex,
+            fom_regex=addtl_fom_regex,
             group_name="when_fom",
             units="",
             log_file=log_file,
-            contexts=["test_context"],
+            contexts=["test_context_when"],
         )

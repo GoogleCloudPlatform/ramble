@@ -2231,7 +2231,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         all_contexts = {}
         for source in fom_sources:
             for when_fs, source_context_defs in source.figure_of_merit_contexts.items():
-                if self.expander.satisfies(list(when_fs), variant_set=self.object_variants):
+                if self.expander.satisfies(when_fs, variant_set=self.object_variants):
                     for context, context_def in source_context_defs.items():
                         all_contexts[context] = context_def
             extra_vars = (
@@ -2239,7 +2239,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             )
             # figures_of_merit[frozenset(when_list)][frozenset(context_list)][fom_name]
             for when_fs, source_contexts in source.figures_of_merit.items():
-                if not self.expander.satisfies(list(when_fs), variant_set=self.object_variants):
+                if not self.expander.satisfies(when_fs, variant_set=self.object_variants):
                     continue
 
                 for context_fs, source_foms in source_contexts.items():
@@ -2266,7 +2266,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                     all_contexts[context]["regex"]
                                 )
                                 definitions[context]["definition"] = {
-                                    "regex": re.compile(r"%s" % regex_str),
+                                    "regex": re.compile(regex_str),
                                     "format": all_contexts[context]["output_format"],
                                 }
 
@@ -2295,7 +2295,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 "contexts": set(source_def["contexts"]),
                                 "group": _expand_var(source_def["group_name"]),
                                 "units": _expand_var(source_def["units"]),
-                                "regex": re.compile(r"%s" % _expand_var(source_def["regex"])),
+                                "regex": re.compile(_expand_var(source_def["regex"])),
                                 "fom_type": source_def["fom_type"].to_dict(),
                                 # If expansion works (i.e., it doesn't rely on the matched fom
                                 # groups), then cache it here to avoid repeated expansion later.

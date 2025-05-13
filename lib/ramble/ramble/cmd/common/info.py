@@ -241,8 +241,8 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
 
     indentation = " " * 4
 
-    for when_key, context_dict in internal_attr.items():
-        for context_key, fom_dict in context_dict.items():
+    for _, context_dict in internal_attr.items():
+        for _, fom_dict in context_dict.items():
             if not verbose:
                 to_print = list(fom_dict.keys())
 
@@ -268,7 +268,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     if attr == "registered_phases":
         _print_phases(obj, attr, verbose, pattern, format=format)
         return
-    if attr == "figures_of_merit":
+    elif attr == "figures_of_merit":
         _print_figures_of_merit(obj, attr, verbose, pattern, format=format)
         return
 
