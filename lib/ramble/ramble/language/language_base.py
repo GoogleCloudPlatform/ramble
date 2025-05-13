@@ -216,6 +216,7 @@ class DirectiveMeta(type):
                         "register_phase",
                         "figure_of_merit",
                         "figure_of_merit_context",
+                        "formatted_executable",
                     ]:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'

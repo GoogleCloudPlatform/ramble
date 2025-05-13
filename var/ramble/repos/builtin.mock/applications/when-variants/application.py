@@ -12,7 +12,14 @@ from ramble.appkit import *
 class WhenVariants(ExecutableApplication):
     name = "when-variants"
 
-    executable("test_exec", "echo '{test_variable}'", use_mpi=False)
+    executable(
+        "test_exec",
+        template=[
+            "echo '{test_variable}'",
+            "echo '{test_formatted_exec}'",
+        ],
+        use_mpi=False,
+    )
 
     workload("test_wl", executable="test_exec")
 
@@ -49,3 +56,48 @@ class WhenVariants(ExecutableApplication):
                 software_spec("zlib-mod", pkg_spec="zlib@1.2.13")
 
         required_package("zlib")
+
+    with when("+inc_zlib"):
+        with when("zlib_type=preferred"):
+            formatted_executable(
+                "test_formatted_exec",
+                prefix=" from_variant ",
+                indentation=4,
+                join_separator="\n",
+                commands=[
+                    "zlib included with type of preferred",
+                ],
+            )
+
+        with when("zlib_type=testing"):
+            formatted_executable(
+                "test_formatted_exec",
+                prefix=" from_variant ",
+                indentation=4,
+                join_separator="\n",
+                commands=[
+                    "zlib included with type of testing",
+                ],
+            )
+
+        with when("zlib_type=modifier"):
+            formatted_executable(
+                "test_formatted_exec",
+                prefix=" from_variant ",
+                indentation=4,
+                join_separator="\n",
+                commands=[
+                    "zlib included with type of modifier",
+                ],
+            )
+
+    with when("~inc_zlib"):
+        formatted_executable(
+            "test_formatted_exec",
+            prefix=" from_variant ",
+            indentation=4,
+            join_separator="\n",
+            commands=[
+                "zlib not included",
+            ],
+        )

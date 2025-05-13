@@ -1192,7 +1192,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.variables[self.keywords.unformatted_command_without_logs] = "\n".join(
             self._command_list_without_logs
         )
-        formatted_exec_groups = [self._formatted_executables]
+        formatted_exec_groups = [{frozenset(): self._formatted_executables}]
 
         objs_to_extract = [self, self.workflow_manager, self.package_manager]
 
@@ -1201,38 +1201,44 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 formatted_exec_groups.append(obj.formatted_executables)
 
         for formatted_exec_group in formatted_exec_groups:
-            for var_name, formatted_conf in formatted_exec_group.items():
-                if var_name in self.variables:
-                    raise FormattedExecutableError(
-                        f"Formatted executable {var_name} defined, but variable "
-                        "definition already exists."
-                    )
+            for when_set, formatted_exec_defs in formatted_exec_group.items():
+                if not self.expander.satisfies(when_set, variant_set=self.object_variants):
+                    continue
 
-                n_indentation = 0
-                if namespace.indentation in formatted_conf:
-                    n_indentation = int(formatted_conf[namespace.indentation])
+                for var_name, formatted_conf in formatted_exec_defs.items():
+                    if var_name in self.variables:
+                        raise FormattedExecutableError(
+                            f"Formatted executable {var_name} defined, but variable "
+                            "definition already exists."
+                        )
 
-                prefix = ""
-                if namespace.prefix in formatted_conf:
-                    prefix = formatted_conf[namespace.prefix]
+                    n_indentation = 0
+                    if namespace.indentation in formatted_conf:
+                        n_indentation = int(formatted_conf[namespace.indentation])
 
-                join_separator = "\n"
-                if namespace.join_separator in formatted_conf:
-                    join_separator = formatted_conf[namespace.join_separator].replace(r"\n", "\n")
+                    prefix = ""
+                    if namespace.prefix in formatted_conf:
+                        prefix = formatted_conf[namespace.prefix]
 
-                indentation = " " * n_indentation
+                    join_separator = "\n"
+                    if namespace.join_separator in formatted_conf:
+                        join_separator = formatted_conf[namespace.join_separator].replace(
+                            r"\n", "\n"
+                        )
 
-                commands_to_format = self._command_list
-                if namespace.commands in formatted_conf:
-                    commands_to_format = formatted_conf[namespace.commands].copy()
+                    indentation = " " * n_indentation
 
-                formatted_lines = []
-                for command in commands_to_format:
-                    expanded = self.expander.expand_var(command)
-                    for out_line in expanded.split("\n"):
-                        formatted_lines.append(indentation + prefix + out_line)
+                    commands_to_format = self._command_list
+                    if namespace.commands in formatted_conf:
+                        commands_to_format = formatted_conf[namespace.commands].copy()
 
-                self.variables[var_name] = join_separator.join(formatted_lines)
+                    formatted_lines = []
+                    for command in commands_to_format:
+                        expanded = self.expander.expand_var(command)
+                        for out_line in expanded.split("\n"):
+                            formatted_lines.append(indentation + prefix + out_line)
+
+                    self.variables[var_name] = join_separator.join(formatted_lines)
 
     def _derive_variables_for_template_path(self, workspace):
         """Define variables for template paths (for add_expand_vars)"""
