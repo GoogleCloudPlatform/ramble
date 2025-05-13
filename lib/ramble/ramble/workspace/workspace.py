@@ -46,7 +46,6 @@ from ramble.util import constants
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
-from ramble.util.spec_utils import specs_equiv
 
 import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
@@ -1410,16 +1409,28 @@ ramble:
 
         packages_dict = full_software_dict[namespace.packages]
         environments_dict = full_software_dict[namespace.environments]
+        newly_created_packages = set()
 
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
 
         experiment_set = self.build_experiment_set(die_on_validate_error=False)
+
+        pkgman_prefixes = set()
+        for _, app_inst, _ in experiment_set.all_experiments():
+            app_inst.build_modifier_instances()
+            app_inst.add_expand_vars(self)
+            if app_inst.package_manager is not None:
+                pkgman_prefixes.add(app_inst.package_manager.spec_prefix())
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
             app_inst.add_expand_vars(self)
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
+
+            spec_prefix = (
+                f"{app_inst.package_manager.spec_prefix()}" if len(pkgman_prefixes) > 1 else ""
+            )
 
             if app_inst.package_manager is None:
                 continue
@@ -1429,41 +1440,33 @@ ramble:
                 compiler_dicts.append(mod_inst.compilers)
 
             for compiler_dict in compiler_dicts:
-                for comp, info in compiler_dict.items():
-                    keep_comp = app_inst.expander.satisfies(
-                        info["when"], variant_set=app_inst.object_variants
-                    )
-                    if keep_comp:
-                        if comp not in packages_dict or force:
-                            packages_dict[comp] = syaml.syaml_dict()
-                            packages_dict[comp]["pkg_spec"] = info["pkg_spec"]
-                            ramble.config.add(
-                                f'software:packages:{comp}:pkg_spec:{info["pkg_spec"]}',
-                                scope=self.ws_file_config_scope_name(),
-                            )
-                            if "compiler_spec" in info and info["compiler_spec"]:
-                                packages_dict[comp]["compiler_spec"] = info["compiler_spec"]
-                                config_path = (
-                                    f"software:packages:{comp}:"
-                                    + f'compiler_spec:{info["compiler_spec"]}'
+                for comp, definitions in compiler_dict.items():
+                    for info in definitions:
+                        keep_comp = app_inst.expander.satisfies(
+                            info.when, variant_set=app_inst.object_variants
+                        )
+                        if keep_comp:
+                            if (
+                                not quiet
+                                and comp in packages_dict
+                                and info.conflict_dict(packages_dict[comp])
+                            ):
+                                logger.debug(f"  Spec 1: {str(info)}")
+                                logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
+                                raise RambleConflictingDefinitionError(
+                                    f"Compiler {comp} would be defined "
+                                    "in multiple conflicting ways"
                                 )
-                                ramble.config.add(
-                                    config_path, scope=self.ws_file_config_scope_name()
-                                )
-                            if "compiler" in info and info["compiler"]:
-                                packages_dict[comp]["compiler"] = info["compiler"]
-                                config_path = (
-                                    f"software:packages:{comp}:" + f'compiler:{info["compiler"]}'
-                                )
-                                ramble.config.add(
-                                    config_path, scope=self.ws_file_config_scope_name()
-                                )
-                        elif not quiet and not specs_equiv(info, packages_dict[comp]):
-                            logger.debug(f"  Spec 1: {str(info)}")
-                            logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
-                            raise RambleConflictingDefinitionError(
-                                f"Compiler {comp} would be defined " "in multiple conflicting ways"
-                            )
+
+                            if comp not in packages_dict or (
+                                force and comp not in newly_created_packages
+                            ):
+                                newly_created_packages.add(comp)
+                                packages_dict[comp] = syaml.syaml_dict()
+
+                            packages_dict[comp].update(info.to_dict(prefix=spec_prefix))
+                            for conf in info.config_opts():
+                                ramble.config.add(conf, scope=self.ws_file_config_scope_name())
 
             logger.debug(f"Trying to define packages for {env_name}")
             app_packages = []
@@ -1476,30 +1479,34 @@ ramble:
                 software_dicts.append(mod_inst.software_specs)
 
             for software_dict in software_dicts:
-                for spec_name, info in software_dict.items():
-                    keep_pkg = app_inst.expander.satisfies(
-                        info["when"], variant_set=app_inst.object_variants
-                    )
-                    if keep_pkg:
-                        logger.debug(f"    Found spec: {spec_name}")
-                        if spec_name not in packages_dict or force:
-                            packages_dict[spec_name] = syaml.syaml_dict()
-                            packages_dict[spec_name]["pkg_spec"] = info["pkg_spec"]
-                            if "compiler_spec" in info and info["compiler_spec"]:
-                                packages_dict[spec_name]["compiler_spec"] = info["compiler_spec"]
-                            if "compiler" in info and info["compiler"]:
-                                packages_dict[spec_name]["compiler"] = info["compiler"]
+                for spec_name, definitions in software_dict.items():
+                    for info in definitions:
+                        keep_pkg = app_inst.expander.satisfies(
+                            info.when, variant_set=app_inst.object_variants
+                        )
+                        if keep_pkg:
+                            logger.debug(f"    Found spec: {spec_name}")
+                            if (
+                                not quiet
+                                and spec_name in packages_dict
+                                and info.conflict_dict(packages_dict[spec_name])
+                            ):
+                                logger.debug(f"  Spec 1: {str(info)}")
+                                logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
+                                raise RambleConflictingDefinitionError(
+                                    f"Package {spec_name} would be defined in multiple "
+                                    "conflicting ways"
+                                )
 
-                        elif not quiet and not specs_equiv(info, packages_dict[spec_name]):
-                            logger.debug(f"  Spec 1: {str(info)}")
-                            logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
-                            raise RambleConflictingDefinitionError(
-                                f"Package {spec_name} would be defined in multiple "
-                                "conflicting ways"
-                            )
+                            if spec_name not in packages_dict or (
+                                force and spec_name not in newly_created_packages
+                            ):
+                                packages_dict[spec_name] = syaml.syaml_dict()
 
-                        if spec_name not in app_packages:
-                            app_packages.append(spec_name)
+                            packages_dict[spec_name].update(info.to_dict(prefix=spec_prefix))
+
+                            if spec_name not in app_packages:
+                                app_packages.append(spec_name)
 
             if app_packages:
                 if env_name not in environments_dict:

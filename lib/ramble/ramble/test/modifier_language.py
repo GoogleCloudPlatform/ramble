@@ -203,8 +203,8 @@ def test_software_spec_directive(mod_class):
 
         assert spec_name in mod_inst.software_specs
         for attr in expected_attrs:
-            assert attr in mod_inst.software_specs[spec_name]
-            assert test_def[attr] == mod_inst.software_specs[spec_name][attr]
+            assert hasattr(mod_inst.software_specs[spec_name][0], attr)
+            assert test_def[attr] == getattr(mod_inst.software_specs[spec_name][0], attr)
 
 
 def add_compiler(mod_inst, spec_num=1):
@@ -241,8 +241,8 @@ def test_define_compiler_directive(mod_class):
 
         assert spec_name in mod_inst.compilers
         for attr in expected_attrs:
-            assert attr in mod_inst.compilers[spec_name]
-            assert test_def[attr] == mod_inst.compilers[spec_name][attr]
+            assert hasattr(mod_inst.compilers[spec_name][0], attr)
+            assert test_def[attr] == getattr(mod_inst.compilers[spec_name][0], attr)
 
 
 def add_required_package(mod_inst, pkg_num=1):

@@ -235,28 +235,36 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         # sub items. These need to be iterated over, and we need to escape
         # existing characters that would normally be used to color strings.
         if isinstance(internal_attr, dict):
-            for name, val in internal_attr.items():
+            for name, vals in internal_attr.items():
                 if pattern and not fnmatch.fnmatch(name, pattern):
                     continue
 
-                if isinstance(val, dict):
-                    color_name = ramble.util.colors.section_title(name)
-                    color.cprint(f"{color_name}:")
-                    for sub_name, sub_val in val.items():
-                        # Avoid showing duplicate names for variables
-                        if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
-                            to_print = f"{indentation}{sub_val}"
-                        else:
-                            color_sub_name = ramble.util.colors.nested_1(sub_name)
-                            to_print = f"{indentation}{color_sub_name}: {sub_val}"
-                        try:
-                            color.cprint(to_print)
-                        except color.ColorParseError:
-                            escaped_sub_val = sub_val.replace("@", "@@")
-                            color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
-                    color.cprint("")
+                if not isinstance(vals, list):
+                    itr_vals = [vals]
                 else:
-                    color.cprint(f"{str(val)}")
+                    itr_vals = vals
+
+                for val in itr_vals:
+                    if isinstance(val, dict):
+                        color_name = ramble.util.colors.section_title(name)
+                        color.cprint(f"{color_name}:")
+                        for sub_name, sub_val in val.items():
+                            # Avoid showing duplicate names for variables
+                            if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
+                                to_print = f"{indentation}{sub_val}"
+                            else:
+                                color_sub_name = ramble.util.colors.nested_1(sub_name)
+                                to_print = f"{indentation}{color_sub_name}: {sub_val}"
+                            try:
+                                color.cprint(to_print)
+                            except color.ColorParseError:
+                                escaped_sub_val = sub_val.replace("@", "@@")
+                                color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
+                        color.cprint("")
+                    elif hasattr(val, "as_str"):
+                        color.cprint(f"{val.as_str()}")
+                    else:
+                        color.cprint(f"{str(val)}")
         # If the attribute is not a dict, print using the existing format rules.
         elif isinstance(internal_attr, list):
             to_print = fnmatch.filter(internal_attr, pattern)
