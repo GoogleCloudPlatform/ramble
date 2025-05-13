@@ -44,6 +44,8 @@ def test_setup_analyze(test_case_path, request):
         ├── expected_analyze.out
         └── configs (this is required)
             └── ramble.yaml (can contain more config files)
+            └── includes (optional includes dir, when present, add to the include section)
+                └── variables.yaml (optional)
     ```
 
     When writing a Ramble object, if a `test_cases` directory is included, then
@@ -67,6 +69,9 @@ def test_setup_analyze(test_case_path, request):
     src_config_dir_path = test_case_path / "configs"
     dest_config_path = pathlib.Path(os.path.join(ws.config_dir))
     _copy_tree(src_config_dir_path, dest_config_path)
+    dest_includes_dir_path = dest_config_path / "includes"
+    if dest_includes_dir_path.is_dir():
+        ws_cmd("manage", "includes", "--add", str(dest_includes_dir_path), global_args=global_args)
     ws._re_read()
     # TODO: add assertions around setup artifacts
     ws_cmd("setup", "--dry-run", global_args=global_args)

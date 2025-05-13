@@ -2,33 +2,9 @@ ramble:
   variants:
     package_manager: spack
     workflow_manager: slurm
-  applications:
-    osu-micro-benchmarks:
-      workloads:
-        osu_latency:
-          experiments:
-            test:
-              env_vars:
-                set:
-                  I_MPI_PIN_PROCESSOR_LIST: 0
-              variables:
-                n_nodes: 2
-                processes_per_node: 1
-                mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node} -hostfile {experiment_run_dir}/hostfile
-                slurm_partition: c2dstandard
+  # defined in includes/application.yaml
+  applications: {}
+  # defined in includes/software.yaml
   software:
-    packages:
-      gcc14:
-        pkg_spec: gcc@14.2.0 +binutils target=x86_64
-        compiler_spec: gcc@14.2.0
-      omb:
-        pkg_spec: osu-micro-benchmarks@7.4
-        compiler: gcc14
-      impi:
-        pkg_spec: intel-oneapi-mpi@2021.13.1 target=zen3
-        compiler: gcc14
-    environments:
-      osu-micro-benchmarks:
-        packages:
-        - omb
-        - impi
+    packages: {}
+    environments: {}

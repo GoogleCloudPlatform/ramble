@@ -1,0 +1,14 @@
+applications:
+  osu-micro-benchmarks:
+    workloads:
+      osu_latency:
+        experiments:
+          test:
+            env_vars:
+              set:
+                I_MPI_PIN_PROCESSOR_LIST: 0
+            variables:
+              n_nodes: 2
+              processes_per_node: 1
+              mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node} -hostfile {experiment_run_dir}/hostfile
+              slurm_partition: c2dstandard

@@ -1,0 +1,16 @@
+software:
+  packages:
+    gcc14:
+      pkg_spec: gcc@14.2.0 +binutils target=x86_64
+      compiler_spec: gcc@14.2.0
+    omb:
+      pkg_spec: osu-micro-benchmarks@7.4
+      compiler: gcc14
+    impi:
+      pkg_spec: intel-oneapi-mpi@2021.13.1 target=zen3
+      compiler: gcc14
+  environments:
+    osu-micro-benchmarks:
+      packages:
+      - omb
+      - impi
