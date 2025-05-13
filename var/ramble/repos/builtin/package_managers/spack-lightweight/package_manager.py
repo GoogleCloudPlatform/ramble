@@ -576,9 +576,17 @@ class SpackLightweight(PackageManagerBase):
         source_cmd = "\n".join(self.runner.generate_source_command())
         activate_cmd = "\n".join(self.runner.generate_activate_command())
         self.runner.deactivate()
+        user_flags = ramble.config.get(
+            f"{self.runner.buildcache_config_name}:flags"
+        )
+        if user_flags is not None:
+            additional_args = user_flags
+        else:
+            additional_args = ""
         return {
             "source_cmd": source_cmd,
             "activate_cmd": activate_cmd,
+            "additional_args": additional_args,
         }
 
 

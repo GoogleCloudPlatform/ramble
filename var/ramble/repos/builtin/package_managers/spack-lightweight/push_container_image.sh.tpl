@@ -14,5 +14,5 @@ echo "Pushing container image to registry at $url"
 spack buildcache push \
   --update-index \
   --base-image "{container_base_image}" \
-  --tag "{container_image_tag}" \
+  --tag "{container_image_tag}" {additional_args} \
   "{container_registry_name}"
