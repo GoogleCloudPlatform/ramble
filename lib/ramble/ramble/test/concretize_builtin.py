@@ -139,4 +139,4 @@ def test_concretize_allows_invalid_experiment(
         with open(ws.config_file_path) as f:
             data = f.read()
 
-            assert "spack_gromacs" in data
+            assert "gromacs" in data

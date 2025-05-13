@@ -274,7 +274,7 @@ class Lammps(ExecutableApplication):
 
     workload_variable(
         "input_stage",
-        default="stable_23Jun2022_update3.tar.gz",
+        default="stable_23Jun2022_update3",
         description="Stage name of LAMMPS input archive",
         workloads=["hns-reaxff"],
     )

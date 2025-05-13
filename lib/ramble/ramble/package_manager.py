@@ -111,11 +111,12 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     def environment_required(self):
         app_inst = self.app_inst
         if hasattr(app_inst, "software_specs"):
-            for info in app_inst.software_specs.values():
-                if self.app_inst.expander.satisfies(
-                    info["when"], variant_set=self.object_variants
-                ):
-                    return True
+            for definitions in app_inst.software_specs.values():
+                for info in definitions:
+                    if self.app_inst.expander.satisfies(
+                        info.when, variant_set=self.object_variants
+                    ):
+                        return True
 
         return False
 

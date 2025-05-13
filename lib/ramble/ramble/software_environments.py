@@ -313,13 +313,7 @@ class TemplatePackage(SoftwarePackage):
         raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix)
         raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix)
 
-        if raw_spec is None:
-            logger.die(
-                f"When rendering package {self.name} "
-                + f"no spec was found for package manager {pm_name}.\n"
-            )
-
-        spec = expander.expand_var(raw_spec, merge_used_stage=False)
+        spec = expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec else None
         compiler = (
             expander.expand_var(raw_compiler, merge_used_stage=False) if raw_compiler else None
         )
@@ -612,29 +606,31 @@ class TemplateEnvironment(SoftwareEnvironment):
             rendered_env_pkg_name = expander.expand_var(env_pkg_template)
 
             if rendered_env_pkg_name:
-                added = False
+                found = False
                 for template_pkg in all_package_templates.values():
                     expander.flush_used_variable_stage()
                     rendered_pkg = template_pkg.render_package(expander, package_manager)
 
                     if rendered_env_pkg_name == rendered_pkg.name:
-                        expander.merge_used_variable_stage()
+                        found = True
+                        if rendered_pkg.spec is not None:
+                            expander.merge_used_variable_stage()
 
-                        if rendered_pkg.name in all_packages[pm_name]:
-                            if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
-                                raise RambleSoftwareEnvironmentError(
-                                    f"Environment {name} defined multiple times in inconsistent "
-                                    f"ways.\nPackage with differences is {rendered_pkg.name}"
-                                )
-                            rendered_pkg = all_packages[pm_name][rendered_pkg.name]
-                        else:
-                            all_packages[pm_name][rendered_pkg.name] = rendered_pkg
+                            if rendered_pkg.name in all_packages[pm_name]:
+                                if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
+                                    raise RambleSoftwareEnvironmentError(
+                                        f"Environment {name} defined multiple "
+                                        "times in inconsistent ways.\n"
+                                        f"Package with differences is {rendered_pkg.name}"
+                                    )
+                                rendered_pkg = all_packages[pm_name][rendered_pkg.name]
+                            else:
+                                all_packages[pm_name][rendered_pkg.name] = rendered_pkg
 
-                        added = True
                         template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
                         new_env.add_package(rendered_pkg)
 
-                if not added:
+                if not found:
                     raise RambleSoftwareEnvironmentError(
                         f"Environment template {self.name} references "
                         f"undefined package {env_pkg_template} rendered to {rendered_env_pkg_name}"

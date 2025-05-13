@@ -13,7 +13,7 @@ from llnl.util.tty.colify import colify
 
 import ramble.repository
 import ramble.software_environments
-from ramble.util.spec_utils import specs_equiv
+from ramble.util.logger import logger
 
 description = "inspect software definitions in object definitions"
 section = "developer"
@@ -68,25 +68,29 @@ def collect_definitions():
 
             for top_level_attr in top_level_attrs:
                 if hasattr(obj_inst, top_level_attr):
-                    for pkg_name, pkg_def in getattr(obj_inst, top_level_attr).items():
-                        if pkg_name not in definitions:
-                            definitions[pkg_name] = pkg_def.copy()
-                            used_by[pkg_name] = [obj_namespace]
-                        else:
-                            if not specs_equiv(definitions[pkg_name], pkg_def):
-                                if pkg_name not in conflicts:
-                                    conflicts[pkg_name] = []
-                                conflicts[pkg_name].append(obj_namespace)
+                    for pkg_name, pkg_defs in getattr(obj_inst, top_level_attr).items():
+                        for pkg_def in pkg_defs:
+                            if pkg_name not in definitions:
+                                definitions[pkg_name] = pkg_def.copy()
+                                used_by[pkg_name] = [obj_namespace]
                             else:
-                                used_by[pkg_name].append(obj_namespace)
+                                logger.debug(f" Checking package: {pkg_name}")
+                                if pkg_def.conflict_spec(
+                                    definitions[pkg_name], skip_conflicting_when=True
+                                ):
+                                    if pkg_name not in conflicts:
+                                        conflicts[pkg_name] = []
+                                    conflicts[pkg_name].append(obj_namespace)
+                                else:
+                                    used_by[pkg_name].append(obj_namespace)
 
-                        for spec_name in specs:
-                            if spec_name in pkg_def:
-                                spec_def = pkg_def[spec_name]
-                                if spec_def:
-                                    if spec_def not in specs[spec_name]:
-                                        specs[spec_name][spec_def] = []
-                                    specs[spec_name][spec_def].append(obj_namespace)
+                            for spec_name in specs:
+                                if hasattr(pkg_def, spec_name):
+                                    spec_def = getattr(pkg_def, spec_name)
+                                    if spec_def:
+                                        if spec_def not in specs[spec_name]:
+                                            specs[spec_name][spec_def] = []
+                                        specs[spec_name][spec_def].append(obj_namespace)
 
 
 def print_summary():
@@ -119,8 +123,8 @@ def print_conflicts():
             color.cprint(f'{nested_1("Package")}: {pkg_name}:')
             color.cprint("\tDefined as:")
             for attr in ["pkg_spec", "compiler_spec", "compiler"]:
-                if attr in definitions[pkg_name]:
-                    attr_def = definitions[pkg_name][attr]
+                if hasattr(definitions[pkg_name], attr):
+                    attr_def = getattr(definitions[pkg_name], attr)
                     if attr_def:
                         color.cprint(f'\t\t{attr} = {attr_def.replace("@", "@@")}')
             color.cprint("\tIn objects:")

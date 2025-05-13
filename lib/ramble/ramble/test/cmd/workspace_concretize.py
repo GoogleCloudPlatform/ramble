@@ -32,7 +32,7 @@ def test_workspace_concretize_additive(request):
 
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "spack_gromacs" in content
+        assert "gromacs" in content
         assert "gcc9" in content
         assert "wrfv4" not in content
         assert "intel-oneapi-vtune" not in content
@@ -42,7 +42,7 @@ def test_workspace_concretize_additive(request):
 
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "spack_gromacs" in content
+        assert "gromacs" in content
         assert "gcc9" in content
         assert "wrfv4" in content
         assert "intel-oneapi-vtune" not in content
@@ -59,7 +59,46 @@ def test_workspace_concretize_additive(request):
 
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "spack_gromacs" in content
+        assert "gromacs" in content
         assert "gcc9" in content
         assert "wrfv4" in content
         assert "intel-oneapi-vtune" in content
+
+
+def test_workspace_multispec_concretize(request):
+    workspace_name = request.node.name
+
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+
+    workspace(
+        "manage",
+        "experiments",
+        "gromacs",
+        "-p",
+        "spack",
+        "-e",
+        "spack_test",
+        "--wf",
+        "water_*",
+        global_args=global_args,
+    )
+    workspace(
+        "manage",
+        "experiments",
+        "gromacs",
+        "-p",
+        "eessi",
+        "-e",
+        "eessi_test",
+        "--wf",
+        "water_*",
+        global_args=global_args,
+    )
+    workspace("concretize", "-q", global_args=global_args)
+
+    with open(ws.config_file_path) as f:
+        content = f.read()
+        assert "gromacs" in content
+        assert "spack_pkg_spec" in content
+        assert "eessi_pkg_spec" in content
