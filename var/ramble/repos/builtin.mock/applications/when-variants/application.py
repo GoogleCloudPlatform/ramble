@@ -44,6 +44,20 @@ class WhenVariants(ExecutableApplication):
         description="Test boolean variant",
     )
 
+    variant(
+        "validation",
+        default=False,
+        values=[True, False],
+        description="Variant to control whether validation is on or not",
+    )
+
+    with when("+validation"):
+        register_validator(
+            "fixed_n_nodes",
+            predicate="{n_nodes} == 2",
+            message="When validation is enabled, this test needs n_nodes=2",
+        )
+
     with default_args(when=["package_manager_family=spack", "+inc_zlib"]):
         with when("zlib_type=preferred"):
             software_spec("zlib-pref", pkg_spec="zlib@1.2.12")

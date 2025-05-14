@@ -927,18 +927,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def _check_object_validators(self):
         expander = self.expander
         for _, obj in self._objects():
-            for name, validator in obj.validators.items():
-                valid = expander.evaluate_predicate(validator["predicate"])
-                if not valid:
-                    msg = expander.expand_var(validator["message"])
-                    err_msg = (
-                        f"Validator '{name}' (defined in '{obj.name}') "
-                        f"fails with message: '{msg}'"
-                    )
-                    if validator["fail_on_invalid"]:
-                        raise ObjectValidationError(err_msg)
-                    else:
-                        logger.warn(err_msg)
+            for when_set, validator_defs in obj.validators.items():
+                if not self.expander.satisfies(when_set, variant_set=self.object_variants):
+                    continue
+
+                for name, validator in validator_defs.items():
+                    valid = expander.evaluate_predicate(validator["predicate"])
+                    if not valid:
+                        msg = expander.expand_var(validator["message"])
+                        err_msg = (
+                            f"Validator '{name}' (defined in '{obj.name}') "
+                            f"fails with message: '{msg}'"
+                        )
+                        if validator["fail_on_invalid"]:
+                            raise ObjectValidationError(err_msg)
+                        else:
+                            logger.warn(err_msg)
 
     def _define_custom_executables(self):
         # Define custom executables
