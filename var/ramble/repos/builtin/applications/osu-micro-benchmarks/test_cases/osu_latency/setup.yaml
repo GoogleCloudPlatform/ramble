@@ -1,0 +1,4 @@
+setup:
+  commands:
+  # Create dummy config for a basic osu_latency test
+  - manage experiments osu-micro-benchmarks --wf osu_latency -e test -p none -v n_nodes=2 -v processes_per_node=1 

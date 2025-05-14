@@ -808,8 +808,10 @@ def pytest_generate_tests(metafunc):
                 prefix = child_path.parts[-2]
                 for test_dir in child_path.iterdir():
                     if test_dir.is_dir():
+                        # Require at least a configs directory, or a setup.yaml
                         configs_dir = test_dir / "configs"
-                        if configs_dir.is_dir():
+                        setup_yaml = test_dir / "setup.yaml"
+                        if configs_dir.is_dir() or setup_yaml.is_file():
                             test_case_path = test_dir.resolve()
                             test_case_paths.append(test_case_path)
                             test_ids.append(f"{prefix}_{test_case_path.name}_{id}")

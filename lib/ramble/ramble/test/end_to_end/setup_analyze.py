@@ -15,6 +15,8 @@ import pytest
 import ramble.workspace
 from ramble.main import RambleCommand
 
+import spack.util.spack_yaml as syaml
+
 pytestmark = [
     pytest.mark.maybeslow,
     pytest.mark.usefixtures(
@@ -42,10 +44,9 @@ def test_setup_analyze(test_case_path, request):
         │   └── <application-name>__<workload_name>__<experiment_name>
         │       └── <experiment_name>.out (can have other artifacts)
         ├── expected_analyze.out
-        └── configs (this is required)
+        ├── setup.yaml (contains workspace commands for setting up the ramble config)
+        └── configs (either this or the setup.yaml must be present)
             └── ramble.yaml (can contain more config files)
-            └── includes (optional includes dir, when present, add to the include section)
-                └── variables.yaml (optional)
     ```
 
     When writing a Ramble object, if a `test_cases` directory is included, then
@@ -67,11 +68,25 @@ def test_setup_analyze(test_case_path, request):
     ws = ramble.workspace.create(ws_name)
     ws.write()
     src_config_dir_path = test_case_path / "configs"
-    dest_config_path = pathlib.Path(os.path.join(ws.config_dir))
-    _copy_tree(src_config_dir_path, dest_config_path)
-    dest_includes_dir_path = dest_config_path / "includes"
-    if dest_includes_dir_path.is_dir():
-        ws_cmd("manage", "includes", "--add", str(dest_includes_dir_path), global_args=global_args)
+    if src_config_dir_path.is_dir():
+        dest_config_path = pathlib.Path(os.path.join(ws.config_dir))
+        _copy_tree(src_config_dir_path, dest_config_path)
+    # Invoke the workspace commands defined in setup.yaml.
+    # The setup.yaml is assumed to be structured as the following, with each command being a
+    # space separated ramble workspace command:
+    # ```
+    # setup:
+    #   commands:
+    #   - manage experiments ...
+    # ```
+    src_setup_config = test_case_path / "setup.yaml"
+    if src_setup_config.is_file():
+        with open(src_setup_config) as f:
+            setup_config = syaml.load(f).get("setup")
+            if setup_config is not None:
+                cmds = setup_config.get("commands", [])
+                for cmd in cmds:
+                    ws_cmd(*cmd.split(), global_args=global_args)
     ws._re_read()
     # TODO: add assertions around setup artifacts
     ws_cmd("setup", "--dry-run", global_args=global_args)
