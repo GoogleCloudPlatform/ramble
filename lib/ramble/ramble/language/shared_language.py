@@ -696,6 +696,7 @@ def register_validator(
     predicate: str,
     message: str,
     fail_on_invalid: bool = True,
+    when=None,
     **kwargs,
 ):
     """Directive to define a validator for the object.
@@ -708,10 +709,19 @@ def register_validator(
                  variables.
         fail_on_invalid: When true, this fails the experiment setup, otherwise it logs
                          a warning. The default is True.
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _define_validator(obj):
-        obj.validators[name] = {
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "register_validator"
+        )
+        when_key = frozenset(when_list)
+
+        if when_key not in obj.validators:
+            obj.validators[when_key] = {}
+
+        obj.validators[when_key][name] = {
             "predicate": predicate,
             "message": message,
             "fail_on_invalid": fail_on_invalid,
