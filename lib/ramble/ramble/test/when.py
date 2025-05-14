@@ -546,3 +546,57 @@ test inheritance 12.0
 
             assert "FAILED" in results
             assert "SUCCESS" not in results
+
+
+def test_register_template_when(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    test_template = """
+echo "test template for {experiment_name}"
+"""
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        ws.write()
+
+        template_src_path = os.path.join(ws.shared_dir, "test_template.tpl")
+        template_dest_path = os.path.join(
+            ws.experiment_dir, "when-directives", "test_wl", "generated", "test_template"
+        )
+
+        workspace("setup", global_args=global_args)
+
+        with open(template_src_path, "w+") as f:
+            f.write(test_template)
+
+        workspace("setup", global_args=global_args)
+
+        assert not os.path.exists(template_dest_path)
+
+        config("add", "variants:register_template_when:true", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        assert os.path.exists(template_dest_path)
+
+        with open(template_dest_path) as f:
+            generated_template = f.read()
+
+            assert "test template for generated" in generated_template

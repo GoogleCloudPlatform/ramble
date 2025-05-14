@@ -2580,8 +2580,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
             return (obj, {**tpl_config, "src_path": src_path, "dest_path": dest_path})
 
         for obj_type, obj in self._objects():
-            for tpl_conf in obj.templates.values():
-                yield _get_template_config(obj, tpl_conf, obj_type=obj_type)
+            for when_set, tpl in obj.templates.items():
+                if not self.expander.satisfies(when_set, variant_set=self.object_variants):
+                    continue
+
+                for tpl_conf in tpl.values():
+                    yield _get_template_config(obj, tpl_conf, obj_type=obj_type)
 
     def _render_object_templates(self, extra_vars_origin, workspace):
         for obj, tpl_config in self._object_templates(workspace):
