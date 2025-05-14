@@ -10,6 +10,7 @@
 directives, which are to allow functions to be invoked at class level
 """
 
+import copy
 import functools
 from collections.abc import Sequence  # novm
 from typing import Any, Dict, List
@@ -60,6 +61,7 @@ class DirectiveMeta(type):
 
     # Set of all known directives
     _directive_names = set()
+    _directive_init_values = {}
     _directives_to_be_executed = []
     _directive_functions = {}
     _directive_classes = {}
@@ -114,8 +116,8 @@ class DirectiveMeta(type):
         if valid_module:
             # Ensure the presence of the dictionaries associated
             # with the directives
-            for d in DirectiveMeta._directive_names:
-                setattr(cls, d, {})
+            for d, t in DirectiveMeta._directive_init_values.items():
+                setattr(cls, d, copy.deepcopy(t))
 
             directive_attrs = {
                 "_directive_functions": {},
@@ -141,7 +143,7 @@ class DirectiveMeta(type):
         super().__init__(name, bases, attr_dict)
 
     @classmethod
-    def directive(cls, dicts=None):
+    def directive(cls, dicts=None, init_value=None):
         """Decorator for Ramble directives.
 
         Ramble directives allow you to modify an object while it is being
@@ -179,6 +181,11 @@ class DirectiveMeta(type):
         and that if no directive actually modified it, it will just be an empty
         dict.
 
+        The ``(init_value={})`` part allows objects in Ramble to define what the
+        type of the attribute defined by the `dicts` argument will be. This
+        allows ``(dicts="variables", init_value=[])`` which makes the attribute
+        a list instead of a dict, which is the default.
+
         This is just a modular way to add storage attributes to the Application
         class, and it's how Ramble gets information from the applications to
         the core.
@@ -191,8 +198,14 @@ class DirectiveMeta(type):
             message = "dicts arg must be list, tuple, or string. Found {0}"
             raise TypeError(message.format(type(dicts)))
 
+        if init_value is None:
+            init_value = {}
+
         # Add the dictionary names if not already there
-        DirectiveMeta._directive_names |= set(dicts)
+        dicts_set = set(dicts)
+        DirectiveMeta._directive_names |= dicts_set
+        for attr_name in dicts_set:
+            DirectiveMeta._directive_init_values[attr_name] = init_value
 
         # This decorator just returns the directive functions
         def _decorator(decorated_function):
