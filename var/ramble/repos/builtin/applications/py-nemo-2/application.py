@@ -15,6 +15,7 @@ from ramble.base_app.builtin.py_nemo import BasePyNemo
 
 from spack.util.path import canonicalize_path
 
+
 class PyNemo2(BasePyNemo):
     """A scalable generative AI framework built for researchers and
     developers working on Large Language Models, Multimodal, and
