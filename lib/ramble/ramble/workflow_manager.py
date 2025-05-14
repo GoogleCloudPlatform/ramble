@@ -24,6 +24,7 @@ from ramble.util.naming import NS_SEPARATOR
 class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     name = None
     object_variants = None
+    origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(("workflow_manager_builtin", "{obj_name}", "{name}"))
     _language_classes = [WorkflowManagerMeta, SharedMeta]
     _pipelines = [

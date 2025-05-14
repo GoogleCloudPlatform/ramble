@@ -64,7 +64,7 @@ def archive_pattern(pattern, **kwargs):
 
 
 @shared_directive("figure_of_merit_contexts")
-def figure_of_merit_context(name, regex, output_format, **kwargs):
+def figure_of_merit_context(name, regex, output_format, when=None, **kwargs):
     """Defines a context for figures of merit
 
     Defines a new context to contain figures of merit.
@@ -75,10 +75,22 @@ def figure_of_merit_context(name, regex, output_format, **kwargs):
       regex (str): Regular expression, using group names, to match a context.
       output_format (str): String, using python keywords {group_name} to extract
                            group names from context regular expression.
+      when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_figure_of_merit_context(obj):
-        obj.figure_of_merit_contexts[name] = {"regex": regex, "output_format": output_format}
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "figure_of_merit_context"
+        )
+        when_key = frozenset(when_list)
+        if when_key not in obj.figure_of_merit_contexts:
+            obj.figure_of_merit_contexts[when_key] = {}
+
+        obj.figure_of_merit_contexts[when_key][name] = {
+            "regex": regex,
+            "output_format": output_format,
+            "when": when_list,
+        }
 
     return _execute_figure_of_merit_context
 
@@ -92,6 +104,7 @@ def figure_of_merit(
     units="",
     contexts=None,
     fom_type: FomType = FomType.UNDEFINED,
+    when=None,
     **kwargs,
 ):
     """Adds a figure of merit to track for this object
@@ -107,17 +120,32 @@ def figure_of_merit(
       contexts (list(str) | None): List of contexts (defined by
                                    figure_of_merit_context) this figure of merit
                                    should exist in.
-      fom_type: The type of figure of merit
+      fom_type (ramble.util.foms.FomType): The type of figure of merit
+      when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_figure_of_merit(obj):
-        obj.figures_of_merit[name] = {
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "figure_of_merit"
+        )
+        when_key = frozenset(when_list)
+        if when_key not in obj.figures_of_merit:
+            obj.figures_of_merit[when_key] = {}
+
+        context_list = contexts if contexts is not None else []
+        context_key = frozenset(context_list)
+        if context_key not in obj.figures_of_merit[when_key]:
+            obj.figures_of_merit[when_key][context_key] = {}
+
+        obj.figures_of_merit[when_key][context_key][name] = {
             "log_file": log_file,
             "regex": fom_regex,
             "group_name": group_name,
             "units": units,
-            "contexts": [] if contexts is None else contexts,
+            "contexts": context_list,
             "fom_type": fom_type,
+            "when": when_list,
+            "origin_type": obj.origin_type if hasattr(obj, "origin_type") else "",
         }
 
     return _execute_figure_of_merit

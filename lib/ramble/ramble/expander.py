@@ -12,7 +12,7 @@ import operator
 import random
 import re
 import string
-from typing import Dict, List
+from typing import Dict, FrozenSet, List, Union
 
 import ramble.error
 import ramble.keywords
@@ -667,7 +667,7 @@ class Expander:
 
     def satisfies(
         self,
-        reqs: List[str] = None,
+        reqs: Union[str, List[str], FrozenSet[str], None] = None,
         variant_set=None,
         extra_vars=None,
         merge_used_stage: bool = True,
@@ -692,6 +692,11 @@ class Expander:
 
         satisfied = True
         if reqs is not None:
+            if isinstance(reqs, str):
+                reqs = [reqs]
+            elif isinstance(reqs, frozenset):
+                reqs = list(reqs)
+
             for req in reqs:
                 exp_req = self.expand_var(
                     req, extra_vars=extra_vars, merge_used_stage=merge_used_stage

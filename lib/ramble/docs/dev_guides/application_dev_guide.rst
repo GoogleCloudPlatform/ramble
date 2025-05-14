@@ -277,6 +277,53 @@ that should be used when referencing file paths in application definitions. This
 helps with Ramble to properly mock out these paths during unit testing, where the
 files may not exist under the dry-run setting.
 
+^^^^^^^^^^^^^^^^^
+Conditional Logic
+^^^^^^^^^^^^^^^^^
+
+Ramble supports conditional logic to allow developers to set directives based on
+their :ref:`variants<variants-config>`. Directives supporting this logic will
+have a `when` argument to accept conditions. Multiple directives can be grouped
+under the same when clause by enclosing them in a `with` statement and using the
+`when` directive.
+
+For example, the Gromacs definition defines a default software spec based on the
+package manager variant:
+
+.. code-block:: python
+
+    with when("package_manager_family=spack"):
+        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+
+        software_spec(
+            "impi2018",
+            pkg_spec="intel-mpi@2018.4.274",
+        )
+
+        with default_args(compiler="gcc9"):
+            software_spec(
+                "spack_gromacs",
+                pkg_spec="gromacs@2020.5",
+            )
+
+    software_spec(
+        "eessi_gromacs",
+        pkg_spec="GROMACS/2024.1-foss-2023b",
+        when=["package_manager_family=eessi"],
+    )
+
+The following standard variant definitions can be used in the `when` clause,
+along with any variants created in definition files:
+
+.. code-block:: python
+
+    package_manager  
+    package_manager_family  
+    workflow_manager  
+    workflow_manager_family  
+    modifier  
+    <mod-name>_mode 
+
 --------------------------
 Package Manager Directives
 --------------------------
