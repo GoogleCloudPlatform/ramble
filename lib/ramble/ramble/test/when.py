@@ -442,3 +442,62 @@ def test_formatted_exec_when(request, inc_value, type_value):
 
             assert test_str in data
             assert "{test_formatted_exec}" not in data
+
+
+def test_success_criteria_when(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    test_output = """
+test when context 4.2
+test when fom 5.6 test always 3.5
+test inheritance 12.0
+"""
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        ws.write()
+
+        output_path = os.path.join(
+            ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
+        )
+        results_path = os.path.join(ws.root, "results.latest.txt")
+
+        workspace("setup", global_args=global_args)
+
+        with open(output_path, "w+") as f:
+            f.write(test_output)
+
+        workspace("analyze", global_args=global_args)
+
+        with open(results_path) as f:
+            results = f.read()
+
+            assert "FAILED" not in results
+            assert "SUCCESS" in results
+
+        config("add", "variants:success_criteria_when:true", global_args=global_args)
+
+        ws._re_read()
+        workspace("analyze", global_args=global_args)
+
+        with open(results_path) as f:
+            results = f.read()
+
+            assert "FAILED" in results
+            assert "SUCCESS" not in results

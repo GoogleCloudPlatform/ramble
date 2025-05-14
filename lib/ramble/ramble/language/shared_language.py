@@ -317,6 +317,7 @@ def success_criteria(
     fom_context="null",
     formula=None,
     anti_match=None,
+    when=None,
     **kwargs,
 ):
     """Defines a success criteria used by experiments of this object
@@ -340,12 +341,17 @@ def success_criteria(
                      '{value}' keyword is set as the value of the FOM.
       anti_match (str): For mode='string'. Value to check indicate failure.
                         This setting and `match` are mutually exclusive.
+      when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_success_criteria(obj):
         valid_modes = ramble.success_criteria.SuccessCriteria._valid_modes
         if mode not in valid_modes:
             logger.die(f"Mode {mode} is not valid. Valid values are {valid_modes}")
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "success_criteria"
+        )
 
         obj.success_criteria[name] = {
             "mode": mode,
@@ -355,6 +361,7 @@ def success_criteria(
             "fom_name": fom_name,
             "fom_context": fom_context,
             "formula": formula,
+            "when": when_list,
         }
 
     return _execute_success_criteria
