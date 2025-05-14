@@ -378,3 +378,67 @@ test inheritance 12.0
             assert "test inheritance context" in results
             assert "12 integer" in results
             assert "12.0" not in results
+
+
+@pytest.mark.parametrize(
+    "inc_value,type_value",
+    [
+        (True, "preferred"),
+        (True, "testing"),
+        (True, "modifier"),
+        (False, "preferred"),
+    ],
+)
+def test_formatted_exec_when(request, inc_value, type_value):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:inc_zlib:{inc_value}", global_args=global_args)
+        config("add", f"variants:zlib_type:{type_value}", global_args=global_args)
+
+        (True, "preferred", "     from_variant zlib included with type of preferred"),
+        (True, "testing", "     from_variant zlib included with type of testing"),
+        (True, "modifier", "     from_variant zlib included with type of modifier"),
+        (False, "preferred", "     from_variant zlib not included"),
+
+        if inc_value:
+            inc_str = f"included with type of {type_value}"
+        else:
+            inc_str = "not included"
+        test_str = f"     from_variant zlib {inc_str}"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+            assert "{test_formatted_exec}" not in data

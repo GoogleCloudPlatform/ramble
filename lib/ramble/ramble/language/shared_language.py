@@ -656,6 +656,7 @@ def formatted_executable(
     prefix: str = "",
     indentation: int = 0,
     join_separator: str = "\n",
+    when=None,
     **kwargs,
 ):
     """Define a new formatted execution for this object
@@ -664,11 +665,22 @@ def formatted_executable(
         name: Name of the new formatted executable
         prefix: Prefix for each line of the formatted executable
         indentation: Number of spaces to indent before the prefix of each line
+        join_separator: String to use when separating the commands during formatting
         commands: List of commands to expand when generating the formatted executable
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _define_formatted_executable(obj):
-        obj.formatted_executables[name] = {
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "formatted_executable"
+        )
+
+        when_set = frozenset(when_list)
+
+        if when_set not in obj.formatted_executables:
+            obj.formatted_executables[when_set] = {}
+
+        obj.formatted_executables[when_set][name] = {
             "prefix": prefix,
             "indentation": indentation,
             "join_separator": join_separator,
