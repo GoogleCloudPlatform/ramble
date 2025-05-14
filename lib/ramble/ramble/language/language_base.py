@@ -214,6 +214,7 @@ class DirectiveMeta(type):
                         "define_compiler",
                         "package_manager_config",
                         "register_phase",
+                        "register_template",
                         "figure_of_merit",
                         "figure_of_merit_context",
                         "formatted_executable",

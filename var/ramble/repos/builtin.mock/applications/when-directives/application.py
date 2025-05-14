@@ -135,3 +135,18 @@ class WhenDirectives(ExecutableApplication):
         match=r".*THIS TEXT NOT IN OUT FILE.*",
         when=["+success_criteria_when"],
     )
+
+    # For register_template()
+    variant(
+        "register_template_when",
+        default=False,
+        values=[True, False],
+        description="Register template using when",
+    )
+
+    register_template(
+        "test_template_when",
+        src_path="$workspace_shared/test_template.tpl",
+        dest_path="test_template",
+        when=["+register_template_when"],
+    )

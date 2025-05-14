@@ -8,7 +8,7 @@
 
 import collections
 import contextlib
-from typing import Any, Callable, Optional, Union
+from typing import Any, Callable, List, Optional, Union
 
 import ramble.language.language_base
 import ramble.language.language_helpers
@@ -608,6 +608,7 @@ def register_template(
     extra_vars: Optional[dict] = None,
     extra_vars_func: Optional[str] = None,
     output_perm=None,
+    when: Optional[List[str]] = None,
     **kwargs,
 ):
     """Directive to define an object-specific template to be rendered into experiment run_dir.
@@ -639,18 +640,27 @@ def register_template(
                          This option is combined together with and takes precedence
                          over `extra_vars`, if both are present.
         output_perm: The chmod mask for the rendered output file.
+        when: List of when conditions to apply to directive
     """
 
     def _define_template(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "register_template"
+        )
+        when_key = frozenset(when_list)
+        if when_key not in obj.templates:
+            obj.templates[when_key] = {}
+
         var_name = name if define_var else None
         extra_vars_func_name = f"_{extra_vars_func}" if extra_vars_func is not None else None
-        obj.templates[name] = {
+        obj.templates[when_key][name] = {
             "src_path": src_path,
             "dest_path": dest_path,
             "var_name": var_name,
             "extra_vars": extra_vars,
             "extra_vars_func_name": extra_vars_func_name,
             "output_perm": output_perm,
+            "when": when_list,
         }
 
     return _define_template
