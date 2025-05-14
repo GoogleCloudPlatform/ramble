@@ -135,6 +135,7 @@ class ModifierBase(metaclass=ModifierMeta):
 
     def inherit_from_application(self, app):
         self.expander = app.expander.copy()
+        self.object_variants = app.object_variants.copy()
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
 
@@ -251,18 +252,24 @@ class ModifierBase(metaclass=ModifierMeta):
             (str): Variable name
         """
 
-        if self._usage_mode in self.modifier_variables:
-            for var, var_conf in self.modifier_variables[self._usage_mode].items():
-                if not var_conf.expandable:
-                    yield var
+        for var in self.object_variables:
+            if not self.expander.satisfies(var.when, variant_set=self.object_variants):
+                continue
+
+            yield var.name
 
     def mode_variables(self):
         """Return a dict of variables that should be defined for the current mode"""
 
-        if self._usage_mode in self.modifier_variables:
-            return self.modifier_variables[self._usage_mode]
-        else:
-            return {}
+        mode_variables = {}
+
+        for var in self.object_variables:
+            if not self.expander.satisfies(var.when, variant_set=self.object_variants):
+                continue
+
+            mode_variables[var.name] = var
+
+        return mode_variables
 
     def artifact_inventory(self, workspace, app_inst=None):
         """Return an inventory of modifier artifacts

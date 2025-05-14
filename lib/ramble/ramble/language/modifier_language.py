@@ -284,7 +284,7 @@ def required_variable(var: str, results_level="variable", modes=None, descriptio
     return _mark_required_var
 
 
-@modifier_directive("modifier_variables")
+@modifier_directive(dicts=())
 def modifier_variable(
     name: str,
     default,
@@ -294,6 +294,7 @@ def modifier_variable(
     modes: Optional[list] = None,
     expandable: bool = True,
     track_used: bool = False,
+    when=None,
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -309,6 +310,7 @@ def modifier_variable(
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vecotizing
                            experiments.
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _define_modifier_variable(mod):
@@ -318,17 +320,24 @@ def modifier_variable(
             mode, modes, mod.modes, "mode", "modes", "modifier_variable"
         )
 
-        for mode_name in all_modes:
-            if mode_name not in mod.modifier_variables:
-                mod.modifier_variables[mode_name] = {}
+        base_when_list = ramble.language.language_helpers.build_when_list(
+            when, mod, name, "figure_of_merit_context"
+        )
 
-            mod.modifier_variables[mode_name][name] = ramble.workload.WorkloadVariable(
-                name,
-                default=default,
-                description=description,
-                values=values,
-                expandable=expandable,
-                **kwargs,
+        for mode_name in all_modes:
+            mode_variant = f"{mod.name}_mode={mode_name}"
+            when_list = base_when_list + [mode_variant]
+
+            mod.object_variables.append(
+                ramble.workload.WorkloadVariable(
+                    name,
+                    default=default,
+                    description=description,
+                    values=values,
+                    expandable=expandable,
+                    when=when_list,
+                    **kwargs,
+                )
             )
 
     return _define_modifier_variable
