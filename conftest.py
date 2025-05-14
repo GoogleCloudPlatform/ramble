@@ -61,7 +61,9 @@ def pytest_configure(config):
         return
     path = pathlib.Path(repo_path)
     # Define testpaths
-    config.args = [p for p in path.rglob("test") if p.is_dir()]
+    testpaths = [p for p in path.rglob("test") if p.is_dir()]
+    testpaths.append("setup_analyze.py")
+    config.args = testpaths
 
 
 def pytest_collection_modifyitems(config, items):
@@ -266,6 +268,7 @@ def mutable_modifiers(mutable_mods_repo_path):
         yield mods_repo
 
 
+@pytest.fixture(scope="function")
 def mutable_package_managers(mutable_pkg_mans_repo_path):
     obj_type = ramble.repository.ObjectTypes.package_managers
     with ramble.repository.use_repositories(
@@ -792,3 +795,25 @@ def pytest_generate_tests(metafunc):
                 all_sections.append(section_str.strip())
 
         metafunc.parametrize("config_section", all_sections)
+
+    if "test_case_path" in metafunc.fixturenames:
+        repo_path = pathlib.Path(
+            metafunc.config.getoption("--repo-path") or ramble.paths.builtin_path
+        )
+        test_case_paths = []
+        test_ids = []
+        id = 0
+        for child_path in repo_path.rglob("test_cases"):
+            if child_path.is_dir():
+                prefix = child_path.parts[-2]
+                for test_dir in child_path.iterdir():
+                    if test_dir.is_dir():
+                        # Require at least a configs directory, or a setup.yaml
+                        configs_dir = test_dir / "configs"
+                        setup_yaml = test_dir / "setup.yaml"
+                        if configs_dir.is_dir() or setup_yaml.is_file():
+                            test_case_path = test_dir.resolve()
+                            test_case_paths.append(test_case_path)
+                            test_ids.append(f"{prefix}_{test_case_path.name}_{id}")
+                            id += 1
+        metafunc.parametrize("test_case_path", test_case_paths, ids=test_ids)
