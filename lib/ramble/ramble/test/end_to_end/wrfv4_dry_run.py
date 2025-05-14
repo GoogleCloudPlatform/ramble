@@ -227,6 +227,11 @@ compilers:
                 # Test the run script has a reference to the experiment log file
                 assert os.path.join(exp_dir, f"{exp}.out") in data
 
+            assert os.path.isdir(os.path.join(ws1.root, "shared"))
+            assert os.path.isdir(os.path.join(ws1.root, "shared", "licenses"))
+            assert os.path.isdir(os.path.join(ws1.root, "shared", "licenses", "wrfv4"))
+            assert os.path.exists(license_inc_path)
+
             with open(license_inc_path) as f:
                 data = f.read()
                 # Test the license is added to the include file
@@ -456,6 +461,11 @@ licenses:
 
                 # Test the run script has a reference to the experiment log file
                 assert os.path.join(exp_dir, f"{exp}.out") in data
+
+            assert os.path.isdir(os.path.join(ws1.root, "shared"))
+            assert os.path.isdir(os.path.join(ws1.root, "shared", "licenses"))
+            assert os.path.isdir(os.path.join(ws1.root, "shared", "licenses", "wrfv4"))
+            assert os.path.exists(license_inc_path)
 
             with open(license_inc_path) as f:
                 data = f.read()

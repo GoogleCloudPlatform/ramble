@@ -10,10 +10,8 @@ from ramble.app.builtin.mock.basic import Basic as BaseBasic
 from ramble.appkit import *
 
 
-class BasicInherited(BaseBasic):
-    name = "basic-inherited"
-
-    license_name("basic-inherited-extended")
+class BasicInheritedNolicense(BaseBasic):
+    name = "basic-inherited-nolicense"
 
     input_file(
         "inherited_input",
@@ -22,7 +20,7 @@ class BasicInherited(BaseBasic):
         extension=".log",
     )
 
-    workload("test_wl3", executable="foo", input="inherited_input")
+    workload("test_wl4", executable="foo", input="inherited_input")
 
     workload_variable(
         "my_var",

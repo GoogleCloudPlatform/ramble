@@ -31,6 +31,7 @@ def test_application_type_features(app_class):
     assert hasattr(test_app, "software_specs")
     assert hasattr(test_app, "required_packages")
     assert hasattr(test_app, "maintainers")
+    assert hasattr(test_app, "license_names")
     assert hasattr(test_app, "package_manager_configs")
 
 
@@ -328,3 +329,13 @@ def test_software_spec_directive(app_class):
         assert name in app_inst.software_specs
         for key, value in info.items():
             assert getattr(app_inst.software_specs[name][0], key) == value
+
+
+@pytest.mark.parametrize("app_class", app_types)
+def test_license_name_directive(app_class):
+    new_license_name = "fake-app"
+
+    app_inst = app_class("/not/a/path")
+    app_inst.license_name(new_license_name)
+
+    assert new_license_name in app_inst.license_names
