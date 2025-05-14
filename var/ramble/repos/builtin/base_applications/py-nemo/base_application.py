@@ -121,7 +121,8 @@ class BasePyNemo(ExecutableApplication):
     figure_of_merit(
         "Final Epoch ID",
         fom_regex=final_epoch_regex,
-        group_name="epoch_id", log_file="{processed_log_file}",
+        group_name="epoch_id",
+        log_file="{processed_log_file}",
     )
     figure_of_merit(
         "Final Step ID",
