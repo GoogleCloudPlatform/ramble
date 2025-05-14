@@ -8,7 +8,6 @@
 
 
 import os
-import re
 
 from ramble.appkit import *
 from ramble.base_app.builtin.py_nemo import BasePyNemo
