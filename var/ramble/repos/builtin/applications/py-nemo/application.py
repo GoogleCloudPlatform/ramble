@@ -8,7 +8,6 @@
 
 
 import os
-import re
 
 import ruamel.yaml as yaml
 
