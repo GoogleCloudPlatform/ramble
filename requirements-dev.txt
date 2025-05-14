@@ -6,6 +6,7 @@ coverage
 pre-commit
 pytest-xdist
 pytest-cov
+pytest-clarity
 line_profiler
 isort
 codecov-cli
