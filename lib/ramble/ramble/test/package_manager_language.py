@@ -48,7 +48,7 @@ def test_pkg_man_variables(pm_class):
     assert hasattr(pm_inst, "object_variables")
 
     found = False
-    for var in pm_inst.object_variables:
+    for var in pm_inst.object_variables[frozenset()]:
         if var_name == var.name:
             assert var.default == test_defs["default"]
             assert var.description == test_defs["description"]

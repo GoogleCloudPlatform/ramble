@@ -747,7 +747,7 @@ def register_validator(
     return _define_validator
 
 
-@shared_directive("object_variables", init_value=[])
+@shared_directive("object_variables")
 def variable(
     name: str,
     default,
@@ -780,14 +780,18 @@ def variable(
             when, obj, name, error_context
         )
 
-        obj.object_variables.append(
+        when_set = frozenset(when_list)
+
+        if when_set not in obj.object_variables:
+            obj.object_variables[when_set] = []
+
+        obj.object_variables[when_set].append(
             ramble.workload.WorkloadVariable(
                 name,
                 default=default,
                 description=description,
                 values=values,
                 expandable=expandable,
-                when=when_list,
                 **kwargs,
             )
         )

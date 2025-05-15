@@ -537,20 +537,21 @@ class ApplicationBase(metaclass=ApplicationMeta):
         # Define extra variables
         ########################
 
-        # Add modifier mode variables defaults as a placeholder:
+        var_objs = []
+
         for mod_inst in self._modifier_instances:
-            for var in mod_inst.mode_variables().values():
-                if var.name not in self.variables:
-                    self.variables[var.name] = var.default
+            var_objs.append(mod_inst)
 
         if self.package_manager is not None:
-            # Add package manager variable defaults as placeholder
-            for var in self.package_manager.object_variables:
-                self.variables[var.name] = var.default
+            var_objs.append(self.package_manager)
 
         if self.workflow_manager is not None:
-            for var in self.workflow_manager.object_variables:
-                self.variables[var.name] = var.default
+            var_objs.append(self.workflow_manager)
+
+        for var_obj in var_objs:
+            for var in var_obj.selected_variables().values():
+                if var.name not in self.variables:
+                    self.variables[var.name] = var.default
 
         ##########################################
         # Expand used variables to track all usage
@@ -1035,19 +1036,27 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """Set default experiment variables (for add_expand_vars),
         if they haven't been set already"""
         # Set default experiment variables, if they haven't been set already
+        var_objs = []
         var_sets = []
+
+        # Built var_objs list
+        if self.package_manager is not None:
+            var_objs.append(self.package_manager)
+
+        if self.workflow_manager is not None:
+            var_objs.append(self.workflow_manager)
+
+        for mod_inst in self._modifier_instances:
+            var_objs.append(mod_inst)
+
+        # Built var_sets list
         if self.expander.workload_name in self.workloads:
             var_sets.append(self.workloads[self.expander.workload_name].variables)
 
-        if self.package_manager is not None:
-            var_sets.append(self.package_manager.variable_definitions())
+        for var_obj in var_objs:
+            var_sets.append(var_obj.selected_variables())
 
-        for mod_inst in self._modifier_instances:
-            var_sets.append(mod_inst.mode_variables())
-
-        if self.workflow_manager is not None:
-            var_sets.append(self.workflow_manager.variable_definitions())
-
+        # Define variables from var_sets
         for var_set in var_sets:
             for var, val in var_set.items():
                 if var not in self.variables.keys():

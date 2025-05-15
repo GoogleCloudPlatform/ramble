@@ -252,24 +252,26 @@ class ModifierBase(metaclass=ModifierMeta):
             (str): Variable name
         """
 
-        for var in self.object_variables:
-            if not self.expander.satisfies(var.when, variant_set=self.object_variants):
+        for when_key, var_list in self.object_variables.items():
+            if not self.expander.satisfies(when_key, self.object_variants):
                 continue
 
-            yield var.name
+            for var in var_list:
+                yield var.name
 
-    def mode_variables(self):
+    def selected_variables(self):
         """Return a dict of variables that should be defined for the current mode"""
 
-        mode_variables = {}
+        mod_variables = {}
 
-        for var in self.object_variables:
-            if not self.expander.satisfies(var.when, variant_set=self.object_variants):
+        for when_key, var_list in self.object_variables.items():
+            if not self.expander.satisfies(when_key, self.object_variants):
                 continue
 
-            mode_variables[var.name] = var
+            for var in var_list:
+                mod_variables[var.name] = var
 
-        return mode_variables
+        return mod_variables
 
     def artifact_inventory(self, workspace, app_inst=None):
         """Return an inventory of modifier artifacts

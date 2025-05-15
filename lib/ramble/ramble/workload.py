@@ -23,7 +23,6 @@ class WorkloadVariable:
         values=None,
         expandable: bool = True,
         track_used: bool = True,
-        when=None,
         **kwargs,
     ):
         """Constructor for a new variable
@@ -34,8 +33,6 @@ class WorkloadVariable:
             description (str): Description of variable
             values: List of suggested values for variable
             expandable (bool): True if variable can be expanded, False otherwise
-            track_used (bool): True if variable should be considered used,
-                            False to ignore it for vectorizing experiments
             when (list | None): List of when conditions to apply to directive
         """
         self.name = name
@@ -44,7 +41,6 @@ class WorkloadVariable:
         self.values = values.copy() if isinstance(values, list) else [values]
         self.expandable = expandable
         self.track_used = track_used
-        self.when = when.copy() if when else frozenset()
 
     def __str__(self):
         if not hasattr(self, "_str_indent"):

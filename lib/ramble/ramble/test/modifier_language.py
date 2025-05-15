@@ -468,21 +468,21 @@ def test_modifier_variable_directive(mod_class):
     test_defs = []
 
     mod_inst = mod_class("/not/a/path")
+    mod_inst.name = "mock-test-mod"
     test_defs.append(add_modifier_variable(mod_inst))
 
     for test_def in test_defs:
         found = False
 
-        for var in mod_inst.object_variables:
-            if var.name == test_def["name"]:
-                mode_variant = f"{mod_inst.name}_mode={test_def['mode']}"
-
-                assert mode_variant in var.when
-                assert test_def["description"] == var.description
-                assert test_def["default"] == var.default
-                found = True
-
-            assert found
+        for when_set, var_list in mod_inst.object_variables.items():
+            for var in var_list:
+                if var.name == test_def["name"]:
+                    mode_variant = f"mock-test-mod_mode={test_def['mode']}"
+                    assert mode_variant in when_set
+                    assert test_def["description"] == var.description
+                    assert test_def["default"] == var.default
+                    found = True
+        assert found
 
 
 @pytest.mark.parametrize("mod_class", mod_types)

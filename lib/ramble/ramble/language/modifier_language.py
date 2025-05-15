@@ -326,7 +326,7 @@ def modifier_variable(
 
         for mode_name in all_modes:
             mode_variant = f"{mod.name}_mode={mode_name}"
-            when_list = base_when_list + [mode_variant]
+            #  when_list = base_when_list + [mode_variant]
 
             ramble.language.shared_language.variable(
                 name,
@@ -335,7 +335,7 @@ def modifier_variable(
                 values=values,
                 expandable=expandable,
                 track_used=track_used,
-                when=when_list,
+                when=base_when_list + [mode_variant],
                 error_context="modifier_variable",
                 **kwargs,
             )(mod)
