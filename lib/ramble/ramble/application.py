@@ -539,7 +539,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.variables[var.name] = var.default
 
         if self.workflow_manager is not None:
-            for var in self.workflow_manager.wm_vars.values():
+            for var in self.workflow_manager.object_variables:
                 self.variables[var.name] = var.default
 
         ##########################################
@@ -1036,7 +1036,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             var_sets.append(mod_inst.mode_variables())
 
         if self.workflow_manager is not None:
-            var_sets.append(self.workflow_manager.wm_vars)
+            var_sets.append(self.workflow_manager.variable_definitions())
 
         for var_set in var_sets:
             for var, val in var_set.items():

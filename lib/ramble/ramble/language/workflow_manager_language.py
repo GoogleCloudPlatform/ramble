@@ -19,12 +19,13 @@ class WorkflowManagerMeta(ramble.language.shared_language.SharedMeta):
 workflow_manager_directive = WorkflowManagerMeta.directive
 
 
-@workflow_manager_directive("wm_vars")
+@workflow_manager_directive(dicts=())
 def workflow_manager_variable(
     name: str,
     default,
     description: str,
     values: Optional[list] = None,
+    when=None,
     **kwargs,
 ):
     """Define a variable for this wm
@@ -33,16 +34,24 @@ def workflow_manager_variable(
         default: Default value if the variable is not defined
         description: Description of the variable
         values: Optional list of suggested values for this variable
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _define_wm_variable(wm):
         import ramble.workload
 
-        wm.wm_vars[name] = ramble.workload.WorkloadVariable(
-            name,
-            default=default,
-            description=description,
-            values=values,
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, wm, name, "workflow_manager_variable"
+        )
+
+        wm.object_variables.append(
+            ramble.workload.WorkloadVariable(
+                name,
+                default=default,
+                description=description,
+                values=values,
+                when=when_list,
+            )
         )
 
     return _define_wm_variable
