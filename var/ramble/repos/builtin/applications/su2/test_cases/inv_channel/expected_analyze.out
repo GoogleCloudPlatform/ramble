@@ -1,0 +1,5 @@
+Experiment su2.inv_channel.test figures of merit:
+  Status = SUCCESS
+  Tags = ['cfd', 'fluid-dynamics', 'multi-physics']
+  default (null) context figures of merit:
+    Solution postprocessing time = 2.893862 s

@@ -1,0 +1,24 @@
+------------------------- Solution Postprocessing -----------------------
+Reading and storing the solution from restart_flow.
+Volume output fields: COORDINATES, SOLUTION
+  Info: Ignoring the following screen output fields:
+  RMS_DENSITY, RMS_ENERGY, LIFT, DRAG
+Screen output fields: INNER_ITER, WALL_TIME
+  Info: Ignoring the following history output groups:
+  RMS_RES
+History output group(s): ITER
+Ignoring Convergence Field(s): RMS_DENSITY
+Warning: No (valid) fields chosen for convergence monitoring. Convergence monitoring inactive.
+Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+|Paraview                           |flow.vtu                           |
+|Paraview surface                   |surface_flow.vtu                   |
+
+------------------------- Finalize Solver -------------------------
+Deleted CGeometry container.
+Deleted CSolver class.
+Deleted CConfig container.
+Deleted COutput class.
+
+Completed in 2.893862 seconds on 112 cores.
+
+------------------------- Exit Success (SU2_SOL) ------------------------
