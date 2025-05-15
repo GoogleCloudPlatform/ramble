@@ -321,7 +321,7 @@ def modifier_variable(
         )
 
         base_when_list = ramble.language.language_helpers.build_when_list(
-            when, mod, name, "figure_of_merit_context"
+            when, mod, name, "modifier_variable"
         )
 
         for mode_name in all_modes:

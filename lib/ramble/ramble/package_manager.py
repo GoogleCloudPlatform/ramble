@@ -120,6 +120,16 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
         return False
 
+    def variable_definitions(self):
+        all_vars = {}
+        for var in self.object_variables:
+            if not self.app_inst.expander.satisfies(
+                var.when, variant_set=self.app_inst.object_variants
+            ):
+                continue
+            all_vars[var.name] = var
+        return all_vars
+
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
 

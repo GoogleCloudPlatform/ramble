@@ -535,7 +535,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         if self.package_manager is not None:
             # Add package manager variable defaults as placeholder
-            for var in self.package_manager.package_manager_variables.values():
+            for var in self.package_manager.object_variables:
                 self.variables[var.name] = var.default
 
         if self.workflow_manager is not None:
@@ -1030,7 +1030,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             var_sets.append(self.workloads[self.expander.workload_name].variables)
 
         if self.package_manager is not None:
-            var_sets.append(self.package_manager.package_manager_variables)
+            var_sets.append(self.package_manager.variable_definitions())
 
         for mod_inst in self._modifier_instances:
             var_sets.append(mod_inst.mode_variables())
