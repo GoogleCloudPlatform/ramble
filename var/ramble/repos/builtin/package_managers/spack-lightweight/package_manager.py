@@ -1118,6 +1118,12 @@ class SpackRunner(CommandRunner):
                 )
                 with open(spack_env_file) as f:
                     existing_data = syaml.load_config(f)
+                    # Prune the compiler block for diffing purpose
+                    if (
+                        "spack" in existing_data
+                        and "compilers" in existing_data["spack"]
+                    ):
+                        del existing_data["spack"]["compilers"]
                 gen_env_hash = ramble.util.hashing.hash_json(env_data)
                 existing_env_hash = ramble.util.hashing.hash_json(
                     existing_data
