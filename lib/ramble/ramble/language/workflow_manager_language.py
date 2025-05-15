@@ -25,6 +25,8 @@ def workflow_manager_variable(
     default,
     description: str,
     values: Optional[list] = None,
+    expandable: bool = True,
+    track_used: bool = False,
     when=None,
     **kwargs,
 ):
@@ -34,25 +36,24 @@ def workflow_manager_variable(
         default: Default value if the variable is not defined
         description: Description of the variable
         values: Optional list of suggested values for this variable
+        expandable (bool): True if the variable should be expanded, False if not.
+        track_used (bool): True if the variable should be tracked as used,
+                           False if not. Can help with allowing lists without vecotizing
         when (list | None): List of when conditions to apply to directive
     """
 
     def _define_wm_variable(wm):
-        import ramble.workload
-
-        when_list = ramble.language.language_helpers.build_when_list(
-            when, wm, name, "workflow_manager_variable"
-        )
-
-        wm.object_variables.append(
-            ramble.workload.WorkloadVariable(
-                name,
-                default=default,
-                description=description,
-                values=values,
-                when=when_list,
-            )
-        )
+        ramble.language.shared_language.variable(
+            name,
+            default,
+            description=description,
+            values=values,
+            expandable=expandable,
+            track_used=track_used,
+            when=when,
+            error_context="workflow_manager_variable",
+            **kwargs,
+        )(wm)
 
     return _define_wm_variable
 

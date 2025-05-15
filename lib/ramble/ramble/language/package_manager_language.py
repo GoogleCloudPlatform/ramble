@@ -28,6 +28,7 @@ def package_manager_variable(
     description: str,
     values: Optional[list] = None,
     expandable: bool = True,
+    track_used: bool = False,
     when=None,
     **kwargs,
 ):
@@ -39,27 +40,23 @@ def package_manager_variable(
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
         expandable (bool): True if the variable should be expanded, False if not.
+        track_used (bool): True if the variable should be tracked as used,
+                           False if not. Can help with allowing lists without vecotizing
         when (list | None): List of when conditions to apply to directive
     """
 
     def _define_package_manager_variable(pm):
-        import ramble.workload
-
-        when_list = ramble.language.language_helpers.build_when_list(
-            when, pm, name, "package_manager_variable"
-        )
-
-        pm.object_variables.append(
-            ramble.workload.WorkloadVariable(
-                name,
-                default=default,
-                description=description,
-                values=values,
-                expandable=expandable,
-                when=when_list,
-                **kwargs,
-            )
-        )
+        ramble.language.shared_language.variable(
+            name,
+            default,
+            description=description,
+            values=values,
+            expandable=expandable,
+            track_used=track_used,
+            when=when,
+            error_context="package_manager_variable",
+            **kwargs,
+        )(pm)
 
     return _define_package_manager_variable
 

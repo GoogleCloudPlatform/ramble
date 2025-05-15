@@ -756,6 +756,7 @@ def variable(
     expandable: bool = True,
     track_used: bool = False,
     when=None,
+    error_context="variable",
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -775,7 +776,9 @@ def variable(
     def _define_variable(obj):
         import ramble.workload
 
-        when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "variable")
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, error_context
+        )
 
         obj.object_variables.append(
             ramble.workload.WorkloadVariable(

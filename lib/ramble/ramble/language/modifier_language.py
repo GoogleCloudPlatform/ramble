@@ -328,17 +328,17 @@ def modifier_variable(
             mode_variant = f"{mod.name}_mode={mode_name}"
             when_list = base_when_list + [mode_variant]
 
-            mod.object_variables.append(
-                ramble.workload.WorkloadVariable(
-                    name,
-                    default=default,
-                    description=description,
-                    values=values,
-                    expandable=expandable,
-                    when=when_list,
-                    **kwargs,
-                )
-            )
+            ramble.language.shared_language.variable(
+                name,
+                default,
+                description=description,
+                values=values,
+                expandable=expandable,
+                track_used=track_used,
+                when=when_list,
+                error_context="modifier_variable",
+                **kwargs,
+            )(mod)
 
     return _define_modifier_variable
 
