@@ -283,6 +283,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if obj_variants is not None:
                 self.object_variants.merge_multi_value_variants(obj_variants)
 
+        for obj_type, obj in self._objects():
+            if obj_type is ramble.repository.ObjectTypes.applications:
+                self.object_variants.multi_value_variant("application_name", value=obj.name)
+
+        self.object_variants.default_variant(
+            "workload_name",
+            default=self.expander.workload_name,
+            description="Name of experiment workload",
+        )
+
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
             self.object_variants.value(namespace.package_manager)
