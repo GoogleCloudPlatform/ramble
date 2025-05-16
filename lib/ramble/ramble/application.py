@@ -280,9 +280,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.object_variants.merge_default_variants(getattr(obj, "object_variants"))
                 self.object_variants.merge_multi_value_variants(obj_variants)
 
-        for obj_type, obj in self._objects():
-            if obj_type is ramble.repository.ObjectTypes.applications:
-                self.object_variants.multi_value_variant("application_name", value=obj.name)
+        base_chain = self.__class__.__mro__
+        for cls in base_chain:
+            if hasattr(cls, "name") and getattr(cls, "name") is not None:
+                self.object_variants.multi_value_variant("application_name", value=cls.name)
 
         self.object_variants.default_variant(
             "workload_name",
