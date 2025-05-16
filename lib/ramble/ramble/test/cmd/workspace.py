@@ -1354,13 +1354,17 @@ licenses:
     with open(lic_path, "w+") as f:
         f.write(test_licenses)
 
-    # Create more templates
+    # Create more templates, and test files to archive
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
+
+        new_archive_file = os.path.join(ws1.root, f"test_pattern.{i}")
+        with open(new_archive_file, "w+") as f:
+            f.write("Test archive file")
 
     ws1._re_read()
 
@@ -1374,14 +1378,14 @@ licenses:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
         f = open(new_file, "w+")
         f.close()
 
-    workspace("archive", global_args=["-w", workspace_name])
+    workspace("archive", "--archive-pattern", "test_pattern*", global_args=["-w", workspace_name])
 
     assert ws1.latest_archive
     assert os.path.exists(ws1.latest_archive_path)
@@ -1394,6 +1398,13 @@ licenses:
     for file in new_files:
         archived_path = file.replace(ws1.root, ws1.latest_archive_path)
         assert os.path.exists(archived_path)
+
+    # Check for archive pattern files
+    for i in range(0, 5):
+        archived_path = os.path.join(ws1.latest_archive_path, f"test_pattern.{i}")
+        assert os.path.isfile(archived_path)
+        with open(archived_path) as f:
+            assert "Test archive file" in f.read()
 
     assert not os.path.exists(
         os.path.join(
@@ -1450,7 +1461,7 @@ licenses:
     # Create more templates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()

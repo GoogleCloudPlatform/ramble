@@ -1016,6 +1016,17 @@ def workspace_archive_setup_parser(subparser):
         help="If set, secrets are included in the archive. Default is false",
     )
 
+    subparser.add_argument(
+        "--archive-pattern",
+        dest="archive_patterns",
+        nargs="+",
+        action="append",
+        help=(
+            "patterns to specify additionally files that will be included in the archive. "
+            "Paths are relative to workspace root."
+        ),
+    )
+
     arguments.add_common_arguments(
         subparser,
         ["phases", "include_phase_dependencies", "where", "exclude_where", "profile_phases"],
@@ -1032,6 +1043,10 @@ def workspace_archive(args):
         exclude_where_filters=args.exclude_where,
     )
 
+    archive_patterns = (
+        list(itertools.chain.from_iterable(args.archive_patterns)) if args.archive_patterns else []
+    )
+
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
     pipeline = pipeline_cls(
         ws,
@@ -1040,6 +1055,7 @@ def workspace_archive(args):
         archive_prefix=args.archive_prefix,
         upload_url=args.upload_url,
         include_secrets=args.include_secrets,
+        archive_patterns=archive_patterns,
     )
 
     workspace_run_pipeline(args, pipeline)

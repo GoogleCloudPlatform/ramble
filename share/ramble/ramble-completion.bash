@@ -646,7 +646,7 @@ _ramble_workspace_activate() {
 }
 
 _ramble_workspace_archive() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --phases --include-phase-dependencies --where --exclude-where --profile-phase"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --archive-pattern --phases --include-phase-dependencies --where --exclude-where --profile-phase"
 }
 
 _ramble_workspace_deactivate() {
