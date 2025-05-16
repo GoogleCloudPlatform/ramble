@@ -490,6 +490,55 @@ def test_formatted_exec_when(request, inc_value, type_value):
 
 
 @pytest.mark.parametrize(
+    "workload_name",
+    ["test_wl", "test_unset_wl"],
+)
+def test_variable_when_workload_constraint(request, workload_name):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            workload_name,
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        if workload_name == "test_wl":
+            test_str = "Test when workload variable is_defined"
+        else:
+            test_str = "Test when workload variable {test_when_var}"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            workload_name,
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+
+
+@pytest.mark.parametrize(
     "inc_value,type_value",
     [
         (True, "preferred"),

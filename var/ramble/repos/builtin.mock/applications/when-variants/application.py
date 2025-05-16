@@ -21,11 +21,13 @@ class WhenVariants(ExecutableApplication):
             "echo 'PM test: {pm_var_test}'",
             "echo 'WM test: {wm_var_test}'",
             "echo 'MOD test: {mod_var_test}'",
+            "echo 'Test when workload variable {test_when_var}'",
         ],
         use_mpi=False,
     )
 
     workload("test_wl", executable="test_exec")
+    workload("test_unset_wl", executable="test_exec")
 
     with default_args(workload="test_wl"):
         workload_variable(
@@ -62,7 +64,15 @@ class WhenVariants(ExecutableApplication):
             message="When validation is enabled, this test needs n_nodes=2",
         )
 
+    with when("workload_name=test_wl"):
+        variable(
+            "test_when_var",
+            default="is_defined",
+            description="Test workload constrained variable definition",
+        )
+
     with default_args(when=["package_manager_family=spack", "+inc_zlib"]):
+
         with when("zlib_type=preferred"):
             software_spec("zlib-pref", pkg_spec="zlib@1.2.12")
 
