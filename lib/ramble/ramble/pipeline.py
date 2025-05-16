@@ -318,6 +318,7 @@ class ArchivePipeline(Pipeline):
         archive_prefix=None,
         upload_url=None,
         include_secrets=False,
+        archive_patterns=None,
     ):
         super().__init__(workspace, filters)
         self.action_string = "Archiving"
@@ -326,6 +327,7 @@ class ArchivePipeline(Pipeline):
         self.include_secrets = include_secrets
         self.archive_prefix = archive_prefix
         self.archive_name = None
+        self.archive_patterns = archive_patterns.copy() if archive_patterns else []
 
         if self.upload_url and not self.create_tar:
             logger.warn("Upload URL is currently only supported when using tar format (-t)")
@@ -397,6 +399,15 @@ class ArchivePipeline(Pipeline):
                     dest = src.replace(self.workspace.log_dir, archive_logs)
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
+
+        for pattern in self.archive_patterns:
+            pattern_path = self.workspace.root + os.sep + pattern
+            for file in glob.glob(pattern_path):
+                dest_dir = os.path.dirname(
+                    file.replace(self.workspace.root, self.workspace.latest_archive_path)
+                )
+                fs.mkdirp(dest_dir)
+                shutil.copy(file, dest_dir)
 
         archive_path_latest = os.path.join(self.workspace.archive_dir, "archive.latest")
         create_symlink(archive_path, archive_path_latest)
