@@ -17,6 +17,30 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
+def basic_exp_dict():
+    """To set expander consistently with test_wl2 of builtin.mock/applications/basic"""
+    return {
+        "application_name": "bar",
+        "inputs": {"test_wl": "input", "test_wl2": "input"},
+        "workload_name": "test_wl2",
+        "experiment_name": "baz",
+        "application_input_dir": "/workspace/inputs/bar",
+        "workload_input_dir": "/workspace/inputs/bar/test_wl2",
+        "application_run_dir": "/workspace/experiments/bar",
+        "workload_run_dir": "/workspace/experiments/bar/test_wl2",
+        "experiment_run_dir": "/workspace/experiments/bar/test_wl2/baz",
+        "env_name": "spack_bar.test_wl2",
+        "n_ranks": "4",
+        "processes_per_node": "2",
+        "n_nodes": "2",
+        "var1": "{var2}",
+        "var2": "{var3}",
+        "var3": "3",
+        "mpi_command": "mpirun -n {n_ranks}",
+        "batch_command": "sbatch -p {partition} {execute_experiment}",
+    }
+
+
 @pytest.mark.parametrize(
     "app", ["basic", "basic-inherited", "input-test", "interleved-env-vars", "register-builtin"]
 )
@@ -36,6 +60,9 @@ def test_app_features(mutable_mock_apps_repo, app):
 
 def test_basic_app(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get("basic")
+    exp_dict = basic_exp_dict()
+    basic_inst.set_variables(exp_dict, None)
+    basic_inst.define_variable("application_name", "basic")
 
     assert "test_wl" in basic_inst.workloads
     assert len(basic_inst.workloads["test_wl"].executables) == 1
@@ -67,10 +94,12 @@ def test_basic_app(mutable_mock_apps_repo):
     example_input = basic_inst.workloads["test_wl2"].find_input("input")
     assert example_input is not None
 
+    basic_inst.define_variable("workload_name", "test_wl")
     exec_graph = basic_inst._get_executable_graph("test_wl")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
+    basic_inst.define_variable("workload_name", "test_wl2")
     exec_graph = basic_inst._get_executable_graph("test_wl2")
     assert exec_graph.get_node("bar") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
@@ -158,13 +187,17 @@ def test_application_copy_is_deep(mutable_mock_apps_repo, app_name):
 )
 def test_required_builtins(mutable_mock_apps_repo, app):
     app_inst = mutable_mock_apps_repo.get(app)
+    exp_dict = basic_exp_dict()
+    app_inst.set_variables(exp_dict, None)
+    app_inst.define_variable("application_name", app)
 
     required_builtins = []
-    for builtin, conf in app_inst.builtins.items():
+    for builtin, conf in app_inst.builtins[frozenset()].items():
         if conf[app_inst._builtin_required_key]:
             required_builtins.append(builtin)
 
     for workload in app_inst.workloads.keys():
+        app_inst.define_variable("workload_name", workload)
         exec_graph = app_inst._get_executable_graph(workload)
         for builtin in required_builtins:
             assert exec_graph.get_node(builtin) is not None
@@ -172,10 +205,13 @@ def test_required_builtins(mutable_mock_apps_repo, app):
 
 def test_register_builtin_app(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get("register-builtin")
+    exp_dict = basic_exp_dict()
+    app_inst.set_variables(exp_dict, None)
+    app_inst.define_variable("application_name", "register-builtin")
 
     required_builtins = []
     excluded_builtins = []
-    for builtin, conf in app_inst.builtins.items():
+    for builtin, conf in app_inst.builtins[frozenset()].items():
         if conf[app_inst._builtin_required_key]:
             required_builtins.append(builtin)
         else:
@@ -183,6 +219,7 @@ def test_register_builtin_app(mutable_mock_apps_repo):
 
     for workload in app_inst.workloads.keys():
         exec_graph = app_inst._get_executable_graph(workload)
+        app_inst.define_variable("workload_name", workload)
 
         for builtin in required_builtins:
             assert exec_graph.get_node(builtin) is not None
@@ -209,30 +246,6 @@ def test_short_print(mutable_mock_apps_repo, app):
     str_val = str(app_inst)
 
     assert str_val == app
-
-
-def basic_exp_dict():
-    """To set expander consistently with test_wl2 of builtin.mock/applications/basic"""
-    return {
-        "application_name": "bar",
-        "inputs": {"test_wl": "input", "test_wl2": "input"},
-        "workload_name": "test_wl2",
-        "experiment_name": "baz",
-        "application_input_dir": "/workspace/inputs/bar",
-        "workload_input_dir": "/workspace/inputs/bar/test_wl2",
-        "application_run_dir": "/workspace/experiments/bar",
-        "workload_run_dir": "/workspace/experiments/bar/test_wl2",
-        "experiment_run_dir": "/workspace/experiments/bar/test_wl2/baz",
-        "env_name": "spack_bar.test_wl2",
-        "n_ranks": "4",
-        "processes_per_node": "2",
-        "n_nodes": "2",
-        "var1": "{var2}",
-        "var2": "{var3}",
-        "var3": "3",
-        "mpi_command": "mpirun -n {n_ranks}",
-        "batch_command": "sbatch -p {partition} {execute_experiment}",
-    }
 
 
 def test_get_executable_graph_initial(mutable_mock_apps_repo):

@@ -150,3 +150,18 @@ class WhenDirectives(ExecutableApplication):
         dest_path="test_template",
         when=["+register_template_when"],
     )
+
+    # For register_builtin()
+    variant(
+        "register_builtin_when",
+        default=False,
+        values=[True, False],
+        description="Register builtin using when",
+    )
+
+    register_builtin(
+        "test_builtin_when", required=True, when=["+register_builtin_when"]
+    )
+
+    def test_builtin_when(self):
+        return ['echo "when-builtin"']

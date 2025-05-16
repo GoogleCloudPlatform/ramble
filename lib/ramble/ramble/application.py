@@ -961,13 +961,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     name=name, **conf
                 )
 
-    def _get_exec_order(self, workload_name):
-        graph = self._get_executable_graph(workload_name)
-        order = []
-        for node in graph.walk():
-            order.append(node.key)
-        return order
-
     def _get_executable_graph(self, workload_name):
         """Return executables for add_expand_vars"""
         self._define_custom_executables()
@@ -979,8 +972,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
         builtin_objects = []
         all_builtins = []
         for _, obj in self._objects():
-            builtin_objects.append(obj)
-            all_builtins.append(obj.builtins)
+            for when_set, builtins in obj.builtins.items():
+                if self.expander.satisfies(when_set, variant_set=self.object_variants):
+                    builtin_objects.append(obj)
+                    all_builtins.append(builtins)
 
         all_executables = self.executables.copy()
         all_executables.update(self.custom_executables)

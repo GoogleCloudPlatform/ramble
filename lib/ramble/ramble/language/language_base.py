@@ -213,6 +213,7 @@ class DirectiveMeta(type):
                         "required_package",
                         "define_compiler",
                         "package_manager_config",
+                        "register_builtin",
                         "register_phase",
                         "register_template",
                         "figure_of_merit",

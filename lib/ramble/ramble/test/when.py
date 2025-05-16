@@ -600,3 +600,52 @@ echo "test template for {experiment_name}"
             generated_template = f.read()
 
             assert "test template for generated" in generated_template
+
+
+@pytest.mark.parametrize(
+    "include_builtin,builtin_found",
+    [
+        (True, True),
+        (False, False),
+    ],
+)
+def test_register_builtin_when(request, include_builtin, builtin_found):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:register_builtin_when:{include_builtin}", global_args=global_args)
+
+        test_str = 'echo "when-builtin"'
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert (test_str in data) == builtin_found
