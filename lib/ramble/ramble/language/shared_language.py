@@ -369,7 +369,13 @@ def success_criteria(
 
 @shared_directive("builtins")
 def register_builtin(
-    name, required=True, injection_method="prepend", depends_on=None, dependents=None, **kwargs
+    name,
+    required=True,
+    injection_method="prepend",
+    depends_on=None,
+    dependents=None,
+    when=None,
+    **kwargs,
 ):
     """Register a builtin
 
@@ -433,6 +439,7 @@ def register_builtin(
                                        (and must execute after).
         dependents (list(str) | None): The names of builtins that should come
                                        after this builtin
+        when (list | None): List of when conditions to apply to directive
     """
     if depends_on is None:
         depends_on = []
@@ -442,6 +449,13 @@ def register_builtin(
     supported_injection_methods = ["prepend", "append"]
 
     def _store_builtin(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "register_builtin"
+        )
+        when_key = frozenset(when_list)
+        if when_key not in obj.builtins:
+            obj.builtins[when_key] = {}
+
         if injection_method not in supported_injection_methods:
             raise ramble.language.language_base.DirectiveError(
                 f"Object {obj.name} defines builtin {name} with an invalid "
@@ -451,12 +465,13 @@ def register_builtin(
 
         builtin_name = obj._builtin_name.format(obj_name=obj.name, name=name)
 
-        obj.builtins[builtin_name] = {
+        obj.builtins[when_key][builtin_name] = {
             "name": name,
             "required": required,
             "injection_method": injection_method,
             "depends_on": depends_on.copy(),
             "dependents": dependents.copy(),
+            "when": when_list,
         }
 
     return _store_builtin

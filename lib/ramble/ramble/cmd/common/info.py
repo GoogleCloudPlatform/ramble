@@ -156,6 +156,30 @@ def print_object_overview(obj):
         color.cprint(f"\t{name}")
 
 
+def _unpack_when_set_if_needed(internal_attr: dict):
+    """If the attribute has a frozenset key, assume the attribute is nested in
+    a set of 'when' conditions and unpack the innner values to print.
+    """
+    first_key = next(iter(internal_attr))
+    first_val = internal_attr[first_key]
+
+    if isinstance(first_key, frozenset):
+        if isinstance(first_val, dict):
+            unpacked_dict = {}
+            for when_key, inner_dict in internal_attr.items():
+                unpacked_dict.update(inner_dict)
+            return unpacked_dict
+        elif isinstance(first_val, list):
+            unpacked_list = []
+            for when_key, inner_list in internal_attr.items():
+                unpacked_list.extend(inner_list)
+            return unpacked_list
+        else:
+            return internal_attr[first_key]
+    else:
+        return internal_attr
+
+
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
     to_print = fnmatch.filter(internal_attr, pattern)
     if format == supported_formats.lists:
@@ -271,6 +295,8 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     elif attr == "figures_of_merit":
         _print_figures_of_merit(obj, attr, verbose, pattern, format=format)
         return
+    elif isinstance(internal_attr, dict):
+        internal_attr = _unpack_when_set_if_needed(internal_attr)
 
     print_attribute_header(attr, verbose)
 
