@@ -390,10 +390,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self.no_expand_vars = set()
         workload_name = self.expander.workload_name
         if workload_name in self.workloads:
-            for var in self.workloads[workload_name].variables.values():
-                if self.expander.satisfies(var.when, self.object_variants):
-                    if not var.expandable:
-                        self.no_expand_vars.add(var.name)
+            for when_key, var_list in self.workloads[workload_name].variables.items():
+                if self.expander.satisfies(when_key, self.object_variants):
+                    for var in var_list:
+                        if not var.expandable:
+                            self.no_expand_vars.add(var.name)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
 
@@ -1041,12 +1042,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
         wl_vars = {}
 
         if self.expander.workload_name in self.workloads:
-            for var in self.workloads[self.expander.workload_name].variables.values():
-                if self.expander.satisfies(var.when, self.object_variants):
-                    wl_vars[var.name] = var
+            for when_key, var_list in self.workloads[
+                self.expander.workload_name
+            ].variables.items():
+                if self.expander.satisfies(when_key, self.object_variants):
+                    for var in var_list:
+                        wl_vars[var.name] = var
 
-        for when_set, var_list in self.object_variables.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+        for when_key, var_list in self.object_variables.items():
+            if self.expander.satisfies(when_key, self.object_variants):
                 for var in var_list:
                     wl_vars[var.name] = var
 

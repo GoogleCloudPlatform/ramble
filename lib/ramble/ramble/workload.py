@@ -62,7 +62,7 @@ class WorkloadVariable:
 
         print_attrs = ["Description", "Default", "Values"]
 
-        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
+        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
         for print_attr in print_attrs:
             name = print_attr
             if print_attr == "Values":
@@ -184,8 +184,15 @@ class Workload:
 
         if self.variables:
             out_str += rucolor.nested_1(f"{indentation}    Variables:\n")
-            for var in self.variables.values():
-                out_str += var.as_str(n_indent + 4)
+            for when_set, var_list in self.variables.items():
+                if when_set:
+                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
+                    for variant in when_set:
+                        out_str += f"{indentation}            {variant}\n"
+                else:
+                    out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
+                for var in var_list:
+                    out_str += var.as_str(n_indent + 12)
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
@@ -200,7 +207,10 @@ class Workload:
         Args:
             variable (WorkloadVariable): New variable to add to this workload
         """
-        self.variables[variable.name] = variable
+        when_key = frozenset(variable.when)
+        if when_key not in self.variables:
+            self.variables[when_key] = []
+        self.variables[when_key].append(variable)
 
     def add_environment_variable(self, env_var: WorkloadEnvironmentVariable):
         """Add an environment variable to this workload
@@ -282,10 +292,12 @@ class Workload:
         Returns:
             (WorkloadVariable | None): Variable instance if it exists, None if it is not found
         """
-        if name in self.variables:
-            return self.variables[name]
-        else:
-            return None
+        named_vars = []
+        for var_list in self.variables.values():
+            for var in var_list:
+                if var.name == name:
+                    named_vars.append(var)
+        return named_vars
 
     def find_environment_variable(self, name):
         """Find an environment variable in this workload

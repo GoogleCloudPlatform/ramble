@@ -49,11 +49,11 @@ def test_basic_app(mutable_mock_apps_repo):
     example_input = basic_inst.workloads["test_wl"].find_input("input")
     assert example_input is not None
 
-    assert len(basic_inst.workloads["test_wl"].variables) == 2
-    my_var = basic_inst.workloads["test_wl"].find_variable("my_var")
-    assert my_var is not None
-    assert my_var.default == "1.0"
-    assert my_var.description == "Example var"
+    assert len(basic_inst.workloads["test_wl"].variables[frozenset()]) == 2
+    possible_vars = basic_inst.workloads["test_wl"].find_variable("my_var")
+    assert len(possible_vars) == 1
+    assert possible_vars[0].default == "1.0"
+    assert possible_vars[0].description == "Example var"
 
     assert "test_wl2" in basic_inst.workloads
     assert len(basic_inst.workloads["test_wl2"].executables) == 1
@@ -519,15 +519,21 @@ def test_workload_groups(mutable_mock_apps_repo):
     assert "empty" in workload_group_inst.workload_groups
     assert "test_wlg" in workload_group_inst.workload_groups
 
-    my_var = workload_group_inst.workloads["test_wl"].find_variable("test_var")
-    assert my_var is not None
-    assert my_var.default == "2.0"
-    assert my_var.description == "Test workload vars and groups"
+    possible_vars = workload_group_inst.workloads["test_wl"].find_variable("test_var")
+    assert len(possible_vars) >= 1
+    found = False
+    for var in possible_vars:
+        if var.default == "2.0" and var.description == "Test workload vars and groups":
+            found = True
+    assert found
 
-    my_mixed_var_wl = workload_group_inst.workloads["test_wl"].find_variable("test_var_mixed")
-    assert my_mixed_var_wl is not None
-    assert my_mixed_var_wl.default == "3.0"
-    assert my_mixed_var_wl.description == "Test vars for workload and groups"
+    possible_vars = workload_group_inst.workloads["test_wl"].find_variable("test_var_mixed")
+    assert len(possible_vars) >= 1
+    found = False
+    for var in possible_vars:
+        if var.default == "3.0" and var.description == "Test vars for workload and groups":
+            found = True
+    assert found
 
 
 def test_workload_groups_inherited(mutable_mock_apps_repo):
@@ -543,12 +549,19 @@ def test_workload_groups_inherited(mutable_mock_apps_repo):
     assert "test_wl" in wlgi_inst.workload_groups["test_wlg"]
 
     # Ensure a new workload can obtain the parent level vars via groups
-    my_var = wlgi_inst.workloads["test_wl3"].find_variable("test_var")
-    assert my_var is not None
-    assert my_var.default == "2.0"
-    assert my_var.description == "Test workload vars and groups"
+    possible_vars = wlgi_inst.workloads["test_wl3"].find_variable("test_var")
+    assert len(possible_vars) >= 1
+    found = False
+    for var in possible_vars:
+        if var.default == "2.0" and var.description == "Test workload vars and groups":
+            found = True
+    assert found
 
     for wl in ["test_wl", "test_wl3"]:
-        my_mixed_var_wl = wlgi_inst.workloads[wl].find_variable("test_var_mixed")
-        assert my_mixed_var_wl is not None
-        assert my_mixed_var_wl.default == "3.0"
+        possible_vars = wlgi_inst.workloads[wl].find_variable("test_var_mixed")
+        assert len(possible_vars) >= 1
+        found = False
+        for var in possible_vars:
+            if var.default == "3.0":
+                found = True
+        assert found

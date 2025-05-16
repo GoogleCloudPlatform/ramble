@@ -398,9 +398,12 @@ class Hpl(ExecutableApplication):
             nBlocks -= nBlocks % lcmPQ
             problemSize = blockSize * nBlocks
 
-            for name, var in self.workloads["standard"].variables.items():
-                if var.name not in self.variables:
-                    self.define_variable(var.name, var.default)
+            for when_key, var_list in self.workloads[
+                "standard"
+            ].variables.items():
+                if self.expander.satisfies(when_key, self.object_variants):
+                    for var in var_list:
+                        self.define_variable(var.name, var.default)
 
             # Key = Variable name
             # Value = Value to override variable with
