@@ -232,6 +232,11 @@ class DirectiveMeta(type):
                         "figure_of_merit_context",
                         "formatted_executable",
                         "register_validator",
+                        "variable",
+                        "workload_variable",
+                        "modifier_variable",
+                        "package_manager_variable",
+                        "workflow_manager_variable",
                     ]:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'

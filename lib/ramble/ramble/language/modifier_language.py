@@ -316,7 +316,7 @@ def modifier_variable(
     def _define_modifier_variable(mod):
         import ramble.workload
 
-        all_modes = ramble.language.language_helpers.require_definition(
+        all_modes = ramble.language.language_helpers.merge_definitions(
             mode, modes, mod.modes, "mode", "modes", "modifier_variable"
         )
 
@@ -326,7 +326,6 @@ def modifier_variable(
 
         for mode_name in all_modes:
             mode_variant = f"{mod.name}_mode={mode_name}"
-            #  when_list = base_when_list + [mode_variant]
 
             ramble.language.shared_language.variable(
                 name,

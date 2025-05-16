@@ -17,6 +17,10 @@ class WhenVariants(ExecutableApplication):
         template=[
             "echo '{test_variable}'",
             "echo '{test_formatted_exec}'",
+            "echo 'Standard was {standard_variable}'",
+            "echo 'PM test: {pm_var_test}'",
+            "echo 'WM test: {wm_var_test}'",
+            "echo 'MOD test: {mod_var_test}'",
         ],
         use_mpi=False,
     )
@@ -83,6 +87,12 @@ class WhenVariants(ExecutableApplication):
                 ],
             )
 
+            variable(
+                "standard_variable",
+                default="preferred",
+                description="Test usage of the `variable` directive",
+            )
+
         with when("zlib_type=testing"):
             formatted_executable(
                 "test_formatted_exec",
@@ -92,6 +102,12 @@ class WhenVariants(ExecutableApplication):
                 commands=[
                     "zlib included with type of testing",
                 ],
+            )
+
+            variable(
+                "standard_variable",
+                default="testing",
+                description="Test usage of the `variable` directive",
             )
 
         with when("zlib_type=modifier"):
@@ -105,6 +121,12 @@ class WhenVariants(ExecutableApplication):
                 ],
             )
 
+            variable(
+                "standard_variable",
+                default="modifier",
+                description="Test usage of the `variable` directive",
+            )
+
     with when("~inc_zlib"):
         formatted_executable(
             "test_formatted_exec",
@@ -114,4 +136,10 @@ class WhenVariants(ExecutableApplication):
             commands=[
                 "zlib not included",
             ],
+        )
+
+        variable(
+            "standard_variable",
+            default="unincluded",
+            description="Test usage of the `variable` directive",
         )

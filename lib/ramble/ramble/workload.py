@@ -23,6 +23,7 @@ class WorkloadVariable:
         values=None,
         expandable: bool = True,
         track_used: bool = True,
+        when=None,
         **kwargs,
     ):
         """Constructor for a new variable
@@ -41,6 +42,7 @@ class WorkloadVariable:
         self.values = values.copy() if isinstance(values, list) else [values]
         self.expandable = expandable
         self.track_used = track_used
+        self.when = when.copy() if when else []
 
     def __str__(self):
         if not hasattr(self, "_str_indent"):

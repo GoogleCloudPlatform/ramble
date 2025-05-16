@@ -204,6 +204,7 @@ def workload_variable(
     workload_group=None,
     expandable: bool = True,
     track_used: bool = True,
+    when=None,
     **kwargs,
 ):
     """Define a new variable to be used in experiments
@@ -226,6 +227,7 @@ def workload_variable(
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vecotizing
                            experiments.
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_workload_variable(app):
@@ -234,12 +236,17 @@ def workload_variable(
             workload, workloads, app.workloads, "workload", "workloads", "workload_variable"
         )
 
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, app, name, "workload_variable"
+        )
+
         workload_var = ramble.workload.WorkloadVariable(
             name,
             default=default,
             description=description,
             values=values,
             expandable=expandable,
+            when=when_list,
             **kwargs,
         )
 

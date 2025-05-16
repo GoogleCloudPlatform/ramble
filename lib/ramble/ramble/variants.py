@@ -119,7 +119,10 @@ class VariantSet:
             value: The value the variant should take.
         """
         if name in self.default_variants:
-            if value not in self.default_variants[name].values:
+            if (
+                self.default_variants[name].values
+                and value not in self.default_variants[name].values
+            ):
                 raise RambleVariantError(
                     f"When defining variant {name} the value {value} is not valid.\n"
                     f"   Valid values include: {self.default_variants[name].values}"

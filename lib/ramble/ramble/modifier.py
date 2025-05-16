@@ -135,7 +135,13 @@ class ModifierBase(metaclass=ModifierMeta):
 
     def inherit_from_application(self, app):
         self.expander = app.expander.copy()
-        self.object_variants = app.object_variants.copy()
+        self.object_variants.merge_default_variants(app.object_variants)
+
+        for name, value in app.variants.items():
+            expanded_value = self.expander.expand_var(value, typed=True)
+            self.object_variants.experiment_variant(name, expanded_value)
+
+        self.object_variants.merge_multi_value_variants(app.object_variants)
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
 
@@ -260,7 +266,12 @@ class ModifierBase(metaclass=ModifierMeta):
                 yield var.name
 
     def selected_variables(self):
-        """Return a dict of variables that should be defined for the current mode"""
+        """Extract all variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are variable names, values are variable instances
+        """
 
         mod_variables = {}
 

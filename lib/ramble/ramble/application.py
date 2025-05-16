@@ -266,10 +266,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
 
         self.variants = variants.copy()
-        for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
-            obj_variants = getattr(obj, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_default_variants(getattr(obj, "object_variants"))
 
         for name, value in variants.items():
             expanded_value = self.expander.expand_var(value, typed=True)
@@ -281,6 +277,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
             obj_variants = getattr(obj, "object_variants", None)
             if obj_variants is not None:
+                self.object_variants.merge_default_variants(getattr(obj, "object_variants"))
                 self.object_variants.merge_multi_value_variants(obj_variants)
 
         for obj_type, obj in self._objects():
@@ -394,8 +391,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         workload_name = self.expander.workload_name
         if workload_name in self.workloads:
             for var in self.workloads[workload_name].variables.values():
-                if not var.expandable:
-                    self.no_expand_vars.add(var.name)
+                if self.expander.satisfies(var.when, self.object_variants):
+                    if not var.expandable:
+                        self.no_expand_vars.add(var.name)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
 
@@ -1032,34 +1030,37 @@ class ApplicationBase(metaclass=ApplicationMeta):
             )
             self.variables[input_conf["input_name"]] = input_path
 
+    def selected_variables(self):
+        """Extract all variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are variable names, values are variable instances
+        """
+
+        wl_vars = {}
+
+        if self.expander.workload_name in self.workloads:
+            for var in self.workloads[self.expander.workload_name].variables.values():
+                if self.expander.satisfies(var.when, self.object_variants):
+                    wl_vars[var.name] = var
+
+        for when_set, var_list in self.object_variables.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                for var in var_list:
+                    wl_vars[var.name] = var
+
+        return wl_vars
+
     def _set_default_experiment_variables(self):
         """Set default experiment variables (for add_expand_vars),
         if they haven't been set already"""
         # Set default experiment variables, if they haven't been set already
-        var_objs = []
-        var_sets = []
-
-        # Built var_objs list
-        if self.package_manager is not None:
-            var_objs.append(self.package_manager)
-
-        if self.workflow_manager is not None:
-            var_objs.append(self.workflow_manager)
-
-        for mod_inst in self._modifier_instances:
-            var_objs.append(mod_inst)
-
-        # Built var_sets list
-        if self.expander.workload_name in self.workloads:
-            var_sets.append(self.workloads[self.expander.workload_name].variables)
-
-        for var_obj in var_objs:
-            var_sets.append(var_obj.selected_variables())
 
         # Define variables from var_sets
-        for var_set in var_sets:
-            for var, val in var_set.items():
-                if var not in self.variables.keys():
+        for _, obj in self._objects():
+            for var, val in obj.selected_variables().items():
+                if var not in self.variables:
                     self.define_variable(var, val.default)
 
         if self.expander.workload_name in self.workloads:
