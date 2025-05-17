@@ -94,3 +94,57 @@ def test_analyze_print(monkeypatch):
     msg_list = []
     workspace("analyze", "-p", global_args=["-w", workspace_name])
     assert any(m.startswith("Results from the analysis pipeline") for m in msg_list)
+
+
+# If an app has no FOM defined, analyze should not fail due to the lack of FOMs
+def test_analyze_success_with_no_fom_defined(mock_applications, request):
+    ws_name = request.node.name
+    global_args = ["-w", ws_name]
+    ws = ramble.workspace.create(ws_name)
+    workspace(
+        "manage",
+        "experiments",
+        "validation",
+        "-v",
+        "n_nodes=2",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        global_args=global_args,
+    )
+    ws._re_read()
+    workspace("setup", "--dry-run", global_args=global_args)
+    workspace("analyze", global_args=["-w", ws_name])
+    result_file = os.path.join(ws.root, "results.latest.txt")
+    with open(result_file) as f:
+        content = f.read()
+        assert "Status = SUCCESS" in content
+
+
+# If app has FOM defined, analyze fails when no FOM is detected from the experiment
+def test_analyze_fail_with_no_fom_detected(mock_applications, request):
+    ws_name = request.node.name
+    global_args = ["-w", ws_name]
+    ws = ramble.workspace.create(ws_name)
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "--wf",
+        "working_wl",
+        global_args=global_args,
+    )
+    ws._re_read()
+    workspace("setup", "--dry-run", global_args=global_args)
+    workspace("analyze", global_args=["-w", ws_name])
+    result_file = os.path.join(ws.root, "results.latest.txt")
+    with open(result_file) as f:
+        content = f.read()
+        assert "Status = FAILED" in content
