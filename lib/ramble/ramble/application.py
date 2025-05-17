@@ -1856,7 +1856,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 if criteria_obj.passed(app_inst=self, fom_values=fom_values):
                     criteria_obj.mark_found()
 
-        success = False
+        # If an app has no FOMs defined, don't fail it for that
+        success = (not definitions) or False
         for fom in fom_values.values():
             for value in fom.values():
                 if "origin_type" in value and value["origin_type"] == "application":
