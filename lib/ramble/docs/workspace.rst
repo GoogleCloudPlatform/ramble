@@ -219,6 +219,54 @@ as well as unused experiment templates, one can use:
 Note: This command will also remove comments within the edited section
 of the workspace config file.
 
+------------------------
+Workspace Manage
+------------------------
+
+In addition to helping you automatically define software for your applications,
+ramble also offers a CLI interface to more finely control various aspects of
+the workspace configuration -- ``ramble workspace manage``.
+
+Specifically, this command can help you populate values in the ramble.yaml for:
+  * Experiment definitions
+  * Software definitions
+  * Workspace includes
+
+These can be combined over multiple invocations to express very powerful
+experiment configurations. The options are extensive, and are thus not covered
+here but users are invited to experiment and pass the ``-h`` for more
+information.
+
+Advanced options like ``--workflow-manager`` and ``--package-manager`` can be
+used to set key variable variants to quickly invoke additional core ramble
+features, and the intended user for this feature is both automation and human
+users alike.
+
+Below are some examples that can be used as starting points:
+
+.. code-block:: console
+
+    $ ramble workspace manage experiments <application_name>
+
+This command populates a workspace with default experiments and workloads for a
+given application, including setting default values for key variables. When
+paired with ``ramble workspace concretize`` it can quickly allow a user to
+generate a functioning workspace.
+
+In cases where a user wants to specify software that is different to the output
+of concretize, the following gives a easy and repeatable way to fine tune the
+selection. If for example you wanted to update a specific package to a
+different version, one may type:
+
+.. code-block:: console
+
+    $ ramble workspace manage software --pkg gcc9 --package-spec gcc@9.4.0 --overwrite
+
+This would update the software package definition names ``gcc9`` to have a new package spec.
+
+Finally, ``ramble workspace manage includes`` can be used to quickly and easy
+add includes when using a hierarchical workspace.
+
 ---------------------
 Workspace Deployments
 ---------------------
@@ -226,7 +274,7 @@ Workspace Deployments
 A deployment is one mechanism of transferring a configured workspace from one
 location to another. Ramble provides commands to handle creating (and pushing)
 a deployment from a local workspace to a remote location, or pulling a
-deployment from a remote location into a local workspace. 
+deployment from a remote location into a local workspace.
 
 A deployment is a directory that contains the necessary artifacts required to
 recreate the experiments in the workspace on a separate machine. Deployments
