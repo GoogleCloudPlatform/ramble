@@ -41,7 +41,7 @@ def package_manager_variable(
         values (list): Optional list of suggested values for this variable
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
-                           False if not. Can help with allowing lists without vecotizing
+                           False if not. Can help with allowing lists without vectorizing
         when (list | None): List of when conditions to apply to directive
     """
 

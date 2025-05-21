@@ -34,6 +34,8 @@ class WorkloadVariable:
             description (str): Description of variable
             values: List of suggested values for variable
             expandable (bool): True if variable can be expanded, False otherwise
+            track_used (bool): True if variable should be considered used,
+                               False to ignore it for vectorizing experiments
             when (list | None): List of when conditions to apply to directive
         """
         self.name = name

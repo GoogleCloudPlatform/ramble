@@ -308,7 +308,7 @@ def modifier_variable(
         modes (list): List of modes this variable is used in
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
-                           False if not. Can help with allowing lists without vecotizing
+                           False if not. Can help with allowing lists without vectorizing
                            experiments.
         when (list | None): List of when conditions to apply to directive
     """
