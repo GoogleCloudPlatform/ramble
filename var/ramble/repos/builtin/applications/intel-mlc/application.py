@@ -186,7 +186,9 @@ class IntelMlc(ExecutableApplication):
 
         thread_dist = app_inst.expander.expand_var_name("thread_distribution")
         if thread_dist == "{thread_distribution}":
-            thread_dist = workload.variables["thread_distribution"].default
+            possible_vars = workload.find_variable("thread_distribution")
+            assert len(possible_vars) == 1
+            thread_dist = possible_vars[0].default
 
         ppn = int(app_inst.expander.expand_var_name("processes_per_node"))
         n_threads = int(app_inst.expander.expand_var_name("n_threads"))
@@ -195,7 +197,9 @@ class IntelMlc(ExecutableApplication):
             "spread_divisions"
         )
         if spread_divisions == "{spread_divisions}":
-            spread_divisions = workload.variables["spread_divisions"].default
+            possible_vars = workload.find_variable("spread_divisions")
+            assert len(possible_vars) == 1
+            spread_divisions = possible_vars[0].default
 
         try:
             spread_divisions = int(spread_divisions)

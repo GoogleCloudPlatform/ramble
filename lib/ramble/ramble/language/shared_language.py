@@ -762,6 +762,58 @@ def register_validator(
     return _define_validator
 
 
+@shared_directive("object_variables")
+def variable(
+    name: str,
+    default,
+    description: str,
+    values: Optional[list] = None,
+    expandable: bool = True,
+    track_used: bool = False,
+    when=None,
+    error_context="variable",
+    **kwargs,
+):
+    """Define a variable for this modifier
+
+    Args:
+        name (str): Name of variable to define
+        default: Default value of variable definition
+        description (str): Description of variable's purpose
+        values (list): Optional list of suggested values for this variable
+        expandable (bool): True if the variable should be expanded, False if not.
+        track_used (bool): True if the variable should be tracked as used,
+                           False if not. Can help with allowing lists without vectorizing
+                           experiments.
+        when (list | None): List of when conditions to apply to directive
+    """
+
+    def _define_variable(obj):
+        import ramble.workload
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, error_context
+        )
+
+        when_set = frozenset(when_list)
+
+        if when_set not in obj.object_variables:
+            obj.object_variables[when_set] = []
+
+        obj.object_variables[when_set].append(
+            ramble.workload.WorkloadVariable(
+                name,
+                default=default,
+                description=description,
+                values=values,
+                expandable=expandable,
+                **kwargs,
+            )
+        )
+
+    return _define_variable
+
+
 @shared_directive(dicts=())
 def variant(
     name: str,

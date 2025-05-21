@@ -17,11 +17,17 @@ class WhenVariants(ExecutableApplication):
         template=[
             "echo '{test_variable}'",
             "echo '{test_formatted_exec}'",
+            "echo 'Standard was {standard_variable}'",
+            "echo 'PM test: {pm_var_test}'",
+            "echo 'WM test: {wm_var_test}'",
+            "echo 'MOD test: {mod_var_test}'",
+            "echo 'Test when workload variable {test_when_var}'",
         ],
         use_mpi=False,
     )
 
     workload("test_wl", executable="test_exec")
+    workload("test_unset_wl", executable="test_exec")
 
     with default_args(workload="test_wl"):
         workload_variable(
@@ -58,7 +64,15 @@ class WhenVariants(ExecutableApplication):
             message="When validation is enabled, this test needs n_nodes=2",
         )
 
+    with when("workload_name=test_wl"):
+        variable(
+            "test_when_var",
+            default="is_defined",
+            description="Test workload constrained variable definition",
+        )
+
     with default_args(when=["package_manager_family=spack", "+inc_zlib"]):
+
         with when("zlib_type=preferred"):
             software_spec("zlib-pref", pkg_spec="zlib@1.2.12")
 
@@ -83,6 +97,12 @@ class WhenVariants(ExecutableApplication):
                 ],
             )
 
+            variable(
+                "standard_variable",
+                default="preferred",
+                description="Test usage of the `variable` directive",
+            )
+
         with when("zlib_type=testing"):
             formatted_executable(
                 "test_formatted_exec",
@@ -92,6 +112,12 @@ class WhenVariants(ExecutableApplication):
                 commands=[
                     "zlib included with type of testing",
                 ],
+            )
+
+            variable(
+                "standard_variable",
+                default="testing",
+                description="Test usage of the `variable` directive",
             )
 
         with when("zlib_type=modifier"):
@@ -105,6 +131,12 @@ class WhenVariants(ExecutableApplication):
                 ],
             )
 
+            variable(
+                "standard_variable",
+                default="modifier",
+                description="Test usage of the `variable` directive",
+            )
+
     with when("~inc_zlib"):
         formatted_executable(
             "test_formatted_exec",
@@ -114,4 +146,10 @@ class WhenVariants(ExecutableApplication):
             commands=[
                 "zlib not included",
             ],
+        )
+
+        variable(
+            "standard_variable",
+            default="unincluded",
+            description="Test usage of the `variable` directive",
         )

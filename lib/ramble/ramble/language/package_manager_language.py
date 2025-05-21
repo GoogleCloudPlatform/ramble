@@ -21,13 +21,15 @@ class PackageManagerMeta(ramble.language.shared_language.SharedMeta):
 package_manager_directive = PackageManagerMeta.directive
 
 
-@package_manager_directive("package_manager_variables")
+@package_manager_directive(dicts=())
 def package_manager_variable(
     name: str,
     default,
     description: str,
     values: Optional[list] = None,
     expandable: bool = True,
+    track_used: bool = False,
+    when=None,
     **kwargs,
 ):
     """Define a variable for this package manager
@@ -38,18 +40,23 @@ def package_manager_variable(
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
         expandable (bool): True if the variable should be expanded, False if not.
+        track_used (bool): True if the variable should be tracked as used,
+                           False if not. Can help with allowing lists without vectorizing
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _define_package_manager_variable(pm):
-        import ramble.workload
-
-        pm.package_manager_variables[name] = ramble.workload.WorkloadVariable(
+        ramble.language.shared_language.variable(
             name,
-            default=default,
+            default,
             description=description,
             values=values,
             expandable=expandable,
-        )
+            track_used=track_used,
+            when=when,
+            error_context="package_manager_variable",
+            **kwargs,
+        )(pm)
 
     return _define_package_manager_variable
 

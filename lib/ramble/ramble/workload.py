@@ -23,6 +23,7 @@ class WorkloadVariable:
         values=None,
         expandable: bool = True,
         track_used: bool = True,
+        when=None,
         **kwargs,
     ):
         """Constructor for a new variable
@@ -34,7 +35,8 @@ class WorkloadVariable:
             values: List of suggested values for variable
             expandable (bool): True if variable can be expanded, False otherwise
             track_used (bool): True if variable should be considered used,
-                            False to ignore it for vectorizing experiments
+                               False to ignore it for vectorizing experiments
+            when (list | None): List of when conditions to apply to directive
         """
         self.name = name
         self.default = default
@@ -42,6 +44,7 @@ class WorkloadVariable:
         self.values = values.copy() if isinstance(values, list) else [values]
         self.expandable = expandable
         self.track_used = track_used
+        self.when = when.copy() if when else []
 
     def __str__(self):
         if not hasattr(self, "_str_indent"):
@@ -61,7 +64,7 @@ class WorkloadVariable:
 
         print_attrs = ["Description", "Default", "Values"]
 
-        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
+        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
         for print_attr in print_attrs:
             name = print_attr
             if print_attr == "Values":
@@ -183,8 +186,15 @@ class Workload:
 
         if self.variables:
             out_str += rucolor.nested_1(f"{indentation}    Variables:\n")
-            for var in self.variables.values():
-                out_str += var.as_str(n_indent + 4)
+            for when_set, var_list in self.variables.items():
+                if when_set:
+                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
+                    for variant in when_set:
+                        out_str += f"{indentation}            {variant}\n"
+                else:
+                    out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
+                for var in var_list:
+                    out_str += var.as_str(n_indent + 12)
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
@@ -199,7 +209,10 @@ class Workload:
         Args:
             variable (WorkloadVariable): New variable to add to this workload
         """
-        self.variables[variable.name] = variable
+        when_key = frozenset(variable.when)
+        if when_key not in self.variables:
+            self.variables[when_key] = []
+        self.variables[when_key].append(variable)
 
     def add_environment_variable(self, env_var: WorkloadEnvironmentVariable):
         """Add an environment variable to this workload
@@ -281,10 +294,12 @@ class Workload:
         Returns:
             (WorkloadVariable | None): Variable instance if it exists, None if it is not found
         """
-        if name in self.variables:
-            return self.variables[name]
-        else:
-            return None
+        named_vars = []
+        for var_list in self.variables.values():
+            for var in var_list:
+                if var.name == name:
+                    named_vars.append(var)
+        return named_vars
 
     def find_environment_variable(self, name):
         """Find an environment variable in this workload

@@ -63,9 +63,14 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.inputs["inherited_input"]["url"] == "file:///tmp/inherited_file.log"
     assert app_inst.inputs["inherited_input"]["description"] == "Again, not a file"
 
-    assert "my_base_var" in app_inst.workloads["test_wl"].variables
-    assert "my_var" in app_inst.workloads["test_wl"].variables
-    assert "Shadowed" in app_inst.workloads["test_wl"].variables["my_var"].description
-    assert app_inst.workloads["test_wl"].variables["my_var"].default == "1.0"
+    possible_vars = app_inst.workloads["test_wl"].find_variable("my_base_var")
+    assert len(possible_vars) == 1
+    possible_vars = app_inst.workloads["test_wl"].find_variable("my_var")
+    assert len(possible_vars) >= 1
+    found = False
+    for var in possible_vars:
+        if "Shadowed" in var.description and var.default == "1.0":
+            found = True
+    assert found
 
     assert app_inst.license_names == ["basic", "basic-inherited-extended", "basic-inherited"]

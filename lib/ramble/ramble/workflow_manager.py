@@ -120,3 +120,20 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
 
     def __str__(self):
         return self.name
+
+    def selected_variables(self):
+        """Extract all variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are variable names, values are variable instances
+        """
+
+        all_vars = {}
+        for when_key, var_list in self.object_variables.items():
+            if not self.app_inst.expander.satisfies(when_key, self.app_inst.object_variants):
+                continue
+
+            for var in var_list:
+                all_vars[var.name] = var
+        return all_vars

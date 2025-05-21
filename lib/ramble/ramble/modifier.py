@@ -135,6 +135,13 @@ class ModifierBase(metaclass=ModifierMeta):
 
     def inherit_from_application(self, app):
         self.expander = app.expander.copy()
+        self.object_variants.merge_default_variants(app.object_variants)
+
+        for name, value in app.variants.items():
+            expanded_value = self.expander.expand_var(value, typed=True)
+            self.object_variants.experiment_variant(name, expanded_value)
+
+        self.object_variants.merge_multi_value_variants(app.object_variants)
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
 
@@ -251,18 +258,31 @@ class ModifierBase(metaclass=ModifierMeta):
             (str): Variable name
         """
 
-        if self._usage_mode in self.modifier_variables:
-            for var, var_conf in self.modifier_variables[self._usage_mode].items():
-                if not var_conf.expandable:
-                    yield var
+        for when_key, var_list in self.object_variables.items():
+            if not self.expander.satisfies(when_key, self.object_variants):
+                continue
 
-    def mode_variables(self):
-        """Return a dict of variables that should be defined for the current mode"""
+            for var in var_list:
+                yield var.name
 
-        if self._usage_mode in self.modifier_variables:
-            return self.modifier_variables[self._usage_mode]
-        else:
-            return {}
+    def selected_variables(self):
+        """Extract all variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are variable names, values are variable instances
+        """
+
+        mod_variables = {}
+
+        for when_key, var_list in self.object_variables.items():
+            if not self.expander.satisfies(when_key, self.object_variants):
+                continue
+
+            for var in var_list:
+                mod_variables[var.name] = var
+
+        return mod_variables
 
     def artifact_inventory(self, workspace, app_inst=None):
         """Return an inventory of modifier artifacts

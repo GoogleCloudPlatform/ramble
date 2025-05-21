@@ -284,7 +284,7 @@ def required_variable(var: str, results_level="variable", modes=None, descriptio
     return _mark_required_var
 
 
-@modifier_directive("modifier_variables")
+@modifier_directive(dicts=())
 def modifier_variable(
     name: str,
     default,
@@ -294,6 +294,7 @@ def modifier_variable(
     modes: Optional[list] = None,
     expandable: bool = True,
     track_used: bool = False,
+    when=None,
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -307,29 +308,36 @@ def modifier_variable(
         modes (list): List of modes this variable is used in
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
-                           False if not. Can help with allowing lists without vecotizing
+                           False if not. Can help with allowing lists without vectorizing
                            experiments.
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _define_modifier_variable(mod):
         import ramble.workload
 
-        all_modes = ramble.language.language_helpers.require_definition(
+        all_modes = ramble.language.language_helpers.merge_definitions(
             mode, modes, mod.modes, "mode", "modes", "modifier_variable"
         )
 
-        for mode_name in all_modes:
-            if mode_name not in mod.modifier_variables:
-                mod.modifier_variables[mode_name] = {}
+        base_when_list = ramble.language.language_helpers.build_when_list(
+            when, mod, name, "modifier_variable"
+        )
 
-            mod.modifier_variables[mode_name][name] = ramble.workload.WorkloadVariable(
+        for mode_name in all_modes:
+            mode_variant = f"{mod.name}_mode={mode_name}"
+
+            ramble.language.shared_language.variable(
                 name,
-                default=default,
+                default,
                 description=description,
                 values=values,
                 expandable=expandable,
+                track_used=track_used,
+                when=base_when_list + [mode_variant],
+                error_context="modifier_variable",
                 **kwargs,
-            )
+            )(mod)
 
     return _define_modifier_variable
 

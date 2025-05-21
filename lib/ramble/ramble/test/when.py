@@ -489,6 +489,275 @@ def test_formatted_exec_when(request, inc_value, type_value):
             assert "{test_formatted_exec}" not in data
 
 
+@pytest.mark.parametrize(
+    "workload_name",
+    ["test_wl", "test_unset_wl"],
+)
+def test_variable_when_workload_constraint(request, workload_name):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            workload_name,
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        if workload_name == "test_wl":
+            test_str = "Test when workload variable is_defined"
+        else:
+            test_str = "Test when workload variable {test_when_var}"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            workload_name,
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+
+
+@pytest.mark.parametrize(
+    "inc_value,type_value",
+    [
+        (True, "preferred"),
+        (True, "testing"),
+        (True, "modifier"),
+        (False, "preferred"),
+    ],
+)
+def test_variable_when(request, inc_value, type_value):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:inc_zlib:{inc_value}", global_args=global_args)
+        config("add", f"variants:zlib_type:{type_value}", global_args=global_args)
+
+        if inc_value:
+            test_str = f"Standard was {type_value}"
+        else:
+            test_str = "Standard was unincluded"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+
+
+@pytest.mark.parametrize(
+    "inc_value",
+    [True, False],
+)
+def test_package_manager_variable_when(request, inc_value, mutable_mock_pkg_mans_repo):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:package_manager_included:{inc_value}", global_args=global_args)
+
+        if inc_value:
+            test_str = "PM test: included"
+        else:
+            test_str = "PM test: {pm_var_test}"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+
+
+@pytest.mark.parametrize(
+    "inc_value",
+    [True, False],
+)
+def test_workflow_manager_variable_when(request, inc_value, mutable_mock_wms_repo):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "--wm",
+            "when-workflow-manager",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:workflow_manager_included:{inc_value}", global_args=global_args)
+
+        if inc_value:
+            test_str = "WM test: included"
+        else:
+            test_str = "WM test: {wm_var_test}"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+
+
+@pytest.mark.parametrize(
+    "inc_value",
+    [True, False],
+)
+def test_modifier_variable_when(request, inc_value, mutable_mock_mods_repo):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+
+        config("add", f"variants:modifier_included:{inc_value}", global_args=global_args)
+
+        if inc_value:
+            test_str = "MOD test: included"
+        else:
+            test_str = "MOD test: {mod_var_test}"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-variants",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert test_str in data
+
+
 def test_success_criteria_when(request):
     ws_name = request.node.name
 

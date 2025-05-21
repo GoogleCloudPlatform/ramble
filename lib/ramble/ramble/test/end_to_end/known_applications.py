@@ -130,8 +130,8 @@ def test_known_workflow_managers(workflow_manager, mock_file_auto_create, mutabl
             wm_inst = ramble.repository.get(
                 workflow_manager, object_type=ramble.repository.ObjectTypes.workflow_managers
             )
-            for var_name in wm_inst.wm_vars:
-                config("remove", f"variables:{var_name}", global_args=["-w", ws_name])
+            for var in wm_inst.object_variables[frozenset()]:
+                config("remove", f"variables:{var.name}", global_args=["-w", ws_name])
 
             for var_name in wm_inst.templates:
                 config("remove", f"variables:{var_name}", global_args=["-w", ws_name])

@@ -31,7 +31,6 @@ def test_modifier_type_features(mod_class):
     assert hasattr(test_mod, "required_packages")
     assert hasattr(test_mod, "success_criteria")
     assert hasattr(test_mod, "builtins")
-    assert hasattr(test_mod, "modifier_variables")
     assert hasattr(test_mod, "executable_modifiers")
     assert hasattr(test_mod, "env_var_modifications")
     assert hasattr(test_mod, "maintainers")
@@ -469,18 +468,21 @@ def test_modifier_variable_directive(mod_class):
     test_defs = []
 
     mod_inst = mod_class("/not/a/path")
+    mod_inst.name = "mock-test-mod"
     test_defs.append(add_modifier_variable(mod_inst))
 
-    assert hasattr(mod_inst, "modifier_variables")
-
     for test_def in test_defs:
-        mode = test_def["mode"]
-        var_name = test_def["name"]
+        found = False
 
-        assert mode in mod_inst.modifier_variables
-        assert test_def["name"] in mod_inst.modifier_variables[mode]
-        assert test_def["description"] == mod_inst.modifier_variables[mode][var_name].description
-        assert test_def["default"] == mod_inst.modifier_variables[mode][var_name].default
+        for when_set, var_list in mod_inst.object_variables.items():
+            for var in var_list:
+                if var.name == test_def["name"]:
+                    mode_variant = f"mock-test-mod_mode={test_def['mode']}"
+                    assert mode_variant in when_set
+                    assert test_def["description"] == var.description
+                    assert test_def["default"] == var.default
+                    found = True
+        assert found
 
 
 @pytest.mark.parametrize("mod_class", mod_types)
