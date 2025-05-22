@@ -24,15 +24,13 @@ class Su2(ExecutableApplication):
     maintainers("linsword13")
 
     with when("package_manager_family=spack"):
-        define_compiler(
-            "gcc14", pkg_spec="gcc@14.2.0", compiler_spec="gcc@14.2.0"
-        )
-        # TODO: intel-mpi doesn't work yet, probably need some package-level tweak
-        software_spec("ompi5", pkg_spec="openmpi@5.0.5")
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+        # See https://github.com/spack/spack/pull/50601 for building with intel mpi.
+        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@13.1.0")
         software_spec(
             "su2",
-            pkg_spec="su2@8.0.1 +mpi",
-            compiler="gcc14",
+            pkg_spec="su2@8.2.0 +mpi +openmp",
+            compiler="gcc12",
         )
         required_package("su2")
 
@@ -44,16 +42,12 @@ class Su2(ExecutableApplication):
         description="input deck used in https://su2code.github.io/tutorials/Inviscid_Bump",
     )
 
-    executable(
-        "link-inputs", template=["ln -s {input_path}/* {experiment_run_dir}/."]
-    )
+    executable("link-inputs", template=["ln -s {input_path}/* ."])
 
     executable(
         "execute",
-        # Using the wrapper instead of invoking mpi command directly.
-        # The wrapper performs some output file merging.
-        template=["parallel_computation.py -f {input_config} -n {n_ranks}"],
-        use_mpi=False,
+        template=["{su2_executable} {input_config}"],
+        use_mpi=True,
     )
 
     workload(
@@ -62,25 +56,35 @@ class Su2(ExecutableApplication):
         input="inv_channel",
     )
 
+    workload_group("all_workloads", workloads=["inv_channel"])
+
     workload_variable(
         "input_path",
         default="{inv_channel}",
         description="Path to the input for experiments",
-        workloads=["inv_channel"],
+        workload="inv_channel",
     )
 
     workload_variable(
         "input_config",
         default="inv_channel.cfg",
         description="Name of the input configuration file",
-        workloads=["inv_channel"],
+        workload="inv_channel",
     )
 
+    workload_variable(
+        "su2_executable",
+        default="SU2_CFD",
+        description="Path to the SU2 executable",
+        workload_group="all_workloads",
+    )
+
+    # This is only used if using the SU2 parallel wrapper like parallel_computation.py
     environment_variable(
         "SU2_MPI_COMMAND",
         value="{mpi_command} -n %i %s",
         description="custom mpi command used by the wrapper",
-        workloads=["*"],
+        workload_group="all_workloads",
     )
 
     # The two env vars won't be needed after
@@ -89,24 +93,30 @@ class Su2(ExecutableApplication):
         "SU2_RUN",
         value="{su2_path}/bin",
         description="SU2 bin path",
-        workloads=["*"],
+        workload_group="all_workloads",
     )
 
     environment_variable(
         "SU2_HOME",
         value="{su2_path}",
         description="SU2 package prefix",
-        workloads=["*"],
+        workload_group="all_workloads",
     )
 
     success_criteria("completion", mode="string", match=".*?Exit Success")
 
-    # TODO: add in FOMs around solver iteration time
-    # Currently such solver times are not generated to the output.
     figure_of_merit(
-        "Solution postprocessing time",
-        fom_regex=r"\s*Completed in (?P<time>\d+(\.\d+)) seconds",
-        group_name="time",
+        "Version",
+        fom_regex=r".*?Release\s+(?P<version>[0-9\.]+)",
+        group_name="version",
+        units="",
+        fom_type=FomType.INFO,
+    )
+
+    figure_of_merit(
+        "Average seconds per iteration",
+        fom_regex=r".*?Avg. s/iter:\s+(?P<avg_sec_per_iter>[0-9\.]+)",
+        group_name="avg_sec_per_iter",
         units="s",
         fom_type=FomType.TIME,
     )

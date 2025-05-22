@@ -1,24 +1,60 @@
-------------------------- Solution Postprocessing -----------------------
-Reading and storing the solution from restart_flow.
-Volume output fields: COORDINATES, SOLUTION
-  Info: Ignoring the following screen output fields:
-  RMS_DENSITY, RMS_ENERGY, LIFT, DRAG
-Screen output fields: INNER_ITER, WALL_TIME
-  Info: Ignoring the following history output groups:
-  RMS_RES
-History output group(s): ITER
-Ignoring Convergence Field(s): RMS_DENSITY
-Warning: No (valid) fields chosen for convergence monitoring. Convergence monitoring inactive.
-Warning: No (valid) fields chosen for time convergence monitoring. Time convergence monitoring inactive.
+-------------------------------------------------------------------------
+|    ___ _   _ ___                                                      |
+|   / __| | | |_  )   Release 8.2.0 "Harrier"                           |
+|   \__ \ |_| |/ /                                                      |
+|   |___/\___//___|   Suite (Computational Fluid Dynamics Code)         |
+|                                                                       |
+-------------------------------------------------------------------------
+| SU2 Project Website: https://su2code.github.io                        |
+|                                                                       |
+| The SU2 Project is maintained by the SU2 Foundation                   |
+| (http://su2foundation.org)                                            |
+-------------------------------------------------------------------------
+| Copyright 2012-2025, SU2 Contributors                                 |
+|                                                                       |
+| SU2 is free software; you can redistribute it and/or                  |
+| modify it under the terms of the GNU Lesser General Public            |
+| License as published by the Free Software Foundation; either          |
+| version 2.1 of the License, or (at your option) any later version.    |
+|                                                                       |
+| SU2 is distributed in the hope that it will be useful,                |
+| but WITHOUT ANY WARRANTY; without even the implied warranty of        |
+| MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU      |
+| Lesser General Public License for more details.                       |
+|                                                                       |
+| You should have received a copy of the GNU Lesser General Public      |
+| License along with SU2. If not, see <http://www.gnu.org/licenses/>.   |
+-------------------------------------------------------------------------
+
+----------------------------- Solver Exit -------------------------------
+All convergence criteria satisfied.
++-----------------------------------------------------------------------+
+|      Convergence Field     |     Value    |   Criterion  |  Converged |
++-----------------------------------------------------------------------+
+|                    rms[Rho]|      -10.0049|         < -10|         Yes|
++-----------------------------------------------------------------------+
+-------------------------------------------------------------------------
++-----------------------------------------------------------------------+
+|        File Writing Summary       |              Filename             |
++-----------------------------------------------------------------------+
+|SU2 binary restart                 |restart_flow.dat                   |
 |Paraview                           |flow.vtu                           |
 |Paraview surface                   |surface_flow.vtu                   |
++-----------------------------------------------------------------------+
 
-------------------------- Finalize Solver -------------------------
+--------------------------- Finalizing Solver ---------------------------
+Deleted CNumerics container.
+Deleted CIntegration container.
+Deleted CSolver container.
+Deleted CIteration container.
+Deleted CInterface container.
 Deleted CGeometry container.
-Deleted CSolver class.
+Deleted CFreeFormDefBox class.
+Deleted CSurfaceMovement class.
+Deleted CVolumetricMovement class.
 Deleted CConfig container.
+Deleted nInst container.
 Deleted COutput class.
+-------------------------------------------------------------------------
 
-Completed in 2.893862 seconds on 112 cores.
-
-------------------------- Exit Success (SU2_SOL) ------------------------
+------------------------- Exit Success (SU2_CFD) ------------------------
