@@ -15,6 +15,7 @@ class NvidiaDcgm(ExecutableApplication):
 
     DCGM is a suite of tools for managing and monitoring NVIDIA GPUs
     in cluster environments.
+    https://docs.nvidia.com/datacenter/dcgm/latest/user-guide/dcgm-diagnostics.html
 
 
     # Example Ramble configuration for the DCGM application
@@ -34,7 +35,7 @@ class NvidiaDcgm(ExecutableApplication):
         batch_submit: '{execute_experiment}' # Simple direct execution
 
       applications:
-        dcgm:
+        nvidia-dcgm:
           workloads:
             diag:
               experiments:
@@ -50,7 +51,7 @@ class NvidiaDcgm(ExecutableApplication):
 
     name = "nvidia-dcgm"
     maintainers("samskillman")
-    tags("gpu", "monitoring", "diagnostics", "dcgm")
+    tags("gpu", "diagnostics", "dcgm", "nvidia")
 
     executable(
         "diag",
