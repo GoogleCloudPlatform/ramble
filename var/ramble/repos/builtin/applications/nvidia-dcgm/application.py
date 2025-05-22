@@ -10,7 +10,7 @@
 from ramble.appkit import *
 
 
-class Dcgm(ExecutableApplication):
+class NvidiaDcgm(ExecutableApplication):
     """NVIDIA Data Center GPU Manager (DCGM).
 
     DCGM is a suite of tools for managing and monitoring NVIDIA GPUs
@@ -48,7 +48,7 @@ class Dcgm(ExecutableApplication):
         environments: {}
     """
 
-    name = "dcgm"
+    name = "nvidia-dcgm"
     maintainers("samskillman")
     tags("gpu", "monitoring", "diagnostics", "dcgm")
 
