@@ -1,6 +1,6 @@
 ARG BASE_IMG=debian
 ARG BASE_VER=12.5
-FROM ${BASE_IMG}:${BASE_VER} as builder
+FROM ${BASE_IMG}:${BASE_VER} AS builder
 
 ARG SPACK_REF=releases/latest
 ARG PYTHON_VER=3.11.6
@@ -12,7 +12,7 @@ RUN cd /opt && \
     . /opt/spack/share/spack/setup-env.sh && \
     spack install --deprecated py-pip ^python@${PYTHON_VER} && \
     spack clean -a
-RUN echo -e ". /opt/spack/share/spack/setup-env.sh\n spack load py-pip ^python@${PYTHON_VER}\n export SPACK_PYTHON=`which python3`" > /etc/profile.d/ramble.sh
+RUN echo ". /opt/spack/share/spack/setup-env.sh\n spack load py-pip ^python@${PYTHON_VER}\n export SPACK_PYTHON=`which python3`" > /etc/profile.d/ramble.sh
 RUN cd /opt &&  \
     . spack/share/spack/setup-env.sh && \
     spack load py-pip ^python@${PYTHON_VER} && \
