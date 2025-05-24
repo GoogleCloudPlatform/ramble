@@ -32,6 +32,20 @@ class TestMod(BasicModifier):
         "exp-scope", description="This is a test mode at the experiment scope"
     )
 
+    modifier_variable(
+        "level1_mod_var",
+        default="testing {level2_mod_var}",
+        description="Test nesting modifier variables",
+        modes=["test"],
+    )
+
+    modifier_variable(
+        "level2_mod_var",
+        default="nested",
+        description="Test nesting modifier variables",
+        modes=["test"],
+    )
+
     variable_modification(
         "test_var_mod",
         "test-mod-append",

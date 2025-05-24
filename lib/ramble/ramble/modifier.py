@@ -263,7 +263,8 @@ class ModifierBase(metaclass=ModifierMeta):
                 continue
 
             for var in var_list:
-                yield var.name
+                if not var.expandable:
+                    yield var.name
 
     def selected_variables(self):
         """Extract all variables which would be included based
