@@ -1400,7 +1400,9 @@ class SpackRunner(CommandRunner):
                         info = (
                             info_line[:3]
                             .replace("[+]", "")
+                            .replace("[^]", "")
                             .replace(" - ", "")
+                            .replace("[-]", "")
                             .replace("[e]", "")
                             + info_line[3:]
                         )
