@@ -32,6 +32,7 @@ pytestmark = pytest.mark.usefixtures(
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
+on = RambleCommand("on")
 
 
 @pytest.fixture()
@@ -1717,6 +1718,57 @@ ramble:
     assert os.path.exists(ws1.latest_archive_path + ".tar.gz")
 
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + ".tar.gz"))
+
+
+def test_workspace_archive_includes_exec_logs(request):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+    processes_per_node: '1'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    fom-log-path:
+      workloads:
+        test:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '1'
+  software:
+    packages: {}
+    environments: {}
+"""
+
+    workspace_name = request.node.name
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    workspace("setup", global_args=["-w", workspace_name])
+    on(global_args=["-w", workspace_name])
+
+    expected_files = [
+        os.path.join(ws1.experiment_dir, "fom-log-path", "test", "test_experiment", "log.file"),
+        os.path.join(
+            ws1.experiment_dir, "fom-log-path", "test", "test_experiment", "other.log.file"
+        ),
+    ]
+
+    for file in expected_files:
+        assert os.path.isfile(file)
+
+    workspace("archive", global_args=["-w", workspace_name])
+
+    for file in expected_files:
+        assert os.path.isfile(file.replace(ws1.root, ws1.latest_archive_path))
 
 
 def test_dryrun_noexpvars_setup():
