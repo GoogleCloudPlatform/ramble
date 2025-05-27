@@ -26,6 +26,8 @@ def exp_dict():
         "n_ranks": "4",
         "processes_per_node": "2",
         "n_nodes": "2",
+        "cores_per_node": "16",
+        "n_threads": "4",
         "var1": "{var2}",
         "var2": "{var3}",
         "var3": "3",
@@ -124,6 +126,8 @@ def build_variant_set():
         ("{'key1': 'val1', 'key2': 'val2'}", "{'key1': 'val1', 'key2': 'val2'}", set(), 1),
         ("${job_id}", "${job_id}", set(), 1),
         ("${job_id:-}", "${job_id:-}", set(), 1),
+        ("join_str(range(0, 5, 2), ': ')", "0: 2: 4", set(), 1),
+        ("join_str(range(0, {cores_per_node}, {n_threads}))", "0,4,8,12", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):

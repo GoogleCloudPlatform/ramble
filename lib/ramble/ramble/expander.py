@@ -29,6 +29,10 @@ def _or(a, b):
     return a or b
 
 
+def _join_str(seq, sep=","):
+    return sep.join(str(i) for i in seq)
+
+
 def _re_search(regex, s):
     import re
 
@@ -78,6 +82,7 @@ supported_scalar_function_pointers = {
     "randrange": random.randrange,
     "randint": random.randint,
     "simplify_str": spack.util.naming.simplify_name,
+    "join_str": _join_str,
     "re_search": _re_search,
 }
 
