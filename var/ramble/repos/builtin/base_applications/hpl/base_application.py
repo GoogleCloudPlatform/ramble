@@ -403,7 +403,8 @@ class Hpl(ExecutableApplication):
             ].variables.items():
                 if self.expander.satisfies(when_key, self.object_variants):
                     for var in var_list:
-                        self.define_variable(var.name, var.default)
+                        if var.name not in self.variables:
+                            self.define_variable(var.name, var.default)
 
             # Key = Variable name
             # Value = Value to override variable with
