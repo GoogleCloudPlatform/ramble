@@ -15,8 +15,14 @@ class FomLogPath(ExecutableApplication):
     executable(
         "write-fom", "echo 'fom: test'", redirect="log.file", use_mpi=False
     )
+    executable(
+        "write-log",
+        "echo 'fom: test'",
+        redirect="other.log.file",
+        use_mpi=False,
+    )
 
-    workload("test", executable="write-fom")
+    workload("test", executables=["write-fom", "write-log"])
 
     figure_of_merit(
         "test_fom",

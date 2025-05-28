@@ -1681,6 +1681,25 @@ class ApplicationBase(metaclass=ApplicationMeta):
         archive_lock = lk.Lock(os.path.join(archive_experiment_dir, ".ramble-exp-archive"))
 
         with lk.WriteTransaction(archive_lock):
+            # Copy all log files from executables
+            exec_logs = set()
+            workload = self.workloads[self.expander.workload_name]
+            for exec_name in workload.executables:
+                if exec_name in self.executables:
+                    exec_obj = self.executables[exec_name]
+                    exec_log = self.expander.expand_var(exec_obj.redirect)
+                    exec_logs.add(exec_log)
+
+            for exec_log in exec_logs:
+                file = exec_log
+                if not os.path.isabs(file):
+                    file = os.path.join(experiment_run_dir, exec_log)
+
+                if os.path.isfile(file):
+                    dest_dir = os.path.dirname(file.replace(workspace.root, ws_archive_dir))
+                    fs.mkdirp(dest_dir)
+                    shutil.copy(file, dest_dir)
+
             # Copy all of the templates to the archive directory
             for template_name, _ in workspace.all_templates():
                 src = os.path.join(experiment_run_dir, template_name)
