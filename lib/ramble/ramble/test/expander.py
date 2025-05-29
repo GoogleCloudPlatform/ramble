@@ -36,6 +36,7 @@ def exp_dict():
         "test_mask": '"0x0"',
         "max_len": 9,
         "test_dict": {"test_key1": "test_val1", "test_key2": "test_val2"},
+        "experiment_index": 5,
     }
 
 
@@ -128,6 +129,14 @@ def build_variant_set():
         ("${job_id:-}", "${job_id:-}", set(), 1),
         ("join_str(range(0, 5, 2), ': ')", "0: 2: 4", set(), 1),
         ("join_str(range(0, {cores_per_node}, {n_threads}))", "0,4,8,12", set(), 1),
+        ('int("0b101110", 2)', "46", set(), 1),
+        ("0b10 & 0b01", "0", set(), 1),
+        ("0b10 | 0b01", "3", set(), 1),
+        ("0b10 ^ 0b01", "3", set(), 1),
+        ("0b10 << 1", "4", set(), 1),
+        ("0b10 >> 1", "1", set(), 1),
+        # Can be a handy way to select experiments to run
+        ("(1 << {experiment_index} & 0b1011010) == 0", "True", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):

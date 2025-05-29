@@ -159,6 +159,11 @@ Supported math operators are:
 * ``and`` (logical and)
 * ``or`` (logical or)
 * ``%`` (modulo)
+* ``&`` (bitwise and)
+* ``|`` (bitwise or)
+* ``~`` (bitwise not)
+* ``<<`` (left arithmetic shift)
+* ``>>`` (right arithmetic shift)
 
 Supported functions are:
 
@@ -173,6 +178,7 @@ Supported functions are:
 * ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
 * ``randrange`` (from `random.randrange`)
 * ``randint`` (from `random.randint`)
+* ``join_str(iterable, sep=",")`` (concatenate iterable into ``sep``-separated string)
 * ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
 * ``maybe(var_name, default="")`` (returns the expanded ``var_name`` if it is defined, otherwise returns ``default``)
 

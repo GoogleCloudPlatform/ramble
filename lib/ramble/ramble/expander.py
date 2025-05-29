@@ -69,6 +69,11 @@ supported_math_operators = {
     ast.And: _and,
     ast.Or: _or,
     ast.Mod: operator.mod,
+    ast.BitAnd: operator.and_,
+    ast.BitOr: operator.or_,
+    ast.BitXor: operator.xor,
+    ast.LShift: operator.lshift,
+    ast.RShift: operator.rshift,
 }
 
 supported_scalar_function_pointers = {
