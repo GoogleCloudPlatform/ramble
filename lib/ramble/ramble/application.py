@@ -177,6 +177,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._pipeline_graphs = None
         self.package_manager = None
         self.custom_executables = {}
+        self.success_list = None
         self._exp_lock = None
         self._input_lock = None
         self._software_lock = None
@@ -339,6 +340,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "Valid workflow managers can be listed via:\n"
                 "\tramble list --type workflow_managers"
             )
+
+    def set_success_list(self, success_criteria):
+        self.success_list = ramble.success_criteria.ScopedCriteriaList()
+
+        if success_criteria:
+            for conf in success_criteria:
+                self.success_list.add_criteria("experiment", **conf)
 
     def build_phase_order(self):
         if self._pipeline_graphs is not None:
@@ -530,7 +538,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         backup_variables = self.variables.copy()
 
-        self._define_commands(self._executable_graph, workspace.success_list)
+        self._define_commands(self._executable_graph, self.success_list)
         self._define_formatted_executables()
 
         ########################
@@ -569,7 +577,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         self.expander.expand_var_name(var)
 
         # Add variables from success criteria
-        criteria_list = workspace.success_list
+        criteria_list = self.success_list
         for criteria in criteria_list.all_criteria():
             if criteria.mode == "fom_comparison":
                 self.expander.expand_var(criteria.fom_formula)
@@ -1094,7 +1102,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._command_list = []
         self._command_list_without_logs = []
 
-        if success_list is None:
+        success_list = self.success_list
+        if not success_list:
             success_list = ramble.success_criteria.ScopedCriteriaList()
 
         # Inject all prepended chained experiments
@@ -1497,7 +1506,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         exp_lock = self.experiment_lock()
 
-        self._define_commands(self._executable_graph, workspace.success_list)
+        self._define_commands(self._executable_graph, self.success_list)
         self._define_formatted_executables()
 
         with lk.WriteTransaction(exp_lock):
@@ -1713,7 +1722,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     shutil.copy(src_path, archive_experiment_dir)
 
             # Copy all figure of merit files
-            criteria_list = workspace.success_list
+            criteria_list = self.success_list
             analysis_files, _ = self._analysis_dicts(criteria_list)
             for file in analysis_files.keys():
                 if os.path.exists(file):
@@ -1793,7 +1802,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         fom_values = {}
 
-        criteria_list = workspace.success_list
+        criteria_list = self.success_list
+        if not criteria_list:
+            criteria_list = ramble.success_criteria.ScopedCriteriaList()
         criteria_list.reset()
 
         files, definitions = self._analysis_dicts(criteria_list)
