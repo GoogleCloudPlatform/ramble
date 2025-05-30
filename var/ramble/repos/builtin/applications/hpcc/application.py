@@ -27,7 +27,7 @@ class Hpcc(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("benchmark-app", "mini-app", "benchmark", "DGEMM")
+    tags("hpc-benchmark", "dgemm")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")

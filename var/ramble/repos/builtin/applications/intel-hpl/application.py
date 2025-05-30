@@ -17,7 +17,7 @@ class IntelHpl(HplBase):
 
     maintainers("rfbgo")
 
-    tags("benchmark-app", "benchmark", "linpack", "optimized", "intel", "mkl")
+    tags("intel-optimized")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc13p2", pkg_spec="gcc@13.2.0")

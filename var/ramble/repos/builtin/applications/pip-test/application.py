@@ -14,7 +14,7 @@ class PipTest(ExecutableApplication):
 
     name = "pip-test"
 
-    tags("test-app")
+    tags("python", "test-app")
 
     with when("package_manager_family=pip"):
         software_spec(

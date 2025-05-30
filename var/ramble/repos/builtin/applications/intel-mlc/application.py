@@ -16,7 +16,7 @@ class IntelMlc(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("benchmark-app", "mini-app", "benchmark")
+    tags("memory-benchmark", "intel-tool")
 
     required_package("intel-mlc")
 

@@ -17,7 +17,7 @@ class PyEspresso(ExecutableApplication):
 
     name = "py-espresso"
 
-    tags("molecular-dynamics")
+    tags("molecular-dynamics", "python")
 
     with when("package_manager_family=spack"):
         software_spec(

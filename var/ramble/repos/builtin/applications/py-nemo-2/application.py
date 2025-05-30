@@ -27,8 +27,6 @@ class PyNemo2(BasePyNemo):
 
     maintainers("duncanspani")
 
-    tags("ml-framework", "machine-learning")
-
     # Add Nemo 2.0 config to archive.
     archive_pattern("{experiment_run_dir}/{nemo_config_name}/*")
 

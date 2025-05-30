@@ -51,7 +51,7 @@ class NvidiaDcgm(ExecutableApplication):
 
     name = "nvidia-dcgm"
     maintainers("samskillman")
-    tags("gpu", "diagnostics", "dcgm", "nvidia")
+    tags("gpu-utility", "diagnostics", "nvidia-tool")
 
     executable(
         "diag",

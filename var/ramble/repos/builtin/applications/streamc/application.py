@@ -19,12 +19,7 @@ class Streamc(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags(
-        "memorybenchmark",
-        "microbenchmark",
-        "memory-benchmark",
-        "micro-benchmark",
-    )
+    tags("memory-benchmark", "micro-benchmark")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")

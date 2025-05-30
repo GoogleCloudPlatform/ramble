@@ -1,6 +1,6 @@
 Experiment osu-micro-benchmarks.osu_latency.test figures of merit:
   Status = SUCCESS
-  Tags = ['synthetic-benchmarks']
+  Tags = ['communication-benchmark', 'micro-benchmark', 'mpi-benchmark', 'network-benchmark']
   default (null) context figures of merit:
     OMB Version = v7.4
     OMB Datatype = MPI_CHAR

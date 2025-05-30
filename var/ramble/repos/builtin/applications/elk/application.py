@@ -29,7 +29,7 @@ class Elk(ExecutableApplication):
 
     name = "elk"
 
-    tags("LAPW", "density-functional-theory")
+    tags("quantum-chemistry", "materials-science", "dft", "lapw")
 
     input_file(
         "examples",

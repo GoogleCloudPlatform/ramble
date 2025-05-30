@@ -19,7 +19,7 @@ class Su2(ExecutableApplication):
 
     name = "su2"
 
-    tags("cfd", "fluid-dynamics", "multi-physics")
+    tags("cfd", "multiphysics", "aerospace")
 
     maintainers("linsword13")
 

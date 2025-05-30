@@ -32,8 +32,6 @@ class PyNemo(BasePyNemo):
 
     maintainers("douglasjacobsen")
 
-    tags("ml-framework", "machine-learning")
-
     archive_pattern("{experiment_run_dir}/{nemo_generated_config_name}")
 
     executable(

@@ -27,7 +27,7 @@ class Hpcg(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("benchmark-app", "mini-app", "benchmark")
+    tags("hpc-benchmark", "conjugate-gradient")
 
     executable("execute", "xhpcg", use_mpi=True)
 

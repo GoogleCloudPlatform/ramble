@@ -19,7 +19,7 @@ class Wrfv3(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("nwp", "weather")
+    tags("weather", "nwp", "climate-modeling")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc8", pkg_spec="gcc@8.2.0")

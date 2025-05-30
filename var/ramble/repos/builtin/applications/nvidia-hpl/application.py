@@ -34,8 +34,6 @@ class NvidiaHpl(HplBase, NvidiaHPCBase):
 
     maintainers("douglasjacobsen")
 
-    tags("benchmark-app", "benchmark", "linpack", "optimized", "nvidia")
-
     executable(
         "execute",
         "{internal_mpi_command} /workspace/hpl.sh --dat {experiment_run_dir}/HPL.dat",

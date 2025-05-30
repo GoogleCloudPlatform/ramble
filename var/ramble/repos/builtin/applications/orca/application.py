@@ -19,7 +19,7 @@ class Orca(ExecutableApplication):
 
     name = "orca"
 
-    tags = ["quantum chemistry"]
+    tags("quantum-chemistry", "electronic-structure")
 
     with when("package_manager_family=spack"):
         software_spec("orca", pkg_spec="orca@5.0.4")

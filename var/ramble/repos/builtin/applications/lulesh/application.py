@@ -15,11 +15,11 @@ from ramble.expander import Expander
 class Lulesh(ExecutableApplication):
     """Define LULESH application"""
 
-    name = "LULESH"
+    name = "lulesh"
 
     maintainers("douglasjacobsen")
 
-    tags("proxy-app", "mini-app")
+    tags("mini-app", "shock-physics")
 
     with when("package_manager_family"):
         define_compiler("gcc13", pkg_spec="gcc@13.1.0")

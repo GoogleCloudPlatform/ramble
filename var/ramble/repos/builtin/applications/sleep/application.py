@@ -18,7 +18,7 @@ class Sleep(ExecutableApplication):
 
     name = "sleep"
 
-    tags("test-app")
+    tags("system-utility", "test-app")
 
     maintainers("douglasjacobsen")
 

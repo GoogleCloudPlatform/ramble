@@ -37,7 +37,7 @@ class NvidiaHpcBenchmarks(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("benchmark-app", "mini-app", "benchmark", "containerize")
+    tags("gpu-benchmark", "gpu-accelerated", "nvidia-optimized", "cuda")
 
     workload_group("all_workloads")
 

@@ -19,13 +19,7 @@ class Minixyce(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags(
-        "circuitdesign",
-        "miniapp",
-        "mini-app",
-        "minibenchmark",
-        "mini-benchmark",
-    )
+    tags("circuit-simulation", "mini-app")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")

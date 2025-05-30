@@ -27,7 +27,7 @@ class Hmmer(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("molecular-dynamics", "hidden-markov-models", "bio-molecule")
+    tags("bioinformatics", "molecular-simulation", "hidden-markov-models")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
