@@ -70,12 +70,6 @@ def test_criteria_list(tmpdir):
 
     criteria_list.add_criteria("experiment", "test-exp", "string", r".*Experiment.*", log_path)
 
-    criteria_list.add_criteria("workload", "test-wl", "string", r".*Some output.*", log_path)
-
-    criteria_list.add_criteria("application", "test-app", "string", r".*exit code.*", log_path)
-
-    criteria_list.add_criteria("workspace", "test-ws", "string", r".*Into a log file.*", log_path)
-
     remark_all(list(criteria_list.all_criteria()), log_path)
 
     assert criteria_list.passed()
