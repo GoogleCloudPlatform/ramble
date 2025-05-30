@@ -66,6 +66,7 @@ class ExperimentSet:
         workspace_context.modifiers = workspace.get_workspace_modifiers()
         workspace_context.zips = workspace.get_workspace_zips()
         workspace_context.variants = workspace.get_workspace_variants()
+        workspace_context.success_criteria = workspace.get_workspace_success_criteria()
 
         try:
             self.keywords.check_reserved_keys(workspace_context.variables)
@@ -477,6 +478,8 @@ class ExperimentSet:
                 repeats,
             )
 
+            app_inst.set_success_list(final_context.success_criteria)
+
             exp_used_variables = app_inst.build_used_variables(self._workspace)
             used_variables = used_variables.union(exp_used_variables)
         render_group.used_variables = used_variables.copy()
@@ -548,6 +551,7 @@ class ExperimentSet:
                         )
                     pass
 
+                app_inst.set_success_list(final_context.success_criteria)
                 rendered_experiments.add(final_exp_namespace)
                 self.experiments[final_exp_namespace] = app_inst
                 self.experiment_order.append(final_exp_namespace)

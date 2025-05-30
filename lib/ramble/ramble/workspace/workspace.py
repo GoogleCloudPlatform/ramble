@@ -31,7 +31,6 @@ import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
 import ramble.software_environments
-import ramble.success_criteria
 import ramble.util.env
 import ramble.util.hashing
 import ramble.util.install_cache
@@ -472,8 +471,6 @@ class Workspace:
         # It's used to cache package provenance info from different package managers.
         self.pkg_prov_cache = defaultdict(dict)
 
-        self.success_list = ramble.success_criteria.ScopedCriteriaList()
-
         # Key for each application config should be it's filepath
         # Format for an application config should be:
         #  {
@@ -821,20 +818,6 @@ ramble:
         self._previous_active = None  # previously active environment
         self.specs = []
 
-    def extract_success_criteria(self, scope, contents):
-        """Extract success citeria, and inject it into the scoped list
-
-        Extract success criteria from a contents dictionary, and inject it into
-        the scoped success list within the right scope.
-        """
-        self.success_list.flush_scope(scope)
-
-        if namespace.success in contents:
-            logger.debug(" ---- Found success in %s" % scope)
-            for conf in contents[namespace.success]:
-                logger.debug(" ---- Adding criteria %s" % conf["name"])
-                self.success_list.add_criteria(scope, **conf)
-
     def all_specs(self):
         import ramble.spec
 
@@ -890,8 +873,6 @@ ramble:
         for application, contents in app_dict.items():
             application_context = ramble.context.create_context_from_dict(application, contents)
 
-            self.extract_success_criteria("application", contents)
-
             yield contents, application_context
 
         logger.debug("  Iterating over configs in directories...")
@@ -906,8 +887,6 @@ ramble:
                 application_context = ramble.context.create_context_from_dict(
                     application, contents
                 )
-
-                self.extract_success_criteria("application", contents)
 
                 yield contents, application_context
 
@@ -928,8 +907,6 @@ ramble:
         for workload, contents in workloads.items():
             workload_context = ramble.context.create_context_from_dict(workload, contents)
 
-            self.extract_success_criteria("workload", contents)
-
             yield contents, workload_context
 
     def all_experiments(self, workload):
@@ -947,8 +924,6 @@ ramble:
         experiments = workload[namespace.experiment]
         for experiment, contents in experiments.items():
             experiment_context = ramble.context.create_context_from_dict(experiment, contents)
-
-            self.extract_success_criteria("experiment", contents)
 
             yield contents, experiment_context
 
@@ -2181,6 +2156,10 @@ ramble:
     def get_workspace_variants(self):
         """Return a dict of workspace variants"""
         return ramble.config.config.get_config("variants")
+
+    def get_workspace_success_criteria(self):
+        """Return a dict of workspace success_criteria"""
+        return ramble.config.config.get_config("success_criteria")
 
     def get_software_dict(self):
         """Return the software dictionary for this workspace"""

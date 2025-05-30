@@ -30,7 +30,6 @@ import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
-from ramble.namespace import namespace
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
 
@@ -242,10 +241,6 @@ class AnalyzePipeline(Pipeline):
         print_results=False,
         summary_only=False,
     ):
-        workspace_success = {namespace.success: ramble.config.config.get_config(namespace.success)}
-
-        workspace.extract_success_criteria("workspace", workspace_success)
-
         super().__init__(workspace, filters)
         self.action_string = "Analyzing"
         self.output_formats = ["text"] if output_formats is None else output_formats

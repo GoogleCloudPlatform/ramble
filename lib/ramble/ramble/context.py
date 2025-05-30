@@ -33,6 +33,7 @@ class Context:
         self.chained_experiments = []
         self.modifiers = []
         self.context_name = None
+        self.success_criteria = []
         self.exclude = {}
         self.zips = {}
         self.matrices = []
@@ -92,6 +93,8 @@ class Context:
             self.n_repeats = int(in_context.n_repeats)
         if in_context.formatted_executables:
             self.formatted_executables.update(in_context.formatted_executables)
+        if in_context.success_criteria:
+            self.success_criteria.extend(in_context.success_criteria)
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -168,5 +171,8 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.formatted_executables in in_dict:
         new_context.formatted_executables = in_dict[namespace.formatted_executables].copy()
+
+    if namespace.success in in_dict:
+        new_context.success_criteria = in_dict[namespace.success].copy()
 
     return new_context
