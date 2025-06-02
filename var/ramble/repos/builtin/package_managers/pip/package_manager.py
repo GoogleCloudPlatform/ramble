@@ -17,7 +17,7 @@ import llnl.util.filesystem as fs
 import ramble.config
 import ramble.fetch_strategy
 import ramble.stage
-from ramble.application import ApplicationError
+from ramble.error import ApplicationError
 from ramble.pkgmankit import *
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger

@@ -9,7 +9,7 @@
 import deprecation
 import pytest
 
-import ramble.application
+import ramble.error
 import ramble.filters
 import ramble.pipeline
 import ramble.repository
@@ -77,7 +77,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
             analyze_pipeline.run()
             archive_pipeline = archive_cls(ws, filters, create_tar=True)
             archive_pipeline.run()
-        except ramble.application.ObjectValidationError:
+        except ramble.error.ObjectValidationError:
             # TODO: should figure out a better approach to configure the variables correctly.
             pytest.skip(
                 reason=(

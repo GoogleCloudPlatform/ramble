@@ -11,7 +11,7 @@ import os
 import pytest
 
 import ramble.workspace
-from ramble.error import RambleCommandError
+from ramble.error import ObjectValidationError, RambleCommandError
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
@@ -388,8 +388,6 @@ test inheritance 12.0
     ],
 )
 def test_register_validator_when(request, validator_value, fails):
-    from ramble.application import ObjectValidationError
-
     ws_name = request.node.name.replace("[", "_").replace("]", "_")
 
     global_args = ["-w", ws_name]

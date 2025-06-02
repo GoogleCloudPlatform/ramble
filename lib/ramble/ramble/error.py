@@ -96,3 +96,49 @@ class SpecError(RambleError):
 
 class RambleCommandError(Exception):
     """Raised when RambleCommand execution fails."""
+
+
+class ApplicationError(RambleError):
+    """
+    Exception that is raised by applications
+    """
+
+
+class ExecutableNameError(RambleError):
+    """
+    Exception raised when a name collision in executables happens
+    """
+
+
+class FormattedExecutableError(ApplicationError):
+    """
+    Exception raise when there are issues defining formatted executables
+    """
+
+
+class PhaseCycleDetectedError(ApplicationError):
+    """
+    Exception raised when a cycle is detected while ordering phases
+    """
+
+
+class InvalidPhaseError(ApplicationError):
+    """
+    Exception raised when a phase is used but not defined
+    """
+
+
+class ChainCycleDetectedError(ApplicationError):
+    """
+    Exception raised when a cycle is detected in a defined experiment chain
+    """
+
+
+class InvalidChainError(ApplicationError):
+    """
+    Exception raised when a invalid chained experiment is defined
+    """
+
+
+class ObjectValidationError(ApplicationError):
+    """Error when an object validator fails"""

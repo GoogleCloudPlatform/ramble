@@ -9,8 +9,8 @@
 import pytest
 
 import ramble.config
+import ramble.error
 import ramble.workspace
-from ramble import application
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
@@ -38,7 +38,7 @@ def test_object_validation(workspace_name):
     )
     ws._re_read()
     with pytest.raises(
-        application.ObjectValidationError, match="should run with even number of processes"
+        ramble.error.ObjectValidationError, match="should run with even number of processes"
     ):
         workspace("setup", global_args=global_args)
 

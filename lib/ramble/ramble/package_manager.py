@@ -197,7 +197,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         manager instance is attached to.
 
         Args:
-            app_inst (ramble.application.ApplicationBase): The experiment this
+            app_inst (ramble.base_cls.builtin.ApplicationBase): The experiment this
                 package manager will act on.
         """
         self.app_inst = app_inst
@@ -256,7 +256,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         Args:
             workspace (ramble.workspace.Workspace): Reference to the workspace
                 that is currently being acted on.
-            app_inst (ramble.application.ApplicationBase): Reference to the
+            app_inst (ramble.base_cls.builtin.ApplicationBase): Reference to the
                 application instance that owns the results.
 
         """

@@ -11,7 +11,7 @@ import os
 import pytest
 
 import ramble.workspace
-from ramble.application import ApplicationError
+from ramble.error import ApplicationError
 from ramble.main import RambleCommand
 from ramble.util import constants
 

@@ -7,7 +7,12 @@
 # except according to those terms.
 
 
-from ramble.application import ApplicationBase
+import ramble.repository
+
+base_class_type = ramble.repository.ObjectTypes.base_classes
+ApplicationBase = ramble.repository.get_obj_class(
+    "application-base", object_type=base_class_type
+)
 
 
 class ExecutableApplication(ApplicationBase):
