@@ -62,6 +62,7 @@ ObjectTypes = Enum(
         "modifiers",
         "package_managers",
         "workflow_managers",
+        "base_classes",
         "base_applications",
         "base_modifiers",
         "base_package_managers",
@@ -107,6 +108,14 @@ type_definitions = {
         "config_section": "workflow_manager_repos",
         "accepted_configs": ["workflow_manager_repo.yaml", unified_config],
         "singular": "workflow manager",
+    },
+    ObjectTypes.base_classes: {
+        "file_name": "base_class.py",
+        "dir_name": "base_classes",
+        "abbrev": "base_cls",
+        "config_section": "base_class_repos",
+        "accepted_configs": ["base_class_repo.yaml", unified_config],
+        "singular": "base class",
     },
     ObjectTypes.base_applications: {
         "file_name": "base_application.py",
@@ -163,6 +172,11 @@ def _workflow_managers(repo_dirs=None):
     return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.workflow_managers)
 
 
+def _base_classes(repo_dirs=None):
+    """Get the base classes singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_classes)
+
+
 def _base_apps(repo_dirs=None):
     """Get the base applications singleton RepoPath instance for Ramble."""
     return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_applications)
@@ -188,6 +202,7 @@ paths = {
     ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
     ObjectTypes.package_managers: llnl.util.lang.Singleton(_package_managers),
     ObjectTypes.workflow_managers: llnl.util.lang.Singleton(_workflow_managers),
+    ObjectTypes.base_classes: llnl.util.lang.Singleton(_base_classes),
     ObjectTypes.base_applications: llnl.util.lang.Singleton(_base_apps),
     ObjectTypes.base_modifiers: llnl.util.lang.Singleton(_base_mods),
     ObjectTypes.base_package_managers: llnl.util.lang.Singleton(_base_package_managers),

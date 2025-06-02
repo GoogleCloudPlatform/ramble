@@ -49,6 +49,7 @@ import ramble.paths
 import ramble.schema
 import ramble.schema.applications
 import ramble.schema.base_application_repos
+import ramble.schema.base_class_repos
 import ramble.schema.base_modifier_repos
 import ramble.schema.base_package_manager_repos
 import ramble.schema.base_workflow_manager_repos
@@ -102,6 +103,7 @@ section_schemas = {
     "package_manager_repos": ramble.schema.package_manager_repos.schema,
     "workflow_manager_repos": ramble.schema.workflow_manager_repos.schema,
     "base_application_repos": ramble.schema.base_application_repos.schema,
+    "base_class_repos": ramble.schema.base_class_repos.schema,
     "base_modifier_repos": ramble.schema.base_modifier_repos.schema,
     "base_package_manager_repos": ramble.schema.base_package_manager_repos.schema,
     "base_workflow_manager_repos": ramble.schema.base_workflow_manager_repos.schema,
