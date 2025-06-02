@@ -272,6 +272,11 @@ def get(spec, object_type=default_type):
     return paths[object_type].get(spec)
 
 
+def get_obj_class(spec, object_type=default_type):
+    """Convenience wrapper around ``ramble.repository.get_obj_class()``."""
+    return paths[object_type].get_obj_class(spec)
+
+
 def set_path(repo, object_type=default_type):
     """Set the path singleton to a specific value.
 
