@@ -42,6 +42,8 @@ class Darshan(BasicModifier):
         mode="mpi",
     )
 
+    archive_pattern("{darshan_log_path}/*")
+
     with when("package_manager_family=spack"):
         software_spec(
             "darshan-runtime",
@@ -50,10 +52,6 @@ class Darshan(BasicModifier):
         software_spec(
             "darshan-util",
             pkg_spec="darshan-util@3.4.6",
-        )
-        software_spec(
-            "texlive",
-            pkg_spec="texlive",
         )
 
         required_package("darshan-runtime")
