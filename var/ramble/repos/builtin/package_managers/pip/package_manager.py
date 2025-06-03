@@ -16,6 +16,7 @@ import llnl.util.filesystem as fs
 
 import ramble.config
 import ramble.fetch_strategy
+import ramble.software_info
 import ramble.stage
 from ramble.error import ApplicationError
 from ramble.pkgmankit import *
@@ -260,7 +261,7 @@ def _extract_pkg_name(pkg_spec):
     return match.group("pkg_name") if match else None
 
 
-class PipSoftwareInfo(ramble.package_manager.SoftwareInfo):
+class PipSoftwareInfo(ramble.software_info.SoftwareInfo):
     # TODO: should this "parse" function have a unified interface?
     def parse_from_string(self, in_str):
         """Construct a package dictionary from a package string

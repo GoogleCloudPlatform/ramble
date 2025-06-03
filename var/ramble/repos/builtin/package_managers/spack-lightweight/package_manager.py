@@ -15,6 +15,7 @@ import llnl.util.filesystem as fs
 
 import ramble.config
 import ramble.error
+import ramble.software_info
 import ramble.util.hashing
 from ramble.pkgmankit import *  # noqa: F403
 from ramble.util.logger import logger
@@ -552,7 +553,7 @@ spack_namespace = "spack"
 package_name_regex = re.compile(r"[\s-]*(?P<package_name>[\w][\w-]+).*")
 
 
-class SpackSoftwareInfo(ramble.package_manager.SoftwareInfo):
+class SpackSoftwareInfo(ramble.software_info.SoftwareInfo):
     def parse_from_string(self, in_str):
         """Construct a package dictionary from a comma delimited spec string
 

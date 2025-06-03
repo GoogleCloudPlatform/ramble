@@ -154,3 +154,9 @@ class InvalidModeError(ModifierError):
     """
     Exception raised when an invalid mode is passed
     """
+
+
+class PackageManagerError(RambleError):
+    """
+    Exception that is raised by package managers
+    """

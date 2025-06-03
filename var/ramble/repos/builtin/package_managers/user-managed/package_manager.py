@@ -9,7 +9,7 @@
 from ramble.pkgmankit import *  # noqa: F403
 
 
-class UserManagedSoftwareInfo(ramble.package_manager.SoftwareInfo):
+class UserManagedSoftwareInfo(ramble.software_info.SoftwareInfo):
     def parse_from_spec(self, spec):
         parts = spec.split("@")
 
