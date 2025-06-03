@@ -23,6 +23,10 @@ class NcclTcpxo(BasicModifier):
     mode(
         "auto", description="Auto detected shell based on config:shell setting"
     )
+    mode(
+        "ll128",
+        description="Use NCCL LL128, reduces latency for small-medium message sizes",
+    )
     default_mode("auto")
 
     def _cos_paths(self):
@@ -75,4 +79,22 @@ class NcclTcpxo(BasicModifier):
                     "The nccl-tcpxo modifier is not currently supported for batch shell."
                 )
 
+        return cmds
+
+    register_builtin(
+        "set_ll128_env_vars",
+        injection_method="prepend",
+        depends_on=["source_tcpxo"],
+    )
+
+    def set_ll128_env_vars(self):
+        cmds = []
+        if self._usage_mode == "ll128":
+            cmds.append("NCCL_PROTO=Simple,LL128")
+            cmds.append(
+                "NCCL_TUNER_CONFIG_PATH=/var/lib/tcpxo/lib64/a3plus_tuner_config_ll128.textproto"
+            )
+            cmds.append(
+                "NCCL_SHIMNET_GUEST_CONFIG_CHECKER_CONFIG_FILE=/var/lib/tcpxo/lib64/a3plus_guest_config_ll128.textproto"
+            )
         return cmds
