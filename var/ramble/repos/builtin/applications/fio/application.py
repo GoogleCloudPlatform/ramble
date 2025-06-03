@@ -42,18 +42,17 @@ class Fio(ExecutableApplication):
 
     # Use client/server mode to run on multiple nodes
     executable(
-        "slurm-multinode-run",
+        "multinode-run",
         template=[
-            "export DIRECTORY='{directory}'",
             "echo 'Starting fio servers...'",
-            "pdsh -w $SLURM_JOB_NODELIST {experiment_run_dir}/fio_start_server.sh",
-            "echo 'Creating test directory $DIRECTORY...'",
-            "mkdir -p '$DIRECTORY'",
-            "echo 'Running job file {job_file} on nodes: $SLURM_JOB_NODELIST'",
-            "fio --output={out_file} --output-format {out_format} --eta=never --client=hostfile {job_file_path}",
+            "pdsh -w {hostlist} {experiment_run_dir}/fio_start_server.sh",
+            "echo 'Creating test directory if needed...'",
+            "mkdir -p {directory}",
+            'echo "Running job file {job_file} on nodes: {hostlist}"',
+            "fio --output={out_file} --output-format {out_format} --eta=never --client={hostfile} {job_file_path}",
             "echo 'Fio jobs finished.'",
             "echo 'Stopping fio servers...'",
-            "pdsh -w $SLURM_JOB_NODELIST {experiment_run_dir}/fio_stop_server.sh",
+            "pdsh -w {hostlist} {experiment_run_dir}/fio_stop_server.sh",
         ],
         use_mpi=False,
     )
@@ -68,159 +67,140 @@ class Fio(ExecutableApplication):
     )
 
     workload("standard", executables=["run", "cleanup"])
-    workload("slurm-multinode", executables=["slurm-multinode-run", "cleanup"])
-    all_workloads = ["standard", "slurm-multinode"]
+    workload("multinode", executables=["multinode-run", "cleanup"])
+    workload_group("all_workloads", workloads=["standard", "multinode"])
 
-    workload_variable(
-        "job_file",
-        description="Job file to run. If a job file is not specified, one will be generated from variables.",
-        default="generated.conf",
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "job_file_path",
-        description=("Path to job file."),
-        default="{experiment_run_dir}/{job_file}",
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "out_file",
-        description="File to write results",
-        default="fio.out",
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "out_format",
-        description="Format to write results. Defaults to 'json' for Ramble to analyze results.",
-        default="json",
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "job_name",
-        description="Job name",
-        default="{experiment_name}",
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "directory",
-        description="Used to place files in a different location than ./",
-        default="{experiment_run_dir}",
-        workloads=all_workloads,
-    )
+    with default_args(workload_group="all_workloads"):
+        workload_variable(
+            "job_file",
+            description="Job file to run. If a job file is not specified, one will be generated from variables.",
+            default="generated.conf",
+        )
+        workload_variable(
+            "job_file_path",
+            description="Path to job file.",
+            default="{experiment_run_dir}/{job_file}",
+        )
+        workload_variable(
+            "out_file",
+            description="File to write results",
+            default="fio.out",
+        )
+        workload_variable(
+            "out_format",
+            description="Format to write results. Defaults to 'json' for Ramble to analyze results.",
+            default="json",
+        )
+        workload_variable(
+            "job_name",
+            description="Job name",
+            default="{experiment_name}",
+        )
+        workload_variable(
+            "directory",
+            description="Used to place files in a different location than ./",
+            default="{experiment_run_dir}",
+        )
 
-    # variables set using strings / numbers stored as strings
-    _STR_VARS = {
-        "ioengine",
-        "runtime",
-        "size",
-        "rw",
-        "bs",
-        "iodepth",
-        "numjobs",
-        "directory",
-    }
+        # variables set using strings / numbers stored as strings
+        _STR_VARS = {
+            "ioengine",
+            "runtime",
+            "size",
+            "rw",
+            "bs",
+            "iodepth",
+            "numjobs",
+            "directory",
+        }
 
-    # variables that are set using boolean value (var=0|1)
-    _BOOL_VARS = {
-        "buffered",
-        "direct",
-        "randrepeat",
-    }
+        # variables that are set using boolean value (var=0|1)
+        _BOOL_VARS = {
+            "buffered",
+            "direct",
+            "randrepeat",
+        }
 
-    # variables that are set using the var name, defaults to unset
-    _SET_VARS = {
-        "group_reporting",
-        "norandommap",
-        "refill_buffers",
-        "time_based",
-        "stonewall",
-    }
+        # variables that are set using the var name, defaults to unset
+        _SET_VARS = {
+            "group_reporting",
+            "norandommap",
+            "refill_buffers",
+            "time_based",
+            "stonewall",
+        }
 
-    # If not set in Ramble, workload vars are not written to job file / use fio application default
-    workload_variable(
-        "ioengine",
-        description="I/O engine",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "direct",
-        description="If true, use non-buffered I/O",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "buffered",
-        description="If true, use buffered I/O. This is the opposite of the direct option",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "time_based",
-        description="If set, fio will run for the duration of the runtime specified even if the file(s) are completely read or written.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "runtime",
-        description="Limit runtime. The test will run until it completes the configured I/O workload or until it has run for this specified amount of time, whichever occurs first.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "refill_buffers",
-        description="If this option is given, fio will refill the I/O buffers on every submit. ",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "norandommap",
-        description="Normally fio will cover every block of the file when doing random I/O. If this option is given, fio will just get a new random offset without looking at past I/O history.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "randrepeat",
-        description="Seed all random number generators in a predictable way so the pattern is repeatable across runs. ",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "group_reporting",
-        description="To see the final report per-group instead of per-job, use group_reporting. Jobs in a file will be part of the same reporting group, unless if separated by a stonewall, or by using new_group.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "size",
-        description="The total size of file I/O for each thread of this job.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "rw",
-        description="Type of I/O pattern",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "bs",
-        description="The block size in bytes used for I/O units.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "iodepth",
-        description="Number of I/O units to keep in flight against the file.",
-        default=None,
-        workloads=all_workloads,
-    )
-    workload_variable(
-        "numjobs",
-        description="Create the specified number of clones of this job.",
-        default=None,
-        workloads=all_workloads,
-    )
+        # If not set in Ramble, workload vars are not written to job file / use fio application default
+        workload_variable(
+            "ioengine",
+            description="I/O engine",
+            default=None,
+        )
+        workload_variable(
+            "direct",
+            description="If true, use non-buffered I/O",
+            default=None,
+        )
+        workload_variable(
+            "buffered",
+            description="If true, use buffered I/O. This is the opposite of the direct option",
+            default=None,
+        )
+        workload_variable(
+            "time_based",
+            description="If set, fio will run for the duration of the runtime specified even if the file(s) are completely read or written.",
+            default=None,
+        )
+        workload_variable(
+            "runtime",
+            description="Limit runtime. The test will run until it completes the configured I/O workload or until it has run for this specified amount of time, whichever occurs first.",
+            default=None,
+        )
+        workload_variable(
+            "refill_buffers",
+            description="If this option is given, fio will refill the I/O buffers on every submit. ",
+            default=None,
+        )
+        workload_variable(
+            "norandommap",
+            description="Normally fio will cover every block of the file when doing random I/O. If this option is given, fio will just get a new random offset without looking at past I/O history.",
+            default=None,
+        )
+        workload_variable(
+            "randrepeat",
+            description="Seed all random number generators in a predictable way so the pattern is repeatable across runs. ",
+            default=None,
+        )
+        workload_variable(
+            "group_reporting",
+            description="To see the final report per-group instead of per-job, use group_reporting. Jobs in a file will be part of the same reporting group, unless if separated by a stonewall, or by using new_group.",
+            default=None,
+        )
+        workload_variable(
+            "size",
+            description="The total size of file I/O for each thread of this job.",
+            default=None,
+        )
+        workload_variable(
+            "rw",
+            description="Type of I/O pattern",
+            default=None,
+        )
+        workload_variable(
+            "bs",
+            description="The block size in bytes used for I/O units.",
+            default=None,
+        )
+        workload_variable(
+            "iodepth",
+            description="Number of I/O units to keep in flight against the file.",
+            default=None,
+        )
+        workload_variable(
+            "numjobs",
+            description="Create the specified number of clones of this job.",
+            default=None,
+        )
 
     log_str = os.path.join("{experiment_run_dir}", "metrics.out")
 
