@@ -142,3 +142,15 @@ class InvalidChainError(ApplicationError):
 
 class ObjectValidationError(ApplicationError):
     """Error when an object validator fails"""
+
+
+class ModifierError(RambleError):
+    """
+    Exception that is raised by modifiers
+    """
+
+
+class InvalidModeError(ModifierError):
+    """
+    Exception raised when an invalid mode is passed
+    """

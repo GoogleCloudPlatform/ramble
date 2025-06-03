@@ -28,7 +28,6 @@ import ramble.fetch_strategy
 import ramble.graphs
 import ramble.keywords
 import ramble.mirror
-import ramble.modifier_types.disabled
 import ramble.paths
 import ramble.repeats
 import ramble.repository
@@ -1048,9 +1047,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 mod_inst.modify_experiment(self)
                 mod_inst.set_modifier_variants()
             else:
-                mod_inst = ramble.modifier_types.disabled.DisabledModifier(
-                    mod_inst
+                base_class_type = ramble.repository.ObjectTypes.base_classes
+                DisabledModifier = ramble.repository.get_obj_class(
+                    "disabled-modifier", object_type=base_class_type
                 )
+                mod_inst = DisabledModifier(mod_inst)
 
             self._modifier_instances.append(mod_inst)
 

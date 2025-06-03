@@ -13,10 +13,9 @@ import llnl.util.filesystem
 from llnl.util.filesystem import *
 
 import ramble.language.modifier_language
+import ramble.repository
 from ramble.language.modifier_language import *
 from ramble.language.shared_language import *
-from ramble.modifier import ModifierBase
-from ramble.modifier_types.basic import BasicModifier
 from ramble.spec import Spec
 from ramble.util.command_runner import (
     CommandRunner,
@@ -30,3 +29,10 @@ from ramble.util.file_util import get_file_path
 from ramble.util.logger import logger
 from ramble.util.logger import logger as tty
 from ramble.util.output_capture import OUTPUT_CAPTURE
+
+base_class_type = ramble.repository.ObjectTypes.base_classes
+ModifierBase = ramble.repository.get_obj_class("modifier-base", object_type=base_class_type)
+BasicModifier = ramble.repository.get_obj_class("basic-modifier", object_type=base_class_type)
+DisabledModifier = ramble.repository.get_obj_class(
+    "disabled-modifier", object_type=base_class_type
+)

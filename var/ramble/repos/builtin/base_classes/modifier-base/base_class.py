@@ -16,7 +16,7 @@ from typing import List
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
-from ramble.error import RambleError
+from ramble.error import InvalidModeError, ModifierError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
 from ramble.util.logger import logger
@@ -27,10 +27,20 @@ class ModifierBase(metaclass=ModifierMeta):
     name = None
     object_variants = None
     origin_type = "modifier"
-    _builtin_name = NS_SEPARATOR.join(("modifier_builtin", "{obj_name}", "{name}"))
+    _builtin_name = NS_SEPARATOR.join(
+        ("modifier_builtin", "{obj_name}", "{name}")
+    )
     _mod_prefix_builtin = f"modifier_builtin{NS_SEPARATOR}"
     _language_classes = [ModifierMeta, SharedMeta]
-    _pipelines = ["analyze", "archive", "mirror", "setup", "pushtocache", "execute", "logs"]
+    _pipelines = [
+        "analyze",
+        "archive",
+        "mirror",
+        "setup",
+        "pushtocache",
+        "execute",
+        "logs",
+    ]
 
     modifier_class = "ModifierBase"
 
@@ -89,7 +99,8 @@ class ModifierBase(metaclass=ModifierMeta):
             non_disabled_modes.remove("disabled")
             if len(non_disabled_modes) > 1 or len(non_disabled_modes) == 0:
                 raise InvalidModeError(
-                    "Cannot auto determine usage " f"mode for modifier {self.name}"
+                    "Cannot auto determine usage "
+                    f"mode for modifier {self.name}"
                 )
 
             self._usage_mode = non_disabled_modes.pop()
@@ -184,7 +195,9 @@ class ModifierBase(metaclass=ModifierMeta):
         if self._usage_mode not in self.variable_modifications:
             return mods
 
-        for var, var_mods in self.variable_modifications[self._usage_mode].items():
+        for var, var_mods in self.variable_modifications[
+            self._usage_mode
+        ].items():
             for var_mod in var_mods:
                 if var_mod["method"] in ["append", "prepend"]:
                     if var in mods:
@@ -213,7 +226,9 @@ class ModifierBase(metaclass=ModifierMeta):
     def applies_to_executable(self, executable):
         apply = False
 
-        mod_regex = re.compile(self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}")
+        mod_regex = re.compile(
+            self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
+        )
         for pattern in self._on_executables:
             if fnmatch.fnmatch(executable, pattern):
                 apply = True
@@ -224,13 +239,17 @@ class ModifierBase(metaclass=ModifierMeta):
 
         return apply
 
-    def apply_executable_modifiers(self, executable_name, executable, app_inst=None):
+    def apply_executable_modifiers(
+        self, executable_name, executable, app_inst=None
+    ):
         pre_execs = []
         post_execs = []
         for exec_mod in self.executable_modifiers:
             mod_func = getattr(self, exec_mod)
 
-            pre_exec, post_exec = mod_func(executable_name, executable, app_inst=app_inst)
+            pre_exec, post_exec = mod_func(
+                executable_name, executable, app_inst=app_inst
+            )
 
             pre_execs.extend(pre_exec)
             post_execs.extend(post_exec)
@@ -322,15 +341,3 @@ class ModifierBase(metaclass=ModifierMeta):
                         for k in var_props.keys() - {"modes"}
                     }
         return filtered_vars
-
-
-class ModifierError(RambleError):
-    """
-    Exception that is raised by modifiers
-    """
-
-
-class InvalidModeError(ModifierError):
-    """
-    Exception raised when an invalid mode is passed
-    """
