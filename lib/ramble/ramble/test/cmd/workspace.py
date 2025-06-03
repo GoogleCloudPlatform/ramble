@@ -6,8 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 import glob
+import os
+import re
 
 import pytest
 
@@ -129,52 +130,62 @@ def check_results(ws):
     assert os.path.exists(os.path.join(ws.root, fn + ".yaml"))
 
 
-def test_workspace_create_links(mutable_mock_workspace_path, tmpdir):
+def test_workspace_create_links(mutable_mock_workspace_path, tmpdir, request):
     import pathlib
 
     expected_links = ["software", "inputs"]
     with tmpdir.as_cwd():
-        workspace("create", "-d", "foo")
+        workspace("create", "-d", f"{request.node.name}_foo")
         workspace(
-            "create", "-d", "bar", "--inputs-dir", "foo/inputs", "--software-dir", "foo/software"
+            "create",
+            "-d",
+            f"{request.node.name}_bar",
+            "--inputs-dir",
+            f"{request.node.name}_foo/inputs",
+            "--software-dir",
+            f"{request.node.name}_foo/software",
         )
 
         for expected_link in expected_links:
-            assert os.path.exists(os.path.join("bar", expected_link))
-            assert os.path.islink(os.path.join("bar", expected_link))
-            resolved_path = pathlib.PosixPath(os.path.join("bar", expected_link)).resolve()
-            assert str(resolved_path) == os.path.abspath(os.path.join("foo", expected_link))
+            assert os.path.exists(os.path.join(f"{request.node.name}_bar", expected_link))
+            assert os.path.islink(os.path.join(f"{request.node.name}_bar", expected_link))
+            resolved_path = pathlib.PosixPath(
+                os.path.join(f"{request.node.name}_bar", expected_link)
+            ).resolve()
+            assert str(resolved_path) == os.path.abspath(
+                os.path.join(f"{request.node.name}_foo", expected_link)
+            )
 
 
-def test_workspace_activate_fails(mutable_mock_workspace_path):
-    workspace("create", "foo")
-    out = workspace("activate", "foo")
+def test_workspace_activate_fails(mutable_mock_workspace_path, request):
+    workspace("create", request.node.name)
+    out = workspace("activate", request.node.name)
     assert "To set up shell support" in out
 
 
-def test_workspace_list(mutable_mock_workspace_path):
-    workspace("create", "foo")
-    workspace("create", "bar")
-    workspace("create", "baz")
+def test_workspace_list(mutable_mock_workspace_path, request):
+    workspace("create", f"{request.node.name}_foo")
+    workspace("create", f"{request.node.name}_bar")
+    workspace("create", f"{request.node.name}_baz")
 
     out = workspace("list")
 
-    assert "foo" in out
-    assert "bar" in out
-    assert "baz" in out
+    assert f"{request.node.name}_foo" in out
+    assert f"{request.node.name}_bar" in out
+    assert f"{request.node.name}_baz" in out
 
     # make sure `ramble workspace list` skips invalid things in
     # var/ramble/workspaces
     mutable_mock_workspace_path.join(".DS_Store").ensure(file=True)
     out = workspace("list")
 
-    assert "foo" in out
-    assert "bar" in out
-    assert "baz" in out
+    assert f"{request.node.name}_foo" in out
+    assert f"{request.node.name}_bar" in out
+    assert f"{request.node.name}_baz" in out
     assert ".DS_Store" not in out
 
 
-def test_workspace_info():
+def test_workspace_info(request):
     test_config = """
 ramble:
   variables:
@@ -212,7 +223,7 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_info"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -228,7 +239,7 @@ ramble:
     check_info_basic(output)
 
 
-def test_workspace_info_prints_all_levels():
+def test_workspace_info_prints_all_levels(request):
     test_config = """
 ramble:
   variables:
@@ -273,7 +284,7 @@ config:
     conf_level: 1
 """
 
-    workspace_name = "test_workspace_info_prints_all_levels"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -296,7 +307,7 @@ config:
     assert "Variables from Experiment:" in output
 
 
-def test_workspace_info_with_experiment_chain():
+def test_workspace_info_with_experiment_chain(request):
     test_config = """
 ramble:
   variables:
@@ -328,7 +339,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_workspace_info_with_experiment_chain"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -345,7 +356,7 @@ ramble:
     assert "- basic.test_wl2.test_experiment.chain.0.basic.test_wl.test_experiment" in output
 
 
-def test_workspace_info_with_where_filter():
+def test_workspace_info_with_where_filter(request):
     test_config = """
 ramble:
   variables:
@@ -383,7 +394,7 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_info"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -407,7 +418,7 @@ ramble:
     assert "zlib.ensure_installed.test_experiment" not in output
 
 
-def test_workspace_dir(tmpdir):
+def test_workspace_dir(tmpdir, request):
     with tmpdir.as_cwd():
         workspace("create", "-d", ".")
         assert os.path.exists(tmpdir + "/configs/ramble.yaml")
@@ -419,7 +430,7 @@ def test_workspace_dir(tmpdir):
         assert num_templates > 0
 
 
-def test_workspace_from_template(tmpdir):
+def test_workspace_from_template(tmpdir, request):
     with tmpdir.as_cwd():
         tpl_in = """
 cd "{experiment_run_dir}"
@@ -446,54 +457,54 @@ cmake -DTEST=1 -h
         assert num_templates > 0
 
 
-def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
+def test_workspace_dirs(tmpdir, mutable_mock_workspace_path, request):
     with tmpdir.as_cwd():
         # Make a temp directory,
         # Set it up as the workspace_dirs path,
         # make a test workspace there, and
         # verify the workspace was created where
         # it would be expected
-        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir1 = os.path.join(os.getcwd(), f"{request.node.name}_ws1")
         os.makedirs(wsdir1)
         with ramble.config.override("config:workspace_dirs", wsdir1):
-            workspace("create", "test1")
+            workspace("create", f"{request.node.name}_test1")
             out = workspace("list")
-        assert "test1" in out
+        assert f"{request.node.name}_test1" in out
 
         # Now make a second temp directory,
         # follow same process to make another test
         # workspace, and verify that the first
         # test workspace is not found while the
         # second is
-        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        wsdir2 = os.path.join(os.getcwd(), f"{request.node.name}_ws2")
         os.makedirs(wsdir2)
         with ramble.config.override("config:workspace_dirs", wsdir2):
-            workspace("create", "test2")
+            workspace("create", f"{request.node.name}_test2")
             out = workspace("list")
-        assert "test2" in out
-        assert "test1" not in out
+        assert f"{request.node.name}_test2" in out
+        assert f"{request.node.name}_test1" not in out
 
 
-def test_remove_workspace():
-    workspace("create", "foo")
-    workspace("create", "bar")
+def test_remove_workspace(request):
+    workspace("create", f"{request.node.name}_foo")
+    workspace("create", f"{request.node.name}_bar")
 
     out = workspace("list")
-    assert "foo" in out
-    assert "bar" in out
+    assert f"{request.node.name}_foo" in out
+    assert f"{request.node.name}_bar" in out
 
-    workspace("remove", "-y", "foo")
+    workspace("remove", "-y", f"{request.node.name}_foo")
     out = workspace("list")
-    assert "foo" not in out
-    assert "bar" in out
+    assert f"{request.node.name}_foo" not in out
+    assert f"{request.node.name}_bar" in out
 
-    workspace("remove", "-y", "bar")
+    workspace("remove", "-y", f"{request.node.name}_bar")
     out = workspace("list")
-    assert "foo" not in out
-    assert "bar" not in out
+    assert f"{request.node.name}_foo" not in out
+    assert f"{request.node.name}_bar" not in out
 
 
-def test_concretize_command():
+def test_concretize_command(request):
     test_config = """
 ramble:
   variables:
@@ -528,7 +539,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_concretize_command"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -548,8 +559,8 @@ ramble:
     assert search_files_for_string([config_path], "pkg_spec: zlib") is True
 
 
-def test_concretize_nothing():
-    ws_name = "test"
+def test_concretize_nothing(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
     assert ws_name in workspace("list")
 
@@ -566,7 +577,7 @@ def test_concretize_nothing():
         assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
 
 
-def test_concretize_concrete_config():
+def test_concretize_concrete_config(request):
     test_config = """
 ramble:
   variables:
@@ -606,7 +617,7 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_concretize_concrete_config"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -619,10 +630,10 @@ ramble:
 
     with pytest.raises(ramble.workspace.RambleWorkspaceError) as e:
         workspace("concretize", global_args=["-w", workspace_name])
-        assert "Package zlib would be defined in multiple conflicting ways" in e
+        assert "Package zlib would be defined in multiple conflicting ways" in str(e.value)
 
 
-def test_force_concretize():
+def test_force_concretize(request):
     test_config = """
 ramble:
   variables:
@@ -662,7 +673,7 @@ ramble:
         - zlib-test
 """
 
-    workspace_name = "test_force_concretize"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -684,25 +695,25 @@ ramble:
     assert search_files_for_string([config_path], "zlib-test") is False
 
 
-def test_setup_command():
-    ws_name = "test"
+def test_setup_command(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(request.node.name) as ws:
         add_basic(ws)
         check_basic(ws)
 
-        workspace("concretize")
+        workspace("concretize", global_args=["-w", request.node.name])
 
-        workspace("setup")
+        workspace("setup", global_args=["-w", request.node.name])
         assert os.path.exists(ws.root + "/all_experiments")
 
 
-def test_setup_command_with_missing_log_dir():
-    ws_name = "test"
+def test_setup_command_with_missing_log_dir(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(request.node.name) as ws:
         add_basic(ws)
         check_basic(ws)
         # Missing log directory shouldn't prevent workspace
@@ -710,14 +721,14 @@ def test_setup_command_with_missing_log_dir():
         # by the `is_workspace_dir` check.
         os.rmdir(ws.log_dir)
 
-        workspace("concretize")
+        workspace("concretize", global_args=["-w", request.node.name])
 
-        workspace("setup")
+        workspace("setup", global_args=["-w", request.node.name])
         assert os.path.exists(ws.root + "/all_experiments")
 
 
-def test_setup_nothing():
-    ws_name = "test"
+def test_setup_nothing(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
     assert ws_name in workspace("list")
     pipeline_type = ramble.pipeline.pipelines.setup
@@ -735,25 +746,25 @@ def test_setup_nothing():
         assert os.path.exists(ws.root + "/all_experiments")
 
 
-def test_anlyze_command():
-    ws_name = "test"
+def test_anlyze_command(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(request.node.name) as ws:
         add_basic(ws)
         check_basic(ws)
 
-        workspace("concretize")
+        workspace("concretize", global_args=["-w", request.node.name])
 
-        workspace("setup")
+        workspace("setup", global_args=["-w", request.node.name])
         assert os.path.exists(ws.root + "/all_experiments")
 
-        workspace("analyze")
+        workspace("analyze", global_args=["-w", request.node.name])
         check_results(ws)
 
 
-def test_analyze_nothing():
-    ws_name = "test"
+def test_analyze_nothing(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
     assert ws_name in workspace("list")
     setup_type = ramble.pipeline.pipelines.setup
@@ -777,8 +788,8 @@ def test_analyze_nothing():
         check_results(ws)
 
 
-def test_workspace_flag_named():
-    ws_name = "test_ws_flag"
+def test_workspace_flag_named(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
     assert ws_name in workspace("list")
 
@@ -803,8 +814,8 @@ def test_workspace_flag_named():
         check_no_basic(ws)
 
 
-def test_workspace_flag_anon(tmpdir):
-    ws_path = str(tmpdir.join("test_ws_dir_flag"))
+def test_workspace_flag_anon(tmpdir, request):
+    ws_path = str(tmpdir.join(request.node.name))
     workspace("create", "-d", ws_path)
     assert ramble.workspace.is_workspace_dir(ws_path)
 
@@ -829,8 +840,8 @@ def test_workspace_flag_anon(tmpdir):
         check_no_basic(ws)
 
 
-def test_no_workspace_flag():
-    ws_name = "test_no_ws_flag"
+def test_no_workspace_flag(request):
+    ws_name = request.node.name
     workspace("create", ws_name)
     assert ws_name in workspace("list")
 
@@ -862,15 +873,16 @@ def test_no_workspace_flag():
         check_no_basic(ws)
 
 
-def test_edit_edits_correct_paths():
-    ws = ramble.workspace.create("test")
+def test_edit_edits_correct_paths(request):
+    ws_name = request.node.name
+    ws = ramble.workspace.create(ws_name)
     ws.write()
 
     config_file = ramble.workspace.config_file(ws.root)
     default_template_path = ws.template_path("execute_experiment")
     experiments_test_file = os.path.join(ws.experiment_dir, "test")
 
-    ws_args = ["-w", "test"]
+    ws_args = ["-w", ws_name]
     assert (
         workspace("edit", "-f", "ramble.yaml", "--print-file", global_args=ws_args).strip()
         == config_file
@@ -888,7 +900,7 @@ def test_edit_edits_correct_paths():
     )
 
 
-def test_edit_fails_without_workspace():
+def test_edit_fails_without_workspace(request):
     output = workspace("edit", global_args=["-W"], fail_on_error=False)
     assert (
         "ramble workspace edit requires either a "
@@ -897,9 +909,11 @@ def test_edit_fails_without_workspace():
     )
 
 
-def test_edit_override_gets_correct_path():
-    ws1 = ramble.workspace.create("test1")
-    ws2 = ramble.workspace.create("test2")
+def test_edit_override_gets_correct_path(request):
+    ws1_name = f"{request.node.name}_ws1"
+    ws2_name = f"{request.node.name}_ws2"
+    ws1 = ramble.workspace.create(ws1_name)
+    ws2 = ramble.workspace.create(ws2_name)
 
     ws1.write()
     ws2.write()
@@ -912,7 +926,7 @@ def test_edit_override_gets_correct_path():
         assert output == config_path
 
 
-def test_dryrun_setup():
+def test_dryrun_setup(request):
     test_config = """
 ramble:
   variables:
@@ -933,7 +947,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_dryrun"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -956,7 +970,7 @@ ramble:
     )
 
 
-def test_matrix_vector_workspace_full():
+def test_matrix_vector_workspace_full(request):
     test_config = """
 ramble:
   variables:
@@ -999,7 +1013,7 @@ ramble:
     expected_experiments.add("exp_series_6_4_10_2")
     expected_experiments.add("exp_series_6_4_10_4")
 
-    workspace_name = "test_vec_mat_expansion"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1028,7 +1042,7 @@ ramble:
         assert os.path.exists(os.path.join(exp_base, exp))
 
 
-def test_invalid_vector_workspace():
+def test_invalid_vector_workspace(request):
     test_config = """
 ramble:
   variables:
@@ -1052,7 +1066,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_vectors"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1081,7 +1095,7 @@ ramble:
     )
 
 
-def test_invalid_size_matrices_workspace():
+def test_invalid_size_matrices_workspace(request):
     test_config = """
 ramble:
   variables:
@@ -1104,7 +1118,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_size_matrices"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1127,7 +1141,7 @@ ramble:
     assert "do not result in the same number of elements." in output
 
 
-def test_undefined_var_matrices_workspace():
+def test_undefined_var_matrices_workspace(request):
     test_config = """
 ramble:
   variables:
@@ -1146,7 +1160,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_input_matrices"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1166,7 +1180,7 @@ ramble:
     assert "variable or zip foo has not been defined yet" in output
 
 
-def test_non_vector_var_matrices_workspace():
+def test_non_vector_var_matrices_workspace(request):
     test_config = """
 ramble:
   variables:
@@ -1187,7 +1201,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_non_vector_input_matrices"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1207,7 +1221,7 @@ ramble:
     assert "variable foo does not refer to a vector" in output
 
 
-def test_multi_use_vector_var_matrices_workspace():
+def test_multi_use_vector_var_matrices_workspace(request):
     test_config = """
 ramble:
   variables:
@@ -1229,7 +1243,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_non_vector_input_matrices"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1249,7 +1263,7 @@ ramble:
     assert "Variable foo has been used in multiple matrices" in output
 
 
-def test_reconcretize_in_configs_dir(tmpdir):
+def test_reconcretize_in_configs_dir(tmpdir, request):
     """
     Test multiple concretizations while the configs dir is the cwd do not fail.
     This catches a bug that existed when lock files were written incorrectly.
@@ -1283,14 +1297,14 @@ ramble:
                 f.write(config)
             ws._re_read()
 
-    ws_path = str(tmpdir.join("test_reconcretize_in_configs_dir"))
+    ws_path = str(tmpdir.join(request.node.name))
     workspace("create", "-d", ws_path)
     assert ramble.workspace.is_workspace_dir(ws_path)
 
     workspace_flags = ["-D", ws_path]
 
-    config_path = py.path.local(os.path.join(ws_path, "configs"))
-    with config_path.as_cwd():
+    config_path_py = py.path.local(os.path.join(ws_path, "configs"))
+    with config_path_py.as_cwd():
         write_config(ws_path, test_config)
 
         with ramble.workspace.Workspace(ws_path) as ws:
@@ -1311,7 +1325,7 @@ ramble:
             assert namespace.environments in software_dict
 
 
-def test_workspace_archive():
+def test_workspace_archive(request):
     test_config = """
 ramble:
   variables:
@@ -1339,7 +1353,7 @@ licenses:
       TEST_LIC: 'value'
 """
 
-    workspace_name = "test_basic_archive"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1404,7 +1418,7 @@ licenses:
     )
 
 
-def test_workspace_archive_include_secrets():
+def test_workspace_archive_include_secrets(request):
     test_config = """
 ramble:
   variables:
@@ -1432,7 +1446,7 @@ licenses:
       TEST_LIC: 'value'
 """
 
-    workspace_name = "test_basic_archive"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1470,7 +1484,7 @@ licenses:
     )
 
 
-def test_workspace_tar_archive():
+def test_workspace_tar_archive(request):
     test_config = """
 ramble:
   variables:
@@ -1491,7 +1505,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_basic_archive"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1544,7 +1558,7 @@ ramble:
     assert os.path.exists(os.path.join(ws1.archive_dir, "archive.latest.tar.gz"))
 
 
-def test_workspace_tar_upload_archive():
+def test_workspace_tar_upload_archive(request):
     test_config = """
 ramble:
   variables:
@@ -1565,7 +1579,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_basic_archive"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1624,7 +1638,7 @@ ramble:
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + ".tar.gz"))
 
 
-def test_workspace_tar_upload_archive_config_url():
+def test_workspace_tar_upload_archive_config_url(request):
     test_config = """
 ramble:
   variables:
@@ -1645,7 +1659,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_basic_archive"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1706,7 +1720,7 @@ ramble:
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + ".tar.gz"))
 
 
-def test_dryrun_noexpvars_setup():
+def test_dryrun_noexpvars_setup(request):
     test_config = """
 ramble:
   variables:
@@ -1725,7 +1739,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_dryrun"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1748,9 +1762,9 @@ ramble:
     )
 
 
-def test_workspace_include():
+def test_workspace_include(request):
 
-    workspace_name = "test_info"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1807,7 +1821,7 @@ ramble:
 
 
 @pytest.mark.parametrize("tpl_name", ["env_path"])
-def test_invalid_template_name_errors(tpl_name, capsys):
+def test_invalid_template_name_errors(tpl_name, capsys, request):
     test_config = """
 ramble:
   variables:
@@ -1826,7 +1840,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_template_name"
+    workspace_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1846,10 +1860,10 @@ ramble:
             f"Template file {tpl_name}.tpl results in a template name of"
             + f"{tpl_name} which is reserved by ramble"
         )
-        assert err_str in captured
+        assert err_str in str(captured)
 
 
-def test_custom_executables_info():
+def test_custom_executables_info(request):
     test_config = """
 ramble:
   variables:
@@ -1890,7 +1904,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_custom_executables_info"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1908,7 +1922,7 @@ ramble:
     assert "exp_level_cmd" in output
 
 
-def test_custom_executables_order_info():
+def test_custom_executables_order_info(request):
     test_config = """
 ramble:
   variables:
@@ -1952,7 +1966,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_custom_executables_info"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1968,7 +1982,7 @@ ramble:
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
 
 
-def test_workspace_simplify():
+def test_workspace_simplify(request):
     test_ws_config = """
 ramble:
   variants:
@@ -2031,7 +2045,7 @@ software:
       compiler_spec: gcc@10.5.0
 """
 
-    workspace_name = "test_simplify"
+    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 

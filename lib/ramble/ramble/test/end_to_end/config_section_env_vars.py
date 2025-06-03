@@ -22,7 +22,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_config_section_env_vars(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_config_section_env_vars(
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
+):
     test_config = """
 ramble:
   variables:
@@ -46,7 +48,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_config_section_env_vars"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

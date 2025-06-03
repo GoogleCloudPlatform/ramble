@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_gromacs_size_expansion(mutable_config, mutable_mock_workspace_path):
+def test_gromacs_size_expansion(mutable_config, mutable_mock_workspace_path, request):
     test_config = """
 ramble:
   variants:
@@ -59,7 +59,7 @@ ramble:
         - intel-mpi
 """
 
-    workspace_name = "test_gromacs_size_expansion"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

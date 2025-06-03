@@ -24,7 +24,7 @@ workspace = RambleCommand("workspace")
 
 
 def test_workspace_setup_creates_inventory(
-    mutable_config, mutable_mock_workspace_path, mock_applications
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
 ):
     test_config = """
 ramble:
@@ -49,7 +49,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_workspace_setup_creates_inventory"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

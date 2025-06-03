@@ -23,7 +23,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path):
+def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path, request):
     """Tests tty.die at end of ramble.application_types.spack._create_software_env"""
     test_config = """
 ramble:
@@ -61,7 +61,7 @@ ramble:
         - wrfv3
 """
 
-    workspace_name = "test_missing_required_dry_run"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

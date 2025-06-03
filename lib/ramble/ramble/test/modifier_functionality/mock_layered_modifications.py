@@ -18,9 +18,9 @@ workspace = RambleCommand("workspace")
 
 
 def test_layered_variable_modifications(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, request
 ):
-    workspace_name = "test_gromacs_dry_run_mock_spack_mod"
+    workspace_name = request.node.name
 
     test_modifiers = [
         (SCOPES.experiment, modifier_helpers.named_modifier("test-mod")),

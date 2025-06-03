@@ -25,7 +25,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_wrfv4_explicit_zips(mutable_config, mutable_mock_workspace_path):
+def test_wrfv4_explicit_zips(mutable_config, mutable_mock_workspace_path, request):
     test_config = """
 ramble:
   variants:
@@ -118,7 +118,7 @@ licenses:
       WRF_LICENSE: port@server
 """
 
-    workspace_name = "test_end_to_end_wrfv4"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

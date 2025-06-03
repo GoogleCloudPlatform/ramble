@@ -28,7 +28,7 @@ def assert_text_in_mirror_logs(ws, text):
     assert search_files_for_string(mirror_logs, text)
 
 
-def test_warn_mirror_support(tmpdir):
+def test_warn_mirror_support(tmpdir, request):
     test_config = """
 ramble:
   variants:
@@ -48,7 +48,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = "test_pip_mirror_support"
+    ws_name = request.node.name
     ws = ramble.workspace.create(ws_name)
     ramble.workspace.activate(ws)
     ws.write()

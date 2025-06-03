@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -38,8 +39,9 @@ def test_gromacs_dry_run_mock_mods(
     mock_modifiers,
     scope,
     modifier_mode,
+    request,
 ):
-    workspace_name = "test_gromacs_dry_run_mock_mods"
+    workspace_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
 
     test_modifiers = [
         (scope, modifier_helpers.named_modifier(mock_modifier, modifier_mode)),

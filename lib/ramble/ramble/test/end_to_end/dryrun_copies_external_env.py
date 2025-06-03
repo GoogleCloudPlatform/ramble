@@ -24,7 +24,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir):
+def test_dryrun_copies_external_env(mutable_config, mutable_mock_workspace_path, tmpdir, request):
     test_spack_env = """
 spack:
   specs: [ 'wrf' ]
@@ -64,7 +64,7 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_dryrun_copies_external_env"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

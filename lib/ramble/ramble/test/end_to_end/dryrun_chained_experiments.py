@@ -29,7 +29,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.filterwarnings("ignore:invalid decimal literal")
-def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path):
+def test_dryrun_chained_experiments(mutable_config, mutable_mock_workspace_path, request):
     test_config = r"""
 ramble:
   variants:
@@ -120,7 +120,7 @@ ramble:
 
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_dryrun_chained_experiments"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

@@ -22,7 +22,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.maybeslow
-def test_analyze_upload():
+def test_analyze_upload(request):
     test_config = """
 ramble:
   config:
@@ -45,7 +45,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = "test_analyze_upload"
+    ws_name = request.node.name
     ws = ramble.workspace.create(ws_name)
     ws.write()
 

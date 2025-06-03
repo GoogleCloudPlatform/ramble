@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_get_file_path(mock_applications, mock_file_auto_create):
+def test_get_file_path(mock_applications, mock_file_auto_create, request):
     test_config = """
 ramble:
   config:
@@ -46,7 +46,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test-get-file-path"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 

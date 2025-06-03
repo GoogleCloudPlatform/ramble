@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace_path):
+def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace_path, request):
     """
     Verify that concretizing an application with required set to True
     does not insert a required statement into software dict.
@@ -75,7 +75,7 @@ ramble:
 
     import re
 
-    workspace_name = "test_concretize_does_not_set_required"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

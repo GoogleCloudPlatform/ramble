@@ -64,8 +64,8 @@ ramble:
     return ws
 
 
-def test_analyze_fom_output():
-    workspace_name = "test-fom-output"
+def test_analyze_fom_output(request):
+    workspace_name = request.node.name
     ws = _setup_workspace(workspace_name)
 
     workspace("analyze", "-p", global_args=["-w", workspace_name])
@@ -77,8 +77,8 @@ def test_analyze_fom_output():
         assert "possible hostname = test-user.c.googlers.com" in content
 
 
-def test_analyze_print(monkeypatch):
-    workspace_name = "test-analyze-print"
+def test_analyze_print(monkeypatch, request):
+    workspace_name = request.node.name
     _setup_workspace(workspace_name)
 
     msg_list = []

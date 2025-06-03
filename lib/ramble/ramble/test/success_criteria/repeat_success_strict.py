@@ -23,7 +23,9 @@ workspace = RambleCommand("workspace")
 ramble_on = RambleCommand("on")
 
 
-def test_repeat_success_strict(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_repeat_success_strict(
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
+):
     test_config = """
 ramble:
   config:
@@ -46,7 +48,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_repeat_success_strict"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

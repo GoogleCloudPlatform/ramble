@@ -29,7 +29,7 @@ def _spack_loc_log_line(pkg_spec):
     return f"with args: ['location', '-i', '{pkg_spec}']"
 
 
-def test_define_package_paths():
+def test_define_package_paths(request):
     test_config = """
 ramble:
   variants:
@@ -61,7 +61,7 @@ ramble:
         - gromacs
         - intel-mpi
 """
-    workspace_name = "test-define-package-paths"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
@@ -97,7 +97,7 @@ ramble:
         assert impi_log_line not in content
 
 
-def test_package_path_variables():
+def test_package_path_variables(request):
     test_config = """
 ramble:
   variants:
@@ -130,7 +130,7 @@ ramble:
         - gromacs
         - intel-mpi
 """
-    workspace_name = "test-define-package-paths"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 

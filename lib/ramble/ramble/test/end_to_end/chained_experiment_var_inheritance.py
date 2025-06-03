@@ -25,7 +25,9 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.filterwarnings("ignore:invalid decimal literal")
-def test_chained_experiment_variable_inheritance(mutable_config, mutable_mock_workspace_path):
+def test_chained_experiment_variable_inheritance(
+    mutable_config, mutable_mock_workspace_path, request
+):
     test_config = r"""
 ramble:
   variants:
@@ -122,7 +124,7 @@ ramble:
 
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_chained_experiment_variable_inheritance"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

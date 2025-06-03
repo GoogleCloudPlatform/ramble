@@ -27,7 +27,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_spack_env_cache():
+def test_spack_env_cache(request):
     test_config = """
 ramble:
   variants:
@@ -73,7 +73,7 @@ ramble:
         - intel-mpi
 """
     try:
-        workspace_name = "test-spack-env-cache"
+        workspace_name = request.node.name
         ws = ramble.workspace.create(workspace_name)
         ws.write()
 

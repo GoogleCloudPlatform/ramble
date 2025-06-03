@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -48,6 +49,7 @@ def test_workspace_tag_filtering(
     tag,
     expected_experiments,
     unexpected_experiments,
+    request,
 ):
     test_config = """
 ramble:
@@ -78,7 +80,7 @@ ramble:
     environments: {}
 """
 
-    workspace_name = f"test_tag_filtering_{tag}"
+    workspace_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

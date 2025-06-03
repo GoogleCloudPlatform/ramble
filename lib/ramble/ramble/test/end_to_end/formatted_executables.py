@@ -23,7 +23,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_formatted_executables(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_formatted_executables(
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
+):
     test_config = r"""
 ramble:
   variables:
@@ -65,7 +67,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_formatted_executables"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -98,7 +100,7 @@ ramble:
 
 
 def test_redefined_executable_errors(
-    mutable_config, mutable_mock_workspace_path, mock_applications
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
 ):
     test_config = r"""
 ramble:
@@ -124,7 +126,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_redefined_executable_errors"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -48,9 +49,15 @@ workspace = RambleCommand("workspace")
     ],
 )
 def test_gromacs_dry_run_mock_env_vars_mod(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope, factory, answer
+    mutable_mock_workspace_path,
+    mutable_applications,
+    mock_modifiers,
+    scope,
+    factory,
+    answer,
+    request,
 ):
-    workspace_name = "test_gromacs_dry_run_mock_env_vars_mod"
+    workspace_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
 
     test_modifiers = [
         (scope, factory()),

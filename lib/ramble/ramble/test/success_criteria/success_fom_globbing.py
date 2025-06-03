@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -56,7 +57,14 @@ workspace = RambleCommand("workspace")
     ],
 )
 def test_success_fom_globbing(
-    mutable_config, mutable_mock_workspace_path, mock_applications, value, formula, result, scope
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    value,
+    formula,
+    result,
+    scope,
+    request,
 ):
 
     success_criteria_definitions = [
@@ -72,7 +80,7 @@ def test_success_fom_globbing(
         )
     ]
 
-    workspace_name = "test_success_fom_globbing"
+    workspace_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

@@ -23,7 +23,9 @@ workspace = RambleCommand("workspace")
 config = RambleCommand("config")
 
 
-def test_merge_config_files(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_merge_config_files(
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
+):
     test_applications = """
 applications:
   zlib:
@@ -65,7 +67,7 @@ licenses:
     set:
       TEST_LICENSE: 'port@server'
 """
-    workspace_name = "test_merge_config_files"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

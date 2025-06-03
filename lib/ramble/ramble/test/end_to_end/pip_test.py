@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_pip():
+def test_pip(request):
     test_config = """
 ramble:
   variants:
@@ -53,7 +53,7 @@ ramble:
         - requests
         - semver
 """
-    workspace_name = "test-pip-pkgman"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 

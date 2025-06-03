@@ -21,8 +21,8 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
-def test_slurm_workflow_default():
-    workspace_name = "test_slurm_workflow_default"
+def test_slurm_workflow_default(request):
+    workspace_name = request.node.name
 
     test_config = """
 ramble:
@@ -61,8 +61,8 @@ ramble:
             assert "batch_submit" not in content
 
 
-def test_slurm_workflow():
-    workspace_name = "test_slurm_workflow"
+def test_slurm_workflow(request):
+    workspace_name = request.node.name
 
     test_config = """
 ramble:

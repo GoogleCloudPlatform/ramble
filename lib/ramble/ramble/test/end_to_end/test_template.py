@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_template():
+def test_template(request):
     test_config = """
 ramble:
   variables:
@@ -36,7 +36,7 @@ ramble:
                 n_nodes: 1
                 hello_name: santa
 """
-    workspace_name = "test_template"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
@@ -78,7 +78,7 @@ ramble:
     assert "script.sh" in files
 
 
-def test_template_inherited():
+def test_template_inherited(request):
     test_config = """
 ramble:
   variables:
@@ -93,7 +93,7 @@ ramble:
           experiments:
             test: {}
 """
-    workspace_name = "test_template_inherited"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)

@@ -24,7 +24,9 @@ config = ramble.main.RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_passthrough_variables(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_passthrough_variables(
+    mutable_config, mutable_mock_workspace_path, mock_applications, request
+):
     test_config = """
 ramble:
   variables:
@@ -48,7 +50,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_config_section_env_vars"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -77,7 +79,7 @@ ramble:
             assert undefined_found
 
 
-def test_disable_passthrough(mutable_config, mutable_mock_workspace_path):
+def test_disable_passthrough(mutable_config, mutable_mock_workspace_path, request):
     test_config = """
 ramble:
   variables:
@@ -96,7 +98,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_disable_passthrough"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

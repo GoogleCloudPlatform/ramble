@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_missing_mpi_cmd():
+def test_missing_mpi_cmd(request):
     test_config = """
 ramble:
   variants:
@@ -47,7 +47,7 @@ ramble:
               variables:
                 n_nodes: '1'
 """
-    workspace_name = "test-missing-mpi-cmd"
+    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 

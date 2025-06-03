@@ -23,7 +23,11 @@ workspace = RambleCommand("workspace")
 
 
 def test_globbing_patterns(
-    mutable_config, mutable_mock_workspace_path, mock_applications, mock_modifiers
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    mock_modifiers,
+    request,
 ):
     test_config = """
 ramble:
@@ -53,7 +57,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_globbing_patterns"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

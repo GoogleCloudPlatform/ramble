@@ -25,7 +25,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_gromacs_repeats(mutable_config, mutable_mock_workspace_path):
+def test_gromacs_repeats(mutable_config, mutable_mock_workspace_path, request):
     test_config = """
 ramble:
   variants:
@@ -79,7 +79,7 @@ ramble:
         - intel-mpi
 """
 
-    workspace_name = "test_end_to_end_repeats"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -49,13 +50,14 @@ def test_success_modifier(
     value,
     result,
     scope,
+    request,
 ):
 
     modifier = [
         (scope, {"name": "success-criteria"}),
     ]
 
-    workspace_name = "test_success_modifier"
+    workspace_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

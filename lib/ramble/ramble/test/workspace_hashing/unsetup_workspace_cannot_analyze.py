@@ -25,7 +25,7 @@ workspace = RambleCommand("workspace")
 
 
 def test_unsetup_workspace_cannot_analyze(
-    mutable_config, mutable_mock_workspace_path, mock_applications, capsys
+    mutable_config, mutable_mock_workspace_path, mock_applications, capsys, request
 ):
     test_config = """
 ramble:
@@ -57,7 +57,7 @@ ramble:
         packages:
         - zlib
 """
-    workspace_name = "test_unsetup_workspace_cannot_analyze"
+    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

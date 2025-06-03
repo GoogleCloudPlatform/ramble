@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_short_builtin_dep_name(mock_applications):
+def test_short_builtin_dep_name(mock_applications, request):
     test_config = """
 ramble:
   variants:
@@ -42,7 +42,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = "test_short_builtin_dep_name"
+    ws_name = request.node.name
     ws = ramble.workspace.create(ws_name)
     ramble.workspace.activate(ws)
     ws.write()
