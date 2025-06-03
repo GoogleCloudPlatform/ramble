@@ -9,8 +9,13 @@
 # flake8: noqa: F401
 """wmkit is a set of useful modules to import when writing workflow managers"""
 
+import ramble.repository
 from ramble.language.shared_language import *
 from ramble.language.workflow_manager_language import *
 from ramble.util.command_runner import CommandRunner, RunnerError
 from ramble.util.logger import logger
-from ramble.workflow_manager import WorkflowManagerBase
+
+base_class_type = ramble.repository.ObjectTypes.base_classes
+WorkflowManagerBase = ramble.repository.get_obj_class(
+    "workflow-manager-base", object_type=base_class_type
+)

@@ -25,7 +25,9 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     name = None
     object_variants = None
     origin_type = "workflow_manager"
-    _builtin_name = NS_SEPARATOR.join(("workflow_manager_builtin", "{obj_name}", "{name}"))
+    _builtin_name = NS_SEPARATOR.join(
+        ("workflow_manager_builtin", "{obj_name}", "{name}")
+    )
     _language_classes = [WorkflowManagerMeta, SharedMeta]
     _pipelines = [
         "analyze",
@@ -55,7 +57,9 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     )
 
     workflow_manager_variable(
-        "hostfile", default="{experiment_run_dir}/hostfile", description="Default hostfile path"
+        "hostfile",
+        default="{experiment_run_dir}/hostfile",
+        description="Default hostfile path",
     )
 
     def __init__(self, file_path):
@@ -131,7 +135,9 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
 
         all_vars = {}
         for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(when_key, self.app_inst.object_variants):
+            if not self.app_inst.expander.satisfies(
+                when_key, self.app_inst.object_variants
+            ):
                 continue
 
             for var in var_list:

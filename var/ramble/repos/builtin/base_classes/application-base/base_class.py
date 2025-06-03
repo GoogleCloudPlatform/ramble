@@ -43,7 +43,6 @@ import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
 import ramble.variants
-import ramble.workflow_manager
 from ramble.error import (
     ApplicationError,
     ChainCycleDetectedError,
