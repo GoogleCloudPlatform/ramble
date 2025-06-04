@@ -21,9 +21,7 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
-def test_default_workflow_manager_banner():
-    workspace_name = "test_workflow_manager_default"
-
+def test_default_workflow_manager_banner(workspace_name):
     test_config = """
 ramble:
   variables:

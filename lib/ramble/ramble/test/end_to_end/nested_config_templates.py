@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_nested_config_templates(request):
+def test_nested_config_templates(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -38,7 +38,6 @@ ramble:
               variables:
                 n_nodes: 1
 """
-    workspace_name = request.node.name
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)

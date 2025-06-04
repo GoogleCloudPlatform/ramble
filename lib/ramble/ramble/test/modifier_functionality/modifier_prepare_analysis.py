@@ -32,10 +32,8 @@ on_cmd = RambleCommand("on")
     ],
 )
 def test_basic_dry_run_mock_prepare_analysis_mod(
-    mutable_mock_workspace_path, mock_applications, mock_modifiers, scope
+    mutable_mock_workspace_path, mock_applications, mock_modifiers, scope, workspace_name
 ):
-    workspace_name = "test_basic_dry_run_mock_prepare_analysis_mod"
-
     test_modifiers = [(scope, modifier_helpers.named_modifier("prepare-analysis"))]
 
     with ramble.workspace.create(workspace_name) as ws1:

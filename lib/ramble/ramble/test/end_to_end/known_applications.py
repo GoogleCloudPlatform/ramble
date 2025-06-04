@@ -26,7 +26,7 @@ config = RambleCommand("config")
 @pytest.mark.long
 @deprecation.fail_if_not_removed
 @pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
-def test_known_applications(application, package_manager, mock_file_auto_create, request):
+def test_known_applications(application, package_manager, mock_file_auto_create, workspace_name):
     setup_type = ramble.pipeline.pipelines.setup
     analyze_type = ramble.pipeline.pipelines.analyze
     archive_type = ramble.pipeline.pipelines.archive
@@ -35,7 +35,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
     archive_cls = ramble.pipeline.pipeline_class(archive_type)
     filters = ramble.filters.Filters()
 
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+    ws_name = workspace_name
 
     with ramble.workspace.create(ws_name) as ws:
         ws.write()
@@ -90,7 +90,9 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
 @pytest.mark.long
 @deprecation.fail_if_not_removed
 @pytest.mark.filterwarnings("ignore:invalid escape sequence:DeprecationWarning")
-def test_known_workflow_managers(workflow_manager, mock_file_auto_create, mutable_config, request):
+def test_known_workflow_managers(
+    workflow_manager, mock_file_auto_create, mutable_config, workspace_name
+):
     setup_type = ramble.pipeline.pipelines.setup
     analyze_type = ramble.pipeline.pipelines.analyze
     archive_type = ramble.pipeline.pipelines.archive
@@ -99,9 +101,7 @@ def test_known_workflow_managers(workflow_manager, mock_file_auto_create, mutabl
     archive_cls = ramble.pipeline.pipeline_class(archive_type)
     filters = ramble.filters.Filters()
 
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         args = [
             "gromacs",
@@ -121,7 +121,7 @@ def test_known_workflow_managers(workflow_manager, mock_file_auto_create, mutabl
         args.append("--wm")
         args.append(workflow_manager)
 
-        workspace("manage", "experiments", *args, global_args=["-w", ws_name])
+        workspace("manage", "experiments", *args, global_args=["-w", workspace_name])
 
         # Handle workflow manager. Remove variables defined in the workflow to
         # ensure we catch invalid configurations.
@@ -131,10 +131,10 @@ def test_known_workflow_managers(workflow_manager, mock_file_auto_create, mutabl
                 workflow_manager, object_type=ramble.repository.ObjectTypes.workflow_managers
             )
             for var in wm_inst.object_variables[frozenset()]:
-                config("remove", f"variables:{var.name}", global_args=["-w", ws_name])
+                config("remove", f"variables:{var.name}", global_args=["-w", workspace_name])
 
             for var_name in wm_inst.templates:
-                config("remove", f"variables:{var_name}", global_args=["-w", ws_name])
+                config("remove", f"variables:{var_name}", global_args=["-w", workspace_name])
 
         ws._re_read()
         ws.concretize()

@@ -20,7 +20,7 @@ workspace = RambleCommand("workspace")
 ramble_on = RambleCommand("on")
 
 
-def test_disconnected_success(mock_applications, request):
+def test_disconnected_success(mock_applications, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -51,7 +51,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

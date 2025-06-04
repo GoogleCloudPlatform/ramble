@@ -17,10 +17,8 @@ workspace = RambleCommand("workspace")
 
 
 def test_repeated_variable_modifications(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, request
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, workspace_name
 ):
-    workspace_name = request.node.name
-
     test_modifiers = [
         (SCOPES.experiment, modifier_helpers.named_modifier("repeat-var-mod")),
     ]

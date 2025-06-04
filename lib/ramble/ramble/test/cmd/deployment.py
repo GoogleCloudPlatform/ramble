@@ -49,9 +49,8 @@ def check_deployment_files(root, app_name):
 
 
 @pytest.mark.maybeslow
-def test_local_deployment(mutable_config, mutable_mock_workspace_path):
+def test_local_deployment(mutable_config, mutable_mock_workspace_path, workspace_name):
 
-    workspace_name = "test_local_deployment"
     app_name = "namd"
 
     deployment_dir = ""

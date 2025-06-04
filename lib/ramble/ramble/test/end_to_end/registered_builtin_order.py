@@ -21,10 +21,9 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_registered_builtin_order(request):
-    ws_name = request.node.name
-    ws = ramble.workspace.create(ws_name)
-    global_args = ["-w", ws_name]
+def test_registered_builtin_order(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
 
     workspace(
         "manage",

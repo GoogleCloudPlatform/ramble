@@ -50,10 +50,8 @@ workspace = RambleCommand("workspace")
     ],
 )
 def test_gromacs_multi_modifier_dry_run(
-    mutable_mock_workspace_path, mutable_applications, scopes, factories, answers
+    mutable_mock_workspace_path, mutable_applications, scopes, factories, answers, workspace_name
 ):
-    workspace_name = "test_gromacs_multi_modifier_dry_run"
-
     test_modifiers = []
 
     for scope, factory in zip(scopes, factories):

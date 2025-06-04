@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -21,7 +22,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_env_var_builtin(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_env_var_builtin(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_config = """
 ramble:
   config:
@@ -63,7 +66,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_env_var_command"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -82,8 +84,6 @@ ramble:
         exp2_script = os.path.join(exp2_dir, "execute_experiment")
         exp3_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl3", "simple_test")
         exp3_script = os.path.join(exp3_dir, "execute_experiment")
-
-        import re
 
         export_regex = re.compile(r"export MY_VAR=TEST")
         cmd1_regex = re.compile("bar >>")
@@ -127,7 +127,9 @@ ramble:
             assert cmd_found and export_found
 
 
-def test_env_var_from_app_only(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_env_var_from_app_only(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_config = """
 ramble:
   variables:
@@ -148,7 +150,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_env_var_from_app_only"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

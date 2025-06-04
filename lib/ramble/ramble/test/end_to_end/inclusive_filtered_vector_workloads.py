@@ -21,7 +21,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_inclusive_filtered_vector_workloads(mutable_config, mutable_mock_workspace_path):
+def test_inclusive_filtered_vector_workloads(
+    mutable_config, mutable_mock_workspace_path, workspace_name
+):
     test_config = """
 ramble:
   variables:
@@ -43,7 +45,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_inclusive_filtered_vector_workloads"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

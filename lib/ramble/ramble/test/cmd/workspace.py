@@ -8,6 +8,7 @@
 
 import glob
 import os
+import re
 
 import pytest
 
@@ -175,7 +176,7 @@ def test_workspace_list(mutable_mock_workspace_path):
     assert ".DS_Store" not in out
 
 
-def test_workspace_info():
+def test_workspace_info(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -213,7 +214,6 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_info"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -229,7 +229,7 @@ ramble:
     check_info_basic(output)
 
 
-def test_workspace_info_prints_all_levels():
+def test_workspace_info_prints_all_levels(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -274,7 +274,6 @@ config:
     conf_level: 1
 """
 
-    workspace_name = "test_workspace_info_prints_all_levels"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -297,7 +296,7 @@ config:
     assert "Variables from Experiment:" in output
 
 
-def test_workspace_info_with_experiment_chain():
+def test_workspace_info_with_experiment_chain(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -329,7 +328,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_workspace_info_with_experiment_chain"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -346,7 +344,7 @@ ramble:
     assert "- basic.test_wl2.test_experiment.chain.0.basic.test_wl.test_experiment" in output
 
 
-def test_workspace_info_with_where_filter():
+def test_workspace_info_with_where_filter(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -384,7 +382,6 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_info"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -494,7 +491,7 @@ def test_remove_workspace():
     assert "bar" not in out
 
 
-def test_concretize_command():
+def test_concretize_command(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -529,7 +526,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_concretize_command"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -567,7 +563,7 @@ def test_concretize_nothing():
         assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
 
 
-def test_concretize_concrete_config():
+def test_concretize_concrete_config(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -607,7 +603,6 @@ ramble:
         - zlib
 """
 
-    workspace_name = "test_concretize_concrete_config"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -625,7 +620,7 @@ ramble:
         workspace("concretize", global_args=["-w", workspace_name])
 
 
-def test_force_concretize():
+def test_force_concretize(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -665,7 +660,6 @@ ramble:
         - zlib-test
 """
 
-    workspace_name = "test_force_concretize"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -915,7 +909,7 @@ def test_edit_override_gets_correct_path():
         assert output == config_path
 
 
-def test_dryrun_setup():
+def test_dryrun_setup(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -936,7 +930,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_dryrun"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -959,7 +952,7 @@ ramble:
     )
 
 
-def test_matrix_vector_workspace_full():
+def test_matrix_vector_workspace_full(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1002,7 +995,6 @@ ramble:
     expected_experiments.add("exp_series_6_4_10_2")
     expected_experiments.add("exp_series_6_4_10_4")
 
-    workspace_name = "test_vec_mat_expansion"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1031,7 +1023,7 @@ ramble:
         assert os.path.exists(os.path.join(exp_base, exp))
 
 
-def test_invalid_vector_workspace():
+def test_invalid_vector_workspace(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1055,7 +1047,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_vectors"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1084,7 +1075,7 @@ ramble:
     )
 
 
-def test_invalid_size_matrices_workspace():
+def test_invalid_size_matrices_workspace(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1107,7 +1098,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_size_matrices"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1130,7 +1120,7 @@ ramble:
     assert "do not result in the same number of elements." in output
 
 
-def test_undefined_var_matrices_workspace():
+def test_undefined_var_matrices_workspace(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1149,7 +1139,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_input_matrices"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1169,7 +1158,7 @@ ramble:
     assert "variable or zip foo has not been defined yet" in output
 
 
-def test_non_vector_var_matrices_workspace():
+def test_non_vector_var_matrices_workspace(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1190,7 +1179,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_non_vector_input_matrices"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1210,7 +1198,7 @@ ramble:
     assert "variable foo does not refer to a vector" in output
 
 
-def test_multi_use_vector_var_matrices_workspace():
+def test_multi_use_vector_var_matrices_workspace(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1232,7 +1220,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_non_vector_input_matrices"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1252,7 +1239,7 @@ ramble:
     assert "Variable foo has been used in multiple matrices" in output
 
 
-def test_reconcretize_in_configs_dir(tmpdir):
+def test_reconcretize_in_configs_dir(tmpdir, workspace_name):
     """
     Test multiple concretizations while the configs dir is the cwd do not fail.
     This catches a bug that existed when lock files were written incorrectly.
@@ -1286,7 +1273,7 @@ ramble:
                 f.write(config)
             ws._re_read()
 
-    ws_path = str(tmpdir.join("test_reconcretize_in_configs_dir"))
+    ws_path = str(tmpdir.join(workspace_name))
     workspace("create", "-d", ws_path)
     assert ramble.workspace.is_workspace_dir(ws_path)
 
@@ -1314,7 +1301,7 @@ ramble:
             assert namespace.environments in software_dict
 
 
-def test_workspace_archive():
+def test_workspace_archive(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1342,7 +1329,6 @@ licenses:
       TEST_LIC: 'value'
 """
 
-    workspace_name = "test_basic_archive"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1418,7 +1404,7 @@ licenses:
     )
 
 
-def test_workspace_archive_include_secrets():
+def test_workspace_archive_include_secrets(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1446,7 +1432,6 @@ licenses:
       TEST_LIC: 'value'
 """
 
-    workspace_name = "test_basic_archive"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1484,7 +1469,7 @@ licenses:
     )
 
 
-def test_workspace_tar_archive():
+def test_workspace_tar_archive(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1505,7 +1490,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_basic_archive"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1558,7 +1542,7 @@ ramble:
     assert os.path.exists(os.path.join(ws1.archive_dir, "archive.latest.tar.gz"))
 
 
-def test_workspace_tar_upload_archive():
+def test_workspace_tar_upload_archive(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1579,7 +1563,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_basic_archive"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1638,7 +1621,7 @@ ramble:
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + ".tar.gz"))
 
 
-def test_workspace_tar_upload_archive_config_url():
+def test_workspace_tar_upload_archive_config_url(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1659,7 +1642,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_basic_archive"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1720,7 +1702,7 @@ ramble:
     assert os.path.exists(os.path.join(remote_archive_path, ws1.latest_archive + ".tar.gz"))
 
 
-def test_workspace_archive_includes_exec_logs(request):
+def test_workspace_archive_includes_exec_logs(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1741,7 +1723,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = request.node.name
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1771,7 +1752,7 @@ ramble:
         assert os.path.isfile(file.replace(ws1.root, ws1.latest_archive_path))
 
 
-def test_dryrun_noexpvars_setup():
+def test_dryrun_noexpvars_setup(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1790,7 +1771,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_dryrun"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1813,9 +1793,8 @@ ramble:
     )
 
 
-def test_workspace_include():
+def test_workspace_include(workspace_name):
 
-    workspace_name = "test_info"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1872,7 +1851,7 @@ ramble:
 
 
 @pytest.mark.parametrize("tpl_name", ["env_path"])
-def test_invalid_template_name_errors(tpl_name, capsys):
+def test_invalid_template_name_errors(tpl_name, capsys, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1891,7 +1870,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_invalid_template_name"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1912,7 +1890,7 @@ ramble:
         ws1._re_read()
 
 
-def test_custom_executables_info():
+def test_custom_executables_info(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -1953,7 +1931,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_custom_executables_info"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -1971,7 +1948,7 @@ ramble:
     assert "exp_level_cmd" in output
 
 
-def test_custom_executables_order_info():
+def test_custom_executables_order_info(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -2015,7 +1992,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_custom_executables_info"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -2031,7 +2007,7 @@ ramble:
     assert "['exp_level_cmd', 'wl_level_cmd', 'app_level_cmd']" in output
 
 
-def test_workspace_simplify():
+def test_workspace_simplify(workspace_name):
     test_ws_config = """
 ramble:
   variants:
@@ -2094,7 +2070,6 @@ software:
       compiler_spec: gcc@10.5.0
 """
 
-    workspace_name = "test_simplify"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
@@ -2139,8 +2114,7 @@ def write_variables_config_file(file_path, levels, value):
             f.write(f"  scope{i}: {value}\n")
 
 
-def test_workspace_config_precedence(request, tmpdir):
-    workspace_name = request.node.name
+def test_workspace_config_precedence(workspace_name, tmpdir):
     ws = ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]
@@ -2189,9 +2163,7 @@ def test_workspace_config_precedence(request, tmpdir):
     assert "scope3 = workspace" in output
 
 
-def test_workspace_info_software(request):
-    workspace_name = request.node.name
-
+def test_workspace_info_software(workspace_name):
     ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]
@@ -2317,8 +2289,7 @@ def test_workspace_info_software(request):
     assert "spack-test" not in output
 
 
-def test_workspace_no_empty_workloads(request):
-    workspace_name = request.node.name
+def test_workspace_no_empty_workloads(workspace_name):
     global_args = ["-w", workspace_name]
 
     with ramble.workspace.create(workspace_name) as ws:
@@ -2344,8 +2315,8 @@ def test_workspace_no_empty_workloads(request):
 
 
 def test_no_inherit_active_workspace_variants(request):
-    workspace1_name = f"{request.node.name}_1"
-    workspace2_name = f"{request.node.name}_2"
+    workspace1_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name) + "_1"
+    workspace2_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name) + "_2"
 
     global_args = ["-w", workspace1_name]
 

@@ -22,8 +22,7 @@ pytestmark = pytest.mark.usefixtures(
 
 
 @pytest.mark.maybeslow
-def test_workflow_manager_foms(mutable_mock_wms_repo):
-    workspace_name = "test_workflow_manager_foms"
+def test_workflow_manager_foms(mutable_mock_wms_repo, workspace_name):
     test_config = """
 ramble:
   variants:

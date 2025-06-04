@@ -47,6 +47,7 @@ def test_workspace_tag_filtering(
     tag,
     expected_experiments,
     unexpected_experiments,
+    workspace_name,
 ):
     test_config = """
 ramble:
@@ -77,7 +78,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = f"test_tag_filtering_{tag}"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

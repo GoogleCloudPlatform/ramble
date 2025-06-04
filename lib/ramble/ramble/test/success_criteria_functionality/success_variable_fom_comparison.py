@@ -53,7 +53,14 @@ config = RambleCommand("config")
     ],
 )
 def test_success_variable_fom_comparison(
-    mutable_config, mutable_mock_workspace_path, mock_applications, value, formula, result, scope
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    value,
+    formula,
+    result,
+    scope,
+    workspace_name,
 ):
 
     success_criteria_definitions = [
@@ -68,7 +75,6 @@ def test_success_variable_fom_comparison(
         )
     ]
 
-    workspace_name = "test_success_fom_comparison"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

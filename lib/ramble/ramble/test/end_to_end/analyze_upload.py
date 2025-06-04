@@ -22,7 +22,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.maybeslow
-def test_analyze_upload(request):
+def test_analyze_upload(workspace_name):
     test_config = """
 ramble:
   config:
@@ -45,8 +45,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = request.node.name
-    ws = ramble.workspace.create(ws_name)
+    ws = ramble.workspace.create(workspace_name)
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
@@ -56,12 +55,12 @@ ramble:
 
     ws._re_read()
 
-    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
     exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
     with open(exp_out, "w") as f:
         f.write("test-user.c.googlers.com\n")
 
-    workspace("analyze", "--upload", global_args=["-w", ws_name])
+    workspace("analyze", "--upload", global_args=["-w", workspace_name])
 
     analyze_log = os.path.join(ws.log_dir, "analyze.latest.out")
 

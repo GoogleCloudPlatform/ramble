@@ -28,7 +28,11 @@ workspace = RambleCommand("workspace")
 
 
 def test_shared_contexts(
-    mutable_config, mutable_mock_workspace_path, mock_applications, mock_modifiers
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    mock_modifiers,
+    workspace_name,
 ):
     test_config = """
 ramble:
@@ -52,7 +56,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_shared_context"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

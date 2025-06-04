@@ -20,10 +20,9 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_object_import_separate_python_source(request):
-    ws_name = request.node.name
-    ws = ramble.workspace.create(ws_name)
-    global_args = ["-w", ws_name]
+def test_object_import_separate_python_source(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
 
     workspace(
         "manage",

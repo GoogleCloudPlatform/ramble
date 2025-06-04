@@ -20,9 +20,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_object_validation():
-    workspace_name = "test-validation"
-
+def test_object_validation(workspace_name):
     global_args = ["-w", workspace_name]
 
     ws = ramble.workspace.create(workspace_name)

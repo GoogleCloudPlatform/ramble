@@ -47,10 +47,14 @@ workspace = RambleCommand("workspace")
     ],
 )
 def test_gromacs_dry_run_mock_env_vars_mod(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope, factory, answer
+    mutable_mock_workspace_path,
+    mutable_applications,
+    mock_modifiers,
+    scope,
+    factory,
+    answer,
+    workspace_name,
 ):
-    workspace_name = "test_gromacs_dry_run_mock_env_vars_mod"
-
     test_modifiers = [
         (scope, factory()),
     ]

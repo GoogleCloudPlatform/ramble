@@ -24,8 +24,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_workspace_add_includes(request):
-    workspace_name = request.node.name
+def test_workspace_add_includes(workspace_name):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
 
@@ -52,8 +51,7 @@ def test_workspace_add_includes(request):
         assert "- $workspace_configs/auxiliary_software_files" in data
 
 
-def test_workspace_remove_includes_index(request):
-    workspace_name = request.node.name
+def test_workspace_remove_includes_index(workspace_name):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
 
@@ -96,8 +94,7 @@ def test_workspace_remove_includes_index(request):
         assert "- $workspace_configs/auxiliary_software_files" not in data
 
 
-def test_workspace_remove_includes_pattern(request):
-    workspace_name = request.node.name
+def test_workspace_remove_includes_pattern(workspace_name):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
 

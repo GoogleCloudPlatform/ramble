@@ -22,7 +22,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_expanded_foms_dry_run(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_expanded_foms_dry_run(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_config = """
 ramble:
   variables:
@@ -43,7 +45,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = "test_end_to_end_expanded_foms"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

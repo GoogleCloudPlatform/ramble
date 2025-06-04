@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_short_builtin_dep_name(mock_applications):
+def test_short_builtin_dep_name(mock_applications, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -42,8 +42,7 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws_name = "test_short_builtin_dep_name"
-    ws = ramble.workspace.create(ws_name)
+    ws = ramble.workspace.create(workspace_name)
     ramble.workspace.activate(ws)
     ws.write()
 
@@ -55,4 +54,4 @@ ramble:
     ws._re_read()
 
     with pytest.raises(GraphNodeAmbiguousError):
-        workspace("setup", "--dry-run", global_args=["-w", ws_name])
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])

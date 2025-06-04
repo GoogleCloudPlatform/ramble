@@ -24,7 +24,7 @@ workspace = RambleCommand("workspace")
 
 
 def test_dryrun_series_contains_package_paths(
-    mutable_config, mutable_mock_workspace_path, mock_applications
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
 ):
     test_config = r"""
 ramble:
@@ -59,7 +59,6 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_dryrun_series_contains_package_paths"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

@@ -15,9 +15,7 @@ workspace = RambleCommand("workspace")
 config = RambleCommand("config")
 
 
-def test_env_dirs_do_not_collide(mutable_config, mutable_mock_workspace_path, request):
-    workspace_name = request.node.name
-
+def test_env_dirs_do_not_collide(mutable_config, mutable_mock_workspace_path, workspace_name):
     ws = ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]

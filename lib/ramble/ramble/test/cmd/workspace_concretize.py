@@ -19,9 +19,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_workspace_concretize_additive(request):
-    workspace_name = request.node.name
-
+def test_workspace_concretize_additive(workspace_name):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
 
@@ -65,9 +63,7 @@ def test_workspace_concretize_additive(request):
         assert "intel-oneapi-vtune" in content
 
 
-def test_workspace_multispec_concretize(request):
-    workspace_name = request.node.name
-
+def test_workspace_multispec_concretize(workspace_name):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
 

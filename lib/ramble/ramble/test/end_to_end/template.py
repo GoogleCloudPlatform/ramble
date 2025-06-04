@@ -22,7 +22,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_template():
+def test_template(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -39,7 +39,6 @@ ramble:
                 n_nodes: 1
                 hello_name: santa
 """
-    workspace_name = "test_template"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
@@ -81,7 +80,7 @@ ramble:
     assert "script.sh" in files
 
 
-def test_template_inherited():
+def test_template_inherited(workspace_name):
     test_config = """
 ramble:
   variables:
@@ -96,7 +95,6 @@ ramble:
           experiments:
             test: {}
 """
-    workspace_name = "test_template_inherited"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
@@ -120,7 +118,7 @@ ramble:
     assert os.path.isfile(script_path)
 
 
-def test_executable_templates_no_trailing_spaces(mutable_mock_apps_repo):
+def test_executable_templates_no_trailing_spaces(mutable_mock_apps_repo, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -139,7 +137,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_executable_templates_no_trailing_spaces"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
@@ -157,7 +154,7 @@ ramble:
         assert "EOF " not in content
 
 
-def test_template_wrong_extension(mutable_mock_apps_repo):
+def test_template_wrong_extension(mutable_mock_apps_repo, workspace_name):
     template_src_name = "template_wrong_extension.sh"
     ext = constants.TEMPLATE_EXTENSION
     test_config = f"""
@@ -175,7 +172,6 @@ ramble:
           experiments:
             test: {{}}
 """
-    workspace_name = "test_template_wrong_extension"
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)

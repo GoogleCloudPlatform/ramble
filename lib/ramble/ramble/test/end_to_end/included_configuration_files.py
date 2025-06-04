@@ -26,7 +26,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_included_configuration_files(mutable_config, mutable_mock_workspace_path, request):
+def test_included_configuration_files(mutable_config, mutable_mock_workspace_path, workspace_name):
 
     test_config = """
 ramble:
@@ -111,7 +111,6 @@ software:
       - intel-mpi
 """
 
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

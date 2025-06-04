@@ -64,7 +64,7 @@ ramble:
         assert expected_val in data
 
 
-def test_license_name_parent(mutable_mock_apps_repo, request):
+def test_license_name_parent(mutable_mock_apps_repo, workspace_name):
     app_name = "basic-inherited-nolicense"
     test_licenses = f"""
 licenses:
@@ -72,12 +72,11 @@ licenses:
     set:
       TEST_VAR: {test_val}
 """
-    workspace_name = request.node.name
     expected_val = test_val
     license_param_core(app_name, workspace_name, test_licenses, expected_val)
 
 
-def test_license_name_self_implicit(mutable_mock_apps_repo, request):
+def test_license_name_self_implicit(mutable_mock_apps_repo, workspace_name):
     app_name = "basic-inherited-nolicense"
     expected_val = test_val + "_imp"
     test_licenses = f"""
@@ -89,11 +88,10 @@ licenses:
     set:
       TEST_VAR: {expected_val}
 """
-    workspace_name = request.node.name
     license_param_core(app_name, workspace_name, test_licenses, expected_val)
 
 
-def test_license_name_self_explicit(mutable_mock_apps_repo, request):
+def test_license_name_self_explicit(mutable_mock_apps_repo, workspace_name):
     app_name = "basic-inherited"
     expected_val = test_val + "_exp"
     test_licenses = f"""
@@ -105,5 +103,4 @@ licenses:
     set:
       TEST_VAR: {expected_val}
 """
-    workspace_name = request.node.name
     license_param_core(app_name, workspace_name, test_licenses, expected_val)

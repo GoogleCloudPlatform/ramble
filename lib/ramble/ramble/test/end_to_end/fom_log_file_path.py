@@ -24,9 +24,7 @@ on = RambleCommand("on")
 workspace = RambleCommand("workspace")
 
 
-def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, request):
-    workspace_name = request.node.name
-
+def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, workspace_name):
     global_args = ["-w", workspace_name]
 
     ws = ramble.workspace.create(workspace_name)

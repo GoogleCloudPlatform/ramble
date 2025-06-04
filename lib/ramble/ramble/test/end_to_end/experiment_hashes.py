@@ -17,9 +17,7 @@ import spack.util.spack_json as sjson
 workspace = RambleCommand("workspace")
 
 
-def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, request):
-    workspace_name = request.node.name
-
+def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspace_name):
     ws1 = ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]
