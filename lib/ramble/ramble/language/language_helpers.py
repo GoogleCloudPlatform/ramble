@@ -7,7 +7,8 @@
 # except according to those terms.
 
 import fnmatch
-from typing import Any, List
+from collections import OrderedDict
+from typing import Any, List, Union
 
 from ramble.language.language_base import DirectiveError
 
@@ -73,16 +74,17 @@ def merge_definitions(
         single_type, multiple_type, single_arg_name, multiple_arg_name, directive_name
     )
 
-    all_types = []
+    merged_types = []
 
     if single_type:
-        all_types.append(single_type)
+        merged_types.append(single_type)
 
     if multiple_type:
-        expanded_multiple_type = expand_patterns(multiple_type, multiple_pattern_match)
-        all_types.extend(expanded_multiple_type)
+        merged_types.extend(multiple_type)
 
-    return all_types
+    merged_types_expanded = expand_patterns(merged_types, multiple_pattern_match)
+
+    return merged_types_expanded
 
 
 def require_definition(
@@ -128,32 +130,52 @@ def require_definition(
     )
 
 
-def expand_patterns(multiple_type: list, multiple_pattern_match: list):
+def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict]):
     """Expand wildcard patterns within a list of names
 
     This method takes an input list containing wildcard patterns and expands the
     wildcard with values matching a list of names. Returns a list containing
     matching names and any inputs with zero matches.
 
+    If multiple_pattern_match is a dict keyed on 'when', it checks the input
+    against patterns in all 'when' conditions, without evaluating them, and
+    returns a list containing names that match under any when condition, and
+    any inputs with zero matches.
+
     Args:
-        multiple_types: List of strings for type names, may contain wildcards
-        multiple_pattern_match: List of strings to match against patterns in multiple_type
+        merged_types: List of strings for type names, may contain wildcards
+        multiple_pattern_match: List of strings (optional: nested in when_set
+            dict) to match against patterns in merged_types
 
     Returns:
         List of expanded patterns matching the names list plus patterns
-        not found in the names list.
+            not found in the names list.
     """
-
-    expanded_patterns = []
-    for input in multiple_type:
-        matched_inputs = fnmatch.filter(multiple_pattern_match, input)
-        if matched_inputs:
-            for matching_name in matched_inputs:
-                expanded_patterns.append(matching_name)
+    expanded_patterns = OrderedDict()
+    for input in merged_types:
+        expanded = False
+        if (
+            multiple_pattern_match
+            and isinstance(multiple_pattern_match, dict)
+            and isinstance(next(iter(multiple_pattern_match)), frozenset)
+        ):
+            for _, pattern_list in multiple_pattern_match.items():
+                matched_inputs = fnmatch.filter(pattern_list, input)
+                if matched_inputs:
+                    expanded = True
+                    for match in matched_inputs:
+                        expanded_patterns[match] = ""
         else:
-            expanded_patterns.append(input)
+            matched_inputs = fnmatch.filter(multiple_pattern_match, input)
+            if matched_inputs:
+                expanded = True
+                for match in matched_inputs:
+                    expanded_patterns[match] = ""
 
-    return expanded_patterns
+        if not expanded:
+            expanded_patterns[input] = ""
+
+    return list(expanded_patterns.keys())
 
 
 def build_when_list(

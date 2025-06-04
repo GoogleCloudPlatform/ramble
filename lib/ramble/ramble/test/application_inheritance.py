@@ -8,6 +8,8 @@
 
 from ramble.test.application import basic_exp_dict
 
+_FS = frozenset()
+
 
 def test_basic_inheritance(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get("basic-inherited")
@@ -15,12 +17,12 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     app_inst.set_variables(exp_dict, None)
     app_inst.define_variable("application_name", "basic-inherited")
 
-    assert "foo" in app_inst.executables
-    assert app_inst.executables["foo"].template == ["bar"]
-    assert not app_inst.executables["foo"].mpi
-    assert "bar" in app_inst.executables
-    assert app_inst.executables["bar"].template == ["baz"]
-    assert app_inst.executables["bar"].mpi
+    assert "foo" in app_inst.executables[_FS]
+    assert app_inst.executables[_FS]["foo"].template == ["bar"]
+    assert not app_inst.executables[_FS]["foo"].mpi
+    assert "bar" in app_inst.executables[_FS]
+    assert app_inst.executables[_FS]["bar"].template == ["baz"]
+    assert app_inst.executables[_FS]["bar"].mpi
 
     assert "test_wl" in app_inst.workloads
     assert app_inst.workloads["test_wl"].executables == ["foo"]
@@ -49,8 +51,8 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
-    assert "test_fom" in app_inst.figures_of_merit[frozenset()][frozenset()]
-    fom_conf = app_inst.figures_of_merit[frozenset()][frozenset()]["test_fom"]
+    assert "test_fom" in app_inst.figures_of_merit[_FS][_FS]
+    fom_conf = app_inst.figures_of_merit[_FS][_FS]["test_fom"]
     assert fom_conf["log_file"] == "{log_file}"
     assert fom_conf["regex"] == r"(?P<test>[0-9]+\.[0-9]+).*seconds.*"  # noqa: W605
     assert fom_conf["group_name"] == "test"
