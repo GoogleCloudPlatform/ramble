@@ -22,8 +22,8 @@ class Roms(ExecutableApplication):
     """
 
     name = "roms"
-
-    tags("ocean")
+    maintainers("rbfgo")
+    tags("weather", "ocean-modeling", "climate-modeling")
 
     with when("package_manager_family=spack"):
         software_spec("roms", pkg_spec="roms@4.1")

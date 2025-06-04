@@ -35,7 +35,7 @@ class SpackStack(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("software", "configuration")
+    tags("spack", "software-stack", "build-tool")
 
     executable(
         "configure",

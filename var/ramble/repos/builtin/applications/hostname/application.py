@@ -14,7 +14,7 @@ class Hostname(ExecutableApplication):
 
     name = "hostname"
 
-    tags("test-app")
+    tags("system-utility", "test-app")
 
     maintainers("douglasjacobsen")
 

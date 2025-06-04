@@ -25,7 +25,7 @@ class PyCosmoflow(ExecutableApplication):
 
     name = "py-cosmoflow"
 
-    tags("mlperf-hpc")
+    tags("machine-learning", "hpc-ml", "tensorflow", "cosmology")
 
     default_config_string = "{default_config_value}"
 

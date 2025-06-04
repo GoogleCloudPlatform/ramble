@@ -17,8 +17,6 @@ class OpenfoamOrg(OpenfoamBase):
 
     maintainers("douglasjacobsen")
 
-    tags("cfd", "fluid", "dynamics")
-
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 

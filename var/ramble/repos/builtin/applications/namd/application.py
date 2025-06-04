@@ -21,7 +21,7 @@ class Namd(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("molecular-dynamics", "charm++", "task-parallelism")
+    tags("molecular-dynamics", "hpc-benchmark", "charmpp")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")

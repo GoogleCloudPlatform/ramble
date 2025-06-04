@@ -19,7 +19,7 @@ class Gromacs(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("molecular-dynamics")
+    tags("molecular-dynamics", "hpc-benchmark")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")

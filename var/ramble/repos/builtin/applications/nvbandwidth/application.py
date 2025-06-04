@@ -16,7 +16,7 @@ class Nvbandwidth(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("synthetic-benchmarks")
+    tags("gpu-benchmark", "memory-benchmark", "cuda")
 
     with when("package_manager_family=spack"):
         software_spec("nvbandwidth", pkg_spec="nvbandwidth")

@@ -18,7 +18,7 @@ class Lammps(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("molecular-dynamics")
+    tags("molecular-dynamics", "hpc-benchmark")
 
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 

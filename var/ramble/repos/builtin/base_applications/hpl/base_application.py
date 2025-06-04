@@ -16,7 +16,7 @@ class Hpl(ExecutableApplication):
 
     name = "hpl"
 
-    tags("benchmark-app", "benchmark", "linpack")
+    tags("hpc-benchmark", "linpack", "dense-linear-algebra")
 
     workload_group("standard", workloads=[])
 

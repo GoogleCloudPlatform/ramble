@@ -34,7 +34,7 @@ class NvidiaHplMxp(HplBase, NvidiaHpcBase):
 
     maintainers("douglasjacobsen")
 
-    tags("benchmark-app", "benchmark", "linpack", "optimized", "nvidia")
+    tags("mixed-precision")
 
     executable(
         "execute",

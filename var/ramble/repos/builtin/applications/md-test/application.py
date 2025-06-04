@@ -17,7 +17,7 @@ class MdTest(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("synthetic-benchmarks", "IO")
+    tags("io-benchmark", "metadata-benchmark")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc", pkg_spec="gcc")

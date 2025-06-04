@@ -16,7 +16,7 @@ class Hp2p(ExecutableApplication):
 
     name = "hp2p"
 
-    tags("benchmark", "mpi")
+    tags("mpi-benchmark", "network-benchmark")
     maintainers("rfbgo")
 
     with when("package_manager_family=spack"):

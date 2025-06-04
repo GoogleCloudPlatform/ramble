@@ -1,5 +1,5 @@
 Experiment su2.inv_channel.test figures of merit:
   Status = SUCCESS
-  Tags = ['cfd', 'fluid-dynamics', 'multi-physics']
+  Tags = ['aerospace', 'cfd', 'multiphysics']
   default (null) context figures of merit:
     Version = 8.2.0

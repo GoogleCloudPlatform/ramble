@@ -16,7 +16,7 @@ class ArchitectureCheck(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("sysinfo", "system-info", "tools")
+    tags("system-utility", "diagnostics")
 
     executable(
         "spack_test",

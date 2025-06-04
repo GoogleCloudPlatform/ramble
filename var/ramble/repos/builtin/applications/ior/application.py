@@ -17,7 +17,7 @@ class Ior(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags("synthetic-benchmarks", "IO")
+    tags("io-benchmark", "storage-benchmark")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc", pkg_spec="gcc")
@@ -123,7 +123,7 @@ class Ior(ExecutableApplication):
     # Capture Summary Data in the format:
     # Operation   Max(MiB)   Min(MiB)  Mean(MiB)     StdDev   Max(OPs)   Min(OPs)  Mean(OPs)     StdDev    Mean(s) Stonewall(s) Stonewall(MiB) Test# #Tasks tPN reps fPP reord reordoff reordrand seed segcnt   blksiz    xsize aggs(MiB)   API RefNum
     # write         612.90     560.70     596.63      14.15     612.90     560.70     596.63      14.15    0.85865         NA            NA     0      2   2   10   0     0        1         0    0     16 16777216  1048576     512.0 POSIX      0
-    # Make a tuple of (name, unit, type) to make building the regex easier
+    # Make a tuple of (metric_name, unit, type) to make building the regex easier
     metrics = [
         # ('Operation', '', 'str'),
         ("bw_Max", "MiB", "float"),
@@ -163,13 +163,13 @@ class Ior(ExecutableApplication):
     ]
 
     summary_regex = "(?P<Operation>(read|write))"
-    for name, unit, variant in metrics:
+    for metric_name, unit, variant in metrics:
         if "str" in variant:
-            summary_regex += r"\s+(?P<" + name + r">\w+)"
+            summary_regex += r"\s+(?P<" + metric_name + r">\w+)"
         elif "int" in variant:
-            summary_regex += r"\s+(?P<" + name + r">[0-9]+)"
+            summary_regex += r"\s+(?P<" + metric_name + r">[0-9]+)"
         elif "float" in variant:
-            summary_regex += r"\s+(?P<" + name + r">[0-9]+\.[0-9]+)"
+            summary_regex += r"\s+(?P<" + metric_name + r">[0-9]+\.[0-9]+)"
         else:
             tty.error("Incorrect metric for FOMs")
 

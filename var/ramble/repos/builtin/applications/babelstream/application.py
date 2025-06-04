@@ -19,7 +19,7 @@ class Babelstream(ExecutableApplication):
 
     name = "babelstream"
 
-    tags("babelstream")
+    tags("memory-benchmark", "gpu-benchmark", "cuda")
 
     maintainers("rfbgo", "kaanolgu", "douglasjacobsen", "tomdeakin")
 

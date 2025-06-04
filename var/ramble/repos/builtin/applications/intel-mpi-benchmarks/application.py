@@ -24,11 +24,11 @@ class IntelMpiBenchmarks(ExecutableApplication):
     https://www.intel.com/content/www/us/en/develop/documentation/imb-user-guide/top.html
     """
 
-    name = "IntelMpiBenchmarks"
+    name = "intel-mpi-benchmarks"
 
     maintainers("rfbgo")
 
-    tags("micro-benchmark", "benchmark", "mpi")
+    tags("mpi-benchmark", "micro-benchmark", "communication-benchmark")
 
     with when("package_manager_family"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")

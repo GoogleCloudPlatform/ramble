@@ -20,15 +20,7 @@ class Cloverleaf(ExecutableApplication):
 
     maintainers("rfbgo")
 
-    tags(
-        "cfd",
-        "fluid",
-        "dynamics",
-        "euler",
-        "miniapp",
-        "minibenchmark",
-        "mini-benchmark",
-    )
+    tags("cfd", "euler", "mini-app")
 
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")

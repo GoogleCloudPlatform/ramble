@@ -31,7 +31,7 @@ class Maxtext(ExecutableApplication):
 
     maintainers("dapomeroy")
 
-    tags("machine-learning")
+    tags("machine-learning", "llm", "jax", "cuda")
 
     executable(
         "train",

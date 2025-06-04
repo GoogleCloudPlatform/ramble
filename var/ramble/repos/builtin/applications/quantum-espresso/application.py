@@ -20,12 +20,11 @@ class QuantumEspresso(ExecutableApplication):
     maintainers("douglasjacobsen")
 
     tags(
-        "electronic-structure",
-        "materials",
+        "quantum-chemistry",
+        "materials-science",
         "dft",
-        "density-functional-theory",
-        "plane-waves",
-        "pseudopotentials",
+        "plane-wave",
+        "pseudopotential",
     )
 
     with when("package_manager_family=spack"):

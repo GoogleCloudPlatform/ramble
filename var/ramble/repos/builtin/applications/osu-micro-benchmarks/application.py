@@ -21,7 +21,12 @@ class OsuMicroBenchmarks(ExecutableApplication):
 
     maintainers("rfbgo", "douglasjacobsen")
 
-    tags("synthetic-benchmarks")
+    tags(
+        "mpi-benchmark",
+        "micro-benchmark",
+        "network-benchmark",
+        "communication-benchmark",
+    )
 
     with when("package_manager_family=spack"):
         define_compiler("gcc", pkg_spec="gcc")

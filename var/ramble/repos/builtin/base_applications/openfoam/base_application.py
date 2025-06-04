@@ -19,7 +19,7 @@ class Openfoam(ExecutableApplication):
 
     maintainers("douglasjacobsen")
 
-    tags("cfd", "fluid", "dynamics")
+    tags("cfd")
 
     workload(
         "motorbike",

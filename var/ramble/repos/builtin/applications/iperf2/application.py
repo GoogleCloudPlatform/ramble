@@ -19,6 +19,8 @@ class Iperf2(ExecutableApplication):
 
     maintainers("rfbgo")
 
+    tags("network-benchmark")
+
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
     with when("package_manager_family=spack"):

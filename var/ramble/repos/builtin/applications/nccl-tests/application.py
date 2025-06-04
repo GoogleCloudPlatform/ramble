@@ -20,7 +20,7 @@ class NcclTests(ExecutableApplication):
     name = "nccl-tests"
     maintainers("douglasjacobsen")
 
-    tags("gpu")
+    tags("gpu-benchmark", "communication-benchmark", "cuda")
 
     executable(
         "all-to-all-execute",
