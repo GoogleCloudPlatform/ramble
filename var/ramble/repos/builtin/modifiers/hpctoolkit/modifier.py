@@ -77,12 +77,8 @@ class Hpctoolkit(BasicModifier):
         pre_cmd = []
         post_cmd = []
 
-        if not hasattr(self, "_setup_command_base") or not getattr(
-            self, "_setup_command_base"
-        ):
-
+        if not getattr(self, "_setup_command_base", False):
             self._setup_command_base = True
-            self._command_names = set()
             self._hpctoolkit_databases = set()
             self._env_setup = (
                 app_inst.package_manager.environment_load_commands()
@@ -92,11 +88,6 @@ class Hpctoolkit(BasicModifier):
             hpctoolkit_database = (
                 "{experiment_run_dir}/hpctoolkit-" + executable_name
             )
-            for tmp in executable.template:
-                cmd_name = app_inst.expander.expand_var(
-                    tmp.split()[0]
-                ).split()[0]
-                self._command_names.add(cmd_name)
             self._hpctoolkit_databases.add(hpctoolkit_database)
 
             pre_cmd.append(
