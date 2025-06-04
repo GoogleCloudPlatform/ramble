@@ -71,13 +71,17 @@ class Darshan(BasicModifier):
         # Only support instrumenting MPI apps for now
         if not exec.mpi or self._usage_mode != "mpi":
             return [], []
-        pre_cmds = [
-            # Set it here instead of via env_var_modification,
-            # as this needs to override the value Spack sets
-            'export DARSHAN_LOG_DIR_PATH="{darshan_log_path}"',
-            "rm -rf {darshan_log_path}",
-            "mkdir -p {darshan_log_path}",
-        ]
+        if not getattr(self, "_setup_done", False):
+            self._setup_done = True
+            pre_cmds = [
+                "rm -rf {darshan_log_path}",
+                "mkdir -p {darshan_log_path}",
+            ]
+        else:
+            pre_cmds = []
+        # Set it here instead of via env_var_modification,
+        # as this needs to override the value Spack sets
+        pre_cmds.append('export DARSHAN_LOG_DIR_PATH="{darshan_log_path}"')
         post_cmds = ["unset DARSHAN_LOG_DIR_PATH"]
         darshan_path = os.path.join(
             self.expander.expand_var_name("darshan-runtime_path"),
