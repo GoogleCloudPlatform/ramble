@@ -34,6 +34,8 @@ pytestmark = [
     ),
 ]
 
+_FS = frozenset()
+
 
 class MockFetcher:
     """Mock fetcher object which implements the necessary functionality for
@@ -85,7 +87,7 @@ def create_archive(archive_dir, app_class):
                 with open(archive_name, "rb") as f:
                     bytes = f.read()
                     conf["fetcher"].digest = hashlib.sha256(bytes).hexdigest()
-                    app_class.inputs[conf["input_name"]]["sha256"] = conf["fetcher"].digest
+                    app_class.inputs[_FS][conf["input_name"]]["sha256"] = conf["fetcher"].digest
         else:
             with open(input_name, "w+") as f:
                 f.write("Input file\n")
@@ -93,7 +95,7 @@ def create_archive(archive_dir, app_class):
             with open(input_name, "rb") as f:
                 bytes = f.read()
                 conf["fetcher"].digest = hashlib.sha256(bytes).hexdigest()
-                app_class.inputs[conf["input_name"]]["sha256"] = conf["fetcher"].digest
+                app_class.inputs[_FS][conf["input_name"]]["sha256"] = conf["fetcher"].digest
 
 
 def check_mirror(mirror_path, app_name, app_class):

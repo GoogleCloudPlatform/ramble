@@ -113,9 +113,9 @@ def test_basic_app(mutable_mock_apps_repo):
     assert fom_conf["group_name"] == "test"
     assert fom_conf["units"] == "s"
 
-    assert "input" in basic_inst.inputs
-    assert basic_inst.inputs["input"]["url"] == "file:///tmp/test_file.log"
-    assert basic_inst.inputs["input"]["description"] == "Not a file"
+    assert "input" in basic_inst.inputs[_FS]
+    assert basic_inst.inputs[_FS]["input"]["url"] == "file:///tmp/test_file.log"
+    assert basic_inst.inputs[_FS]["input"]["description"] == "Not a file"
 
 
 @pytest.mark.parametrize("app_name", ["basic", "zlib"])
@@ -399,7 +399,7 @@ def test_set_default_experiment_variables(mutable_mock_apps_repo):
 
     executable_application_instance.internals = {}
 
-    executable_application_instance.inputs = {"input": {"target_dir": "."}}
+    executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
     executable_application_instance.variables = {}
 
     executable_application_instance._set_default_experiment_variables()
@@ -424,7 +424,7 @@ def test_define_commands(mutable_mock_apps_repo):
 
     executable_application_instance.internals = {}
 
-    executable_application_instance.inputs = {"input": {"target_dir": "."}}
+    executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
     executable_application_instance.variables = {}
 
     exec_graph = executable_application_instance._get_executable_graph("test_wl2")
@@ -495,7 +495,7 @@ ramble:
 
     executable_application_instance.internals = {}
 
-    executable_application_instance.inputs = {"input": {"target_dir": "."}}
+    executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
     executable_application_instance.variables = {}
 
     exec_graph = executable_application_instance._get_executable_graph("test_wl2")

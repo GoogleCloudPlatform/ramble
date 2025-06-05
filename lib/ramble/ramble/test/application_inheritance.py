@@ -58,12 +58,12 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert fom_conf["group_name"] == "test"
     assert fom_conf["units"] == "s"
 
-    assert "input" in app_inst.inputs
-    assert app_inst.inputs["input"]["url"] == "file:///tmp/test_file.log"
-    assert app_inst.inputs["input"]["description"] == "Not a file"
-    assert "inherited_input" in app_inst.inputs
-    assert app_inst.inputs["inherited_input"]["url"] == "file:///tmp/inherited_file.log"
-    assert app_inst.inputs["inherited_input"]["description"] == "Again, not a file"
+    assert "input" in app_inst.inputs[_FS]
+    assert app_inst.inputs[_FS]["input"]["url"] == "file:///tmp/test_file.log"
+    assert app_inst.inputs[_FS]["input"]["description"] == "Not a file"
+    assert "inherited_input" in app_inst.inputs[_FS]
+    assert app_inst.inputs[_FS]["inherited_input"]["url"] == "file:///tmp/inherited_file.log"
+    assert app_inst.inputs[_FS]["inherited_input"]["description"] == "Again, not a file"
 
     possible_vars = app_inst.workloads["test_wl"].find_variable("my_base_var")
     assert len(possible_vars) == 1

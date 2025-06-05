@@ -1349,19 +1349,41 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         workload_names = [workload] if workload else self.workloads.keys()
 
+        # Batch 'when' evaluation to avoid repeat expander calls
+        when_satisfied = set()
+        for when_set in self.inputs.keys():
+            if self.expander.satisfies(when_set, variant_set=self.object_variants):
+                when_satisfied.add(when_set)
+
         inputs = {}
         for workload_name in workload_names:
             workload = self.workloads[workload_name]
 
             for input_file in workload.inputs:
-                if input_file not in self.inputs:
+                inputs_found = 0
+                active_inputs = 0
+                input_conf = {}
+                for when_set, app_inputs in self.inputs.items():
+                    if input_file in app_inputs:
+                        inputs_found += 1
+                        if when_set in when_satisfied:
+                            active_inputs += 1
+                            input_conf = app_inputs[input_file].copy()
+
+                if not inputs_found:
                     logger.die(
                         f"Workload {workload_name} references a non-existent input file "
                         f"{input_file}.\n"
                         f"Make sure this input file is defined before using it in a workload."
                     )
-
-                input_conf = self.inputs[input_file].copy()
+                if active_inputs == 0:
+                    logger.debug(f"Skipping input {input_file}. `When` conditions not satisfied.")
+                    continue
+                elif active_inputs > 1:
+                    logger.die(
+                        f"Input files {input_file} are defined with overlapping 'when' "
+                        f"conditions. Make sure that conditions are mutually exclusive."
+                    )
 
                 # Expand input value as it may be a var
                 expanded_url = self.expander.expand_var(input_conf["url"])
