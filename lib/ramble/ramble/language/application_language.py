@@ -117,7 +117,7 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
 
 
 @application_directive("executables")
-def executable(name, template, **kwargs):
+def executable(name, template, when=None, **kwargs):
     """Adds an executable to this application
 
     Defines a new executable that can be used to configure workloads and
@@ -141,12 +141,18 @@ def executable(name, template, **kwargs):
                               both) to capture. Defaults to stdout
         run_in_background (bool): Optional, Declare if the command should
                                      run in the background. Defaults to False
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_executable(app):
         from ramble.util.executable import CommandExecutable
 
-        app.executables[name] = CommandExecutable(name=name, template=template, **kwargs)
+        when_list = ramble.language.language_helpers.build_when_list(when, app, name, "executable")
+        when_set = frozenset(when_list)
+        if when_set not in app.executables:
+            app.executables[when_set] = {}
+
+        app.executables[when_set][name] = CommandExecutable(name=name, template=template, **kwargs)
 
     return _execute_executable
 

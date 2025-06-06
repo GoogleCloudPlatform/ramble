@@ -963,11 +963,27 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         else:
                             logger.warn(err_msg)
 
+    def _get_filtered_executables(self) -> dict:
+        """Returns a dict of executables that satisfy `when` conditions"""
+        filtered_executables = {}
+        all_executables = self.executables.copy()
+        for when_set, executables in all_executables.items():
+            if self.expander.satisfies(when_set, variant_set=self.object_variants):
+                for executable in executables:
+                    if executable in filtered_executables:
+                        logger.die(
+                            f"Executable {executable} is defined for overlapping `when` "
+                            "conditions. Ensure conditions are mutually exclusive."
+                        )
+                filtered_executables.update(executables)
+
+        return filtered_executables
+
     def _define_custom_executables(self):
         # Define custom executables
         if namespace.custom_executables in self.internals:
             for name, conf in self.internals[namespace.custom_executables].items():
-                if name in self.executables or name in self.custom_executables:
+                if name in self._get_filtered_executables() or name in self.custom_executables:
                     experiment_namespace = self.expander.expand_var_name("experiment_namespace")
                     raise ExecutableNameError(
                         f"In experiment {experiment_namespace} "
@@ -996,11 +1012,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     builtin_objects.append(obj)
                     all_builtins.append(builtins)
 
-        all_executables = self.executables.copy()
-        all_executables.update(self.custom_executables)
+        filtered_executables = self._get_filtered_executables()
+        filtered_executables.update(self.custom_executables)
+
+        filtered_exec_order = []
+        for executable in exec_order:
+            if executable in filtered_executables or any(executable in b for b in all_builtins):
+                filtered_exec_order.append(executable)
+            else:
+                logger.debug(f"Skipping executable {executable}. `When` conditions not satisfied.")
 
         executable_graph = ramble.graphs.ExecutableGraph(
-            exec_order, all_executables, builtin_objects, all_builtins, self
+            filtered_exec_order, filtered_executables, builtin_objects, all_builtins, self
         )
 
         # Perform executable injection
@@ -1693,9 +1716,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
             # Copy all log files from executables
             exec_logs = set()
             workload = self.workloads[self.expander.workload_name]
+            filtered_executables = self._get_filtered_executables()
             for exec_name in workload.executables:
-                if exec_name in self.executables:
-                    exec_obj = self.executables[exec_name]
+                if exec_name in filtered_executables:
+                    exec_obj = filtered_executables[exec_name]
                     exec_log = self.expander.expand_var(exec_obj.redirect)
                     exec_logs.add(exec_log)
 

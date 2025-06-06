@@ -918,3 +918,93 @@ def test_register_builtin_when(request, include_builtin, builtin_found):
             data = f.read()
 
             assert (test_str in data) == builtin_found
+
+
+@pytest.mark.parametrize(
+    "exec_variant_on,exec_ver2_found,skipped_exec_found",
+    [
+        (False, False, False),
+        (True, True, True),
+    ],
+)
+def test_executable_when(request, exec_variant_on, exec_ver2_found, skipped_exec_found):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+    test_var = "when-executable-test"
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "exec_when_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-v",
+            f"test_variable={test_var}",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:executable_when:{exec_variant_on}", global_args=global_args)
+
+        test_ver1_str = "echo 'executable version1'"
+        test_ver2_str = "echo 'executable version2'"
+        test_skipped_exec_str = "echo 'skipped-executable'"
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "exec_when_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            print(data)
+
+            assert test_var in data
+            assert (test_ver1_str in data) != exec_ver2_found
+            assert (test_ver2_str in data) == exec_ver2_found
+            assert (test_skipped_exec_str in data) == skipped_exec_found
+
+
+def test_executable_errors_when_overlapping_conditions(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "exec_when_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:executable_error_when:true", global_args=global_args)
+
+        ws._re_read()
+
+        with pytest.raises(RambleCommandError):
+
+            captured = workspace("setup", global_args=global_args)
+            assert "test_exec_def_when is defined for overlapping `when` conditions" in captured

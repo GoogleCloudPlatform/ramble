@@ -16,6 +16,8 @@ pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
 )
 
+_FS = frozenset()
+
 
 def basic_exp_dict():
     """To set expander consistently with test_wl2 of builtin.mock/applications/basic"""
@@ -68,7 +70,7 @@ def test_basic_app(mutable_mock_apps_repo):
     assert len(basic_inst.workloads["test_wl"].executables) == 1
     foo_exec = basic_inst.workloads["test_wl"].find_executable("foo")
     assert foo_exec is not None
-    foo_exec = basic_inst.executables[foo_exec]
+    foo_exec = basic_inst.executables[_FS][foo_exec]
     assert foo_exec.template == ["bar"]
     assert not foo_exec.mpi
 
@@ -76,7 +78,7 @@ def test_basic_app(mutable_mock_apps_repo):
     example_input = basic_inst.workloads["test_wl"].find_input("input")
     assert example_input is not None
 
-    assert len(basic_inst.workloads["test_wl"].variables[frozenset()]) == 2
+    assert len(basic_inst.workloads["test_wl"].variables[_FS]) == 2
     possible_vars = basic_inst.workloads["test_wl"].find_variable("my_var")
     assert len(possible_vars) == 1
     assert possible_vars[0].default == "1.0"
@@ -86,7 +88,7 @@ def test_basic_app(mutable_mock_apps_repo):
     assert len(basic_inst.workloads["test_wl2"].executables) == 1
     bar_exec = basic_inst.workloads["test_wl2"].find_executable("bar")
     assert bar_exec is not None
-    bar_exec = basic_inst.executables[bar_exec]
+    bar_exec = basic_inst.executables[_FS][bar_exec]
     assert bar_exec.template == ["baz"]
     assert bar_exec.mpi
 
@@ -104,8 +106,8 @@ def test_basic_app(mutable_mock_apps_repo):
     assert exec_graph.get_node("bar") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
-    assert "test_fom" in basic_inst.figures_of_merit[frozenset()][frozenset()]
-    fom_conf = basic_inst.figures_of_merit[frozenset()][frozenset()]["test_fom"]
+    assert "test_fom" in basic_inst.figures_of_merit[_FS][_FS]
+    fom_conf = basic_inst.figures_of_merit[_FS][_FS]["test_fom"]
     assert fom_conf["log_file"] == "{log_file}"
     assert fom_conf["regex"] == r"(?P<test>[0-9]+\.[0-9]+).*seconds.*"  # noqa: W605
     assert fom_conf["group_name"] == "test"
@@ -192,7 +194,7 @@ def test_required_builtins(mutable_mock_apps_repo, app):
     app_inst.define_variable("application_name", app)
 
     required_builtins = []
-    for builtin, conf in app_inst.builtins[frozenset()].items():
+    for builtin, conf in app_inst.builtins[_FS].items():
         if conf[app_inst._builtin_required_key]:
             required_builtins.append(builtin)
 
@@ -211,7 +213,7 @@ def test_register_builtin_app(mutable_mock_apps_repo):
 
     required_builtins = []
     excluded_builtins = []
-    for builtin, conf in app_inst.builtins[frozenset()].items():
+    for builtin, conf in app_inst.builtins[_FS].items():
         if conf[app_inst._builtin_required_key]:
             required_builtins.append(builtin)
         else:

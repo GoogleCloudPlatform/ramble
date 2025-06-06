@@ -165,3 +165,51 @@ class WhenDirectives(ExecutableApplication):
 
     def test_builtin_when(self):
         return ['echo "when-builtin"']
+
+    # For executable()
+    variant(
+        "executable_when",
+        default=False,
+        values=[True, False],
+        description="Register executable using when",
+    )
+
+    variant(
+        "executable_error_when",
+        default=False,
+        values=[True, False],
+        description="Register executable with overlapping when condition",
+    )
+
+    executable(
+        "test_exec_def_when",
+        "echo 'executable version1'",
+        use_mpi=False,
+        when=["~executable_when"],
+    )
+
+    executable(
+        "test_exec_def_when",
+        "echo 'executable version2'",
+        use_mpi=False,
+        when=["+executable_when"],
+    )
+
+    executable(
+        "test_exec_skipped",
+        "echo 'skipped-executable'",
+        use_mpi=False,
+        when=["+executable_when"],
+    )
+
+    executable(
+        "test_exec_def_when",
+        "echo 'this should error when active",
+        use_mpi=False,
+        when=["+executable_error_when"],
+    )
+
+    workload(
+        "exec_when_wl",
+        executables=["test_exec", "test_exec_skipped", "test_exec_def_when"],
+    )

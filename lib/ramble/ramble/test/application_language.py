@@ -17,6 +17,8 @@ app_types = [
     ExecutableApplication,  # noqa: F405
 ]
 
+_FS = frozenset()
+
 
 @deprecation.fail_if_not_removed
 @pytest.mark.parametrize("app_class", app_types)
@@ -257,17 +259,15 @@ def test_executable_directive(app_class):
 
     assert hasattr(app_inst, "executables")
     for exe_name, conf in test_defs.items():
-        assert exe_name in app_inst.executables
+        assert exe_name in app_inst.executables[_FS]
         for conf_name, conf_val in conf.items():
-            assert hasattr(app_inst.executables[exe_name], conf_name)
-            assert conf_val == getattr(app_inst.executables[exe_name], conf_name)
+            assert hasattr(app_inst.executables[_FS][exe_name], conf_name)
+            assert conf_val == getattr(app_inst.executables[_FS][exe_name], conf_name)
 
 
 @pytest.mark.parametrize("app_class", app_types)
 def test_figure_of_merit_directive(app_class):
     test_defs = {}
-
-    _FS = frozenset()
 
     app_inst = app_class("/not/a/path")
     test_defs.update(add_figure_of_merit(app_inst))
