@@ -227,10 +227,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
         new_clone = type(self)(self._file_path)
         self.generated_experiments.append(new_clone)
 
-        if self._env_variable_sets:
-            new_clone.set_env_variable_sets(self._env_variable_sets.copy())
         if self.variables:
             new_clone.set_variables(self.variables.copy(), self.experiment_set)
+        if self.variants:
+            new_clone.set_variants(self.variants)
+        if self._env_variable_sets:
+            new_clone.set_env_variable_sets(self._env_variable_sets.copy())
         if self.internals:
             new_clone.set_internals(self.internals.copy())
         if self._formatted_executables:
@@ -240,8 +242,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         new_clone.set_template(False)
         new_clone.repeats.set_repeats(False, 0)
         new_clone.set_chained_experiments(None)
-        if self.variants:
-            new_clone.set_variants(self.variants)
 
         return new_clone
 
@@ -321,6 +321,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         }
                     )
 
+            # Define any missing package manager variables
+            for var, val in self.package_manager.selected_variables().items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
+
     def _set_workflow_manager(self):
         workflow_name = conversions.canonical_none(
             self.object_variants.value(namespace.workflow_manager)
@@ -340,6 +345,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "Valid workflow managers can be listed via:\n"
                 "\tramble list --type workflow_managers"
             )
+
+        if self.workflow_manager is not None:
+            # Define any missing workflow manager variables
+            for var, val in self.workflow_manager.selected_variables().items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
 
     def set_success_list(self, success_criteria):
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
@@ -386,6 +397,26 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._env_variable_sets = env_variable_sets.copy()
 
+        # Extract workload environment variable sets
+        if self.expander.workload_name in self.workloads:
+            workload = self.workloads[self.expander.workload_name]
+
+            new_env_vars = {}
+            for env_var in workload.environment_variables.values():
+                action = "set"
+                value = env_var.value
+
+                add = True
+                for env_var_set in self._env_variable_sets:
+                    if action in env_var_set:
+                        if env_var.name in env_var_set[action].keys():
+                            add = False
+
+                if add:
+                    new_env_vars[env_var.name] = value
+
+            self._env_variable_sets.append({"set": new_env_vars})
+
     def set_variables(self, variables, experiment_set):
         """Set internal reference to variables
 
@@ -404,6 +435,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     for var in var_list:
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
+
+        # Define missing workload variables
+        for var, val in self.selected_variables().items():
+            if var not in self.variables:
+                self.define_variable(var, val.default)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
 
@@ -928,6 +964,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
+            # Define any missing modifier variables
+            for var, val in mod_inst.selected_variables().items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
+
             # Set standard variants for all modifiers
             obj_variants = getattr(mod_inst, "object_variants", None)
             if obj_variants is not None:
@@ -1082,36 +1123,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     wl_vars[var.name] = var
 
         return wl_vars
-
-    def _set_default_experiment_variables(self):
-        """Set default experiment variables (for add_expand_vars),
-        if they haven't been set already"""
-        # Set default experiment variables, if they haven't been set already
-
-        # Define variables from var_sets
-        for _, obj in self._objects():
-            for var, val in obj.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
-
-        if self.expander.workload_name in self.workloads:
-            workload = self.workloads[self.expander.workload_name]
-
-            new_env_vars = {}
-            for env_var in workload.environment_variables.values():
-                action = "set"
-                value = env_var.value
-
-                add = True
-                for env_var_set in self._env_variable_sets:
-                    if action in env_var_set:
-                        if env_var.name in env_var_set[action].keys():
-                            add = False
-
-                if add:
-                    new_env_vars[env_var.name] = value
-
-            self._env_variable_sets.append({"set": new_env_vars})
 
     def _define_commands(self, exec_graph, success_list=None):
         """Populate the internal list of commands based on executables
@@ -1328,7 +1339,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         if not self._vars_are_expanded:
             self._validate_experiment()
             self._executable_graph = self._get_executable_graph(self.expander.workload_name)
-            self._set_default_experiment_variables()
             self._set_input_path()
 
             self._derive_variables_for_template_path(workspace)
