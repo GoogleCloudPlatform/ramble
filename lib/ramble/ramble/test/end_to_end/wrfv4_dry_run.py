@@ -25,7 +25,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_wrfv4_spack_dry_run(mutable_config, mutable_mock_workspace_path):
+def test_wrfv4_spack_dry_run(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -119,7 +119,6 @@ compilers:
     extra_rpaths: []
 """
 
-    workspace_name = "test_end_to_end_wrfv4"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
@@ -321,7 +320,7 @@ compilers:
 
 
 @pytest.mark.maybeslow
-def test_wrfv4_no_pkg_man_dry_run(mutable_config, mutable_mock_workspace_path):
+def test_wrfv4_no_pkg_man_dry_run(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -374,7 +373,6 @@ licenses:
       WRF_LICENSE: port@server
 """
 
-    workspace_name = "test_end_to_end_wrfv4"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -23,7 +24,9 @@ config = ramble.main.RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_passthrough_variables(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_passthrough_variables(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_config = """
 ramble:
   variables:
@@ -47,7 +50,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_config_section_env_vars"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -63,8 +65,6 @@ ramble:
         exp1_dir = os.path.join(experiment_root, "basic", "test_wl2", "simple_test")
         exp1_script = os.path.join(exp1_dir, "execute_experiment")
 
-        import re
-
         undefined_regex = re.compile(r"{undefined_var}")
 
         # Assert undefined variable is found
@@ -76,7 +76,7 @@ ramble:
             assert undefined_found
 
 
-def test_disable_passthrough(mutable_config, mutable_mock_workspace_path):
+def test_disable_passthrough(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -95,7 +95,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_disable_passthrough"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

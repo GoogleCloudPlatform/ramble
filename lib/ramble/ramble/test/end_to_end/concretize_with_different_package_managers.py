@@ -22,7 +22,7 @@ workspace = RambleCommand("workspace")
 
 
 def test_concretize_with_different_package_managers(
-    mutable_config, mutable_mock_workspace_path, request
+    mutable_config, mutable_mock_workspace_path, workspace_name
 ):
     test_config = """
 ramble:
@@ -56,7 +56,6 @@ ramble:
     environments: {}
 """
 
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

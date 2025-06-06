@@ -21,9 +21,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.maybeslow
-def test_spack_package_manager_provenance_zlib(mock_applications, request):
-    workspace_name = request.node.name
-
+def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name):
     ws = ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]
@@ -100,9 +98,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, request):
             assert "zlib" in names
 
 
-def test_usermanged_package_manager_provenance_zlib(mock_applications, request):
-    workspace_name = request.node.name
-
+def test_usermanged_package_manager_provenance_zlib(mock_applications, workspace_name):
     ws = ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]

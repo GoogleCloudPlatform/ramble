@@ -48,13 +48,13 @@ def test_success_modifier(
     value,
     result,
     scope,
+    workspace_name,
 ):
 
     modifier = [
         (scope, {"name": "success-criteria"}),
     ]
 
-    workspace_name = "test_success_modifier"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

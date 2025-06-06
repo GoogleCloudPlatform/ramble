@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -20,7 +21,9 @@ config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_concretize_does_not_set_required(mutable_config, mutable_mock_workspace_path):
+def test_concretize_does_not_set_required(
+    mutable_config, mutable_mock_workspace_path, workspace_name
+):
     """
     Verify that concretizing an application with required set to True
     does not insert a required statement into software dict.
@@ -74,9 +77,6 @@ ramble:
     environments: {}
 """
 
-    import re
-
-    workspace_name = "test_concretize_does_not_set_required"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -101,13 +101,11 @@ ramble:
 
 
 def test_concretize_allows_invalid_experiment(
-    mutable_config, mutable_mock_workspace_path, request
+    mutable_config, mutable_mock_workspace_path, workspace_name
 ):
-    ws_name = request.node.name
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
 
         workspace(
             "manage",

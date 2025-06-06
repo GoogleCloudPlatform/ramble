@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -24,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_formatted_executables():
+def test_formatted_executables(workspace_name):
     test_config = r"""
 ramble:
   variables:
@@ -66,7 +67,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_formatted_executables"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -98,7 +98,7 @@ ramble:
             assert "\n" + " " * 2 + "test_from_ws mpirun -n 16 -ppn 16 test" in data
 
 
-def test_redefined_executable_errors():
+def test_redefined_executable_errors(workspace_name):
     test_config = r"""
 ramble:
   variables:
@@ -123,7 +123,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_redefined_executable_errors"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -139,7 +138,7 @@ ramble:
             assert "Formatted executable var_exec_name defined" in output
 
 
-def test_object_formatted_executables(mock_modifiers, request):
+def test_object_formatted_executables(mock_modifiers, workspace_name):
     mod_config = r"""
 modifiers:
 - name: formatted-exec-mod
@@ -148,8 +147,6 @@ modifiers:
     template_suffix = r"""
 {mod_formatted_exec}
 """
-    workspace_name = request.node.name
-
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
 
@@ -192,7 +189,7 @@ modifiers:
         assert '    FROM_MOD echo "Test formatted exec"' in data
 
 
-def test_nested_formatted_executables_are_properly_formatted(request):
+def test_nested_formatted_executables_are_properly_formatted(workspace_name):
     test_config = r"""
 ramble:
   variables:
@@ -236,7 +233,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -255,8 +251,6 @@ ramble:
         experiment_root = ws.experiment_dir
         exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
         exp_script = os.path.join(exp_dir, "execute_experiment")
-
-        import re
 
         test_regexes = [
             re.compile(r"^  test_l3 l3line1$"),

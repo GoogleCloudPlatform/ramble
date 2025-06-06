@@ -19,12 +19,11 @@ workspace = RambleCommand("workspace")
 
 
 def test_variant_propagation_in_new_workspace(
-    mutable_config, mutable_mock_workspace_path, request
+    mutable_config, mutable_mock_workspace_path, workspace_name
 ):
-    ws_name = request.node.name
     ramble.config.add("variants:package_manager:spack")
     ramble.config.add("variants:workflow_manager:slurm")
-    with ramble.workspace.create(ws_name) as ws1:
+    with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
         config_path = ws1.config_file_path

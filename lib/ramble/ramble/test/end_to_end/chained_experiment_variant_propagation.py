@@ -24,7 +24,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.maybeslow
-def test_chained_experiment_variant_propagation(request):
+def test_chained_experiment_variant_propagation(workspace_name):
     test_config = r"""
 ramble:
   variants:
@@ -120,8 +120,6 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
 
     filters = ramble.filters.Filters()
-
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

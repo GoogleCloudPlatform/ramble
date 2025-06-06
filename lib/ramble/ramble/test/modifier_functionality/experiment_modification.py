@@ -15,10 +15,8 @@ workspace = RambleCommand("workspace")
 
 
 def test_experiment_modification(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, request
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, workspace_name
 ):
-    workspace_name = request.node.name
-
     test_config = """
 ramble:
   variables:

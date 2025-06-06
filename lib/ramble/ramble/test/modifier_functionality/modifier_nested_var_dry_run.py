@@ -15,9 +15,8 @@ workspace = RambleCommand("workspace")
 
 
 def test_nested_modifier_var(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, request
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, workspace_name
 ):
-    workspace_name = request.node.name
     global_args = ["-w", workspace_name]
 
     with ramble.workspace.create(workspace_name) as ws1:

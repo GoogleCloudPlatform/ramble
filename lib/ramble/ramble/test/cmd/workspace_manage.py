@@ -17,8 +17,7 @@ pytestmark = pytest.mark.usefixtures("mutable_mock_workspace_path")
 workspace = RambleCommand("workspace")
 
 
-def test_manage_variable_multiple_equals(request, tmpdir):
-    workspace_name = request.node.name
+def test_manage_variable_multiple_equals(workspace_name, tmpdir):
     ws = ramble.workspace.create(workspace_name)
 
     global_args = ["-w", workspace_name]

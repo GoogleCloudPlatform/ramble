@@ -25,7 +25,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_nested_compilers_are_installed(mutable_config, mutable_mock_workspace_path, capsys):
+def test_nested_compilers_are_installed(
+    mutable_config, mutable_mock_workspace_path, capsys, workspace_name
+):
     test_config = """
 ramble:
   variants:
@@ -71,7 +73,6 @@ ramble:
     setup_cls = ramble.pipeline.pipeline_class(setup_type)
     filters = ramble.filters.Filters()
 
-    workspace_name = "test_nested_compilers_are_installed"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

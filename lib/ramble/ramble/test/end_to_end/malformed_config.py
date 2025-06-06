@@ -24,7 +24,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_missing_config_keys():
+def test_missing_config_keys(workspace_name):
     test_config = """
 amble:
   variables:
@@ -39,8 +39,7 @@ amble:
           experiments:
             test: {}
 """
-    ws_name = "test_missing_config_keys"
-    ws = ramble.workspace.create(ws_name)
+    ws = ramble.workspace.create(workspace_name)
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
@@ -54,4 +53,4 @@ amble:
         ramble.workspace.RambleActiveWorkspaceError,
         match="ramble.yaml needs to contain at least one of the required keys",
     ):
-        workspace("info", global_args=["-w", ws_name])
+        workspace("info", global_args=["-w", workspace_name])

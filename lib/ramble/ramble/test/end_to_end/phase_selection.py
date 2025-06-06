@@ -33,7 +33,9 @@ def enable_verbose():
     llnl.util.tty._verbose = old_setting
 
 
-def test_workspace_phase_selection(mutable_config, mutable_mock_workspace_path, enable_verbose):
+def test_workspace_phase_selection(
+    mutable_config, mutable_mock_workspace_path, enable_verbose, workspace_name
+):
     test_config = """
 ramble:
   variants:
@@ -110,7 +112,6 @@ licenses:
       WRF_LICENSE: port@server
 """
 
-    workspace_name = "test_end_to_end_wrfv4"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

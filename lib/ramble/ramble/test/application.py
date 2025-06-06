@@ -440,7 +440,7 @@ def test_define_commands(mutable_mock_apps_repo):
     assert "mpirun" in executable_application_instance.variables["command"]
 
 
-def test_derive_variables_for_template_path(mutable_mock_apps_repo):
+def test_derive_variables_for_template_path(mutable_mock_apps_repo, workspace_name):
     """_set_default_variables_for_template_path"""
     test_config = """
 ramble:
@@ -470,7 +470,6 @@ ramble:
 """
     import os.path
 
-    workspace_name = "test_derive_variables_for_template_path"
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 

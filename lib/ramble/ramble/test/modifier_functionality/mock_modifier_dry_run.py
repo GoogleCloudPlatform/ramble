@@ -38,9 +38,8 @@ def test_gromacs_dry_run_mock_mods(
     mock_modifiers,
     scope,
     modifier_mode,
+    workspace_name,
 ):
-    workspace_name = "test_gromacs_dry_run_mock_mods"
-
     test_modifiers = [
         (scope, modifier_helpers.named_modifier(mock_modifier, modifier_mode)),
     ]

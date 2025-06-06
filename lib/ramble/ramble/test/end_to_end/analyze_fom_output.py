@@ -63,8 +63,7 @@ ramble:
     return ws
 
 
-def test_analyze_fom_output():
-    workspace_name = "test-fom-output"
+def test_analyze_fom_output(workspace_name):
     ws = _setup_workspace(workspace_name)
 
     workspace("analyze", "-p", global_args=["-w", workspace_name])
@@ -76,8 +75,7 @@ def test_analyze_fom_output():
         assert "possible hostname = test-user.c.googlers.com" in content
 
 
-def test_analyze_print(monkeypatch):
-    workspace_name = "test-analyze-print"
+def test_analyze_print(monkeypatch, workspace_name):
     _setup_workspace(workspace_name)
 
     msg_list = []
@@ -97,10 +95,9 @@ def test_analyze_print(monkeypatch):
 
 
 # If an app has no FOM defined, analyze should not fail due to the lack of FOMs
-def test_analyze_success_with_no_fom_defined(mock_applications, request):
-    ws_name = request.node.name
-    global_args = ["-w", ws_name]
-    ws = ramble.workspace.create(ws_name)
+def test_analyze_success_with_no_fom_defined(mock_applications, workspace_name):
+    global_args = ["-w", workspace_name]
+    ws = ramble.workspace.create(workspace_name)
     workspace(
         "manage",
         "experiments",
@@ -115,7 +112,7 @@ def test_analyze_success_with_no_fom_defined(mock_applications, request):
     )
     ws._re_read()
     workspace("setup", "--dry-run", global_args=global_args)
-    workspace("analyze", global_args=["-w", ws_name])
+    workspace("analyze", global_args=["-w", workspace_name])
     result_file = os.path.join(ws.root, "results.latest.txt")
     with open(result_file) as f:
         content = f.read()
@@ -123,10 +120,9 @@ def test_analyze_success_with_no_fom_defined(mock_applications, request):
 
 
 # If app has FOM defined, analyze fails when no FOM is detected from the experiment
-def test_analyze_fail_with_no_fom_detected(mock_applications, request):
-    ws_name = request.node.name
-    global_args = ["-w", ws_name]
-    ws = ramble.workspace.create(ws_name)
+def test_analyze_fail_with_no_fom_detected(mock_applications, workspace_name):
+    global_args = ["-w", workspace_name]
+    ws = ramble.workspace.create(workspace_name)
     workspace(
         "manage",
         "experiments",
@@ -143,7 +139,7 @@ def test_analyze_fail_with_no_fom_detected(mock_applications, request):
     )
     ws._re_read()
     workspace("setup", "--dry-run", global_args=global_args)
-    workspace("analyze", global_args=["-w", ws_name])
+    workspace("analyze", global_args=["-w", workspace_name])
     result_file = os.path.join(ws.root, "results.latest.txt")
     with open(result_file) as f:
         content = f.read()

@@ -30,10 +30,8 @@ workspace = RambleCommand("workspace")
     ],
 )
 def test_gromacs_dry_run_mock_spack_mod(
-    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope
+    mutable_mock_workspace_path, mutable_applications, mock_modifiers, scope, workspace_name
 ):
-    workspace_name = "test_gromacs_dry_run_mock_spack_mod"
-
     test_modifiers = [
         (scope, modifier_helpers.named_modifier("spack-mod")),
     ]

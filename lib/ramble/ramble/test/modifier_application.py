@@ -19,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_wrfv4_aps_test(mutable_config, mutable_mock_workspace_path):
+def test_wrfv4_aps_test(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -63,7 +63,6 @@ ramble:
         - intel-oneapi-vtune
 """
 
-    workspace_name = "test_wrfv4_modified_aps"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

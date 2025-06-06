@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -22,7 +23,11 @@ workspace = RambleCommand("workspace")
 
 
 def test_globbing_patterns(
-    mutable_config, mutable_mock_workspace_path, mock_applications, mock_modifiers
+    mutable_config,
+    mutable_mock_workspace_path,
+    mock_applications,
+    mock_modifiers,
+    workspace_name,
 ):
     test_config = """
 ramble:
@@ -52,7 +57,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_globbing_patterns"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -73,8 +77,6 @@ ramble:
             experiment_root, "glob-patterns", "test_three_exec", "test_wildcard_3_execs"
         )
         exp2_script = os.path.join(exp2_dir, "execute_experiment")
-
-        import re
 
         test_cmd_regex = re.compile("base test .*>>")
         glob_cmd_regex = re.compile("test foo .*>>")

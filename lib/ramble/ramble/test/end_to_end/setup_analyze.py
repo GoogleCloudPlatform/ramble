@@ -32,7 +32,7 @@ pytestmark = [
 ws_cmd = RambleCommand("workspace")
 
 
-def test_setup_analyze(test_case_path, request):
+def test_setup_analyze(test_case_path, workspace_name):
     """test_setup_analyze tests ramble objects that contain a `test_cases` directory.
 
     Specifically, it assumes the following structure for the `test_cases` directory:
@@ -63,9 +63,8 @@ def test_setup_analyze(test_case_path, request):
             else:
                 shutil.copy(item, dest)
 
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
-    global_args = ["-w", ws_name]
-    ws = ramble.workspace.create(ws_name)
+    global_args = ["-w", workspace_name]
+    ws = ramble.workspace.create(workspace_name)
     ws.write()
     src_config_dir_path = test_case_path / "configs"
     if src_config_dir_path.is_dir():

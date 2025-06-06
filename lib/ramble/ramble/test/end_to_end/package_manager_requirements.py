@@ -23,7 +23,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_package_manager_requirements_zlib(mock_applications, mock_modifiers):
+def test_package_manager_requirements_zlib(mock_applications, mock_modifiers, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -54,7 +54,6 @@ ramble:
     except RunnerError as e:
         pytest.skip(e)
 
-    workspace_name = "test_package_manager_requirements_zlib"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -76,7 +75,7 @@ ramble:
             assert "debug: true" in data
 
 
-def test_package_manager_requirements_error(mock_applications, mock_modifiers):
+def test_package_manager_requirements_error(mock_applications, mock_modifiers, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -107,7 +106,6 @@ ramble:
     except RunnerError as e:
         pytest.skip(e)
 
-    workspace_name = "test_package_manager_requirements_error"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 

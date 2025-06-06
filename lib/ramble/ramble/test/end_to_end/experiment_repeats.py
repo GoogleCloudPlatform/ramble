@@ -24,7 +24,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_gromacs_repeats(mutable_config, mutable_mock_workspace_path):
+def test_gromacs_repeats(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -78,7 +78,6 @@ ramble:
         - intel-mpi
 """
 
-    workspace_name = "test_end_to_end_repeats"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
@@ -177,7 +176,7 @@ ramble:
                 assert "summary::variance = 61.727 s^2" in data
 
         # When --summary-only, only the base experiments are included
-        workspace("analyze", "-s", global_args=["-w", workspace_name])
+        workspace("analyze", "-s", global_args=["-w", workspace_name])  # noqa: E501
         result_file = glob.glob(os.path.join(ws1.root, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
@@ -187,7 +186,7 @@ ramble:
 
 
 @pytest.mark.long
-def test_repeat_stats(mutable_config, mutable_mock_workspace_path, request):
+def test_repeat_stats(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -203,7 +202,6 @@ ramble:
             sleep_test:
               n_repeats: 3
 """
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)

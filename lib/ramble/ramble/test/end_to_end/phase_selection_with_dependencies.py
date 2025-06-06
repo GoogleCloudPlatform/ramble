@@ -34,7 +34,7 @@ def enable_verbose():
 
 @pytest.mark.long
 def test_workspace_phase_selection_with_dependencies(
-    mutable_config, mutable_mock_workspace_path, enable_verbose
+    mutable_config, mutable_mock_workspace_path, enable_verbose, workspace_name
 ):
     test_config = """
 ramble:
@@ -112,7 +112,6 @@ licenses:
       WRF_LICENSE: port@server
 """
 
-    workspace_name = "test_workspace_phase_selection_with_dependencies"
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 

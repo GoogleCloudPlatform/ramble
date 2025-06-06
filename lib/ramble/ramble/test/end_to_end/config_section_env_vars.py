@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -21,7 +22,9 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_config_section_env_vars(mutable_config, mutable_mock_workspace_path, mock_applications):
+def test_config_section_env_vars(
+    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
+):
     test_config = """
 ramble:
   variables:
@@ -45,7 +48,6 @@ ramble:
     packages: {}
     environments: {}
 """
-    workspace_name = "test_config_section_env_vars"
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
@@ -60,8 +62,6 @@ ramble:
         experiment_root = ws.experiment_dir
         exp1_dir = os.path.join(experiment_root, "basic", "test_wl", "simple_test")
         exp1_script = os.path.join(exp1_dir, "execute_experiment")
-
-        import re
 
         export_regex = re.compile(r"export MY_VAR=TEST")
 

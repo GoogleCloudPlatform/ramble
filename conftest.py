@@ -551,6 +551,15 @@ def mock_executable(tmpdir):
 
 
 @pytest.fixture(scope="function")
+def workspace_name(request):
+    """Fixture for constructing a workspace name based on a test name"""
+    import re
+
+    ws_name = re.sub("[^0-9a-zA-Z_-]", "_", request.node.name)
+    return ws_name
+
+
+@pytest.fixture(scope="function")
 def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
     """Fixture for mocking the internal ramble workspaces directory."""
     mock_path = tmpdir_factory.mktemp("mock-workspace-path")

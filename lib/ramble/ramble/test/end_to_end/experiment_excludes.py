@@ -24,7 +24,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_wrfv4_exclusions(mutable_config, mutable_mock_workspace_path, request):
+def test_wrfv4_exclusions(mutable_config, mutable_mock_workspace_path, workspace_name):
     test_config = """
 ramble:
   variants:
@@ -135,7 +135,6 @@ compilers:
     extra_rpaths: []
 """
 
-    workspace_name = request.node.name
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
