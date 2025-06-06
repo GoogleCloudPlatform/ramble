@@ -382,15 +382,15 @@ def test_set_input_path_multi_input(mutable_mock_apps_repo):
     assert executable_application_instance.variables["test-input3"] == input3_path
 
 
-def test_set_default_experiment_variables(mutable_mock_apps_repo):
-    """_set_default_experiment_variables"""
+def test_set_variables(mutable_mock_apps_repo):
+    """Test that set_variables defines workload variables"""
 
     executable_application_instance = mutable_mock_apps_repo.get("basic")
 
     expansion_vars = basic_exp_dict()
+    del expansion_vars["n_ranks"]
 
     # Set up the instance to pass the initial part of the function
-    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
 
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
@@ -400,9 +400,8 @@ def test_set_default_experiment_variables(mutable_mock_apps_repo):
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.variables = {}
 
-    executable_application_instance._set_default_experiment_variables()
+    executable_application_instance.set_variables(expansion_vars, None)
 
     assert executable_application_instance.variables["n_ranks"] == "1"
 
@@ -414,9 +413,6 @@ def test_define_commands(mutable_mock_apps_repo):
 
     expansion_vars = basic_exp_dict()
 
-    # Set up the instance to pass the initial part of the function
-    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
-
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
     test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
@@ -425,14 +421,13 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.variables = {}
+    executable_application_instance.set_variables(expansion_vars, None)
 
     exec_graph = executable_application_instance._get_executable_graph("test_wl2")
 
     executable_application_instance.set_formatted_executables(
         {"command": {"join_separator": "\n"}}
     )
-    executable_application_instance._set_default_experiment_variables()
 
     executable_application_instance.chain_prepend = []
     executable_application_instance._define_commands(exec_graph)
@@ -484,9 +479,6 @@ ramble:
 
     expansion_vars = basic_exp_dict()
 
-    # Set up the instance to pass the initial part of the function
-    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
-
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
     test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
@@ -495,11 +487,9 @@ ramble:
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.variables = {}
+    executable_application_instance.set_variables(expansion_vars, None)
 
     exec_graph = executable_application_instance._get_executable_graph("test_wl2")
-
-    executable_application_instance._set_default_experiment_variables()
 
     executable_application_instance.chain_prepend = []
     executable_application_instance._define_commands(exec_graph)
