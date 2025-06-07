@@ -21,6 +21,10 @@ from ramble.util.logger import logger
 import spack.util.naming
 
 
+def _escaped_str(in_str):
+    return str(in_str).replace(r"\{", r"\\{").replace(r"\}", r"\\}")
+
+
 def _and(a, b):
     return a and b
 
@@ -535,7 +539,7 @@ class Expander:
         pulling a list from a different experiment.
         """
         try:
-            math_ast = ast.parse(str(var), mode="eval")
+            math_ast = ast.parse(_escaped_str(var), mode="eval")
             value = self.eval_math(math_ast.body)
             if isinstance(value, list):
                 return value
@@ -760,7 +764,7 @@ class Expander:
 
         """
         try:
-            math_ast = ast.parse(in_str, mode="eval")
+            math_ast = ast.parse(_escaped_str(in_str), mode="eval")
             out_str = self.eval_math(math_ast.body)
             return out_str
         except MathEvaluationError as e:
