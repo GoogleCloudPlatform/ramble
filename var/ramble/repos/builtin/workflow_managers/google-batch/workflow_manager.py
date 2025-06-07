@@ -71,7 +71,7 @@ class GoogleBatch(WorkflowManagerBase):
 
     workflow_manager_variable(
         name="mpi_command",
-        default="srun {srun_args}",
+        default="mpirun -n {n_ranks}",
         description="mpirun prefix, mostly served as an overridable default",
     )
 

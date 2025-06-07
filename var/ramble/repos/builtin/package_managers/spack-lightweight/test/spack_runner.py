@@ -327,6 +327,8 @@ def test_new_compiler_installs(tmpdir, capsys, request):
     import os
 
     with tmpdir.as_cwd():
+        # compilers.yaml is written to support older spack versions.
+        # The compiler information was changed to exist in the packages.yaml file around v1.0.0
         compilers_config = """
 compilers::
 - compiler:
@@ -352,6 +354,11 @@ packages:
     externals:
     - spec: gcc@12.1.0 languages=c,fortran
       prefix: {os.getcwd()}
+      extra_attributes:
+        compilers:
+          c: /tmpdir_path/gcc
+          cxx: /tmpdir_path/g++
+          fortran: /tmpdir_path/gfortran
     buildable: false
 """
 
