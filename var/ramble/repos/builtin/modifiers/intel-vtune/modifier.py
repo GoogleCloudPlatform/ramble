@@ -52,7 +52,11 @@ class IntelVtune(BasicModifier):
         mode="mpi",
     )
 
-    register_builtin("setup_vtune_results_dir", injection_method="prepend")
+    register_builtin(
+        "setup_vtune_results_dir", required=True, injection_method="prepend"
+    )
 
     def setup_vtune_results_dir(self):
-        return ["rm -rf {vtune_results_dir}", "mkdir -p {vtune_results_dir}"]
+        # For some analysis types (like per-node), the results_dir only acts as a prefix,
+        # and a series of directories will be created, such as vtune_dir.node1, vtune_dir.node2
+        return ["rm -rf {vtune_results_dir}*"]
