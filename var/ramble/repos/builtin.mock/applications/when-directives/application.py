@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 from ramble.appkit import *
 
 
@@ -212,4 +214,42 @@ class WhenDirectives(ExecutableApplication):
     workload(
         "exec_when_wl",
         executables=["test_exec", "test_exec_skipped", "test_exec_def_when"],
+    )
+
+    # for input_file()
+    cwd = os.getcwd()
+    variant(
+        "input_when",
+        default=False,
+        values=[True, False],
+        description="Add input file using when",
+    )
+
+    input_file(
+        "test-input1",
+        url=f"file://{cwd}/input1_false",
+        description="Test input when false",
+        when=["~input_when"],
+    )
+
+    input_file(
+        "test-input1",
+        url=f"file://{cwd}/input1_true",
+        expand=False,
+        description="Test input when true",
+        when=["+input_when"],
+    )
+
+    input_file(
+        "test-input2",
+        url=f"file://{cwd}/input2",
+        expand=False,
+        description="Test input skipped when false",
+        when=["+input_when"],
+    )
+
+    workload(
+        "test_inputs_wl",
+        executables=["test_exec"],
+        inputs=["test-input1", "test-input2"],
     )

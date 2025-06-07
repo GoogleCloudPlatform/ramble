@@ -166,6 +166,7 @@ def input_file(
     sha256=None,
     extension=None,
     expand=True,
+    when=None,
     **kwargs,
 ):
     """Adds an input file definition to this application
@@ -184,16 +185,23 @@ def input_file(
         extension (str): Optiona, the extension to use for the input, if it isn't part of the
                               file name.
         expand (bool): Optional. Whether the input should be expanded or not. Defaults to True
+        when (list | None): List of when conditions to apply to directive
     """
 
     def _execute_input_file(app):
-        app.inputs[name] = {
+        when_list = ramble.language.language_helpers.build_when_list(when, app, name, "input_file")
+        when_set = frozenset(when_list)
+        if when_set not in app.inputs:
+            app.inputs[when_set] = {}
+
+        app.inputs[when_set][name] = {
             "url": url,
             "description": description,
             "target_dir": target_dir,
             "sha256": sha256,
             "extension": extension,
             "expand": expand,
+            "when": when_list,
         }
 
     return _execute_input_file

@@ -239,6 +239,7 @@ class DirectiveMeta(type):
                         "package_manager_variable",
                         "workflow_manager_variable",
                         "executable",
+                        "input_file",
                     ]:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'

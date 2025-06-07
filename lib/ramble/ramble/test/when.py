@@ -1008,3 +1008,49 @@ def test_executable_errors_when_overlapping_conditions(request):
 
             captured = workspace("setup", global_args=global_args)
             assert "test_exec_def_when is defined for overlapping `when` conditions" in captured
+
+
+@pytest.mark.parametrize(
+    "input_when,expected_input_file",
+    [
+        (False, "input1_false"),
+        (True, "input1_true"),
+    ],
+)
+def test_input_when(request, input_when, expected_input_file):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_inputs_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:input_when:{input_when}", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        log_file = os.path.join(
+            ws.path,
+            "logs",
+            "setup.latest.out",
+        )
+
+        with open(log_file) as f:
+            data = f.read()
+
+            assert expected_input_file in data
+            assert ("input2" in data) == input_when
