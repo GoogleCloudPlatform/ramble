@@ -51,6 +51,7 @@ include = [
   "**/lib/ramble/ramble/**",
   "**/lib/ramble/ramble/schema/**",
   "**/lib/ramble/ramble/cmd/**",
+  "**/var/ramble/repos/builtin/base_classes/**",
 ]
 omit = [
     "**/spack/lib/**",
