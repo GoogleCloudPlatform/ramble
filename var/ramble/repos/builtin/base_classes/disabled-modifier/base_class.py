@@ -7,7 +7,7 @@
 # except according to those terms.
 
 
-from ramble.modifier import ModifierBase
+from ramble.modkit import *  # noqa: F403
 
 
 class DisabledModifier(ModifierBase):

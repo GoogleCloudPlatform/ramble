@@ -16,7 +16,6 @@ from typing import List
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
-from ramble.error import RambleError
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
 from ramble.util.naming import NS_SEPARATOR
@@ -27,7 +26,9 @@ import spack.util.naming
 class PackageManagerBase(metaclass=PackageManagerMeta):
     name = None
     object_variants = None
-    _builtin_name = NS_SEPARATOR.join(("package_manager_builtin", "{obj_name}", "{name}"))
+    _builtin_name = NS_SEPARATOR.join(
+        ("package_manager_builtin", "{obj_name}", "{name}")
+    )
     _language_classes = [PackageManagerMeta, SharedMeta]
     _pipelines = [
         "analyze",
@@ -129,7 +130,9 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """
         all_vars = {}
         for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(when_key, self.app_inst.object_variants):
+            if not self.app_inst.expander.satisfies(
+                when_key, self.app_inst.object_variants
+            ):
                 continue
 
             for var in var_list:
@@ -197,7 +200,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         manager instance is attached to.
 
         Args:
-            app_inst (ramble.application.ApplicationBase): The experiment this
+            app_inst (ramble.base_cls.builtin.ApplicationBase): The experiment this
                 package manager will act on.
         """
         self.app_inst = app_inst
@@ -220,7 +223,9 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         Returns:
             (set): All variable names used by this experiment.
         """
-        app_context = self.app_inst.expander.expand_var_name(self.keywords.env_name)
+        app_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
 
         software_environments = workspace.software_environments
         software_environments.render_environment(
@@ -229,7 +234,9 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
         return self.app_inst.expander._used_variables
 
-    def populate_inventory(self, workspace, force_compute=False, require_exist=False):
+    def populate_inventory(
+        self, workspace, force_compute=False, require_exist=False
+    ):
         """Stub class method for populating an experiment inventory.
         Specific package managers should implement this to convey inventory
         information to the workspace / experiment.
@@ -256,14 +263,16 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         Args:
             workspace (ramble.workspace.Workspace): Reference to the workspace
                 that is currently being acted on.
-            app_inst (ramble.application.ApplicationBase): Reference to the
+            app_inst (ramble.base_cls.builtin.ApplicationBase): Reference to the
                 application instance that owns the results.
 
         """
         if app_inst.result is None:
             return
         prov_cache = workspace.pkg_prov_cache
-        env_name = self.app_inst.expander.expand_var_name(self.keywords.env_name)
+        env_name = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
         if env_name in prov_cache[self.name]:
             # No copy done as this shouldn't be modified once written
             pkg_list = prov_cache[self.name][env_name]
@@ -286,30 +295,3 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""
         return []
-
-
-class PackageManagerError(RambleError):
-    """
-    Exception that is raised by package managers
-    """
-
-
-class SoftwareInfo:
-    """Represents information about a software build configuration (standard class)."""
-
-    def __init__(
-        self, name="", version="unknown", compiler="", compiler_version="", target="", variants=""
-    ):
-        """Initializes the BuildInfo object."""
-        self.name = name
-        self.version = version
-        self.compiler = compiler
-        self.compiler_version = compiler_version
-        self.target = target
-        self.variants = variants
-
-    def to_version_text(self):
-        return f"{self.name} @{self.version}"
-
-    def to_dict(self):
-        return self.__dict__

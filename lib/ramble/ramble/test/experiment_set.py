@@ -14,7 +14,7 @@ import ramble.context
 import ramble.experiment_set
 import ramble.renderer
 import ramble.workspace
-from ramble.application import ChainCycleDetectedError, InvalidChainError
+from ramble.error import ChainCycleDetectedError, InvalidChainError
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(

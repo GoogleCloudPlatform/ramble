@@ -14,10 +14,10 @@ import pytest
 
 import llnl.util.filesystem as fs
 
-import ramble.application
 import ramble.config
 import ramble.filters
 import ramble.pipeline
+import ramble.repository
 import ramble.workspace
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
@@ -25,6 +25,10 @@ from ramble.namespace import namespace
 from ramble.test.dry_run_helpers import search_files_for_string
 
 import spack.util.spack_yaml as syaml
+
+ApplicationBase = ramble.repository.get_obj_class(
+    "application-base", object_type=ramble.repository.ObjectTypes.base_classes
+)
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
@@ -1399,7 +1403,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            ramble.application.ApplicationBase.license_inc_name,
+            ApplicationBase.license_inc_name,
         )
     )
 
@@ -1464,7 +1468,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            ramble.application.ApplicationBase.license_inc_name,
+            ApplicationBase.license_inc_name,
         )
     )
 

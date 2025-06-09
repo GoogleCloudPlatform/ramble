@@ -33,7 +33,7 @@ namespaces = [
     "ramble.package_manager",
     "ramble.wm",
     "ramble.workflow_manager",
-    "ramble.application",
+    "ramble.base_cls",
     "ramble.modifier",
 ]
 

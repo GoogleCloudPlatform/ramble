@@ -19,9 +19,9 @@ import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 from llnl.util.tty.color import cprint
 
-import ramble.application
 import ramble.config
 import ramble.expander
+import ramble.experiment_result
 import ramble.fetch_strategy
 import ramble.repository
 import ramble.software_environments
@@ -35,6 +35,11 @@ from ramble.util.logger import logger
 
 import spack.util.spack_json as sjson
 from spack.util.executable import Executable, which
+
+ApplicationBase = ramble.repository.get_obj_class(
+    "application-base", object_type=ramble.repository.ObjectTypes.base_classes
+)
+
 
 if not ramble.config.get("config:disable_progress_bar", False):
     try:
@@ -259,7 +264,7 @@ class AnalyzePipeline(Pipeline):
         no_analyze_cnt = 0
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if not (app_inst.is_template or app_inst.repeats.is_repeat_base):
-                if app_inst.get_status() != ramble.application.ExperimentStatus.UNKNOWN:
+                if app_inst.get_status() != ramble.experiment_result.ExperimentStatus.UNKNOWN:
                     found_valid_experiment = True
             else:
                 no_analyze_cnt += 1
@@ -369,7 +374,7 @@ class ArchivePipeline(Pipeline):
 
         excluded_secrets = set()
         if not self.include_secrets:
-            excluded_secrets.add(ramble.application.ApplicationBase.license_inc_name)
+            excluded_secrets.add(ApplicationBase.license_inc_name)
 
         fs.mkdirp(archive_shared)
         for root, _, files in os.walk(self.workspace.shared_dir):

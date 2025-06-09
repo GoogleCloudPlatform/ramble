@@ -13,6 +13,7 @@ from typing import List
 import llnl.util.filesystem as fs
 
 import ramble.config
+import ramble.software_info
 import ramble.util.hashing
 from ramble.pkgmankit import *  # noqa: F403
 from ramble.util.shell_utils import source_str
@@ -136,7 +137,7 @@ class EnvironmentModules(PackageManagerBase):
                     name = parts[0].strip()
                     version = "/".join(parts[1:]) if len(parts) > 1 else ""
                     pkg_list.append(
-                        ramble.package_manager.SoftwareInfo(
+                        ramble.software_info.SoftwareInfo(
                             name=name, version=version
                         )
                     )

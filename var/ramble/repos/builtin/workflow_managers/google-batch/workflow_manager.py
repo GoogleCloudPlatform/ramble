@@ -10,7 +10,7 @@ import os
 
 import yaml
 
-from ramble.application import ExperimentStatus
+from ramble.experiment_result import ExperimentStatus
 from ramble.util import shell_utils
 from ramble.wmkit import *
 

@@ -8,11 +8,16 @@
 
 import os
 
+import ramble.repository
 import ramble.workspace
-from ramble.application import ApplicationBase
 from ramble.main import RambleCommand
 
 import spack.util.spack_json as sjson
+
+ApplicationBase = ramble.repository.get_obj_class(
+    "application-base", object_type=ramble.repository.ObjectTypes.base_classes
+)
+
 
 workspace = RambleCommand("workspace")
 

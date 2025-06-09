@@ -28,7 +28,6 @@ import ramble.fetch_strategy
 import ramble.graphs
 import ramble.keywords
 import ramble.mirror
-import ramble.modifier_types.disabled
 import ramble.paths
 import ramble.repeats
 import ramble.repository
@@ -44,11 +43,21 @@ import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
 import ramble.variants
-import ramble.workflow_manager
-from ramble.error import RambleError
+from ramble.error import (
+    ApplicationError,
+    ChainCycleDetectedError,
+    ExecutableNameError,
+    FormattedExecutableError,
+    InvalidChainError,
+    ObjectValidationError,
+)
 from ramble.experiment_result import ExperimentResult, ExperimentStatus
 from ramble.language.application_language import ApplicationMeta
-from ramble.language.shared_language import SharedMeta, register_builtin, register_phase
+from ramble.language.shared_language import (
+    SharedMeta,
+    register_builtin,
+    register_phase,
+)
 from ramble.util import constants, conversions
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
@@ -63,12 +72,16 @@ import spack.util.spack_json
 
 _NULL_CONTEXT = "null"
 
-_DEFAULT_CONTENT_PERM = stat.S_IRWXU | stat.S_IRWXG | stat.S_IROTH | stat.S_IXOTH
+_DEFAULT_CONTENT_PERM = (
+    stat.S_IRWXU | stat.S_IRWXG | stat.S_IROTH | stat.S_IXOTH
+)
 
 
 def _get_context_display_name(context):
     return (
-        f"default ({_NULL_CONTEXT}) context" if context == _NULL_CONTEXT else f"{context} context"
+        f"default ({_NULL_CONTEXT}) context"
+        if context == _NULL_CONTEXT
+        else f"{context} context"
     )
 
 
@@ -97,7 +110,9 @@ def _run_phase_hook(obj, workspace, pipeline, hook):
 
     hook_func_name = f"_{hook}"
     if hasattr(obj, hook_func_name):
-        phase_func = _get_phase_func_wrapper(workspace, getattr(obj, hook_func_name), hook)
+        phase_func = _get_phase_func_wrapper(
+            workspace, getattr(obj, hook_func_name), hook
+        )
         phase_func(workspace)
 
 
@@ -215,7 +230,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """Create a lock for the experiment directory, and return it"""
         if self._exp_lock is None:
             lock_path = os.path.join(
-                self.expander.expand_var("{experiment_run_dir}"), ".ramble-experiment"
+                self.expander.expand_var("{experiment_run_dir}"),
+                ".ramble-experiment",
             )
 
             self._exp_lock = lk.Lock(lock_path)
@@ -236,7 +252,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         if self.internals:
             new_clone.set_internals(self.internals.copy())
         if self._formatted_executables:
-            new_clone.set_formatted_executables(self._formatted_executables.copy())
+            new_clone.set_formatted_executables(
+                self._formatted_executables.copy()
+            )
 
         new_clone.keywords = ramble.keywords.keywords.copy()
         new_clone.set_template(False)
@@ -275,16 +293,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._set_package_manager()
         self._set_workflow_manager()
 
-        for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
+        for _, obj in self._objects(
+            exclude_types=[ramble.repository.ObjectTypes.applications]
+        ):
             obj_variants = getattr(obj, "object_variants", None)
             if obj_variants is not None:
-                self.object_variants.merge_default_variants(getattr(obj, "object_variants"))
+                self.object_variants.merge_default_variants(
+                    getattr(obj, "object_variants")
+                )
                 self.object_variants.merge_multi_value_variants(obj_variants)
 
         base_chain = self.__class__.__mro__
         for cls in base_chain:
             if hasattr(cls, "name") and getattr(cls, "name") is not None:
-                self.object_variants.multi_value_variant("application_name", value=cls.name)
+                self.object_variants.multi_value_variant(
+                    "application_name", value=cls.name
+                )
 
         self.object_variants.default_variant(
             "workload_name",
@@ -300,7 +324,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         if pkgman_name is not None:
             try:
                 pkgman_type = ramble.repository.ObjectTypes.package_managers
-                self.package_manager = ramble.repository.get(pkgman_name, pkgman_type).copy()
+                self.package_manager = ramble.repository.get(
+                    pkgman_name, pkgman_type
+                ).copy()
                 self.package_manager.set_application(self)
             except ramble.repository.UnknownObjectError:
                 logger.die(
@@ -311,7 +337,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         if self.package_manager is not None:
             for pkgname, config in self.required_packages.items():
-                if self.expander.satisfies(config["when"], variant_set=self.object_variants):
+                if self.expander.satisfies(
+                    config["when"], variant_set=self.object_variants
+                ):
                     self.keywords.update_keys(
                         {
                             f"{pkgname}_path": {
@@ -337,7 +365,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         try:
             wfman_type = ramble.repository.ObjectTypes.workflow_managers
-            self.workflow_manager = ramble.repository.get(workflow_name, wfman_type).copy()
+            self.workflow_manager = ramble.repository.get(
+                workflow_name, wfman_type
+            ).copy()
             self.workflow_manager.set_application(self)
         except ramble.repository.UnknownObjectError:
             logger.die(
@@ -375,22 +405,32 @@ class ApplicationBase(metaclass=ApplicationMeta):
             for mod_inst in self._modifier_instances:
                 # Define phase nodes
                 for _, phase_node in mod_inst.all_pipeline_phases(pipeline):
-                    self._pipeline_graphs[pipeline].add_node(phase_node, obj_inst=mod_inst)
+                    self._pipeline_graphs[pipeline].add_node(
+                        phase_node, obj_inst=mod_inst
+                    )
 
                 # Define phase edges
                 for _, phase_node in mod_inst.all_pipeline_phases(pipeline):
-                    self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
+                    self._pipeline_graphs[pipeline].define_edges(
+                        phase_node, internal_order=True
+                    )
 
             if self.package_manager:
                 # Define phase nodes
-                for _, phase_node in self.package_manager.all_pipeline_phases(pipeline):
+                for _, phase_node in self.package_manager.all_pipeline_phases(
+                    pipeline
+                ):
                     self._pipeline_graphs[pipeline].add_node(
                         phase_node, obj_inst=self.package_manager
                     )
 
                 # Define phase edges
-                for _, phase_node in self.package_manager.all_pipeline_phases(pipeline):
-                    self._pipeline_graphs[pipeline].define_edges(phase_node, internal_order=True)
+                for _, phase_node in self.package_manager.all_pipeline_phases(
+                    pipeline
+                ):
+                    self._pipeline_graphs[pipeline].define_edges(
+                        phase_node, internal_order=True
+                    )
 
     def set_env_variable_sets(self, env_variable_sets):
         """Set internal reference to environment variable sets"""
@@ -425,12 +465,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self.variables = variables
         self.experiment_set = experiment_set
-        self.expander = ramble.expander.Expander(self.variables, self.experiment_set)
+        self.expander = ramble.expander.Expander(
+            self.variables, self.experiment_set
+        )
 
         self.no_expand_vars = set()
         workload_name = self.expander.workload_name
         if workload_name in self.workloads:
-            for when_key, var_list in self.workloads[workload_name].variables.items():
+            for when_key, var_list in self.workloads[
+                workload_name
+            ].variables.items():
                 if self.expander.satisfies(when_key, self.object_variants):
                     for var in var_list:
                         if not var.expandable:
@@ -502,7 +546,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def experiment_log_file(self, logs_dir):
         """Returns an experiment log file path for the given logs directory"""
-        return os.path.join(logs_dir, self.expander.experiment_namespace) + ".out"
+        return (
+            os.path.join(logs_dir, self.expander.experiment_namespace) + ".out"
+        )
 
     def get_pipeline_phases(self, pipeline, phase_filters=None):
         if phase_filters is None:
@@ -520,16 +566,24 @@ class ApplicationBase(metaclass=ApplicationMeta):
         phases = set()
         final_added_index = None
         if pipeline in self._pipeline_graphs:
-            for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
-                if self.expander.satisfies(phase.when, variant_set=self.object_variants):
+            for idx, phase in enumerate(
+                self._pipeline_graphs[pipeline].walk()
+            ):
+                if self.expander.satisfies(
+                    phase.when, variant_set=self.object_variants
+                ):
                     for phase_filter in phase_filters:
                         if fnmatch.fnmatch(phase.key, phase_filter):
                             phases.add(phase)
                             final_added_index = idx
 
-        include_phase_deps = ramble.config.get("config:include_phase_dependencies")
+        include_phase_deps = ramble.config.get(
+            "config:include_phase_dependencies"
+        )
         if include_phase_deps:
-            for idx, phase in enumerate(self._pipeline_graphs[pipeline].walk()):
+            for idx, phase in enumerate(
+                self._pipeline_graphs[pipeline].walk()
+            ):
                 if idx < final_added_index and phase not in phases:
                     phases.add(phase)
 
@@ -551,7 +605,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for var, val in print_vars.items():
             expansion_var = self.expander.expansion_str(var)
             expanded = self.expander.expand_var(expansion_var)
-            color.cprint(f"{indent}  {var} = {val} ==> {expanded}".replace("@", "@@"))
+            color.cprint(
+                f"{indent}  {var} = {val} ==> {expanded}".replace("@", "@@")
+            )
 
     def build_used_variables(self, workspace):
         """Build a set of all used variables
@@ -660,7 +716,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         if namespace.executables in self.internals:
             header = rucolor.nested_4("Executable Order")
-            color.cprint(f"{indent}{header}: {str(self.internals[namespace.executables])}")
+            color.cprint(
+                f"{indent}{header}: {str(self.internals[namespace.executables])}"
+            )
 
         if namespace.executable_injection in self.internals:
             header = rucolor.nested_4("Executable Injection")
@@ -710,9 +768,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
         logger.msg(f"  Executing phase {phase}")
         start_time = time.time()
 
-        for _, obj in self._objects(exclude_types=[ramble.repository.ObjectTypes.applications]):
+        for _, obj in self._objects(
+            exclude_types=[ramble.repository.ObjectTypes.applications]
+        ):
             _run_phase_hook(obj, workspace, pipeline, phase)
-        phase_func = _get_phase_func_wrapper(workspace, phase_node.attribute, phase)
+        phase_func = _get_phase_func_wrapper(
+            workspace, phase_node.attribute, phase
+        )
         phase_func(workspace, app_inst=self)
         self._phase_times[phase] = time.time() - start_time
 
@@ -726,11 +788,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
         logger.msg("Phase timing statistics:")
         if phase_filters is None:
             phase_filters = ["*"]
-        for phase in self.get_pipeline_phases(pipeline, phase_filters=phase_filters):
+        for phase in self.get_pipeline_phases(
+            pipeline, phase_filters=phase_filters
+        ):
             # Set default time to 0.0 s, to prevent KeyError from skipped phases
             if phase not in self._phase_times:
                 self._phase_times[phase] = 0.0
-            logger.msg(f"  {phase} time: {round(self._phase_times[phase], 5)} (s)")
+            logger.msg(
+                f"  {phase} time: {round(self._phase_times[phase], 5)} (s)"
+            )
 
     def create_experiment_chain(self, workspace):
         """Create the necessary chained experiments for this instance
@@ -751,7 +817,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         chain_idx = 0
         chain_stack = []
         for exp in reversed(self.chained_experiments):
-            for exp_name in self.experiment_set.search_primary_experiments(exp["name"]):
+            for exp_name in self.experiment_set.search_primary_experiments(
+                exp["name"]
+            ):
                 child_inst = self.experiment_set.get_experiment(exp_name)
 
                 if child_inst in classes_in_stack:
@@ -782,7 +850,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 )
 
             if "order" in cur_exp_def:
-                possible_orders = ["after_chain", "after_root", "before_chain", "before_root"]
+                possible_orders = [
+                    "after_chain",
+                    "after_root",
+                    "before_chain",
+                    "before_root",
+                ]
                 if cur_exp_def["order"] not in possible_orders:
                     raise InvalidChainError(
                         "Invalid experiment chain defined:\n"
@@ -845,29 +918,45 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     new_inst = base_inst.clone()
 
                     if namespace.variables in cur_exp_def:
-                        for var, val in cur_exp_def[namespace.variables].items():
+                        for var, val in cur_exp_def[
+                            namespace.variables
+                        ].items():
                             new_inst.variables[var] = val
 
                     new_inst.expander._experiment_namespace = new_name
-                    new_inst.variables[self.keywords.experiment_run_dir] = new_run_dir
-                    new_inst.variables[self.keywords.experiment_name] = new_name
+                    new_inst.variables[self.keywords.experiment_run_dir] = (
+                        new_run_dir
+                    )
+                    new_inst.variables[self.keywords.experiment_name] = (
+                        new_name
+                    )
                     new_inst.variables[self.keywords.experiment_index] = (
-                        self.expander.expand_var_name(self.keywords.experiment_index)
+                        self.expander.expand_var_name(
+                            self.keywords.experiment_index
+                        )
                     )
                     new_inst.repeats = self.repeats
                     new_inst.read_status()
 
                     # Extract inherited variables
                     if namespace.inherit_variables in cur_exp_def:
-                        for inherit_var in cur_exp_def[namespace.inherit_variables]:
-                            new_inst.variables[inherit_var] = self.variables[inherit_var]
+                        for inherit_var in cur_exp_def[
+                            namespace.inherit_variables
+                        ]:
+                            new_inst.variables[inherit_var] = self.variables[
+                                inherit_var
+                            ]
 
                     # Expand the chained experiment vars, so we can build the execution command
                     new_inst.add_expand_vars(workspace)
-                    chain_cmd = new_inst.expander.expand_var(cur_exp_def[namespace.command])
+                    chain_cmd = new_inst.expander.expand_var(
+                        cur_exp_def[namespace.command]
+                    )
                     self.chain_commands[new_name] = chain_cmd
                     cur_exp_def[namespace.command] = chain_cmd
-                    self.experiment_set.add_chained_experiment(new_name, new_inst)
+                    self.experiment_set.add_chained_experiment(
+                        new_name, new_inst
+                    )
 
                 chain_idx += 1
             else:
@@ -877,10 +966,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 else:
                     if base_inst.chained_experiments:
                         for exp in reversed(base_inst.chained_experiments):
-                            for exp_name in self.experiment_set.search_primary_experiments(
+                            for (
+                                exp_name
+                            ) in self.experiment_set.search_primary_experiments(
                                 exp["name"]
                             ):
-                                child_inst = self.experiment_set.get_experiment(exp_name)
+                                child_inst = (
+                                    self.experiment_set.get_experiment(
+                                        exp_name
+                                    )
+                                )
                                 if child_inst in classes_in_stack:
                                     raise ChainCycleDetectedError(
                                         "Cycle detected in "
@@ -951,7 +1046,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 mod_inst.modify_experiment(self)
                 mod_inst.set_modifier_variants()
             else:
-                mod_inst = ramble.modifier_types.disabled.DisabledModifier(mod_inst)
+                base_class_type = ramble.repository.ObjectTypes.base_classes
+                DisabledModifier = ramble.repository.get_obj_class(
+                    "disabled-modifier", object_type=base_class_type
+                )
+                mod_inst = DisabledModifier(mod_inst)
 
             self._modifier_instances.append(mod_inst)
 
@@ -974,7 +1073,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if obj_variants is not None:
                 self.object_variants.merge_multi_value_variants(obj_variants)
 
-    def validate_experiment(self, warn_validation=True, die_on_validate_error=True):
+    def validate_experiment(
+        self, warn_validation=True, die_on_validate_error=True
+    ):
         # Validate the new modifiers variables exist
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(
@@ -988,7 +1089,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         expander = self.expander
         for _, obj in self._objects():
             for when_set, validator_defs in obj.validators.items():
-                if not self.expander.satisfies(when_set, variant_set=self.object_variants):
+                if not self.expander.satisfies(
+                    when_set, variant_set=self.object_variants
+                ):
                     continue
 
                 for name, validator in validator_defs.items():
@@ -1009,7 +1112,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         filtered_executables = {}
         all_executables = self.executables.copy()
         for when_set, executables in all_executables.items():
-            if self.expander.satisfies(when_set, variant_set=self.object_variants):
+            if self.expander.satisfies(
+                when_set, variant_set=self.object_variants
+            ):
                 for executable in executables:
                     if executable in filtered_executables:
                         logger.die(
@@ -1023,9 +1128,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def _define_custom_executables(self):
         # Define custom executables
         if namespace.custom_executables in self.internals:
-            for name, conf in self.internals[namespace.custom_executables].items():
-                if name in self._get_filtered_executables() or name in self.custom_executables:
-                    experiment_namespace = self.expander.expand_var_name("experiment_namespace")
+            for name, conf in self.internals[
+                namespace.custom_executables
+            ].items():
+                if (
+                    name in self._get_filtered_executables()
+                    or name in self.custom_executables
+                ):
+                    experiment_namespace = self.expander.expand_var_name(
+                        "experiment_namespace"
+                    )
                     raise ExecutableNameError(
                         f"In experiment {experiment_namespace} "
                         f'a custom executable "{name}" is defined.\n'
@@ -1033,8 +1145,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         "defined"
                     )
 
-                self.custom_executables[name] = ramble.util.executable.CommandExecutable(
-                    name=name, **conf
+                self.custom_executables[name] = (
+                    ramble.util.executable.CommandExecutable(name=name, **conf)
                 )
 
     def _get_executable_graph(self, workload_name):
@@ -1049,7 +1161,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         all_builtins = []
         for _, obj in self._objects():
             for when_set, builtins in obj.builtins.items():
-                if self.expander.satisfies(when_set, variant_set=self.object_variants):
+                if self.expander.satisfies(
+                    when_set, variant_set=self.object_variants
+                ):
                     builtin_objects.append(obj)
                     all_builtins.append(builtins)
 
@@ -1058,18 +1172,28 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         filtered_exec_order = []
         for executable in exec_order:
-            if executable in filtered_executables or any(executable in b for b in all_builtins):
+            if executable in filtered_executables or any(
+                executable in b for b in all_builtins
+            ):
                 filtered_exec_order.append(executable)
             else:
-                logger.debug(f"Skipping executable {executable}. `When` conditions not satisfied.")
+                logger.debug(
+                    f"Skipping executable {executable}. `When` conditions not satisfied."
+                )
 
         executable_graph = ramble.graphs.ExecutableGraph(
-            filtered_exec_order, filtered_executables, builtin_objects, all_builtins, self
+            filtered_exec_order,
+            filtered_executables,
+            builtin_objects,
+            all_builtins,
+            self,
         )
 
         # Perform executable injection
         if namespace.executable_injection in self.internals:
-            for exec_injection in self.internals[namespace.executable_injection]:
+            for exec_injection in self.internals[
+                namespace.executable_injection
+            ]:
                 exec_name = exec_injection["name"]
                 order = "before"
                 if "order" in exec_injection:
@@ -1077,7 +1201,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 relative_to = None
                 if "relative_to" in exec_injection:
                     relative_to = exec_injection["relative_to"]
-                executable_graph.inject_executable(exec_name, order, relative_to)
+                executable_graph.inject_executable(
+                    exec_name, order, relative_to
+                )
 
         return executable_graph
 
@@ -1094,7 +1220,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             input_path = os.path.join(
                 self.expander.expand_var(
-                    os.path.join(input_conf["target_dir"], input_file), extra_vars=input_vars
+                    os.path.join(input_conf["target_dir"], input_file),
+                    extra_vars=input_vars,
                 ),
             )
             self.variables[input_conf["input_name"]] = input_path
@@ -1143,13 +1270,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
         # Inject all prepended chained experiments
         for chained_exp in self.chain_prepend:
             self._command_list.append(self.chain_commands[chained_exp])
-            self._command_list_without_logs.append(self.chain_commands[chained_exp])
+            self._command_list_without_logs.append(
+                self.chain_commands[chained_exp]
+            )
 
         # ensure all log files are purged and set up
         logs = []
 
         for exec_node in exec_graph.walk():
-            if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
+            if isinstance(
+                exec_node.attribute, ramble.util.executable.CommandExecutable
+            ):
                 exec_cmd = exec_node.attribute
                 if exec_cmd.redirect:
                     expanded_log = self.expander.expand_var(exec_cmd.redirect)
@@ -1169,14 +1300,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for exec_node in exec_graph.walk():
             exec_vars = {"executable_name": exec_node.key}
 
-            if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
+            if isinstance(
+                exec_node.attribute, ramble.util.executable.CommandExecutable
+            ):
                 exec_vars.update(exec_node.attribute.variables)
 
             for mod in self._modifier_instances:
                 if mod.applies_to_executable(exec_node.key):
                     exec_vars.update(mod.modded_variables(self, exec_vars))
 
-            if isinstance(exec_node.attribute, ramble.util.executable.CommandExecutable):
+            if isinstance(
+                exec_node.attribute, ramble.util.executable.CommandExecutable
+            ):
                 # Process directive defined executables
                 base_command = exec_node.attribute.copy()
                 pre_commands = []
@@ -1197,10 +1332,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 for cmd_conf in command_configs:
                     mpi_cmd = ""
                     if cmd_conf.mpi:
-                        raw_mpi_cmd = self.expander.expand_var("{mpi_command}", exec_vars).strip()
+                        raw_mpi_cmd = self.expander.expand_var(
+                            "{mpi_command}", exec_vars
+                        ).strip()
                         if (
                             not raw_mpi_cmd
-                            and int(self.expander.expand_var_name(self.keywords.n_nodes)) > 1
+                            and int(
+                                self.expander.expand_var_name(
+                                    self.keywords.n_nodes
+                                )
+                            )
+                            > 1
                         ):
                             logger.warn(
                                 f"Command {cmd_conf.name} requires a non-empty `mpi_command` "
@@ -1210,11 +1352,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                     redirect = ""
                     if cmd_conf.redirect:
-                        out_log = self.expander.expand_var(cmd_conf.redirect, exec_vars)
+                        out_log = self.expander.expand_var(
+                            cmd_conf.redirect, exec_vars
+                        )
                         output_operator = cmd_conf.output_capture
 
                         redirect_mapper = output_mapper()
-                        redirect = redirect_mapper.generate_out_string(out_log, output_operator)
+                        redirect = redirect_mapper.generate_out_string(
+                            out_log, output_operator
+                        )
 
                     if cmd_conf.run_in_background:
                         bg_cmd = " &"
@@ -1225,10 +1371,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         command_part = f"{mpi_cmd}{part}"
                         suffix_part = f"{redirect}{bg_cmd}"
 
-                        expanded_cmd = self.expander.expand_var(command_part, exec_vars).lstrip()
-                        suffix_cmd = self.expander.expand_var(suffix_part, exec_vars).lstrip()
+                        expanded_cmd = self.expander.expand_var(
+                            command_part, exec_vars
+                        ).lstrip()
+                        suffix_cmd = self.expander.expand_var(
+                            suffix_part, exec_vars
+                        ).lstrip()
 
-                        self._command_list.append((expanded_cmd + " " + suffix_cmd).rstrip())
+                        self._command_list.append(
+                            (expanded_cmd + " " + suffix_cmd).rstrip()
+                        )
                         self._command_list_without_logs.append(expanded_cmd)
 
             else:  # All Builtins
@@ -1241,7 +1393,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         # Inject all appended chained experiments
         for chained_exp in self.chain_append:
-            expanded = self.expander.expand_var(self.chain_commands[chained_exp])
+            expanded = self.expander.expand_var(
+                self.chain_commands[chained_exp]
+            )
             self._command_list.append(expanded)
             self._command_list_without_logs.append(expanded)
 
@@ -1255,9 +1409,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         based on the formatting requested.
         """
 
-        self.variables[self.keywords.unformatted_command] = "\n".join(self._command_list)
-        self.variables[self.keywords.unformatted_command_without_logs] = "\n".join(
-            self._command_list_without_logs
+        self.variables[self.keywords.unformatted_command] = "\n".join(
+            self._command_list
+        )
+        self.variables[self.keywords.unformatted_command_without_logs] = (
+            "\n".join(self._command_list_without_logs)
         )
         formatted_exec_groups = [{frozenset(): self._formatted_executables}]
 
@@ -1269,7 +1425,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for formatted_exec_group in formatted_exec_groups:
             for when_set, formatted_exec_defs in formatted_exec_group.items():
-                if not self.expander.satisfies(when_set, variant_set=self.object_variants):
+                if not self.expander.satisfies(
+                    when_set, variant_set=self.object_variants
+                ):
                     continue
 
                 for var_name, formatted_conf in formatted_exec_defs.items():
@@ -1281,7 +1439,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                     n_indentation = 0
                     if namespace.indentation in formatted_conf:
-                        n_indentation = int(formatted_conf[namespace.indentation])
+                        n_indentation = int(
+                            formatted_conf[namespace.indentation]
+                        )
 
                     prefix = ""
                     if namespace.prefix in formatted_conf:
@@ -1289,29 +1449,36 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                     join_separator = "\n"
                     if namespace.join_separator in formatted_conf:
-                        join_separator = formatted_conf[namespace.join_separator].replace(
-                            r"\n", "\n"
-                        )
+                        join_separator = formatted_conf[
+                            namespace.join_separator
+                        ].replace(r"\n", "\n")
 
                     indentation = " " * n_indentation
 
                     commands_to_format = self._command_list
                     if namespace.commands in formatted_conf:
-                        commands_to_format = formatted_conf[namespace.commands].copy()
+                        commands_to_format = formatted_conf[
+                            namespace.commands
+                        ].copy()
 
                     formatted_lines = []
                     for command in commands_to_format:
                         expanded = self.expander.expand_var(command)
                         for out_line in expanded.split("\n"):
-                            formatted_lines.append(indentation + prefix + out_line)
+                            formatted_lines.append(
+                                indentation + prefix + out_line
+                            )
 
-                    self.variables[var_name] = join_separator.join(formatted_lines)
+                    self.variables[var_name] = join_separator.join(
+                        formatted_lines
+                    )
 
     def _derive_variables_for_template_path(self, workspace):
         """Define variables for template paths (for add_expand_vars)"""
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
-                self.expander.expand_var(f"{{experiment_run_dir}}"), template_name  # noqa: F541
+                self.expander.expand_var("{experiment_run_dir}"),
+                template_name,  # noqa: F541
             )
             self.variables[template_name] = expand_path
 
@@ -1338,7 +1505,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
         if not self._vars_are_expanded:
             self._validate_experiment()
-            self._executable_graph = self._get_executable_graph(self.expander.workload_name)
+            self._executable_graph = self._get_executable_graph(
+                self.expander.workload_name
+            )
             self._set_input_path()
 
             self._derive_variables_for_template_path(workspace)
@@ -1362,7 +1531,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         # Batch 'when' evaluation to avoid repeat expander calls
         when_satisfied = set()
         for when_set in self.inputs.keys():
-            if self.expander.satisfies(when_set, variant_set=self.object_variants):
+            if self.expander.satisfies(
+                when_set, variant_set=self.object_variants
+            ):
                 when_satisfied.add(when_set)
 
         inputs = {}
@@ -1387,7 +1558,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         f"Make sure this input file is defined before using it in a workload."
                     )
                 if active_inputs == 0:
-                    logger.debug(f"Skipping input {input_file}. `When` conditions not satisfied.")
+                    logger.debug(
+                        f"Skipping input {input_file}. `When` conditions not satisfied."
+                    )
                     continue
                 elif active_inputs > 1:
                     logger.die(
@@ -1403,7 +1576,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                 file_name = os.path.basename(input_conf["url"])
                 if not fetcher.extension:
-                    fetcher.extension = spack.util.compression.extension(file_name)
+                    fetcher.extension = spack.util.compression.extension(
+                        file_name
+                    )
 
                 file_name = file_name.replace(f".{fetcher.extension}", "")
 
@@ -1426,7 +1601,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         Perform mirroring of inputs within this application class.
         """
-        mirror_lock = lk.Lock(os.path.join(workspace.input_mirror_path, ".ramble-mirror"))
+        mirror_lock = lk.Lock(
+            os.path.join(workspace.input_mirror_path, ".ramble-mirror")
+        )
         self._inputs_and_fetchers(self.expander.workload_name)
 
         with lk.WriteTransaction(mirror_lock):
@@ -1434,7 +1611,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 mirror_paths = ramble.mirror.mirror_archive_paths(
                     input_conf["fetcher"], os.path.join(self.name, input_file)
                 )
-                fetch_dir = os.path.join(workspace.input_mirror_path, self.name)
+                fetch_dir = os.path.join(
+                    workspace.input_mirror_path, self.name
+                )
                 fs.mkdirp(fetch_dir)
                 stage = ramble.stage.InputStage(
                     input_conf["fetcher"],
@@ -1444,7 +1623,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     lock=False,
                 )
 
-                stage.cache_mirror(workspace.input_mirror_cache, workspace.input_mirror_stats)
+                stage.cache_mirror(
+                    workspace.input_mirror_cache, workspace.input_mirror_stats
+                )
 
     register_phase("get_inputs", pipeline="setup")
 
@@ -1459,10 +1640,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for input_file, input_conf in self._input_fetchers.items():
             if not workspace.dry_run:
-                input_vars = {self.keywords.input_name: input_conf["input_name"]}
+                input_vars = {
+                    self.keywords.input_name: input_conf["input_name"]
+                }
                 input_namespace = workload_namespace + "." + input_file
                 input_path = self.expander.expand_var(
-                    os.path.join(input_conf["target_dir"], input_file), extra_vars=input_vars
+                    os.path.join(input_conf["target_dir"], input_file),
+                    extra_vars=input_vars,
                 )
                 input_tuple = (f"input-file-{input_file}", input_path)
 
@@ -1502,16 +1686,24 @@ class ApplicationBase(metaclass=ApplicationMeta):
                             logger.all_msg(
                                 f"Failed fetching input {input_file} in application {self.name}"
                             )
-                            logger.all_msg(f"Input url was: {input_conf['fetcher'].url}")
+                            logger.all_msg(
+                                f"Input url was: {input_conf['fetcher'].url}"
+                            )
                             logger.die(str(e))
 
                 workspace.add_to_cache(input_tuple)
             else:
-                logger.msg(f'DRY-RUN: Would download {input_conf["fetcher"].url}')
+                logger.msg(
+                    f'DRY-RUN: Would download {input_conf["fetcher"].url}'
+                )
 
     def _prepare_license_path(self, workspace):
-        self.license_path = os.path.join(workspace.shared_license_dir, self.name)
-        self.license_file = os.path.join(self.license_path, self.license_inc_name)
+        self.license_path = os.path.join(
+            workspace.shared_license_dir, self.name
+        )
+        self.license_file = os.path.join(
+            self.license_path, self.license_inc_name
+        )
 
         fs.mkdirp(self.license_path)
 
@@ -1526,7 +1718,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         shell = ramble.config.get("config:shell")
         var_set = set()
         for scope in config_scopes:
-            license_conf = ramble.config.config.get_config("licenses", scope=scope)
+            license_conf = ramble.config.config.get_config(
+                "licenses", scope=scope
+            )
             if license_conf:
                 # If we have multiple matches, the last entry should win (latest in hierarchy)
                 app_licenses = {}
@@ -1539,14 +1733,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         conf, self.expander, var_set, shell=shell
                     )
 
-                    lock = lk.Lock(os.path.join(self.license_path, ".ramble-license"))
+                    lock = lk.Lock(
+                        os.path.join(self.license_path, ".ramble-license")
+                    )
                     with lk.WriteTransaction(lock):
                         with open(self.license_file, "w+") as f:
                             for cmd in env_cmds:
                                 if cmd:
                                     f.write(cmd + "\n")
 
-    register_phase("make_experiments", pipeline="setup", run_after=["get_inputs"])
+    register_phase(
+        "make_experiments", pipeline="setup", run_after=["get_inputs"]
+    )
 
     def _make_experiments(self, workspace, app_inst=None):
         """Create experiment directories
@@ -1575,19 +1773,25 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             for template_name, template_conf in workspace.all_templates():
                 expand_path = os.path.join(experiment_run_dir, template_name)
-                logger.msg(f"Writing template {template_name} to {expand_path}")
+                logger.msg(
+                    f"Writing template {template_name} to {expand_path}"
+                )
                 fs.mkdirp(os.path.dirname(expand_path))
 
                 with open(expand_path, "w+") as f:
                     f.write(
-                        self.expander.expand_var(template_conf["contents"], extra_vars=exec_vars)
+                        self.expander.expand_var(
+                            template_conf["contents"], extra_vars=exec_vars
+                        )
                     )
                 os.chmod(expand_path, _DEFAULT_CONTENT_PERM)
 
             self._render_object_templates(exec_vars, workspace)
 
             experiment_script = workspace.experiments_script
-            experiment_script.write(self.expander.expand_var("{batch_submit}\n"))
+            experiment_script.write(
+                self.expander.expand_var("{batch_submit}\n")
+            )
 
         self.set_status(status=ExperimentStatus.SETUP)
 
@@ -1605,9 +1809,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
         # Remove the workspace path from variable definitions before hashing
         for var in variables:
             if isinstance(variables[var], str):
-                variables[var] = variables[var].replace(workspace.root + os.path.sep, "")
+                variables[var] = variables[var].replace(
+                    workspace.root + os.path.sep, ""
+                )
 
-    def populate_inventory(self, workspace, force_compute=False, require_exist=False):
+    def populate_inventory(
+        self, workspace, force_compute=False, require_exist=False
+    ):
         """Populate this experiment's hash inventory
 
         If an inventory file exists, read it first.
@@ -1622,7 +1830,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
 
         experiment_run_dir = self.expander.experiment_run_dir
-        inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
+        inventory_file = os.path.join(
+            experiment_run_dir, self._inventory_file_name
+        )
 
         if os.path.exists(inventory_file) and not force_compute:
             with open(inventory_file) as f:
@@ -1642,8 +1852,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 ("env_vars", self._env_variable_sets),
             ]
 
-            self.hash_inventory["application_definition"] = ramble.util.hashing.hash_file(
-                self._file_path
+            self.hash_inventory["application_definition"] = (
+                ramble.util.hashing.hash_file(self._file_path)
             )
 
             added_mods = set()
@@ -1652,7 +1862,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     self.hash_inventory["modifier_definitions"].append(
                         {
                             "name": mod_inst.name,
-                            "digest": ramble.util.hashing.hash_file(mod_inst._file_path),
+                            "digest": ramble.util.hashing.hash_file(
+                                mod_inst._file_path
+                            ),
                         }
                     )
                     added_mods.add(mod_inst.name)
@@ -1680,23 +1892,34 @@ class ApplicationBase(metaclass=ApplicationMeta):
             for input_conf in self._input_fetchers.values():
                 if input_conf["fetcher"].digest:
                     self.hash_inventory["inputs"].append(
-                        {"name": input_conf["input_name"], "digest": input_conf["fetcher"].digest}
+                        {
+                            "name": input_conf["input_name"],
+                            "digest": input_conf["fetcher"].digest,
+                        }
                     )
                 else:
                     self.hash_inventory["inputs"].append(
                         {
                             "name": input_conf["input_name"],
-                            "digest": ramble.util.hashing.hash_string(input_conf["fetcher"].url),
+                            "digest": ramble.util.hashing.hash_string(
+                                input_conf["fetcher"].url
+                            ),
                         }
                     )
 
         if self.package_manager is not None:
-            self.package_manager.populate_inventory(workspace, force_compute, require_exist)
+            self.package_manager.populate_inventory(
+                workspace, force_compute, require_exist
+            )
 
-        self.experiment_hash = ramble.util.hashing.hash_json(self.hash_inventory)
+        self.experiment_hash = ramble.util.hashing.hash_json(
+            self.hash_inventory
+        )
         self.variables[self.keywords.experiment_hash] = self.experiment_hash
 
-    register_phase("write_inventory", pipeline="setup", run_after=["make_experiments"])
+    register_phase(
+        "write_inventory", pipeline="setup", run_after=["make_experiments"]
+    )
 
     def _write_inventory(self, workspace, app_inst=None):
         """Build and write an inventory of an experiment
@@ -1706,7 +1929,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
 
         experiment_run_dir = self.expander.experiment_run_dir
-        inventory_file = os.path.join(experiment_run_dir, self._inventory_file_name)
+        inventory_file = os.path.join(
+            experiment_run_dir, self._inventory_file_name
+        )
 
         # Populate modifier artifacts portion of inventory
         # This happens here to allow modifiers to hash files
@@ -1715,7 +1940,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
             inventory = mod_inst.artifact_inventory(workspace, app_inst)
             if inventory:
                 self.hash_inventory["modifier_artifacts"].append(
-                    {"name": mod_inst.name, "mode": mod_inst._usage_mode, "artifacts": inventory}
+                    {
+                        "name": mod_inst.name,
+                        "mode": mod_inst._usage_mode,
+                        "artifacts": inventory,
+                    }
                 )
 
         with lk.WriteTransaction(self.experiment_lock()):
@@ -1738,11 +1967,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
         experiment_run_dir = self.expander.experiment_run_dir
         ws_archive_dir = workspace.latest_archive_path
 
-        archive_experiment_dir = experiment_run_dir.replace(workspace.root, ws_archive_dir)
+        archive_experiment_dir = experiment_run_dir.replace(
+            workspace.root, ws_archive_dir
+        )
 
         fs.mkdirp(archive_experiment_dir)
 
-        archive_lock = lk.Lock(os.path.join(archive_experiment_dir, ".ramble-exp-archive"))
+        archive_lock = lk.Lock(
+            os.path.join(archive_experiment_dir, ".ramble-exp-archive")
+        )
 
         with lk.WriteTransaction(archive_lock):
             # Copy all log files from executables
@@ -1761,7 +1994,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     file = os.path.join(experiment_run_dir, exec_log)
 
                 if os.path.isfile(file):
-                    dest_dir = os.path.dirname(file.replace(workspace.root, ws_archive_dir))
+                    dest_dir = os.path.dirname(
+                        file.replace(workspace.root, ws_archive_dir)
+                    )
                     fs.mkdirp(dest_dir)
                     shutil.copy(file, dest_dir)
 
@@ -1797,11 +2032,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
             for pattern in archive_patterns:
                 exp_pattern = self.expander.expand_var(pattern)
                 for file in glob.glob(exp_pattern):
-                    dest_dir = os.path.dirname(file.replace(workspace.root, ws_archive_dir))
+                    dest_dir = os.path.dirname(
+                        file.replace(workspace.root, ws_archive_dir)
+                    )
                     fs.mkdirp(dest_dir)
                     shutil.copy(file, dest_dir)
 
-            for file_name in [self._inventory_file_name, self._status_file_name]:
+            for file_name in [
+                self._inventory_file_name,
+                self._status_file_name,
+            ]:
                 file = os.path.join(experiment_run_dir, file_name)
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
@@ -1819,7 +2059,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
         pass
 
-    register_phase("analyze_experiments", pipeline="analyze", run_after=["prepare_analysis"])
+    register_phase(
+        "analyze_experiments",
+        pipeline="analyze",
+        run_after=["prepare_analysis"],
+    )
 
     def _analyze_experiments(self, workspace, app_inst=None):
         """Perform experiment analysis.
@@ -1841,8 +2085,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
         injected in a workspace config.
         """
 
-        if self.get_status() == ExperimentStatus.UNKNOWN and not workspace.dry_run:
-            logger.warn(f"Experiment has status {self.get_status()}. Skipping analysis..\n")
+        if (
+            self.get_status() == ExperimentStatus.UNKNOWN
+            and not workspace.dry_run
+        ):
+            logger.warn(
+                f"Experiment has status {self.get_status()}. Skipping analysis..\n"
+            )
             return
 
         def format_context(context_match, context_format):
@@ -1876,11 +2125,14 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 logger.debug(f"Reading log file: {file}")
 
                 if not os.path.exists(file):
-                    logger.debug(f"Skipping analysis of non-existent file: {file}")
+                    logger.debug(
+                        f"Skipping analysis of non-existent file: {file}"
+                    )
                     continue
 
                 per_file_crit_objs = [
-                    criteria_list.find_criteria(c) for c in file_conf["success_criteria"]
+                    criteria_list.find_criteria(c)
+                    for c in file_conf["success_criteria"]
                 ]
 
                 with open(file) as f:
@@ -1898,15 +2150,21 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         # Iterate over contexts and add matched contexts to active_contexts
                         for context, foms in file_conf["contexts"].items():
                             if not context == _NULL_CONTEXT:
-                                context_conf = definitions[context]["definition"]
-                                context_match = context_conf["regex"].match(line)
+                                context_conf = definitions[context][
+                                    "definition"
+                                ]
+                                context_match = context_conf["regex"].match(
+                                    line
+                                )
 
                                 if context_match:
                                     context_name = format_context(
                                         context_match, context_conf["format"]
                                     )
                                     logger.debug("Line was: %s" % line)
-                                    logger.debug(f" Context match {context} -- {context_name}")
+                                    logger.debug(
+                                        f" Context match {context} -- {context_name}"
+                                    )
 
                                     active_contexts[context] = context_name
 
@@ -1921,44 +2179,73 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                     fom_vars = {}
                                     for k, v in fom_match.groupdict().items():
                                         fom_vars[k] = v
-                                    if fom_conf["fom_name_expanded"] is not None:
-                                        fom_name = fom_conf["fom_name_expanded"]
+                                    if (
+                                        fom_conf["fom_name_expanded"]
+                                        is not None
+                                    ):
+                                        fom_name = fom_conf[
+                                            "fom_name_expanded"
+                                        ]
                                     else:
                                         fom_name = self.expander.expand_var(
                                             fom, extra_vars=fom_vars
                                         )
 
-                                    if fom_conf["group"] in fom_conf["regex"].groupindex:
-                                        logger.debug(" --- Matched fom %s" % fom_name)
+                                    if (
+                                        fom_conf["group"]
+                                        in fom_conf["regex"].groupindex
+                                    ):
+                                        logger.debug(
+                                            " --- Matched fom %s" % fom_name
+                                        )
                                         fom_contexts = []
                                         # if a FOM has contexts, check if each is active
                                         if fom_conf["contexts"]:
-                                            for fom_context in fom_conf["contexts"]:
+                                            for fom_context in fom_conf[
+                                                "contexts"
+                                            ]:
                                                 context_name = (
                                                     active_contexts[context]
-                                                    if context in active_contexts
+                                                    if context
+                                                    in active_contexts
                                                     else _NULL_CONTEXT
                                                 )
-                                                fom_contexts.append(context_name)
+                                                fom_contexts.append(
+                                                    context_name
+                                                )
                                         else:
                                             fom_contexts.append(_NULL_CONTEXT)
 
                                         for fom_context in fom_contexts:
                                             if fom_context not in fom_values:
                                                 fom_values[fom_context] = {}
-                                            fom_val = fom_match.group(fom_conf["group"])
-                                            if fom_conf["units_expanded"] is not None:
+                                            fom_val = fom_match.group(
+                                                fom_conf["group"]
+                                            )
+                                            if (
+                                                fom_conf["units_expanded"]
+                                                is not None
+                                            ):
                                                 fom_unit = fom_conf["units"]
                                             else:
-                                                fom_unit = self.expander.expand_var(
-                                                    fom_conf["units"], extra_vars=fom_vars
+                                                fom_unit = (
+                                                    self.expander.expand_var(
+                                                        fom_conf["units"],
+                                                        extra_vars=fom_vars,
+                                                    )
                                                 )
-                                            fom_values[fom_context][fom_name] = {
+                                            fom_values[fom_context][
+                                                fom_name
+                                            ] = {
                                                 "value": fom_val,
                                                 "units": fom_unit,
                                                 "origin": fom_conf["origin"],
-                                                "origin_type": fom_conf["origin_type"],
-                                                "fom_type": fom_conf["fom_type"],
+                                                "origin_type": fom_conf[
+                                                    "origin_type"
+                                                ],
+                                                "fom_type": fom_conf[
+                                                    "fom_type"
+                                                ],
                                             }
 
         # Test all non-file based success criteria
@@ -1971,7 +2258,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
         success = (not definitions) or False
         for fom in fom_values.values():
             for value in fom.values():
-                if "origin_type" in value and value["origin_type"] == "application":
+                if (
+                    "origin_type" in value
+                    and value["origin_type"] == "application"
+                ):
                     success = True
         success = success and criteria_list.passed()
 
@@ -1987,7 +2277,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
             wm_status = self.workflow_manager.get_status(workspace)
             if not (
                 wm_status is None
-                or wm_status in [ExperimentStatus.COMPLETE, ExperimentStatus.UNRESOLVED]
+                or wm_status
+                in [ExperimentStatus.COMPLETE, ExperimentStatus.UNRESOLVED]
             ):
                 status = wm_status
 
@@ -2013,7 +2304,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.result.contexts.append(context_map)
 
     register_phase(
-        "append_results_to_workspace", pipeline="analyze", run_after=["analyze_experiments"]
+        "append_results_to_workspace",
+        pipeline="analyze",
+        run_after=["analyze_experiments"],
     )
 
     def _append_results_to_workspace(self, workspace, app_inst=None):
@@ -2075,13 +2368,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
             ):
                 insert_idx = base_exp_name.find(".chain")
                 repeat_exp_namespace = (
-                    base_exp_name[:insert_idx] + f".{n}" + base_exp_name[insert_idx:]
+                    base_exp_name[:insert_idx]
+                    + f".{n}"
+                    + base_exp_name[insert_idx:]
                 )
             else:
                 base_exp_namespace = self.expander.experiment_namespace
                 repeat_exp_namespace = f"{base_exp_namespace}.{n}"
             repeat_experiments[repeat_exp_namespace] = {}
-            repeat_experiments[repeat_exp_namespace]["base_exp"] = base_exp_namespace
+            repeat_experiments[repeat_exp_namespace][
+                "base_exp"
+            ] = base_exp_namespace
             if n == 1:
                 first_repeat_exp = repeat_exp_namespace
 
@@ -2158,16 +2455,28 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 "fom_values": [],
                             }
                             if is_numeric_fom(fom):
-                                repeat_foms[context_name][fom_key]["fom_is_numeric"] = True
+                                repeat_foms[context_name][fom_key][
+                                    "fom_is_numeric"
+                                ] = True
                             else:
-                                repeat_foms[context_name][fom_key]["fom_is_numeric"] = False
-                            fom_contents = (False, fom["value"], fom["fom_type"])
-                        if repeat_foms[context_name][fom_key]["fom_is_numeric"]:
-                            repeat_foms[context_name][fom_key]["fom_values"].append(
-                                float(fom["value"])
+                                repeat_foms[context_name][fom_key][
+                                    "fom_is_numeric"
+                                ] = False
+                            fom_contents = (
+                                False,
+                                fom["value"],
+                                fom["fom_type"],
                             )
+                        if repeat_foms[context_name][fom_key][
+                            "fom_is_numeric"
+                        ]:
+                            repeat_foms[context_name][fom_key][
+                                "fom_values"
+                            ].append(float(fom["value"]))
                         else:
-                            repeat_foms[context_name][fom_key]["fom_values"].append(fom["value"])
+                            repeat_foms[context_name][fom_key][
+                                "fom_values"
+                            ].append(fom["value"])
 
         # Iterate through the aggregated foms, calculate stats, and insert into results
         for context, fom_dict in repeat_foms.items():
@@ -2290,7 +2599,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
             ("application_definition", self.success_criteria),
         ]
 
-        logger.debug(f" Number of modifiers are: {len(self._modifier_instances)}")
+        logger.debug(
+            f" Number of modifiers are: {len(self._modifier_instances)}"
+        )
         if self._modifier_instances:
             criteria_list.flush_scope("modifier_definition")
         for mod in self._modifier_instances:
@@ -2298,7 +2609,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for success_scope, success_list in success_lists:
             for criteria, conf in success_list.items():
-                if not self.expander.satisfies(conf["when"], variant_set=self.object_variants):
+                if not self.expander.satisfies(
+                    conf["when"], variant_set=self.object_variants
+                ):
                     continue
 
                 if conf["mode"] == "string":
@@ -2341,8 +2654,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
             log_path = self.expander.expand_var(criteria.file)
 
             # Ensure log path is absolute. If not, prepend the experiment run directory
-            if not os.path.isabs(log_path) and self.expander.experiment_run_dir not in log_path:
-                log_path = os.path.join(self.expander.experiment_run_dir, log_path)
+            if (
+                not os.path.isabs(log_path)
+                and self.expander.experiment_run_dir not in log_path
+            ):
+                log_path = os.path.join(
+                    self.expander.experiment_run_dir, log_path
+                )
 
             if log_path not in files and os.path.exists(log_path):
                 files[log_path] = self._new_file_dict()
@@ -2359,20 +2677,31 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         all_contexts = {}
         for source in fom_sources:
-            for when_fs, source_context_defs in source.figure_of_merit_contexts.items():
-                if self.expander.satisfies(when_fs, variant_set=self.object_variants):
+            for (
+                when_fs,
+                source_context_defs,
+            ) in source.figure_of_merit_contexts.items():
+                if self.expander.satisfies(
+                    when_fs, variant_set=self.object_variants
+                ):
                     for context, context_def in source_context_defs.items():
                         all_contexts[context] = context_def
             extra_vars = (
-                source.modded_variables(self) if source.origin_type == "modifier" else None
+                source.modded_variables(self)
+                if source.origin_type == "modifier"
+                else None
             )
             # figures_of_merit[frozenset(when_list)][frozenset(context_list)][fom_name]
             for when_fs, source_contexts in source.figures_of_merit.items():
-                if not self.expander.satisfies(when_fs, variant_set=self.object_variants):
+                if not self.expander.satisfies(
+                    when_fs, variant_set=self.object_variants
+                ):
                     continue
 
                 for context_fs, source_foms in source_contexts.items():
-                    if not context_fs:  # FOMs with no defined context are set to the null context
+                    if (
+                        not context_fs
+                    ):  # FOMs with no defined context are set to the null context
                         context_fs = frozenset([_NULL_CONTEXT])
                         all_contexts[_NULL_CONTEXT] = {}
                     for context in context_fs:
@@ -2396,7 +2725,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 )
                                 definitions[context]["definition"] = {
                                     "regex": re.compile(regex_str),
-                                    "format": all_contexts[context]["output_format"],
+                                    "format": all_contexts[context][
+                                        "output_format"
+                                    ],
                                 }
 
                         for fom, source_def in source_foms.items():
@@ -2410,11 +2741,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 definitions[context]["foms"][fom] = {}
 
                             def _expand_var(var):
-                                return self.expander.expand_var(var, extra_vars=extra_vars)
+                                return self.expander.expand_var(
+                                    var, extra_vars=extra_vars
+                                )
 
                             def _try_expand_var_or_none(var: str, expander):
                                 try:
-                                    return expander.expand_var(var, allow_passthrough=False)
+                                    return expander.expand_var(
+                                        var, allow_passthrough=False
+                                    )
                                 except ramble.expander.RambleSyntaxError:
                                     return None
 
@@ -2424,14 +2759,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 "contexts": set(source_def["contexts"]),
                                 "group": _expand_var(source_def["group_name"]),
                                 "units": _expand_var(source_def["units"]),
-                                "regex": re.compile(_expand_var(source_def["regex"])),
+                                "regex": re.compile(
+                                    _expand_var(source_def["regex"])
+                                ),
                                 "fom_type": source_def["fom_type"].to_dict(),
                                 # If expansion works (i.e., it doesn't rely on the matched fom
                                 # groups), then cache it here to avoid repeated expansion later.
                                 "units_expanded": _try_expand_var_or_none(
                                     source_def["units"], self.expander
                                 ),
-                                "fom_name_expanded": _try_expand_var_or_none(fom, self.expander),
+                                "fom_name_expanded": _try_expand_var_or_none(
+                                    fom, self.expander
+                                ),
                             }
 
                             definitions[context]["foms"][fom] = fom_def
@@ -2440,9 +2779,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                             # Ensure log path is absolute. If not, prepend the experiment run dir
                             if (
                                 not os.path.isabs(log_path)
-                                and self.expander.experiment_run_dir not in log_path
+                                and self.expander.experiment_run_dir
+                                not in log_path
                             ):
-                                log_path = os.path.join(self.expander.experiment_run_dir, log_path)
+                                log_path = os.path.join(
+                                    self.expander.experiment_run_dir, log_path
+                                )
 
                             if log_path not in files:
                                 files[log_path] = self._new_file_dict()
@@ -2464,7 +2806,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         ExperimentStatus.UNKNOWN
         """
         status_path = os.path.join(
-            self.expander.expand_var_name(self.keywords.experiment_run_dir), self._status_file_name
+            self.expander.expand_var_name(self.keywords.experiment_run_dir),
+            self._status_file_name,
         )
 
         if os.path.isfile(status_path):
@@ -2472,7 +2815,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
-                    self.set_status(ExperimentStatus(status_data[self.keywords.experiment_status]))
+                    self.set_status(
+                        ExperimentStatus(
+                            status_data[self.keywords.experiment_status]
+                        )
+                    )
         else:
             self.set_status(ExperimentStatus.UNKNOWN)
 
@@ -2494,20 +2841,28 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self.variables[self.keywords.RAMBLE_STATUS] = status
         if status != ExperimentStatus.SUCCESS:
-            self.variables[self.keywords.RAMBLE_STATUS] = ExperimentStatus.FAILED
+            self.variables[self.keywords.RAMBLE_STATUS] = (
+                ExperimentStatus.FAILED
+            )
 
-    register_phase("write_status", pipeline="analyze", run_after=["analyze_experiments"])
-    register_phase("write_status", pipeline="setup", run_after=["make_experiments"])
+    register_phase(
+        "write_status", pipeline="analyze", run_after=["analyze_experiments"]
+    )
+    register_phase(
+        "write_status", pipeline="setup", run_after=["make_experiments"]
+    )
 
     def _write_status(self, workspace, app_inst=None):
         """Phase to write an experiment's ramble_status.json file"""
 
         status_data = {}
-        status_data[self.keywords.experiment_status] = self.expander.expand_var_name(
-            self.keywords.experiment_status
+        status_data[self.keywords.experiment_status] = (
+            self.expander.expand_var_name(self.keywords.experiment_status)
         )
 
-        exp_dir = self.expander.expand_var_name(self.keywords.experiment_run_dir)
+        exp_dir = self.expander.expand_var_name(
+            self.keywords.experiment_run_dir
+        )
 
         status_path = os.path.join(exp_dir, self._status_file_name)
 
@@ -2562,14 +2917,18 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 obj_src_dir_path = os.path.dirname(obj_path)
                 obj_dir_name = os.path.basename(obj_src_dir_path)
                 repo_root = os.path.join(root_path, "ramble", repo_namespace)
-                obj_dest_dir = os.path.join(repo_root, type_dir_name, obj_dir_name)
+                obj_dest_dir = os.path.join(
+                    repo_root, type_dir_name, obj_dir_name
+                )
                 shutil.rmtree(obj_dest_dir, ignore_errors=True)
                 shutil.copytree(
                     obj_src_dir_path,
                     obj_dest_dir,
                     ignore=shutil.ignore_patterns("*.pyc", "__pycache__"),
                 )
-                config_path = os.path.join(repo_root, ramble.repository.unified_config)
+                config_path = os.path.join(
+                    repo_root, ramble.repository.unified_config
+                )
                 if not os.path.exists(config_path):
                     with open(config_path, "w+") as f:
                         f.write("repo:\n")
@@ -2596,7 +2955,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         action_funcs = ramble.util.env.action_funcs
 
         for scope in config_scopes:
-            license_conf = ramble.config.config.get_config("licenses", scope=scope)
+            license_conf = ramble.config.config.get_config(
+                "licenses", scope=scope
+            )
             if license_conf:
                 if self.name in license_conf:
                     app_licenses = license_conf[self.name]
@@ -2610,7 +2971,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
         # Process environment variable actions
         for env_var_set in self._env_variable_sets:
             for action, conf in env_var_set.items():
-                (env_cmds, _) = action_funcs[action](conf, self.expander, set(), shell=shell)
+                (env_cmds, _) = action_funcs[action](
+                    conf, self.expander, set(), shell=shell
+                )
 
                 for cmd in env_cmds:
                     if cmd:
@@ -2618,7 +2981,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for mod_inst in self._modifier_instances:
             for action, conf in mod_inst.all_env_var_modifications():
-                (env_cmds, _) = action_funcs[action](conf, self.expander, set(), shell=shell)
+                (env_cmds, _) = action_funcs[action](
+                    conf, self.expander, set(), shell=shell
+                )
 
                 for cmd in env_cmds:
                     if cmd:
@@ -2655,10 +3020,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if not os.path.isabs(src_path_config):
                 # Search up the object chain to resolve source path
                 found = False
-                object_paths = [e[1] for e in ramble.repository.list_object_files(obj, obj_type)]
+                object_paths = [
+                    e[1]
+                    for e in ramble.repository.list_object_files(obj, obj_type)
+                ]
                 searched_paths = []
                 for obj_path in object_paths:
-                    src_path = os.path.join(os.path.dirname(obj_path), src_path_config)
+                    src_path = os.path.join(
+                        os.path.dirname(obj_path), src_path_config
+                    )
                     if os.path.isfile(src_path):
                         found = True
                         break
@@ -2670,7 +3040,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     )
             else:
                 if not os.path.isfile(src_path_config):
-                    raise ApplicationError(f"Template file {src_path_config} does not exist")
+                    raise ApplicationError(
+                        f"Template file {src_path_config} does not exist"
+                    )
                 src_path = src_path_config
 
             # Resolve the destination path
@@ -2684,15 +3056,22 @@ class ApplicationBase(metaclass=ApplicationMeta):
             if not os.path.isabs(dest_path):
                 dest_path = os.path.join(run_dir, dest_path)
 
-            return (obj, {**tpl_config, "src_path": src_path, "dest_path": dest_path})
+            return (
+                obj,
+                {**tpl_config, "src_path": src_path, "dest_path": dest_path},
+            )
 
         for obj_type, obj in self._objects():
             for when_set, tpl in obj.templates.items():
-                if not self.expander.satisfies(when_set, variant_set=self.object_variants):
+                if not self.expander.satisfies(
+                    when_set, variant_set=self.object_variants
+                ):
                     continue
 
                 for tpl_conf in tpl.values():
-                    yield _get_template_config(obj, tpl_conf, obj_type=obj_type)
+                    yield _get_template_config(
+                        obj, tpl_conf, obj_type=obj_type
+                    )
 
     def _render_object_templates(self, extra_vars_origin, workspace):
         for obj, tpl_config in self._object_templates(workspace):
@@ -2757,54 +3136,17 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         if ramble.repository.ObjectTypes.package_managers not in exclude_types:
             if self.package_manager is not None:
-                yield (ramble.repository.ObjectTypes.package_managers, self.package_manager)
+                yield (
+                    ramble.repository.ObjectTypes.package_managers,
+                    self.package_manager,
+                )
 
-        if ramble.repository.ObjectTypes.workflow_managers not in exclude_types:
+        if (
+            ramble.repository.ObjectTypes.workflow_managers
+            not in exclude_types
+        ):
             if self.workflow_manager is not None:
-                yield (ramble.repository.ObjectTypes.workflow_managers, self.workflow_manager)
-
-
-class ApplicationError(RambleError):
-    """
-    Exception that is raised by applications
-    """
-
-
-class ExecutableNameError(RambleError):
-    """
-    Exception raised when a name collision in executables happens
-    """
-
-
-class FormattedExecutableError(ApplicationError):
-    """
-    Exception raise when there are issues defining formatted executables
-    """
-
-
-class PhaseCycleDetectedError(ApplicationError):
-    """
-    Exception raised when a cycle is detected while ordering phases
-    """
-
-
-class InvalidPhaseError(ApplicationError):
-    """
-    Exception raised when a phase is used but not defined
-    """
-
-
-class ChainCycleDetectedError(ApplicationError):
-    """
-    Exception raised when a cycle is detected in a defined experiment chain
-    """
-
-
-class InvalidChainError(ApplicationError):
-    """
-    Exception raised when a invalid chained experiment is defined
-    """
-
-
-class ObjectValidationError(ApplicationError):
-    """Error when an object validator fails"""
+                yield (
+                    ramble.repository.ObjectTypes.workflow_managers,
+                    self.workflow_manager,
+                )

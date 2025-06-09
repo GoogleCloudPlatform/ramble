@@ -10,11 +10,15 @@ import os
 
 import pytest
 
-import ramble.application
 import ramble.config
+import ramble.repository
 import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
+
+ApplicationBase = ramble.repository.get_obj_class(
+    "application-base", object_type=ramble.repository.ObjectTypes.base_classes
+)
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -68,6 +72,6 @@ ramble:
                 "basic",
                 "test_wl",
                 "simple_test",
-                ramble.application.ApplicationBase._inventory_file_name,
+                ApplicationBase._inventory_file_name,
             )
         )

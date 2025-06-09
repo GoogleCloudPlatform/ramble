@@ -12,9 +12,9 @@ import pytest
 
 import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
+from ramble.error import InvalidModeError
 from ramble.language.language_base import DirectiveError
 from ramble.main import RambleCommand
-from ramble.modifier import InvalidModeError
 from ramble.test.dry_run_helpers import SCOPES, dry_run_config
 
 workspace = RambleCommand("workspace")

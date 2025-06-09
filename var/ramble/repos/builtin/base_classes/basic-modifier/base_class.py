@@ -7,18 +7,17 @@
 # except according to those terms.
 
 
-from ramble.application import ApplicationBase
+from ramble.modkit import *  # noqa: F403
 
 
-class ExecutableApplication(ApplicationBase):
-    """Specialized class for applications that are pre-built binaries.
+class BasicModifier(ModifierBase):
+    """Specialized class for basic modifiers.
 
-    This class can be used to set up an application that uses an executable
-    which should already be on the platform.
-
-    It currently only utilizes phases defined in the base class.
+    This class can be used to set up a modifier that can be composed into
+    experiment definitions.
     """
+
+    modifier_class = "BasicModifier"
 
     def __init__(self, file_path):
         super().__init__(file_path)
-        self.application_class = "ExecutableApplication"
