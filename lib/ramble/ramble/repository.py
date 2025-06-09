@@ -287,6 +287,11 @@ def get(spec, object_type=default_type):
     return paths[object_type].get(spec)
 
 
+def get_base_class(spec):
+    """Convenience wrapper around ``ramble.repository.get_obj_class()`` for base classes."""
+    return paths[ObjectTypes.base_classes].get_obj_class(spec)
+
+
 def get_obj_class(spec, object_type=default_type):
     """Convenience wrapper around ``ramble.repository.get_obj_class()``."""
     return paths[object_type].get_obj_class(spec)

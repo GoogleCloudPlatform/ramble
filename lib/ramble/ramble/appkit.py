@@ -16,13 +16,10 @@ import llnl.util.filesystem
 from llnl.util.filesystem import *
 
 import ramble.language.application_language
-from ramble.repository import ObjectTypes, get_obj_class
+from ramble.repository import get_base_class
 
-ExecutableApplication = get_obj_class(
-    "executable-application", object_type=ObjectTypes.base_classes
-)
-
-ApplicationBase = get_obj_class("application-base", object_type=ObjectTypes.base_classes)
+ExecutableApplication = get_base_class("executable-application")
+ApplicationBase = get_base_class("application-base")
 
 from ramble.language.application_language import *
 from ramble.language.shared_language import *

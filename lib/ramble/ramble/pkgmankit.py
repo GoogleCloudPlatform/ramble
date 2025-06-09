@@ -33,7 +33,4 @@ from ramble.util.logger import logger
 from ramble.util.logger import logger as tty
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
-base_class_type = ramble.repository.ObjectTypes.base_classes
-PackageManagerBase = ramble.repository.get_obj_class(
-    "package-manager-base", object_type=base_class_type
-)
+PackageManagerBase = ramble.repository.get_base_class("package-manager-base")

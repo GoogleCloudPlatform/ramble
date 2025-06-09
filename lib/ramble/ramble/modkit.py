@@ -30,9 +30,5 @@ from ramble.util.logger import logger
 from ramble.util.logger import logger as tty
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
-base_class_type = ramble.repository.ObjectTypes.base_classes
-ModifierBase = ramble.repository.get_obj_class("modifier-base", object_type=base_class_type)
-BasicModifier = ramble.repository.get_obj_class("basic-modifier", object_type=base_class_type)
-DisabledModifier = ramble.repository.get_obj_class(
-    "disabled-modifier", object_type=base_class_type
-)
+ModifierBase = ramble.repository.get_base_class("modifier-base")
+BasicModifier = ramble.repository.get_base_class("basic-modifier")

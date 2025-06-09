@@ -153,7 +153,7 @@ class RenderedPackage(SoftwarePackage):
         Args:
             name (str): Name of package
             pkg_info (dict): Package info containing specs for supported package managers
-            package_manager (ramble.base_cls.builtin.PackageManagerBase):
+            package_manager (ramble.repository.get_base_class("package-manager-base")):
                 package manager tied to this package
             spec (str): Package spec (used to install / load package)
             compiler (optional str): Name of package definition to use as compiler
@@ -372,7 +372,7 @@ class SoftwareEnvironment:
 
         Args:
             name (str): Name of the environment
-            package_manager (ramble.base_cls.builtin.PackageManagerBase):
+            package_manager (ramble.repository.get_base_class("package-manager-base")):
                 Package manager associated with the environment
         """
 
@@ -596,7 +596,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         Args:
             expander (ramble.expander.Expander): Expander object to use when rendering
             all_packages (dict): All package definitions
-            package_manager (ramble.base_cls.builtin.PackageManagerBase):
+            package_manager (ramble.repository.get_base_class("package-manager-base")):
                 Package manager the environment is rendered with
 
         Returns:
@@ -719,7 +719,7 @@ class SoftwareEnvironments:
         information about used packages and environments.
 
         Args:
-            package_manager (ramble.base_cls.builtin.PackageManagerBase):
+            package_manager (ramble.repository.get_base_class("package-manager-base")):
                 Reference to a package manager object
             env_name (str): Name of the rendered environment to mark as used
         """
@@ -926,7 +926,7 @@ class SoftwareEnvironments:
         Args:
             env_name (str): Name of environment needed by the experiment
             expander (ramble.expander.Expander): Expander object from the experiment
-            package_manager (ramble.base_cls.builtin.PackageManagerBase):
+            package_manager (ramble.repository.get_base_class("package-manager-base")):
                 Package manager the environment is rendered with
 
         Returns:

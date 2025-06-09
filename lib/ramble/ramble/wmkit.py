@@ -15,7 +15,4 @@ from ramble.language.workflow_manager_language import *
 from ramble.util.command_runner import CommandRunner, RunnerError
 from ramble.util.logger import logger
 
-base_class_type = ramble.repository.ObjectTypes.base_classes
-WorkflowManagerBase = ramble.repository.get_obj_class(
-    "workflow-manager-base", object_type=base_class_type
-)
+WorkflowManagerBase = ramble.repository.get_base_class("workflow-manager-base")
