@@ -15,7 +15,7 @@ import llnl.util.filesystem as fs
 import ramble.config
 import ramble.software_info
 import ramble.util.hashing
-from ramble.pkgmankit import *  # noqa: F403
+from ramble.pkgmankit import *
 from ramble.util.shell_utils import source_str
 
 

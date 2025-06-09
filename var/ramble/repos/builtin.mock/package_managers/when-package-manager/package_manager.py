@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from ramble.pkgmankit import *  # noqa: F403
+from ramble.pkgmankit import *
 
 
 class WhenPackageManager(PackageManagerBase):

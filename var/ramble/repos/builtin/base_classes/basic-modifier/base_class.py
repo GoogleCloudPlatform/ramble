@@ -7,7 +7,7 @@
 # except according to those terms.
 
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class BasicModifier(ModifierBase):

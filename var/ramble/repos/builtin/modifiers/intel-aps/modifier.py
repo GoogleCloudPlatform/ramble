@@ -8,7 +8,7 @@
 
 import re
 
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 # Pre-defined charts and graphs
 # The per-mode value is a tuple of (options_for_aps, min_stat_level)

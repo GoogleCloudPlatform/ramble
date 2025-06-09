@@ -7,7 +7,7 @@
 # except according to those terms.
 
 from ramble.pkg_man.builtin.spack_lightweight import SpackLightweight
-from ramble.pkgmankit import *  # noqa: F403
+from ramble.pkgmankit import *
 from ramble.util.command_runner import RunnerError
 
 

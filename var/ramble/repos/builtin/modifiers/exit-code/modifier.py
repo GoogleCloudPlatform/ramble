@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import ramble.config
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 
 
 class ExitCode(BasicModifier):
