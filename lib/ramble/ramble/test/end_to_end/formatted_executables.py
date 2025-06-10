@@ -273,3 +273,58 @@ ramble:
                         tests[idx] = True
 
         assert all(tests)
+
+
+def test_formatted_executables_escaped_braces(workspace_name):
+    test_config = r"""
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: '{execute_experiment}'
+    processes_per_node: '16'
+    n_threads: '1'
+  internals:
+    custom_executables:
+      escaped_command:
+        template:
+        - 'echo "\{experiment_index\}"'
+        - '{escaped_formatted_exec}'
+    executable_injection:
+    - name: escaped_command
+  formatted_executables:
+    escaped_formatted_exec:
+      commands:
+      - 'echo "\{experiment_namespace\}"'
+  applications:
+    basic:
+      workloads:
+        working_wl:
+          experiments:
+            simple_test:
+              variables:
+                n_nodes: 1
+  software:
+    packages: {}
+    environments: {}
+"""
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+        with open(config_path, "w+") as f:
+            f.write(test_config)
+
+        ws._re_read()
+
+        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+        experiment_root = ws.experiment_dir
+        exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
+        exp_script = os.path.join(exp_dir, "execute_experiment")
+
+        with open(exp_script) as f:
+            data = f.read()
+            assert r'echo "{experiment_index}"' in data
+            assert r'echo "{experiment_namespace}"' in data
+            assert "{escaped_formatted_exec}" not in data

@@ -12,6 +12,7 @@ import operator
 import random
 import re
 import string
+from contextlib import contextmanager
 from typing import Dict, FrozenSet, List, Union
 
 import ramble.error
@@ -175,6 +176,7 @@ class ExpansionNode:
         evaluation_func=eval,
         no_expand_vars=None,
         used_vars=None,
+        replace_escaped_braces=None,
     ):
         """Define the value for this node.
 
@@ -196,6 +198,8 @@ class ExpansionNode:
                 strings
             no_expand_vars (set): set of variable names that should never be
                 expanded
+            replace_escaped_braces (bool): Whether escaped curly braces are replaced
+                                           as part of expansion or not.
         """
         if no_expand_vars is None:
             no_expand_vars = set()
@@ -240,6 +244,7 @@ class ExpansionNode:
                             expansion_dict,
                             expansion_dict[keyword],
                             allow_passthrough=allow_passthrough,
+                            replace_escaped_braces=replace_escaped_braces,
                         )
                 else:
                     self.value = keyword
@@ -285,7 +290,7 @@ class ExpansionNode:
                     self.value = replaced_contents
 
                 # Replace escaped curly braces with curly braces
-                if isinstance(self.value, str):
+                if replace_escaped_braces and isinstance(self.value, str):
                     self.value = self.value.replace("\\{", "{").replace("\\}", "}")
 
 
@@ -378,6 +383,7 @@ class Expander:
         if no_expand_vars is None:
             no_expand_vars = set()
 
+        self._replace_escaped_braces = True
         self._keywords = ramble.keywords.keywords
 
         self._variables = variables
@@ -523,6 +529,15 @@ class Expander:
 
         return self._experiment_run_dir
 
+    @contextmanager
+    def preserve_escaped_braces(self):
+        previous = self._replace_escaped_braces
+        self._replace_escaped_braces = False
+        try:
+            yield
+        finally:
+            self._replace_escaped_braces = previous
+
     def expand_lists(self, var):
         """Expand a variable into a list if possible
 
@@ -556,6 +571,7 @@ class Expander:
         allow_passthrough: bool = True,
         typed: bool = False,
         merge_used_stage: bool = True,
+        replace_escaped_braces: bool = None,
     ):
         """Convert a variable name to an expansion string, and expand it
 
@@ -571,6 +587,8 @@ class Expander:
             typed (bool): Whether the return type should be typed or not
             merge_used_stage (bool): Whether tracked variables are merged into
                                      the used variable set or not.
+            replace_escaped_braces (bool): Whether escaped curly braces are replaced
+                                           as part of expansion or not.
         """
         return self.expand_var(
             self.expansion_str(var_name),
@@ -587,6 +605,7 @@ class Expander:
         allow_passthrough: bool = True,
         typed: bool = False,
         merge_used_stage: bool = True,
+        replace_escaped_braces=None,
     ):
         """Perform expansion of a string
 
@@ -601,6 +620,8 @@ class Expander:
             typed (bool): Whether the return type should be typed or not
             merge_used_stage (bool): Whether tracked variables are merged into
                                      the used variable set or not.
+            replace_escaped_braces (bool): Whether escaped curly braces are replaced
+                                           as part of expansion or not.
         """
 
         if var is None or var == "None":
@@ -613,6 +634,8 @@ class Expander:
             passthrough_setting = False
 
         logger.debug(f"BEGINNING OF EXPAND_VAR STACK ON {var}")
+        logger.debug(f" REPLACE VAR (1): {replace_escaped_braces}")
+        logger.debug(f" REPLACE VAR (2): {self._replace_escaped_braces}")
         expansions = self._variables
         if extra_vars:
             expansions = self._variables.copy()
@@ -620,7 +643,10 @@ class Expander:
 
         try:
             value = self._partial_expand(
-                expansions, str(var), allow_passthrough=passthrough_setting
+                expansions,
+                str(var),
+                allow_passthrough=passthrough_setting,
+                replace_escaped_braces=replace_escaped_braces,
             )
         except RamblePassthroughError as e:
             if not passthrough_setting:
@@ -719,7 +745,13 @@ class Expander:
     def expansion_str(in_str):
         return f"{ExpansionDelimiter.left}{in_str}{ExpansionDelimiter.right}"
 
-    def _partial_expand(self, expansion_vars, in_str, allow_passthrough=True):
+    def _partial_expand(
+        self,
+        expansion_vars,
+        in_str,
+        allow_passthrough=True,
+        replace_escaped_braces=None,
+    ):
         """Perform expansion of a string with some variables
 
         args:
@@ -728,9 +760,22 @@ class Expander:
           allow_passthrough (bool): Define if variables are allowed to passthrough
                                     without being expanded.
 
+          replace_escaped_braces (bool): Whether escaped curly braces are replaced
+                                         as part of expansion or not.
+
         returns:
           in_str (str): Expanded version of input string
         """
+
+        if replace_escaped_braces is None:
+            replace_escaped_braces = self._replace_escaped_braces
+
+        if not isinstance(replace_escaped_braces, bool):
+            logger.error(
+                "Partial expand called with invalid value "
+                f"for replace_escaped_braces of {replace_escaped_braces}\n"
+                "Value must be a boolean."
+            )
 
         if isinstance(in_str, str):
             str_graph = ExpansionGraph(in_str)
@@ -742,6 +787,7 @@ class Expander:
                     evaluation_func=self.perform_math_eval,
                     no_expand_vars=self._no_expand_vars,
                     used_vars=self._used_variable_stage,
+                    replace_escaped_braces=replace_escaped_braces,
                 )
 
             return str(str_graph.root.value)
