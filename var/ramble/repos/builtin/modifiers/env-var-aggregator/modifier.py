@@ -8,7 +8,7 @@
 
 import ramble.config
 import ramble.util.executable
-from ramble.modkit import *  # noqa: F403
+from ramble.modkit import *
 from ramble.util import shell_utils
 from ramble.util.logger import logger
 

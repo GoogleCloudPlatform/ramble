@@ -17,7 +17,7 @@ import ramble.config
 import ramble.error
 import ramble.software_info
 import ramble.util.hashing
-from ramble.pkgmankit import *  # noqa: F403
+from ramble.pkgmankit import *
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml

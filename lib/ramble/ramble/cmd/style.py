@@ -17,6 +17,7 @@ import tempfile
 from llnl.util.filesystem import mkdirp, working_dir
 
 import ramble.paths
+from ramble import repository
 
 from spack.util.executable import ProcessError, which
 
@@ -65,6 +66,8 @@ common_object_exemptions = {
     ],
 }
 
+base_class_file = repository.type_definitions[repository.ObjectTypes.base_classes]["file_name"]
+
 #: This is a dict that maps:
 #:  filename pattern ->
 #:     flake8 exemption code ->
@@ -74,28 +77,28 @@ common_object_exemptions = {
 #: exemptions if any patterns in the sub-dict match.
 pattern_exemptions = {
     # exemptions applied only to application.py files.
-    r"application.py$": {
+    rf"application.py|{base_class_file}$": {
         # Allow 'from ramble.appkit import *' in applications,
         # but no other wildcards
         "F403": [r"^from ramble.appkit import \*$"],
         **common_object_exemptions,
     },
     # exemptions applied only to modifier.py files.
-    r"modifier.py$": {
+    rf"modifier.py|{base_class_file}$": {
         # Allow 'from ramble.modkit import *' in applications,
         # but no other wildcards
         "F403": [r"^from ramble.modkit import \*$"],
         **common_object_exemptions,
     },
     # exemptions applied only to package_manager.py files.
-    r"package_manager.py$": {
+    rf"package_manager.py|{base_class_file}$": {
         # Allow 'from ramble.modkit import *' in applications,
         # but no other wildcards
         "F403": [r"^from ramble.pkgmankit import \*$"],
         **common_object_exemptions,
     },
     # exemptions applied only to workflow_manager.py files.
-    r"workflow_manager.py$": {
+    rf"workflow_manager.py|{base_class_file}$": {
         # Allow 'from ramble.modkit import *' in workflow_managers,
         # but no other wildcards
         "F403": [r"^from ramble.wmkit import \*$"],
