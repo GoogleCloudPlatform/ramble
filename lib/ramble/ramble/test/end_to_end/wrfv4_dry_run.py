@@ -67,6 +67,7 @@ ramble:
                 - TEST_VAR
               variables:
                 n_nodes: ['1', '2', '4', '8', '16']
+                lic_path: /fake/lic/path
               matrix:
               - n_nodes
               - env_name
@@ -100,6 +101,7 @@ licenses:
   wrfv4:
     set:
       WRF_LICENSE: port@server
+      WRF_CERTIFICATE_PATH: '{lic_path}'
 """
 
     test_compilers = """
@@ -235,6 +237,7 @@ compilers:
                 data = f.read()
                 # Test the license is added to the include file
                 assert "export WRF_LICENSE=port@server" in data
+                assert 'export WRF_CERTIFICATE_PATH="/fake/lic/path"' in data
 
             with open(os.path.join(exp_dir, "execute_experiment")) as f:
                 data = f.read()
