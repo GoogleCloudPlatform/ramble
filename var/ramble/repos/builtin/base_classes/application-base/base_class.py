@@ -1740,7 +1740,9 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         with open(self.license_file, "w+") as f:
                             for cmd in env_cmds:
                                 if cmd:
-                                    f.write(cmd + "\n")
+                                    f.write(
+                                        self.expander.expand_var(cmd) + "\n"
+                                    )
 
     register_phase(
         "make_experiments", pipeline="setup", run_after=["get_inputs"]
