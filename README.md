@@ -31,7 +31,7 @@ e.g.
     pip install -r requirements.txt
 
 We recommend Python >= 3.7 for Ramble, but a best effort attempt is made to
-support Python 3.6 as it is used by older operating systems such as Centos7.
+support Python 3.6 as it is used by older operating systems.
 Specifically, you might need to update `pip` and downgrade `protobuf` when
 using Python 3.6.
 

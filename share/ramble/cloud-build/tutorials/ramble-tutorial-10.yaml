@@ -82,8 +82,8 @@ steps:
 substitutions:
   _SPACK_REF: v0.21.2
   _PYTHON_VER: 3.11.6
-  _BASE_IMG: centos
-  _BASE_VER: '7'
+  _BASE_IMG: rockylinux
+  _BASE_VER: '8'
   _CI_CACHE: gs://spack/latest
 timeout: 1500s
 options:
