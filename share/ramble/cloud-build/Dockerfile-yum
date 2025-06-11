@@ -1,5 +1,5 @@
-ARG BASE_IMG=centos
-ARG BASE_VER=7
+ARG BASE_IMG=rocklinux
+ARG BASE_VER=8
 FROM ${BASE_IMG}:${BASE_VER} as builder
 
 ARG SPACK_REF=releases/latest
