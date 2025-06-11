@@ -207,7 +207,7 @@ class IntelMlc(ExecutableApplication):
             logger.die(f" Spread divisions was: {spread_divisions}")
         cpu_list = app_inst.expander.expand_var_name("cpu_list")
 
-        if cpu_list != "{cpu_list}":
+        if cpu_list not in ["{cpu_list}", ""]:
             return
 
         if thread_dist == "compact":
