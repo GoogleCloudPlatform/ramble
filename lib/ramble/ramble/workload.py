@@ -193,8 +193,12 @@ class Workload:
                         out_str += f"{indentation}            {variant}\n"
                 else:
                     out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
+
+                var_dict = {}
                 for var in var_list:
-                    out_str += var.as_str(n_indent + 12)
+                    var_dict[var.name] = var
+                for var_name in sorted(var_dict.keys()):
+                    out_str += var_dict[var_name].as_str(n_indent + 12)
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
