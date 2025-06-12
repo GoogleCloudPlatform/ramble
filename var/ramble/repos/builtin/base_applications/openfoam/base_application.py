@@ -21,85 +21,34 @@ class Openfoam(ExecutableApplication):
 
     tags("cfd")
 
-    workload(
+    motorbike_workloads = [
         "motorbike",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
-
-    workload(
         "motorbike_20m",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
-
-    workload(
         "motorbike_42m",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
-
-    workload(
         "motorbike_100m",
-        executables=[
-            "clean",
-            "get_inputs",
-            "configure_mesh",
-            "surfaceFeatures",
-            "blockMesh",
-            "decomposePar1",
-            "snappyHexMesh",
-            "configure_simplefoam",
-            "redistributePar",
-            "decomposePar2",
-            "patchSummary",
-            "potentialFoam",
-            "checkMesh",
-            "simpleFoam",
-        ],
-    )
+        "motorbike_200m",
+    ]
+
+    for wl in motorbike_workloads:
+        workload(
+            wl,
+            executables=[
+                "clean",
+                "get_inputs",
+                "configure_mesh",
+                "surfaceFeatures",
+                "blockMesh",
+                "decomposePar1",
+                "snappyHexMesh",
+                "configure_simplefoam",
+                "redistributePar",
+                "decomposePar2",
+                "patchSummary",
+                "potentialFoam",
+                "checkMesh",
+                "simpleFoam",
+            ],
+        )
 
     workload_variable(
         "input_path",
@@ -179,6 +128,12 @@ class Openfoam(ExecutableApplication):
         default="(180 72 72)",
         description="Mesh size for simulation",
         workload="motorbike_100m",
+    )
+    workload_variable(
+        "mesh_size",
+        default="(226 96 96)",
+        description="Mesh size for simulation",
+        workload="motorbike_200m",
     )
     workload_variable(
         "max_local_cells",
