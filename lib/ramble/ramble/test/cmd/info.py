@@ -99,3 +99,22 @@ def test_mock_spack_info_software(mock_applications, app_query):
 
     for field in expected_fields:
         assert field in out
+
+
+@pytest.mark.parametrize(
+    "info_query",
+    [
+        ["--type", "modifiers", "apptainer"],
+        ["--type", "modifiers", "apptainer", "-vv"],
+        ["--type", "package_managers", "spack"],
+        ["--type", "workflow_managers", "slurm"],
+    ],
+)
+def test_non_app_object_info_common_fields(info_query):
+    expected_fields = (
+        "Description",
+        "object_variables",
+    )
+    out = info(*info_query)
+    for field in expected_fields:
+        assert field in out
