@@ -231,6 +231,7 @@ Specifically, this command can help you populate values in the ramble.yaml for:
   * Experiment definitions
   * Software definitions
   * Workspace includes
+  * Workspace modifiers
 
 These can be combined over multiple invocations to express very powerful
 experiment configurations. The options are extensive, and are thus not covered
@@ -263,6 +264,21 @@ different version, one may type:
     $ ramble workspace manage software --pkg gcc9 --package-spec gcc@9.4.0 --overwrite
 
 This would update the software package definition names ``gcc9`` to have a new package spec.
+
+Modifiers can be applied to various levels of a workspace configuration. To
+simplify the workflow around adding and removing modifiers from a set of
+experiments, users can use the following commands:
+
+.. code-block:: console
+
+  $ ramble workspace manage modifiers --list
+  $ ramble workspace manage modifiers --add -s workspace -n lscpu
+  $ ramble workspace manage modifiers --remove -s workspace -n lscpu
+
+When performing the ``--remove`` action, the scope argument (``-s``) on these
+commands has a robust syntax that allows users to specify various scopes within
+a workspace (``workspace``, ``application``, ``application:workload``, or
+``application:workload:experiment``).
 
 Finally, ``ramble workspace manage includes`` can be used to quickly and easy
 add includes when using a hierarchical workspace.
