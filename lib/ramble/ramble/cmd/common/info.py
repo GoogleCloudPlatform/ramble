@@ -36,6 +36,7 @@ obj_attribute_map = {
     "target_shells": "shell_support_pattern",
     "templates": None,
     "validators": None,
+    "object_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -50,12 +51,7 @@ obj_attribute_map = {
     "executable_modifiers": None,
     "env_var_modifications": None,
     "required_vars": None,
-    "modifier_variables": None,
     "package_manager_requirements": None,
-    # Package manager specific:
-    "package_manager_variables": None,
-    # Workflow manager specific:
-    "workflow_manager_variables": "wm_vars",
 }
 
 
@@ -181,7 +177,7 @@ def _unpack_when_set_if_needed(internal_attr: dict):
 
 
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
-    to_print = fnmatch.filter(internal_attr, pattern)
+    to_print = fnmatch.filter(map(str, internal_attr), pattern)
     if format == supported_formats.lists:
         color.cprint("    " + str(list(to_print)))
     elif format == supported_formats.text:
@@ -324,7 +320,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
             _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
         # If the attribute is not a dict, print using the existing format rules.
         elif isinstance(internal_attr, list):
-            to_print = fnmatch.filter(internal_attr, pattern)
+            to_print = fnmatch.filter(map(str, internal_attr), pattern)
             if format == supported_formats.lists:
                 color.cprint("    " + str(list(to_print)))
             elif format == supported_formats.text:
