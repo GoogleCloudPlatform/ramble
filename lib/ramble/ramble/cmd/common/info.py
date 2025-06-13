@@ -189,14 +189,14 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
     sub items. These need to be iterated over, and we need to escape existing
     characters that would normally be used to color strings.
     """
-    for name, val in internal_attr.items():
+    for name, vals in internal_attr.items():
         if pattern and not fnmatch.fnmatch(name, pattern):
             continue
 
-        if isinstance(val, dict):
+        if isinstance(vals, dict):
             color_name = ramble.util.colors.section_title(name)
             color.cprint(f"{color_name}:")
-            for sub_name, sub_val in val.items():
+            for sub_name, sub_val in vals.items():
                 # Avoid showing duplicate names for variables
                 if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
                     to_print = f"{indentation}{sub_val}"
@@ -209,8 +209,24 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
                     escaped_sub_val = sub_val.replace("@", "@@")
                     color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
             color.cprint("")
+        elif isinstance(vals, set):
+            color_name = ramble.util.colors.section_title(name)
+            color.cprint(f"{color_name}:")
+            for sub_name in vals:
+                # Avoid showing duplicate names for variables
+                color_sub_name = ramble.util.colors.nested_1(sub_name)
+                to_print = f"{indentation}{color_sub_name}"
+                try:
+                    color.cprint(to_print)
+                except color.ColorParseError:
+                    escaped_sub_name = ramble.util.colors.nested_1(sub_name.replace("@", "@@"))
+                    color.cprint(f"{indentation}{escaped_sub_name}")
+            color.cprint("")
+        elif isinstance(vals, list):
+            for val in vals:
+                color.cprint(f"{val.as_str()}")
         else:
-            color.cprint(f"{str(val)}")
+            color.cprint(f"{str(vals)}")
 
 
 # Attributes that need special print functions

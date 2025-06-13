@@ -80,6 +80,10 @@ class SoftwareSpec:
             color_key = ramble.util.colors.nested_1(key)
             escaped_val = val.replace("@", "@@")
             output += f"{indentation}{color_key}: {escaped_val}\n"
+        if self.when:
+            output += ramble.util.colors.nested_2(f"\n{indentation}When:\n")
+            for condition in self.when:
+                output += f"{indentation}    {condition}\n"
         return output
 
     def __str__(self):
