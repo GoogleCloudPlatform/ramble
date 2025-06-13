@@ -1052,3 +1052,138 @@ def test_input_when(request, input_when, expected_input_file):
 
             assert expected_input_file in data
             assert ("input2" in data) == input_when
+
+
+@pytest.mark.parametrize(
+    "wl_def_when,expected_exec",
+    [
+        (False, "test_exec"),
+        (True, "test_exec_def_when"),
+    ],
+)
+def test_workload_definition_when(request, wl_def_when, expected_exec):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    exec_test_str = {
+        "test_exec": "echo '{test_variable}'",
+        "test_exec_def_when": "echo 'executable version1'",
+    }
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_workload_definition_when",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:workload_definition_when:{wl_def_when}", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_workload_definition_when",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert exec_test_str[expected_exec] in data
+
+
+def test_workload_errors_when_not_enabled(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_workload_enabled_when",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:workload_enabled_when:false", global_args=global_args)
+
+        ws._re_read()
+
+        with pytest.raises(RambleCommandError):
+
+            captured = workspace("setup", global_args=global_args)
+            assert (
+                "test_workload_enabled_when is not defined for the active `when` conditions"
+            ) in captured
+
+        config("remove", "variants:workload_enabled_when:false", global_args=global_args)
+        config("add", "variants:workload_enabled_when:true", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_workload_enabled_when",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert "echo '{test_variable}'" in data
+
+
+def test_workload_errors_when_overlapping_conditions(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:workload_defined_twice:true", global_args=global_args)
+
+        ws._re_read()
+
+        with pytest.raises(RambleCommandError):
+
+            captured = workspace("setup", global_args=global_args)
+            assert "test_wl is defined for overlapping `when` conditions" in captured

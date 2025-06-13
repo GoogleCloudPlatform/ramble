@@ -253,3 +253,49 @@ class WhenDirectives(ExecutableApplication):
         executables=["test_exec"],
         inputs=["test-input1", "test-input2"],
     )
+
+    # for workload()
+    variant(
+        "workload_enabled_when",
+        default=False,
+        values=[True, False],
+        description="Enable workload using when",
+    )
+
+    workload(
+        "test_workload_enabled_when",
+        executables=["test_exec"],
+        when=["+workload_enabled_when"],
+    )
+
+    variant(
+        "workload_definition_when",
+        default=False,
+        values=[True, False],
+        description="Workload definition changes using when",
+    )
+
+    workload(
+        "test_workload_definition_when",
+        executables=["test_exec"],
+        when=["~workload_definition_when"],
+    )
+
+    workload(
+        "test_workload_definition_when",
+        executables=["test_exec_def_when"],
+        when=["+workload_definition_when"],
+    )
+
+    variant(
+        "workload_defined_twice",
+        default=False,
+        values=[True, False],
+        description="Errors when workload has overlapping when conditions",
+    )
+
+    workload(
+        "test_wl",
+        executables=["test_exec"],
+        when=["+workload_defined_twice"],
+    )

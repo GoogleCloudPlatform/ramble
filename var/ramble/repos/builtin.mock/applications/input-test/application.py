@@ -41,3 +41,8 @@ class InputTest(ExecutableApplication):
         executables=["test"],
         inputs=["test-input1", "test-input2", "test-input3"],
     )
+
+    workload(
+        "test_wl2",
+        executables=["test"],
+    )

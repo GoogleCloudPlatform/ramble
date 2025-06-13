@@ -182,7 +182,7 @@ class IntelMlc(ExecutableApplication):
             super().add_expand_vars(workspace)
 
     def _generate_input_file(self, workspace, app_inst=None):
-        workload = app_inst.workloads[app_inst.expander.workload_name]
+        workload = app_inst.get_workload()
 
         thread_dist = app_inst.expander.expand_var_name("thread_distribution")
         if thread_dist == "{thread_distribution}":

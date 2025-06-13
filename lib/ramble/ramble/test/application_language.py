@@ -240,14 +240,14 @@ def test_workload_directive(app_class):
     wl_name = test_defs["name"]
 
     assert hasattr(app_inst, "workloads")
-    assert wl_name in app_inst.workloads
-    assert app_inst.workloads[wl_name].executables is not None
-    assert app_inst.workloads[wl_name].inputs is not None
+    assert wl_name in app_inst.workloads[_FS]
+    assert app_inst.workloads[_FS][wl_name].executables is not None
+    assert app_inst.workloads[_FS][wl_name].inputs is not None
     for test in test_defs["executables"]:
-        assert app_inst.workloads[wl_name].find_executable(test) is not None
+        assert app_inst.workloads[_FS][wl_name].find_executable(test) is not None
 
     for test in test_defs["inputs"]:
-        assert app_inst.workloads[wl_name].find_input(test) is not None
+        assert app_inst.workloads[_FS][wl_name].find_input(test) is not None
 
 
 @pytest.mark.parametrize("app_class", app_types)

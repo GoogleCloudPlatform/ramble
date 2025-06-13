@@ -24,27 +24,27 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.executables[_FS]["bar"].template == ["baz"]
     assert app_inst.executables[_FS]["bar"].mpi
 
-    assert "test_wl" in app_inst.workloads
-    assert app_inst.workloads["test_wl"].executables == ["foo"]
-    assert app_inst.workloads["test_wl"].inputs == ["input"]
+    assert "test_wl" in app_inst.workloads[_FS]
+    assert app_inst.workloads[_FS]["test_wl"].executables == ["foo"]
+    assert app_inst.workloads[_FS]["test_wl"].inputs == ["input"]
 
     app_inst.define_variable("workload_name", "test_wl")
     exec_graph = app_inst._get_executable_graph("test_wl")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
-    assert "test_wl2" in app_inst.workloads
-    assert app_inst.workloads["test_wl2"].executables == ["bar"]
-    assert app_inst.workloads["test_wl2"].inputs == ["input"]
+    assert "test_wl2" in app_inst.workloads[_FS]
+    assert app_inst.workloads[_FS]["test_wl2"].executables == ["bar"]
+    assert app_inst.workloads[_FS]["test_wl2"].inputs == ["input"]
 
     app_inst.define_variable("workload_name", "test_wl2")
     exec_graph = app_inst._get_executable_graph("test_wl2")
     assert exec_graph.get_node("bar") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
-    assert "test_wl3" in app_inst.workloads
-    assert app_inst.workloads["test_wl3"].executables == ["foo"]
-    assert app_inst.workloads["test_wl3"].inputs == ["inherited_input"]
+    assert "test_wl3" in app_inst.workloads[_FS]
+    assert app_inst.workloads[_FS]["test_wl3"].executables == ["foo"]
+    assert app_inst.workloads[_FS]["test_wl3"].inputs == ["inherited_input"]
 
     app_inst.define_variable("workload_name", "test_wl3")
     exec_graph = app_inst._get_executable_graph("test_wl3")
@@ -65,9 +65,9 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.inputs[_FS]["inherited_input"]["url"] == "file:///tmp/inherited_file.log"
     assert app_inst.inputs[_FS]["inherited_input"]["description"] == "Again, not a file"
 
-    possible_vars = app_inst.workloads["test_wl"].find_variable("my_base_var")
+    possible_vars = app_inst.workloads[_FS]["test_wl"].find_variable("my_base_var")
     assert len(possible_vars) == 1
-    possible_vars = app_inst.workloads["test_wl"].find_variable("my_var")
+    possible_vars = app_inst.workloads[_FS]["test_wl"].find_variable("my_var")
     assert len(possible_vars) >= 1
     found = False
     for var in possible_vars:

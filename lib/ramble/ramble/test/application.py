@@ -66,34 +66,34 @@ def test_basic_app(mutable_mock_apps_repo):
     basic_inst.set_variables(exp_dict, None)
     basic_inst.define_variable("application_name", "basic")
 
-    assert "test_wl" in basic_inst.workloads
-    assert len(basic_inst.workloads["test_wl"].executables) == 1
-    foo_exec = basic_inst.workloads["test_wl"].find_executable("foo")
+    assert "test_wl" in basic_inst.workloads[_FS]
+    assert len(basic_inst.workloads[_FS]["test_wl"].executables) == 1
+    foo_exec = basic_inst.workloads[_FS]["test_wl"].find_executable("foo")
     assert foo_exec is not None
     foo_exec = basic_inst.executables[_FS][foo_exec]
     assert foo_exec.template == ["bar"]
     assert not foo_exec.mpi
 
-    assert len(basic_inst.workloads["test_wl"].inputs) == 1
-    example_input = basic_inst.workloads["test_wl"].find_input("input")
+    assert len(basic_inst.workloads[_FS]["test_wl"].inputs) == 1
+    example_input = basic_inst.workloads[_FS]["test_wl"].find_input("input")
     assert example_input is not None
 
-    assert len(basic_inst.workloads["test_wl"].variables[_FS]) == 2
-    possible_vars = basic_inst.workloads["test_wl"].find_variable("my_var")
+    assert len(basic_inst.workloads[_FS]["test_wl"].variables[_FS]) == 2
+    possible_vars = basic_inst.workloads[_FS]["test_wl"].find_variable("my_var")
     assert len(possible_vars) == 1
     assert possible_vars[0].default == "1.0"
     assert possible_vars[0].description == "Example var"
 
-    assert "test_wl2" in basic_inst.workloads
-    assert len(basic_inst.workloads["test_wl2"].executables) == 1
-    bar_exec = basic_inst.workloads["test_wl2"].find_executable("bar")
+    assert "test_wl2" in basic_inst.workloads[_FS]
+    assert len(basic_inst.workloads[_FS]["test_wl2"].executables) == 1
+    bar_exec = basic_inst.workloads[_FS]["test_wl2"].find_executable("bar")
     assert bar_exec is not None
     bar_exec = basic_inst.executables[_FS][bar_exec]
     assert bar_exec.template == ["baz"]
     assert bar_exec.mpi
 
-    assert len(basic_inst.workloads["test_wl2"].inputs) == 1
-    example_input = basic_inst.workloads["test_wl2"].find_input("input")
+    assert len(basic_inst.workloads[_FS]["test_wl2"].inputs) == 1
+    example_input = basic_inst.workloads[_FS]["test_wl2"].find_input("input")
     assert example_input is not None
 
     basic_inst.define_variable("workload_name", "test_wl")
@@ -118,18 +118,30 @@ def test_basic_app(mutable_mock_apps_repo):
     assert basic_inst.inputs[_FS]["input"]["description"] == "Not a file"
 
 
-@pytest.mark.parametrize("app_name", ["basic", "zlib"])
-def test_application_copy_is_deep(mutable_mock_apps_repo, app_name):
+@pytest.mark.parametrize(
+    "app_name,wl_name",
+    [
+        ("basic", "test_wl2"),
+        ("zlib", "ensure_installed"),
+    ],
+)
+def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
     src_inst = mutable_mock_apps_repo.get(app_name)
 
-    defined_variables = {"test_var1": "test_val1", "test_var2": "test_val2"}
-
-    defined_env_vars = {
-        "set": {"SET_ENV_VAR": "TEST"},
-        "unset": ["UNSET_ENV_VAR"],
-        "append": [{"var-separator": ",", "vars": {"APPEND_VAR": "APPEND_TEST"}}],
-        "prepend": [{"var-separator": ",", "vars": {"PREPEND_VAR": "PREPEND_TEST"}}],
+    defined_variables = {
+        "workload_name": wl_name,
+        "test_var1": "test_val1",
+        "test_var2": "test_val2",
     }
+
+    defined_env_vars = [
+        {
+            "set": {"SET_ENV_VAR": "TEST"},
+            "unset": ["UNSET_ENV_VAR"],
+            "append": [{"var-separator": ",", "vars": {"APPEND_VAR": "APPEND_TEST"}}],
+            "prepend": [{"var-separator": ",", "vars": {"PREPEND_VAR": "PREPEND_TEST"}}],
+        }
+    ]
 
     defined_internals = {
         "custom_executables": {
@@ -149,29 +161,33 @@ def test_application_copy_is_deep(mutable_mock_apps_repo, app_name):
         assert clone_inst.variables[var] == val
 
     # Test env-vars
-    for var_set in src_inst._env_variable_sets.keys():
-        assert var_set in clone_inst._env_variable_sets.keys()
-        # Test set sets
-        if var_set == "set":
-            for var, val in src_inst._env_variable_sets[var_set].items():
-                assert var in clone_inst._env_variable_sets[var_set]
-                assert clone_inst._env_variable_sets[var_set][var] == val
-        elif var_set == "append" or var_set == "prepend":
-            for idx, set_group in enumerate(src_inst._env_variable_sets[var_set]):
-                if "var-separator" in set_group:
-                    assert "var-separator" in clone_inst._env_variable_sets[var_set][idx]
-                    assert (
-                        clone_inst._env_variable_sets[var_set][idx]["var-separator"]
-                        == set_group["var-separator"]
-                    )
-                if "vars" in set_group:
-                    assert "vars" in clone_inst._env_variable_sets[var_set][idx]
-                    for var, val in set_group["vars"].items():
-                        assert var in clone_inst._env_variable_sets[var_set][idx]["vars"]
-                        assert clone_inst._env_variable_sets[var_set][idx]["vars"][var] == val
-        elif var_set == "unset":
-            for var in src_inst._env_variable_sets[var_set]:
-                assert var in clone_inst._env_variable_sets[var_set]
+    def _compare_env_var_groups(src_group, clone_group):
+        for var_set in src_group.keys():
+            assert var_set in clone_group.keys()
+            # Test set sets
+            if var_set == "set":
+                for var, val in src_group[var_set].items():
+                    assert var in clone_group[var_set]
+                    assert clone_group[var_set][var] == val
+            elif var_set == "append" or var_set == "prepend":
+                for idx, set_group in enumerate(src_group[var_set]):
+                    if "var-separator" in set_group:
+                        assert "var-separator" in clone_group[var_set][idx]
+                        assert (
+                            clone_group[var_set][idx]["var-separator"]
+                            == set_group["var-separator"]
+                        )
+                    if "vars" in set_group:
+                        assert "vars" in clone_group[var_set][idx]
+                        for var, val in set_group["vars"].items():
+                            assert var in clone_group[var_set][idx]["vars"]
+                            assert clone_group[var_set][idx]["vars"][var] == val
+            elif var_set == "unset":
+                for var in src_group[var_set]:
+                    assert var in clone_group[var_set]
+
+    for src_group, clone_group in zip(src_inst._env_variable_sets, clone_inst._env_variable_sets):
+        _compare_env_var_groups(src_group, clone_group)
 
     # Test internals:
     for internal, conf in src_inst.internals.items():
@@ -198,7 +214,7 @@ def test_required_builtins(mutable_mock_apps_repo, app):
         if conf[app_inst._builtin_required_key]:
             required_builtins.append(builtin)
 
-    for workload in app_inst.workloads.keys():
+    for workload in app_inst.workloads[_FS].keys():
         app_inst.define_variable("workload_name", workload)
         exec_graph = app_inst._get_executable_graph(workload)
         for builtin in required_builtins:
@@ -219,7 +235,7 @@ def test_register_builtin_app(mutable_mock_apps_repo):
         else:
             excluded_builtins.append(builtin)
 
-    for workload in app_inst.workloads.keys():
+    for workload in app_inst.workloads[_FS].keys():
         exec_graph = app_inst._get_executable_graph(workload)
         app_inst.define_variable("workload_name", workload)
 
@@ -261,7 +277,7 @@ def test_get_executable_graph_initial(mutable_mock_apps_repo):
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
-    executable_application_instance.workloads = {"test_wl": test_wl, "test_wl2": test_wl2}
+    executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
     executable_application_instance.internals = {}
 
     executable_graph = executable_application_instance._get_executable_graph("test_wl2")
@@ -281,7 +297,7 @@ def test_get_executable_graph_yaml_defined(mutable_mock_apps_repo):
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
-    executable_application_instance.workloads = {"test_wl": test_wl, "test_wl2": test_wl2}
+    executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     # Insert namespace.executables into the instance's internals to pass the
     # second part of the function
@@ -311,7 +327,7 @@ def test_get_executable_graph_custom_executables(mutable_mock_apps_repo):
     executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
-    executable_application_instance.workloads = {"test_wl": test_wl, "test_wl2": test_wl2}
+    executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     # Insert namespace.executables into the instance's internals to pass the
     # second part of the function
@@ -395,7 +411,7 @@ def test_set_variables(mutable_mock_apps_repo):
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
     test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
-    executable_application_instance.workloads = {"test_wl": test_wl, "test_wl2": test_wl2}
+    executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     executable_application_instance.internals = {}
 
@@ -416,7 +432,7 @@ def test_define_commands(mutable_mock_apps_repo):
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
     test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
-    executable_application_instance.workloads = {"test_wl": test_wl, "test_wl2": test_wl2}
+    executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     executable_application_instance.internals = {}
 
@@ -482,7 +498,7 @@ ramble:
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
     test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
-    executable_application_instance.workloads = {"test_wl": test_wl, "test_wl2": test_wl2}
+    executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     executable_application_instance.internals = {}
 
@@ -507,23 +523,23 @@ def test_class_attributes(mutable_mock_apps_repo):
     instances = [basic_inst, basic_clone]
     for inst in instances:
         assert hasattr(inst, "workloads")
-        assert "test_wl" in inst.workloads
+        assert "test_wl" in inst.workloads[_FS]
 
     basic_clone.workload("added_workload", executables=["foo"])
 
-    assert "added_workload" in basic_clone.workloads
-    assert "added_workload" not in basic_inst.workloads
+    assert "added_workload" in basic_clone.workloads[_FS]
+    assert "added_workload" not in basic_inst.workloads[_FS]
 
 
 def test_workload_groups(mutable_mock_apps_repo):
     workload_group_inst = mutable_mock_apps_repo.get("workload-groups")
 
-    assert "test_wl" in workload_group_inst.workloads
+    assert "test_wl" in workload_group_inst.workloads[_FS]
 
     assert "empty" in workload_group_inst.workload_groups
     assert "test_wlg" in workload_group_inst.workload_groups
 
-    possible_vars = workload_group_inst.workloads["test_wl"].find_variable("test_var")
+    possible_vars = workload_group_inst.workloads[_FS]["test_wl"].find_variable("test_var")
     assert len(possible_vars) >= 1
     found = False
     for var in possible_vars:
@@ -531,7 +547,7 @@ def test_workload_groups(mutable_mock_apps_repo):
             found = True
     assert found
 
-    possible_vars = workload_group_inst.workloads["test_wl"].find_variable("test_var_mixed")
+    possible_vars = workload_group_inst.workloads[_FS]["test_wl"].find_variable("test_var_mixed")
     assert len(possible_vars) >= 1
     found = False
     for var in possible_vars:
@@ -543,8 +559,8 @@ def test_workload_groups(mutable_mock_apps_repo):
 def test_workload_groups_inherited(mutable_mock_apps_repo):
     wlgi_inst = mutable_mock_apps_repo.get("workload-groups-inherited")
 
-    assert "test_wl" in wlgi_inst.workloads
-    assert "test_wl3" in wlgi_inst.workloads
+    assert "test_wl" in wlgi_inst.workloads[_FS]
+    assert "test_wl3" in wlgi_inst.workloads[_FS]
 
     # check we inherit groups we don't touch
     assert "empty" in wlgi_inst.workload_groups
@@ -553,7 +569,7 @@ def test_workload_groups_inherited(mutable_mock_apps_repo):
     assert "test_wl" in wlgi_inst.workload_groups["test_wlg"]
 
     # Ensure a new workload can obtain the parent level vars via groups
-    possible_vars = wlgi_inst.workloads["test_wl3"].find_variable("test_var")
+    possible_vars = wlgi_inst.workloads[_FS]["test_wl3"].find_variable("test_var")
     assert len(possible_vars) >= 1
     found = False
     for var in possible_vars:
@@ -562,7 +578,7 @@ def test_workload_groups_inherited(mutable_mock_apps_repo):
     assert found
 
     for wl in ["test_wl", "test_wl3"]:
-        possible_vars = wlgi_inst.workloads[wl].find_variable("test_var_mixed")
+        possible_vars = wlgi_inst.workloads[_FS][wl].find_variable("test_var_mixed")
         assert len(possible_vars) >= 1
         found = False
         for var in possible_vars:

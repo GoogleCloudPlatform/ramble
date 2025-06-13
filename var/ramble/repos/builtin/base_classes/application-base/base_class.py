@@ -7,6 +7,7 @@
 # except according to those terms.
 """Define base classes for application definitions"""
 
+import copy
 import fnmatch
 import io
 import operator
@@ -169,6 +170,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._formatted_executables = {}
         self.variables = None
         self.variants = None
+        self._active_workload = None
         self.no_expand_vars = None
         self.experiment_set = None
         self.internals = {}
@@ -256,6 +258,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self._formatted_executables.copy()
             )
 
+        new_clone.workloads = copy.deepcopy(self.workloads)
         new_clone.keywords = ramble.keywords.keywords.copy()
         new_clone.set_template(False)
         new_clone.repeats.set_repeats(False, 0)
@@ -315,6 +318,106 @@ class ApplicationBase(metaclass=ApplicationMeta):
             default=self.expander.workload_name,
             description="Name of experiment workload",
         )
+
+    def _validate_workload(self, workload_name):
+        """Checks if a workload name is valid and returns the workload that
+        satisfies `when` conditions.
+        """
+        workload = None
+        workload_found = False
+        for when_set, workloads in self.workloads.items():
+            if workload_name in workloads:
+                workload_found = True
+                if self.expander.satisfies(when_set, self.object_variants):
+                    if workload:
+                        logger.die(
+                            f"Workload {workload_name} is defined with "
+                            "overlapping `when` conditions. Ensure that "
+                            "conditions are mutually exclusive."
+                        )
+                    workload = workloads[workload_name]
+
+        if not workload_found:
+            raise ApplicationError(
+                f"Workload {workload_name} is not defined "
+                f"as a workload of application {self.name}."
+            )
+        if not workload:
+            logger.die(
+                f"Workload {workload_name} is not defined "
+                "for the active `when` conditions."
+            )
+
+        return workload
+
+    def set_active_workload(self):
+        """Retrieves the current workload name from the expander, evaluates
+        `when` conditions, and sets the active workload to the one that matches
+        conditions.
+        """
+        self._active_workload = self._validate_workload(
+            self.expander.workload_name
+        )
+
+    def get_workload(self, workload_name=None):
+        """Retrieves a workload that satisfies current `when` conditions. If
+        workload_name is not provided, retrieves the active workload.
+        """
+        if not workload_name or (
+            self.expander.workload_name
+            and self.expander.workload_name == workload_name
+        ):
+            if not self._active_workload:
+                self.set_active_workload()
+            return self._active_workload
+        else:
+            return self._validate_workload(workload_name)
+
+    def get_workloads(self, workload_name=None):
+        """Retrieves all workloads with workload_name, ignoring `when`
+        conditions. If workload_name is not provided, retrieves all workloads
+        with the same name as the active workload.
+
+        Use this instead of get_workload() if calling before variants are set,
+        e.g. in set_variables()
+        """
+        matching_workloads = []
+        if not workload_name:
+            workload_name = self.expander.workload_name
+
+        for when_set, workloads in self.workloads.items():
+            if workload_name in workloads:
+                matching_workloads.append(workloads[workload_name])
+
+        if not matching_workloads:
+            raise ApplicationError(
+                f"Workload {workload_name} is not defined "
+                f"as a workload of application {self.name}."
+            )
+
+        return matching_workloads
+
+    def get_all_workloads(self):
+        """Retrieves all workloads satisfying current `when` conditions."""
+        all_workloads = []
+        for when_set, workloads in self.workloads.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                for workload in workloads:
+                    if workload in all_workloads:
+                        logger.die(
+                            f"Workload {workload} is defined with "
+                            "overlapping `when` conditions. Ensure that "
+                            "conditions are mutually exclusive."
+                        )
+                    all_workloads.append(workloads[workload])
+
+        if not all_workloads:
+            logger.die(
+                "No workloads satisfy the current `when` conditions: \n"
+                f"  {self.object_variants.as_set()}"
+            )
+
+        return all_workloads
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
@@ -438,24 +541,23 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._env_variable_sets = env_variable_sets.copy()
 
         # Extract workload environment variable sets
-        if self.expander.workload_name in self.workloads:
-            workload = self.workloads[self.expander.workload_name]
+        workload = self.get_workload()
 
-            new_env_vars = {}
-            for env_var in workload.environment_variables.values():
-                action = "set"
-                value = env_var.value
+        new_env_vars = {}
+        for env_var in workload.environment_variables.values():
+            action = "set"
+            value = env_var.value
 
-                add = True
-                for env_var_set in self._env_variable_sets:
-                    if action in env_var_set:
-                        if env_var.name in env_var_set[action].keys():
-                            add = False
+            add = True
+            for env_var_set in self._env_variable_sets:
+                if action in env_var_set:
+                    if env_var.name in env_var_set[action].keys():
+                        add = False
 
-                if add:
-                    new_env_vars[env_var.name] = value
+            if add:
+                new_env_vars[env_var.name] = value
 
-            self._env_variable_sets.append({"set": new_env_vars})
+        self._env_variable_sets.append({"set": new_env_vars})
 
     def set_variables(self, variables, experiment_set):
         """Set internal reference to variables
@@ -470,12 +572,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
         )
 
         self.no_expand_vars = set()
-        workload_name = self.expander.workload_name
-        if workload_name in self.workloads:
-            for when_key, var_list in self.workloads[
-                workload_name
-            ].variables.items():
-                if self.expander.satisfies(when_key, self.object_variants):
+        workloads = self.get_workloads()
+        for workload in workloads:
+            for var_when_set, var_list in workload.variables.items():
+                if self.expander.satisfies(var_when_set, self.object_variants):
                     for var in var_list:
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
@@ -513,9 +613,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self.experiment_tags = self.tags.copy()
 
-        workload_name = self.expander.workload_name
-        if workload_name in self.workloads:
-            self.experiment_tags.extend(self.workloads[workload_name].tags)
+        self.experiment_tags.extend(self.get_workload().tags)
 
         if tags:
             self.experiment_tags.extend(tags)
@@ -1152,7 +1250,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def _get_executable_graph(self, workload_name):
         """Return executables for add_expand_vars"""
         self._define_custom_executables()
-        exec_order = self.workloads[workload_name].executables
+        exec_order = self.get_workload(workload_name).executables
         # Use yaml defined executable order, if defined
         if namespace.executables in self.internals:
             exec_order = self.internals[namespace.executables]
@@ -1236,11 +1334,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         wl_vars = {}
 
-        if self.expander.workload_name in self.workloads:
-            for when_key, var_list in self.workloads[
-                self.expander.workload_name
-            ].variables.items():
-                if self.expander.satisfies(when_key, self.object_variants):
+        workloads = self.get_workloads()
+        for workload in workloads:
+            for var_when_set, var_list in workload.variables.items():
+                if self.expander.satisfies(var_when_set, self.object_variants):
                     for var in var_list:
                         wl_vars[var.name] = var
 
@@ -1500,19 +1597,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
             )
             self.variables[template_name] = expand_path
 
-    def _validate_experiment(self):
-        """Perform validation of an experiment before performing actions with it
-
-        This function is an entry point to validate various aspects of an
-        experiment definition before it is used. It is expected to raise errors
-        when validation fails.
-        """
-        if self.expander.workload_name not in self.workloads:
-            raise ApplicationError(
-                f"Workload {self.expander.workload_name} is not defined "
-                f"as a workload of application {self.name}."
-            )
-
     def add_expand_vars(self, workspace):
         """Add application specific expansion variables
 
@@ -1522,7 +1606,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         - spack_setup: set to an empty string, so spack applications can override this
         """
         if not self._vars_are_expanded:
-            self._validate_experiment()
             self._executable_graph = self._get_executable_graph(
                 self.expander.workload_name
             )
@@ -1544,8 +1627,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._input_fetchers = {}
 
-        workload_names = [workload] if workload else self.workloads.keys()
-
         # Batch 'when' evaluation to avoid repeat expander calls
         when_satisfied = set()
         for when_set in self.inputs.keys():
@@ -1555,9 +1636,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 when_satisfied.add(when_set)
 
         inputs = {}
-        for workload_name in workload_names:
-            workload = self.workloads[workload_name]
-
+        workloads = (
+            [self.get_workload(workload)]
+            if workload
+            else self.get_all_workloads()
+        )
+        for workload in workloads:
             for input_file in workload.inputs:
                 inputs_found = 0
                 active_inputs = 0
@@ -1571,7 +1655,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                 if not inputs_found:
                     logger.die(
-                        f"Workload {workload_name} references a non-existent input file "
+                        f"Workload {workload.name} references a non-existent input file "
                         f"{input_file}.\n"
                         f"Make sure this input file is defined before using it in a workload."
                     )
@@ -1600,7 +1684,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
                 file_name = file_name.replace(f".{fetcher.extension}", "")
 
-                namespace = f"{self.name}.{workload_name}"
+                namespace = f"{self.name}.{workload.name}"
 
                 inputs[file_name] = {
                     "fetcher": fetcher,
@@ -2000,7 +2084,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         with lk.WriteTransaction(archive_lock):
             # Copy all log files from executables
             exec_logs = set()
-            workload = self.workloads[self.expander.workload_name]
+            workload = self.get_workload()
             filtered_executables = self._get_filtered_executables()
             for exec_name in workload.executables:
                 if exec_name in filtered_executables:
