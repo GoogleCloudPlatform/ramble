@@ -9,7 +9,6 @@
 import pytest
 import ruamel.yaml as yaml
 
-import ramble.repository
 import ramble.util.yaml_generation
 
 import spack.util.spack_yaml as syaml

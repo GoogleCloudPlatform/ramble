@@ -13,8 +13,6 @@ import pytest
 
 import llnl.util.filesystem as fs
 
-import ramble.config
-import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import search_files_for_string

@@ -8,8 +8,6 @@
 
 import pytest
 
-import ramble.config
-import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
 

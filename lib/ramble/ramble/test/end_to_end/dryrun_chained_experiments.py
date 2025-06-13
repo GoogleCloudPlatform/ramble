@@ -11,10 +11,8 @@ import re
 
 import pytest
 
-import ramble.config
 import ramble.filters
 import ramble.pipeline
-import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
 
