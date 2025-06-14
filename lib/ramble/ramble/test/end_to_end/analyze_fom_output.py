@@ -13,8 +13,6 @@ import pytest
 
 import llnl.util.tty as tty
 
-import ramble.config
-import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
 

@@ -8,7 +8,6 @@
 
 import pytest
 
-import ramble.paths
 import ramble.repository
 
 

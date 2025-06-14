@@ -10,8 +10,6 @@ import os
 
 import pytest
 
-import ramble.config
-import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.pkg_man.builtin.spack_lightweight import SpackRunner, ValidationFailedError

@@ -12,7 +12,6 @@ import pytest
 
 import ramble.context
 import ramble.experiment_set
-import ramble.renderer
 import ramble.workspace
 from ramble.error import ChainCycleDetectedError, InvalidChainError
 from ramble.main import RambleCommand

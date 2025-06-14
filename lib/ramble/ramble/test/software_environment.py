@@ -9,7 +9,6 @@
 import pytest
 
 import ramble.expander
-import ramble.renderer
 import ramble.software_environments
 import ramble.workspace
 from ramble.main import RambleCommand

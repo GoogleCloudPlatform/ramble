@@ -21,7 +21,6 @@ from llnl.util.filesystem import mkdirp, partition_path, touch, working_dir
 import ramble.stage
 from ramble.stage import InputStage, ResourceStage, StageComposite
 
-import spack.paths
 import spack.stage
 import spack.util.executable
 from spack.resource import Resource

@@ -14,14 +14,12 @@ import pytest
 import llnl.util.filesystem as fs
 
 import ramble.config
-import ramble.workspace
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
 
 import spack.util.url
 
 mirror = RambleCommand("mirror")
-workspace = RambleCommand("workspace")
 
 pytestmark = pytest.mark.skipif(sys.platform == "win32", reason="does not run on windows")
 

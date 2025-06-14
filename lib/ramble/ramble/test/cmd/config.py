@@ -15,7 +15,6 @@ import llnl.util.filesystem as fs
 
 import ramble.config
 import ramble.main
-import ramble.test.cmd.workspace
 import ramble.workspace
 
 import spack.util.spack_yaml as syaml
