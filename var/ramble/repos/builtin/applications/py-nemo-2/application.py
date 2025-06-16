@@ -40,7 +40,7 @@ class PyNemo2(BasePyNemo):
         "pretraining_exec",
         'bash -c "cd /opt/NeMo; git rev-parse HEAD; '
         "{custom_injected_string}; "
-        'python3 -u {experiment_run_dir}/{nemo_config_name};"',
+        'python3 -u {experiment_run_dir}/{nemo_config_name} {nemo_cli_args};"',
         use_mpi=True,
     )
 
@@ -65,6 +65,13 @@ class PyNemo2(BasePyNemo):
         "nemo_config_name",
         default="",
         description="Name of NeMo 2.0 config under {nemo_config_dir_path}.",
+        workload_group="pretraining",
+    )
+
+    workload_variable(
+        "nemo_cli_args",
+        default="",
+        description="CLI args to pass to append to the Python Nemo command.",
         workload_group="pretraining",
     )
 
