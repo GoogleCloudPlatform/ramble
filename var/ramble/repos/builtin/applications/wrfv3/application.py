@@ -24,7 +24,7 @@ class Wrfv3(ExecutableApplication):
     with when("package_manager_family=spack"):
         define_compiler("gcc8", pkg_spec="gcc@8.2.0")
 
-        software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
+        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
             "wrfv3",

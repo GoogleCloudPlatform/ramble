@@ -25,8 +25,8 @@ class Gromacs(ExecutableApplication):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
         software_spec(
-            "impi2018",
-            pkg_spec="intel-mpi@2018.4.274",
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.13.1",
         )
 
         with default_args(compiler="gcc9"):

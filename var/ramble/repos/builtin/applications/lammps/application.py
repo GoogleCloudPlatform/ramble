@@ -23,7 +23,7 @@ class Lammps(ExecutableApplication):
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
     with when("package_manager_family=spack"):
-        software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
+        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
             "lammps",

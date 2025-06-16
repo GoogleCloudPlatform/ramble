@@ -139,33 +139,35 @@ Which should contain the following information:
         Inputs: ['water_gmx50_bare']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water GMX50
-                Default: {water_gmx50_bare}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for water GMX50
+                    Default: {water_gmx50_bare}/{size}
     Workload: water_bare
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water bare hbonds
-                Default: {water_bare_hbonds}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for water bare hbonds
+                    Default: {water_bare_hbonds}/{size}
 
 
 Within each of the workloads your workspace has experiments for, you can see

@@ -52,8 +52,8 @@ ramble:
       gcc9:
         pkg_spec: gcc@9.4.0 target=x86_64
         compiler_spec: gcc@9.4.0
-      impi2021:
-        pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
+      intel-mpi:
+        pkg_spec: intel-oneapi-mpi@2021.13.1 target=x86_64
         compiler: gcc9
       gromacs:
         pkg_spec: gromacs@2021.6
@@ -62,4 +62,4 @@ ramble:
       gromacs:
         packages:
         - gromacs
-        - impi2021
+        - intel-mpi
