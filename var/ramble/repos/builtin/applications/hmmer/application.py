@@ -32,7 +32,7 @@ class Hmmer(ExecutableApplication):
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
-        software_spec("impi_2018", pkg_spec="intel-mpi@2018.4.274")
+        software_spec("impi_2018", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
             "hmmer",

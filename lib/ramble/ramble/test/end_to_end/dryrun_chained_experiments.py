@@ -84,8 +84,8 @@ ramble:
     packages:
       gcc:
         pkg_spec: gcc@9.3.0 target=x86_64
-      impi2018:
-        pkg_spec: intel-mpi@2018.4.274
+      intel-mpi:
+        pkg_spec: intel-oneapi-mpi@2021.13.1
         compiler: gcc
       imb:
         pkg_spec: intel-mpi-benchmarks
@@ -97,11 +97,11 @@ ramble:
       intel-mpi-benchmarks:
         packages:
         - imb
-        - impi2018
+        - intel-mpi
       gromacs:
         packages:
         - gromacs
-        - impi2018
+        - intel-mpi
 """
 
     mock_output_data = """

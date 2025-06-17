@@ -26,8 +26,7 @@ class Wrfv4(ExecutableApplication):
 
         software_spec(
             "intel-mpi",
-            pkg_spec="intel-mpi@2018.4.274",
-            compiler="gcc9",
+            pkg_spec="intel-oneapi-mpi@2021.13.1",
         )
 
         software_spec(

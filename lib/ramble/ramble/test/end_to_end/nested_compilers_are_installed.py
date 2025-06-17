@@ -55,7 +55,7 @@ ramble:
         pkg_spec: gcc@10.1.0
         compiler: gcc9
       intel:
-        pkg_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-oneapi-mpi@2021.13.1
         compiler: gcc10
       wrf:
         pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf

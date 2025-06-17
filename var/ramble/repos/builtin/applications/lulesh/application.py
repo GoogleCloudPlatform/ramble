@@ -24,7 +24,7 @@ class Lulesh(ExecutableApplication):
     with when("package_manager_family"):
         define_compiler("gcc13", pkg_spec="gcc@13.1.0")
 
-        software_spec("impi2018", pkg_spec="intel-mpi@2018.4.274")
+        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
             "lulesh",

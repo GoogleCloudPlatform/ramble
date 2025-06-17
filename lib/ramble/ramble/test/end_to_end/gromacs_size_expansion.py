@@ -44,7 +44,7 @@ ramble:
       gcc:
         pkg_spec: gcc@8.5.0
       intel-mpi:
-        pkg_spec: intel-mpi@2018.4.274
+        pkg_spec: intel-oneapi-mpi@2021.13.1
         compiler: gcc
       gromacs:
         pkg_spec: gromacs

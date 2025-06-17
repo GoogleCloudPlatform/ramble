@@ -44,33 +44,35 @@ Under the workloads marked by ``Workload: water_bare`` and
         Inputs: ['water_gmx50_bare']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water GMX50
-                Default: {water_gmx50_bare}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for water GMX50
+                    Default: {water_gmx50_bare}/{size}
     Workload: water_bare
         Executables: ['pre-process', 'execute-gen']
         Inputs: ['water_bare_hbonds']
         Tags: []
         Variables:
-            size:
-                Description: Workload size
-                Default: 1536
-                Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
-            type:
-                Description: Workload type.
-                Default: pme
-                Suggested Values: ['pme', 'rf']
-            input_path:
-                Description: Input path for water bare hbonds
-                Default: {water_bare_hbonds}/{size}
+            Unconditional:
+                size:
+                    Description: Workload size
+                    Default: 1536
+                    Suggested Values: ['0000.65', '0000.96', '0001.5', '0003', '0006', '0012', '0024', '0048', '0096', '0192', '0384', '0768', '1536', '3072']
+                type:
+                    Description: Workload type.
+                    Default: pme
+                    Suggested Values: ['pme', 'rf']
+                input_path:
+                    Description: Input path for water bare hbonds
+                    Default: {water_bare_hbonds}/{size}
 
 Here we see that both of these workloads have a ``type`` variable (with
 possible values of ``pme`` and ``rf``) and a ``size`` variable with a variety
@@ -89,32 +91,34 @@ With this command, you should see output similar to the following:
   ##################
   # software_specs #
   ##################
-  impi2018:
-      pkg_spec: intel-mpi@2018.4.274
-      compiler_spec: None
-      compiler: None
-      package_manager: spack*
-  
-  spack_gromacs:
+  intel-mpi:
+      pkg_spec: intel-oneapi-mpi@2021.13.1
+
+      When:
+          package_manager_family=spack
+
+  gromacs:
       pkg_spec: gromacs@2020.5
-      compiler_spec: None
       compiler: gcc9
-      package_manager: spack*
-  
-  eessi_gromacs:
+
+      When:
+          package_manager_family=spack
+
+  gromacs:
       pkg_spec: GROMACS/2024.1-foss-2023b
-      compiler_spec: None
-      compiler: None
-      package_manager: eessi
-  
+
+      When:
+          package_manager_family=eessi
+
   #############
   # compilers #
   #############
   gcc9:
       pkg_spec: gcc@9.3.0
-      compiler_spec: None
-      compiler: None
-      package_manager: spack*
+
+      When:
+          package_manager_family=spack
+
 
 This output does not represent the only possible configuration that works for
 this application, it only presents a good starting point. When using Ramble,

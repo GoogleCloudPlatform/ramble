@@ -296,18 +296,18 @@ package manager variant:
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
         software_spec(
-            "impi2018",
-            pkg_spec="intel-mpi@2018.4.274",
+            "impi",
+            pkg_spec="intel-oneapi-mpi@2021.13.1",
         )
 
         with default_args(compiler="gcc9"):
             software_spec(
-                "spack_gromacs",
+                "gromacs",
                 pkg_spec="gromacs@2020.5",
             )
 
     software_spec(
-        "eessi_gromacs",
+        "gromacs",
         pkg_spec="GROMACS/2024.1-foss-2023b",
         when=["package_manager_family=eessi"],
     )
