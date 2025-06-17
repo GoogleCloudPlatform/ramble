@@ -398,9 +398,9 @@ class Hpl(ExecutableApplication):
             nBlocks -= nBlocks % lcmPQ
             problemSize = blockSize * nBlocks
 
-            for when_key, var_list in self.workloads[
+            for when_key, var_list in self.get_workload(
                 "standard"
-            ].variables.items():
+            ).variables.items():
                 if self.expander.satisfies(when_key, self.object_variants):
                     for var in var_list:
                         if var.name not in self.variables:

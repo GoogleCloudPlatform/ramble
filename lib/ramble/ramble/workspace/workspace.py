@@ -1226,11 +1226,17 @@ ramble:
             for part in matrix.split(","):
                 exp_matrix.append(part)
 
+        # Unpack all workload names from `when` sets
+        all_workload_names = set()
+        for _, workloads in app_inst.workloads.items():
+            for workload in workloads.keys():
+                all_workload_names.add(workload)
+
         workload_names = []
-        for workload in app_inst.workloads.values():
+        for workload in all_workload_names:
             add_workload = False
             for wl_filter in workload_filters:
-                if fnmatch.fnmatch(workload.name, wl_filter):
+                if fnmatch.fnmatch(workload, wl_filter):
                     add_workload = True
                     break
 
@@ -1240,12 +1246,12 @@ ramble:
                     subdict = apps_dict[application]
                     if namespace.workload in subdict:
                         subdict = subdict[namespace.workload]
-                        if workload.name in subdict:
-                            subdict = subdict[workload.name]
+                        if workload in subdict:
+                            subdict = subdict[workload]
                             if namespace.experiment in subdict:
                                 subdict = subdict[namespace.experiment]
                                 if experiment_name in subdict:
-                                    exp_name = f"{application}.{workload.name}.{experiment_name}"
+                                    exp_name = f"{application}.{workload}.{experiment_name}"
                                     if not overwrite:
                                         logger.warn(
                                             f"Experiment {exp_name} is defined already. "
@@ -1254,7 +1260,7 @@ ramble:
                                     add_workload = overwrite
 
             if add_workload:
-                workload_names.append(workload.name)
+                workload_names.append(workload)
 
         if workload_name_variable:
             var_def_dict[workload_name_variable] = workload_names.copy()

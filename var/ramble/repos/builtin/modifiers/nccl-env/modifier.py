@@ -692,7 +692,7 @@ class NcclEnv(BasicModifier):
         if self._applied:
             return pre_cmds, post_cmds
 
-        workload = app_inst.workloads[app_inst.expander.workload_name]
+        workload = app_inst.get_workload()
 
         # Apply before the first executable from the workload
         if executable_name == workload.executables[0]:

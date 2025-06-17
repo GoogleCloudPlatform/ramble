@@ -53,7 +53,14 @@ application_directive = ApplicationMeta.directive
 
 @application_directive("workloads")
 def workload(
-    name, executables=None, executable=None, input=None, inputs=None, tags=None, **kwargs
+    name,
+    executables=None,
+    executable=None,
+    input=None,
+    inputs=None,
+    tags=None,
+    when=None,
+    **kwargs,
 ):
     """Adds a workload to this application
 
@@ -78,7 +85,12 @@ def workload(
             input, inputs, app.inputs, "input", "inputs", "workload"
         )
 
-        app.workloads[name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
+        when_list = ramble.language.language_helpers.build_when_list(when, app, name, "workload")
+        when_set = frozenset(when_list)
+        if when_set not in app.workloads:
+            app.workloads[when_set] = {}
+
+        app.workloads[when_set][name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
 
     return _execute_workload
 
@@ -105,13 +117,15 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
 
         # Apply any existing variables in the group to the workload
         for workload in workloads:
-            if name in app.workload_group_vars:
-                for var in app.workload_group_vars[name]:
-                    app.workloads[workload].add_variable(var)
+            for when_set in app.workloads.keys():
+                if workload in app.workloads[when_set]:
+                    if name in app.workload_group_vars:
+                        for var in app.workload_group_vars[name]:
+                            app.workloads[when_set][workload].add_variable(var)
 
-            if name in app.workload_group_env_vars:
-                for env_var in app.workload_group_env_vars[name]:
-                    app.workloads[workload].add_environment_variable(env_var)
+                    if name in app.workload_group_env_vars:
+                        for env_var in app.workload_group_env_vars[name]:
+                            app.workloads[when_set][workload].add_environment_variable(env_var)
 
     return _execute_workload_groups
 
@@ -264,8 +278,10 @@ def workload_variable(
             **kwargs,
         )
 
-        for wl_name in all_workloads:
-            app.workloads[wl_name].add_variable(workload_var.copy())
+        for when_set, app_workloads in app.workloads.items():
+            for wl_name in all_workloads:
+                if wl_name in app_workloads:
+                    app.workloads[when_set][wl_name].add_variable(workload_var.copy())
 
         if workload_group is not None:
             workload_group_list = app.workload_groups[workload_group]
@@ -276,9 +292,11 @@ def workload_variable(
             # Track which vars we add to, to allow us to re-apply during inheritance
             app.workload_group_vars[workload_group].append(workload_var.copy())
 
-            for wl_name in workload_group_list:
-                # Apply the variable
-                app.workloads[wl_name].add_variable(workload_var.copy())
+            for when_set, app_workloads in app.workloads.items():
+                for wl_name in workload_group_list:
+                    if wl_name in app_workloads:
+                        # Apply the variable
+                        app.workloads[when_set][wl_name].add_variable(workload_var.copy())
 
         if not all_workloads and workload_group is None:
             raise DirectiveError("A workload or workload group is required")
@@ -310,8 +328,12 @@ def environment_variable(
             name, value=value, description=description
         )
 
-        for wl_name in all_workloads:
-            app.workloads[wl_name].add_environment_variable(workload_env_var.copy())
+        for when_set, app_workloads in app.workloads.items():
+            for wl_name in all_workloads:
+                if wl_name in app_workloads:
+                    app.workloads[when_set][wl_name].add_environment_variable(
+                        workload_env_var.copy()
+                    )
 
         if workload_group is not None:
             workload_group_list = app.workload_groups[workload_group]
@@ -321,8 +343,11 @@ def environment_variable(
 
             app.workload_group_env_vars[workload_group].append(workload_env_var.copy())
 
-            for wl_name in workload_group_list:
-                app.workloads[wl_name].add_environment_variable(workload_env_var.copy())
+            for when_set, app_workloads in app.workloads.items():
+                for wl_name in workload_group_list:
+                    app.workloads[when_set][wl_name].add_environment_variable(
+                        workload_env_var.copy()
+                    )
 
         if not all_workloads and workload_group is None:
             raise DirectiveError("A workload or workload group is required")
