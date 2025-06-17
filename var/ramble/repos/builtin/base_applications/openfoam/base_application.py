@@ -143,7 +143,7 @@ class Openfoam(ExecutableApplication):
     )
     workload_variable(
         "max_global_cells",
-        default="50000000",
+        default="300000000",
         description="Max global cells for simulation",
         workloads=["motorbike*"],
     )
