@@ -131,7 +131,7 @@ class Openfoam(ExecutableApplication):
     )
     workload_variable(
         "mesh_size",
-        default="(226 96 96)",
+        default="(226 90 90)",
         description="Mesh size for simulation",
         workload="motorbike_200m",
     )
@@ -143,7 +143,7 @@ class Openfoam(ExecutableApplication):
     )
     workload_variable(
         "max_global_cells",
-        default="50000000",
+        default="300000000",
         description="Max global cells for simulation",
         workloads=["motorbike*"],
     )
