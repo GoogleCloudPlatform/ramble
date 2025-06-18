@@ -653,6 +653,10 @@ def workspace_info_setup_parser(subparser):
         "--variants", action="store_true", help="If set, experiment variants will be printed"
     )
 
+    subparser.add_argument(
+        "--executables", action="store_true", help="If set, experiment executables will be printed"
+    )
+
     arguments.add_common_arguments(subparser, ["where", "exclude_where", "filter_tags"])
 
     subparser.add_argument(
@@ -663,7 +667,7 @@ def workspace_info_setup_parser(subparser):
         help="level of verbosity. Add flags to "
         + "increase description of workspace\n"
         + "level 1 enables software, tags, templates, and variants\n"
-        + "level 2 enables expansions and phases\n",
+        + "level 2 enables executables, expansions, and phases\n",
     )
 
 
@@ -680,6 +684,7 @@ def workspace_info(args):
     if args.verbose >= 2:
         args.expansions = True
         args.phases = True
+        args.executables = True
 
     color.cprint(rucolor.section_title("Workspace: ") + ws.name)
     color.cprint("")
@@ -811,6 +816,13 @@ def workspace_info(args):
                         color.cprint(rucolor.nested_4("        Variants: "))
                         for key, value in app_inst.variants.items():
                             color.cprint(f"          {key}: {value}")
+
+                    if args.executables:
+                        color.cprint(rucolor.nested_4("        Executables: "))
+                        app_inst.add_expand_vars(ws)
+                        exec_graph = app_inst._executable_graph
+                        for executable in exec_graph.walk():
+                            color.cprint(f"          {executable.key}")
 
                     if args.expansions:
                         var_groups = [
