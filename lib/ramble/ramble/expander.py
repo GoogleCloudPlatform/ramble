@@ -12,6 +12,7 @@ import operator
 import random
 import re
 import string
+import warnings
 from contextlib import contextmanager
 from typing import Dict, FrozenSet, List, Union
 
@@ -805,15 +806,23 @@ class Expander:
             unmodified (if unsuccessful)
 
         """
-        try:
-            math_ast = ast.parse(in_str, mode="eval")
-            out_str = self.eval_math(math_ast.body)
-            return out_str
-        except MathEvaluationError as e:
-            logger.debug(f'   Math input is: "{in_str}"')
-            logger.debug(e)
-        except RambleSyntaxError as e:
-            raise RambleSyntaxError(f'{str(e)} in "{in_str}"')
+        with warnings.catch_warnings(record=True) as wal:
+            try:
+                math_ast = ast.parse(in_str, mode="eval")
+                out_str = self.eval_math(math_ast.body)
+                return out_str
+            except MathEvaluationError as e:
+                logger.debug(f'   Math input is: "{in_str}"')
+                logger.debug(e)
+            except RambleSyntaxError as e:
+                raise RambleSyntaxError(f'{str(e)} in "{in_str}"')
+            except Exception as e:
+                logger.debug(f"ast.parse hit the following exception on input: {in_str}")
+                logger.debug(f"{e}")
+
+            for warn in wal:
+                if r"invalid escape sequence '\{'" not in str(warn.message):
+                    logger.warn(str(warn.message))
 
         return in_str
 
