@@ -36,6 +36,7 @@ _OUTPUT_MAPPING = {
     "raw_variables": "RAMBLE_RAW_VARIABLES",
     namespace.tags: "TAGS",
     "experiment_chain": "EXPERIMENT_CHAIN",
+    "success_criteria": "SUCCESS_CRITERIA",
 }
 
 
@@ -56,6 +57,7 @@ class ExperimentResult:
         self.experiment_chain = app_inst.chain_order.copy()
         self.tags = list(app_inst.experiment_tags)
         self.contexts = []
+        self.success_criteria = {}
         self.software = {}
 
         self.keys = {}

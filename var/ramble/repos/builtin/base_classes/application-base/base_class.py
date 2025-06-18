@@ -2390,6 +2390,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._init_result()
 
+        for criteria_obj in criteria_list.all_criteria():
+            if criteria_obj.ok():
+                self.result.success_criteria[criteria_obj.name] = "PASSED"
+            else:
+                self.result.success_criteria[criteria_obj.name] = "FAILED"
+
         for context, fom_map in fom_values.items():
             context_map = {
                 "name": context,

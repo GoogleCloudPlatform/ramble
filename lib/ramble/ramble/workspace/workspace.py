@@ -1662,6 +1662,10 @@ ramble:
                             if software_key in exp and exp[software_key]:
                                 self.write_software_info(f, exp)
 
+                        if exp["SUCCESS_CRITERIA"]:
+                            f.write("  Success criteria summary:\n")
+                            for name, result in exp["SUCCESS_CRITERIA"].items():
+                                f.write(f"    {name} = {result}\n")
                 else:
                     logger.msg("No results to write")
 
