@@ -409,6 +409,71 @@ ramble:
     assert "zlib.ensure_installed.test_experiment" not in output
 
 
+def test_workspace_info_complete(workspace_name):
+    global_args = ["-w", workspace_name]
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "-p",
+        "spack",
+        "--wf",
+        "ensure_installed",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "n_ranks=1",
+        global_args=global_args,
+    )
+    workspace("concretize", global_args=global_args)
+
+    ws._re_read()
+
+    output = workspace(
+        "info",
+        "-vv",
+        global_args=["-w", workspace_name],
+    )
+
+    assert "All experiment tags" in output
+
+    assert "zlib.ensure_installed.generated" in output
+    for pipeline in [
+        "analyze",
+        "archive",
+        "execute",
+        "logs",
+        "mirror",
+        "pushdeployment",
+        "pushtocache",
+        "setup",
+    ]:
+        assert f"Phases for {pipeline}" in output
+
+    assert "Variants:" in output
+    assert "package_manager: spack" in output
+
+    assert "Variables from Workspace" in output
+    assert "mpi_command = mpirun -n {n_ranks} ==> mpirun -n 1" in output
+    assert "Variables from Experiment" in output
+    assert "n_ranks = 1 ==> 1" in output
+
+    assert "Executables" in output
+    assert "builtin::env_vars" in output
+    assert "package_manager_builtin::spack::spack_source" in output
+    assert "list_lib" in output
+
+    assert "Software Stack" in output
+    assert "Template package: zlib" in output
+    assert "Template package: zlib" in output
+    assert "Spec: zlib" in output
+    assert "Template environment: zlib" in output
+    assert "- zlib = zlib" in output
+
+
 def test_workspace_dir(tmpdir):
     with tmpdir.as_cwd():
         workspace("create", "-d", ".")
