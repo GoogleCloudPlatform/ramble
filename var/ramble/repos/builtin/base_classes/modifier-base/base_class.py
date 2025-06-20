@@ -304,6 +304,29 @@ class ModifierBase(metaclass=ModifierMeta):
 
         return mod_variables
 
+    def selected_environment_variables(self):
+        """Extract all environment variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are environment variable names, values are environment
+            variable instances
+        """
+
+        mod_environment_variables = {}
+
+        for (
+            when_key,
+            env_var_list,
+        ) in self.object_environment_variables.items():
+            if not self.expander.satisfies(when_key, self.object_variants):
+                continue
+
+            for env_var in env_var_list:
+                mod_environment_variables[env_var.name] = env_var
+
+        return mod_environment_variables
+
     def artifact_inventory(self, workspace, app_inst=None):
         """Return an inventory of modifier artifacts
 

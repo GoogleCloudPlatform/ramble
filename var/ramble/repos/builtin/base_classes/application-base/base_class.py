@@ -536,15 +536,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     )
 
     def set_env_variable_sets(self, env_variable_sets):
-        """Set internal reference to environment variable sets"""
+        """Set internal reference to application environment variable sets"""
 
         self._env_variable_sets = env_variable_sets.copy()
 
-        # Extract workload environment variable sets
-        workload = self.get_workload()
-
         new_env_vars = {}
-        for env_var in workload.environment_variables.values():
+        for env_var in self.selected_environment_variables().values():
             action = "set"
             value = env_var.value
 
@@ -1347,6 +1344,65 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     wl_vars[var.name] = var
 
         return wl_vars
+
+    def selected_environment_variables(self):
+        """Extract all environment variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are environment variable names, values are environment
+            variable instances
+        """
+
+        selected_env_vars = {}
+
+        workloads = self.get_workloads()
+        for workload in workloads:
+            for (
+                when_set,
+                env_var_list,
+            ) in workload.environment_variables.items():
+                if self.expander.satisfies(when_set, self.object_variants):
+                    for env_var in env_var_list:
+                        selected_env_vars[env_var.name] = env_var
+
+        for (
+            when_set,
+            env_var_list,
+        ) in self.object_environment_variables.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                for env_var in env_var_list:
+                    selected_env_vars[env_var.name] = env_var
+
+        return selected_env_vars
+
+    def get_environment_variable_sets(self):
+        """Get environment variable sets for all objects.
+
+        Returns:
+            (list) List of environment variable sets from all objects
+        """
+        obj_env_var_sets = self._env_variable_sets.copy()
+
+        env_var_objs = []
+        if self.package_manager is not None:
+            env_var_objs.append(self.package_manager)
+        if self.workflow_manager is not None:
+            env_var_objs.append(self.workflow_manager)
+        for mod_inst in self._modifier_instances:
+            env_var_objs.append(mod_inst)
+
+        for env_var_obj in env_var_objs:
+            obj_env_vars = {}
+            for (
+                env_var
+            ) in env_var_obj.selected_environment_variables().values():
+                obj_env_vars[env_var.name] = env_var.value
+
+            if obj_env_vars:
+                obj_env_var_sets.append({"set": obj_env_vars})
+
+        return obj_env_var_sets
 
     def _define_commands(self, exec_graph, success_list=None):
         """Populate the internal list of commands based on executables
@@ -3079,7 +3135,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         )
 
         # Process environment variable actions
-        for env_var_set in self._env_variable_sets:
+        for env_var_set in self.get_environment_variable_sets():
             for action, conf in env_var_set.items():
                 (env_cmds, _) = action_funcs[action](
                     conf, self.expander, set(), shell=shell

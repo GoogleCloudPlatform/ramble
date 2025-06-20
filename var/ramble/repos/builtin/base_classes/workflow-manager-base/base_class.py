@@ -143,3 +143,26 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
             for var in var_list:
                 all_vars[var.name] = var
         return all_vars
+
+    def selected_environment_variables(self):
+        """Extract all environment variables which would be included based
+        on the current variants.
+
+        Returns:
+            (dict) Keys are environment variable names, values are environment
+            variable instances
+        """
+
+        all_env_vars = {}
+        for (
+            when_key,
+            env_var_list,
+        ) in self.object_environment_variables.items():
+            if not self.app_inst.expander.satisfies(
+                when_key, self.app_inst.object_variants
+            ):
+                continue
+
+            for env_var in env_var_list:
+                all_env_vars[env_var.name] = env_var
+        return all_env_vars

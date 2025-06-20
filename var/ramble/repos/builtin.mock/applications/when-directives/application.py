@@ -17,6 +17,7 @@ class WhenDirectives(ExecutableApplication):
     executable("test_exec", "echo '{test_variable}'", use_mpi=False)
 
     workload("test_wl", executable="test_exec")
+    workload_group("test_wl_group", workloads=["test_wl"])
 
     with default_args(workload="test_wl"):
         workload_variable(
@@ -299,3 +300,18 @@ class WhenDirectives(ExecutableApplication):
         executables=["test_exec"],
         when=["+workload_defined_twice"],
     )
+
+    variant(
+        "app_env_var_included",
+        default=False,
+        values=[True, False],
+        description="Test app object env variable",
+    )
+
+    with when("+app_env_var_included"):
+        environment_variable(
+            "APP_ENV_VAR",
+            value="APP_ENV_VAR_SET",
+            description="Test app environment variable",
+            workload_group="test_wl_group",
+        )
