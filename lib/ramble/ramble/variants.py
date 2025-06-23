@@ -256,10 +256,8 @@ class Variant:
         self.description = description
         self.values = values
         if isinstance(self.default, bool):
-            if self.default:
-                self._definition = f"+{self.name}"
-            else:
-                self._definition = f"~{self.name}"
+            prefix = "+" if self.default else "~"
+            self._definition = f"{prefix}{self.name}"
         else:
             self._definition = f"{self.name}={str(self.default)}"
 
