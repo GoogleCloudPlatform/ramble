@@ -2150,10 +2150,8 @@ ramble:
                         else:
                             to_remove.append(mod_tup)
 
-        if not to_remove:
-            logger.die("No existing modifiers match requested criteria.")
-
         removed = 0
+
         for mod_tup in to_remove:
             base_section = self._get_scope_section(mod_tup[0])
 
@@ -2173,6 +2171,7 @@ ramble:
 
                 if not dry_run:
                     self._write_config(config_section)
+
         return removed
 
     def add_modifier(

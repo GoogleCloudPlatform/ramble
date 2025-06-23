@@ -1448,7 +1448,7 @@ def workspace_manage_includes(args):
 
 def workspace_manage_modifiers_setup_parser(subparser):
     """manage workspace modifiers"""
-    actions = subparser.add_mutually_exclusive_group()
+    actions = subparser.add_mutually_exclusive_group(required=True)
     actions.add_argument(
         "--list", "-l", action="store_true", help="whether to print existing modifiers"
     )
@@ -1469,6 +1469,8 @@ def workspace_manage_modifiers_setup_parser(subparser):
         "--mod-index",
         "-i",
         dest="remove_index",
+        default=None,
+        type=int,
         metavar="INDEX",
         help="index of modifier to remove, only used with --remove",
     )
@@ -1526,13 +1528,10 @@ def workspace_manage_modifiers(args):
 
     ws = ramble.cmd.require_active_workspace(cmd_name="workspace manage modifiers")
 
-    if args.list:
-        with ws.read_transaction():
-            ws.print_modifiers()
-    elif args.remove:
+    if args.remove:
         remove_index = None
-        if args.remove_index:
-            remove_index = int(args.remove_index)
+        if args.remove_index is not None:
+            remove_index = args.remove_index
 
         with ws.write_transaction():
             removed = ws.remove_modifier(
@@ -1572,6 +1571,9 @@ def workspace_manage_modifiers(args):
                 logger.msg(f"Added {added} modifier to workspace.")
             else:
                 logger.msg("No modifiers matched criteria. 0 modifiers added to workspace.")
+    elif args.list:
+        with ws.read_transaction():
+            ws.print_modifiers()
 
 
 def workspace_generate_config_setup_parser(subparser):
