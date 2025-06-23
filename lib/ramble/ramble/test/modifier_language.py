@@ -435,13 +435,14 @@ def test_env_var_modification_directive(mod_class):
     for test_def in test_defs:
         method = test_def["method"]
         mode = test_def["mode"]
+        mode_when = frozenset([f"{mod_inst.name}_mode={mode}"])
 
-        assert method in mod_inst.env_var_modifications[mode]
+        assert method in mod_inst.env_var_modifications[mode_when]
         if method == "set":
-            assert test_def["name"] in mod_inst.env_var_modifications[mode][method]
+            assert test_def["name"] in mod_inst.env_var_modifications[mode_when][method]
             assert (
                 test_def["modification"]
-                == mod_inst.env_var_modifications[mode][method][test_def["name"]]
+                == mod_inst.env_var_modifications[mode_when][method][test_def["name"]]
             )
 
 

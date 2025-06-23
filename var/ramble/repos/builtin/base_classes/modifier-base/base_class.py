@@ -257,10 +257,11 @@ class ModifierBase(metaclass=ModifierMeta):
         return pre_execs, post_execs
 
     def all_env_var_modifications(self):
-        if self._usage_mode not in self.env_var_modifications:
-            return
+        for when_set, env_var_mods in self.env_var_modifications.items():
+            if not self.expander.satisfies(when_set, self.object_variants):
+                continue
 
-        yield from self.env_var_modifications[self._usage_mode].items()
+            yield from self.env_var_modifications[when_set].items()
 
     def all_package_manager_requirements(self):
         if self._usage_mode in self.package_manager_requirements:

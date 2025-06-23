@@ -1257,3 +1257,61 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
 
             for obj_under_test, exec_test_str in exec_test_str.items():
                 assert (exec_test_str in data) == (obj_under_test == obj)
+
+
+@pytest.mark.parametrize(
+    "env_var_mod_when,expected_exec",
+    [
+        (False, False),
+        (True, True),
+    ],
+)
+def test_env_var_modification_when(request, env_var_mod_when, expected_exec):
+    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+
+    global_args = ["-w", ws_name]
+
+    exec_test_str = "export APP_ENV_VAR=APP_ENV_VAR_MODIFIED;"
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(mod_config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+
+        config(
+            "add",
+            f"variants:env_var_modification_active:{env_var_mod_when}",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert (exec_test_str in data) == expected_exec
