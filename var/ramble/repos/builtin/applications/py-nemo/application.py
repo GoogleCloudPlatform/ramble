@@ -13,7 +13,7 @@ import ruamel.yaml as yaml
 
 import ramble.util.yaml_generation
 from ramble.appkit import *
-from ramble.base_app.builtin.py_nemo import BasePyNemo
+from ramble.base_app.builtin.py_nemo import PyNemo as BasePyNemo
 
 import spack.util.spack_yaml as syaml
 from spack.util.path import canonicalize_path
