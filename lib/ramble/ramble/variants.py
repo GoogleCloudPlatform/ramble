@@ -72,9 +72,9 @@ class VariantSet:
         self._set_cache = None
         for name, variant_list in in_set.multi_value_variants.items():
             if name not in self.multi_value_variants:
-                self.multi_value_variants[name] = []
+                self.multi_value_variants[name] = set()
             for variant in variant_list:
-                self.multi_value_variants[name].append(variant.copy())
+                self.multi_value_variants[name].add(variant)
 
     def default_variant(
         self,
@@ -147,9 +147,9 @@ class VariantSet:
     def multi_value_variant(self, name: str, value: Any):
         self._set_cache = None
         if name not in self.multi_value_variants:
-            self.multi_value_variants[name] = []
+            self.multi_value_variants[name] = set()
 
-        self.multi_value_variants[name].append(Variant(name, default=value))
+        self.multi_value_variants[name].add(Variant(name, default=value))
 
     def _define_variant(
         self,
@@ -255,6 +255,11 @@ class Variant:
         self.default = default
         self.description = description
         self.values = values
+        if isinstance(self.default, bool):
+            prefix = "+" if self.default else "~"
+            self._definition = f"{prefix}{self.name}"
+        else:
+            self._definition = f"{self.name}={str(self.default)}"
 
     def copy(self):
         return Variant(
@@ -270,6 +275,7 @@ class Variant:
         Returns:
             str: String definition for this variant
         """
+        return self._definition
 
         if isinstance(self.default, bool):
             if self.default:
