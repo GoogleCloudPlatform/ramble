@@ -97,7 +97,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             logger.die(e)
 
-    register_phase("software_create_env", pipeline="mirror")
     register_phase("software_create_env", pipeline="setup")
     register_phase("software_create_env", pipeline="pushdeployment")
 
@@ -273,9 +272,7 @@ class SpackLightweight(PackageManagerBase):
                     expanded_req[key] = app_inst.expander.expand_var(val)
                 self.runner.validate_command(**expanded_req)
 
-    register_phase(
-        "mirror_software", pipeline="mirror", run_after=["software_create_env"]
-    )
+    register_phase("mirror_software", pipeline="mirror")
 
     def _mirror_software(self, workspace, app_inst=None):
         """Mirror software source for this experiment using spack"""
@@ -287,6 +284,13 @@ class SpackLightweight(PackageManagerBase):
         env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None.")
+
+        if not os.path.exists(env_path) or not os.path.isfile(
+            os.path.join(env_path, "spack.lock")
+        ):
+            raise ApplicationError(
+                f"Spack environment {env_path} does not exist, or has not been concretized."
+            )
 
         cache_tupl = ("spack-mirror", env_path)
         if workspace.check_cache(cache_tupl):
