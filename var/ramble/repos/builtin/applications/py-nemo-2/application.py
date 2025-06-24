@@ -10,7 +10,7 @@
 import os
 
 from ramble.appkit import *
-from ramble.base_app.builtin.py_nemo import BasePyNemo
+from ramble.base_app.builtin.py_nemo import PyNemo as BasePyNemo
 
 from spack.util.path import canonicalize_path
 
