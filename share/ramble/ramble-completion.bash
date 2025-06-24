@@ -632,7 +632,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize setup analyze push-to-cache info edit mirror experiment-logs list ls remove rm generate-config manage"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize config setup analyze push-to-cache info edit mirror experiment-logs list ls remove rm generate-config manage"
     fi
 }
 
@@ -664,6 +664,10 @@ _ramble_workspace_create() {
 
 _ramble_workspace_concretize() {
     RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify --quiet -q"
+}
+
+_ramble_workspace_config() {
+    RAMBLE_COMPREPLY="-h --help --print-squash -p --simplify-software --ss --simplify-variables --sv --include-section -i --exclude-section -e"
 }
 
 _ramble_workspace_setup() {

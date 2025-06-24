@@ -2802,3 +2802,96 @@ def test_manage_modifier_remove_invalid_scope_errors(workspace_name, action, sco
             "manage", "modifiers", action, "-s", scope, "-n", "lscpu", global_args=global_args
         )
         assert error_message in output
+
+
+def test_workspace_config_squash(workspace_name, capsys):
+    test_vars_include = """variables:
+  foo: bar
+  n_ranks: 1
+  test_var: test_value
+"""
+
+    test_software_include = """software:
+  packages:
+    gcc:
+      pkg_spec: gcc@9.3.0 target=x86_64
+  environments:
+    gcc:
+      packages:
+      - gcc
+"""
+
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        with open(f"{os.path.join(ws.root, 'variables.yaml')}", "w+") as f:
+            f.write(test_vars_include)
+
+        with open(f"{os.path.join(ws.root, 'software.yaml')}", "w+") as f:
+            f.write(test_software_include)
+
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        workspace(
+            "manage",
+            "includes",
+            "--add",
+            "$workspace_root/variables.yaml",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage", "includes", "--add", "$workspace_root/software.yaml", global_args=global_args
+        )
+
+        config_output = config("get", "variables", global_args=global_args)
+
+        assert "foo: bar" in config_output
+
+        ws.write()
+
+        # Can't call with the front-end command, because included config scopes
+        # are not processed correctly in tests.
+        ws.squash_and_print_config(excluded_section=["*repos", "config"])
+
+        config_output = capsys.readouterr().out
+
+        assert "foo: bar" in config_output
+        assert "test_var: test_value" in config_output
+        assert "gcc" in config_output
+        assert "pkg_spec: gcc@9.3.0" in config_output
+
+        with open(ws.config_file_path, "w+") as f:
+            f.write(config_output)
+
+        ws._re_read()
+
+        workspace("config", "--simplify-software", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "pkg_spec: gcc@9.3.0" not in data
+            assert "gcc" not in data
+
+        workspace("config", "--simplify-variables", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "foo: bar" not in data
+            assert "test_var: test_value" not in data
