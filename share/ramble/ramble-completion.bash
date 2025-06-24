@@ -739,7 +739,7 @@ _ramble_workspace_manage() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="experiments software includes"
+        RAMBLE_COMPREPLY="experiments software includes modifiers"
     fi
 }
 
@@ -758,4 +758,8 @@ _ramble_workspace_manage_software() {
 
 _ramble_workspace_manage_includes() {
     RAMBLE_COMPREPLY="-h --help --list -l --remove -r --remove-index --add -a"
+}
+
+_ramble_workspace_manage_modifiers() {
+    RAMBLE_COMPREPLY="-h --help --list -l --add --remove --mod-index -i --scope -s --name -n --mode -m --on-executable -e --dry-run"
 }

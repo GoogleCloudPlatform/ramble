@@ -2400,3 +2400,405 @@ def test_no_inherit_active_workspace_variants(request):
             data = f.read()
             assert "spack" not in data
             assert "slurm" not in data
+
+
+@pytest.mark.parametrize(
+    "mod_scope,mod_conf",
+    [
+        ("workspace", {"name": "lscpu", "mode": "standard", "on_executable": ["*"]}),
+        ("basic", {"name": "lscpu"}),
+        ("basic:test_wl", {"name": "lscpu", "mode": "standard"}),
+        ("basic:test_wl:generated", {"name": "lscpu", "on_executable": ["*"]}),
+    ],
+)
+def test_manage_single_modifiers(workspace_name, mod_scope, mod_conf):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 0 modifiers" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" not in data
+            assert mod_conf["name"] not in data
+
+        add_args = ["-s", mod_scope, "-n", mod_conf["name"]]
+        remove_args = ["-s", mod_scope, "-n", mod_conf["name"]]
+        if "mode" in mod_conf:
+            add_args.append("-m")
+            add_args.append(mod_conf["mode"])
+            remove_args.append("-m")
+            remove_args.append(mod_conf["mode"])
+
+        on_exec_str = None
+        if "on_executable" in mod_conf:
+            on_exec_str = "[" + ",".join(mod_conf["on_executable"]) + "]"
+            add_args.append("-e")
+            add_args.append(on_exec_str)
+
+        workspace("manage", "modifiers", "--add", *add_args, global_args=global_args)
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert f"Modifier scope: {mod_scope}" in list_output
+        assert f"Name: {mod_conf['name']}" in list_output
+        if "mode" in mod_conf:
+            assert f"Mode: {mod_conf['mode']}" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" in data
+            assert f"- name: {mod_conf['name']}" in data
+            if "mode" in mod_conf:
+                assert f"mode: {mod_conf['mode']}" in data
+            if on_exec_str is not None:
+                assert "on_executable" in data
+
+        workspace("manage", "modifiers", "--remove", *remove_args, global_args=global_args)
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 0 modifiers" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" not in data
+            assert mod_conf["name"] not in data
+
+
+def test_manage_modifier_index_remove(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name):
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        output = workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "-s",
+            "workspace",
+            "-n",
+            "lscpu",
+            global_args=global_args,
+        )
+
+        assert "Added 1 modifier to workspace" in output
+
+        output = workspace(
+            "manage",
+            "modifiers",
+            "--remove",
+            "-i",
+            "0",
+            global_args=global_args,
+        )
+
+        assert "Removed 1 modifier from workspace" in output
+
+
+def test_manage_modifier_no_modifiers(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name):
+
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        output = workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "-s",
+            "workspace",
+            "-n",
+            "not-a-modifier",
+            global_args=global_args,
+        )
+
+        assert "0 modifiers added" in output
+
+        output = workspace(
+            "manage",
+            "modifiers",
+            "--remove",
+            "-s",
+            "workspace",
+            "-n",
+            "not-a-modifier",
+            global_args=global_args,
+        )
+
+        assert "0 modifiers removed" in output
+
+
+def test_manage_modifier_remove_scope_globs(workspace_name):
+    global_args = ["-w", workspace_name]
+    mod_scope = "workspace"
+
+    with ramble.workspace.create(workspace_name) as ws:
+
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 0 modifiers" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" not in data
+            assert "intel-aps" not in data
+            assert "intel-vtune" not in data
+
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "-s",
+            "workspace",
+            "-n",
+            "intel-aps",
+            global_args=global_args,
+        )
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "-s",
+            "basic:test_wl",
+            "-n",
+            "intel-vtune",
+            global_args=global_args,
+        )
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "-s",
+            "basic:test_wl:generated",
+            "-n",
+            "intel-vtune",
+            global_args=global_args,
+        )
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 3 modifiers" in list_output
+        assert f"Modifier scope: {mod_scope}" in list_output
+        assert "Name: intel-aps" in list_output
+        assert "Name: intel-vtune" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" in data
+            assert "- name: intel-aps" in data
+            assert "- name: intel-vtune" in data
+
+        workspace(
+            "manage", "modifiers", "--remove", "-s", "*", "-n", "intel*", global_args=global_args
+        )
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 0 modifiers" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" not in data
+            assert "intel-aps" not in data
+            assert "intel-tune" not in data
+
+
+def test_manage_modifier_name_globs(workspace_name):
+    global_args = ["-w", workspace_name]
+    mod_scope = "workspace"
+
+    with ramble.workspace.create(workspace_name) as ws:
+
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 0 modifiers" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" not in data
+            assert "intel" not in data
+
+        add_args = ["-s", mod_scope, "-n", "intel*"]
+        remove_args = ["-s", mod_scope, "-n", "intel*"]
+
+        workspace("manage", "modifiers", "--add", *add_args, global_args=global_args)
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 2 modifiers" in list_output
+        assert f"Modifier scope: {mod_scope}" in list_output
+        assert "Name: intel" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" in data
+            assert "- name: intel" in data
+
+        workspace("manage", "modifiers", "--remove", *remove_args, global_args=global_args)
+
+        list_output = workspace("manage", "modifiers", "--list", global_args=global_args)
+
+        assert "Workspace contains 0 modifiers" in list_output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "modifiers" not in data
+            assert "intel" not in data
+
+
+def test_manage_modifier_no_modifier_errors(workspace_name):
+    global_args = ["-w", workspace_name]
+    name_pattern = "no-matching-mod-name"
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        err_str = f"Error: No modifiers found matching name pattern of {name_pattern}"
+        output = workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "-s",
+            "workspace",
+            "-n",
+            name_pattern,
+            global_args=global_args,
+        )
+        assert err_str in output
+
+
+@pytest.mark.parametrize(
+    "action,scope,error_message",
+    [
+        ("--add", "blarg", "No scope matches requested scope of blarg"),
+        ("--add", "foo:test_wl:generated", "No application matches requested scope foo"),
+        ("--add", "basic:foo", "No workload matches requested scope foo in application basic"),
+        (
+            "--add",
+            "basic:test_wl:foo",
+            "No experiment matches requested scope foo in application basic and workload test_wl",
+        ),
+    ],
+)
+def test_manage_modifier_add_invalid_scope_errors(workspace_name, action, scope, error_message):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        with pytest.raises(ramble.error.RambleCommandError) as err:
+            workspace(
+                "manage", "modifiers", action, "-s", scope, "-n", "lscpu", global_args=global_args
+            )
+            assert error_message in err
+
+
+@pytest.mark.parametrize(
+    "action,scope,error_message",
+    [
+        ("--remove", "blarg", "No modifiers matched criteria"),
+        ("--remove", "foo:test_wl:generated", "No modifiers matched criteria"),
+        ("--remove", "basic:foo", "No modifiers matched criteria"),
+        ("--remove", "basic:test_wl:foo", "No modifiers matched criteria"),
+    ],
+)
+def test_manage_modifier_remove_invalid_scope_errors(workspace_name, action, scope, error_message):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        output = workspace(
+            "manage", "modifiers", action, "-s", scope, "-n", "lscpu", global_args=global_args
+        )
+        assert error_message in output

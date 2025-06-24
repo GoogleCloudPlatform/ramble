@@ -14,11 +14,13 @@ import os
 import re
 import shutil
 from collections import defaultdict
+from typing import List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 import llnl.util.tty.log as log
 
+import ramble.cmd.common.list as list_cmd
 import ramble.config
 import ramble.context
 import ramble.error
@@ -1989,6 +1991,252 @@ ramble:
             self._workspace_path_replacements = self.get_workspace_paths(self.root)
 
         return self._workspace_path_replacements
+
+    def _get_scope_section(self, scope):
+        base_section = None
+        if scope == "workspace":
+            base_section = self.config_sections["workspace"]["yaml"][namespace.ramble]
+
+        else:
+            scope_parts = scope.split(":")
+            base_section = self.config_sections["workspace"]["yaml"][namespace.ramble][
+                namespace.application
+            ]
+
+            if len(scope_parts) >= 1:  # Extract application section
+                if scope_parts[0] not in base_section:
+                    logger.die(f"No application matches requested scope {scope_parts[0]}")
+                base_section = base_section[scope_parts[0]]
+
+            if len(scope_parts) >= 2:  # Extract workload section
+                if scope_parts[1] not in base_section[namespace.workload]:
+                    logger.die(
+                        f"No workload matches requested scope {scope_parts[1]} "
+                        f"in application {scope_parts[0]}"
+                    )
+                base_section = base_section[namespace.workload][scope_parts[1]]
+
+            if len(scope_parts) >= 3:  # Extract experiment section
+                if scope_parts[2] not in base_section[namespace.experiment]:
+                    logger.die(
+                        f"No experiment matches requested scope {scope_parts[1]} in application "
+                        f"{scope_parts[0]} and workload {scope_parts[1]}"
+                    )
+
+                base_section = base_section[namespace.experiment][scope_parts[2]]
+        if base_section is None:
+            logger.die(f"No scope matches requested scope of {scope}")
+        return base_section
+
+    def index_modifiers(self):
+        """Construct a list of all modifiers in this workspace, and their associated scope.
+
+        Returns:
+            (list): List of tuples, of the form (scope, modifier_definition)
+        """
+        mod_list = []
+        base_section = self._get_scope_section("workspace")
+        ws_mods = base_section[namespace.modifiers] if namespace.modifiers in base_section else []
+
+        # Add workspace modifiers
+        for mod in ws_mods:
+            mod_list.append(("workspace", mod))
+
+        # Define scoped modifiers
+        for workloads, application_context in self.all_applications():
+            app_context = f"{application_context.context_name}"
+            for mod in application_context.modifiers:
+                mod_list.append((f"{app_context}", mod))
+
+            for experiments, workload_context in self.all_workloads(workloads):
+                wl_context = f"{app_context}:{workload_context.context_name}"
+                for mod in workload_context.modifiers:
+                    mod_list.append((f"{wl_context}", mod))
+
+                for _, experiment_context in self.all_experiments(experiments):
+                    exp_context = f"{wl_context}:{experiment_context.context_name}"
+                    for mod in experiment_context.modifiers:
+                        mod_list.append((f"{exp_context}", mod))
+
+        return mod_list
+
+    def print_modifiers(self):
+        """Print an indexed list of all modifiers in this workspace"""
+        mod_list = self.index_modifiers()
+
+        logger.all_msg(f"Workspace contains {len(mod_list)} modifiers.")
+        logger.all_msg("Additional modifiers may come from scopes outside of wokrspace")
+        logger.all_msg("To see a complete list of these, use:")
+        logger.all_msg("   ramble config get modifiers\n\n")
+
+        prev_scope = None
+        for idx, conf in enumerate(mod_list):
+            scope = conf[0]
+            entry = conf[1]
+            if scope != prev_scope:
+                if prev_scope is not None:
+                    logger.all_msg("")
+                logger.all_msg(f"Modifier scope: {scope}")
+                prev_scope = scope
+            name = entry["name"]
+            mode_str = ""
+            if "mode" in entry and entry["mode"] is not None:
+                mode_str = f" -- Mode: {entry['mode']}"
+
+            out_str = f"Name: {name}{mode_str}"
+
+            logger.all_msg(f"{idx}: {out_str}")
+
+    def remove_modifier(
+        self,
+        remove_index: int = None,
+        scope_pattern: str = None,
+        name_pattern: str = None,
+        mode_pattern: str = None,
+        dry_run: bool = False,
+    ):
+        """Remove an arbitrary number of modifiers from this workspace based
+        on some input arguments.
+
+        Args:
+            remove_index: Index of modifier to remove. Indices match ordering
+                          from the output of print_modifiers
+            scope_pattern: Pattern to select which scopes to remove modifiers from.
+                           If the pattern matches multiple scopes, each will
+                           have matching modifiers removed from them.
+            name_pattern: Pattern to select which modifier names should be removed.
+                          Modifiers with matching names that are in included
+                          scopes will be removed. If the scope doesn't match,
+                          but the name does, the modifier will not be removed.
+            mode_pattern: Pattern to select which modes should be removed. Only
+                          Modifiers which match the scope and name patterns will be
+                          considered for removal, but this can be used to downselect further.
+            dry_run: Whether to print the config instead of editing it, or to edit it directly.
+
+        Returns:
+            (int) Number of modifiers removed
+        """
+        mod_list = self.index_modifiers()
+        to_remove = []
+
+        if remove_index is not None:
+            if not isinstance(remove_index, int):
+                logger.error(
+                    "Cannot remove modifier index without an integer index. "
+                    f"Given index was {remove_index}"
+                )
+
+            if remove_index < 0 or remove_index > len(mod_list):
+                logger.error(
+                    f"Modifier index {remove_index} is outside of the range of modifiers."
+                    "Use `ramble worksapce manage modifiers --list` to see indices"
+                )
+
+            to_remove.append(mod_list[remove_index])
+
+        if scope_pattern is not None:
+            if name_pattern is None:
+                name_pattern = "*"
+            if mode_pattern is None:
+                mode_pattern = "*"
+
+            for mod_tup in mod_list:
+                scope = mod_tup[0]
+                mod_conf = mod_tup[1]
+                if fnmatch.fnmatch(scope, scope_pattern):
+                    if fnmatch.fnmatch(mod_conf["name"], name_pattern):
+                        if "mode" in mod_conf and fnmatch.fnmatch(mod_conf["mode"], mode_pattern):
+                            to_remove.append(mod_tup)
+                        else:
+                            to_remove.append(mod_tup)
+
+        removed = 0
+
+        for mod_tup in to_remove:
+            base_section = self._get_scope_section(mod_tup[0])
+
+            if base_section is not None:
+                base_mods = base_section[namespace.modifiers]
+                remove_index = -1
+                for idx, ws_mod in enumerate(base_mods):
+                    if ws_mod == mod_tup[1]:
+                        remove_index = idx
+                        break
+                if remove_index != -1:
+                    removed += 1
+                    del base_mods[remove_index]
+
+                if not base_section[namespace.modifiers]:
+                    del base_section[namespace.modifiers]
+
+                if not dry_run:
+                    self._write_config(config_section)
+
+        return removed
+
+    def add_modifier(
+        self,
+        scope: str = None,
+        name_pattern: str = None,
+        mode: str = None,
+        on_executable: List[str] = None,
+        dry_run: bool = False,
+    ):
+        """Add an arbitrary number of modifiers to this workspace within a single scope
+
+        Args:
+            scope: Scope to add modifiers within.
+            name_pattern: Pattern to determine which modifiers should be added.
+                          If multiple modifiers match, all will be added with
+                          the additional arguments.
+            mode: Mode to set within the new modifier definitions
+            on_executable: List of strings to set for the on_executable
+                           attribute of the new modifier definitions.
+            dry_run: Whether to print the config instead of editing it, or to edit it directly.
+
+        Returns:
+            (int) Number of modifiers added to workspace
+        """
+
+        class Filters:
+            def __init__(self):
+                self.filter = []
+                self.search_description = False
+
+        on_exec_list = None
+        if on_executable is not None:
+            on_exec_list = syaml.syaml_list()
+            on_exec_list.extend(on_executable[1:-1].split(","))
+
+        base_section = self._get_scope_section(scope)
+
+        if namespace.modifiers not in base_section:
+            base_section[namespace.modifiers] = syaml.syaml_list()
+
+        filters = Filters()
+        filters.filter.append(name_pattern)
+
+        mod_type = ramble.repository.ObjectTypes.modifiers
+        objs = set(ramble.repository.all_object_names(mod_type))
+        mod_names = list_cmd.filter_by_name(objs, filters, mod_type)
+
+        if len(mod_names) < 1:
+            logger.error(f"No modifiers found matching name pattern of {name_pattern}")
+
+        added = 0
+        for mod_name in mod_names:
+            mod_def = syaml.syaml_dict()
+            mod_def["name"] = mod_name
+            if mode is not None:
+                mod_def["mode"] = mode
+            if on_exec_list is not None:
+                mod_def["on_executable"] = on_exec_list
+            base_section[namespace.modifiers].append(mod_def)
+            added += 1
+
+        if not dry_run:
+            self._write_config(config_section)
+        return added
 
     def add_include(self, new_include):
         """Add a new include to this workspace"""

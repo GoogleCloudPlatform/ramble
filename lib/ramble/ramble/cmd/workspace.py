@@ -60,7 +60,7 @@ subcommands = [
     "manage",
 ]
 
-manage_commands = ["experiments", "software", "includes"]
+manage_commands = ["experiments", "software", "includes", "modifiers"]
 
 
 def workspace_activate_setup_parser(subparser):
@@ -1456,6 +1456,136 @@ def workspace_manage_includes(args):
     elif args.add_include:
         with ws.write_transaction():
             ws.add_include(args.add_include)
+
+
+def workspace_manage_modifiers_setup_parser(subparser):
+    """manage workspace modifiers"""
+    actions = subparser.add_mutually_exclusive_group(required=True)
+    actions.add_argument(
+        "--list", "-l", action="store_true", help="whether to print existing modifiers"
+    )
+
+    actions.add_argument(
+        "--add",
+        action="store_true",
+        help="whether to remove an existing modifier by index",
+    )
+
+    actions.add_argument(
+        "--remove",
+        action="store_true",
+        help="whether to remove an existing modifier by index",
+    )
+
+    subparser.add_argument(
+        "--mod-index",
+        "-i",
+        dest="remove_index",
+        default=None,
+        type=int,
+        metavar="INDEX",
+        help="index of modifier to remove, only used with --remove",
+    )
+
+    subparser.add_argument(
+        "--scope",
+        "-s",
+        dest="scope",
+        metavar="SCOPE",
+        default=None,
+        help="scope of modifier to manage. Can be a glob when removing. Of the form "
+        "<application_name>:<workload_name>:<experiment_name> or 'workspace' to "
+        "manage workspace modifiers.",
+    )
+
+    subparser.add_argument(
+        "--name",
+        "-n",
+        dest="name",
+        metavar="NAME",
+        default=None,
+        help="name of modifier to manage. Can be a glob when removing, and defaults to '*'. "
+        "Should be the name of a modifier object.",
+    )
+
+    subparser.add_argument(
+        "--mode",
+        "-m",
+        dest="mode",
+        metavar="MODE",
+        default=None,
+        help="mode of modifier to manage. Can be a glob when removing, and defaults to None, "
+        "using the default for the modifier. ",
+    )
+
+    subparser.add_argument(
+        "--on-executable",
+        "-e",
+        dest="on_executable",
+        metavar="EXEC_LIST",
+        default=None,
+        help="list of 'on_executable' strings to apply for a new modifier. Ignored when removing. "
+        "Should be of the form '[<pattern1>,<pattern2>,<pattern3>...]'",
+    )
+
+    subparser.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="whether to print the config without editing it, or to edit it directly.",
+    )
+
+
+def workspace_manage_modifiers(args):
+    """Execute workspace manage modifiers command"""
+
+    ws = ramble.cmd.require_active_workspace(cmd_name="workspace manage modifiers")
+
+    if args.remove:
+        remove_index = None
+        if args.remove_index is not None:
+            remove_index = args.remove_index
+
+        with ws.write_transaction():
+            removed = ws.remove_modifier(
+                remove_index=remove_index,
+                scope_pattern=args.scope,
+                name_pattern=args.name,
+                mode_pattern=args.mode,
+                dry_run=args.dry_run,
+            )
+
+            if args.dry_run:
+                ws.print_config()
+
+            if removed > 1:
+                logger.msg(f"Removed {removed} modifiers from workspace.")
+            elif removed == 1:
+                logger.msg(f"Removed {removed} modifier from workspace.")
+            else:
+                logger.msg("No modifiers matched criteria. 0 modifiers removed from workspace.")
+
+    elif args.add:
+        with ws.write_transaction():
+            added = ws.add_modifier(
+                scope=args.scope,
+                name_pattern=args.name,
+                mode=args.mode,
+                on_executable=args.on_executable,
+                dry_run=args.dry_run,
+            )
+
+            if args.dry_run:
+                ws.print_config()
+
+            if added > 1:
+                logger.msg(f"Added {added} modifiers to workspace.")
+            elif added == 1:
+                logger.msg(f"Added {added} modifier to workspace.")
+            else:
+                logger.msg("No modifiers matched criteria. 0 modifiers added to workspace.")
+    elif args.list:
+        with ws.read_transaction():
+            ws.print_modifiers()
 
 
 def workspace_generate_config_setup_parser(subparser):
