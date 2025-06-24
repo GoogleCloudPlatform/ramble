@@ -1187,3 +1187,73 @@ def test_workload_errors_when_overlapping_conditions(request):
 
             captured = workspace("setup", global_args=global_args)
             assert "test_wl is defined for overlapping `when` conditions" in captured
+
+
+@pytest.mark.parametrize("obj", ["app", "mod", "wf_man", "pkg_man"])
+def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mock_pkg_mans_repo):
+    global_args = ["-w", workspace_name]
+
+    exec_test_str = {
+        "app": "export APP_ENV_VAR=APP_ENV_VAR_SET;",
+        "mod": "export MOD_ENV_VAR=MOD_ENV_VAR_SET;",
+        "wf_man": "export WORKFLOW_ENV_VAR=WF_ENV_VAR_SET;",
+        "pkg_man": "export PACKAGE_ENV_VAR=PKG_ENV_VAR_SET;",
+    }
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        args = [
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            "--wm",
+            "when-workflow-manager",
+        ]
+
+        if obj == "app":
+            config("add", "variants:app_env_var_included:true", global_args=global_args)
+        elif obj == "mod":
+            mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+            with open(mod_config_path, "w+") as f:
+                f.write("modifiers:\n")
+                f.write(" - name: when-modifier\n")
+            config("add", "variants:mod_env_var_included:true", global_args=global_args)
+        elif obj == "wf_man":
+            config("add", "variants:workflow_manager_included:true", global_args=global_args)
+            config(
+                "add",
+                "variants:workflow_manager_env_var_included:true",
+                global_args=global_args,
+            )
+        elif obj == "pkg_man":
+            config("add", "variants:package_manager_included:true", global_args=global_args)
+            config(
+                "add",
+                "variants:package_manager_env_var_included:true",
+                global_args=global_args,
+            )
+
+        workspace("manage", "experiments", *args, global_args=global_args)
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            for obj_under_test, exec_test_str in exec_test_str.items():
+                assert (exec_test_str in data) == (obj_under_test == obj)

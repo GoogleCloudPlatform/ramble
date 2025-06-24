@@ -83,17 +83,26 @@ class WorkloadVariable:
 class WorkloadEnvironmentVariable:
     """Class representing an environment variable in a workload"""
 
-    def __init__(self, name: str, value=None, description: str = None):
+    def __init__(
+        self,
+        name: str,
+        value=None,
+        description: str = None,
+        when=None,
+        **kwargs,
+    ):
         """WorkloadEnvironmentVariable constructor
 
         Args:
             name (str): Name of environment variable
             value: Value to set environment variable to
             description (str): Description of the environment variable
+            when (list | None): List of when conditions to apply to directive
         """
         self.name = name
         self.value = value
         self.description = description
+        self.when = when.copy() if when else []
 
     def as_str(self, n_indent: int = 0):
         """String representation of environment variable
@@ -202,8 +211,19 @@ class Workload:
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
-            for env_var in self.environment_variables.values():
-                out_str += env_var.as_str(n_indent + 4)
+            for when_set, env_var_list in self.environment_variables.items():
+                if when_set:
+                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
+                    for variant in when_set:
+                        out_str += f"{indentation}            {variant}\n"
+                else:
+                    out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
+
+                env_var_dict = {}
+                for env_var in env_var_list:
+                    env_var_dict[var.name] = env_var
+                for env_var_name in sorted(env_var_dict.keys()):
+                    out_str += env_var_dict[env_var_name].as_str(n_indent + 12)
 
         return out_str
 
@@ -224,7 +244,10 @@ class Workload:
         Args:
             env_var (WorkloadEnvironmentVariable): New environment variable to add to this workload
         """
-        self.environment_variables[env_var.name] = env_var
+        when_key = frozenset(env_var.when)
+        if when_key not in self.environment_variables:
+            self.environment_variables[when_key] = []
+        self.environment_variables[when_key].append(env_var)
 
     def add_executable(self, executable: str):
         """Add an executable to this workload
@@ -315,7 +338,8 @@ class Workload:
             (WorkloadEnvironmentVariable | None): Environment variable instance
                                                   if it exists, None if it is not found
         """
-        if name in self.environment_variables:
-            return self.environment_variables[name]
-        else:
-            return None
+        named_env_vars = []
+        for env_var_list in self.environment_variables.values():
+            for env_var in env_var_list:
+                named_env_vars.append(env_var)
+        return named_env_vars

@@ -304,57 +304,6 @@ def workload_variable(
     return _execute_workload_variable
 
 
-@application_directive("workload_group_env_vars")
-def environment_variable(
-    name, value, description, workload=None, workloads=None, workload_group=None, **kwargs
-):
-    """Define an environment variable to be used in experiments
-
-    Args:
-        name (str): Name of environment variable to define
-        value (str): Value to set env-var to
-        description (str): Description of the env-var
-        workload (str): Name of workload this env-var should be added to
-        workloads (list(str)): List of workload names this env-var should be
-                               added to
-    """
-
-    def _execute_environment_variable(app):
-        all_workloads = ramble.language.language_helpers.merge_definitions(
-            workload, workloads, app.workloads, "workload", "workloads", "environment_variable"
-        )
-
-        workload_env_var = ramble.workload.WorkloadEnvironmentVariable(
-            name, value=value, description=description
-        )
-
-        for when_set, app_workloads in app.workloads.items():
-            for wl_name in all_workloads:
-                if wl_name in app_workloads:
-                    app.workloads[when_set][wl_name].add_environment_variable(
-                        workload_env_var.copy()
-                    )
-
-        if workload_group is not None:
-            workload_group_list = app.workload_groups[workload_group]
-
-            if workload_group not in app.workload_group_env_vars:
-                app.workload_group_env_vars[workload_group] = []
-
-            app.workload_group_env_vars[workload_group].append(workload_env_var.copy())
-
-            for when_set, app_workloads in app.workloads.items():
-                for wl_name in workload_group_list:
-                    app.workloads[when_set][wl_name].add_environment_variable(
-                        workload_env_var.copy()
-                    )
-
-        if not all_workloads and workload_group is None:
-            raise DirectiveError("A workload or workload group is required")
-
-    return _execute_environment_variable
-
-
 @application_directive(dicts=())
 def license_name(name, **kwargs):
     """Add a new license name directive, to specify license name in a declarative way.

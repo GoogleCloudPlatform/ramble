@@ -17,12 +17,11 @@ from ramble.main import RambleCommand
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
+config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_env_var_builtin(
-    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
-):
+def test_env_var_builtin(mock_applications, workspace_name):
     test_config = """
 ramble:
   config:
@@ -125,9 +124,7 @@ ramble:
             assert cmd_found and export_found
 
 
-def test_env_var_from_app_only(
-    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
-):
+def test_env_var_from_app_only(mock_applications, workspace_name):
     test_config = """
 ramble:
   variables:
@@ -164,3 +161,75 @@ ramble:
 
         with open(os.path.join(exp1_dir, "execute_experiment")) as f:
             assert "FROM_DIRECTIVE" in f.read()
+
+
+def test_object_env_var_order(
+    workspace_name,
+    mutable_mock_apps_repo,
+    mutable_mock_mods_repo,
+    mutable_mock_pkg_mans_repo,
+    mutable_mock_wms_repo,
+):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            "--wm",
+            "when-workflow-manager",
+            global_args=global_args,
+        )
+
+        mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(mod_config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+
+        config("add", "variants:app_env_var_included:true", global_args=global_args)
+        config("add", "variants:workflow_manager_included:true", global_args=global_args)
+        config("add", "variants:workflow_manager_env_var_included:true", global_args=global_args)
+        config("add", "variants:package_manager_included:true", global_args=global_args)
+        config("add", "variants:package_manager_env_var_included:true", global_args=global_args)
+        config("add", "variants:mod_env_var_included:true", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        regex_order = [
+            re.compile(r"export APP_ENV_VAR=APP_ENV_VAR_SET;"),
+            re.compile(r"export PACKAGE_ENV_VAR=PKG_ENV_VAR_SET;"),
+            re.compile(r"export WORKFLOW_ENV_VAR=WF_ENV_VAR_SET;"),
+            re.compile(r"export MOD_ENV_VAR=MOD_ENV_VAR_SET;"),
+        ]
+
+        found_order = [False for _ in regex_order]
+
+        found_idx = 0
+
+        rendered_script = os.path.join(
+            ws.experiment_dir, "when-directives", "test_wl", "generated", "execute_experiment"
+        )
+
+        with open(rendered_script) as f:
+            for line in f.readlines():
+                cur_regex = regex_order[found_idx]
+                if cur_regex.search(line):
+                    found_order[found_idx] = True
+                    found_idx += 1
+
+                if found_idx == len(found_order):
+                    break
+
+        assert all(found_order)

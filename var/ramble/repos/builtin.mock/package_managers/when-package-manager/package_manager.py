@@ -23,3 +23,17 @@ class WhenPackageManager(PackageManagerBase):
         package_manager_variable(
             "pm_var_test", default="included", description="Test variable"
         )
+
+    variant(
+        "package_manager_env_var_included",
+        default=False,
+        values=[True, False],
+        description="Test package manager env vars",
+    )
+
+    with when("+package_manager_env_var_included"):
+        environment_variable(
+            "PACKAGE_ENV_VAR",
+            value="PKG_ENV_VAR_SET",
+            description="Test env variable",
+        )

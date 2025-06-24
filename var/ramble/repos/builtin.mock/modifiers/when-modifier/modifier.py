@@ -29,3 +29,17 @@ class WhenModifier(BasicModifier):
             default="included",
             description="Test variable",
         )
+
+    variant(
+        "mod_env_var_included",
+        default=False,
+        values=[True, False],
+        description="Test mod env var",
+    )
+
+    with when("+mod_env_var_included"):
+        environment_variable(
+            "MOD_ENV_VAR",
+            value="MOD_ENV_VAR_SET",
+            description="Test environment variable",
+        )

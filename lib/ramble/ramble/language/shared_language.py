@@ -814,6 +814,83 @@ def variable(
     return _define_variable
 
 
+@shared_directive(dicts=("workload_group_env_vars", "object_environment_variables"))
+def environment_variable(
+    name,
+    value,
+    description,
+    workload=None,
+    workloads=None,
+    workload_group=None,
+    when=None,
+    **kwargs,
+):
+    """Define an environment variable to be used in experiments. Workload args
+    are only applicable to application definitions.
+
+    Args:
+        name (str): Name of environment variable to define
+        value (str): Value to set env-var to
+        description (str): Description of the env-var
+        workload (str): Name of app workload this env-var should be added to
+        workloads (list(str)): List of app workload names this env-var should be
+                               added to
+        workload_group (str): Name of app workload group this env-var should be
+                               added to
+        when (list | None): List of when conditions to apply to directive
+    """
+
+    def _execute_environment_variable(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "environment_variable"
+        )
+
+        workload_env_var = ramble.workload.WorkloadEnvironmentVariable(
+            name, value=value, description=description, when=when_list, **kwargs
+        )
+
+        if workload or workloads or workload_group:
+            if obj.origin_type != "application":
+                raise ramble.language.language_base.DirectiveError(
+                    f"A workload argument was provided for environment variable {name} in object "
+                    f"{obj.name}. Workload arguments are only valid in an application definition."
+                )
+
+            all_workloads = ramble.language.language_helpers.merge_definitions(
+                workload, workloads, obj.workloads, "workload", "workloads", "environment_variable"
+            )
+
+            for when_set, app_workloads in obj.workloads.items():
+                for wl_name in all_workloads:
+                    if wl_name in app_workloads:
+                        obj.workloads[when_set][wl_name].add_environment_variable(
+                            workload_env_var.copy()
+                        )
+
+            if workload_group is not None:
+                workload_group_list = obj.workload_groups[workload_group]
+
+                if workload_group not in obj.workload_group_env_vars:
+                    obj.workload_group_env_vars[workload_group] = []
+
+                obj.workload_group_env_vars[workload_group].append(workload_env_var.copy())
+
+                for when_set, app_workloads in obj.workloads.items():
+                    for wl_name in workload_group_list:
+                        if wl_name in app_workloads:
+                            obj.workloads[when_set][wl_name].add_environment_variable(
+                                workload_env_var.copy()
+                            )
+        else:
+            when_set = frozenset(when_list)
+            if when_set not in obj.object_environment_variables:
+                obj.object_environment_variables[when_set] = []
+
+            obj.object_environment_variables[when_set].append(workload_env_var.copy())
+
+    return _execute_environment_variable
+
+
 @shared_directive(dicts=())
 def variant(
     name: str,
