@@ -10,6 +10,7 @@
 import deprecation
 import pytest
 
+import ramble.language.language_helpers
 from ramble.language.language_base import DirectiveError
 from ramble.modkit import *  # noqa
 
@@ -495,3 +496,24 @@ def test_modifier_class_attributes(mod_class):
 
     assert "added_mode" in mod_copy.modes
     assert "added_mode" not in mod_inst.modes
+
+
+@pytest.mark.parametrize("mod_class", mod_types)
+def test_require_condition_creates_when_list(mod_class):
+    mod_inst = mod_class("/not/a/path")
+    mod_inst.name = "test-mod"
+    for i in range(4):
+        mod_inst.mode(f"mode_{i}", description="mode")
+
+    when_list = ramble.language.language_helpers.require_condition(
+        mod_inst,
+        "test_require_condition",
+        "mode",
+        "modes",
+        mode="mode_0",
+        modes=["mode_1", "mode_2"],
+        when=["test-mod_mode=mode_3"],
+    )
+
+    for i in range(4):
+        assert f"test-mod_mode=mode_{i}" in when_list

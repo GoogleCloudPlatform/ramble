@@ -130,52 +130,59 @@ def require_definition(
     )
 
 
-def require_when_or_mode(
-    mode,
-    modes,
-    mod,
-    when,
-    directive_name,
+def require_condition(
+    obj, directive_name: str, single_arg_name: str = None, multiple_arg_name: str = None, **kwargs
 ):
-    """Require at least one definition for a type in a modifier directive, either in mode/modes or
-    in when
+    """Require at least one condition for a type in a directive, and converts all conditions to
+    when conditions
 
-    If mode/modes are provided, this method will validate that single_type / multiple_type are
+    If single/multiple values are provided, this method will validate that they are
     properly defined, and will merge them into a when list.
 
     It will raise an error if at least one type is not defined, or if any are the incorrect type.
 
     Args:
-        mode: Single string for mode name
-        modes: List of strings for mode names, may contain wildcards
-        mod: Modifier instance
-        when: List of when conditions
+        obj: Object instance
         directive_name: Name of the calling directive
+        single_arg_name: Name of the singular kwarg being required
+        multiple_arg_name: Name of the plural kwarg being required
+
+    Kwargs:
+        when (list | None): List of when conditions to apply to directive
+        mode (str | None): Modifier mode to be applied as a when condition
+        modes (list(str) | None): List of modifier modes to be applied as when conditions
 
     Returns:
-        List of all when conditions (including mode/modes merged)
+        List of all when conditions
     """
 
-    if not (mode or modes or when):
+    if not (single_arg_name in kwargs or multiple_arg_name in kwargs or "when" in kwargs):
         raise DirectiveError(
-            f"Directive {directive_name} requires at least one of mode, modesm or when to be "
-            "defined."
+            f"Directive {directive_name} requires at least one of "
+            f"{single_arg_name} or {multiple_arg_name} or when to be defined."
         )
 
-    all_modes = merge_definitions(
-        mode,
-        modes,
-        mod.modes,
-        "mode",
-        "modes",
-        directive_name,
-    )
+    when_list = []
+    if "when" in kwargs:
+        when_list = build_when_list(kwargs["when"], obj, obj.name, directive_name)
 
-    when_list = build_when_list(when, mod, mod.name, directive_name)
+    single_arg_val = kwargs[single_arg_name] if single_arg_name in kwargs else ""
+    multiple_arg_vals = kwargs[multiple_arg_name] if multiple_arg_name in kwargs else []
 
-    if all_modes:
-        for mode_name in all_modes:
-            when_list.append(f"{mod.name}_mode={mode_name}")
+    # If args are modifier modes, convert to when conditions
+    if single_arg_name == "mode" or multiple_arg_name == "modes":
+        all_modes = merge_definitions(
+            single_arg_val,
+            multiple_arg_vals,
+            obj.modes,
+            "mode",
+            "modes",
+            directive_name,
+        )
+
+        if all_modes:
+            for mode_name in all_modes:
+                when_list.append(f"{obj.name}_mode={mode_name}")
 
     return when_list
 

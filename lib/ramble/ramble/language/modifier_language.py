@@ -223,8 +223,8 @@ def env_var_modification(
                 "requires a value for the modification argument."
             )
 
-        when_list = ramble.language.language_helpers.require_when_or_mode(
-            mode, modes, mod, when, "env_var_modification"
+        when_list = ramble.language.language_helpers.require_condition(
+            mod, "env_var_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
         when_set = frozenset(when_list)
 

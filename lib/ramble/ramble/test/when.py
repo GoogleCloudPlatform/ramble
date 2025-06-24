@@ -25,12 +25,10 @@ config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_register_phase_when(request):
-    ws_name = request.node.name
+def test_register_phase_when(workspace_name):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -62,10 +60,8 @@ def test_register_phase_when(request):
         assert "Test Phase" not in output
 
 
-def test_fom_context_enabled_when_true(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_fom_context_enabled_when_true(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_output = """
 test when context 4.2
@@ -73,7 +69,7 @@ test when fom 5.6 test always 3.5
 test inheritance 12.0
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -125,10 +121,8 @@ test inheritance 12.0
             assert "4.2" in results
 
 
-def test_fom_enabled_when_true(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_fom_enabled_when_true(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_output = """
 test when context 4.2
@@ -136,7 +130,7 @@ test when fom 5.6 test always 3.5
 test inheritance 12.0
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -189,10 +183,8 @@ test inheritance 12.0
             assert "5.6" in results
 
 
-def test_fom_errors_when_context_not_found(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_fom_errors_when_context_not_found(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_output = """
 test when context 4.2
@@ -200,7 +192,7 @@ test when fom 5.6 test always 3.5
 test inheritance 12.0
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -246,10 +238,8 @@ test inheritance 12.0
             assert "context 'test_context_when'" in captured
 
 
-def test_same_fom_name_different_context(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_same_fom_name_different_context(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_output = """
 'Always' fom in always context is decimal, 'always' fom in when context is integer
@@ -258,7 +248,7 @@ test when fom 5.6 test always 3.5
 test inheritance 12.0
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -311,10 +301,8 @@ test inheritance 12.0
             assert "3 integer" in results
 
 
-def test_fom_overwrites_when_inherited(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_fom_overwrites_when_inherited(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_output = """
 Parent FOM regex is decimal, child FOM regex is integer and should clobber parent FOM
@@ -323,7 +311,7 @@ test when fom 5.6 test always 3.5
 test inheritance 12.0
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -387,12 +375,10 @@ test inheritance 12.0
         (False, False),
     ],
 )
-def test_register_validator_when(request, validator_value, fails):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_register_validator_when(workspace_name, validator_value, fails):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -437,12 +423,10 @@ def test_register_validator_when(request, validator_value, fails):
         (False, "preferred"),
     ],
 )
-def test_formatted_exec_when(request, inc_value, type_value):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_formatted_exec_when(workspace_name, inc_value, type_value):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -491,12 +475,10 @@ def test_formatted_exec_when(request, inc_value, type_value):
     "workload_name",
     ["test_wl", "test_unset_wl"],
 )
-def test_variable_when_workload_constraint(request, workload_name):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_variable_when_workload_constraint(workspace_name, workload_name):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -545,12 +527,10 @@ def test_variable_when_workload_constraint(request, workload_name):
         (False, "preferred"),
     ],
 )
-def test_variable_when(request, inc_value, type_value):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_variable_when(workspace_name, inc_value, type_value):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -597,12 +577,10 @@ def test_variable_when(request, inc_value, type_value):
     "inc_value",
     [True, False],
 )
-def test_package_manager_variable_when(request, inc_value, mutable_mock_pkg_mans_repo):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_package_manager_variable_when(workspace_name, inc_value, mutable_mock_pkg_mans_repo):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -650,12 +628,10 @@ def test_package_manager_variable_when(request, inc_value, mutable_mock_pkg_mans
     "inc_value",
     [True, False],
 )
-def test_workflow_manager_variable_when(request, inc_value, mutable_mock_wms_repo):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_workflow_manager_variable_when(workspace_name, inc_value, mutable_mock_wms_repo):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -703,12 +679,10 @@ def test_workflow_manager_variable_when(request, inc_value, mutable_mock_wms_rep
     "inc_value",
     [True, False],
 )
-def test_modifier_variable_when(request, inc_value, mutable_mock_mods_repo):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_modifier_variable_when(workspace_name, inc_value, mutable_mock_mods_repo):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
 
         workspace(
             "manage",
@@ -756,10 +730,8 @@ def test_modifier_variable_when(request, inc_value, mutable_mock_mods_repo):
             assert test_str in data
 
 
-def test_success_criteria_when(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_success_criteria_when(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_output = """
 test when context 4.2
@@ -767,7 +739,7 @@ test when fom 5.6 test always 3.5
 test inheritance 12.0
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -815,16 +787,14 @@ test inheritance 12.0
             assert "SUCCESS" not in results
 
 
-def test_register_template_when(request):
-    ws_name = request.node.name
-
-    global_args = ["-w", ws_name]
+def test_register_template_when(workspace_name):
+    global_args = ["-w", workspace_name]
 
     test_template = """
 echo "test template for {experiment_name}"
 """
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -876,12 +846,10 @@ echo "test template for {experiment_name}"
         (False, False),
     ],
 )
-def test_register_builtin_when(request, include_builtin, builtin_found):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_register_builtin_when(workspace_name, include_builtin, builtin_found):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -925,13 +893,12 @@ def test_register_builtin_when(request, include_builtin, builtin_found):
         (True, True, True),
     ],
 )
-def test_executable_when(request, exec_variant_on, exec_ver2_found, skipped_exec_found):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_executable_when(workspace_name, exec_variant_on, exec_ver2_found, skipped_exec_found):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
     test_var = "when-executable-test"
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -977,12 +944,10 @@ def test_executable_when(request, exec_variant_on, exec_ver2_found, skipped_exec
             assert (test_skipped_exec_str in data) == skipped_exec_found
 
 
-def test_executable_errors_when_overlapping_conditions(request):
-    ws_name = request.node.name
+def test_executable_errors_when_overlapping_conditions(workspace_name):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -1015,12 +980,10 @@ def test_executable_errors_when_overlapping_conditions(request):
         (True, "input1_true"),
     ],
 )
-def test_input_when(request, input_when, expected_input_file):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
+def test_input_when(workspace_name, input_when, expected_input_file):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -1061,17 +1024,15 @@ def test_input_when(request, input_when, expected_input_file):
         (True, "test_exec_def_when"),
     ],
 )
-def test_workload_definition_when(request, wl_def_when, expected_exec):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
-
-    global_args = ["-w", ws_name]
+def test_workload_definition_when(workspace_name, wl_def_when, expected_exec):
+    global_args = ["-w", workspace_name]
 
     exec_test_str = {
         "test_exec": "echo '{test_variable}'",
         "test_exec_def_when": "echo 'executable version1'",
     }
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -1106,12 +1067,10 @@ def test_workload_definition_when(request, wl_def_when, expected_exec):
             assert exec_test_str[expected_exec] in data
 
 
-def test_workload_errors_when_not_enabled(request):
-    ws_name = request.node.name
+def test_workload_errors_when_not_enabled(workspace_name):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -1158,12 +1117,10 @@ def test_workload_errors_when_not_enabled(request):
             assert "echo '{test_variable}'" in data
 
 
-def test_workload_errors_when_overlapping_conditions(request):
-    ws_name = request.node.name
+def test_workload_errors_when_overlapping_conditions(workspace_name):
+    global_args = ["-w", workspace_name]
 
-    global_args = ["-w", ws_name]
-
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
@@ -1266,14 +1223,12 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
         (True, True),
     ],
 )
-def test_env_var_modification_when(request, env_var_mod_when, expected_exec):
-    ws_name = request.node.name.replace("[", "_").replace("]", "_")
-
-    global_args = ["-w", ws_name]
+def test_env_var_modification_when(workspace_name, env_var_mod_when, expected_exec):
+    global_args = ["-w", workspace_name]
 
     exec_test_str = "export APP_ENV_VAR=APP_ENV_VAR_MODIFIED;"
 
-    with ramble.workspace.create(ws_name) as ws:
+    with ramble.workspace.create(workspace_name) as ws:
         workspace(
             "manage",
             "experiments",
