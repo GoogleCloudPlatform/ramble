@@ -154,3 +154,13 @@ class Spack(SpackLightweight):
         required=False,
         depends_on=["package_manager_builtin::spack::spack_source"],
     )
+
+    register_phase(
+        "software_configure", pipeline="mirror", run_before=["mirror_software"]
+    )
+
+    register_phase(
+        "software_create_env",
+        pipeline="mirror",
+        run_before=["software_configure"],
+    )
