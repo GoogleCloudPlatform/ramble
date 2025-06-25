@@ -51,6 +51,13 @@ class Wrfv4(ExecutableApplication):
         description="12 km resolution mesh of the continental United States.",
     )
 
+    input_file(
+        "Maria_1km",
+        url="https://www2.mmm.ucar.edu/wrf/users/benchmark/v44/v4.4_bench_maria1km.tar.gz",
+        sha256="8a64d45fe53b13a810af8137fab3188c6aad6dc0948e4aa1a84c62bf3afaa102",
+        description="1 km Maria workload input",
+    )
+
     executable(
         "cleanup",
         "rm -f rsl.* wrfout*",
@@ -89,6 +96,12 @@ class Wrfv4(ExecutableApplication):
         input="CONUS_12km",
     )
 
+    workload(
+        "Maria_1km",
+        executables=["copy", "cleanup", "execute"],
+        input="Maria_1km",
+    )
+
     workload_variable(
         "input_path",
         default="{CONUS_12km}",
@@ -101,6 +114,13 @@ class Wrfv4(ExecutableApplication):
         default="{CONUS_2p5km}",
         description="Path for CONUS 2.5km inputs.",
         workloads=["CONUS_2p5km"],
+    )
+
+    workload_variable(
+        "input_path",
+        default="{{workload_name}}",
+        description="Path for workload inputs.",
+        workloads=["Maria_1km"],
     )
 
     log_str = os.path.join(
