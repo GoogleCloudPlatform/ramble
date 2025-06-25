@@ -43,3 +43,18 @@ class WhenModifier(BasicModifier):
             value="MOD_ENV_VAR_SET",
             description="Test environment variable",
         )
+
+    variant(
+        "env_var_modification_active",
+        default=False,
+        values=[True, False],
+        description="Test env var modification",
+    )
+
+    with when("+env_var_modification_active"):
+        env_var_modification(
+            "APP_ENV_VAR",
+            modification="APP_ENV_VAR_MODIFIED",
+            method="set",
+            when="when-modifier_mode=standard",
+        )

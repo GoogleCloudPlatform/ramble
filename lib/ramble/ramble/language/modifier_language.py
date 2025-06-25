@@ -177,7 +177,15 @@ def executable_modifier(name, **kwargs):
 
 
 @modifier_directive("env_var_modifications")
-def env_var_modification(name, modification=None, method="set", mode=None, modes=None, **kwargs):
+def env_var_modification(
+    name,
+    modification=None,
+    method="set",
+    mode=None,
+    modes=None,
+    when=None,
+    **kwargs,
+):
     """Define an environment variable modifier
 
     Environment variable modifications modify the values of environment
@@ -187,8 +195,9 @@ def env_var_modification(name, modification=None, method="set", mode=None, modes
         name (str): The name of the environment variable that will be modified
         modification (str): The value of the modification
         method (str): The method of the modification.
-        mode (str): Name of mode this env_var_modification should apply in
-        modes (list(str)): List of mode names this env_var_modification should apply in
+        mode (str | None): Name of mode this env_var_modification should apply in
+        modes (list(str) | None): List of mode names this env_var_modification should apply in
+        when (list | None): List of when conditions this env_var_modification should apply in
 
     Supported values for method are:
 
@@ -214,30 +223,27 @@ def env_var_modification(name, modification=None, method="set", mode=None, modes
                 "requires a value for the modification argument."
             )
 
-        all_modes = ramble.language.language_helpers.require_definition(
-            mode, modes, mod.modes, "mode", "modes", "env_var_modification"
+        when_list = ramble.language.language_helpers.require_condition(
+            mod, "env_var_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
+        when_set = frozenset(when_list)
 
-        for mode_name in all_modes:
-            if mode_name not in mod.env_var_modifications:
-                mod.env_var_modifications[mode_name] = {}
+        if when_set not in mod.env_var_modifications:
+            mod.env_var_modifications[when_set] = {}
 
         # Set requires a dict, everything else requires a list.
         if method == "set":
-            for mode_name in all_modes:
-                if method not in mod.env_var_modifications[mode_name]:
-                    mod.env_var_modifications[mode_name][method] = {}
-                mod.env_var_modifications[mode_name][method][name] = modification
+            if method not in mod.env_var_modifications[when_set]:
+                mod.env_var_modifications[when_set][method] = {}
+            mod.env_var_modifications[when_set][method][name] = modification
             return
 
-        for mode_name in all_modes:
-            if method not in mod.env_var_modifications[mode_name]:
-                mod.env_var_modifications[mode_name][method] = []
+        if method not in mod.env_var_modifications[when_set]:
+            mod.env_var_modifications[when_set][method] = []
 
         # If unset, exit early
         if method == "unset":
-            for mode_name in all_modes:
-                mod.env_var_modifications[mode_name][method].append(name)
+            mod.env_var_modifications[when_set][method].append(name)
             return
 
         append_dict = {}
@@ -253,8 +259,7 @@ def env_var_modification(name, modification=None, method="set", mode=None, modes
         append_dict[append_name] = {}
         append_dict[append_name][name] = modification
 
-        for mode_name in all_modes:
-            mod.env_var_modifications[mode_name][method].append(append_dict.copy())
+        mod.env_var_modifications[when_set][method].append(append_dict.copy())
 
     return _env_var_modification
 

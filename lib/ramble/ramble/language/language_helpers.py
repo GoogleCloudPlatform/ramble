@@ -130,6 +130,63 @@ def require_definition(
     )
 
 
+def require_condition(
+    obj, directive_name: str, single_arg_name: str = None, multiple_arg_name: str = None, **kwargs
+):
+    """Require at least one condition for a type in a directive, and converts all conditions to
+    when conditions
+
+    If single/multiple values are provided, this method will validate that they are
+    properly defined, and will merge them into a when list.
+
+    It will raise an error if at least one type is not defined, or if any are the incorrect type.
+
+    Args:
+        obj: Object instance
+        directive_name: Name of the calling directive
+        single_arg_name: Name of the singular kwarg being required
+        multiple_arg_name: Name of the plural kwarg being required
+
+    Kwargs:
+        when (list | None): List of when conditions to apply to directive
+        mode (str | None): Modifier mode to be applied as a when condition
+        modes (list(str) | None): List of modifier modes to be applied as when conditions
+
+    Returns:
+        List of all when conditions
+    """
+
+    if not (single_arg_name in kwargs or multiple_arg_name in kwargs or "when" in kwargs):
+        raise DirectiveError(
+            f"Directive {directive_name} requires at least one of "
+            f"{single_arg_name} or {multiple_arg_name} or when to be defined."
+        )
+
+    when_list = []
+    if "when" in kwargs:
+        when_list = build_when_list(kwargs["when"], obj, obj.name, directive_name)
+
+    single_arg_val = kwargs[single_arg_name] if single_arg_name in kwargs else ""
+    multiple_arg_vals = kwargs[multiple_arg_name] if multiple_arg_name in kwargs else []
+
+    # If args are modifier modes, convert to when conditions
+    if single_arg_name == "mode" or multiple_arg_name == "modes":
+        all_modes = merge_definitions(
+            single_arg_val,
+            multiple_arg_vals,
+            obj.modes,
+            "mode",
+            "modes",
+            directive_name,
+        )
+
+        if all_modes:
+            for mode_name in all_modes:
+                when_list.append(f"{obj.name}_mode={mode_name}")
+
+    return when_list
+
+
 def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict]):
     """Expand wildcard patterns within a list of names
 
@@ -179,14 +236,14 @@ def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict
 
 
 def build_when_list(
-    when_arg: List[str], obj: Any, directive_id: str, directive_name: str
+    when_arg: Union[str, List[str]], obj: Any, directive_id: str, directive_name: str
 ) -> List[str]:
     """Construct list of when conditions based on a directives input argument
     Also, validate that when is passed in with the right type.
 
     Args:
-        when_arg (list(str)): List of string conditions that were input into
-                              the calling directive.
+        when_arg (str | list(str)): Single or list of string conditions that were input into
+                                    the calling directive.
         obj: A ramble object (i.e. application, modifier, etc..)
         directive_id (str): Directive identifier. The calling directive can
                             define what is used here, but it should be
@@ -199,10 +256,21 @@ def build_when_list(
     """
     when_list = []
     if when_arg is not None:
-        if not isinstance(when_arg, list):
-            raise DirectiveError(
-                f"Object {obj.name} calls directive {directive_name} {directive_id} "
-                f"with an invalid `when` argument. The `when` argument must be input as a list."
-            )
+        if isinstance(when_arg, str):
+            when_arg = [when_arg]
+        elif not isinstance(when_arg, list):
+            if obj == "DirectiveMeta":
+                raise DirectiveError(
+                    "DirectiveMeta is unable to process an invalid `when` argument from directive "
+                    f"{directive_name} {directive_id}. The `when` argument must be input as a "
+                    "string or list."
+                )
+
+            else:
+                raise DirectiveError(
+                    f"Object {obj.name} calls directive {directive_name} {directive_id} "
+                    f"with an invalid `when` argument. The `when` argument must be input as a "
+                    "string or list."
+                )
         when_list.extend(when_arg)
     return when_list

@@ -239,6 +239,7 @@ class DirectiveMeta(type):
                         "package_manager_variable",
                         "workflow_manager_variable",
                         "environment_variable",
+                        "env_var_modification",
                         "workload",
                         "executable",
                         "input_file",
@@ -254,7 +255,14 @@ class DirectiveMeta(type):
                     when_constraints = DirectiveMeta._when_constraints_from_context.copy()
 
                     if kwargs.get("when"):
-                        when_constraints.extend(kwargs["when"])
+                        when_arg = kwargs["when"]
+
+                        # Validate kwarg `when` conditions are correctly formatted
+                        when_list = ramble.language.language_helpers.build_when_list(
+                            when_arg, "DirectiveMeta", args[0], decorated_function.__name__
+                        )
+
+                        when_constraints.extend(when_list)
 
                     kwargs["when"] = when_constraints.copy()
 
