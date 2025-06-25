@@ -262,6 +262,7 @@ class ExperimentSet:
 
     def _prepare_experiment(
         self,
+        workload_template_name,
         exp_template_name,
         variables,
         context,
@@ -273,7 +274,8 @@ class ExperimentSet:
         repeats, and template name.
 
         Args:
-            exp_template_name (str): Template name for experiments
+            workload_template_name (str): Template name for workload
+            experiment_template_name (str): Template name for experiments
             variables (dict): Dictionary of variables for this experiment
             context (Context): Context object for this experiment
             repeats (Repeats): Repeats object for this experiment
@@ -319,10 +321,12 @@ class ExperimentSet:
         final_wl_name = expander.expand_var_name(
             self.keywords.workload_name, allow_passthrough=False
         )
+
         final_exp_name = expander.expand_var(
             exp_template_name + experiment_suffix, allow_passthrough=False
         )
 
+        app_inst.define_variable(self.keywords.workload_template_name, workload_template_name)
         app_inst.define_variable(
             self.keywords.experiment_template_name, exp_template_name + experiment_suffix
         )
@@ -426,6 +430,7 @@ class ExperimentSet:
             Expander.expansion_str(self.keywords.experiment_name),
         )
 
+        workload_template_name = final_context.variables[self.keywords.workload_name]
         experiment_template_name = final_context.variables[self.keywords.experiment_name]
 
         renderer = ramble.renderer.Renderer()
@@ -473,6 +478,7 @@ class ExperimentSet:
             tracking_group, exclude_where=exclude_where, ignore_used=False, fatal=False
         ):
             app_inst = self._prepare_experiment(
+                workload_template_name,
                 experiment_template_name,
                 tracking_vars,
                 final_context,
@@ -490,6 +496,7 @@ class ExperimentSet:
             render_group, exclude_where=exclude_where
         ):
             app_inst = self._prepare_experiment(
+                workload_template_name,
                 experiment_template_name,
                 experiment_vars,
                 final_context,

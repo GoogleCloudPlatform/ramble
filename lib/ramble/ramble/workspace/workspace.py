@@ -14,7 +14,7 @@ import os
 import re
 import shutil
 from collections import defaultdict
-from typing import List
+from typing import List, Set
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -1088,6 +1088,34 @@ ramble:
             workspace_dict = self._get_workspace_dict()
             workspace_dict[namespace.software] = software_dict
 
+    def squash_and_print_config(self, included_section=None, excluded_section=None):
+        workspace_dict = self._get_workspace_dict()
+
+        # Remove includes if they were defined before.
+        if "include" in workspace_dict["ramble"]:
+            del workspace_dict["ramble"]["include"]
+
+        for section in ramble.config.section_schemas:
+            keep = True
+
+            if included_section:
+                keep = False
+                for pattern in included_section:
+                    if fnmatch.fnmatch(section, pattern):
+                        keep = True
+
+            if excluded_section:
+                for pattern in excluded_section:
+                    if fnmatch.fnmatch(section, pattern):
+                        keep = False
+
+            if keep:
+                section_dict = ramble.config.get(section)
+                if section_dict:
+                    workspace_dict["ramble"][section] = section_dict
+
+        print(f"\n{syaml.dump(workspace_dict)}")
+
     def add_experiments(
         self,
         application,
@@ -1752,7 +1780,92 @@ ramble:
         self.input_mirror_cache = ramble.caches.MirrorCache(self.input_mirror_path)
         self.software_mirror_cache = ramble.caches.MirrorCache(self.software_mirror_path)
 
-    def simplify(self):
+    def simplify_variables(self):
+        """Simplify variable sections in workspace configuration file"""
+
+        def _remove_scoped_variables(scope_name: str, used_variables: Set):
+            """Remove unused variables from a specific workspace scope.
+
+            Args:
+                scope_name (str): Name of scope to remove definitions from.
+                used_variables (set): Set of used definitions that should be kept.
+            """
+
+            if scope_name is None:
+                return
+
+            # Delete unused variables from requested scope.
+            to_remove = set()
+            scope_section = self._get_scope_section(scope_name)
+            if namespace.variables in scope_section:
+                for var in scope_section[namespace.variables]:
+                    if var not in used_variables:
+                        to_remove.add(var)
+                for var in to_remove:
+                    del scope_section[namespace.variables][var]
+
+                if not scope_section[namespace.variables]:
+                    del scope_section[namespace.variables]
+
+        # Build experiment sets to determine which variables are used
+        self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
+        experiment_set = self.build_experiment_set()
+
+        workspace_used_variables = set()
+
+        prev_app = None
+        prev_wl = None
+        prev_exp = None
+
+        app_used_vars = set()
+        wl_used_vars = set()
+        exp_used_vars = set()
+
+        for _, app_inst, _ in experiment_set.all_experiments():
+            app_inst.build_used_variables(self)
+
+            if prev_exp != app_inst.variables[app_inst.keywords.experiment_template_name]:
+                if prev_exp is not None:
+                    _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
+
+                prev_exp = app_inst.variables[app_inst.keywords.experiment_template_name]
+                exp_used_vars = set()
+
+            if prev_wl != app_inst.variables[app_inst.keywords.workload_template_name]:
+                if prev_wl is not None:
+                    _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
+
+                prev_wl = app_inst.variables[app_inst.keywords.workload_template_name]
+                wl_used_vars = set()
+
+            if prev_app != app_inst.variables[app_inst.keywords.application_name]:
+                if prev_app is not None:
+                    _remove_scoped_variables(prev_app, app_used_vars)
+
+                prev_app = app_inst.variables[app_inst.keywords.application_name]
+                app_used_vars = set()
+
+            workspace_used_variables = workspace_used_variables.union(
+                app_inst.expander._used_variables
+            )
+            app_used_vars = app_used_vars.union(app_inst.expander._used_variables)
+            wl_used_vars = wl_used_vars.union(app_inst.expander._used_variables)
+            exp_used_vars = exp_used_vars.union(app_inst.expander._used_variables)
+
+        if prev_exp is not None:
+            _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
+
+        if prev_wl is not None:
+            _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
+
+        if prev_app is not None:
+            _remove_scoped_variables(prev_app, app_used_vars)
+
+        _remove_scoped_variables("workspace", workspace_used_variables)
+
+        self._write_config(config_section)
+
+    def simplify_software(self):
         # First drop unused experiment templates from app dict so environments aren't rendered
         app_dict = ramble.config.config.get_config(
             namespace.application, scope=self.ws_file_config_scope_name()
@@ -2017,13 +2130,14 @@ ramble:
                 base_section = base_section[namespace.workload][scope_parts[1]]
 
             if len(scope_parts) >= 3:  # Extract experiment section
-                if scope_parts[2] not in base_section[namespace.experiment]:
+                joined_scope_part = ":".join(scope_parts[2:])
+                if joined_scope_part not in base_section[namespace.experiment]:
                     logger.die(
-                        f"No experiment matches requested scope {scope_parts[1]} in application "
-                        f"{scope_parts[0]} and workload {scope_parts[1]}"
+                        f"No experiment matches requested scope {joined_scope_part} "
+                        f"in application{scope_parts[0]} and workload {scope_parts[1]}"
                     )
 
-                base_section = base_section[namespace.experiment][scope_parts[2]]
+                base_section = base_section[namespace.experiment][joined_scope_part]
         if base_section is None:
             logger.die(f"No scope matches requested scope of {scope}")
         return base_section

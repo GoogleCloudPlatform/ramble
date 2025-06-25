@@ -47,6 +47,7 @@ subcommands = [
     "deactivate",
     "create",
     "concretize",
+    "config",
     "setup",
     "analyze",
     "push-to-cache",
@@ -435,7 +436,7 @@ def workspace_concretize(args):
 
     if args.simplify:
         logger.debug("Simplifying workspace config")
-        ws.simplify()
+        ws.simplify_software()
     else:
         logger.debug("Concretizing workspace")
         ws.concretize(force=args.force_concretize, quiet=args.quiet)
@@ -616,6 +617,66 @@ def workspace_push_to_cache_setup_parser(subparser):
     arguments.add_common_arguments(
         subparser, ["where", "exclude_where", "filter_tags", "profile_phases"]
     )
+
+
+def workspace_config_setup_parser(subparser):
+    """Squashed workspace config"""
+
+    actions = subparser.add_mutually_exclusive_group(required=True)
+
+    actions.add_argument(
+        "--print-squash",
+        "-p",
+        action="store_true",
+        help="Print a squashed workspace configuration",
+    )
+
+    actions.add_argument(
+        "--simplify-software",
+        "--ss",
+        action="store_true",
+        help="Simplify the software configuration section of this workspace",
+    )
+
+    actions.add_argument(
+        "--simplify-variables",
+        "--sv",
+        action="store_true",
+        help="Simplify the variables configuration section of this workspace",
+    )
+
+    subparser.add_argument(
+        "--include-section",
+        "-i",
+        dest="included_section",
+        nargs="+",
+        default=["*"],
+        help="list of patterns to include configuration section, "
+        + "when printing the squashed config",
+        required=False,
+    )
+
+    subparser.add_argument(
+        "--exclude-section",
+        "-e",
+        dest="excluded_section",
+        nargs="+",
+        default=[],
+        help="list of patterns to exclude configuration section, "
+        + "when printing the squashed config. Overrides included section.",
+        required=False,
+    )
+
+
+def workspace_config(args):
+    ws = ramble.cmd.require_active_workspace(cmd_name="workspace squashed-config")
+
+    if args.print_squash:
+        ws.squash_and_print_config(args.included_section, args.excluded_section)
+    elif args.simplify_software:
+        ws.simplify_software()
+    elif args.simplify_variables:
+        ws.simplify_variables()
 
 
 def workspace_info_setup_parser(subparser):
