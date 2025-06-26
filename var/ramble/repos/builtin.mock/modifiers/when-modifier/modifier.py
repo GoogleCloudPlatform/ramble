@@ -58,3 +58,28 @@ class WhenModifier(BasicModifier):
             method="set",
             when="when-modifier_mode=standard",
         )
+
+    variant(
+        "exec_modifier_active",
+        default=False,
+        values=[True, False],
+        description="Test exec modifier",
+    )
+
+    executable_modifier(
+        "test_exec_modifier",
+        when=["+exec_modifier_active"],
+    )
+
+    def test_exec_modifier(self, exec_name, executable, app_inst=None):
+        prepend_execs = []
+        append_execs = [
+            ramble.util.executable.CommandExecutable(
+                name="test_exec_modifier_exec",
+                template="echo 'append executable'",
+                redirect=None,
+                output_capture=None,
+            )
+        ]
+
+        return prepend_execs, append_execs

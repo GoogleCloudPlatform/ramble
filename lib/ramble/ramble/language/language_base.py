@@ -242,6 +242,7 @@ class DirectiveMeta(type):
                         "env_var_modification",
                         "workload",
                         "executable",
+                        "executable_modifier",
                         "input_file",
                     ]:
                         msg = (

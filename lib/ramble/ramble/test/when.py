@@ -1270,3 +1270,59 @@ def test_env_var_modification_when(workspace_name, env_var_mod_when, expected_ex
             data = f.read()
 
             assert (exec_test_str in data) == expected_exec
+
+
+@pytest.mark.parametrize(
+    "exec_mod_when,expected_exec",
+    [
+        (False, False),
+        (True, True),
+    ],
+)
+def test_executable_modification_when(workspace_name, exec_mod_when, expected_exec):
+    global_args = ["-w", workspace_name]
+
+    exec_test_str = "echo 'append executable'"
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(mod_config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+
+        config(
+            "add",
+            f"variants:exec_modifier_active:{exec_mod_when}",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert (exec_test_str in data) == expected_exec

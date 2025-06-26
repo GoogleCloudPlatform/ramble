@@ -127,7 +127,7 @@ def variable_modification(
 
 
 @modifier_directive("executable_modifiers")
-def executable_modifier(name, **kwargs):
+def executable_modifier(name, when=None, **kwargs):
     """Register an executable modifier
 
     Executable modifiers can modify various aspects of non-builtin application
@@ -162,6 +162,7 @@ def executable_modifier(name, **kwargs):
     Args:
         name (str): Name of executable modifier to use. Should be the name of a
                     class method.
+        when (list | None): List of when conditions this executable modifier should apply in
 
     Each executable modifier needs to return:
       prepend_execs (list(CommandExecutable)): List of executables to inject
@@ -171,7 +172,15 @@ def executable_modifier(name, **kwargs):
     """
 
     def _executable_modifier(mod):
-        mod.executable_modifiers[name] = name
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, mod, name, "executable_modifier"
+        )
+        when_set = frozenset(when_list)
+
+        if when_set not in mod.executable_modifiers:
+            mod.executable_modifiers[when_set] = {}
+
+        mod.executable_modifiers[when_set][name] = name
 
     return _executable_modifier
 
