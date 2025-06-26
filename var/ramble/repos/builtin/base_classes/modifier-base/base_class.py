@@ -244,15 +244,17 @@ class ModifierBase(metaclass=ModifierMeta):
     ):
         pre_execs = []
         post_execs = []
-        for exec_mod in self.executable_modifiers:
-            mod_func = getattr(self, exec_mod)
+        for when_set, exec_mods in self.executable_modifiers.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                for exec_mod in exec_mods:
+                    mod_func = getattr(self, exec_mod)
 
-            pre_exec, post_exec = mod_func(
-                executable_name, executable, app_inst=app_inst
-            )
+                    pre_exec, post_exec = mod_func(
+                        executable_name, executable, app_inst=app_inst
+                    )
 
-            pre_execs.extend(pre_exec)
-            post_execs.extend(post_exec)
+                    pre_execs.extend(pre_exec)
+                    post_execs.extend(post_exec)
 
         return pre_execs, post_execs
 
