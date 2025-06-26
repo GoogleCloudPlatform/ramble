@@ -158,12 +158,16 @@ def _unpack_when_set_if_needed(internal_attr: dict):
     """
     first_key = next(iter(internal_attr))
     first_val = internal_attr[first_key]
-
     if isinstance(first_key, frozenset):
         if isinstance(first_val, dict):
-            unpacked_dict = {}
+            # unpack to a list of dicts so dicts with same keys don't overwrite
+            unpacked_dict = []
             for when_key, inner_dict in internal_attr.items():
-                unpacked_dict.update(inner_dict)
+                if not when_key:
+                    unpacked_dict.append(inner_dict)
+                else:
+                    for when_condition in when_key:
+                        unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
@@ -224,7 +228,10 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
             color.cprint("")
         elif isinstance(vals, list):
             for val in vals:
-                color.cprint(f"{val.as_str()}")
+                if hasattr(val, "as_str"):
+                    color.cprint(f"{val.as_str()}")
+                else:
+                    color.cprint(f"{str(val)}")
         else:
             color.cprint(f"{str(vals)}")
 
@@ -324,24 +331,33 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         else:
             to_print = internal_attr
 
-        # If we are trying to print a list, filter it and print using the
-        # format specification
+        # If we are trying to print a list:
+        #     if it's a list of dicts, convert the keys like above and print
+        #     otherwise filter it and print using the format specification
         # Otherwise, print it as a raw string.
         if isinstance(to_print, list):
+            if isinstance(next(iter(internal_attr)), dict):
+                for attr_dict in internal_attr:
+                    to_print = list(attr_dict.keys())
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {str(to_print)}\n")
     else:
         if isinstance(internal_attr, dict):
             _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
-        # If the attribute is not a dict, print using the existing format rules.
         elif isinstance(internal_attr, list):
-            to_print = fnmatch.filter(map(str, internal_attr), pattern)
-            if format == supported_formats.lists:
-                color.cprint("    " + str(list(to_print)))
-            elif format == supported_formats.text:
-                color.cprint(colified(to_print, tty=True, indent=4))
-            color.cprint("")
+            # If it's a list of dicts, print each
+            if isinstance(next(iter(internal_attr)), dict):
+                for attr_dict in internal_attr:
+                    _print_verbose_dict_attr(attr_dict, pattern=pattern, indentation=indentation)
+            # If the attribute is not a dict or list of dict, print using the existing format rules
+            else:
+                to_print = fnmatch.filter(map(str, internal_attr), pattern)
+                if format == supported_formats.lists:
+                    color.cprint("    " + str(list(to_print)))
+                elif format == supported_formats.text:
+                    color.cprint(colified(to_print, tty=True, indent=4))
+                color.cprint("")
         else:
             color.cprint(f"{indentation}" + str(internal_attr))
 

@@ -80,6 +80,75 @@ class WorkloadVariable:
         return copy.deepcopy(self)
 
 
+class WorkloadVariableModification:
+    """Class representing a variable modification"""
+
+    def __init__(
+        self,
+        name: str,
+        modification: str,
+        method: str = "set",
+        separator: str = " ",
+        when=None,
+        **kwargs,
+    ):
+        """Constructor for a new variable modification
+
+        Args:
+            name (str): The variable to modify
+            modification (str): The value to modify 'name' with
+            method (str): How the modification should be applied
+            mode (str): Single mode to group this modification into
+            modes (str): List of modes to group this modification into
+            separator (str): Optional separator to use when modifying with 'append' or
+                            'prepend' methods.
+            when (list | None): List of when conditions this modification should apply in
+
+        Supported values are 'append', 'prepend', and 'set':
+            'append' will add the modification to the end of 'name'
+            'prepend' will add the modification to the beginning of 'name'
+            'set' (Default) will overwrite 'name' with the modification
+        """
+        self.name = name
+        self.modification = modification
+        self.method = method
+        self.separator = separator
+        self.when = when.copy() if when else []
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0):
+        """String representation of this variable
+
+        Args:
+          n_indent (int): Number of spaces to indent string lines with
+
+        Returns:
+            (str): Representation of this variable
+        """
+        indentation = " " * n_indent
+
+        print_attrs = ["Modification", "Method", "Separator", "When"]
+
+        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
+        for print_attr in print_attrs:
+            name = print_attr
+            attr_name = print_attr.lower()
+
+            attr_val = getattr(self, attr_name, None)
+            if attr_val:
+                if print_attr == "Separator":
+                    attr_val = f"'{attr_val}'"
+                out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
+        return out_str
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+
 class WorkloadEnvironmentVariable:
     """Class representing an environment variable in a workload"""
 

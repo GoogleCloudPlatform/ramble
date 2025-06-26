@@ -192,34 +192,35 @@ class ModifierBase(metaclass=ModifierMeta):
         if extra_vars is None:
             extra_vars = {}
 
-        if self._usage_mode not in self.variable_modifications:
-            return mods
+        for when_set, var_mod_dict in self.variable_modifications.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                for var, var_mods in var_mod_dict.items():
+                    for var_mod in var_mods:
+                        if var_mod.method in ["append", "prepend"]:
+                            if var in mods:
+                                prev_val = mods[var]
+                            elif var in extra_vars:
+                                prev_val = extra_vars[var]
+                            elif var in app.variables:
+                                prev_val = app.variables[var]
+                            else:
+                                prev_val = ""
 
-        for var, var_mods in self.variable_modifications[
-            self._usage_mode
-        ].items():
-            for var_mod in var_mods:
-                if var_mod["method"] in ["append", "prepend"]:
-                    if var in mods:
-                        prev_val = mods[var]
-                    elif var in extra_vars:
-                        prev_val = extra_vars[var]
-                    elif var in app.variables:
-                        prev_val = app.variables[var]
-                    else:
-                        prev_val = ""
+                            if prev_val != "" and prev_val is not None:
+                                sep = var_mod.separator
+                            else:
+                                sep = ""
 
-                    if prev_val != "" and prev_val is not None:
-                        sep = var_mod["separator"]
-                    else:
-                        sep = ""
-
-                    if var_mod["method"] == "append":
-                        mods[var] = f'{prev_val}{sep}{var_mod["modification"]}'
-                    else:  # method == prepend
-                        mods[var] = f'{var_mod["modification"]}{sep}{prev_val}'
-                else:  # method == set
-                    mods[var] = var_mod["modification"]
+                            if var_mod.method == "append":
+                                mods[var] = (
+                                    f"{prev_val}{sep}{var_mod.modification}"
+                                )
+                            else:  # method == prepend
+                                mods[var] = (
+                                    f"{var_mod.modification}{sep}{prev_val}"
+                                )
+                        else:  # method == set
+                            mods[var] = var_mod.modification
 
         return mods
 

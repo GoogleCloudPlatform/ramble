@@ -16,6 +16,8 @@ from ramble.modkit import *  # noqa
 
 mod_types = [ModifierBase, BasicModifier]  # noqa: F405
 
+_FS = frozenset()
+
 
 @deprecation.fail_if_not_removed
 @pytest.mark.parametrize("mod_class", mod_types)
@@ -99,47 +101,55 @@ def test_variable_modification_directive(mod_class):
 
     assert hasattr(mod_inst, "variable_modifications")
 
+    when_conditions = 0
     mod_count = 0
-    for mode_name in mod_inst.variable_modifications:
-        for var_name in mod_inst.variable_modifications[mode_name]:
-            for modification in mod_inst.variable_modifications[mode_name][var_name]:
+    for when_set, var_mod_dict in mod_inst.variable_modifications.items():
+        when_conditions += len(when_set)
+        for var_name in mod_inst.variable_modifications[when_set]:
+            for modification in mod_inst.variable_modifications[when_set][var_name]:
                 mod_count += 1
-    assert mod_count == 9  # Each call to add_variable_modification adds 3 modifications
+    assert mod_count == 3  # Each call to add_variable_modification adds 1 variable modification
+    assert when_conditions == 3  # Each modification applies in 3 modes, stored as when conditions
 
     for test_def in test_defs:
         var_name = test_def["name"]
         mode_name = test_def["mode"]
+        mode_when = f"{mod_inst.name}_mode={mode_name}"
 
-        assert mode_name in mod_inst.variable_modifications
-        assert var_name in mod_inst.variable_modifications[mode_name]
-        found_match = (
-            False if len(mod_inst.variable_modifications[mode_name][var_name]) > 0 else True
-        )
-        for modification in mod_inst.variable_modifications[mode_name][var_name]:
-            match = True
-            for attr in expected_attrs:
-                assert attr in modification
-                if test_def[attr] != modification[attr]:
-                    match = False
-            if match:
-                found_match = True
-        assert found_match
-
-        for mode_name in test_def["modes"]:
+        for when_set, var_mod_dict in mod_inst.variable_modifications.items():
+            assert mode_when in when_set
+            assert var_name in mod_inst.variable_modifications[when_set]
             found_match = (
-                False if len(mod_inst.variable_modifications[mode_name][var_name]) > 0 else True
+                False if len(mod_inst.variable_modifications[when_set][var_name]) > 0 else True
             )
-            assert mode_name in mod_inst.variable_modifications
-            assert var_name in mod_inst.variable_modifications[mode_name]
-            for modification in mod_inst.variable_modifications[mode_name][var_name]:
+            for modification in mod_inst.variable_modifications[when_set][var_name]:
                 match = True
                 for attr in expected_attrs:
-                    assert attr in modification
-                    if test_def[attr] != modification[attr]:
+                    assert getattr(modification, attr) is not None
+                    if test_def[attr] != getattr(modification, attr):
                         match = False
                 if match:
                     found_match = True
             assert found_match
+
+        for mode_name in test_def["modes"]:
+            mode_when = f"{mod_inst.name}_mode={mode_name}"
+
+            for when_set, var_mod_dict in mod_inst.variable_modifications.items():
+                found_match = (
+                    False if len(mod_inst.variable_modifications[when_set][var_name]) > 0 else True
+                )
+                assert mode_when in when_set
+                assert var_name in mod_inst.variable_modifications[when_set]
+                for modification in mod_inst.variable_modifications[when_set][var_name]:
+                    match = True
+                    for attr in expected_attrs:
+                        assert getattr(modification, attr) is not None
+                        if test_def[attr] != getattr(modification, attr):
+                            match = False
+                    if match:
+                        found_match = True
+                assert found_match
 
 
 @pytest.mark.parametrize("mod_class", mod_types)
@@ -159,12 +169,12 @@ def test_variable_modification_invalid_method(mod_class):
 
 
 @pytest.mark.parametrize("mod_class", mod_types)
-def test_variable_modification_missing_mode(mod_class):
+def test_variable_modification_missing_mode_or_when(mod_class):
     var_mod_name = "missing_mode_variable"
     var_mod_mod = "missing_mode_mod"
     var_mod_method = "set"
 
-    with pytest.raises(DirectiveError, match="mode or modes to be defined"):
+    with pytest.raises(DirectiveError, match="mode or modes or when to be defined"):
         mod_inst = mod_class("/not/a/path")
         mod_inst.variable_modification(var_mod_name, var_mod_mod, var_mod_method)
 
@@ -291,8 +301,6 @@ def add_figure_of_merit_context(mod_inst, context_num=1):
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_figure_of_merit_context_directive(mod_class):
     test_defs = []
-
-    _FS = frozenset()
 
     mod_inst = mod_class("/not/a/path")
     test_defs.append(add_figure_of_merit_context(mod_inst).copy())
