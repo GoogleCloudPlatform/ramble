@@ -66,3 +66,4 @@ class namespace:
 
     metadata = "metadata"
     include = "include"
+    workspace = "workspace"
