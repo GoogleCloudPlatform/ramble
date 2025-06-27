@@ -100,7 +100,7 @@ auxiliary_software_dir_name = "auxiliary_software_files"
 #: Config file information for workspaces.
 #: Keys are filenames, values are dictionaries describing the config files.
 config_schema = ramble.schema.workspace.schema
-config_section = "workspace"
+config_section = namespace.workspace
 config_file_name = "ramble.yaml"
 licenses_file_name = "licenses.yaml"
 
@@ -364,7 +364,7 @@ def get_workspace(args, cmd_name, required=False):
 
     logger.debug("In get_workspace()")
 
-    workspace = getattr(args, "workspace", None)
+    workspace = getattr(args, namespace.workspace, None)
     if workspace:
         if exists(workspace):
             return read(workspace)
@@ -427,7 +427,7 @@ class Workspace:
         self.repeat_success_strict = True
 
         self.read_default_template = read_default_template
-        self.configs = ramble.config.ConfigScope("workspace", self.config_dir)
+        self.configs = ramble.config.ConfigScope(namespace.workspace, self.config_dir)
         self._templates = {}
         self._auxiliary_software_files = {}
         self.software_mirror_path = None
@@ -439,11 +439,11 @@ class Workspace:
         self.software_mirror_cache = None
         self.software_environments = None
         self.metadata = syaml.syaml_dict()
-        self.hash_inventory = {"experiments": [], "versions": []}
+        self.hash_inventory = {namespace.experiment: [], "versions": []}
         version = ramble.util.version.get_version()
         self.hash_inventory["versions"].append(
             {
-                "name": "ramble",
+                "name": namespace.ramble,
                 "version": version,
                 "digest": ramble.util.hashing.hash_string(version),
             }
@@ -507,7 +507,7 @@ class Workspace:
     def _read(self):
         # Create the workspace config section
         with lk.ReadTransaction(self.txlock):
-            self.config_sections["workspace"] = {
+            self.config_sections[namespace.workspace] = {
                 "filename": self.config_file_path,
                 "path": self.config_file_path,
                 "schema": config_schema,
@@ -601,8 +601,8 @@ cd "{experiment_run_dir}"
 
         all_variants = {}
         for scope in ramble.config.scopes():
-            if "workspace" not in scope:
-                variant_dict = ramble.config.get("variants", scope=scope)
+            if namespace.workspace not in scope:
+                variant_dict = ramble.config.get(namespace.variants, scope=scope)
 
                 for var, val in variant_dict.items():
                     all_variants[var] = val
@@ -613,7 +613,7 @@ cd "{experiment_run_dir}"
 
         if variant_defs:
             merged_string = "\n".join(variant_defs)
-            variant_string = f"""  variants:
+            variant_string = f"""  {namespace.variants}:
 {merged_string}"""
 
         return f"""\
@@ -641,14 +641,14 @@ ramble:
     set:
       OMP_NUM_THREADS: '{{n_threads}}'
 {variant_string}
-  variables:
+  {namespace.variables}:
     mpi_command: mpirun -n {{n_ranks}}
     batch_submit: '{{execute_experiment}}'
     processes_per_node: 1
-  applications: {{}}
-  software:
-    packages: {{}}
-    environments: {{}}
+  {namespace.application}: {{}}
+  {namespace.software}:
+    {namespace.packages}: {{}}
+    {namespace.environments}: {{}}
 """
 
     def _read_application_config(self, path, f, raw_yaml=None):
@@ -868,7 +868,7 @@ ramble:
         logger.debug(f" With ws dict: {ws_dict}")
 
         # Iterate over applications in ramble.yaml first
-        app_dict = ramble.config.config.get_config("applications")
+        app_dict = ramble.config.config.get_config(namespace.application)
 
         for application, contents in app_dict.items():
             application_context = ramble.context.create_context_from_dict(application, contents)
@@ -1490,7 +1490,7 @@ ramble:
                 environments_dict[env_name][namespace.packages] = app_packages.copy()
 
         ramble.config.config.update_config(
-            "software", full_software_dict, scope=self.ws_file_config_scope_name()
+            namespace.software, full_software_dict, scope=self.ws_file_config_scope_name()
         )
 
         return
@@ -1514,7 +1514,7 @@ ramble:
                 res["workspace_hash"] = "Unknown.."
 
         res["workspace_name"] = self.name
-        res["experiments"] = []
+        res[namespace.experiment] = []
 
         return res
 
@@ -1522,7 +1522,7 @@ ramble:
         if not self.results:
             self.results = self.default_results()
 
-        self.results["experiments"].append(result)
+        self.results[namespace.experiment].append(result)
 
     def insert_result(self, result, insert_before_exp):
         """Insert a result before a specified experiment"""
@@ -1536,14 +1536,14 @@ ramble:
         if not self.results:
             self.results = self.default_results()
 
-        insert_index = search_exp_index(self.results["experiments"], insert_before_exp)
+        insert_index = search_exp_index(self.results[namespace.experiment], insert_before_exp)
 
         tty.debug(f"Attempting to insert result before experiment {insert_before_exp}")
         if insert_index is not None:
-            self.results["experiments"].insert(insert_index, result)
+            self.results[namespace.experiment].insert(insert_index, result)
         else:
             tty.debug(f"Could not find {insert_before_exp}, appending result to end instead.")
-            self.results["experiments"].append(result)
+            self.results[namespace.experiment].append(result)
 
     def symlink_result(self, out_file, latest_file):
         """
@@ -1597,7 +1597,7 @@ ramble:
         filename_base = "results" + inner_delim + dt
         latest_base = "results" + inner_delim + "latest"
 
-        software_key = ramble.experiment_result._OUTPUT_MAPPING["software"]
+        software_key = ramble.experiment_result._OUTPUT_MAPPING[namespace.software]
 
         if "text" in output_formats:
 
@@ -1609,8 +1609,8 @@ ramble:
 
             with open(out_file, "w+") as f:
                 f.write(f"From Workspace: {self.name} (hash: {results['workspace_hash']})\n")
-                if "experiments" in results:
-                    for exp in results["experiments"]:
+                if namespace.experiment in results:
+                    for exp in results[namespace.experiment]:
                         f.write("Experiment %s figures of merit:\n" % exp["name"])
                         f.write("  Status = %s\n" % exp["RAMBLE_STATUS"])
                         if "TAGS" in exp:
@@ -1663,7 +1663,7 @@ ramble:
             self.symlink_result(out_file, latest_file)
 
         # Convert SoftwareInfo classes to dicts
-        for exp in results["experiments"]:
+        for exp in results[namespace.experiment]:
             for key, pkg_list in exp[software_key].items():
                 exp[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
 
@@ -1723,8 +1723,8 @@ ramble:
         parsed_url = url_util.parse(mirror_root)
         self.mirror_path = url_util.local_file_path(parsed_url)
         self.mirror_existed = web_util.url_exists(self.mirror_path)
-        self.input_mirror_path = os.path.join(self.mirror_path, "inputs")
-        self.software_mirror_path = os.path.join(self.mirror_path, "software")
+        self.input_mirror_path = os.path.join(self.mirror_path, workspace_input_path)
+        self.software_mirror_path = os.path.join(self.mirror_path, workspace_software_path)
         mirror_dirs = [self.mirror_path, self.input_mirror_path, self.software_mirror_path]
         for subdir in mirror_dirs:
             if not os.path.isdir(subdir):
@@ -1960,7 +1960,7 @@ ramble:
         """Construct dictionary of path replacements for workspace"""
         workspace_path_replacements = {
             "workspace_root": root,
-            "workspace": root,
+            namespace.workspace: root,
             "workspace_configs": os.path.join(root, workspace_config_path),
             "workspace_software": os.path.join(root, workspace_software_path),
             "workspace_logs": os.path.join(root, workspace_log_path),
@@ -1983,9 +1983,16 @@ ramble:
     def add_include(self, new_include):
         """Add a new include to this workspace"""
 
-        if namespace.include not in self.config_sections["workspace"]["yaml"][namespace.ramble]:
-            self.config_sections["workspace"]["yaml"][namespace.ramble][namespace.include] = []
-        includes = self.config_sections["workspace"]["yaml"][namespace.ramble][namespace.include]
+        if (
+            namespace.include
+            not in self.config_sections[namespace.workspace]["yaml"][namespace.ramble]
+        ):
+            self.config_sections[namespace.workspace]["yaml"][namespace.ramble][
+                namespace.include
+            ] = []
+        includes = self.config_sections[namespace.workspace]["yaml"][namespace.ramble][
+            namespace.include
+        ]
         includes.append(new_include)
         self._write_config(config_section)
 
@@ -1998,10 +2005,15 @@ ramble:
                                 Removes all matching includes.
         """
 
-        if namespace.include not in self.config_sections["workspace"]["yaml"][namespace.ramble]:
+        if (
+            namespace.include
+            not in self.config_sections[namespace.workspace]["yaml"][namespace.ramble]
+        ):
             return
 
-        includes = self.config_sections["workspace"]["yaml"][namespace.ramble][namespace.include]
+        includes = self.config_sections[namespace.workspace]["yaml"][namespace.ramble][
+            namespace.include
+        ]
         changed = False
 
         if index is not None:
@@ -2040,7 +2052,9 @@ ramble:
 
         # load config scopes added via 'include:', in reverse so that
         # highest-precedence scopes are last.
-        includes = config_dict(self.config_sections["workspace"]["yaml"]).get("include", [])
+        includes = config_dict(self.config_sections[namespace.workspace]["yaml"]).get(
+            "include", []
+        )
         missing = []
         for full_config_path in reversed(includes):
             # Remove trailing slash
@@ -2087,12 +2101,12 @@ ramble:
 
     def ws_file_config_scope_name(self):
         """Name of the config scope of this workspace's config file."""
-        return f"workspace:{self.name}:{self.config_dir}"
+        return f"{namespace.workspace}:{self.name}:{self.config_dir}"
         # return 'ws:%s' % self.name
 
     def ws_file_config_scope(self):
         """Get the configuration scope for the workspace's config file."""
-        section = self.config_sections["workspace"]
+        section = self.config_sections[namespace.workspace]
         config_name = self.ws_file_config_scope_name()
         return ramble.config.SingleFileScope(
             config_name,
@@ -2111,8 +2125,8 @@ ramble:
 
     def _get_workspace_dict(self):
         return (
-            self.config_sections["workspace"]["yaml"]
-            if "workspace" in self.config_sections
+            self.config_sections[namespace.workspace]["yaml"]
+            if namespace.workspace in self.config_sections
             else None
         )
 
@@ -2131,15 +2145,15 @@ ramble:
 
     def get_workspace_vars(self):
         """Return a dict of workspace variables"""
-        return ramble.config.config.get_config("variables")
+        return ramble.config.config.get_config(namespace.variables)
 
     def get_workspace_env_vars(self):
         """Return a dict of workspace environment variables"""
-        return ramble.config.config.get_config("env_vars")
+        return ramble.config.config.get_config(namespace.env_var)
 
     def get_workspace_formatted_executables(self):
         """Return a dict of workspace formatted executables"""
-        return ramble.config.config.get_config("formatted_executables")
+        return ramble.config.config.get_config(namespace.formatted_executables)
 
     def get_workspace_internals(self):
         """Return a dict of workspace internals"""
@@ -2147,40 +2161,23 @@ ramble:
 
     def get_workspace_modifiers(self):
         """Return a dict of workspace modifiers"""
-        return ramble.config.config.get_config("modifiers")
+        return ramble.config.config.get_config(namespace.modifiers)
 
     def get_workspace_zips(self):
         """Return a dict of workspace zips"""
-        return ramble.config.config.get_config("zips")
+        return ramble.config.config.get_config(namespace.zips)
 
     def get_workspace_variants(self):
         """Return a dict of workspace variants"""
-        return ramble.config.config.get_config("variants")
+        return ramble.config.config.get_config(namespace.variants)
 
     def get_workspace_success_criteria(self):
         """Return a dict of workspace success_criteria"""
-        return ramble.config.config.get_config("success_criteria")
+        return ramble.config.config.get_config(namespace.success)
 
     def get_software_dict(self):
         """Return the software dictionary for this workspace"""
-        # DEPRECATED: Remove once the spack config section is completely removed
-        spack_dict = ramble.config.config.get_config("spack")
         software_dict = ramble.config.config.get_config(namespace.software)
-
-        if spack_dict:
-            logger.die(
-                "The spack configuration section is deprecated. "
-                "Please update to the software dict."
-            )
-
-        if namespace.packages in software_dict:
-            for pkg, config in software_dict[namespace.packages].items():
-                if "spack_spec" in config:
-                    logger.die(
-                        f'Package {pkg} defines "spack_spec" which is deprecated. '
-                        'Convert this to "pkg_spec" or "spack_pkg_spec" instead.'
-                    )
-
         return software_dict
 
     def get_applications(self):
@@ -2289,10 +2286,12 @@ def no_active_workspace():
 
 
 def _filter_results(results, summary_only):
-    if not summary_only or "experiments" not in results:
+    if not summary_only or namespace.experiment not in results:
         return results
     results = copy.deepcopy(results)
-    results["experiments"] = [r for r in results["experiments"] if r["N_REPEATS"] > 0]
+    results[namespace.experiment] = [
+        r for r in results[namespace.experiment] if r["N_REPEATS"] > 0
+    ]
     return results
 
 
