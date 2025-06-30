@@ -21,6 +21,16 @@ Then:
     pip install -r ramble/requirements.txt
     ./ramble/bin/ramble workspace create -d test_workspace -c ramble/examples/basic_hostname_config.yaml
 
+Alternatively, you can also use `uv` ([link to uv installation](https://docs.astral.sh/uv/getting-started/installation/#installing-uv)) to install Ramble:
+
+    git clone -c feature.manyFiles=true https://github.com/GoogleCloudPlatform/ramble.git
+    pushd ramble
+    uv venv # or uv venv --python <python_version> for using specific Python version
+    . .venv/bin/activate
+    uv pip install -r requirements.txt
+    bin/ramble workspace create -d test_workspace -c examples/basic_hostname_config.yaml
+    popd
+
 Dependencies
 ------------
 
