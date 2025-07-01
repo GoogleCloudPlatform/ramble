@@ -8,9 +8,7 @@
 """Define base classes for modifier definitions"""
 
 import fnmatch
-import io
 import re
-import textwrap
 from typing import List
 
 import ramble.util.class_attributes
@@ -19,6 +17,7 @@ import ramble.variants
 from ramble.error import InvalidModeError, ModifierError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
+from ramble.util import format
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
@@ -173,18 +172,7 @@ class ModifierBase(metaclass=ModifierMeta):
         return self.name
 
     def format_doc(self, **kwargs):
-        """Wrap doc string at 72 characters and format nicely"""
-        indent = kwargs.get("indent", 0)
-
-        if not self.__doc__:
-            return ""
-
-        doc = re.sub(r"\s+", " ", self.__doc__)
-        lines = textwrap.wrap(doc, 72)
-        results = io.StringIO()
-        for line in lines:
-            results.write((" " * indent) + line + "\n")
-        return results.getvalue()
+        return format.format_doc(self.__doc__, **kwargs)
 
     def modded_variables(self, app, extra_vars=None):
         mods = {}

@@ -7,10 +7,7 @@
 # except according to those terms.
 """Define base classes for package manager definitions"""
 
-import io
 import os
-import re
-import textwrap
 from typing import List
 
 import ramble.util.class_attributes
@@ -18,6 +15,7 @@ import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
+from ramble.util import format
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
@@ -188,18 +186,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         return self.name
 
     def format_doc(self, **kwargs):
-        """Wrap doc string at 72 characters and format nicely"""
-        indent = kwargs.get("indent", 0)
-
-        if not self.__doc__:
-            return ""
-
-        doc = re.sub(r"\s+", " ", self.__doc__)
-        lines = textwrap.wrap(doc, 72)
-        results = io.StringIO()
-        for line in lines:
-            results.write((" " * indent) + line + "\n")
-        return results.getvalue()
+        return format.format_doc(self.__doc__, **kwargs)
 
     def all_pipeline_phases(self, pipeline):
         """Iterator over all phases within a specified pipeline
