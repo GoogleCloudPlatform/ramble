@@ -8,3 +8,6 @@
 
 # Only files that end with this extension are considered valid templates by Ramble
 TEMPLATE_EXTENSION = ".tpl"
+
+# File that includes licensing information for sourcing
+LICENSE_INC_NAME = "license.inc"
