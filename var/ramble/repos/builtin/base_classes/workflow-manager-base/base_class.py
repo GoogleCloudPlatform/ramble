@@ -7,6 +7,9 @@
 # except according to those terms.
 """Define base classes for workflow manager definitions"""
 
+import io
+import re
+import textwrap
 from typing import List
 
 import ramble.util.class_attributes
@@ -166,3 +169,17 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
             for env_var in env_var_list:
                 all_env_vars[env_var.name] = env_var
         return all_env_vars
+
+    def format_doc(self, **kwargs):
+        """Wrap doc string at 72 characters and format nicely"""
+        indent = kwargs.get("indent", 0)
+
+        if not self.__doc__:
+            return ""
+
+        doc = re.sub(r"\s+", " ", self.__doc__)
+        lines = textwrap.wrap(doc, 72)
+        results = io.StringIO()
+        for line in lines:
+            results.write((" " * indent) + line + "\n")
+        return results.getvalue()
