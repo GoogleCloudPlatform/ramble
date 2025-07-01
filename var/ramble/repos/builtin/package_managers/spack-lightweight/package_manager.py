@@ -45,7 +45,13 @@ class SpackLightweight(PackageManagerBase):
         super().__init__(file_path)
         self.output_prefix = self._spec_prefix
 
-        self.runner = SpackRunner()
+        self._runner = None
+
+    @property
+    def runner(self):
+        if self._runner is None:
+            self._runner = SpackRunner()
+        return self._runner
 
     register_phase(
         "software_install_requested_compilers",
