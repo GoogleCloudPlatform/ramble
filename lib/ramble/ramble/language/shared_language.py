@@ -922,6 +922,58 @@ def variant(
     return _define_variant
 
 
+@shared_directive("required_vars")
+def required_variable(
+    var: str,
+    results_level="variable",
+    description=None,
+    mode=None,
+    modes=None,
+    when=None,
+    **kwargs,
+):
+    """Mark a variable as being required by this modifier
+
+    Args:
+        var (str): Variable name to mark as required
+        results_level (str): 'variable' or 'key'. If 'key', variable is promoted to
+                             a key within JSON or YAML formatted results.
+        description (str | None): Description of the required variable.
+        mode (str | None): mode that the required check should be applied to. The
+                            default None means apply to all modes.
+        modes (list[str] | None): modes that the required check should be applied to. The
+                            default None means apply to all modes.
+        when (list | None): List of when conditions to apply the required check.
+    """
+
+    def _mark_required_var(obj):
+        when_list = []
+        if mode or modes:
+            if obj.origin_type and obj.origin_type == "modifier":
+                when_list = ramble.language.language_helpers.require_condition(
+                    obj, "required_variable", "mode", "modes", mode=mode, modes=modes, when=when
+                )
+            else:
+                raise ramble.language.language_base.DirectiveError(
+                    f"A mode argument was provided for required variable {var} in object "
+                    f"{obj.name}. Mode arguments are only valid in a modifier definition."
+                )
+        else:
+            when_list = ramble.language.language_helpers.build_when_list(
+                when, obj, var, "required_variable"
+            )
+
+        obj.required_vars[var] = {
+            "type": ramble.keywords.key_type.required,
+            "level": ramble.keywords.output_level.variable,
+            "description": description,
+            # Extra prop that's only used for filtering
+            "when": when_list,
+        }
+
+    return _mark_required_var
+
+
 @contextlib.contextmanager
 def when(condition):
     from ramble.language.language_base import DirectiveMeta

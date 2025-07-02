@@ -236,6 +236,7 @@ class DirectiveMeta(type):
                         "variable",
                         "workload_variable",
                         "modifier_variable",
+                        "required_variable",
                         "package_manager_variable",
                         "workflow_manager_variable",
                         "environment_variable",

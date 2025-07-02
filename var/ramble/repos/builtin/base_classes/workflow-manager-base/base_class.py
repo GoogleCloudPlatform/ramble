@@ -169,3 +169,19 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
 
     def format_doc(self, **kwargs):
         return format.format_doc(self.__doc__, **kwargs)
+
+    def get_required_variables(self):
+        """Get all the required variables based on the mode and when conditions."""
+        required_vars = self.required_vars
+        filtered_vars = {}
+        if required_vars:
+            for var_name, var_props in required_vars.items():
+                if self.app_inst.expander.satisfies(
+                    var_props["when"], self.app_inst.object_variants
+                ):
+                    filtered_vars[var_name] = {
+                        # Exclude the extra when prop
+                        k: var_props[k]
+                        for k in var_props.keys() - {"when"}
+                    }
+        return filtered_vars

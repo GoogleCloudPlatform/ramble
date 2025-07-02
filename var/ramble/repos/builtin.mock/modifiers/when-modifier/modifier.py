@@ -113,3 +113,16 @@ class WhenModifier(BasicModifier):
         modes=["standard"],
         when=["+pkg_man_reqt_fails_when_enabled"],
     )
+
+    variant(
+        "mod_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test modifier required variable",
+    )
+
+    with when("+mod_required_variable"):
+        required_variable(
+            "test_mod_required_variable",
+            description="Test modifier required variable",
+        )

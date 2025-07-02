@@ -1431,3 +1431,62 @@ def test_package_manager_requirement_when(workspace_name):
             ValidationFailedError, match='Validation of: "spack list not-a-package" failed'
         ):
             workspace("setup", global_args=global_args)
+
+
+@pytest.mark.parametrize("obj", ["app", "mod", "wf_man", "pkg_man"])
+def test_obj_required_var_when(
+    workspace_name, obj, mutable_mock_wms_repo, mutable_mock_pkg_mans_repo
+):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        args = [
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            "--wm",
+            "when-workflow-manager",
+        ]
+
+        config("add", f"variants:{obj}_required_variable:true", global_args=global_args)
+        if obj == "mod":
+            mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+            with open(mod_config_path, "w+") as f:
+                f.write("modifiers:\n")
+                f.write(" - name: when-modifier\n")
+                f.write("   mode: test")
+        elif obj == "wf_man":
+            config("add", "variants:workflow_manager_included:true", global_args=global_args)
+        elif obj == "pkg_man":
+            config("add", "variants:package_manager_included:true", global_args=global_args)
+
+        workspace("manage", "experiments", *args, global_args=global_args)
+
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        assert not os.path.exists(exec_file)
+
+        config("add", f"variables:test_{obj}_required_variable:'test'", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        assert os.path.exists(exec_file)
