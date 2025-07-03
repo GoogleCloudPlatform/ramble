@@ -236,6 +236,15 @@ class IntelMpiBenchmarks(ExecutableApplication):
         contexts=["bw-bytes"],
     )
 
+    figure_of_merit(
+        "Time avg",
+        log_file=log_str,
+        fom_regex=bw_regex,
+        group_name="t_avg",
+        units="usec",
+        contexts=["bw-bytes"],
+    )
+
     # Combiend tables like:
     #  bytes #repetitions  t_min[usec]  t_max[usec]  t_avg[usec]   Mbytes/sec
     #   (happens in sendrecv and exchange)
