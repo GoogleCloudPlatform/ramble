@@ -198,7 +198,7 @@ _ramble_pathadd() {
 
     _pa_canonical=":$_pa_oldvalue:"
     if [ -d "$_pa_new_path" ] && \
-       [ "${_pa_canonical#*:${_pa_new_path}:}" = "${_pa_canonical}" ];
+       [ "${_pa_canonical#${_pa_new_path}:}" = "${_pa_canonical}" ];
     then
         if [ -n "$_pa_oldvalue" ]; then
             eval "export $_pa_varname=\"$_pa_new_path:$_pa_oldvalue\""
