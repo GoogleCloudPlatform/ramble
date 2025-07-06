@@ -8,9 +8,9 @@
 
 .. _package-manager-list:
 
-================
+====================
 Package Manager List
-================
+====================
 
 This is a list of package managers available within Ramble, for managing
 experiment software stacks.  It is automatically generated based on the

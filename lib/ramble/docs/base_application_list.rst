@@ -8,9 +8,9 @@
 
 .. _base-application-list:
 
-================
+=====================
 Base Application List
-================
+=====================
 
 This is a list of base applications you can inherit from within other  for using Ramble.  It is
 automatically generated based on the base applications in this Ramble
