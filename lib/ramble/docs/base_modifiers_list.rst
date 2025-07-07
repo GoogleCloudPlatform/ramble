@@ -8,9 +8,9 @@
 
 .. _base-modifier-list:
 
-================
+==================
 Base Modifier List
-================
+==================
 
 This is a list of base modifiers you can inherit from when creating new
 modifiers for use in Ramble. This list is automatically generated based on the
