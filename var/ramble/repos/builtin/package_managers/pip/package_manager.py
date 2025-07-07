@@ -42,7 +42,13 @@ class Pip(PackageManagerBase):
     def __init__(self, file_path):
         super().__init__(file_path)
 
-        self.runner = PipRunner()
+        self._runner = None
+
+    @property
+    def runner(self):
+        if self._runner is None:
+            self._runner = PipRunner()
+        return self._runner
 
     register_builtin(
         "pip_activate", required=True, depends_on=["builtin::env_vars"]

@@ -67,7 +67,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
         self._verbosity = "short"
 
-        self.runner = None
         self.app_inst = None
         self.keywords = None
 
@@ -86,6 +85,11 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
             )
 
         self.output_prefix = self.name
+
+    @property
+    def runner(self):
+        # Turn `runner` into a property for delayed init
+        return None
 
     def copy(self):
         """Deep copy a package manager instance"""
