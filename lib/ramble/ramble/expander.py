@@ -816,9 +816,9 @@ class Expander:
                 logger.debug(e)
             except RambleSyntaxError as e:
                 raise RambleSyntaxError(f'{str(e)} in "{in_str}"')
-            except Exception as e:
-                logger.debug(f"ast.parse hit the following exception on input: {in_str}")
-                logger.debug(f"{e}")
+            except SyntaxError as e:
+                logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
+                logger.debug(e)
 
             for warn in wal:
                 if r"invalid escape sequence '\{'" not in str(warn.message):
