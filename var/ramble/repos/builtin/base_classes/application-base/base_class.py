@@ -27,7 +27,6 @@ import ramble.fetch_strategy
 import ramble.graphs
 import ramble.keywords
 import ramble.mirror
-import ramble.paths
 import ramble.repeats
 import ramble.repository
 import ramble.stage
@@ -150,8 +149,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
     tags: List[str] = []
 
     license_names: List[str] = []
-
-    license_inc_name = "license.inc"
 
     def __init__(self, file_path):
         super().__init__()
@@ -1847,7 +1844,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             workspace.shared_license_dir, self.name
         )
         self.license_file = os.path.join(
-            self.license_path, self.license_inc_name
+            self.license_path, constants.LICENSE_INC_NAME
         )
 
         fs.mkdirp(self.license_path)
@@ -3118,7 +3115,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         # Append logic to source file which contains the exports
                         shell = ramble.config.get("config:shell")
                         command.append(
-                            f"{source_str(shell)} {{license_input_dir}}/{self.license_inc_name}"
+                            f"{source_str(shell)} {{license_input_dir}}/{constants.LICENSE_INC_NAME}"
                         )
 
         # Process environment variable actions
