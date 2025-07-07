@@ -9,14 +9,12 @@
 
 import copy
 import fnmatch
-import io
 import operator
 import os
 import re
 import shutil
 import stat
 import string
-import textwrap
 import time
 from typing import List
 
@@ -59,7 +57,7 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions
+from ramble.util import constants, conversions, format
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -831,18 +829,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             color.cprint(f"{indent}- {exp}")
 
     def format_doc(self, **kwargs):
-        """Wrap doc string at 72 characters and format nicely"""
-        indent = kwargs.get("indent", 0)
-
-        if not self.__doc__:
-            return ""
-
-        doc = re.sub(r"\s+", " ", self.__doc__)
-        lines = textwrap.wrap(doc, 72)
-        results = io.StringIO()
-        for line in lines:
-            results.write((" " * indent) + line + "\n")
-        return results.getvalue()
+        return format.format_doc(self.__doc__, **kwargs)
 
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):

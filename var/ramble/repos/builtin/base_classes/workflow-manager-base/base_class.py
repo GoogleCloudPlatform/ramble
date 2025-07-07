@@ -166,3 +166,6 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
             for env_var in env_var_list:
                 all_env_vars[env_var.name] = env_var
         return all_env_vars
+
+    def format_doc(self, **kwargs):
+        return format.format_doc(self.__doc__, **kwargs)
