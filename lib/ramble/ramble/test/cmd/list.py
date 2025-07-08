@@ -56,6 +56,12 @@ def test_list_format_html():
     assert '<div class="section" id="hostname">' in output
 
 
+@pytest.mark.maybeslow
+def test_list_base_html():
+    output = list("--type", "base_applications", "--format", "html")
+    assert '<div class="section" id="hpl">' in output
+
+
 def test_list_update(tmpdir):
     update_file = tmpdir.join("output")
 
