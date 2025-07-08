@@ -92,8 +92,7 @@ Base Classes
 
 Ramble provides base classes which can be inherited when creating new modifier
 definition files. These encapsulate most of the basic modifier functionality,
-and allow new modifiers to function with only a little syntax. These can be
-seen in more detail in :mod:`ramble.modifier_types`.
+and allow new modifiers to function with only a little syntax.
 
 New modifier definitions can also inherit their behavior from other
 modifier classes to replicate aspects of their behavior.

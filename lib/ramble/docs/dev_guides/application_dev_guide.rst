@@ -134,8 +134,7 @@ Base Classes
 Ramble provides base classes which can be inherited from when creating new
 application definition files. Currently, these are used to abstract the package
 manager logic, but more generally change the behavior of the underlying
-application definitions. These can be seen in more detail in
-:mod:`ramble.application_types`.
+application definitions.
 
 New application definitions can also inherit their behavior from other
 application classes to replicate aspects of their behavior.
