@@ -185,7 +185,11 @@ above, you should see the following error printed to the screen:
 
 .. code-block:: console
 
-    ==> Error: Experiment gromacs.water_bare.pme_single_rank is not unique.
+    ==> Warning: Two experiments are defined with the name gromacs.water_gmx50.pme_single_rank
+    ==> Warning: Variable differences between experiment definitions:
+    ==> Warning:   - type: {'previous': 'pme', 'new': 'rf'}
+    ==> Warning:   - experiment_index: {'previous': 1, 'new': 2}
+    ==> Error: Experiment gromacs.water_gmx50.pme_single_rank is not unique.
 
 Within Ramble, each experiment is required to have a unique namespace. The
 namespace of an experiment is defined as:
