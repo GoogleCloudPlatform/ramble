@@ -42,8 +42,7 @@ Examples of phases include ``get_inputs`` (for downloading input files needed
 by a workload) and ``software_install`` (for performing software installation
 using a package manager).
 
-Phases can be defined in a variety of locations. Some base classes (e.g.
-:mod:`ramble.application`) define phases for specific pipelines. Additionally,
+Phases can be defined in a variety of locations. Some base classes define phases for specific pipelines. Additionally,
 instances of application, modifier, or package manager definitions can define
 phases as well. Each phase is defined in two parts. The first part is to define
 a class method on a object definition. Phase names need to begin with an

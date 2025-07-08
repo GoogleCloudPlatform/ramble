@@ -42,7 +42,6 @@ var_path = os.path.join(prefix, "var", "ramble")
 tests_path = os.path.join(var_path, "tests")
 share_path = os.path.join(prefix, "share", "ramble")
 repos_path = os.path.join(var_path, "repos")
-application_types_path = os.path.join(module_path, "application_types")
 
 # Paths to built-in Ramble repositories.
 builtin_path = os.path.join(repos_path, "builtin")

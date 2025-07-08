@@ -85,10 +85,7 @@ Base Classes
 
 Ramble provides base classes which can be inherited when creating new package manager
 definition files. These encapsulate most of the basic package manager functionality,
-and allow new package managers to function with only a little syntax. These can be
-seen in more detail in :mod:`ramble.package_manager_types`, however most
-package managers inherit from the base package manager class defined in the
-`package manager module <https://github.com/GoogleCloudPlatform/ramble/blob/develop/lib/ramble/ramble/package_manager.py>`_.
+and allow new package managers to function with only a little syntax.
 
 New package manager definitions can also inherit their behavior from other
 package manager classes to replicate aspects of their behavior.
