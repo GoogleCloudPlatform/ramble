@@ -75,7 +75,7 @@ def default_mode(name, **kwargs):
 
 @modifier_directive("variable_modifications")
 def variable_modification(
-    name, modification, method="set", mode=None, modes=None, separator=" ", **kwargs
+    name, modification, method="set", mode=None, modes=None, separator=" ", when=None, **kwargs
 ):
     """Define a new variable modification for a mode in this modifier.
 
@@ -89,6 +89,7 @@ def variable_modification(
         modes (str): List of modes to group this modification into
         separator (str): Optional separator to use when modifying with 'append' or
                          'prepend' methods.
+        when (list | None): List of when conditions this modification should apply in
 
     Supported values are 'append', 'prepend', and 'set':
         'append' will add the modification to the end of 'name'
@@ -97,6 +98,8 @@ def variable_modification(
     """
 
     def _execute_variable_modification(mod):
+        import ramble.workload
+
         supported_methods = ["append", "prepend", "set"]
         if method not in supported_methods:
             raise DirectiveError(
@@ -104,24 +107,26 @@ def variable_modification(
                 f"  Valid methods are {str(supported_methods)}"
             )
 
-        all_modes = ramble.language.language_helpers.require_definition(
-            mode, modes, mod.modes, "mode", "modes", "variable_modification"
+        when_list = ramble.language.language_helpers.require_condition(
+            mod, "variable_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
+        when_set = frozenset(when_list)
 
-        for mode_name in all_modes:
-            if mode_name not in mod.variable_modifications:
-                mod.variable_modifications[mode_name] = {}
+        if when_set not in mod.variable_modifications:
+            mod.variable_modifications[when_set] = {}
 
-            if name not in mod.variable_modifications[mode_name]:
-                mod.variable_modifications[mode_name][name] = []
+        if name not in mod.variable_modifications[when_set]:
+            mod.variable_modifications[when_set][name] = []
 
-            mod.variable_modifications[mode_name][name].append(
-                {
-                    "modification": modification,
-                    "method": method,
-                    "separator": separator,
-                }
+        mod.variable_modifications[when_set][name].append(
+            ramble.workload.WorkloadVariableModification(
+                name=name,
+                modification=modification,
+                method=method,
+                separator=separator,
+                when=when_list,
             )
+        )
 
     return _execute_variable_modification
 

@@ -13,6 +13,7 @@ class WhenModifier(BasicModifier):
     name = "when-modifier"
 
     mode("standard", "Standard execution mode")
+    mode("test", "Test mode")
     default_mode("standard")
 
     variant(
@@ -83,3 +84,18 @@ class WhenModifier(BasicModifier):
         ]
 
         return prepend_execs, append_execs
+
+    variant(
+        "variable_modification_active",
+        default=False,
+        values=[True, False],
+        description="Test variable modifier",
+    )
+
+    variable_modification(
+        "test_variable",
+        modification="test var modified",
+        method="set",
+        mode="test",
+        when=["+variable_modification_active"],
+    )

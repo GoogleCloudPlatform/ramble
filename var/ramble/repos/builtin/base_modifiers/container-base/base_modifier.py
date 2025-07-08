@@ -160,12 +160,12 @@ class ContainerBase(BasicModifier):
             exp_mount not in input_mounts
             and expanded_exp_mount not in input_mounts
         ):
-            add_mod = self._usage_mode not in self.variable_modifications
-            add_mod = add_mod or (
-                self._usage_mode in self.variable_modifications
-                and "container_mounts"
-                not in self.variable_modifications[self._usage_mode]
-            )
+            add_mod = True
+            for when_set, var_mod_dict in self.variable_modifications.items():
+                if self.expander.satisfies(when_set, self.object_variants):
+                    if "container_mounts" in var_mod_dict:
+                        add_mod = False
+                        break
             if add_mod:
                 self.variable_modification(
                     "container_mounts",

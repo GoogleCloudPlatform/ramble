@@ -156,7 +156,7 @@ def require_condition(
         List of all when conditions
     """
 
-    if not (single_arg_name in kwargs or multiple_arg_name in kwargs or "when" in kwargs):
+    if not (kwargs[single_arg_name] or kwargs[multiple_arg_name] or kwargs["when"]):
         raise DirectiveError(
             f"Directive {directive_name} requires at least one of "
             f"{single_arg_name} or {multiple_arg_name} or when to be defined."
