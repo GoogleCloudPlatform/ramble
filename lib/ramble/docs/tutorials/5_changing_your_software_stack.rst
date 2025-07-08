@@ -115,10 +115,12 @@ use of the ``spack`` package manager. You are able to change the package
 manager through this variant option, however the remainder of this tutorial
 will assume the package manager is ``spack``. When changing the software
 definitions in a workspace, many options are available to you. For example, you
-could modify the compiler used for building GROMACS (as defined on line 45), or
-you could modify the MPI used for these experiments (as seen on line 53).
-However, we will explore changing aspects of GROMACS itself (such as its
-version or variants). 
+could modify the compiler used for building GROMACS (as controlled by the
+``compiler`` attribute under the ``gromacs`` package definition), or you could
+modify the MPI used for these experiments (as controlled by the ``impi2021``
+package used within the ``gromacs`` environment's package list).  However, we
+will explore changing aspects of GROMACS itself (such as its version or
+variants). 
 
 **NOTE:** It is important to note that changing aspects of
 compilation could result in build-time errors that need to be resolved before
@@ -152,8 +154,8 @@ This command opens the ``ramble.yaml`` file, along with any ``*.tpl`` files in
 the workspace's ``configs`` directory.
 
 Once the ``ramble.yaml`` file is opened, change the version ``2021.6`` to
-``2021.7`` on line 47. Then save and exit the files. These changes should now
-be reflected in the output of:
+``2021.7`` in the ``gromacs`` package definition. Then save and exit the files.
+These changes should now be reflected in the output of:
 
 .. code-block:: console
 
