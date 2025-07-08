@@ -1362,6 +1362,7 @@ class SpackRunner(CommandRunner):
         validation_type="not_empty",
         package_manager="spack",
         regex=None,
+        **kwargs,
     ):
         regex_validations = ["contains_regex", "does_not_contain_regex"]
 

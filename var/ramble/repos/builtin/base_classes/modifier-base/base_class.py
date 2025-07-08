@@ -255,8 +255,11 @@ class ModifierBase(metaclass=ModifierMeta):
             yield from self.env_var_modifications[when_set].items()
 
     def all_package_manager_requirements(self):
-        if self._usage_mode in self.package_manager_requirements:
-            yield from self.package_manager_requirements[self._usage_mode]
+        for when_set, reqs in self.package_manager_requirements.items():
+            if not self.expander.satisfies(when_set, self.object_variants):
+                continue
+
+            yield from self.package_manager_requirements[when_set]
 
     def all_pipeline_phases(self, pipeline):
         if pipeline in self.phase_definitions:

@@ -99,3 +99,17 @@ class WhenModifier(BasicModifier):
         mode="test",
         when=["+variable_modification_active"],
     )
+
+    variant(
+        "pkg_man_reqt_fails_when_enabled",
+        default=False,
+        values=[True, False],
+        description="Test package manager requirement",
+    )
+
+    package_manager_requirement(
+        "list not-a-package",
+        validation_type="not_empty",
+        modes=["standard"],
+        when=["+pkg_man_reqt_fails_when_enabled"],
+    )

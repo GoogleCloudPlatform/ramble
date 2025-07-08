@@ -365,9 +365,11 @@ def modifier_variable(
 def package_manager_requirement(
     command: str,
     validation_type: str,
-    modes: list,
+    mode: str = None,
+    modes: list = None,
     regex=None,
     package_manager: str = "*",
+    when=None,
     **kwargs,
 ):
     """Define a requirement when this modifier is used in an experiment with a
@@ -382,10 +384,12 @@ def package_manager_requirement(
         validation_type (str): Type of validation to perform on output of command.
                          Valid types are: 'empty', 'not_empty', 'contains_regex',
                          'does_not_contain_regex'
+        mode (str): Usage mode this requirement should apply to
         modes (list(str)): List of usage modes this requirement should apply to
         regex (str): Regular expression to use when validation_type is either 'contains_regex'
                or 'does_no_contain_regex'
         package_manager (str): Name of the package manager this requirement applies to
+        when (list | None): List of when conditions this requirement should apply to
     """
 
     def _new_package_manager_requirement(mod):
@@ -406,21 +410,22 @@ def package_manager_requirement(
                 f"{validation_type} but no regex is given"
             )
 
-        exp_modes = modes
-        if isinstance(exp_modes, list):
-            exp_modes = ramble.language.language_helpers.expand_patterns(exp_modes, mod.modes)
+        when_list = ramble.language.language_helpers.require_condition(
+            mod, "package_manager_requirement", "mode", "modes", mode=mode, modes=modes, when=when
+        )
+        when_set = frozenset(when_list)
 
-        for mode in exp_modes:
-            if mode not in mod.package_manager_requirements:
-                mod.package_manager_requirements[mode] = []
+        if when_set not in mod.package_manager_requirements:
+            mod.package_manager_requirements[when_set] = []
 
-            mod.package_manager_requirements[mode].append(
-                {
-                    "command": command,
-                    "validation_type": validation_type,
-                    "regex": regex,
-                    "package_manager": package_manager,
-                }
-            )
+        mod.package_manager_requirements[when_set].append(
+            {
+                "command": command,
+                "validation_type": validation_type,
+                "regex": regex,
+                "package_manager": package_manager,
+                "when": when_list,
+            }
+        )
 
     return _new_package_manager_requirement

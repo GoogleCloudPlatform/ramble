@@ -13,6 +13,7 @@ import pytest
 import ramble.workspace
 from ramble.error import ObjectValidationError, RambleCommandError
 from ramble.main import RambleCommand
+from ramble.pkg_man.builtin.spack_lightweight import ValidationFailedError
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
@@ -1387,3 +1388,46 @@ def test_variable_modification_when(workspace_name, var_mod_when, modifier_mode,
 
             assert (exec_original_str in data) != expected_exec
             assert (exec_test_str in data) == expected_exec
+
+
+@pytest.mark.long
+def test_package_manager_requirement_when(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(mod_config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        config(
+            "add",
+            "variants:pkg_man_reqt_fails_when_enabled:true",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        with pytest.raises(
+            ValidationFailedError, match='Validation of: "spack list not-a-package" failed'
+        ):
+            workspace("setup", global_args=global_args)
