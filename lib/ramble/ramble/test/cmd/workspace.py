@@ -453,7 +453,6 @@ def test_workspace_info_complete(workspace_name):
     assert "package_manager: spack" in output
 
     assert "Variables from Workspace" in output
-    assert "mpi_command = mpirun -n {n_ranks} ==> mpirun -n 1" in output
     assert "Variables from Experiment" in output
     assert "n_ranks = 1 ==> 1" in output
 

@@ -601,7 +601,10 @@ cd "{experiment_run_dir}"
         # Construct string for default variants
         variant_string = ""
 
-        all_variants = {}
+        # Set default workflow_manager to the user-managed one,
+        # which provides defaults for required variables such as
+        # batch_submit and mpi_command.
+        all_variants = {"workflow_manager": "user-managed"}
         for scope in ramble.config.scopes():
             if namespace.workspace not in scope:
                 variant_dict = ramble.config.get(namespace.variants, scope=scope)
@@ -644,8 +647,6 @@ ramble:
       OMP_NUM_THREADS: '{{n_threads}}'
 {variant_string}
   {namespace.variables}:
-    mpi_command: mpirun -n {{n_ranks}}
-    batch_submit: '{{execute_experiment}}'
     processes_per_node: 1
   {namespace.application}: {{}}
   {namespace.software}:
