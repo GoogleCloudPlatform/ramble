@@ -59,3 +59,23 @@ def test_manage_variable_multiple_equals(workspace_name, tmpdir):
                     results[idx] = True
 
     assert all(results)
+
+
+def test_manage_experiments_no_overwrite_wm_vars(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+    workspace(
+        "manage",
+        "experiments",
+        "hostname",
+        "--wf",
+        "parallel",
+        "--wm",
+        "user-managed",
+        global_args=global_args,
+    )
+    with open(ws.config_file_path) as f:
+        content = f.read()
+        assert "processes_per_node:" in content
+        assert "batch_submit" not in content
+        assert "mpi_command" not in content

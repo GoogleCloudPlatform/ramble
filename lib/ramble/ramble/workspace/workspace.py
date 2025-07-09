@@ -10,6 +10,7 @@ import contextlib
 import copy
 import datetime
 import fnmatch
+import itertools
 import os
 import re
 import shutil
@@ -387,6 +388,25 @@ def get_workspace(args, cmd_name, required=False):
             "or use:",
             f"    ramble -w WRKSPC {cmd_name} ...",
         )
+
+
+def _get_all_wm_var_names(wm):
+    """Return a set of all workflow manager's variables names."""
+    if wm is None:
+        variants_dict = ramble.config.get(namespace.variants)
+        wm_name = variants_dict.get(namespace.workflow_manager)
+        if wm_name is None:
+            return set()
+    else:
+        wm_name = wm
+    try:
+        wm_inst = ramble.repository.get(
+            wm_name, object_type=ramble.repository.ObjectTypes.workflow_managers
+        )
+    except ramble.repository.UnknownObjectError:
+        return set()
+    vars = list(itertools.chain.from_iterable(wm_inst.object_variables.values()))
+    return {var.name for var in vars}
 
 
 class Workspace:
@@ -1297,6 +1317,8 @@ ramble:
             var_def_dict[workload_name_variable] = workload_names.copy()
             workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
 
+        wm_all_var_names = _get_all_wm_var_names(workflow_manager)
+
         for workload_name in workload_names:
             edited = True
             if workload_name not in workloads_dict:
@@ -1324,7 +1346,12 @@ ramble:
 
             # Ensure required variables are defined
             for key in app_inst.keywords.all_required_keys():
-                if key not in workspace_vars:
+                # Do not define missing required variables that are defined in
+                # the associated workflow manager.
+                # TODO: should include consideration for when clause, right now
+                # the `selected_variables` method cannot be used due to no associated
+                # expander at this stage.
+                if key not in workspace_vars and key not in wm_all_var_names:
                     vars_dict[key] = ""
 
             # Only extract variable defaults if requested.
