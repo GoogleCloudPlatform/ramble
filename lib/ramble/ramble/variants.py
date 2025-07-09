@@ -118,16 +118,7 @@ class VariantSet:
             name: Name of variant
             value: The value the variant should take.
         """
-        if name in self.default_variants:
-            if (
-                self.default_variants[name].values
-                and value not in self.default_variants[name].values
-            ):
-                raise RambleVariantError(
-                    f"When defining variant {name} the value {value} is not valid.\n"
-                    f"   Valid values include: {self.default_variants[name].values}"
-                )
-
+        if name in reserved_variants:
             self._define_variant(
                 name,
                 variant_type=variant_types.experiment,
@@ -135,7 +126,7 @@ class VariantSet:
                 description=None,
                 values=None,
             )
-        elif name in reserved_variants:
+        else:
             self._define_variant(
                 name,
                 variant_type=variant_types.experiment,
@@ -222,15 +213,24 @@ class VariantSet:
         defined_variants = set()
         out_set = set()
 
-        # Define default variants after experiment variants so we only define
-        # undefined variants.
-        variant_sets = [self.experiment_variants, self.default_variants]
+        for name, variant in self.experiment_variants.items():
+            if name in self.default_variants:
+                if (
+                    name not in reserved_variants
+                    and self.default_variants[name].values
+                    and variant.default not in self.default_variants[name].values
+                ):
+                    raise RambleVariantError(
+                        f"When defining variant {name} the value {variant.default} is not valid.\n"
+                        f"   Valid values include: {self.default_variants[name].values}"
+                    )
+                out_set.add(variant.as_definition())
+                defined_variants.add(name)
 
-        for variant_set in variant_sets:
-            for name, variant in variant_set.items():
-                if name not in defined_variants:
-                    out_set.add(variant.as_definition())
-                    defined_variants.add(name)
+        for name, variant in self.default_variants.items():
+            if name not in defined_variants:
+                out_set.add(variant.as_definition())
+                defined_variants.add(name)
 
         for name, variant_list in self.multi_value_variants.items():
             for variant in variant_list:
