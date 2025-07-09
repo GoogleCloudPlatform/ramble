@@ -823,6 +823,7 @@ def environment_variable(
     workloads=None,
     workload_group=None,
     when=None,
+    always_set=True,
     **kwargs,
 ):
     """Define an environment variable to be used in experiments. Workload args
@@ -838,6 +839,8 @@ def environment_variable(
         workload_group (str): Name of app workload group this env-var should be
                                added to
         when (list | None): List of when conditions to apply to directive
+        always_set (bool): Always set this env-var. If false, only set if not
+                           already set.
     """
 
     def _execute_environment_variable(obj):
@@ -846,7 +849,12 @@ def environment_variable(
         )
 
         workload_env_var = ramble.workload.WorkloadEnvironmentVariable(
-            name, value=value, description=description, when=when_list, **kwargs
+            name,
+            value=value,
+            description=description,
+            when=when_list,
+            always_set=always_set,
+            **kwargs,
         )
 
         if workload or workloads or workload_group:

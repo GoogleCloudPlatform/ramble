@@ -233,3 +233,50 @@ def test_object_env_var_order(
                     break
 
         assert all(found_order)
+
+
+@pytest.mark.parametrize(
+    "env_var_setting",
+    ["Always", "IfUnset"],
+)
+def test_set_env_var_only_if_unset(workspace_name, mutable_mock_apps_repo, env_var_setting):
+    global_args = ["-w", workspace_name]
+
+    command_str = {
+        "Always": "export SET_ONLY_IF_UNSET=set_value;",
+        "IfUnset": 'export SET_ONLY_IF_UNSET="${SET_ONLY_IF_UNSET:-unset_default}";',
+    }
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:test_env_var_set_opt:{env_var_setting}", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "basic",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert command_str[env_var_setting] in data

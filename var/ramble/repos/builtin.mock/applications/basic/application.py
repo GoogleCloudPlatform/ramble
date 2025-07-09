@@ -59,3 +59,26 @@ class Basic(ExecutableApplication):
         group_name="test",
         units="s",
     )
+
+    variant(
+        "test_env_var_set_opt",
+        default="Off",
+        values=["Always", "IfUnset", "Off"],
+        description="Test environment variable set option",
+    )
+
+    environment_variable(
+        "SET_ONLY_IF_UNSET",
+        value="unset_default",
+        description="Test environment variable",
+        always_set=False,
+        when=["test_env_var_set_opt=IfUnset"],
+    )
+
+    environment_variable(
+        "SET_ONLY_IF_UNSET",
+        value="set_value",
+        description="Test environment variable",
+        always_set=True,
+        when=["test_env_var_set_opt=Always"],
+    )

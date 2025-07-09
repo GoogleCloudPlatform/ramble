@@ -158,6 +158,7 @@ class WorkloadEnvironmentVariable:
         value=None,
         description: str = None,
         when=None,
+        always_set=True,
         **kwargs,
     ):
         """WorkloadEnvironmentVariable constructor
@@ -169,7 +170,7 @@ class WorkloadEnvironmentVariable:
             when (list | None): List of when conditions to apply to directive
         """
         self.name = name
-        self.value = value
+        self.value = value if always_set is True else f"${{{name}:-{value}}}"
         self.description = description
         self.when = when.copy() if when else []
 
