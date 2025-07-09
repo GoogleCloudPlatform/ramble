@@ -16,12 +16,19 @@ pytestmark = pytest.mark.usefixtures(
     "mutable_mock_workspace_path",
 )
 
+config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
 def test_container_push_cache_script(request):
     ws_name = request.node.name
     ws = ramble.workspace.create(ws_name)
+    global_args = ["-w", ws_name]
+    config(
+        "add",
+        "variants:generate_push_container_image_script:true",
+        global_args=global_args,
+    )
     workspace(
         "manage",
         "experiments",
@@ -40,7 +47,7 @@ def test_container_push_cache_script(request):
         "container_base_image=base-linux",
         "-v",
         "container_image_tag=my-tag",
-        global_args=["-w", ws_name],
+        global_args=global_args,
     )
     ws._re_read()
     with ramble.config.override(
