@@ -37,3 +37,16 @@ class WhenWorkflowManager(WorkflowManagerBase):
             value="WF_ENV_VAR_SET",
             description="Test env variable",
         )
+
+    variant(
+        "wf_man_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test required variable",
+    )
+
+    required_variable(
+        "test_wf_man_required_variable",
+        description="Test required variable",
+        when=["+wf_man_required_variable"],
+    )

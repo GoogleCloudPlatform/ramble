@@ -345,17 +345,17 @@ class ModifierBase(metaclass=ModifierMeta):
         pass
 
     def get_required_variables(self):
-        """Get all the required variables based on the mode."""
+        """Get all the required variables based on the mode and when conditions."""
         required_vars = self.required_vars
         filtered_vars = {}
         if required_vars:
-            mode = self._usage_mode
             for var_name, var_props in required_vars.items():
-                modes = var_props["modes"]
-                if modes is None or mode in modes:
+                if self.expander.satisfies(
+                    var_props["when"], self.object_variants
+                ):
                     filtered_vars[var_name] = {
-                        # Exclude the extra modes prop
+                        # Exclude the extra when prop
                         k: var_props[k]
-                        for k in var_props.keys() - {"modes"}
+                        for k in var_props.keys() - {"when"}
                     }
         return filtered_vars

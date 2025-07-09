@@ -37,3 +37,16 @@ class WhenPackageManager(PackageManagerBase):
             value="PKG_ENV_VAR_SET",
             description="Test env variable",
         )
+
+    variant(
+        "pkg_man_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test required variable",
+    )
+
+    required_variable(
+        "test_pkg_man_required_variable",
+        description="Test required variable",
+        when=["+pkg_man_required_variable"],
+    )

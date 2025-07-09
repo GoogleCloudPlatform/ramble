@@ -315,3 +315,17 @@ class WhenDirectives(ExecutableApplication):
             description="Test app environment variable",
             workload_group="test_wl_group",
         )
+
+    variant(
+        "app_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test required variable",
+    )
+
+    required_variable(
+        "test_app_required_variable",
+        results_level="key",
+        description="Test required variable",
+        when=["+app_required_variable"],
+    )

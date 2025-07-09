@@ -247,6 +247,22 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
         return self.app_inst.expander._used_variables
 
+    def get_required_variables(self):
+        """Get all the required variables based on the mode and when conditions."""
+        required_vars = self.required_vars
+        filtered_vars = {}
+        if required_vars:
+            for var_name, var_props in required_vars.items():
+                if self.app_inst.expander.satisfies(
+                    var_props["when"], self.app_inst.object_variants
+                ):
+                    filtered_vars[var_name] = {
+                        # Exclude the extra when prop
+                        k: var_props[k]
+                        for k in var_props.keys() - {"when"}
+                    }
+        return filtered_vars
+
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
     ):

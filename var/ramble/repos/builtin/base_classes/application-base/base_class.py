@@ -3300,3 +3300,25 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     ramble.repository.ObjectTypes.workflow_managers,
                     self.workflow_manager,
                 )
+
+    def get_required_variables(self):
+        """Get all the required variables based on the when conditions."""
+        required_vars = self.required_vars
+        filtered_vars = {}
+        if required_vars:
+            for var_name, var_props in required_vars.items():
+                if self.expander.satisfies(
+                    var_props["when"], self.object_variants
+                ):
+                    filtered_vars[var_name] = {
+                        # Exclude the extra modes prop
+                        k: var_props[k]
+                        for k in var_props.keys() - {"when"}
+                    }
+        return filtered_vars
+
+    def set_required_variables(self):
+        """Set required variables from all objects"""
+        for _, obj in self._objects():
+            logger.debug(f"Setting required variables for {obj.name}")
+            self.keywords.update_keys(obj.get_required_variables())
