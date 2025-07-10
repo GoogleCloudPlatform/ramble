@@ -390,22 +390,26 @@ def get_workspace(args, cmd_name, required=False):
         )
 
 
-def _get_all_wm_var_names(wm):
-    """Return a set of all workflow manager's variables names."""
-    if wm is None:
+def _get_all_obj_var_names(obj, obj_type):
+    """Return a set of all variables names defined in the given object."""
+    if obj is None:
+        if obj_type == ramble.repository.ObjectTypes.package_managers:
+            variant_name = namespace.package_manager
+        elif obj_type == ramble.repository.ObjectTypes.workflow_managers:
+            variant_name = namespace.workflow_manager
+        else:
+            raise ValueError("Only package manager and workflow manager types are supported")
         variants_dict = ramble.config.get(namespace.variants)
-        wm_name = variants_dict.get(namespace.workflow_manager)
-        if wm_name is None:
+        obj_name = variants_dict.get(variant_name)
+        if obj_name is None:
             return set()
     else:
-        wm_name = wm
+        obj_name = obj
     try:
-        wm_inst = ramble.repository.get(
-            wm_name, object_type=ramble.repository.ObjectTypes.workflow_managers
-        )
+        obj_inst = ramble.repository.get(obj_name, object_type=obj_type)
     except ramble.repository.UnknownObjectError:
         return set()
-    vars = list(itertools.chain.from_iterable(wm_inst.object_variables.values()))
+    vars = list(itertools.chain.from_iterable(obj_inst.object_variables.values()))
     return {var.name for var in vars}
 
 
@@ -1317,7 +1321,11 @@ ramble:
             var_def_dict[workload_name_variable] = workload_names.copy()
             workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
 
-        wm_all_var_names = _get_all_wm_var_names(workflow_manager)
+        obj_var_names = _get_all_obj_var_names(
+            workflow_manager, obj_type=ramble.repository.ObjectTypes.package_managers
+        ) | _get_all_obj_var_names(
+            workflow_manager, obj_type=ramble.repository.ObjectTypes.workflow_managers
+        )
 
         for workload_name in workload_names:
             edited = True
@@ -1347,11 +1355,11 @@ ramble:
             # Ensure required variables are defined
             for key in app_inst.keywords.all_required_keys():
                 # Do not define missing required variables that are defined in
-                # the associated workflow manager.
+                # the associated package and workflow managers.
                 # TODO: should include consideration for when clause, right now
                 # the `selected_variables` method cannot be used due to no associated
                 # expander at this stage.
-                if key not in workspace_vars and key not in wm_all_var_names:
+                if key not in workspace_vars and key not in obj_var_names:
                     vars_dict[key] = ""
 
             # Only extract variable defaults if requested.
