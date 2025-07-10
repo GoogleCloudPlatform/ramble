@@ -8,7 +8,7 @@ or http://www.apache.org/licenses/LICENSE-2.0) or the MIT license,
 Copyrights and patents in the Ramble project are retained by contributors.
 No copyright assignment is required to contribute to Ramble.
 
-Ramble is derived some spack at https://github.com/spack/spack
+Ramble is derived from spack at https://github.com/spack/spack
 
 Spack was originally distributed under the LGPL-2.1 license. Consent from
 contributors to relicense to Apache-2.0/MIT is documented at
