@@ -343,8 +343,7 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_a
             "variables",
             "env_vars",
             "software",
-            "mpi_command",
-            "batch_submit",
+            "processes_per_node",
         ]
 
         for key in expected_keys:

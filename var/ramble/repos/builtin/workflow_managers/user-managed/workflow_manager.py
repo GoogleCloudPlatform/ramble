@@ -25,3 +25,15 @@ class UserManaged(WorkflowManagerBase):
 """,
         description="Banner to describe the workflow within execution templates",
     )
+
+    workflow_manager_variable(
+        name="mpi_command",
+        default="mpirun -n {n_ranks}",
+        description="mpirun prefix, mostly served as an overridable default",
+    )
+
+    workflow_manager_variable(
+        name="batch_submit",
+        default="{execute_experiment}",
+        description="batch_submit script, mostly served as an overridable default",
+    )

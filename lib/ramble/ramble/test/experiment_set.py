@@ -822,24 +822,19 @@ def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var)
         assert "is reserved by ramble" in captured
 
 
-@pytest.mark.parametrize("var", ["batch_submit", "mpi_command"])
-def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsys):
+def test_missing_required_keyword_errors(mutable_mock_workspace_path, capsys):
     workspace("create", "test")
 
     assert "test" in workspace("list")
 
     with ramble.workspace.read("test") as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
-        for context in exp_set._contexts:
-            if exp_set._context[context].variables and var in exp_set._context[context].variables:
-                del exp_set._context[context].variables[var]
 
         application_context = ramble.context.Context()
         application_context.context_name = "basic"
         application_context.variables = {
             "app_var1": "1",
             "app_var2": "2",
-            "n_ranks": ["4", "6"],
         }
 
         workload_context = ramble.context.Context()
@@ -849,28 +844,23 @@ def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsy
             "wl_var2": "2",
         }
         experiment_context = ramble.context.Context()
-        experiment_context.context_name = "series1_{n_ranks}_{processes_per_node}"
+        experiment_context.context_name = "series1"
         experiment_context.variables = {
             "exp_var1": "1",
             "exp_var2": "2",
-            "n_nodes": ["2", "3"],
             "batch_submit": "",
             "mpi_command": "",
         }
-
-        if var in experiment_context.variables.keys():
-            del experiment_context.variables[var]
 
         exp_set.set_application_context(application_context)
         exp_set.set_workload_context(workload_context)
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
             exp_set.set_experiment_context(experiment_context)
         captured = capsys.readouterr()
-        assert f'Required key "{var}" is not defined' in captured.err
-        assert "in basic.test_wl.series1_{n_ranks}_{processes_per_node}" in captured.err
+        assert 'Required key "n_ranks" is not defined' in captured.err
 
 
-def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_path, capsys):
+def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_path):
     workspace("create", "test")
 
     assert "test" in workspace("list")
@@ -932,7 +922,7 @@ def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_pat
         assert "basic.test_wl.test1" in exp_set.experiments
 
 
-def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path, capsys):
+def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path):
     workspace("create", "test")
 
     assert "test" in workspace("list")
@@ -1091,7 +1081,7 @@ def test_chained_invalid_order_errors(mutable_mock_workspace_path):
             exp_set.build_experiment_chains()
 
 
-def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers, capsys):
+def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers):
     workspace("create", "test")
 
     assert "test" in workspace("list")

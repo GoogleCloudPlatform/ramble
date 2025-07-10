@@ -10,6 +10,7 @@ import contextlib
 import copy
 import datetime
 import fnmatch
+import itertools
 import os
 import re
 import shutil
@@ -389,6 +390,29 @@ def get_workspace(args, cmd_name, required=False):
         )
 
 
+def _get_all_obj_var_names(obj, obj_type):
+    """Return a set of all variables names defined in the given object."""
+    if obj is None:
+        if obj_type == ramble.repository.ObjectTypes.package_managers:
+            variant_name = namespace.package_manager
+        elif obj_type == ramble.repository.ObjectTypes.workflow_managers:
+            variant_name = namespace.workflow_manager
+        else:
+            raise ValueError("Only package manager and workflow manager types are supported")
+        variants_dict = ramble.config.get(namespace.variants)
+        obj_name = variants_dict.get(variant_name)
+        if obj_name is None:
+            return set()
+    else:
+        obj_name = obj
+    try:
+        obj_inst = ramble.repository.get(obj_name, object_type=obj_type)
+    except ramble.repository.UnknownObjectError:
+        return set()
+    vars = list(itertools.chain.from_iterable(obj_inst.object_variables.values()))
+    return {var.name for var in vars}
+
+
 class Workspace:
     """Class representing a working directory for workload
     experiments
@@ -601,7 +625,10 @@ cd "{experiment_run_dir}"
         # Construct string for default variants
         variant_string = ""
 
-        all_variants = {}
+        # Set default workflow_manager to the user-managed one,
+        # which provides defaults for required variables such as
+        # batch_submit and mpi_command.
+        all_variants = {"workflow_manager": "user-managed"}
         for scope in ramble.config.scopes():
             if namespace.workspace not in scope:
                 variant_dict = ramble.config.get(namespace.variants, scope=scope)
@@ -644,8 +671,6 @@ ramble:
       OMP_NUM_THREADS: '{{n_threads}}'
 {variant_string}
   {namespace.variables}:
-    mpi_command: mpirun -n {{n_ranks}}
-    batch_submit: '{{execute_experiment}}'
     processes_per_node: 1
   {namespace.application}: {{}}
   {namespace.software}:
@@ -1296,6 +1321,12 @@ ramble:
             var_def_dict[workload_name_variable] = workload_names.copy()
             workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
 
+        obj_var_names = _get_all_obj_var_names(
+            workflow_manager, obj_type=ramble.repository.ObjectTypes.package_managers
+        ) | _get_all_obj_var_names(
+            workflow_manager, obj_type=ramble.repository.ObjectTypes.workflow_managers
+        )
+
         for workload_name in workload_names:
             edited = True
             if workload_name not in workloads_dict:
@@ -1323,7 +1354,12 @@ ramble:
 
             # Ensure required variables are defined
             for key in app_inst.keywords.all_required_keys():
-                if key not in workspace_vars:
+                # Do not define missing required variables that are defined in
+                # the associated package and workflow managers.
+                # TODO: should include consideration for when clause, right now
+                # the `selected_variables` method cannot be used due to no associated
+                # expander at this stage.
+                if key not in workspace_vars and key not in obj_var_names:
                     vars_dict[key] = ""
 
             # Only extract variable defaults if requested.
