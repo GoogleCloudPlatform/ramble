@@ -572,7 +572,7 @@ class SpackLightweight(PackageManagerBase):
     )
 
     variant(
-        "generate_push_container_image_script",
+        "spack_push_container_image_script",
         default=False,
         values=[True, False],
         description="When set, create a script for pushing the container image",
@@ -583,7 +583,7 @@ class SpackLightweight(PackageManagerBase):
         src_path="push_container_image.sh.tpl",
         dest_path="push_container_image.sh",
         extra_vars_func="push_container_image_vars",
-        when=["+generate_push_container_image_script"],
+        when=["+spack_push_container_image_script"],
     )
 
     def _push_container_image_vars(self):

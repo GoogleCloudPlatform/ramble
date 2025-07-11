@@ -60,7 +60,7 @@ def test_container_push_cache_script(request):
     ):
         config(
             "add",
-            "variants:generate_push_container_image_script:true",
+            "variants:spack_push_container_image_script:true",
             global_args=global_args,
         )
         workspace("setup", global_args=["-w", ws_name])
