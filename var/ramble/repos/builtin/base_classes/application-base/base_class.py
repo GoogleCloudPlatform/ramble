@@ -578,6 +578,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.define_variable(var, val.default)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
+        if experiment_set and experiment_set._workspace:
+            self.expander.replacement_paths = (
+                experiment_set._workspace.workspace_paths()
+            )
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
@@ -1954,7 +1958,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for var in variables:
             if isinstance(variables[var], str):
                 variables[var] = variables[var].replace(
-                    workspace.root + os.path.sep, ""
+                    workspace.root, "$workspace_root"
                 )
 
     def populate_inventory(

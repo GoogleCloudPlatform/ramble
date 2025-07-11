@@ -996,6 +996,17 @@ Ramble automatically generates definitions for the following variables:
   the experiment. Unformatted so it can be formatted for various experiments.
 * ``unformatted_command_without_logs`` - The same as ``unformatted_command`` but
   has no log removal, creation, or redirection.
+* ``workspace`` - Path to the root of the workspace
+* ``workspace_root`` - Path to the root of the workspace
+* ``workspace_configs`` - Path to the workspace configs directory
+* ``workspace_software`` - Path to the workspace software directory
+* ``workspace_logs`` - Path to the workspace logs directory
+* ``workspace_inputs`` - Path to the workspace inputs directory
+* ``workspace_experiments`` - Path to the workspace experiments directory
+* ``workspace_shared`` - Path to the workspace shared directory
+* ``workspace_archives`` - Path to the workspace archives directory
+* ``workspace_deployments`` - Path to the workspace deployments directory
+
 
 Package Manager Specific Generated Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

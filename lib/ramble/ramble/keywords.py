@@ -15,6 +15,16 @@ key_type = Enum("type", ["reserved", "optional", "required"])
 output_level = Enum("level", ["key", "variable"])
 default_keys = {
     "workspace_name": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_root": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_configs": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_software": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_logs": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_inputs": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_experiments": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_shared": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_archives": {"type": key_type.reserved, "level": output_level.variable},
+    "workspace_deployments": {"type": key_type.reserved, "level": output_level.variable},
     "application_name": {"type": key_type.reserved, "level": output_level.key},
     "application_run_dir": {"type": key_type.reserved, "level": output_level.variable},
     "application_input_dir": {"type": key_type.reserved, "level": output_level.variable},
