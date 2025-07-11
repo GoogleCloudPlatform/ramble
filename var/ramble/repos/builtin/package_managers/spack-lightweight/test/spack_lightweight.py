@@ -16,12 +16,14 @@ pytestmark = pytest.mark.usefixtures(
     "mutable_mock_workspace_path",
 )
 
+config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
 def test_container_push_cache_script(request):
     ws_name = request.node.name
     ws = ramble.workspace.create(ws_name)
+    global_args = ["-w", ws_name]
     workspace(
         "manage",
         "experiments",
@@ -40,13 +42,10 @@ def test_container_push_cache_script(request):
         "container_base_image=base-linux",
         "-v",
         "container_image_tag=my-tag",
-        global_args=["-w", ws_name],
+        global_args=global_args,
     )
     ws._re_read()
-    with ramble.config.override(
-        "config:spack:", {"buildcache": {"flags": "--private"}}
-    ):
-        workspace("setup", global_args=["-w", ws_name])
+    workspace("setup", global_args=["-w", ws_name])
     script_path = os.path.join(
         ws.experiment_dir,
         "hostname",
@@ -54,6 +53,17 @@ def test_container_push_cache_script(request):
         "generated",
         "push_container_image.sh",
     )
+    # By default, the push script does not get generated
+    assert not os.path.exists(script_path)
+    with ramble.config.override(
+        "config:spack:", {"buildcache": {"flags": "--private"}}
+    ):
+        config(
+            "add",
+            "variants:spack_push_container_image_script:true",
+            global_args=global_args,
+        )
+        workspace("setup", global_args=["-w", ws_name])
     assert os.path.exists(script_path)
     with open(script_path) as f:
         script = f.read()

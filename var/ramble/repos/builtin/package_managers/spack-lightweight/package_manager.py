@@ -13,10 +13,6 @@ import shutil
 
 import llnl.util.filesystem as fs
 
-import ramble.config
-import ramble.error
-import ramble.software_info
-import ramble.util.hashing
 from ramble.pkgmankit import *
 from ramble.util.logger import logger
 
@@ -575,11 +571,19 @@ class SpackLightweight(PackageManagerBase):
         description="Tag for the container image",
     )
 
+    variant(
+        "spack_push_container_image_script",
+        default=False,
+        values=[True, False],
+        description="When set, create a script for pushing the container image",
+    )
+
     register_template(
         name="push_container_image",
         src_path="push_container_image.sh.tpl",
         dest_path="push_container_image.sh",
         extra_vars_func="push_container_image_vars",
+        when=["+spack_push_container_image_script"],
     )
 
     def _push_container_image_vars(self):
