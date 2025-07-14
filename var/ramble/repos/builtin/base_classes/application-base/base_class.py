@@ -196,6 +196,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._input_lock = None
         self._software_lock = None
         self._experiment_graph = None
+        self._inmem_fom_values = {}
 
         # Ensure we always have the application name, and this is never empty
         self.license_names = self.license_names + [self.name]
@@ -1427,12 +1428,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         )
                         logs.append(expanded_log)
 
-            analysis_logs, _ = self._analysis_dicts(success_list)
-
-            for log in analysis_logs:
-                logs.append(log)
-
-            logs = list(dict.fromkeys(logs))
+            analysis_logs, _, _ = self._analysis_dicts(success_list)
+            logs = list(set(logs) | analysis_logs.keys())
 
             for log in logs:
                 self._command_list.append('rm -f "%s"' % log)
@@ -2156,7 +2153,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             # Copy all figure of merit files
             criteria_list = self.success_list
-            analysis_files, _ = self._analysis_dicts(criteria_list)
+            analysis_files, _, _ = self._analysis_dicts(criteria_list)
             for file in analysis_files.keys():
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
@@ -2200,6 +2197,30 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         application specific processing of the output.
         """
         pass
+
+    def _extract_inmem_foms(self, inmem_fom_defs, fom_values):
+        """Extract in-memory FOMs"""
+        for context, foms in inmem_fom_defs.items():
+            if context not in fom_values:
+                fom_values[context] = {}
+            foms = inmem_fom_defs[context]["foms"]
+            for fom in foms:
+                fom_conf = inmem_fom_defs[context]["foms"][fom]
+                # Currently inmem FOM does not have semantics for expanded vars,
+                # so use the already expanded name and unit
+                fom_name = fom_conf["fom_name_expanded"]
+                # TODO: this can be extended to support derived FOMs,
+                # since the `fom_values` contains resolved file-based FOMs
+                inmem_key = fom_conf["inmem_key"]
+                fom_value = self._inmem_fom_values.get(inmem_key)
+                expanded_fom_value = self.expander.expand_var(fom_value)
+                fom_values[context][fom_name] = {
+                    "value": expanded_fom_value,
+                    "units": fom_conf["units_expanded"],
+                    "origin": fom_conf["origin"],
+                    "origin_type": fom_conf["origin_type"],
+                    "fom_type": fom_conf["fom_type"],
+                }
 
     register_phase(
         "analyze_experiments",
@@ -2247,17 +2268,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             context_string = context_format.format(**context_val)
             return context_string
 
-        fom_values = {}
-
         criteria_list = self.success_list
         if not criteria_list:
             criteria_list = ramble.success_criteria.ScopedCriteriaList()
         criteria_list.reset()
 
-        files, definitions = self._analysis_dicts(criteria_list)
+        files, f_defs, inmem_defs = self._analysis_dicts(criteria_list)
 
         exp_lock = self.experiment_lock()
 
+        fom_values = {}
         # Iterate over files. We already know they exist
         with lk.ReadTransaction(exp_lock):
             for file, file_conf in files.items():
@@ -2292,9 +2312,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         # Iterate over contexts and add matched contexts to active_contexts
                         for context, foms in file_conf["contexts"].items():
                             if not context == _NULL_CONTEXT:
-                                context_conf = definitions[context][
-                                    "definition"
-                                ]
+                                context_conf = f_defs[context]["definition"]
                                 context_match = context_conf["regex"].match(
                                     line
                                 )
@@ -2314,7 +2332,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         fom_values[context_name] = {}
 
                             for fom in foms:
-                                fom_conf = definitions[context]["foms"][fom]
+                                fom_conf = f_defs[context]["foms"][fom]
                                 fom_match = fom_conf["regex"].match(line)
 
                                 if fom_match:
@@ -2389,6 +2407,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     "fom_type"
                                                 ],
                                             }
+        self._extract_inmem_foms(inmem_defs, fom_values)
 
         # Test all non-file based success criteria
         for criteria_obj in criteria_list.all_criteria():
@@ -2397,7 +2416,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     criteria_obj.mark_found()
 
         # If an app has no FOMs defined, don't fail it for that
-        success = (not definitions) or False
+        success = (not f_defs and not inmem_defs) or False
         for fom in fom_values.values():
             for value in fom.values():
                 if (
@@ -2733,12 +2752,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         Returns:
             files (dict): All files that need to be processed
-            contexts (dict): Any contexts that have been defined
-            foms (dict): All figures of merit that need to be extracted
+            file_fom_defs (dict): Definitions of all file-backed FOMs to be extracted
+            inmem_fom_defs (dict): Definitions of all in-memory FOMs to be extracted
         """
 
         files = {}
-        definitions = {}
+        file_fom_defs = {}
+        inmem_fom_defs = {}
 
         # Add the application defined criteria
         criteria_list.flush_scope("application_definition")
@@ -2861,32 +2881,38 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 "definitions and 'when' conditions."
                             )
 
-                        # Copy context definition for contexts used by a FOM
-                        if context not in definitions:
-                            definitions[context] = {
-                                "definition": {},
-                                "foms": {},
-                            }
-                            if context != _NULL_CONTEXT:
-                                regex_str = self.expander.expand_var(
-                                    all_contexts[context]["regex"]
-                                )
-                                definitions[context]["definition"] = {
-                                    "regex": re.compile(regex_str),
-                                    "format": all_contexts[context][
-                                        "output_format"
-                                    ],
+                        def _preset_context_dict(dest_def_dict, context):
+                            # Copy context definition for contexts used by a FOM
+                            if context not in dest_def_dict:
+                                dest_def_dict[context] = {
+                                    "definition": {},
+                                    "foms": {},
                                 }
+                                if context != _NULL_CONTEXT:
+                                    regex_str = self.expander.expand_var(
+                                        all_contexts[context]["regex"]
+                                    )
+                                    dest_def_dict[context]["definition"] = {
+                                        "regex": re.compile(regex_str),
+                                        "format": all_contexts[context][
+                                            "output_format"
+                                        ],
+                                    }
 
                         for fom, source_def in source_foms.items():
-                            if fom in definitions[context]["foms"]:
+                            is_inmem = source_def["inmem_key"] is not None
+                            dest_def_dict = (
+                                inmem_fom_defs if is_inmem else file_fom_defs
+                            )
+                            _preset_context_dict(dest_def_dict, context)
+                            if fom in dest_def_dict[context]["foms"]:
                                 logger.warn(
                                     f"FOM {fom} already defined in context {context} by "
-                                    f"{definitions[context]['foms'][fom]['origin']}. "
+                                    f"{dest_def_dict[context]['foms'][fom]['origin']}. "
                                     f"Overwriting with new definition from {source.name}"
                                 )
                             else:
-                                definitions[context]["foms"][fom] = {}
+                                dest_def_dict[context]["foms"][fom] = {}
 
                             def _expand_var(var):
                                 return self.expander.expand_var(
@@ -2905,12 +2931,21 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 "origin": source.name,
                                 "origin_type": source.origin_type,
                                 "contexts": set(source_def["contexts"]),
-                                "group": _expand_var(source_def["group_name"]),
+                                "group": (
+                                    ""
+                                    if is_inmem
+                                    else _expand_var(source_def["group_name"])
+                                ),
                                 "units": _expand_var(source_def["units"]),
-                                "regex": re.compile(
-                                    _expand_var(source_def["regex"])
+                                "regex": (
+                                    ""
+                                    if is_inmem
+                                    else re.compile(
+                                        _expand_var(source_def["regex"])
+                                    )
                                 ),
                                 "fom_type": source_def["fom_type"].to_dict(),
+                                "inmem_key": source_def["inmem_key"],
                                 # If expansion works (i.e., it doesn't rely on the matched fom
                                 # groups), then cache it here to avoid repeated expansion later.
                                 "units_expanded": _try_expand_var_or_none(
@@ -2921,8 +2956,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 ),
                             }
 
-                            definitions[context]["foms"][fom] = fom_def
+                            dest_def_dict[context]["foms"][fom] = fom_def
 
+                            if is_inmem:
+                                continue
                             log_path = _expand_var(source_def["log_file"])
                             # Ensure log path is absolute. If not, prepend the experiment run dir
                             if (
@@ -2944,7 +2981,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             logger.debug("Log = %s" % log_path)
                             logger.debug("Conf = %s" % fom_def)
 
-        return files, definitions
+        return files, file_fom_defs, inmem_fom_defs
+
+    def add_inmem_fom_value(self, inmem_key, value):
+        """Add value to an in-memory FOM"""
+        self._inmem_fom_values[inmem_key] = value
 
     def read_status(self):
         """Read status from an experiment's status file, if possible.

@@ -98,13 +98,14 @@ def figure_of_merit_context(name, regex, output_format, when=None, **kwargs):
 @shared_directive("figures_of_merit")
 def figure_of_merit(
     name,
-    fom_regex,
-    group_name,
+    fom_regex=None,
+    group_name=None,
     log_file="{log_file}",
     units="",
     contexts=None,
     fom_type: FomType = FomType.UNDEFINED,
     when=None,
+    inmem_key=None,
     **kwargs,
 ):
     """Adds a figure of merit to track for this object
@@ -122,9 +123,16 @@ def figure_of_merit(
                                    should exist in.
       fom_type (ramble.util.foms.FomType): The type of figure of merit
       when (list | None): List of when conditions to apply to directive
+      inmem_key: If supplied, this is treated as an in-memory (as ooposed to file-based)
+                 figure of merit, and its value is extracted using this key
     """
 
     def _execute_figure_of_merit(obj):
+        if inmem_key is None:
+            if fom_regex is None or group_name is None:
+                raise ramble.language.language_base.DirectiveError(
+                    "`fom_regex` and `group_name` are required for defining file-based FOM"
+                )
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "figure_of_merit"
         )
@@ -146,6 +154,7 @@ def figure_of_merit(
             "fom_type": fom_type,
             "when": when_list,
             "origin_type": obj.origin_type if hasattr(obj, "origin_type") else "",
+            "inmem_key": inmem_key,
         }
 
     return _execute_figure_of_merit

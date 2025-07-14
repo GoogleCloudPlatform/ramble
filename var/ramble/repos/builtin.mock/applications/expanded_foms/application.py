@@ -37,4 +37,20 @@ class ExpandedFoms(ExecutableApplication):
         units="{unit}",
     )
 
+    figure_of_merit(
+        "test_inmem_{my_var}",
+        units="",
+        inmem_key="test_inmem",
+    )
+
     success_criteria("Run", mode="string", match=r"Collect", file="{log_file}")
+
+    success_criteria(
+        "Inmem FOM matched",
+        mode="fom_comparison",
+        fom_name="test_inmem_{my_var}",
+        formula="{value} == 'inmem_val'",
+    )
+
+    def _prepare_analysis(self, workspace, app_inst):
+        self.add_inmem_fom_value("test_inmem", "inmem_val")
