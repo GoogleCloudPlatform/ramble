@@ -11,13 +11,7 @@ import subprocess
 import sys
 from glob import glob
 
-import pkg_resources
 from docutils.statemachine import StringList
-
-# The name of the Pygments (syntax highlighting) style to use.
-# We use our own extension of the default style with a few modifications
-from pygments.styles.default import DefaultStyle
-from pygments.token import Generic
 from sphinx.domains.python import PythonDomain
 from sphinx.ext.apidoc import main as sphinx_apidoc
 from sphinx.parsers import RSTParser
@@ -248,22 +242,12 @@ nitpick_ignore = [
 # output. They are ignored by default.
 # show_authors = False
 
-
-class RambleStyle(DefaultStyle):
-    styles = DefaultStyle.styles.copy()
-    background_color = "#f4f4f8"
-    styles[Generic.Output] = "#355"
-    styles[Generic.Prompt] = "bold #346ec9"
-
-
-dist = pkg_resources.Distribution(__file__)
-sys.path.append(".")  # make 'conf' module findable
-ep = pkg_resources.EntryPoint.parse("ramble = conf:RambleStyle", dist=dist)
-dist._ep_map = {"pygments.styles": {"plugin1": ep}}
-pkg_resources.working_set.add(dist)
-
 # A list of ignored prefixes for module index sorting.
 # modindex_common_prefix = []
+
+# Custom Pygments styling
+sys.path.append(os.path.abspath("./_pygments"))
+pygments_style = "style.RambleStyle"
 
 
 # -- Options for HTML output ---------------------------------------------------
