@@ -73,6 +73,7 @@ steps:
     id: ramble-unit-tests
     entrypoint: /bin/bash
     env:
+    - 'COMMIT_SHA=$_COMMIT_SHA'
     - 'CODECOV_TOKEN=$_CODECOV_TOKEN'
     - 'PUSH_CODECOV=$_PUSH_CODECOV'
 substitutions:

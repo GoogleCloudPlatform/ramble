@@ -74,8 +74,12 @@ if [ $? != 0 ]; then
 fi
 
 if [[ "$PUSH_CODECOV" ]]; then
-    echo "Processing codecov upload"
-    codecovcli upload-process
+  if [[ -z "$COMMIT_SHA" ]]; then
+    export COMMIT_SHA=`git -C $(dirname $0) log -n 1 --format="%H"`
+  fi
+  echo "Processing codecov upload for commit $COMMIT_SHA"
+
+  codecovcli upload-process -C $COMMIT_SHA
 fi
 
 if [ $ERROR == 1 ]; then
