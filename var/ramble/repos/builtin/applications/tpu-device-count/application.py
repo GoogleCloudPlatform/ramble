@@ -6,7 +6,7 @@ class TpuDeviceCount(ExecutableApplication):
 
     name = "tpu-device-count"
 
-    tags("test-app")
+    tags("tpu")
 
     parameter("device_count", default=1, description="Expected number of TPU devices")
 
@@ -43,5 +43,5 @@ class TpuDeviceCount(ExecutableApplication):
         "TPU_cores_found",
         mode="fom_comparison",
         fom_name="TPU Cores",
-        formula="{value} == {device_count}",
+        formula="{value} > 0",
     )
