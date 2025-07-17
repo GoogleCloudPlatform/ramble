@@ -163,11 +163,7 @@ def _unpack_when_set_if_needed(internal_attr: dict):
             # unpack to a list of dicts so dicts with same keys don't overwrite
             unpacked_dict = []
             for when_key, inner_dict in internal_attr.items():
-                if not when_key:
-                    unpacked_dict.append(inner_dict)
-                else:
-                    for when_condition in when_key:
-                        unpacked_dict.append(inner_dict)
+                unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
