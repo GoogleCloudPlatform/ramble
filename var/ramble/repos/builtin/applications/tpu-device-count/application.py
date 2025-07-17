@@ -1,3 +1,11 @@
+# Copyright 2022-2025 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
 from ramble.appkit import *
 
 
@@ -8,25 +16,23 @@ class TpuDeviceCount(ExecutableApplication):
 
     tags("tpu")
 
-    parameter("device_count", default=1, description="Expected number of TPU devices")
-
     software_spec(
         "libtpu",
         pkg_spec="-f https://storage.googleapis.com/jax-releases/libtpu_releases.html",
-        package_manager="pip",
+        when="package_manager_family=pip",
     )
 
     software_spec(
         "jax",
         pkg_spec="jax[tpu]",
-        package_manager="pip",
+        when="package_manager_family=pip",
     )
 
-    required_package("jax", package_manager="pip")
+    required_package("jax", when="package_manager_family=pip")
 
     executable(
         "count_devices",
-        'python -c \'import jax; print("TPU cores:", jax.device_count())\'',
+        "python -c 'import jax; print(\"TPU cores:\", jax.device_count())'",
         output_capture=OUTPUT_CAPTURE.ALL,
     )
 
