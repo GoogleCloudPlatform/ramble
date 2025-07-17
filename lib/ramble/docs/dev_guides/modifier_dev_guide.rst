@@ -222,3 +222,14 @@ correctly by using ``ramble workspace setup --dry-run``. The output from the
 preparation steps can be copied into the experiment directory to verify the
 ``ramble workspace analyze`` pipeline works, without having to execute the
 experiment itself.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Variants and Conditional Logic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble modifiers support variants, just as applications do (see
+:ref:`application-dev-variant-directive`).
+
+Variants can be used to control the behavior of many of the
+directives within a modifier, and their use follows the discussion
+in :ref:`application-dev-conditional-logic`.

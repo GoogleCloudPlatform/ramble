@@ -276,6 +276,51 @@ that should be used when referencing file paths in application definitions. This
 helps with Ramble to properly mock out these paths during unit testing, where the
 files may not exist under the dry-run setting.
 
+
+.. _application-dev-variant-directive:
+
+^^^^^^^^^^^^^^^^^^^^
+Application Variants
+^^^^^^^^^^^^^^^^^^^^
+
+Ramble supports objects defining variants to help control their conditional
+behavior. Variants can be used to control most aspects of an application
+definition in Ramble, and their usage within an application will be
+described in :ref:`application-dev-conditional-logic`.
+
+To define a new variant within an application, developers can use the
+``variant`` directive. An example can be seen below:
+
+.. code-block:: python
+
+  variant(
+    "gpu",
+    default=False,
+    description="Enables the usage of GPU features in this application.",
+    values=[True, False]
+  )
+
+The previous example would define a new variant named ``gpu`` within
+an application. The allowed values are either ``True`` or ``False``
+(implying it is a boolean variant), and the default is ``False``.
+
+Users will be able to control this variants value by using
+:ref:`variants<variants-config>`. Within the application, this
+variant can be used in ``when`` arguments. This will be discussed in
+more detail later, but an example of this specific variant would be:
+
+.. code-block:: python
+
+  workload_variable("gpu_flag", default="-g", description="Flag that controls GPU features", when="+gpu")
+  workload_variable("gpu_flag", default="", description="Flag that controls GPU features", when="~gpu")
+
+In this case, the variable ``gpu_flag`` will be defined, and will have
+a value of ``-g`` or an empty string, depending on the value of the
+``gpu`` variant.
+
+
+.. _application-dev-conditional-logic:
+
 ^^^^^^^^^^^^^^^^^
 Conditional Logic
 ^^^^^^^^^^^^^^^^^
@@ -322,6 +367,8 @@ along with any variants created in definition files:
     workflow_manager_family  
     modifier  
     <mod-name>_mode 
+
+Most of the directives in Ramble support 
 
 --------------------------
 Package Manager Directives
