@@ -284,7 +284,7 @@ class Variant:
                 return f"~{self.name}"
         return f"{self.name}={str(self.default)}"
 
-    def as_str(self, indent=0):
+    def as_str(self, indent: int = 0, verbose: bool = False):
         """String documentation of this variant
 
         Returns:

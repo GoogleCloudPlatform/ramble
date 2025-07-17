@@ -37,6 +37,7 @@ obj_attribute_map = {
     "templates": None,
     "validators": None,
     "object_variables": None,
+    "object_environment_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -227,11 +228,14 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
         elif isinstance(vals, list):
             for val in vals:
                 if hasattr(val, "as_str"):
-                    color.cprint(f"{val.as_str()}")
+                    color.cprint(f"{val.as_str(verbose=True)}")
                 else:
                     color.cprint(f"{str(val)}")
         else:
-            color.cprint(f"{str(vals)}")
+            if hasattr(vals, "as_str"):
+                color.cprint(f"{vals.as_str(verbose=True)}")
+            else:
+                color.cprint(f"{str(vals)}")
 
 
 # Attributes that need special print functions
@@ -350,12 +354,19 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                     _print_verbose_dict_attr(attr_dict, pattern=pattern, indentation=indentation)
             # If the attribute is not a dict or list of dict, print using the existing format rules
             else:
-                to_print = fnmatch.filter(map(str, internal_attr), pattern)
-                if format == supported_formats.lists:
-                    color.cprint("    " + str(list(to_print)))
-                elif format == supported_formats.text:
-                    color.cprint(colified(to_print, tty=True, indent=4))
-                color.cprint("")
+                if hasattr(next(iter(internal_attr)), "as_str"):
+                    for obj in internal_attr:
+                        if pattern and not fnmatch.fnmatch(obj.name, pattern):
+                            continue
+
+                        color.cprint(f"{obj.as_str(verbose=True)}")
+                else:
+                    to_print = fnmatch.filter(map(str, internal_attr), pattern)
+                    if format == supported_formats.lists:
+                        color.cprint("    " + str(list(to_print)))
+                    elif format == supported_formats.text:
+                        color.cprint(colified(to_print, tty=True, indent=4))
+                    color.cprint("")
         else:
             color.cprint(f"{indentation}" + str(internal_attr))
 

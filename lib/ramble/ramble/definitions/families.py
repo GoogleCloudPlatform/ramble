@@ -35,7 +35,7 @@ class Families:
             self._str_indent = 0
         return self.as_str(n_indent=self._str_indent)
 
-    def as_str(self, n_indent: int = 0):
+    def as_str(self, n_indent: int = 0, **kwargs):
         """String representation of this object's families
 
         Args:
