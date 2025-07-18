@@ -319,6 +319,9 @@ class TemplatePackage(SoftwarePackage):
         raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix)
 
         spec = expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec else None
+        if not spec:
+            raise RambleSoftwareEnvironmentError(f"Package {name} is missing a valid spec")
+
         compiler = (
             expander.expand_var(raw_compiler, merge_used_stage=False) if raw_compiler else None
         )
