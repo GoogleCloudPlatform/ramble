@@ -180,3 +180,14 @@ package managers can be used as a reference.
 This unit test by default will dry-run every possible application with every
 possible package manager. As a result, it is unlikely that a package manager
 without dry-run support would pass Ramble's unit tests.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Variants and Conditional Logic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble package managers support variants, just as applications do
+(see :ref:`application-dev-variant-directive`).
+
+Variants can be used to control the behavior of many of the
+directives within a package manager, and their use follows the
+discussion in :ref:`application-dev-conditional-logic`.
