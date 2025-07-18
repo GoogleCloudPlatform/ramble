@@ -19,6 +19,7 @@ from typing import Dict, FrozenSet, List, Union
 import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
+from ramble.util.path import substitute_path_variables
 
 import spack.util.naming
 
@@ -393,6 +394,7 @@ class Expander:
         self._used_variable_stage = set()
 
         self._experiment_set = experiment_set
+        self.replacement_paths = {}
 
         self._application_name = None
         self._workload_name = None
@@ -669,7 +671,10 @@ class Expander:
         if merge_used_stage:
             self.merge_used_variable_stage()
 
-        return value
+        if isinstance(value, str):
+            return substitute_path_variables(value, local_replacements=self.replacement_paths)
+        else:
+            return value
 
     def evaluate_predicate(self, in_str, extra_vars=None, merge_used_stage: bool = True):
         """Evaluate a predicate by expanding and evaluating math contained in a string

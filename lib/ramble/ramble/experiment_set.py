@@ -365,6 +365,9 @@ class ExperimentSet:
             ),
         )
 
+        for name, value in self._workspace.workspace_paths().items():
+            app_inst.define_variable(name, value)
+
         app_inst.add_expand_vars(self._workspace)
         app_inst.read_status()
 
