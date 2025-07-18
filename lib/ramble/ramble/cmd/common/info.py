@@ -29,6 +29,7 @@ obj_attribute_map = {
     "builtins": None,
     "package_manager_configs": None,
     "required_packages": None,
+    "object_variants": None,
     "compilers": None,
     "software_specs": None,
     "archive_patterns": None,
@@ -197,7 +198,6 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
         i += 1
         if pattern and not fnmatch.fnmatch(name, pattern):
             continue
-
         if isinstance(vals, dict):
             color_name = ramble.util.colors.section_title(name)
             color.cprint(f"{color_name}:")
@@ -373,7 +373,10 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                         color.cprint(colified(to_print, tty=True, indent=4))
                     color.cprint("")
         else:
-            color.cprint(f"{indentation}" + str(internal_attr) + "\n")
+            if hasattr(internal_attr, "as_str"):
+                color.cprint(f"{internal_attr.as_str(verbose=True)}")
+            else:
+                color.cprint(f"{indentation}" + str(internal_attr) + "\n")
 
 
 def print_attribute_header(attr, verbose=False):
