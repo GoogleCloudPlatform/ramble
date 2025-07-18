@@ -192,7 +192,9 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
     sub items. These need to be iterated over, and we need to escape existing
     characters that would normally be used to color strings.
     """
+    i = 0
     for name, vals in internal_attr.items():
+        i += 1
         if pattern and not fnmatch.fnmatch(name, pattern):
             continue
 
@@ -236,6 +238,9 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
                 color.cprint(f"{vals.as_str(verbose=True)}")
             else:
                 color.cprint(f"{str(vals)}")
+                #  Necessary to add a line break after unformmated sections
+                if i == len(internal_attr.keys()):
+                    color.cprint("")
 
 
 # Attributes that need special print functions
@@ -368,7 +373,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                         color.cprint(colified(to_print, tty=True, indent=4))
                     color.cprint("")
         else:
-            color.cprint(f"{indentation}" + str(internal_attr))
+            color.cprint(f"{indentation}" + str(internal_attr) + "\n")
 
 
 def print_attribute_header(attr, verbose=False):
