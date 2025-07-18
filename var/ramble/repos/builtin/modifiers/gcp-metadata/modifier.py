@@ -40,7 +40,7 @@ class GcpMetadata(BasicModifier):
 
     modifier_variable(
         "metadata_parallel_prefix",
-        default="pdsh -R ssh -N -w {hostlist} '",
+        default="pdsh -R ssh -N -w {hostlist}",
         modes=["standard"],
         description="Express how parlalelism should be done between nodes",
     )
@@ -54,7 +54,7 @@ class GcpMetadata(BasicModifier):
     # Need to close any open `'` we leave in the prefix
     modifier_variable(
         "metadata_parallel_suffix",
-        default="'",
+        default="",
         modes=["standard"],
         description="Optional suffix for {metadata_parallel_prefix}",
     )
@@ -116,9 +116,20 @@ class GcpMetadata(BasicModifier):
             if per_node:
                 prefix = self.expander.expand_var("{metadata_parallel_prefix}")
                 # Handle hostname inclusion for psdh specifically.
-                if prefix.startswith("pdsh") and include_hostname:
+                if include_hostname and "pdsh" in prefix:
                     prefix = prefix.replace(" -N ", " ")
+
+                if not prefix.endswith(" '"):
+                    prefix += " '"
+
                 suffix = self.expander.expand_var("{metadata_parallel_suffix}")
+
+                if not suffix.startswith("'"):
+                    if suffix:
+                        suffix = "' " + suffix
+                    else:
+                        suffix = "' "
+
             log_name = (
                 log_name if log_name is not None else end_point.split("/")[-1]
             )
@@ -129,7 +140,7 @@ class GcpMetadata(BasicModifier):
                         # Fail silently (-f) to avoid jamming the log (say with 404 html)
                         # This is especially pertinent to /attribute/physical_host,
                         # which is only available for VMs with placement policy.
-                        f'{prefix} curl -s -f -w "\\n" "http://metadata.google.internal/computeMetadata/v1/{type}/{end_point}" -H "Metadata-Flavor: Google" {suffix}'
+                        f'{prefix}curl -s -f -w "\\n" "http://metadata.google.internal/computeMetadata/v1/{type}/{end_point}" -H "Metadata-Flavor: Google" {suffix}'
                     ],
                     mpi=False,
                     redirect=f"{{experiment_run_dir}}/gcp-metadata.{log_name}.log",
