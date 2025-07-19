@@ -71,7 +71,7 @@ def package_manager_family(*names: str, **kwargs):
     """
 
     def _define_package_manager_family(pm):
-        if not pm.families:
+        if getattr(pm, "families", None) is None:
             pm.families = ramble.definitions.families.Families(pm.origin_type, list(names))
         else:
             pm.families.add_families(list(names))

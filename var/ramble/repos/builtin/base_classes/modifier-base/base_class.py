@@ -24,7 +24,6 @@ from ramble.util.naming import NS_SEPARATOR
 
 class ModifierBase(metaclass=ModifierMeta):
     name = None
-    object_variants = None
     origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(
         ("modifier_builtin", "{obj_name}", "{name}")
@@ -55,7 +54,7 @@ class ModifierBase(metaclass=ModifierMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
+        if getattr(self, "object_variants", None) is None:
             self.object_variants = ramble.variants.VariantSet()
 
         ramble.util.class_attributes.convert_class_attributes(self)

@@ -24,8 +24,6 @@ from ramble.util.naming import NS_SEPARATOR
 
 class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     name = None
-    object_variants = None
-    families = None
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("workflow_manager_builtin", "{obj_name}", "{name}")
@@ -66,10 +64,10 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
+        if getattr(self, "object_variants", None) is None:
             self.object_variants = ramble.variants.VariantSet()
 
-        if self.families is None:
+        if getattr(self, "families", None) is None:
             self.families = ramble.definitions.families.Families(
                 self.origin_type
             )

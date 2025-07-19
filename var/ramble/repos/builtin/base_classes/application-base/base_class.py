@@ -125,7 +125,6 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
 
 class ApplicationBase(metaclass=ApplicationMeta):
     name = None
-    object_variants = None
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
@@ -153,7 +152,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
+        if getattr(self, "object_variants", None) is None:
             self.object_variants = ramble.variants.VariantSet()
 
         ramble.util.class_attributes.convert_class_attributes(self)
