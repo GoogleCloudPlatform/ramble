@@ -9,6 +9,7 @@
 
 from typing import List
 
+import ramble.definitions.families
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
@@ -24,6 +25,7 @@ from ramble.util.naming import NS_SEPARATOR
 class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     name = None
     object_variants = None
+    families = None
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("workflow_manager_builtin", "{obj_name}", "{name}")
@@ -36,7 +38,6 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     ]
     maintainers: List[str] = []
     tags: List[str] = []
-    families: List[str] = []
 
     workflow_manager_variable(
         "workflow_banner",
@@ -68,6 +69,11 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
         if self.object_variants is None:
             self.object_variants = ramble.variants.VariantSet()
 
+        if self.families is None:
+            self.families = ramble.definitions.families.Families(
+                self.origin_type
+            )
+
         ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
@@ -75,10 +81,16 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
         ramble.util.directives.define_directive_methods(self)
 
         self.object_variants.default_variant(
-            "workflow_manager",
+            self.origin_type,
             default=self.name,
             description="Name of workflow manager for an experiment",
         )
+
+        for family in self.families:
+            self.object_variants.multi_value_variant(
+                self.families.family_type,
+                value=family,
+            )
 
         self.app_inst = None
         self.runner = None

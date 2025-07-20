@@ -270,7 +270,7 @@ class SpackLightweight(PackageManagerBase):
         for mod_inst in app_inst._modifier_instances:
             for req in mod_inst.all_package_manager_requirements():
                 expanded_req = {}
-                for key, val in req.items():
+                for key, val in vars(req).items():
                     expanded_req[key] = app_inst.expander.expand_var(val)
                 self.runner.validate_command(**expanded_req)
 

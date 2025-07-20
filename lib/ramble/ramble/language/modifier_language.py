@@ -8,6 +8,7 @@
 
 from typing import Optional
 
+import ramble.definitions.requirements
 import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.language.shared_language
@@ -394,13 +395,13 @@ def package_manager_requirement(
             mod.package_manager_requirements[when_set] = []
 
         mod.package_manager_requirements[when_set].append(
-            {
-                "command": command,
-                "validation_type": validation_type,
-                "regex": regex,
-                "package_manager": package_manager,
-                "when": when_list,
-            }
+            ramble.definitions.requirements.PackageManagerRequirement(
+                command=command,
+                validation_type=validation_type,
+                regex=regex,
+                package_manager=package_manager,
+                when=when_list,
+            )
         )
 
     return _new_package_manager_requirement

@@ -12,6 +12,22 @@ from typing import List, Optional
 import ramble.util.colors as rucolor
 
 
+def _title_color(title: str, n_indent: int = 0):
+    """Set the appropriate color for titles based on indentation"""
+    if n_indent == 0:
+        out_str = rucolor.section_title(f"{title}")
+    elif n_indent == 4:
+        out_str = rucolor.nested_1(f"{title}")
+    elif n_indent == 8:
+        out_str = rucolor.nested_2(f"{title}")
+    elif n_indent == 12:
+        out_str = rucolor.nested_3(f"{title}")
+    elif n_indent == 16:
+        out_str = rucolor.nested_4(f"{title}")
+
+    return out_str
+
+
 class WorkloadVariable:
     """Class representing a variable definition"""
 
@@ -51,7 +67,7 @@ class WorkloadVariable:
             self._str_indent = 0
         return self.as_str(n_indent=self._str_indent)
 
-    def as_str(self, n_indent: int = 0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of this variable
 
         Args:
@@ -62,18 +78,25 @@ class WorkloadVariable:
         """
         indentation = " " * n_indent
 
-        print_attrs = ["Description", "Default", "Values"]
+        if verbose:
+            print_attrs = ["Description", "Default", "Values"]
 
-        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
-        for print_attr in print_attrs:
-            name = print_attr
-            if print_attr == "Values":
-                name = "Suggested Values"
-            attr_name = print_attr.lower()
+            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            for print_attr in print_attrs:
+                name = print_attr
+                if print_attr == "Values":
+                    name = "Suggested Values"
+                attr_name = print_attr.lower()
 
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
+                attr_val = getattr(self, attr_name, None)
+                if attr_val:
+                    out_str += (
+                        f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                        f'{str(attr_val).replace("@", "@@")}\n'
+                    )
+        else:
+            out_str = f"{indentation}{self.name}"
+
         return out_str
 
     def copy(self):
@@ -120,7 +143,7 @@ class WorkloadVariableModification:
             self._str_indent = 0
         return self.as_str(n_indent=self._str_indent)
 
-    def as_str(self, n_indent: int = 0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of this variable
 
         Args:
@@ -133,7 +156,7 @@ class WorkloadVariableModification:
 
         print_attrs = ["Modification", "Method", "Separator", "When"]
 
-        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
+        out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
         for print_attr in print_attrs:
             name = print_attr
             attr_name = print_attr.lower()
@@ -142,7 +165,10 @@ class WorkloadVariableModification:
             if attr_val:
                 if print_attr == "Separator":
                     attr_val = f"'{attr_val}'"
-                out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
+                out_str += (
+                    f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                    f'{str(attr_val).replace("@", "@@")}\n'
+                )
         return out_str
 
     def copy(self):
@@ -173,7 +199,12 @@ class WorkloadEnvironmentVariable:
         self.description = description
         self.when = when.copy() if when else []
 
-    def as_str(self, n_indent: int = 0):
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of environment variable
 
         Args:
@@ -184,14 +215,20 @@ class WorkloadEnvironmentVariable:
         """
         indentation = " " * n_indent
 
-        print_attrs = ["Description", "Value"]
+        if verbose:
+            print_attrs = ["Description", "Value"]
+            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            for name in print_attrs:
+                attr_name = name.lower()
+                attr_val = getattr(self, attr_name, None)
+                if attr_val:
+                    out_str += (
+                        f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                        f'{str(attr_val).replace("@", "@@")}\n'
+                    )
+        else:
+            out_str = f"{indentation}{self.name}"
 
-        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
-        for name in print_attrs:
-            attr_name = name.lower()
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                out_str += f'{indentation}    {name}: {attr_val.replace("@", "@@")}\n'
         return out_str
 
     def copy(self):
@@ -242,7 +279,7 @@ class Workload:
             self._str_indent = 0
         return self.as_str(n_indent=self._str_indent)
 
-    def as_str(self, n_indent: int = 0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of this workload
 
         Args:
@@ -276,7 +313,7 @@ class Workload:
                 for var in var_list:
                     var_dict[var.name] = var
                 for var_name in sorted(var_dict.keys()):
-                    out_str += var_dict[var_name].as_str(n_indent + 12)
+                    out_str += var_dict[var_name].as_str(n_indent=(n_indent + 12), verbose=verbose)
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
@@ -290,9 +327,11 @@ class Workload:
 
                 env_var_dict = {}
                 for env_var in env_var_list:
-                    env_var_dict[var.name] = env_var
+                    env_var_dict[env_var.name] = env_var
                 for env_var_name in sorted(env_var_dict.keys()):
-                    out_str += env_var_dict[env_var_name].as_str(n_indent + 12)
+                    out_str += env_var_dict[env_var_name].as_str(
+                        n_indent=(n_indent + 12), verbose=verbose
+                    )
 
         return out_str
 
