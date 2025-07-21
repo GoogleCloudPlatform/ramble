@@ -14,7 +14,7 @@ _FS = frozenset()
 def test_basic_inheritance(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get("basic-inherited")
     exp_dict = basic_exp_dict()
-    app_inst.set_variables(exp_dict, None)
+    app_inst.set_variables_and_variants(exp_dict, {}, None)
     app_inst.define_variable("application_name", "basic-inherited")
 
     assert "foo" in app_inst.executables[_FS]

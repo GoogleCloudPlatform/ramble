@@ -54,8 +54,9 @@ class ModifierBase(metaclass=ModifierMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if getattr(self, "object_variants", None) is None:
-            self.object_variants = ramble.variants.VariantSet()
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
 
         ramble.util.class_attributes.convert_class_attributes(self)
 

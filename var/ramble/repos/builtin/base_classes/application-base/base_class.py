@@ -152,10 +152,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if getattr(self, "object_variants", None) is None:
-            self.object_variants = ramble.variants.VariantSet()
-
         ramble.util.class_attributes.convert_class_attributes(self)
+
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
 
         self.keywords = ramble.keywords.keywords.copy()
 
@@ -239,10 +240,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         new_clone = type(self)(self._file_path)
         self.generated_experiments.append(new_clone)
 
-        if self.variables:
-            new_clone.set_variables(self.variables.copy(), self.experiment_set)
-        if self.variants:
-            new_clone.set_variants(self.variants)
+        clone_variables = {} if not self.variables else self.variables.copy()
+        clone_variants = {} if not self.variants else self.variants
+        new_clone.set_variables_and_variants(
+            clone_variables, clone_variants, self.experiment_set
+        )
         if self._env_variable_sets:
             new_clone.set_env_variable_sets(self._env_variable_sets.copy())
         if self.internals:
@@ -271,47 +273,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
             return False
 
         return True
-
-    def set_variants(self, variants):
-        """Set variants within an experiment instance, and process their
-        contents.
-
-        Args:
-            variants (dict): Dictionary of variant controls for this
-                             experiment.
-        """
-
-        self.variants = variants.copy()
-
-        for name, value in variants.items():
-            expanded_value = self.expander.expand_var(value, typed=True)
-            self.object_variants.experiment_variant(name, expanded_value)
-
-        self._set_package_manager()
-        self._set_workflow_manager()
-
-        for _, obj in self._objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            obj_variants = getattr(obj, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_default_variants(
-                    getattr(obj, "object_variants")
-                )
-                self.object_variants.merge_multi_value_variants(obj_variants)
-
-        base_chain = self.__class__.__mro__
-        for cls in base_chain:
-            if hasattr(cls, "name") and getattr(cls, "name") is not None:
-                self.object_variants.multi_value_variant(
-                    "application_name", value=cls.name
-                )
-
-        self.object_variants.default_variant(
-            "workload_name",
-            default=self.expander.workload_name,
-            description="Name of experiment workload",
-        )
 
     def _validate_workload(self, workload_name):
         """Checks if a workload name is valid and returns the workload that
@@ -446,11 +407,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         }
                     )
 
-            # Define any missing package manager variables
-            for var, val in self.package_manager.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
-
     def _set_workflow_manager(self):
         workflow_name = conversions.canonical_none(
             self.object_variants.value(namespace.workflow_manager)
@@ -472,12 +428,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "Valid workflow managers can be listed via:\n"
                 "\tramble list --type workflow_managers"
             )
-
-        if self.workflow_manager is not None:
-            # Define any missing workflow manager variables
-            for var, val in self.workflow_manager.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
 
     def set_success_list(self, success_criteria):
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
@@ -550,20 +500,63 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._env_variable_sets.append({"set": new_env_vars})
 
-    def set_variables(self, variables, experiment_set):
-        """Set internal reference to variables
+    def set_variables_and_variants(self, variables, variants, experiment_set):
+        """Set internal reference to variables and variants
 
         Also, create an application specific expander class.
+
+        Args:
+            variables (dict): Dictionary of variable definitions for this
+                             experiment.
+            variants (dict): Dictionary of variant controls for this
+                             experiment.
+            experiment_set: Reference to experiment set, for expanding
+                            referenced variables.
         """
 
         self.variables = variables
+        self.variants = variants.copy()
         self.experiment_set = experiment_set
         self.expander = ramble.expander.Expander(
             self.variables, self.experiment_set
         )
 
+        # Define experiment variants
+        for name, value in variants.items():
+            expanded_value = self.expander.expand_var(value, typed=True)
+            self.object_variants.experiment_variant(name, expanded_value)
+
+        # Set up remaining variants
+        self._set_package_manager()
+        self._set_workflow_manager()
+
+        for _, obj in self._objects(
+            exclude_types=[ramble.repository.ObjectTypes.applications]
+        ):
+            obj_variants = getattr(obj, "object_variants", None)
+            if obj_variants is not None:
+                self.object_variants.merge_default_variants(
+                    getattr(obj, "object_variants")
+                )
+                self.object_variants.merge_multi_value_variants(obj_variants)
+
+        base_chain = self.__class__.__mro__
+        for cls in base_chain:
+            if hasattr(cls, "name") and getattr(cls, "name") is not None:
+                self.object_variants.multi_value_variant(
+                    "application_name", value=cls.name
+                )
+
+        # Define workload_name variant as early as possible
+        self.object_variants.default_variant(
+            "workload_name",
+            default=self.expander.workload_name,
+            description="Name of experiment workload",
+        )
+
         self.no_expand_vars = set()
         workloads = self.get_workloads()
+
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
                 if self.expander.satisfies(var_when_set, self.object_variants):
@@ -571,10 +564,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
 
-        # Define missing workload variables
-        for var, val in self.selected_variables().items():
-            if var not in self.variables:
-                self.define_variable(var, val.default)
+        # Define missing variables
+        for _, obj in self._objects():
+            for var, val in obj.selected_variables().items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
         if experiment_set and experiment_set._workspace:
@@ -1145,15 +1139,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
-            # Define any missing modifier variables
-            for var, val in mod_inst.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
-
             # Set standard variants for all modifiers
             obj_variants = getattr(mod_inst, "object_variants", None)
             if obj_variants is not None:
                 self.object_variants.merge_multi_value_variants(obj_variants)
+
+            # Define any missing modifier variables
+            for var, val in mod_inst.selected_variables().items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
 
     def validate_experiment(
         self, warn_validation=True, die_on_validate_error=True

@@ -891,7 +891,7 @@ def environment_variable(
     return _execute_environment_variable
 
 
-@shared_directive(dicts=())
+@shared_directive("class_variants")
 def variant(
     name: str,
     default: Optional[Any] = None,
@@ -912,12 +912,15 @@ def variant(
         """
         ramble.variants.validate_variant(name)
 
-        if not hasattr(obj, "object_variants") or obj.object_variants is None:
-            obj.object_variants = ramble.variants.VariantSet()
+        args_dict = {
+            "name": name,
+            "default": default,
+            "description": description,
+            "values": values,
+        }
+        args_dict.update(kwargs)
 
-        obj.object_variants.default_variant(
-            name, default=default, description=description, values=values
-        )
+        obj.class_variants[name] = args_dict
 
     return _define_variant
 

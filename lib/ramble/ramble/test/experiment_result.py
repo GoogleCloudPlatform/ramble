@@ -13,8 +13,9 @@ from ramble.experiment_result import ExperimentResult
 
 def test_to_dict(mutable_mock_apps_repo):
     basic_app_inst = mutable_mock_apps_repo.get("basic")
-    basic_app_inst.set_variables(
+    basic_app_inst.set_variables_and_variants(
         {"workload_name": "test_wl", "experiment_status": "placeholder", "test_var": "my_var"},
+        {},
         None,
     )
     basic_app_inst.set_status("UNKNOWN")
