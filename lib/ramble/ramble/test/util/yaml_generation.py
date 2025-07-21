@@ -9,6 +9,7 @@
 import pytest
 import ruamel.yaml as yaml
 
+import ramble.expander
 import ramble.util.yaml_generation
 
 import spack.util.spack_yaml as syaml
@@ -106,3 +107,21 @@ def test_remove_config_value(yaml_config):
     ramble.util.yaml_generation.remove_config_value(read_data, "bar.bar_str")
     assert "bar_str" not in read_data["bar"]
     assert "bar2" in read_data["bar"]
+
+
+def test_apply_default_config_values(mutable_mock_apps_repo):
+    config_data = {"foo": {"bar": "baz"}}
+    default_config_string = "{default_config_value}"
+    app_inst = mutable_mock_apps_repo.get("basic")
+    app_inst.variables = {"foo.bar": ""}
+    expansion_vars = {
+        "workload_name": "test_wl",
+        "foo.bar": default_config_string,
+    }
+    app_inst.expander = ramble.expander.Expander(expansion_vars, None)
+
+    assert app_inst.variables["foo.bar"] == ""
+    ramble.util.yaml_generation.apply_default_config_values(
+        config_data, app_inst, default_config_string
+    )
+    assert app_inst.variables["foo.bar"] == "baz"
