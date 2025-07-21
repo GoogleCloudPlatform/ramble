@@ -68,7 +68,7 @@ def workflow_manager_family(*names: str, **kwargs):
     """
 
     def _define_workflow_manager_family(wm):
-        if not wm.families:
+        if getattr(wm, "families", None) is None:
             wm.families = ramble.definitions.families.Families(wm.origin_type, list(names))
         else:
             wm.families.add_families(list(names))

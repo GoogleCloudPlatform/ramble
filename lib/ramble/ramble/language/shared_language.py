@@ -912,7 +912,7 @@ def variant(
         """
         ramble.variants.validate_variant(name)
 
-        if obj.object_variants is None:
+        if not hasattr(obj, "object_variants") or obj.object_variants is None:
             obj.object_variants = ramble.variants.VariantSet()
 
         obj.object_variants.default_variant(

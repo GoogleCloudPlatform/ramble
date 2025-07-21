@@ -24,8 +24,6 @@ import spack.util.naming
 
 class PackageManagerBase(metaclass=PackageManagerMeta):
     name = None
-    object_variants = None
-    families = None
     origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("package_manager_builtin", "{obj_name}", "{name}")
@@ -60,10 +58,10 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
+        if getattr(self, "object_variants", None) is None:
             self.object_variants = ramble.variants.VariantSet()
 
-        if self.families is None:
+        if getattr(self, "families", None) is None:
             self.families = ramble.definitions.families.Families(
                 self.origin_type
             )
