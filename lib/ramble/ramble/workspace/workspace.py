@@ -2163,24 +2163,7 @@ ramble:
 
     def get_software_dict(self):
         """Return the software dictionary for this workspace"""
-        # DEPRECATED: Remove once the spack config section is completely removed
-        spack_dict = ramble.config.config.get_config("spack")
         software_dict = ramble.config.config.get_config(namespace.software)
-
-        if spack_dict:
-            logger.die(
-                "The spack configuration section is deprecated. "
-                "Please update to the software dict."
-            )
-
-        if namespace.packages in software_dict:
-            for pkg, config in software_dict[namespace.packages].items():
-                if "spack_spec" in config:
-                    logger.die(
-                        f'Package {pkg} defines "spack_spec" which is deprecated. '
-                        'Convert this to "pkg_spec" or "spack_pkg_spec" instead.'
-                    )
-
         return software_dict
 
     def get_applications(self):

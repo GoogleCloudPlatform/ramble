@@ -45,6 +45,5 @@ schema = {
     "$schema": "http://json-schema.org/schema#",
     "title": "Ramble workspace configuration file schema",
     "type": "object",
-    "additionalProperties": ramble.schema.spack.properties,
     "properties": properties,
 }

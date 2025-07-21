@@ -22,7 +22,6 @@ import ramble.schema.licenses
 import ramble.schema.modifiers
 import ramble.schema.repos
 import ramble.schema.software
-import ramble.schema.spack  # DEPRECATED: Remove when spack is removed
 import ramble.schema.success_criteria
 import ramble.schema.variables
 import ramble.schema.variants
@@ -35,7 +34,6 @@ properties = union_dicts(
     ramble.schema.formatted_executables.properties,
     ramble.schema.licenses.properties,
     ramble.schema.repos.properties,
-    ramble.schema.spack.properties,  # DEPRECATED: Remove when spack is removed
     ramble.schema.software.properties,
     ramble.schema.success_criteria.properties,
     ramble.schema.variables.properties,
