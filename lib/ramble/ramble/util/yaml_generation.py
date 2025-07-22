@@ -216,11 +216,9 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
         default_config_string (str): String that conveys the default config_data
                                      should be used in place of the current value.
     """
-    workload = app_inst.get_workload()
-
     # Set all '{default_config_value}' values to value from the base config
-    for var_name in workload.variables.keys():
-        if var_name and len(var_name.split(".")) > 1:
+    for var_name in app_inst.selected_variables().keys():
+        if len(var_name.split(".")) > 1:
             var_val = app_inst.expander.expand_var(app_inst.expander.expansion_str(var_name))
 
             if var_val == default_config_string:
