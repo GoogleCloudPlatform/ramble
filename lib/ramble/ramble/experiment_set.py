@@ -325,13 +325,16 @@ class ExperimentSet:
         app_inst.set_formatted_executables(context.formatted_executables)
 
         if app_inst.package_manager is not None:
-            variables[self.keywords.env_path] = os.path.join(
-                app_inst.package_manager.package_manager_dir(self._workspace),
-                Expander.expansion_str(self.keywords.env_name),
+            app_inst.define_variable(
+                self.keywords.env_path,
+                os.path.join(
+                    app_inst.package_manager.package_manager_dir(self._workspace),
+                    Expander.expansion_str(self.keywords.env_name),
+                ),
             )
 
         # Setup experiment name after modifiers are defined
-        final_exp_name = expander.expand_var(
+        final_exp_name = app_inst.expander.expand_var(
             exp_template_name + experiment_suffix, allow_passthrough=False
         )
 
@@ -343,10 +346,6 @@ class ExperimentSet:
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
         app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
-
-        experiment_namespace = expander.experiment_namespace
-        app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
-
         app_inst.define_variable(
             self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
         )
@@ -376,6 +375,9 @@ class ExperimentSet:
 
         app_inst.add_expand_vars(self._workspace)
         app_inst.read_status()
+
+        experiment_namespace = app_inst.expander.experiment_namespace
+        app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
 
         return app_inst
 
