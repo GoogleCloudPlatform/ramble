@@ -19,6 +19,7 @@ from ramble.language.workflow_manager_language import (
     WorkflowManagerMeta,
     workflow_manager_variable,
 )
+from ramble.util import format
 from ramble.util.naming import NS_SEPARATOR
 
 
