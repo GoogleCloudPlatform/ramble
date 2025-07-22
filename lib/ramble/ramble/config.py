@@ -66,7 +66,6 @@ import ramble.schema.package_manager_repos
 # Objects
 import ramble.schema.repos
 import ramble.schema.software
-import ramble.schema.spack
 import ramble.schema.success_criteria
 import ramble.schema.variables
 import ramble.schema.variants
@@ -91,7 +90,6 @@ section_schemas = {
     "licenses": ramble.schema.licenses.schema,
     "mirrors": ramble.schema.mirrors.schema,
     "modifiers": ramble.schema.modifiers.schema,
-    "spack": ramble.schema.spack.schema,
     "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
     "applications": ramble.schema.applications.schema,
@@ -840,8 +838,6 @@ def _config():
     # first do the builtin, hardcoded defaults
     defaults = InternalConfigScope("_builtin", config_defaults)
     cfg.push_scope(defaults)
-
-    # TODO: do we need the configuration here from Spack?
 
     # add each scope
     for name, path in configuration_paths:

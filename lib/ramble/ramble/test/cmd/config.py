@@ -150,8 +150,7 @@ env_vars:
     )
 
 
-# DEPRECATED: Remove `spack` when removed
-@pytest.mark.parametrize("section_key", ["spack", "software"])
+@pytest.mark.parametrize("section_key", ["software"])
 def test_merged_software_section(mock_low_high_config, section_key):
     low_path = mock_low_high_config.scopes["low"].path
     high_path = mock_low_high_config.scopes["high"].path
