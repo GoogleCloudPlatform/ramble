@@ -36,10 +36,10 @@ def is_object(f):
     return f.startswith("var/ramble/repos/") or "docs/tutorial/examples" in f
 
 
-#: List of directories to exclude from checks.
+# List of directories to exclude from checks.
 exclude_directories = [ramble.paths.external_path]
 
-#: max line length we're enforcing (note: this duplicates what's in .flake8)
+# max line length we're enforcing (note: this duplicates what's in .flake8)
 max_line_length = 99
 
 common_object_exemptions = {
@@ -68,13 +68,13 @@ common_object_exemptions = {
 
 base_class_file = repository.type_definitions[repository.ObjectTypes.base_classes]["file_name"]
 
-#: This is a dict that maps:
-#:  filename pattern ->
-#:     flake8 exemption code ->
-#:        list of patterns, for which matching lines should have codes applied.
-#:
-#: For each file, if the filename pattern matches, we'll add per-line
-#: exemptions if any patterns in the sub-dict match.
+# This is a dict that maps:
+#   filename pattern ->
+#     flake8 exemption code ->
+#        list of patterns, for which matching lines should have codes applied.
+#
+# For each file, if the filename pattern matches, we'll add per-line
+# exemptions if any patterns in the sub-dict match.
 pattern_exemptions = {
     # exemptions applied only to application.py files.
     rf"application.py|{base_class_file}$": {
@@ -127,7 +127,7 @@ tool_names = ["isort", "black", "flake8"]
 tools = {}
 
 
-#: decorator for adding tools to the list
+# decorator for adding tools to the list
 class tool:
     def __init__(self, name):
         self.name = name

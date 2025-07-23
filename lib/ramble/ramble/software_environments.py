@@ -9,15 +9,9 @@
 from collections import defaultdict
 
 import ramble.error
-import ramble.repository
 import ramble.util.colors as rucolor
 from ramble.namespace import namespace
 from ramble.util.logger import logger
-
-base_class_type = ramble.repository.ObjectTypes.base_classes
-PackageManagerBase = ramble.repository.get_obj_class(
-    "package-manager-base", object_type=base_class_type
-)
 
 SUB_INDENT = 2
 
@@ -71,7 +65,7 @@ class SoftwarePackage:
         """Return a spec string for this software package
 
         Args:
-            all_packages (dict, optional): Dictionary of all package definitions.
+            all_packages (dict | None): Dictionary of all package definitions.
                                  Used to look up compiler packages.
             compiler (bool): True of this package is used as a compiler for
                                 another package. False if this is just a primary package.
@@ -143,7 +137,7 @@ class RenderedPackage(SoftwarePackage):
         self,
         name: str,
         pkg_info: dict,
-        package_manager: PackageManagerBase,
+        package_manager,
         spec: str,
         compiler: str = "",
         compiler_spec: str = "",
@@ -153,8 +147,7 @@ class RenderedPackage(SoftwarePackage):
         Args:
             name (str): Name of package
             pkg_info (dict): Package info containing specs for supported package managers
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                package manager tied to this package
+            package_manager: package manager tied to this package
             spec (str): Package spec (used to install / load package)
             compiler (optional str): Name of package definition to use as compiler
                                      for this package
@@ -299,7 +292,7 @@ class TemplatePackage(SoftwarePackage):
             out_str = super().info(indent, verbosity, color_level, only_used=only_used) + out_str
         return out_str
 
-    def render_package(self, expander: object, package_manager: PackageManagerBase):
+    def render_package(self, expander: object, package_manager):
         """Render a SoftwarePackage from this TemplatePackage
 
         Args:
@@ -375,8 +368,7 @@ class SoftwareEnvironment:
 
         Args:
             name (str): Name of the environment
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Package manager associated with the environment
+            package_manager: Package manager associated with the environment
         """
 
         self.name = name
@@ -481,7 +473,7 @@ class ExternalEnvironment(SoftwareEnvironment):
 class RenderedExternalEnvironment(ExternalEnvironment):
     """Class representing a rendered externally defined software environment"""
 
-    def __init__(self, name: str, name_or_path: str, package_manager: PackageManagerBase):
+    def __init__(self, name: str, name_or_path: str, package_manager):
         """Constructor for external software environment"""
         super().__init__(name, name_or_path)
         self.package_manager = package_manager
@@ -494,7 +486,7 @@ class RenderedExternalEnvironment(ExternalEnvironment):
 class RenderedEnvironment(SoftwareEnvironment):
     """Class representing an already rendered software environment"""
 
-    def __init__(self, name: str, package_manager: PackageManagerBase):
+    def __init__(self, name: str, package_manager):
         """Constructor for rendered software environment"""
         super().__init__(name)
         self.package_manager = package_manager
@@ -592,15 +584,14 @@ class TemplateEnvironment(SoftwareEnvironment):
         expander: object,
         all_package_templates: dict,
         all_packages: dict,
-        package_manager: PackageManagerBase,
+        package_manager,
     ):
         """Render a SoftwareEnvironment from this TemplateEnvironment
 
         Args:
             expander (ramble.expander.Expander): Expander object to use when rendering
             all_packages (dict): All package definitions
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Package manager the environment is rendered with
+            package_manager: Package manager the environment is rendered with
 
         Returns:
             (RenderedEnvironment) Reference to the rendered SoftwareEnvironment
@@ -722,8 +713,7 @@ class SoftwareEnvironments:
         information about used packages and environments.
 
         Args:
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Reference to a package manager object
+            package_manager: Reference to a package manager object
             env_name (str): Name of the rendered environment to mark as used
         """
 
@@ -921,16 +911,13 @@ class SoftwareEnvironments:
                 logger.warn(f"    Package: {pkg_name}, Compiler: {comp_name}")
             logger.warn("This might cause problems when installing the packages.")
 
-    def render_environment(
-        self, env_name: str, expander: object, package_manager: PackageManagerBase, require=True
-    ):
+    def render_environment(self, env_name: str, expander: object, package_manager, require=True):
         """Render an environment needed by an experiment
 
         Args:
             env_name (str): Name of environment needed by the experiment
             expander (ramble.expander.Expander): Expander object from the experiment
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Package manager the environment is rendered with
+            package_manager: Package manager the environment is rendered with
 
         Returns:
             (SoftwareEnvironment): Reference to software environment for
