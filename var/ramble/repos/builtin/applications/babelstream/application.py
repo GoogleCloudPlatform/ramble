@@ -28,7 +28,7 @@ class Babelstream(ExecutableApplication):
 
         software_spec(
             "babelstream",
-            pkg_spec="babelstream@5.0",
+            pkg_spec="babelstream@5.0 +omp",
             compiler="gcc12",
         )
     executable(
