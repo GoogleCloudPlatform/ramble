@@ -299,9 +299,20 @@ class ExperimentSet:
             self.keywords.application_name, allow_passthrough=False
         )
 
-        app_inst = ramble.repository.get(final_app_name).clone()
-        app_inst.set_variables(variables, self)
-        app_inst.set_variants(context.variants)
+        final_wl_name = expander.expand_var_name(
+            self.keywords.workload_name, allow_passthrough=False
+        )
+
+        # Define some standard variables before the application is created
+        # to ensure variables and variants can be defined correctly.
+        variables[self.keywords.workload_template_name] = workload_template_name
+        variables[self.keywords.application_name] = final_app_name
+        variables[self.keywords.workload_name] = final_wl_name
+
+        # Setup the application instance
+        app_inst = ramble.repository.get(final_app_name)
+        app_inst.set_variables_and_variants(variables, context.variants, self)
+
         app_inst.set_required_variables()
         app_inst.set_active_workload()
         app_inst.set_env_variable_sets(context.env_variables)
@@ -314,20 +325,19 @@ class ExperimentSet:
         app_inst.set_formatted_executables(context.formatted_executables)
 
         if app_inst.package_manager is not None:
-            variables[self.keywords.env_path] = os.path.join(
-                app_inst.package_manager.package_manager_dir(self._workspace),
-                Expander.expansion_str(self.keywords.env_name),
+            app_inst.define_variable(
+                self.keywords.env_path,
+                os.path.join(
+                    app_inst.package_manager.package_manager_dir(self._workspace),
+                    Expander.expansion_str(self.keywords.env_name),
+                ),
             )
 
-        final_wl_name = expander.expand_var_name(
-            self.keywords.workload_name, allow_passthrough=False
-        )
-
-        final_exp_name = expander.expand_var(
+        # Setup experiment name after modifiers are defined
+        final_exp_name = app_inst.expander.expand_var(
             exp_template_name + experiment_suffix, allow_passthrough=False
         )
 
-        app_inst.define_variable(self.keywords.workload_template_name, workload_template_name)
         app_inst.define_variable(
             self.keywords.experiment_template_name, exp_template_name + experiment_suffix
         )
@@ -336,10 +346,6 @@ class ExperimentSet:
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
         app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
-
-        experiment_namespace = expander.experiment_namespace
-        app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
-
         app_inst.define_variable(
             self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
         )
@@ -364,12 +370,14 @@ class ExperimentSet:
                 expander.expand_var_name(self.keywords.experiment_namespace)
             ),
         )
-
         for name, value in self._workspace.workspace_paths().items():
             app_inst.define_variable(name, value)
 
         app_inst.add_expand_vars(self._workspace)
         app_inst.read_status()
+
+        experiment_namespace = app_inst.expander.experiment_namespace
+        app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
 
         return app_inst
 

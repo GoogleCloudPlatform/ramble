@@ -59,7 +59,7 @@ def workflow_manager_variable(
     return _define_wm_variable
 
 
-@workflow_manager_directive(dicts=())
+@workflow_manager_directive("class_families")
 def workflow_manager_family(*names: str, **kwargs):
     """Add a new family to this workflow manager
 
@@ -68,9 +68,7 @@ def workflow_manager_family(*names: str, **kwargs):
     """
 
     def _define_workflow_manager_family(wm):
-        if getattr(wm, "families", None) is None:
-            wm.families = ramble.definitions.families.Families(wm.origin_type, list(names))
-        else:
-            wm.families.add_families(list(names))
+        for name in names:
+            wm.class_families[name] = True
 
     return _define_workflow_manager_family

@@ -63,7 +63,7 @@ def test_app_features(mutable_mock_apps_repo, app):
 def test_basic_app(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get("basic")
     exp_dict = basic_exp_dict()
-    basic_inst.set_variables(exp_dict, None)
+    basic_inst.set_variables_and_variants(exp_dict, {}, None)
     basic_inst.define_variable("application_name", "basic")
 
     assert "test_wl" in basic_inst.workloads[_FS]
@@ -149,7 +149,7 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
         }
     }
 
-    src_inst.set_variables(defined_variables, None)
+    src_inst.set_variables_and_variants(defined_variables, {}, None)
     src_inst.set_env_variable_sets(defined_env_vars)
     src_inst.set_internals(defined_internals)
 
@@ -206,7 +206,7 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
 def test_required_builtins(mutable_mock_apps_repo, app):
     app_inst = mutable_mock_apps_repo.get(app)
     exp_dict = basic_exp_dict()
-    app_inst.set_variables(exp_dict, None)
+    app_inst.set_variables_and_variants(exp_dict, {}, None)
     app_inst.define_variable("application_name", app)
 
     required_builtins = []
@@ -224,7 +224,7 @@ def test_required_builtins(mutable_mock_apps_repo, app):
 def test_register_builtin_app(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get("register-builtin")
     exp_dict = basic_exp_dict()
-    app_inst.set_variables(exp_dict, None)
+    app_inst.set_variables_and_variants(exp_dict, {}, None)
     app_inst.define_variable("application_name", "register-builtin")
 
     required_builtins = []
@@ -398,13 +398,18 @@ def test_set_input_path_multi_input(mutable_mock_apps_repo):
     assert executable_application_instance.variables["test-input3"] == input3_path
 
 
-def test_set_variables(mutable_mock_apps_repo):
+def test_set_variables_and_variants(mutable_mock_apps_repo):
     """Test that set_variables defines workload variables"""
 
     executable_application_instance = mutable_mock_apps_repo.get("basic")
 
     expansion_vars = basic_exp_dict()
     del expansion_vars["n_ranks"]
+
+    experiment_variants = {
+        "workflow_manager": "slurm",
+        "foo": "bar",
+    }
 
     # Set up the instance to pass the initial part of the function
 
@@ -417,9 +422,15 @@ def test_set_variables(mutable_mock_apps_repo):
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
 
-    executable_application_instance.set_variables(expansion_vars, None)
+    executable_application_instance.set_variables_and_variants(
+        expansion_vars, experiment_variants, None
+    )
 
     assert executable_application_instance.variables["n_ranks"] == "1"
+
+    variant_set = executable_application_instance.object_variants.as_set()
+    assert "workflow_manager=slurm" in variant_set
+    assert "package_manager=spack" not in variant_set
 
 
 def test_define_commands(mutable_mock_apps_repo):
@@ -437,7 +448,7 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.set_variables(expansion_vars, None)
+    executable_application_instance.set_variables_and_variants(expansion_vars, {}, None)
 
     exec_graph = executable_application_instance._get_executable_graph("test_wl2")
 
@@ -503,7 +514,7 @@ ramble:
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.set_variables(expansion_vars, None)
+    executable_application_instance.set_variables_and_variants(expansion_vars, {}, None)
 
     exec_graph = executable_application_instance._get_executable_graph("test_wl2")
 
@@ -518,6 +529,7 @@ ramble:
 
 def test_class_attributes(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get("basic")
+    basic_inst.variables = {"workload_name": "test_wl"}
     basic_clone = basic_inst.clone()
 
     instances = [basic_inst, basic_clone]
