@@ -8,9 +8,6 @@
 import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.mirror
-import ramble.repository
-import ramble.spec
-import ramble.workspace
 from ramble.error import RambleError
 from ramble.util.logger import logger
 

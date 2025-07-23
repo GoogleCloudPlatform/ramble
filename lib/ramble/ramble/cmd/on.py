@@ -8,10 +8,8 @@
 
 import ramble.cmd.common.arguments as arguments
 import ramble.config
-import ramble.expander
 import ramble.filters
 import ramble.pipeline
-import ramble.workspace
 
 description = '"And now\'s the time, the time is now" (execute workspace experiments)'
 section = "workspaces"

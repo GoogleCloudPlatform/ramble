@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import ramble.cmd.common.info
-import ramble.repository
 
 description = "get detailed information on a particular object"
 section = "basic"
