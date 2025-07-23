@@ -56,7 +56,7 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions, format
+from ramble.util import constants, conversions, format, object_utils
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -3300,19 +3300,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def get_required_variables(self):
         """Get all the required variables based on the when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.expander.satisfies(
-                    var_props["when"], self.object_variants
-                ):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra modes prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars
+        return object_utils.get_required_variables(self)
 
     def set_required_variables(self):
         """Set required variables from all objects"""

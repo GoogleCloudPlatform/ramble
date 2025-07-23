@@ -17,7 +17,7 @@ import ramble.variants
 from ramble.error import InvalidModeError, ModifierError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
-from ramble.util import format
+from ramble.util import format, object_utils
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
@@ -346,16 +346,4 @@ class ModifierBase(metaclass=ModifierMeta):
 
     def get_required_variables(self):
         """Get all the required variables based on the mode and when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.expander.satisfies(
-                    var_props["when"], self.object_variants
-                ):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra when prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars
+        return object_utils.get_required_variables(self)

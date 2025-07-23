@@ -19,7 +19,7 @@ from ramble.language.workflow_manager_language import (
     WorkflowManagerMeta,
     workflow_manager_variable,
 )
-from ramble.util import format
+from ramble.util import format, object_utils
 from ramble.util.naming import NS_SEPARATOR
 
 
@@ -184,16 +184,4 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
 
     def get_required_variables(self):
         """Get all the required variables based on the mode and when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.app_inst.expander.satisfies(
-                    var_props["when"], self.app_inst.object_variants
-                ):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra when prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars
+        return object_utils.get_required_variables(self, self.app_inst)
