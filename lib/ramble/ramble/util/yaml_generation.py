@@ -211,8 +211,7 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
 
     Args:
         config_data (dict): Dictionary of config data read from a YAML file
-        app_inst (ramble.base_cls.builtin.ApplicationBase): Application instance
-            representing an experiment
+        app_inst: Application instance representing an experiment
         default_config_string (str): String that conveys the default config_data
                                      should be used in place of the current value.
     """

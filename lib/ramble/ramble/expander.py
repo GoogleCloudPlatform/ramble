@@ -723,7 +723,7 @@ class Expander:
                                set of used variables or not.
 
         Returns:
-            boolean: True or False, based if the experiment's variants satisfy
+            (bool): True or False, based if the experiment's variants satisfy
                      the input requirement.
         """
 

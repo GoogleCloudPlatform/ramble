@@ -199,6 +199,9 @@ gettext_uuid = False
 # directories to ignore when looking for source files.
 exclude_patterns = ["_build", "_ramble_root"]
 
+# TODO: re-enable docutils warnings once they are cleaned up.
+suppress_warnings = ["docutils"]
+
 nitpicky = True
 nitpick_ignore = [
     # Python classes that intersphinx is unable to resolve
@@ -226,6 +229,9 @@ nitpick_ignore = [
     ("py:class", "spack.util.environment.EnvironmentModifications"),
     ("py:class", "spack.util.executable.Executable"),
     ("py:class", "spack.util.pattern.Composite"),
+    ("py:class", "ramble.keywords.type"),
+    ("py:class", "ramble.keywords.level"),
+    ("py:class", "ramble.cmd.common.info.formats"),
 ]
 
 # The reST default role (used for this markup: `text`) to use for all documents.

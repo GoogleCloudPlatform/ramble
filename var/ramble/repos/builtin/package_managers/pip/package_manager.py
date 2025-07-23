@@ -188,7 +188,7 @@ class Pip(PackageManagerBase):
         Args:
             pkg (RenderedPackage): Reference to a rendered package
             all_pkgs (dict): All related packages
-            compiler (boolean): True if this pkg is used as a compiler
+            compiler (bool): True if this pkg is used as a compiler
         """
         return pkg.spec
 
