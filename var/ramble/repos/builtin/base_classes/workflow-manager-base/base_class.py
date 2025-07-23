@@ -10,6 +10,7 @@
 from typing import List
 
 import ramble.definitions.families
+import ramble.object_mixin
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
@@ -19,11 +20,12 @@ from ramble.language.workflow_manager_language import (
     WorkflowManagerMeta,
     workflow_manager_variable,
 )
-from ramble.util import format, object_utils
 from ramble.util.naming import NS_SEPARATOR
 
 
-class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
+class WorkflowManagerBase(
+    ramble.object_mixin.ObjectMixin, metaclass=WorkflowManagerMeta
+):
     name = None
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(
@@ -178,10 +180,3 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
             for env_var in env_var_list:
                 all_env_vars[env_var.name] = env_var
         return all_env_vars
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        return object_utils.get_required_variables(self, self.app_inst)

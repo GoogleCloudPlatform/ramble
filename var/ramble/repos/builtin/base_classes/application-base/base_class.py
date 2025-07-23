@@ -27,6 +27,7 @@ import ramble.fetch_strategy
 import ramble.graphs
 import ramble.keywords
 import ramble.mirror
+import ramble.object_mixin
 import ramble.repeats
 import ramble.repository
 import ramble.stage
@@ -56,7 +57,7 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions, format, object_utils
+from ramble.util import constants, conversions
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -123,7 +124,9 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
     return profiler(phase_func)
 
 
-class ApplicationBase(metaclass=ApplicationMeta):
+class ApplicationBase(
+    ramble.object_mixin.ObjectMixin, metaclass=ApplicationMeta
+):
     name = None
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
@@ -821,9 +824,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         color.cprint(f"{indent}{header}:")
         for exp in self.chain_order:
             color.cprint(f"{indent}- {exp}")
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
 
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):
@@ -3297,10 +3297,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     ramble.repository.ObjectTypes.workflow_managers,
                     self.workflow_manager,
                 )
-
-    def get_required_variables(self):
-        """Get all the required variables based on the when conditions."""
-        return object_utils.get_required_variables(self)
 
     def set_required_variables(self):
         """Set required variables from all objects"""

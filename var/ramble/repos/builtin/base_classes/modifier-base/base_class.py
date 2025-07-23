@@ -11,18 +11,18 @@ import fnmatch
 import re
 from typing import List
 
+import ramble.object_mixin
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.error import InvalidModeError, ModifierError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
-from ramble.util import format, object_utils
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
 
-class ModifierBase(metaclass=ModifierMeta):
+class ModifierBase(ramble.object_mixin.ObjectMixin, metaclass=ModifierMeta):
     name = None
     origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(
@@ -170,9 +170,6 @@ class ModifierBase(metaclass=ModifierMeta):
 
     def __str__(self):
         return self.name
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
 
     def modded_variables(self, app, extra_vars=None):
         mods = {}
@@ -343,7 +340,3 @@ class ModifierBase(metaclass=ModifierMeta):
         processing to output files, before FOMs are extracted.
         """
         pass
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        return object_utils.get_required_variables(self)

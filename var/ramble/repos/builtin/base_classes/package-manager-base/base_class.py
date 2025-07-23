@@ -11,18 +11,20 @@ import os
 from typing import List
 
 import ramble.definitions.families
+import ramble.object_mixin
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
-from ramble.util import format, object_utils
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
 
-class PackageManagerBase(metaclass=PackageManagerMeta):
+class PackageManagerBase(
+    ramble.object_mixin.ObjectMixin, metaclass=PackageManagerMeta
+):
     name = None
     origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(
@@ -195,9 +197,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     def __str__(self):
         return self.name
 
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
-
     def all_pipeline_phases(self, pipeline):
         """Iterator over all phases within a specified pipeline
 
@@ -251,10 +250,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         )
 
         return self.app_inst.expander._used_variables
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        return object_utils.get_required_variables(self, self.app_inst)
 
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
