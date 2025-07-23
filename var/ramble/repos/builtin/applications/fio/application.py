@@ -28,8 +28,7 @@ class Fio(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         define_compiler("gcc13", pkg_spec="gcc@13.1.0")
-
-        software_spec("fio", pkg_spec="fio@3.37 +libaio")
+        software_spec("fio", pkg_spec="fio@3.37 +libaio", compiler="gcc13")
 
     executable(
         "run",
