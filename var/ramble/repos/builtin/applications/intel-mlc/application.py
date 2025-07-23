@@ -20,6 +20,12 @@ class IntelMlc(ExecutableApplication):
 
     required_package("intel-mlc")
 
+    with when("package_manager_family=spack"):
+        software_spec(
+            "intel-mlc",
+            pkg_spec="intel-mlc",
+        )
+
     executable(
         "execute_bw",
         "{intel-mlc_path}/{exec_name} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
