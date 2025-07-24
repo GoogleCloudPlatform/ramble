@@ -14,8 +14,6 @@
 
 from llnl.util.lang import union_dicts
 
-import ramble.schema.applications
-import ramble.schema.licenses
 import ramble.schema.merged
 
 keys = ("ramble", "workspace")

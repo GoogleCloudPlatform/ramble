@@ -6,10 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.language.shared_language
-import ramble.success_criteria
 import ramble.workload
 from ramble.language.language_base import DirectiveError
 

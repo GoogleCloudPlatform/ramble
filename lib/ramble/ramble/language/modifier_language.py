@@ -9,7 +9,6 @@
 from typing import Optional
 
 import ramble.definitions.requirements
-import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.language.shared_language
 from ramble.language.language_base import DirectiveError

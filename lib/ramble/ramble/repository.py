@@ -22,12 +22,7 @@ import stat
 import sys
 import traceback
 import types
-
-try:
-    from collections.abc import Mapping  # novm
-except ImportError:
-    from collections.abc import Mapping
-
+from collections.abc import Mapping
 from enum import Enum
 
 import ruamel.yaml as yaml
