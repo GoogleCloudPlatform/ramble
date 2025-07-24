@@ -19,11 +19,12 @@ from ramble.language.workflow_manager_language import (
     WorkflowManagerMeta,
     workflow_manager_variable,
 )
-from ramble.util import format, object_utils
 from ramble.util.naming import NS_SEPARATOR
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
+
+class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
     name = None
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(
@@ -136,52 +137,3 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
 
     def __str__(self):
         return self.name
-
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-
-        all_vars = {}
-        for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for var in var_list:
-                all_vars[var.name] = var
-        return all_vars
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-
-        all_env_vars = {}
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for env_var in env_var_list:
-                all_env_vars[env_var.name] = env_var
-        return all_env_vars
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        return object_utils.get_required_variables(self, self.app_inst)

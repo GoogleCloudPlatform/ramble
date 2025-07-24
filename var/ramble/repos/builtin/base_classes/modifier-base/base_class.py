@@ -11,18 +11,20 @@ import fnmatch
 import re
 from typing import List
 
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.error import InvalidModeError, ModifierError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
-from ramble.util import format, object_utils
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class ModifierBase(metaclass=ModifierMeta):
+
+class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
     name = None
     origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(
@@ -171,9 +173,6 @@ class ModifierBase(metaclass=ModifierMeta):
     def __str__(self):
         return self.name
 
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
-
     def modded_variables(self, app, extra_vars=None):
         mods = {}
 
@@ -280,48 +279,6 @@ class ModifierBase(metaclass=ModifierMeta):
                 if not var.expandable:
                     yield var.name
 
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-
-        mod_variables = {}
-
-        for when_key, var_list in self.object_variables.items():
-            if not self.expander.satisfies(when_key, self.object_variants):
-                continue
-
-            for var in var_list:
-                mod_variables[var.name] = var
-
-        return mod_variables
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-
-        mod_environment_variables = {}
-
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.expander.satisfies(when_key, self.object_variants):
-                continue
-
-            for env_var in env_var_list:
-                mod_environment_variables[env_var.name] = env_var
-
-        return mod_environment_variables
-
     def artifact_inventory(self, workspace, app_inst=None):
         """Return an inventory of modifier artifacts
 
@@ -343,7 +300,3 @@ class ModifierBase(metaclass=ModifierMeta):
         processing to output files, before FOMs are extracted.
         """
         pass
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        return object_utils.get_required_variables(self)

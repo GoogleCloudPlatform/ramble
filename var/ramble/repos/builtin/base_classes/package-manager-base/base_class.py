@@ -11,18 +11,20 @@ import os
 from typing import List
 
 import ramble.definitions.families
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
-from ramble.util import format, object_utils
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class PackageManagerBase(metaclass=PackageManagerMeta):
+
+class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     name = None
     origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(
@@ -129,46 +131,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
         return False
 
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-        all_vars = {}
-        for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for var in var_list:
-                all_vars[var.name] = var
-        return all_vars
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-        all_env_vars = {}
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for env_var in env_var_list:
-                all_env_vars[env_var.name] = env_var
-        return all_env_vars
-
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
 
@@ -194,9 +156,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
 
     def __str__(self):
         return self.name
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
 
     def all_pipeline_phases(self, pipeline):
         """Iterator over all phases within a specified pipeline
@@ -251,10 +210,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         )
 
         return self.app_inst.expander._used_variables
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        return object_utils.get_required_variables(self, self.app_inst)
 
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False

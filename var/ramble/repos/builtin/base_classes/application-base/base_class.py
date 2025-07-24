@@ -56,7 +56,7 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions, format, object_utils
+from ramble.util import constants, conversions
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -67,6 +67,8 @@ from ramble.workspace import namespace
 import spack.util.compression
 import spack.util.executable
 import spack.util.spack_json
+
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
 _NULL_CONTEXT = "null"
 
@@ -123,7 +125,7 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
     return profiler(phase_func)
 
 
-class ApplicationBase(metaclass=ApplicationMeta):
+class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     name = None
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
@@ -822,9 +824,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for exp in self.chain_order:
             color.cprint(f"{indent}- {exp}")
 
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
-
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):
         """Run a phase, by getting its function pointer"""
@@ -1304,7 +1303,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def selected_variables(self):
         """Extract all variables which would be included based
-        on the current variants.
+        on the current variants. This overrides the one defined in
+        the base mixin.
 
         Returns:
             (dict) Keys are variable names, values are variable instances
@@ -1328,7 +1328,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
     def selected_environment_variables(self):
         """Extract all environment variables which would be included based
-        on the current variants.
+        on the current variants. This overrides the one defined in
+        the base mixin.
 
         Returns:
             (dict) Keys are environment variable names, values are environment
@@ -3297,10 +3298,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     ramble.repository.ObjectTypes.workflow_managers,
                     self.workflow_manager,
                 )
-
-    def get_required_variables(self):
-        """Get all the required variables based on the when conditions."""
-        return object_utils.get_required_variables(self)
 
     def set_required_variables(self):
         """Set required variables from all objects"""
