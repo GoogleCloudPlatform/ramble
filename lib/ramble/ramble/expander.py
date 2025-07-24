@@ -42,11 +42,6 @@ def _re_search(regex, s):
     return re.search(regex, s) is not None
 
 
-def _safe_str_node_check(node):
-    # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
-    return hasattr(ast, "Str") and isinstance(node, ast.Str)
-
-
 def _maybe(expander, var_name, default=""):
     try:
         return expander.expand_var_name(var_name, allow_passthrough=False)
@@ -839,17 +834,10 @@ class Expander:
         others will generate integers (if the inputs are integers).
         """
         try:
-            if isinstance(node, ast.Num):
-                return self._ast_num(node)
-            elif isinstance(node, ast.Constant):
+            if isinstance(node, ast.Constant):
                 return self._ast_constant(node)
             elif isinstance(node, ast.Name):
                 return self._ast_name(node)
-            # TODO: Remove when we drop support for 3.6
-            # DEPRECATED: Remove due to python 3.8
-            # See: https://docs.python.org/3/library/ast.html#node-classes
-            elif isinstance(node, ast.Str):
-                return node.s
             elif isinstance(node, ast.Attribute):
                 return self._ast_attr(node)
             elif isinstance(node, ast.Compare):
@@ -888,10 +876,6 @@ class Expander:
             + f"Occurred while processing {node_type} node:\n"
             + f"{node.__dict__}"
         )
-
-    def _ast_num(self, node):
-        """Handle a number node in the ast"""
-        return node.n
 
     def _ast_constant(self, node):
         """Handle a constant node in the ast"""
@@ -1016,8 +1000,7 @@ class Expander:
                     )
                     self.__raise_syntax_error(node)
                 return val
-        # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
-        elif isinstance(node.left, ast.Constant) or _safe_str_node_check(node.left):
+        elif isinstance(node.left, ast.Constant):
             lhs_value = self.eval_math(node.left)
 
             found = False
@@ -1027,7 +1010,7 @@ class Expander:
                         rhs_value = self.eval_math(elt)
                         if lhs_value == rhs_value:
                             found = True
-                elif isinstance(comp, ast.Constant) or _safe_str_node_check(comp):
+                elif isinstance(comp, ast.Constant):
                     # Attempt evaluating `"str" in "string"`
                     rhs_value = self.eval_math(comp)
                     if isinstance(rhs_value, str) and lhs_value in rhs_value:
@@ -1096,7 +1079,7 @@ class Expander:
                     # DEPRECATED: ast.Index was dropped in python 3.9
                     if hasattr(ast, "Index") and isinstance(slice_node, ast.Index):
                         key = self.eval_math(slice_node.value)
-                    elif isinstance(slice_node, ast.Constant) or _safe_str_node_check(slice_node):
+                    elif isinstance(slice_node, ast.Constant):
                         key = self.eval_math(slice_node)
 
                     if key is None:

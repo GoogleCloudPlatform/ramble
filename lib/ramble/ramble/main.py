@@ -262,16 +262,9 @@ class RambleArgumentParser(argparse.ArgumentParser):
         """Ensure that sensible defaults are propagated to subparsers"""
         kwargs.setdefault("metavar", "SUBCOMMAND")
 
-        # From Python 3.7 we can require a subparser, earlier versions
-        # of argparse will error because required=True is unknown
-        if sys.version_info[:2] > (3, 6):
-            kwargs.setdefault("required", True)
+        kwargs.setdefault("required", True)
 
         sp = super().add_subparsers(**kwargs)
-        # This monkey patching is needed for Python 3.5 and 3.6, which support
-        # having a required subparser but don't expose the API used above
-        if sys.version_info[:2] == (3, 5) or sys.version_info[:2] == (3, 6):
-            sp.required = True
 
         old_add_parser = sp.add_parser
 

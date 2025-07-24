@@ -2,7 +2,7 @@
 line-length = 99
 # Older versions of black (like the ones compatible with py3.7)
 # don't recognize newer python versions like py312.
-target-version = ["py36", "py37", "py38", "py39", "py310"]
+target-version = ["py37", "py38", "py39", "py310"]
 include = '''
     \.pyi?$
 '''
