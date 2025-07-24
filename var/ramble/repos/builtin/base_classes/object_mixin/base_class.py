@@ -25,7 +25,9 @@ class ObjectMixin:
         filtered_vars = {}
         if required_vars:
             for var_name, var_props in required_vars.items():
-                if inst.expander.satisfies(var_props["when"], inst.object_variants):
+                if inst.expander.satisfies(
+                    var_props["when"], inst.object_variants
+                ):
                     filtered_vars[var_name] = {
                         # Exclude the extra when prop
                         k: var_props[k]

@@ -11,7 +11,7 @@ import os
 from typing import List
 
 import ramble.definitions.families
-import ramble.object_mixin
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
@@ -21,10 +21,10 @@ from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class PackageManagerBase(
-    ramble.object_mixin.ObjectMixin, metaclass=PackageManagerMeta
-):
+
+class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     name = None
     origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(

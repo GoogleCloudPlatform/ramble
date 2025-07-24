@@ -11,7 +11,7 @@ import fnmatch
 import re
 from typing import List
 
-import ramble.object_mixin
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
@@ -21,8 +21,10 @@ from ramble.language.shared_language import SharedMeta
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class ModifierBase(ramble.object_mixin.ObjectMixin, metaclass=ModifierMeta):
+
+class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
     name = None
     origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(

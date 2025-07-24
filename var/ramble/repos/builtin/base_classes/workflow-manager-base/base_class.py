@@ -10,7 +10,6 @@
 from typing import List
 
 import ramble.definitions.families
-import ramble.object_mixin
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
@@ -22,10 +21,10 @@ from ramble.language.workflow_manager_language import (
 )
 from ramble.util.naming import NS_SEPARATOR
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class WorkflowManagerBase(
-    ramble.object_mixin.ObjectMixin, metaclass=WorkflowManagerMeta
-):
+
+class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
     name = None
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(

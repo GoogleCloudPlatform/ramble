@@ -27,7 +27,6 @@ import ramble.fetch_strategy
 import ramble.graphs
 import ramble.keywords
 import ramble.mirror
-import ramble.object_mixin
 import ramble.repeats
 import ramble.repository
 import ramble.stage
@@ -68,6 +67,8 @@ from ramble.workspace import namespace
 import spack.util.compression
 import spack.util.executable
 import spack.util.spack_json
+
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
 _NULL_CONTEXT = "null"
 
@@ -124,9 +125,7 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
     return profiler(phase_func)
 
 
-class ApplicationBase(
-    ramble.object_mixin.ObjectMixin, metaclass=ApplicationMeta
-):
+class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     name = None
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
