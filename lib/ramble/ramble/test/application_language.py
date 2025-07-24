@@ -10,6 +10,7 @@
 import deprecation
 import pytest
 
+from ramble import language
 from ramble.appkit import *  # noqa
 
 app_types = [
@@ -278,6 +279,25 @@ def test_figure_of_merit_directive(app_class):
         for conf_name, conf_val in conf.items():
             assert conf_name in app_inst.figures_of_merit[_FS][_FS][fom_name]
             assert app_inst.figures_of_merit[_FS][_FS][fom_name][conf_name] == conf_val
+
+
+def test_figure_of_merit_directive_required_args():
+    app_inst = ExecutableApplication("/not/a/path")  # noqa: F405
+    with pytest.raises(
+        language.language_base.DirectiveError, match="required for defining file-based FOM"
+    ):
+        app_inst.figure_of_merit(
+            "test_fom",
+            units="s",
+        )
+    app_inst.figure_of_merit(
+        "test_inmem_fom",
+        units="s",
+        fom_map_key="test_fom_map_key",
+    )
+    foms = list(list(app_inst.figures_of_merit.values())[0].values())[0]
+    assert len(foms) == 1
+    assert foms["test_inmem_fom"]["fom_map_key"] == "test_fom_map_key"
 
 
 @pytest.mark.parametrize("app_class", app_types)

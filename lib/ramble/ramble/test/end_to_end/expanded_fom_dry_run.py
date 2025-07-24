@@ -29,6 +29,7 @@ ramble:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
     n_threads: '1'
+    my_var: 'testvar'
   applications:
     expanded_foms:
       workloads:
@@ -78,5 +79,7 @@ ramble:
         text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
         with open(text_results_files[0]) as f:
             data = f.read()
+            assert "Status = SUCCESS" in data
             for expected in expected_expansions:
                 assert f"test_fom {expected} = 567.8 {unit}" in data
+            assert "test_inmem_testvar = inmem_val" in data
