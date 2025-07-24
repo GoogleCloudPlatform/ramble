@@ -1304,7 +1304,8 @@ class ApplicationBase(
 
     def selected_variables(self):
         """Extract all variables which would be included based
-        on the current variants.
+        on the current variants. This overrides the one defined in
+        the base mixin.
 
         Returns:
             (dict) Keys are variable names, values are variable instances
@@ -1328,7 +1329,8 @@ class ApplicationBase(
 
     def selected_environment_variables(self):
         """Extract all environment variables which would be included based
-        on the current variants.
+        on the current variants. This overrides the one defined in
+        the base mixin.
 
         Returns:
             (dict) Keys are environment variable names, values are environment
