@@ -327,6 +327,7 @@ class TemplatePackage(SoftwarePackage):
         new_pkg = RenderedPackage(name, pkg_info, package_manager, spec, compiler, compiler_spec)
 
         if new_pkg.name in self._rendered_packages[pm_name]:
+            expander.merge_used_variable_stage()
             if new_pkg != self._rendered_packages[pm_name][name]:
                 new_info = new_pkg.info(only_used=False, color_level=-1).replace("@", "")
                 old_info = (

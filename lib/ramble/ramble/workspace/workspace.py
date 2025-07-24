@@ -1843,7 +1843,7 @@ ramble:
                 if not scope_section[namespace.variables]:
                     del scope_section[namespace.variables]
 
-        # Build experiment sets to determine which variables are used
+        # Build software environments to determine which variables are used
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
         experiment_set = self.build_experiment_set()
 

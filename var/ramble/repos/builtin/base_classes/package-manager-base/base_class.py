@@ -246,9 +246,13 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         )
 
         software_environments = workspace.software_environments
-        software_environments.render_environment(
+        software_env = software_environments.render_environment(
             app_context, self.app_inst.expander, self, require=False
         )
+        if software_env is not None:
+            software_environments.define_compiler_packages(
+                software_env, self.app_inst.expander
+            )
 
         return self.app_inst.expander._used_variables
 
