@@ -213,6 +213,9 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
                 software_env, self.app_inst.expander
             )
 
+        for _, contents in workspace.all_auxiliary_software_files():
+            self.app_inst.expander.expand_var(contents)
+
         return self.app_inst.expander._used_variables
 
     def populate_inventory(
