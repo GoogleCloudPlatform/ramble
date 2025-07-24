@@ -40,7 +40,7 @@ class ExpandedFoms(ExecutableApplication):
     figure_of_merit(
         "test_inmem_{my_var}",
         units="",
-        inmem_key="test_inmem",
+        fom_map_key="test_inmem",
     )
 
     success_criteria("Run", mode="string", match=r"Collect", file="{log_file}")

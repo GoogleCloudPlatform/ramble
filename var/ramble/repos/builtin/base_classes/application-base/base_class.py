@@ -196,7 +196,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._input_lock = None
         self._software_lock = None
         self._experiment_graph = None
-        self._inmem_fom_values = {}
+        # A dict storing fom values, currently it only stores inmem FOMs
+        self._fom_map = {}
 
         # Ensure we always have the application name, and this is never empty
         self.license_names = self.license_names + [self.name]
@@ -2211,8 +2212,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_name = fom_conf["fom_name_expanded"]
                 # TODO: this can be extended to support derived FOMs,
                 # since the `fom_values` contains resolved file-based FOMs
-                inmem_key = fom_conf["inmem_key"]
-                fom_value = self._inmem_fom_values.get(inmem_key)
+                fom_map_key = fom_conf["fom_map_key"]
+                fom_value = self._fom_map.get(fom_map_key)
                 expanded_fom_value = self.expander.expand_var(fom_value)
                 fom_values[context][fom_name] = {
                     "value": expanded_fom_value,
@@ -2900,7 +2901,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     }
 
                         for fom, source_def in source_foms.items():
-                            is_inmem = source_def["inmem_key"] is not None
+                            is_inmem = source_def["fom_map_key"] is not None
                             dest_def_dict = (
                                 inmem_fom_defs if is_inmem else file_fom_defs
                             )
@@ -2945,7 +2946,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     )
                                 ),
                                 "fom_type": source_def["fom_type"].to_dict(),
-                                "inmem_key": source_def["inmem_key"],
+                                "fom_map_key": source_def["fom_map_key"],
                                 # If expansion works (i.e., it doesn't rely on the matched fom
                                 # groups), then cache it here to avoid repeated expansion later.
                                 "units_expanded": _try_expand_var_or_none(
@@ -2983,9 +2984,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return files, file_fom_defs, inmem_fom_defs
 
-    def add_inmem_fom_value(self, inmem_key, value):
+    def add_inmem_fom_value(self, fom_map_key, value):
         """Add value to an in-memory FOM"""
-        self._inmem_fom_values[inmem_key] = value
+        self._fom_map[fom_map_key] = value
 
     def read_status(self):
         """Read status from an experiment's status file, if possible.

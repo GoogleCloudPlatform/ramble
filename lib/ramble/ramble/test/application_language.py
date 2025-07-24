@@ -293,11 +293,11 @@ def test_figure_of_merit_directive_required_args():
     app_inst.figure_of_merit(
         "test_inmem_fom",
         units="s",
-        inmem_key="test_inmem_key",
+        fom_map_key="test_fom_map_key",
     )
     foms = list(list(app_inst.figures_of_merit.values())[0].values())[0]
     assert len(foms) == 1
-    assert foms["test_inmem_fom"]["inmem_key"] == "test_inmem_key"
+    assert foms["test_inmem_fom"]["fom_map_key"] == "test_fom_map_key"
 
 
 @pytest.mark.parametrize("app_class", app_types)
