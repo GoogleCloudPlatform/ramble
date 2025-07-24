@@ -123,7 +123,7 @@ def figure_of_merit(
                                    should exist in.
       fom_type (ramble.util.foms.FomType): The type of figure of merit
       when (list | None): List of when conditions to apply to directive
-      fom_map_key: If supplied, this is treated as an in-memory (as ooposed to file-based)
+      fom_map_key: If supplied, this is treated as an in-memory (as opposed to file-based)
                    figure of merit, and its value is extracted using this key
     """
 
