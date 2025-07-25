@@ -102,19 +102,17 @@ class Tunables(BasicModifier):
                     summary[name][value] = {host}
                 else:
                     summary[name][value].add(host)
-        with open(log_path, "a") as f:
-            for n, sum_dict in summary.items():
-                if len(sum_dict) == 1:
-                    f.write(f"summary:{n}:{next(iter(sum_dict))}\n")
-                else:
-                    f.write(f"summary:{n}:{sum_dict}\n")
+        for n, sum_dict in summary.items():
+            if len(sum_dict) == 1:
+                metric = next(iter(sum_dict))
+            else:
+                metric = sum_dict
+            self._app_inst.add_inmem_fom_value(n, str(metric))
 
     for conf in info_list:
         figure_of_merit(
             conf["name"],
-            fom_regex=rf"summary:{conf['name']}:\s*(?P<fom>.*)",
-            group_name="fom",
             units="",
-            log_file=_TUNABLE_LOG,
+            fom_map_key=conf["name"],
             fom_type=FomType.INFO,
         )

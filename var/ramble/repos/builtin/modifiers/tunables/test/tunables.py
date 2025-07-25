@@ -84,10 +84,10 @@ nodeset-0: fom:hugepage-size:    2048 kB
             assert "modifier::tunables::hugepage-size = 2048 kB" in content
             # Assert output for multi-value FOMs
             assert (
-                "modifier::tunables::smt-active = {'1': {'nodeset-0'}, '0': {'nodeset-1'}}"
+                "modifier::tunables::smt-active = {'1': nodeset-0, '0': nodeset-1}"
                 in content
             )
             assert (
-                "modifier::tunables::thp-enabled = {'always': {'nodeset-0'}, 'madvise': {'nodeset-1'}}"
+                "modifier::tunables::thp-enabled = {'always': nodeset-0, 'madvise': nodeset-1}"
                 in content
             )
