@@ -66,6 +66,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         self._on_executables = ["*"]
         self.expander = None
         self._usage_mode = None
+        self._app_inst = None
 
         self._verbosity = "short"
 
@@ -156,6 +157,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         self.object_variants.merge_multi_value_variants(app.object_variants)
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
+        self._app_inst = app
 
     def define_variable(self, var_name, var_value):
         """Define a variable within this modifier's expander instance"""
