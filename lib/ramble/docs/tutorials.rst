@@ -32,3 +32,4 @@ various features.
     tutorials/11_using_internals
     tutorials/mirrors
     tutorials/EESSI_package_manager
+    tutorials/Workspace_config_command
