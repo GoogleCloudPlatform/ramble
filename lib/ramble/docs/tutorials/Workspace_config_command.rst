@@ -28,7 +28,7 @@ In this tutorial, you will learn how to use the ``ramble workspace config``
 command, to unify configuration files, and remove unnecessary portions of a
 configuration file to make it easier for users to digest and share.
 
-This tutorial builds off of concents introduce in other tutorials, mostly
+This tutorial builds off of concepts introduce in other tutorials, mostly
 around configuring a workspace. Configuring experiments within a workspace will
 not be covered in this tutorial, however we will use pre-configured workspaces
 to illustrate the utility of the ``workspace config`` command.
@@ -129,7 +129,7 @@ will use the ``ramble workspace manage includes`` command.
   $ ramble -D includes-workspace workspace manage includes -a '$workspace_root/software.yaml'
 
 This step causes the ramble workspace to include these YAML files when
-constructing it's merged configuration file.
+constructing its merged configuration file.
 
 At this stage, you can explore the experiments defined in the workspace using:
 
@@ -165,7 +165,7 @@ configuration file form the ``includes-workspace`` you constructed earlier.
    $ ramble -D includes-workspace workspace config -p > squash-workspace/configs/ramble.yaml
 
 At this stage, both workspaces should contain the same experiments. To verify,
-you can example the differences in the following commands:
+you can examine the differences from the following commands:
 
 .. code-block:: console
 
