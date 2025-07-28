@@ -327,7 +327,6 @@ class TemplatePackage(SoftwarePackage):
         new_pkg = RenderedPackage(name, pkg_info, package_manager, spec, compiler, compiler_spec)
 
         if new_pkg.name in self._rendered_packages[pm_name]:
-            expander.merge_used_variable_stage()
             if new_pkg != self._rendered_packages[pm_name][name]:
                 new_info = new_pkg.info(only_used=False, color_level=-1).replace("@", "")
                 old_info = (
@@ -790,6 +789,16 @@ class SoftwareEnvironments:
         for pkg in environment._packages:
             if pkg.compiler:
                 cur_compiler = pkg.compiler
+                # Re-render compiler package to ensure variables are marked as used.
+                if cur_compiler in self._rendered_packages[pm_name]:
+                    for template_name, template_def in self._package_templates.items():
+                        if cur_compiler in template_def._rendered_packages[pm_name]:
+                            expander.flush_used_variable_stage()
+                            rendered_pkg = template_def.render_package(
+                                expander, environment.package_manager
+                            )
+                            expander.merge_used_variable_stage()
+
                 while cur_compiler and cur_compiler not in self._rendered_packages[pm_name]:
                     added = False
                     for template_name, template_def in self._package_templates.items():
@@ -797,10 +806,10 @@ class SoftwareEnvironments:
                         rendered_name = expander.expand_var(template_name, merge_used_stage=False)
 
                         if rendered_name == cur_compiler:
-                            expander.merge_used_variable_stage()
                             rendered_pkg = template_def.render_package(
                                 expander, environment.package_manager
                             )
+                            expander.merge_used_variable_stage()
 
                             if (
                                 cur_compiler in self._rendered_packages[pm_name]
