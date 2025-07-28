@@ -107,7 +107,7 @@ class Tunables(BasicModifier):
                 metric = next(iter(sum_dict))
             else:
                 metric = sum_dict
-            self._app_inst.add_inmem_fom_value(n, str(metric))
+            self.add_inmem_fom_value(n, str(metric))
 
     for conf in info_list:
         figure_of_merit(
