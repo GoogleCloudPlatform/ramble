@@ -15,7 +15,7 @@ Using the ``ramble workspace config`` command
 Ramble contains many configuration sections, which can be defined in separate
 files across several scopes that represent different precedence levels. For
 more information on these, see the :ref:`configuration files
-<configuration_files>` documentation.
+<configuration-files>` documentation.
 
 All of these configuration files impact the resulting configuration within a
 :ref:`workspace<workspace-config>`. It can be difficult to create a hermetic
