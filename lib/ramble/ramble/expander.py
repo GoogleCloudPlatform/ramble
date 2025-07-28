@@ -839,16 +839,16 @@ class Expander:
         others will generate integers (if the inputs are integers).
         """
         try:
-            if isinstance(node, ast.Num):
-                return self._ast_num(node)
-            elif isinstance(node, ast.Constant):
+            if hasattr(ast, "Constant") and isinstance(node, ast.Constant):
                 return self._ast_constant(node)
+            elif hasattr(ast, "Num") and isinstance(node, ast.Num):  # Deprecated, removed in 3.14
+                return self._ast_num(node)
             elif isinstance(node, ast.Name):
                 return self._ast_name(node)
             # TODO: Remove when we drop support for 3.6
             # DEPRECATED: Remove due to python 3.8
             # See: https://docs.python.org/3/library/ast.html#node-classes
-            elif isinstance(node, ast.Str):
+            elif hasattr(ast, "Str") and isinstance(node, ast.Str):  # Deprecated, removed in 3.14
                 return node.s
             elif isinstance(node, ast.Attribute):
                 return self._ast_attr(node)
