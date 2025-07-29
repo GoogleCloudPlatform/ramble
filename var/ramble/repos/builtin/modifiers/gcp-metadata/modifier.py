@@ -174,13 +174,7 @@ class GcpMetadata(BasicModifier):
         ids = self.get_vm_id_list()
 
         if ids:
-            with open(
-                self.expander.expand_var(
-                    "{experiment_run_dir}/gcp-metadata.id_list.log"
-                ),
-                "w+",
-            ) as f:
-                f.write(", ".join(sorted(ids)))
+            self.add_inmem_fom_value("gcp_metadata_id_list", ", ".join(ids))
 
     def _process_id_map(self):
         if self._usage_mode == "local":
@@ -196,13 +190,7 @@ class GcpMetadata(BasicModifier):
         if ":" not in content:
             return
         content = content.strip().replace("\n", ", ")
-        with open(
-            self.expander.expand_var(
-                "{experiment_run_dir}/gcp-metadata.id_map.log"
-            ),
-            "w+",
-        ) as f:
-            f.write(content)
+        self.add_inmem_fom_value("gcp_metadata_id_map", content)
 
     def _process_physical_hosts(self, workspace):
         run_dir = self.expander.expand_var("{experiment_run_dir}")
@@ -232,17 +220,19 @@ class GcpMetadata(BasicModifier):
                     level0_groups.add(levels[0])
                     level1_groups.add(levels[1])
                     level2_groups.add(levels[2])
-
-        with open(
-            os.path.join(run_dir, "gcp-metadata.topology_summary.log"),
-            "w+",
-        ) as f:
-            if len(level0_groups) > 0:
-                # The group level name comes from https://cloud.google.com/compute/docs/instances/use-compact-placement-policies#verify-vm-location.
-                f.write(f"Level 0 groups (cluster) = {len(level0_groups)}\n")
-                f.write(f"Level 1 groups (rack) = {len(level1_groups)}\n")
-                f.write(f"Level 2 groups (host) = {len(level2_groups)}\n")
-                f.write(f'All hosts = {",".join(all_hosts)}\n')
+        if level0_groups:
+            self.add_inmem_fom_value(
+                "gcp_metadata_level_0", len(level0_groups)
+            )
+            self.add_inmem_fom_value(
+                "gcp_metadata_level_1", len(level1_groups)
+            )
+            self.add_inmem_fom_value(
+                "gcp_metadata_level_2", len(level2_groups)
+            )
+            self.add_inmem_fom_value(
+                "gcp_metadata_all_hosts", ",".join(all_hosts)
+            )
 
     def _prepare_analysis(self, workspace):
         self._process_id_list()
@@ -283,17 +273,13 @@ class GcpMetadata(BasicModifier):
     # This returns a list of all known gids in the job
     figure_of_merit(
         "gids",
-        fom_regex=r"(?P<gid>.*)",
-        group_name="gid",
-        log_file="{experiment_run_dir}/gcp-metadata.id_list.log",
+        fom_map_key="gcp_metadata_id_list",
         fom_type=FomType.INFO,
     )
 
     figure_of_merit(
         "hostname-to-gid-map",
-        fom_regex=r"(?P<map>.*)",
-        group_name="map",
-        log_file="{experiment_run_dir}/gcp-metadata.id_map.log",
+        fom_map_key="gcp_metadata_id_map",
         fom_type=FomType.INFO,
     )
 
@@ -305,18 +291,22 @@ class GcpMetadata(BasicModifier):
         fom_type=FomType.INFO,
     )
 
-    figure_of_merit(
-        "Level {level_num} Groups ({level_name})",
-        fom_regex=r"Level (?P<level_num>[0-9]) groups \((?P<level_name>[\w]+)\) = (?P<num_groups>[0-9]+)",
-        log_file="{experiment_run_dir}/gcp-metadata.topology_summary.log",
-        group_name="num_groups",
-        units="",
-    )
+    for lv_num, lv_name in [
+        # The group level name comes from https://cloud.google.com/compute/docs/instances/use-compact-placement-policies#verify-vm-location.
+        (0, "cluster"),
+        (1, "rack"),
+        (2, "host"),
+    ]:
+        figure_of_merit(
+            f"Level {lv_num} Groups ({lv_name})",
+            fom_map_key=f"gcp_metadata_level_{lv_num}",
+            fom_type=FomType.INFO,
+            units="",
+        )
 
     figure_of_merit(
         "All Hosts",
-        fom_regex="All hosts = (?P<hostlist>.*)",
-        log_file="{experiment_run_dir}/gcp-metadata.topology_summary.log",
-        group_name="hostlist",
+        fom_map_key="gcp_metadata_all_hosts",
+        fom_type=FomType.INFO,
         units="",
     )
