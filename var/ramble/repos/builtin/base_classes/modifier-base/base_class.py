@@ -66,7 +66,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         self._on_executables = ["*"]
         self.expander = None
         self._usage_mode = None
-        self._app_inst = None
+        self.app_inst = None
 
         self._verbosity = "short"
 
@@ -80,6 +80,9 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         new_copy._verbosity = self._verbosity
 
         return new_copy
+
+    def satisfy_when(self, when_key):
+        return self.expander.satisfies(when_key, self.object_variants)
 
     def set_usage_mode(self, mode):
         """Set the usage mode for this modifier.
@@ -157,7 +160,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         self.object_variants.merge_multi_value_variants(app.object_variants)
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
-        self._app_inst = app
+        self.app_inst = app
 
     def define_variable(self, var_name, var_value):
         """Define a variable within this modifier's expander instance"""

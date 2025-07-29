@@ -12,22 +12,23 @@ from ramble.util import format
 class ObjectMixin:
     """A mixin class for Ramble objects"""
 
-    def _get_app_or_mod_inst(self):
-        # This helper gets the mod_inst for modifier, and the app_inst for others
+    def _get_app_inst(self):
+        # This helper gets the app_inst for different object types
         if hasattr(self, "app_inst"):
             return self.app_inst
         return self
 
+    def satisfy_when(self, when_key):
+        app_inst = self._get_app_inst()
+        return app_inst.expander.satisfies(when_key, app_inst.object_variants)
+
     def get_required_variables(self):
         """Get all the required variables based on the mode and when conditions."""
-        inst = self._get_app_or_mod_inst()
         required_vars = self.required_vars
         filtered_vars = {}
         if required_vars:
             for var_name, var_props in required_vars.items():
-                if inst.expander.satisfies(
-                    var_props["when"], inst.object_variants
-                ):
+                if self.satisfy_when(var_props["when"]):
                     filtered_vars[var_name] = {
                         # Exclude the extra when prop
                         k: var_props[k]
@@ -44,9 +45,8 @@ class ObjectMixin:
         """
 
         selected_vars = {}
-        inst = self._get_app_or_mod_inst()
         for when_key, var_list in self.object_variables.items():
-            if not inst.expander.satisfies(when_key, inst.object_variants):
+            if not self.satisfy_when(when_key):
                 continue
 
             for var in var_list:
@@ -63,12 +63,11 @@ class ObjectMixin:
         """
 
         selected_env_vars = {}
-        inst = self._get_app_or_mod_inst()
         for (
             when_key,
             env_var_list,
         ) in self.object_environment_variables.items():
-            if not inst.expander.satisfies(when_key, inst.object_variants):
+            if not self.satisfy_when(when_key):
                 continue
 
             for env_var in env_var_list:
@@ -77,4 +76,10 @@ class ObjectMixin:
         return selected_env_vars
 
     def format_doc(self, **kwargs):
+        """Doc formatting for Sphinx"""
         return format.format_doc(self.__doc__, **kwargs)
+
+    def add_inmem_fom_value(self, fom_map_key, value):
+        """Add an in-memory FOM value"""
+        app_inst = self._get_app_inst()
+        app_inst.add_inmem_fom_value(fom_map_key, value)
