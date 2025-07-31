@@ -1481,6 +1481,7 @@ ramble:
             if app_inst.package_manager is None:
                 continue
 
+            compiler_packages = {}
             compiler_dicts = [app_inst.compilers]
             for mod_inst in app_inst._modifier_instances:
                 compiler_dicts.append(mod_inst.compilers)
@@ -1510,6 +1511,7 @@ ramble:
                                 newly_created_packages.add(comp)
                                 packages_dict[comp] = syaml.syaml_dict()
 
+                            compiler_packages[comp] = False
                             packages_dict[comp].update(info.to_dict(prefix=spec_prefix))
                             for conf in info.config_opts():
                                 ramble.config.add(conf, scope=self.ws_file_config_scope_name())
@@ -1549,6 +1551,10 @@ ramble:
                             ):
                                 packages_dict[spec_name] = syaml.syaml_dict()
 
+                            # Check for usage of compilers
+                            if info.compiler in compiler_packages:
+                                compiler_packages[info.compiler] = True
+
                             packages_dict[spec_name].update(info.to_dict(prefix=spec_prefix))
 
                             if spec_name not in app_packages:
@@ -1559,6 +1565,18 @@ ramble:
                     environments_dict[env_name] = syaml.syaml_dict()
 
                 environments_dict[env_name][namespace.packages] = app_packages.copy()
+
+            # Ensure all compilers in this experiment are used.
+            comp_list = []
+            for name, used in compiler_packages.items():
+                if not used:
+                    comp_list.append(name)
+            if comp_list:
+                logger.warn(
+                    "Unused compiler(s) found in experiment: "
+                    + app_inst.expander.experiment_namespace
+                )
+                logger.warn(f"   {comp_list}")
 
         ramble.config.config.update_config(
             namespace.software, full_software_dict, scope=self.ws_file_config_scope_name()
