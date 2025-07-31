@@ -24,6 +24,12 @@ class NvidiaSmi(BasicModifier):
 
     maintainers("samskillman")
 
+    variable(
+        "gpus_per_node",
+        default=8,
+        description="The number of GPUs per node.",
+    )
+
     mode("standard", description="Standard execution mode for nvidia-smi")
     default_mode("standard")
 
@@ -148,9 +154,25 @@ class NvidiaSmi(BasicModifier):
         log_file="{nvidia_smi_log}",
     )
 
+    figure_of_merit(
+        "GPU Count",
+        fom_regex=r"GPU Count: (?P<gpu_count>\d+)",
+        group_name="gpu_count",
+        units="",
+        log_file="{nvidia_smi_log}",
+    )
+
+    success_criteria(
+        "gpu_count_check",
+        mode="fom_comparison",
+        fom_name="GPU Count",
+        formula="{value} == {gpus_per_node}",
+    )
+
     register_builtin("nvidia_smi_exec")
 
     def nvidia_smi_exec(self):
         return [
-            "nvidia-smi --query-gpu=index,name,driver_version,pstate,pci.bus_id,serial,uuid,power.draw,power.limit,clocks.gr,clocks.mem --format=csv,noheader,nounits >> {nvidia_smi_log}"
+            "nvidia-smi --query-gpu=index,name,driver_version,pstate,pci.bus_id,serial,uuid,power.draw,power.limit,clocks.gr,clocks.mem --format=csv,noheader,nounits > {nvidia_smi_log}",
+            'echo "GPU Count: $(wc -l < {nvidia_smi_log})" >> {nvidia_smi_log}',
         ]
