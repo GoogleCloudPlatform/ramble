@@ -111,6 +111,13 @@ class Slurm(WorkflowManagerBase):
         "The path can contain workspace path variables such as $workspace_config.",
     )
 
+    variant(
+        "slurm_include_default_sbatch_headers",
+        default=True,
+        values=[True, False],
+        description="Whether a set of default headers (such as #SBATCH --exclusive) should be included",
+    )
+
     register_template(
         name="batch_submit",
         src_path="batch_submit.tpl",
@@ -170,16 +177,26 @@ class Slurm(WorkflowManagerBase):
 
     def template_render_vars(self):
         vars = {}
-        expander = self.app_inst.expander
+        app_inst = self.app_inst
+        expander = app_inst.expander
         # Adding pre-defined and custom headers
         pragmas = [
-            ("#SBATCH -N {n_nodes}"),
-            ("#SBATCH --ntasks-per-node {processes_per_node}"),
-            ("#SBATCH -J {job_name}"),
-            ("#SBATCH -o {experiment_run_dir}/slurm-%j.out"),
-            ("#SBATCH -e {experiment_run_dir}/slurm-%j.err"),
-            ("#SBATCH --gpus-per-node {gpus_per_node}"),
+            "#SBATCH -N {n_nodes}",
+            "#SBATCH -J {job_name}",
+            "#SBATCH -o {experiment_run_dir}/slurm-%j.out",
+            "#SBATCH -e {experiment_run_dir}/slurm-%j.err",
         ]
+        if expander.satisfies(
+            "+slurm_include_default_sbatch_headers",
+            variant_set=app_inst.object_variants,
+        ):
+            pragmas.extend(
+                [
+                    "#SBATCH --ntasks-per-node {processes_per_node}",
+                    "#SBATCH --gpus-per-node {gpus_per_node}",
+                    "#SBATCH --exclusive",
+                ]
+            )
         partition = expander.expand_var_name("slurm_partition")
         if partition:
             pragmas.append("#SBATCH -p {slurm_partition}")
