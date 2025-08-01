@@ -1,7 +1,11 @@
 name: ramble spelling
 
 on:
-  pull_request: []
+  pull_request:
+   types:
+   - 'opened'
+   - 'reopened'
+   - 'synchronize'
   push:
     branches-ignore:
     - main
