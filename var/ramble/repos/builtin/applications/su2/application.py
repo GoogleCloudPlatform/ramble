@@ -6,8 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
-
 from ramble.appkit import *
 
 
@@ -24,7 +22,7 @@ class Su2(ExecutableApplication):
     maintainers("linsword13")
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc12", pkg_spec="gcc@12.5.0")
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
         # See https://github.com/spack/spack/pull/50601 for building with intel mpi.
         software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.0")
         software_spec(
@@ -34,7 +32,6 @@ class Su2(ExecutableApplication):
         )
         required_package("su2")
 
-    # Input deck archived from https://github.com/su2code/Tutorials/tree/d7991cb74e9e12a08463c579add6a9bf73713628/compressible_flow/Inviscid_Bump
     input_file(
         "inv_channel_in",
         url="https://raw.githubusercontent.com/su2code/Tutorials/refs/tags/v8.2.0/compressible_flow/Inviscid_Bump/inv_channel.cfg",
@@ -59,16 +56,16 @@ class Su2(ExecutableApplication):
     )
 
     workload(
-       "inv_channel",
+        "inv_channel",
         executables=["link-inputs", "execute"],
-        inputs=["inv_channel_in", "inv_mesh_in"]
+        inputs=["inv_channel_in", "inv_mesh_in"],
     )
 
     workload_group("all_workloads", workloads=["inv_channel"])
 
     workload_variable(
         "input_path",
-        default="{workload_input_dir}", # only works where inputs do not need expanding
+        default="{workload_input_dir}",  # only works where inputs do not need expanding
         description="Path to the input for experiments",
         workload="inv_channel",
     )
