@@ -162,6 +162,10 @@ ramble:
         with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
             content = f.read()
             assert "scontrol show hostnames" in content
+            assert "#SBATCH -N 1" in content
+            assert "#SBATCH -J hostname_local_test_slurm" in content
+            assert "#SBATCH --ntasks-per-node 1" in content
+            assert "#SBATCH --exclusive" in content
             assert "#SBATCH --gpus-per-task=1" in content
             assert "#SBATCH -p" not in content
             assert "#SBATCH --time" not in content
@@ -192,3 +196,38 @@ ramble:
             # Since it uses the default execute_experiment tpl, no slurm content is present
             assert "#SBATCH" not in content
             assert "scontrol" not in content
+
+
+def test_slurm_workflow_variant(request):
+    workspace_name = request.node.name
+    test_config = """
+ramble:
+  variants:
+    workflow_manager: slurm
+    slurm_include_default_sbatch_headers: false
+  variables:
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    hostname:
+      workloads:
+        local:
+          experiments:
+            test_variant: {}
+"""
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+    config_path = os.path.join(
+        ws.config_dir, ramble.workspace.config_file_name
+    )
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+    ws._re_read()
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
+    path = os.path.join(ws.experiment_dir, "hostname", "local", "test_variant")
+    with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
+        content = f.read()
+        assert "#SBATCH --ntasks-per-node" not in content
+        assert "#SBATCH --exclusive" not in content
+        assert "#SBATCH --gpus-per-task" not in content
+        assert "#SBATCH -N 1" in content
