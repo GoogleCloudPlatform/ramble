@@ -12,7 +12,7 @@ import pytest
 
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
-from ramble.util.logger import logger  # noqa:  F401
+from ramble.util.logger import logger
 
 
 def test_missing_command():

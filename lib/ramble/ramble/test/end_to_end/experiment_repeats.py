@@ -174,7 +174,7 @@ ramble:
                 assert "summary::variance = 61.727 s^2" in data
 
         # When --summary-only, only the base experiments are included
-        workspace("analyze", "-s", global_args=["-w", workspace_name])  # noqa: E501
+        workspace("analyze", "-s", global_args=["-w", workspace_name])
         result_file = glob.glob(os.path.join(ws1.root, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()

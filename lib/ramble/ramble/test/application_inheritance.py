@@ -54,7 +54,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert "test_fom" in app_inst.figures_of_merit[_FS][_FS]
     fom_conf = app_inst.figures_of_merit[_FS][_FS]["test_fom"]
     assert fom_conf["log_file"] == "{log_file}"
-    assert fom_conf["regex"] == r"(?P<test>[0-9]+\.[0-9]+).*seconds.*"  # noqa: W605
+    assert fom_conf["regex"] == r"(?P<test>[0-9]+\.[0-9]+).*seconds.*"
     assert fom_conf["group_name"] == "test"
     assert fom_conf["units"] == "s"
 

@@ -273,7 +273,7 @@ def list_object_files(obj_inst, object_type):
 
 
 def all_object_names(object_type=default_type):
-    """Convenience wrapper around ``ramble.repository.all_object_names()``."""  # noqa: E501
+    """Convenience wrapper around ``ramble.repository.all_object_names()``."""
     return paths[object_type].all_object_names()
 
 
@@ -882,7 +882,7 @@ class RepoPath:
         return self.repo_for_obj(spec).get(spec)
 
     def get_obj_class(self, obj_name):
-        """Find a class for the spec's object and return the class object."""  # noqa: E501
+        """Find a class for the spec's object and return the class object."""
         return self.repo_for_obj(obj_name).get_obj_class(obj_name)
 
     @autospec

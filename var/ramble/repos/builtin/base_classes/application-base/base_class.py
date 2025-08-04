@@ -1629,7 +1629,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var("{experiment_run_dir}"),
-                template_name,  # noqa: F541
+                template_name,
             )
             self.variables[template_name] = expand_path
 
