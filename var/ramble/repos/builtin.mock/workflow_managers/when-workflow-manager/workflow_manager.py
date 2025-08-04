@@ -50,3 +50,17 @@ class WhenWorkflowManager(WorkflowManagerBase):
         description="Test required variable",
         when=["+wf_man_required_variable"],
     )
+
+    variant(
+        "wf_man_required_key",
+        default=False,
+        values=[True, False],
+        description="Test required key",
+    )
+
+    required_variable(
+        "test_wf_man_required_key",
+        results_level="key",
+        description="Test required key",
+        when=["+wf_man_required_key"],
+    )

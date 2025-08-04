@@ -50,3 +50,17 @@ class WhenPackageManager(PackageManagerBase):
         description="Test required variable",
         when=["+pkg_man_required_variable"],
     )
+
+    variant(
+        "pkg_man_required_key",
+        default=False,
+        values=[True, False],
+        description="Test required key",
+    )
+
+    required_variable(
+        "test_pkg_man_required_key",
+        results_level="key",
+        description="Test required key",
+        when=["+pkg_man_required_key"],
+    )
