@@ -24,9 +24,9 @@ class Su2(ExecutableApplication):
     maintainers("linsword13")
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+        define_compiler("gcc12", pkg_spec="gcc@12.5.0")
         # See https://github.com/spack/spack/pull/50601 for building with intel mpi.
-        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@13.1.0")
+        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.0")
         software_spec(
             "su2",
             pkg_spec="su2@8.2.0 +mpi +openmp",
@@ -36,10 +36,18 @@ class Su2(ExecutableApplication):
 
     # Input deck archived from https://github.com/su2code/Tutorials/tree/d7991cb74e9e12a08463c579add6a9bf73713628/compressible_flow/Inviscid_Bump
     input_file(
-        "inv_channel",
-        url=f"file://{os.getcwd()}/inv_channel.tgz",
-        sha256="1e65ec94bd52a31db344ec4778d96e2574c0acd244731a63048954876a35d4de",
+        "inv_channel_in",
+        url="https://raw.githubusercontent.com/su2code/Tutorials/refs/tags/v8.2.0/compressible_flow/Inviscid_Bump/inv_channel.cfg",
+        sha256="de01ac92d184e312fecad1aca72eba61808c70503ed3197daddadb0e22892205",
         description="input deck used in https://su2code.github.io/tutorials/Inviscid_Bump",
+        expand=False,
+    )
+    input_file(
+        "inv_mesh_in",
+        url="https://raw.githubusercontent.com/su2code/Tutorials/refs/tags/v8.2.0/compressible_flow/Inviscid_Bump/mesh_channel_256x128.su2",
+        sha256="1a7eac64244f1e4206eae3eb2af48a41d614ace59b357026c5f9dd0f56b1271f",
+        description="input deck used in https://su2code.github.io/tutorials/Inviscid_Bump",
+        expand=False,
     )
 
     executable("link-inputs", template=["ln -s {input_path}/* ."])
@@ -51,16 +59,16 @@ class Su2(ExecutableApplication):
     )
 
     workload(
-        "inv_channel",
+       "inv_channel",
         executables=["link-inputs", "execute"],
-        input="inv_channel",
+        inputs=["inv_channel_in", "inv_mesh_in"]
     )
 
     workload_group("all_workloads", workloads=["inv_channel"])
 
     workload_variable(
         "input_path",
-        default="{inv_channel}",
+        default="{workload_input_dir}", # only works where inputs do not need expanding
         description="Path to the input for experiments",
         workload="inv_channel",
     )
