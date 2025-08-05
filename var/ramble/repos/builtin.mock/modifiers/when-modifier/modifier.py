@@ -126,3 +126,17 @@ class WhenModifier(BasicModifier):
             "test_mod_required_variable",
             description="Test modifier required variable",
         )
+
+    variant(
+        "mod_required_key",
+        default=False,
+        values=[True, False],
+        description="Test modifier required key",
+    )
+
+    with when("+mod_required_key"):
+        required_variable(
+            "test_mod_required_key",
+            results_level="key",
+            description="Test modifier required key",
+        )

@@ -975,9 +975,20 @@ def required_variable(
                 when, obj, var, "required_variable"
             )
 
+        if results_level not in ["key", "variable"]:
+            raise ramble.language.language_base.DirectiveError(
+                "The results_level argument for required variable "
+                f"{var} is set to {results_level}.\n"
+                "Valid options are 'key' or 'variable'."
+            )
+
+        output_level = ramble.keywords.output_level.variable
+        if results_level == "key":
+            output_level = ramble.keywords.output_level.key
+
         obj.required_vars[var] = {
             "type": ramble.keywords.key_type.required,
-            "level": ramble.keywords.output_level.variable,
+            "level": output_level,
             "description": description,
             # Extra prop that's only used for filtering
             "when": when_list,
