@@ -44,7 +44,7 @@ def add_mode(mod_inst, mode_num=1):
     mode_name = "TestMode%s" % mode_num
     mode_desc = "This is a test mode"
 
-    mod_inst.mode(mode_name, description=mode_desc)  # noqa: F405
+    mod_inst.mode(mode_name, description=mode_desc)
 
     mode_def = {"name": mode_name, "description": mode_desc}
 

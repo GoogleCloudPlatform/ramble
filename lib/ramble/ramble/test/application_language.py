@@ -48,7 +48,7 @@ def add_workload(app_inst, wl_num=1):
     app_inst.workload(
         wl_name,
         executables=exec_list,
-        executable=exec_var,  # noqa: F405
+        executable=exec_var,
         inputs=inpt_list,
         input=inpt_var,
     )
@@ -72,17 +72,17 @@ def add_executable(app_inst, exe_num=1):
 
     app_inst.executable(
         nompi_bg_exec_name,
-        template,  # noqa: F405
+        template,
         use_mpi=False,
         redirect=redirect_test,
         output_capture=output_capture,
         run_in_background=True,
     )
 
-    app_inst.executable(mpi_exec_name, template, use_mpi=True)  # noqa: F405
+    app_inst.executable(mpi_exec_name, template, use_mpi=True)
 
     app_inst.executable(
-        nompi_list_exec_name,  # noqa: F405
+        nompi_list_exec_name,
         template=[template, template, template],
         use_mpi=False,
         redirect=None,
@@ -90,7 +90,7 @@ def add_executable(app_inst, exe_num=1):
 
     app_inst.executable(
         mpi_list_exec_name,
-        template=[template, template],  # noqa: F405
+        template=[template, template],
         use_mpi=True,
         redirect=redirect_test,
     )
@@ -134,7 +134,7 @@ def add_figure_of_merit(app_inst, fom_num=1):
     app_inst.figure_of_merit(
         fom_name,
         log_file=fom_log,
-        fom_regex=fom_regex,  # noqa: F405
+        fom_regex=fom_regex,
         group_name=fom_group,
         units=fom_units,
     )
@@ -158,7 +158,7 @@ def add_input_file(app_inst, input_num=1):
     input_target = "{application_input_dir}/test_dir%s" % input_num
 
     # Add an input with a target dir
-    app_inst.input_file(input_name, input_url, input_desc, target_dir=input_target)  # noqa: F405
+    app_inst.input_file(input_name, input_url, input_desc, target_dir=input_target)
 
     input_defs = {}
     input_defs[input_name] = {
@@ -172,7 +172,7 @@ def add_input_file(app_inst, input_num=1):
     input_desc = "This is a test secondary input file #%s" % input_num
 
     # Add an input without a target dir
-    app_inst.input_file(input_name, input_url, input_desc)  # noqa: F405
+    app_inst.input_file(input_name, input_url, input_desc)
 
     input_defs[input_name] = {
         "url": input_url,
@@ -193,9 +193,7 @@ def add_compiler(app_inst, spec_num=1):
     spec_defs = {}
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
-    app_inst.define_compiler(
-        spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
-    )
+    app_inst.define_compiler(spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec)
 
     spec_name = f"OtherCompiler{spec_num}"
     spec_pkg_spec = f"compiler_base@{spec_num}.1 +var1 ~var2 target=x86_64"
@@ -203,9 +201,7 @@ def add_compiler(app_inst, spec_num=1):
 
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler_spec": spec_compiler_spec}
 
-    app_inst.define_compiler(
-        spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec  # noqa: F405
-    )
+    app_inst.define_compiler(spec_name, pkg_spec=spec_pkg_spec, compiler_spec=spec_compiler_spec)
 
     return spec_defs
 
@@ -218,7 +214,7 @@ def add_software_spec(app_inst, spec_num=1):
     spec_defs = {}
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler": spec_compiler}
 
-    app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)  # noqa: F405
+    app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)
 
     spec_name = f"MPISpec{spec_num}"
     spec_pkg_spec = f"MPISpec@{spec_num} +var1 ~var2 target=x86_64"
@@ -226,7 +222,7 @@ def add_software_spec(app_inst, spec_num=1):
 
     spec_defs[spec_name] = {"pkg_spec": spec_pkg_spec, "compiler": spec_compiler}
 
-    app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)  # noqa: F405
+    app_inst.software_spec(spec_name, pkg_spec=spec_pkg_spec, compiler=spec_compiler)
 
     return spec_defs
 

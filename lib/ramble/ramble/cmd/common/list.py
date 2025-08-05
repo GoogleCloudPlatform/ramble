@@ -203,7 +203,7 @@ def html(obj_names, out, object_type):
             "<li>"
             '<a class="reference external" '
             f'href="{github_url(obj, object_type)}">'
-            f'{obj.name}/{obj_def["file_name"]}</a>'  # noqa: E501
+            f'{obj.name}/{obj_def["file_name"]}</a>'
             "</li>\n"
         )
         out.write("</ul></dd>\n")
