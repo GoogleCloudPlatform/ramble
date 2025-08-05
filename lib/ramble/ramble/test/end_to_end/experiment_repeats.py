@@ -171,7 +171,11 @@ ramble:
                 assert "Core Time = 11.111 s" in data
                 assert "Core Time = 22.222 s" in data
                 assert "summary::mean = 16.666 s" in data
+                assert "summary::harmonic_mean = 14.815 s" in data
+                assert "summary::median = 16.666 s" in data
                 assert "summary::variance = 61.727 s^2" in data
+                assert "summary::stdev = 7.857 s" in data
+                assert "summary::cv = 0.471" in data
 
         # When --summary-only, only the base experiments are included
         workspace("analyze", "-s", global_args=["-w", workspace_name])

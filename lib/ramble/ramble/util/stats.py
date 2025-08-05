@@ -67,6 +67,13 @@ class StatsMean(StatsBase):
         return round(statistics.mean(values), max_decimal_places(values))
 
 
+class StatsHarmonicMean(StatsBase):
+    name = "harmonic_mean"
+
+    def compute(self, values):
+        return round(statistics.harmonic_mean(values), max_decimal_places(values))
+
+
 class StatsMedian(StatsBase):
     name = "median"
 
@@ -118,6 +125,7 @@ all_stats = [
     StatsMin(),
     StatsMax(),
     StatsMean(),
+    StatsHarmonicMean(),
     StatsMedian(),
     StatsVar(),
     StatsStdev(),
