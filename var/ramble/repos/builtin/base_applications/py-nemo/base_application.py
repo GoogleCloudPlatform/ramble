@@ -173,9 +173,14 @@ class PyNemo(ExecutableApplication):
     )
 
     per_epoch_regex = (
-        r"Epoch (?P<epoch_id>[0-9]+)(:\s+)+(?P<pct_complete>[0-9]+)%.*\s+"
-        + r"(?P<step_idx>[0-9]+)/(?P<max_itr>[0-9]+) \[(?P<elapsed_time>[0-9:]+)<"
-        + r"(?P<remaining_time>[0-9:]+).*"
+        r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%\|.*" +
+        r"\|\s+(?P<step_idx>[0-9]+)\/(?P<max_itr>[0-9]+)\s+\[(?P<elapsed_time>[0-9:]+)" +
+        r"<(?P<remaining_time>[0-9:]+)(,\s+v_num=(?P<v_num>.*?))?" +
+        r",\s+reduced_train_loss=(?P<reduced_train_loss>[0-9\.]+)" +
+        r",\s+global_step=(?P<global_step>[0-9\.]+)" +
+        r",\s+consumed_samples=(?P<consumed_samples>[0-9\.]+)" +
+        r",\s+train_step_timing in s=(?P<train_step_timing>[0-9\.]+)" +
+        r"(,\s+val_loss=(?P<val_loss>[0-9\.]+))?\]"
     )
 
     epoch_context_name = "Epoch ID - Step ID"
@@ -217,6 +222,48 @@ class PyNemo(ExecutableApplication):
         "Remaining Time",
         fom_regex=per_epoch_regex,
         group_name="remaining_time",
+        log_file="{processed_log_file}",
+        contexts=[epoch_context_name],
+    )
+    figure_of_merit(
+        "V Num",
+        fom_regex=per_epoch_regex,
+        group_name="v_num",
+        log_file="{processed_log_file}",
+        contexts=[epoch_context_name],
+    )
+    figure_of_merit(
+        "Reduced Train Loss",
+        fom_regex=per_epoch_regex,
+        group_name="reduced_train_loss",
+        log_file="{processed_log_file}",
+        contexts=[epoch_context_name],
+    )
+    figure_of_merit(
+        "Global Step",
+        fom_regex=per_epoch_regex,
+        group_name="global_step",
+        log_file="{processed_log_file}",
+        contexts=[epoch_context_name],
+    )
+    figure_of_merit(
+        "Consumed Samples",
+        fom_regex=per_epoch_regex,
+        group_name="consumed_samples",
+        log_file="{processed_log_file}",
+        contexts=[epoch_context_name],
+    )
+    figure_of_merit(
+        "Train Step Timing",
+        fom_regex=per_epoch_regex,
+        group_name="train_step_timing",
+        log_file="{processed_log_file}",
+        contexts=[epoch_context_name],
+    )
+    figure_of_merit(
+        "Val Loss",
+        fom_regex=per_epoch_regex,
+        group_name="val_loss",
         log_file="{processed_log_file}",
         contexts=[epoch_context_name],
     )
