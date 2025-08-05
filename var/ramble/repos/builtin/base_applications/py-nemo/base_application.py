@@ -173,14 +173,14 @@ class PyNemo(ExecutableApplication):
     )
 
     per_epoch_regex = (
-        r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%\|.*" +
-        r"\|\s+(?P<step_idx>[0-9]+)\/(?P<max_itr>[0-9]+)\s+\[(?P<elapsed_time>[0-9:]+)" +
-        r"<(?P<remaining_time>[0-9:]+)(,\s+v_num=(?P<v_num>.*?))?" +
-        r",\s+reduced_train_loss=(?P<reduced_train_loss>[0-9\.]+)" +
-        r",\s+global_step=(?P<global_step>[0-9\.]+)" +
-        r",\s+consumed_samples=(?P<consumed_samples>[0-9\.]+)" +
-        r",\s+train_step_timing in s=(?P<train_step_timing>[0-9\.]+)" +
-        r"(,\s+val_loss=(?P<val_loss>[0-9\.]+))?\]"
+        r"Epoch (?P<epoch_id>[0-9]+):\s+:\s+(?P<pct_complete>[0-9]+)%\|.*"
+        + r"\|\s+(?P<step_idx>[0-9]+)\/(?P<max_itr>[0-9]+)\s+\[(?P<elapsed_time>[0-9:]+)"
+        + r"<(?P<remaining_time>[0-9:]+)(,\s+v_num=(?P<v_num>.*?))?"
+        + r",\s+reduced_train_loss=(?P<reduced_train_loss>[0-9\.]+)"
+        + r",\s+global_step=(?P<global_step>[0-9\.]+)"
+        + r",\s+consumed_samples=(?P<consumed_samples>[0-9\.]+)"
+        + r",\s+train_step_timing in s=(?P<train_step_timing>[0-9\.]+)"
+        + r"(,\s+val_loss=(?P<val_loss>[0-9\.]+))?\]"
     )
 
     epoch_context_name = "Epoch ID - Step ID"
