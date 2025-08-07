@@ -71,7 +71,10 @@ class StatsHarmonicMean(StatsBase):
     name = "harmonic_mean"
 
     def compute(self, values):
-        return round(statistics.harmonic_mean(values), max_decimal_places(values))
+        try:
+            return round(statistics.harmonic_mean(values), max_decimal_places(values))
+        except statistics.StatisticsError:
+            return "NA"
 
 
 class StatsMedian(StatsBase):
