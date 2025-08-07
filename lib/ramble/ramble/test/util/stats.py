@@ -23,6 +23,12 @@ import ramble.util.stats
             "s",
             (3.0, "s", "summary::harmonic_mean"),
         ),
+        (
+            ramble.util.stats.StatsHarmonicMean(),
+            [2, 3, 5, -1],
+            "s",
+            ("NA", "s", "summary::harmonic_mean"),
+        ),
         (ramble.util.stats.StatsMedian(), [-2, 0, 2, 5.5], "s", (1.0, "s", "summary::median")),
         (ramble.util.stats.StatsVar(), [-2, 0, 2, 5.5], "s", (10.2, "s^2", "summary::variance")),
         (ramble.util.stats.StatsVar(), [3], "s", ("NA", "", "summary::variance")),
