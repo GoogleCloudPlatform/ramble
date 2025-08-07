@@ -19,7 +19,7 @@ from typing import Dict, FrozenSet, List, Union
 import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
-from ramble.util.path import substitute_path_variables
+from ramble.util.path import substitute_config_variables
 
 import spack.util.naming
 
@@ -672,7 +672,7 @@ class Expander:
             self.merge_used_variable_stage()
 
         if isinstance(value, str):
-            return substitute_path_variables(value, local_replacements=self.replacement_paths)
+            return substitute_config_variables(value, local_replacements=self.replacement_paths)
         else:
             return value
 
