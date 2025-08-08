@@ -961,9 +961,18 @@ class SoftwareEnvironments:
                 if rendered_env.name == env_name:
                     if env_name in self._rendered_environments[pm_name]:
                         if rendered_env != self._rendered_environments[pm_name][env_name]:
+                            error_string = f"Old environment: {env_name}\n"
+                            error_string += "  Packages:\n"
+                            for pkg in self._rendered_environments[pm_name][env_name]._packages:
+                                error_string += f"  - {pkg.name}\n"
+                            error_string += f"New environment: {rendered_env.name}\n"
+                            error_string += "  Packages:\n"
+                            for pkg in rendered_env._packages:
+                                error_string += f"  - {pkg.name}\n"
+
                             raise RambleSoftwareEnvironmentError(
                                 f"Environment {env_name} defined multiple times "
-                                "in inconsistent ways"
+                                "in inconsistent ways.\n" + error_string
                             )
                         rendered_env = self._rendered_environments[pm_name][env_name]
 
