@@ -56,8 +56,8 @@ class IntelMpiBenchmarks(ExecutableApplication):
     )
 
     executable(
-        "exchange",
-        "{install_path}/IMB-MPI1 Exchange -msglog {msglog_min}:{msglog_max} "
+        "transfer",
+        "{install_path}/IMB-MPI1 {transfer_type} -msglog {msglog_min}:{msglog_max} "
         "-iter {num_iterations} {additional_args}",
         use_mpi=True,
     )
@@ -65,11 +65,14 @@ class IntelMpiBenchmarks(ExecutableApplication):
     workload("pingpong", executable="pingpong")
     workload("multi-pingpong", executable="multi-pingpong")
     workload("collective", executable="collective")
-    workload("exchange", executable="exchange")
+    # TODO: should merge pingpong into this workload. For now keeping
+    # the pingpong workload to avoid invalidating existing benchmark
+    # configs.
+    workload("transfer", executable="transfer")
 
     workload_group(
         "mpi1",
-        workloads=["pingpong", "multi-pingpong", "collective", "exchange"],
+        workloads=["pingpong", "multi-pingpong", "collective", "transfer"],
     )
 
     workload_variable(
@@ -124,6 +127,19 @@ class IntelMpiBenchmarks(ExecutableApplication):
         ],
         description="Pingpong Algorithm to Use",
         workloads=["pingpong"],
+    )
+
+    workload_variable(
+        "transfer_type",
+        default="Exchange",
+        values=[
+            "Exchange",
+            "Sendrecv",
+            "Uniband",
+            "Biband",
+        ],
+        description="(Non-collective) Transfer pattern to benchmark",
+        workloads=["transfer"],
     )
 
     workload_variable(
