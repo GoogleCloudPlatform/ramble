@@ -395,7 +395,7 @@ class ArchivePipeline(Pipeline):
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
 
-        for pattern in self.archive_patterns:
+        for pattern in self.archive_patterns + ["results.*"]:
             pattern_path = self.workspace.root + os.sep + pattern
             for file in glob.glob(pattern_path):
                 dest_dir = os.path.dirname(
