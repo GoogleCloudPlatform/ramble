@@ -185,7 +185,9 @@ def executable_modifier(name, when=None, **kwargs):
         if when_set not in mod.executable_modifiers:
             mod.executable_modifiers[when_set] = {}
 
-        mod.executable_modifiers[when_set][name] = name
+        mod.executable_modifiers[when_set][name] = {
+            "when": when_list,
+        }
 
     return _executable_modifier
 
