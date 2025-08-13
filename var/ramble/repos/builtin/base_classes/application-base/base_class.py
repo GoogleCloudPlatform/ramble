@@ -2213,6 +2213,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 # TODO: this can be extended to support derived FOMs,
                 # since the `fom_values` contains resolved file-based FOMs
                 fom_map_key = fom_conf["fom_map_key"]
+                if fom_map_key not in self._fom_map:
+                    continue
                 fom_value = self._fom_map.get(fom_map_key)
                 expanded_fom_value = self.expander.expand_var(fom_value)
                 fom_values[context][fom_name] = {

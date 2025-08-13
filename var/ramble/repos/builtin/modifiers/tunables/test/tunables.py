@@ -91,3 +91,5 @@ nodeset-0: fom:hugepage-size:    2048 kB
                 "modifier::tunables::thp-enabled = {'always': nodeset-0, 'madvise': nodeset-1}"
                 in content
             )
+            # Assert FOMs that are not present don't get included (as None)
+            assert "modifier::tunables::numa-balancing" not in content
