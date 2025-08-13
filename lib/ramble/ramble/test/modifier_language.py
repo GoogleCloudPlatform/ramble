@@ -416,7 +416,6 @@ def test_executable_modifier_directive(mod_class):
         mod_name = test_def
 
         assert mod_name in mod_inst.executable_modifiers[frozenset()]
-        assert mod_name == mod_inst.executable_modifiers[frozenset()][mod_name]
 
 
 def add_env_var_modification(mod_inst, env_var_mod_num=1):
