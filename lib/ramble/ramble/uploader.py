@@ -285,7 +285,7 @@ class BigQueryUploader(Uploader):
             logger.msg("Upload FOMs...")
             errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
 
-        for errors, name in zip([errors1, errors2], ["exp", "fom"]):
+        for errors, name in zip((errors1, errors2), ("exp", "fom")):
             if errors == []:
                 logger.msg(f"New rows have been added in {name}")
             else:

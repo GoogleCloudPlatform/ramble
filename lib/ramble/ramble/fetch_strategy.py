@@ -26,6 +26,7 @@ in order to build it.  They need to define the following methods:
 """
 import copy
 import functools
+import itertools
 import os
 import os.path
 import re
@@ -303,7 +304,7 @@ class URLFetchStrategy(FetchStrategy):
     def candidate_urls(self):
         urls = []
 
-        for url in [self.url] + (self.mirrors or []):
+        for url in itertools.chain([self.url], self.mirrors or []):
             # This must be skipped on Windows due to URL encoding
             # of ':' characters on filepaths on Windows
             if sys.platform != "win32" and url.startswith("file://"):
