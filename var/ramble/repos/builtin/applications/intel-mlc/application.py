@@ -28,7 +28,7 @@ class IntelMlc(ExecutableApplication):
 
     executable(
         "execute_bw",
-        "{intel-mlc_path}/{exec_name} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
+        "{mlc_exec_path} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
     )
 
     workload("max_bandwidth", executables=["execute_bw"])
@@ -40,6 +40,13 @@ class IntelMlc(ExecutableApplication):
         default="mlc",
         values=["mlc", "mlc.exe"],
         description="Name of executable to use for Intel MLC",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "mlc_exec_path",
+        default="{intel-mlc_path}/bin/{exec_name}",
+        description="Path to MLC executable",
         workload_group="all_workloads",
     )
 
