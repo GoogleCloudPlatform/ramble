@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import ast
+import itertools
 import math
 import operator
 import random
@@ -948,7 +949,7 @@ class Expander:
 
             result = self.eval_math(node.values[0])
 
-            for value in node.values[1:]:
+            for value in itertools.islice(node.values, 1, None):
                 result = op(result, self.eval_math(value))
 
             return result
@@ -982,7 +983,7 @@ class Expander:
 
             if len(node.ops) > 1:
                 cur_left = cur_right
-                for comp, right in zip(node.ops, node.comparators)[1:]:
+                for comp, right in itertools.islice(zip(node.ops, node.comparators), 1, None):
                     op = supported_math_operators[type(comp)]
                     cur_right = self.eval_math(right)
 

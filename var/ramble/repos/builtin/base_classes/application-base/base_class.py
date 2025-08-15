@@ -340,43 +340,43 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Use this instead of get_workload() if calling before variants are set,
         e.g. in set_variables()
         """
-        matching_workloads = []
         if not workload_name:
             workload_name = self.expander.workload_name
 
+        found_workload = False
         for when_set, workloads in self.workloads.items():
             if workload_name in workloads:
-                matching_workloads.append(workloads[workload_name])
+                found_workload = True
+                yield workloads[workload_name]
 
-        if not matching_workloads:
+        if not found_workload:
             raise ApplicationError(
                 f"Workload {workload_name} is not defined "
                 f"as a workload of application {self.name}."
             )
 
-        return matching_workloads
-
     def get_all_workloads(self):
         """Retrieves all workloads satisfying current `when` conditions."""
-        all_workloads = []
+        all_workloads_names = set()
+        found = False
         for when_set, workloads in self.workloads.items():
             if self.expander.satisfies(when_set, self.object_variants):
-                for workload in workloads:
-                    if workload in all_workloads:
+                for workload_name, workload in workloads.items():
+                    if workload_name in all_workloads_names:
                         logger.die(
-                            f"Workload {workload} is defined with "
+                            f"Workload {workload_name} is defined with "
                             "overlapping `when` conditions. Ensure that "
                             "conditions are mutually exclusive."
                         )
-                    all_workloads.append(workloads[workload])
+                    all_workloads_names.add(workload_name)
+                    yield workload
+                    found = True
 
-        if not all_workloads:
+        if not found:
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
                 f"  {self.object_variants.as_set()}"
             )
-
-        return all_workloads
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
@@ -678,11 +678,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if idx < final_added_index and phase not in phases:
                     phases.add(phase)
 
-        phase_order = []
         for node in self._pipeline_graphs[pipeline].walk():
             if node in phases:
-                phase_order.append(node.key)
-        return phase_order
+                yield node.key
 
     def __str__(self):
         return self.name

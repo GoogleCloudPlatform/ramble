@@ -34,6 +34,7 @@ import collections
 import contextlib
 import copy
 import functools
+import itertools
 import os
 import re
 import sys
@@ -891,7 +892,7 @@ def add(fullpath, scope=None):
     has_existing_value = True
     path = ""
     override = False
-    for idx, name in enumerate(components[:-1]):
+    for idx, name in enumerate(itertools.islice(components, len(components) - 1)):
         # First handle double colons in constructing path
         colon = "::" if override else ":" if path else ""
         path += colon + name

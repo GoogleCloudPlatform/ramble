@@ -7,7 +7,7 @@
 # except according to those terms.
 """Define base classes for workflow manager definitions"""
 
-from typing import List
+from typing import Iterator, List
 
 import ramble.definitions.families
 import ramble.util.class_attributes
@@ -104,26 +104,24 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
         """Return status of a given job"""
         return None
 
-    def conditional_expand(self, templates):
-        """Return a (potentially empty) list of expanded strings
+    def conditional_expand(self, templates: List[str]) -> Iterator[str]:
+        """Return a (potentially empty) iterator of expanded strings
 
         Args:
             templates: A list of templates to expand.
                 If the template cannot be fully expanded, it's skipped.
         Returns:
-            A list of expanded strings
+            An iterator of expanded strings
         """
         expander = self.app_inst.expander
-        expanded = []
         for tpl in templates:
             try:
                 rendered = expander.expand_var(tpl, allow_passthrough=False)
                 if rendered:
-                    expanded.append(rendered)
+                    yield rendered
             except ExpanderError:
                 # Skip a particular entry if any of the vars are not defined
                 continue
-        return expanded
 
     def template_render_vars(self):
         """Define variables to be used in template rendering"""

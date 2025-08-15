@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import glob
+import itertools
 import os
 import shlex
 import shutil
@@ -159,7 +160,7 @@ class Pipeline:
 
             logger.add_log(exp_log_path)
 
-            phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
+            phase_list = list(app_inst.get_pipeline_phases(self.name, self.filters.phases))
 
             disable_progress = (
                 ramble.config.get("config:disable_progress_bar", False)
@@ -347,10 +348,10 @@ class ArchivePipeline(Pipeline):
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
 
-        for filename in [
+        for filename in (
             ramble.workspace.Workspace.inventory_file_name,
             ramble.workspace.Workspace.hash_file_name,
-        ]:
+        ):
             src = os.path.join(self.workspace.root, filename)
             if os.path.exists(src):
                 dest = src.replace(self.workspace.root, archive_path)
@@ -395,7 +396,7 @@ class ArchivePipeline(Pipeline):
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
 
-        for pattern in self.archive_patterns + ["results.*"]:
+        for pattern in itertools.chain(self.archive_patterns, ["results.*"]):
             pattern_path = self.workspace.root + os.sep + pattern
             for file in glob.glob(pattern_path):
                 dest_dir = os.path.dirname(
