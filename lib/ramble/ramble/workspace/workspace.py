@@ -21,7 +21,6 @@ import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 import llnl.util.tty.log as log
 
-import ramble.cmd.common.list as list_cmd
 import ramble.config
 import ramble.context
 import ramble.error
@@ -39,7 +38,7 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util import constants
+from ramble.util import constants, object_utils
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
@@ -1779,7 +1778,6 @@ ramble:
             from ruamel.yaml import RoundTripDumper
 
             class RambleSafeDumper(RoundTripDumper):
-
                 def ignore_aliases(self, _data):
                     """Make the dumper NEVER print YAML aliases."""
                     return True
@@ -2364,12 +2362,6 @@ ramble:
         Returns:
             (int) Number of modifiers added to workspace
         """
-
-        class Filters:
-            def __init__(self):
-                self.filter = []
-                self.search_description = False
-
         on_exec_list = None
         if on_executable is not None:
             on_exec_list = syaml.syaml_list()
@@ -2380,12 +2372,8 @@ ramble:
         if namespace.modifiers not in base_section:
             base_section[namespace.modifiers] = syaml.syaml_list()
 
-        filters = Filters()
-        filters.filter.append(name_pattern)
-
         mod_type = ramble.repository.ObjectTypes.modifiers
-        objs = set(ramble.repository.all_object_names(mod_type))
-        mod_names = list_cmd.filter_by_name(objs, filters, mod_type)
+        mod_names = object_utils.filter_by_name([name_pattern], False, mod_type)
 
         if len(mod_names) < 1:
             logger.error(f"No modifiers found matching name pattern of {name_pattern}")

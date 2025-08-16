@@ -8,10 +8,8 @@
 
 
 import argparse
-import fnmatch
 import math
 import os
-import re
 import sys
 from html import escape  # novm
 
@@ -19,6 +17,7 @@ from llnl.util.tty.colify import colify
 
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
+from ramble.util import object_utils
 from ramble.util.logger import logger
 
 formatters = {}
@@ -28,49 +27,6 @@ def formatter(func):
     """Decorator used to register formatters"""
     formatters[func.__name__] = func
     return func
-
-
-def filter_by_name(objs, args, object_type):
-    """
-    Filters the sequence of objects according to user prescriptions
-
-    Args:
-        objs: sequence of objects
-        args: parsed command line arguments
-
-    Returns:
-        filtered and sorted list of objects
-    """
-    if args.filter:
-        res = []
-        for f in args.filter:
-            if "*" not in f and "?" not in f:
-                r = fnmatch.translate("*" + f + "*")
-            else:
-                r = fnmatch.translate(f)
-
-            rc = re.compile(r, flags=re.IGNORECASE)
-            res.append(rc)
-
-        if args.search_description:
-
-            def match(p, f):
-                if f.match(p):
-                    return True
-
-                obj = ramble.repository.get(p, object_type=object_type)
-                if obj.__doc__:
-                    return f.match(obj.__doc__)
-                return False
-
-        else:
-
-            def match(p, f):
-                return f.match(p)
-
-        objs = [obj for obj in objs if any(match(obj, f) for f in res)]
-
-    return sorted(objs, key=lambda s: s.lower())
 
 
 @formatter
@@ -263,10 +219,7 @@ def perform_list(args):
 
     object_type = ramble.repository.ObjectTypes[args.type]
 
-    # Retrieve the names of all the objects
-    objs = set(ramble.repository.all_object_names(object_type))
-    # Filter the set appropriately
-    sorted_objects = filter_by_name(objs, args, object_type)
+    sorted_objects = object_utils.filter_by_name(args.filter, args.search_description, object_type)
 
     # Filter by tags
     if args.tags:
