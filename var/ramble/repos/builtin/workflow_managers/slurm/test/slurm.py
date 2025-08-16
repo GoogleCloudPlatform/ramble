@@ -82,6 +82,7 @@ ramble:
     processes_per_node: 1
     n_nodes: 1
     wm_name: ['None', 'slurm']
+    time_limit: '5-00:00:00'
   applications:
     hostname:
       workloads:
@@ -94,6 +95,9 @@ ramble:
                   #SBATCH --time={time_limit_not_exist}
             test_{wm_name}_2:
               variables:
+                extra_sbatch_headers: |
+                  #SBATCH --time={time_limit}
+                  #SBATCH --time={time_limit}
                 slurm_partition: h3
             test_{wm_name}_3:
               variables:
@@ -183,6 +187,8 @@ ramble:
         with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
             content = f.read()
             assert "#SBATCH -p h3" in content
+            # Assert on the de-duplication of headers
+            assert content.count("#SBATCH --time=5-00:00:00") == 1
 
         # Assert on the experiment with custom slurm execute template
         path = os.path.join(
