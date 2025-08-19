@@ -219,6 +219,8 @@ as well as unused experiment templates, one can use:
 Note: This command will also remove comments within the edited section
 of the workspace config file.
 
+.. _workspace-manage:
+
 ------------------------
 Workspace Manage
 ------------------------
