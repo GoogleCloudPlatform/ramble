@@ -137,6 +137,8 @@ def build_variant_set():
         ("0b10 >> 1", "1", set(), 1),
         # Can be a handy way to select experiments to run
         ("(1 << {experiment_index} & 0b1011010) == 0", "True", set(), 1),
+        ("$HOSTNAME", "$HOSTNAME", set(), 1),
+        ("${HOSTNAME}", "${HOSTNAME}", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
