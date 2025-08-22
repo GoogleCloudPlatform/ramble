@@ -600,6 +600,7 @@ class Expander:
             allow_passthrough=allow_passthrough,
             typed=typed,
             merge_used_stage=merge_used_stage,
+            replace_escaped_braces=replace_escaped_braces,
         )
 
     def expand_var(
