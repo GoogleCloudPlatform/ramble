@@ -26,6 +26,17 @@ class IntelMlc(ExecutableApplication):
             pkg_spec="intel-mlc",
         )
 
+    # This is an optional executable that can be included via `executable_injection`.
+    # mlc normally requires the presence of nr_hugepages.
+    executable(
+        "configure_hugepage",
+        template=[
+            "sudo sysctl -w vm.nr_hugepages={nr_hugepages}",
+            "sudo sysctl -p",
+        ],
+        use_mpi=False,
+    )
+
     executable(
         "execute_bw",
         "{mlc_exec_path} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
@@ -98,6 +109,13 @@ class IntelMlc(ExecutableApplication):
         "spread_divisions",
         default="2",
         description="Number of blocks to spread threads over",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "nr_hugepages",
+        default="4000",
+        description="Number of hugepages to configure",
         workload_group="all_workloads",
     )
 
