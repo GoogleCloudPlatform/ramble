@@ -26,8 +26,13 @@ class IntelMlc(ExecutableApplication):
             pkg_spec="intel-mlc",
         )
 
-    # This is an optional executable that can be included via `executable_injection`.
-    # mlc normally requires the presence of nr_hugepages.
+    variant(
+        "configure_hugepage",
+        default=False,
+        values=[False, True],
+        description="When true, configure hugepage setting",
+    )
+
     executable(
         "configure_hugepage",
         template=[
@@ -35,6 +40,7 @@ class IntelMlc(ExecutableApplication):
             "sudo sysctl -p",
         ],
         use_mpi=False,
+        when=["+configure_hugepage"],
     )
 
     executable(
@@ -42,7 +48,7 @@ class IntelMlc(ExecutableApplication):
         "{mlc_exec_path} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
     )
 
-    workload("max_bandwidth", executables=["execute_bw"])
+    workload("max_bandwidth", executables=["configure_hugepage", "execute_bw"])
 
     workload_group("all_workloads", workloads=["max_bandwidth"])
 
