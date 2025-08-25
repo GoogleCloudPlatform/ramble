@@ -444,3 +444,25 @@ have the output file from :ref:`collect-output`, you can copy it into one of
 the experiment directories to allow analyze to extract the correct information
 without having to execute the experiment.
 
+^^^^^^^^^^^^^
+Writing Tests
+^^^^^^^^^^^^^
+
+Tests added to a ``test`` directory alongside the object definition file get picked by
+Ramble's unit testing facility. This applies to all Ramble object types. As an example,
+the tests defined under `tunables <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/tunables/test>`_
+can be run via ``ramble unit-test``.
+
+.. code-block:: console
+
+    # Run all unit tests
+    $ ramble unit-test
+
+    # Target specific tests
+    $ ramble unit-test -k tunables
+
+For testing custom Ramble object repositories, the ``--repo-path`` option can be used.
+
+.. code-block:: console
+
+    $ ramble unit-test --repo-path /path/to/custom/repo
