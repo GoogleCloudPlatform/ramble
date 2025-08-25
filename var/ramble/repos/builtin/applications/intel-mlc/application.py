@@ -26,12 +26,29 @@ class IntelMlc(ExecutableApplication):
             pkg_spec="intel-mlc",
         )
 
+    variant(
+        "configure_hugepage",
+        default=False,
+        values=[False, True],
+        description="When true, configure hugepage setting",
+    )
+
+    executable(
+        "configure_hugepage",
+        template=[
+            "sudo sysctl -w vm.nr_hugepages={nr_hugepages}",
+            "sudo sysctl -p",
+        ],
+        use_mpi=False,
+        when=["+configure_hugepage"],
+    )
+
     executable(
         "execute_bw",
         "{mlc_exec_path} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
     )
 
-    workload("max_bandwidth", executables=["execute_bw"])
+    workload("max_bandwidth", executables=["configure_hugepage", "execute_bw"])
 
     workload_group("all_workloads", workloads=["max_bandwidth"])
 
@@ -98,6 +115,13 @@ class IntelMlc(ExecutableApplication):
         "spread_divisions",
         default="2",
         description="Number of blocks to spread threads over",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "nr_hugepages",
+        default="4000",
+        description="Number of hugepages to configure",
         workload_group="all_workloads",
     )
 
