@@ -36,3 +36,12 @@ class Validation(ExecutableApplication):
         message="The validate_var is recommended to start with 'valid', but got '{validate_var}'",
         fail_on_invalid=False,
     )
+
+    # A validator with undefined vars.
+    # Checking it proceeds with the validation despite the passthrough exception.
+    register_validator(
+        name="validate_undefined_var_check",
+        predicate="{undefined_var} == 1",
+        message="This validator would never be valid",
+        fail_on_invalid=False,
+    )

@@ -1170,7 +1170,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     continue
 
                 for name, validator in validator_defs.items():
-                    valid = expander.evaluate_predicate(validator["predicate"])
+                    try:
+                        valid = expander.evaluate_predicate(
+                            validator["predicate"]
+                        )
+                    except ramble.expander.ExpanderError:
+                        valid = False
                     if not valid:
                         msg = expander.expand_var(validator["message"])
                         err_msg = (
