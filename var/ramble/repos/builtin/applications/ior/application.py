@@ -93,6 +93,13 @@ class Ior(ExecutableApplication):
         use_mpi=True,
     )
 
+    variant(
+        "include_iter_foms",
+        default=True,
+        values=[True, False],
+        description="Whether to include per iteration FOMs in analyze",
+    )
+
     # FOMS
     # Match per iteration output in the format:
     # access    bw(MiB/s)  IOPS       Latency(s)  block(KiB) xfer(KiB)  open(s)    wr/rd(s)   close(s)   total(s)   iter
@@ -112,37 +119,40 @@ class Ior(ExecutableApplication):
     ]
     units = ["MiB/s", "count", "s", "KiB", "KiB", "s", "s", "s", "s", "count"]
 
-    iter_regex = ""
-    for metric in metrics[0:3]:  # iter is non-float
-        iter_regex += (
-            r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
-        )  # xfer => total
-    iter_regex += r"\s+(?P<" + metrics[3] + r">[0-9]+)"  # handle block
-
-    for metric in metrics[4:-1]:  # iter is non-float
-        iter_regex += (
-            r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
-        )  # xfer => total
-    iter_regex += r"\s+(?P<" + metrics[-1] + r">[0-9]+)\s*$"  # handle iter
-
-    access_regex = "(?P<access>(read|write))" + iter_regex
-    figure_of_merit_context(
-        "iter", regex=access_regex, output_format="iter {iter}"
-    )
-
     log_str = Expander.expansion_str("log_file")
 
-    # Capture Per Iteration Data
-    for metric, unit in zip(metrics, units):
-        fom_regex = r"\w+" + iter_regex
-        figure_of_merit(
-            metric,
-            log_file=log_str,
-            fom_regex=fom_regex,
-            group_name=metric,
-            units=unit,
-            contexts=["iter"],
+    with when("+include_iter_foms"):
+        iter_regex = ""
+        for metric in metrics[0:3]:  # iter is non-float
+            iter_regex += (
+                r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
+            )  # xfer => total
+        iter_regex += r"\s+(?P<" + metrics[3] + r">[0-9]+)"  # handle block
+
+        for metric in metrics[4:-1]:  # iter is non-float
+            iter_regex += (
+                r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
+            )  # xfer => total
+        iter_regex += r"\s+(?P<" + metrics[-1] + r">[0-9]+)\s*$"  # handle iter
+
+        access_regex = "(?P<access>(read|write))" + iter_regex
+        figure_of_merit_context(
+            "iter",
+            regex=access_regex,
+            output_format="{access} iter {iter}",
         )
+
+        # Capture Per Iteration Data
+        for metric, unit in zip(metrics, units):
+            fom_regex = r"\w+" + iter_regex
+            figure_of_merit(
+                metric,
+                log_file=log_str,
+                fom_regex=fom_regex,
+                group_name=metric,
+                units=unit,
+                contexts=["iter"],
+            )
 
     # Capture Summary Data in the format:
     # Operation   Max(MiB)   Min(MiB)  Mean(MiB)     StdDev   Max(OPs)   Min(OPs)  Mean(OPs)     StdDev    Mean(s) Stonewall(s) Stonewall(MiB) Test# #Tasks tPN reps fPP reord reordoff reordrand seed segcnt   blksiz    xsize aggs(MiB)   API RefNum
