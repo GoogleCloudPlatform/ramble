@@ -89,12 +89,15 @@ class SpackLightweight(PackageManagerBase):
 
             if software_env is not None:
                 for (
-                    compiler_spec
+                    pkg_spec,
+                    compiler_spec,
                 ) in software_envs.compiler_specs_for_environment(
                     software_env
                 ):
-                    logger.debug(f"Installing compiler: {compiler_spec}")
-                    self.runner.install_compiler(compiler_spec)
+                    logger.debug(
+                        f"Installing compiler: {compiler_spec} with pkg_spec {pkg_spec}"
+                    )
+                    self.runner.install_compiler(pkg_spec, compiler_spec)
 
         except RunnerError as e:
             logger.die(e)
@@ -889,7 +892,7 @@ class SpackRunner(CommandRunner):
                         env_var.group("var"), env_var.group("val")
                     )
 
-    def install_compiler(self, spec):
+    def install_compiler(self, pkg_spec, compiler_spec):
         """
         Ensure a compiler is installed, before using it to install packages
         within an environment.
@@ -914,7 +917,7 @@ class SpackRunner(CommandRunner):
         comp_info_args = []
         if self.compiler_config_dir:
             comp_info_args.extend(["-C", self.env_path])
-        comp_info_args.extend(["compiler", "info", spec])
+        comp_info_args.extend(["compiler", "info", compiler_spec])
 
         compiler_find_flags = ramble.config.get(
             f"{self.compiler_find_config_name}:flags"
@@ -930,7 +933,7 @@ class SpackRunner(CommandRunner):
             self._cmd_start(self.spack, comp_info_args)
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
             self._cmd_end(self.spack, comp_info_args)
-            logger.msg(f"{spec} is already an available compiler")
+            logger.msg(f"{compiler_spec} is already an available compiler")
             return
         except ProcessError:
 
@@ -943,16 +946,16 @@ class SpackRunner(CommandRunner):
                 for flag in shlex.split(install_flags):
                     args.append(flag)
 
-            args.append(spec)
+            args.append(pkg_spec)
 
             self.execute(self.installer, args)
 
-            self.load_compiler(spec)
+            self.load_compiler(pkg_spec)
 
             self.execute(self.spack, compiler_find_args)
 
             if not self.dry_run:
-                self.compilers.append(spec)
+                self.compilers.append(pkg_spec)
 
                 if self.active:
                     self.spack.add_default_env(self.env_key, active_env)
