@@ -2890,3 +2890,29 @@ def test_workspace_config_squash(workspace_name, capsys):
             data = f.read()
             assert "foo: bar" not in data
             assert "test_var: test_value" not in data
+
+
+def test_workspace_experiment_logs(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        output = workspace("experiment-logs", global_args=global_args)
+
+        expected_output = os.sep.join(
+            ["experiments", "basic", "test_wl", "generated", "generated.out"]
+        )
+        assert expected_output in output
