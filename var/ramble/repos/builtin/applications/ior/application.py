@@ -26,33 +26,35 @@ class Ior(ExecutableApplication):
 
         required_package("ior")
 
-    workload("multi-file", executable="ior")
+    workload("multi-file", executables=["ior-prep", "ior"])
 
-    workload("single-file", executable="ior")
+    workload("single-file", executables=["ior-prep", "ior"])
+
+    workload_group("all_workloads", workloads=["multi-file", "single-file"])
 
     workload_variable(
         "transfer-size",
         default="1m",
         description="Transfer Size",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
     workload_variable(
         "block-size",
         default="16m",
         description="Block Size",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
     workload_variable(
         "segment-count",
         default="16",
         description="Segment Count",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
     workload_variable(
         "iterations",
         default="1",
         description="Segment Count",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
     workload_variable(
         "file_args",
@@ -67,15 +69,27 @@ class Ior(ExecutableApplication):
         workloads=["single-file"],
     )
     workload_variable(
+        "target_directory",
+        default="{experiment_run_dir}",
+        description="Target directory for the r/w test. This can be used to target different file systems.",
+        workload_group="all_workloads",
+    )
+    workload_variable(
         "additional_args",
         default="",
         description="Additional args to pass",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
+    )
+
+    executable(
+        name="ior-prep",
+        template="mkdir -p {target_directory}",
+        use_mpi=False,
     )
 
     executable(
         name="ior",
-        template="ior -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {additional_args}",
+        template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {additional_args}",
         use_mpi=True,
     )
 
