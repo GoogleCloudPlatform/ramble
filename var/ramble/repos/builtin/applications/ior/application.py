@@ -48,12 +48,23 @@ class Ior(ExecutableApplication):
         description="Segment Count",
         workloads=["multi-file", "single-file"],
     )
-
     workload_variable(
         "iterations",
         default="1",
         description="Segment Count",
         workloads=["multi-file", "single-file"],
+    )
+    workload_variable(
+        "file_args",
+        default="-F",
+        description="FilePerProc flag",
+        workloads=["multi-file"],
+    )
+    workload_variable(
+        "file_args",
+        default="",
+        description="FilePerProc flag, default to empty",
+        workloads=["single-file"],
     )
     workload_variable(
         "additional_args",
@@ -64,10 +75,9 @@ class Ior(ExecutableApplication):
 
     executable(
         name="ior",
-        template="ior -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {additional_args}",
+        template="ior -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {additional_args}",
         use_mpi=True,
     )
-    executable(name="ior-shared", template="{ior_path} -F", use_mpi=True)
 
     # FOMS
     # Match per iteration output in the format:
