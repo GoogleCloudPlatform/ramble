@@ -384,7 +384,7 @@ packages:
                 sr.add_include_file(packages_path)
                 sr.add_include_file(compilers_path)
                 sr.generate_env_file()
-                sr.install_compiler("gcc@12.1.0")
+                sr.install_compiler("gcc@12.1.0", "gcc@12.1.0")
                 captured = capsys.readouterr()
 
                 assert (
@@ -567,7 +567,7 @@ compilers::
                     sr.create_env(os.getcwd())
                     sr.activate()
                     sr.add_include_file(compilers_path)
-                    sr.install_compiler("gcc@12.2.0")
+                    sr.install_compiler("gcc@12.2.0", "gcc@12.2.0")
                     captured = capsys.readouterr()
 
                     assert expected_str in captured.out

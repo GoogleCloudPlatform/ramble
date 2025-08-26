@@ -844,7 +844,8 @@ class SoftwareEnvironments:
             environment (SoftwareEnvironment): Environment to extract compiler specs for
 
         Yields:
-            (str) Spec string for each compiler
+            (str) Package spec string for each compiler
+            (str) Compiler spec string for each compiler
         """
 
         root_compilers = []
@@ -874,7 +875,9 @@ class SoftwareEnvironments:
 
         for comp in reversed(root_compilers + dep_compilers):
             comp_pkg = self._rendered_packages[pm_name][comp]
-            yield comp_pkg.spec_str(all_packages=self._rendered_packages, compiler=False)
+            yield comp_pkg.spec_str(
+                all_packages=self._rendered_packages, compiler=False
+            ), comp_pkg.spec_str(all_packages=self._rendered_packages, compiler=True)
 
     def package_specs_for_environment(self, environment: object):
         """Iterator over package specs for a given environment
