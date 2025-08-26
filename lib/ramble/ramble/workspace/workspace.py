@@ -1744,6 +1744,11 @@ ramble:
                             if software_key in exp and exp[software_key]:
                                 self.write_software_info(f, exp)
 
+                        if exp["VARIANTS"]:
+                            f.write("  Experiment variants:\n")
+                            for variant in exp["VARIANTS"]:
+                                f.write(f"  - {variant}\n")
+
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")
                             for name, result in exp["SUCCESS_CRITERIA"].items():
