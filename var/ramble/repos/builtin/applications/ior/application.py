@@ -94,7 +94,7 @@ class Ior(ExecutableApplication):
     )
 
     variant(
-        "include_iter_foms",
+        "ior_include_iter_foms",
         default=True,
         values=[True, False],
         description="Whether to include per iteration FOMs in analyze",
@@ -121,7 +121,7 @@ class Ior(ExecutableApplication):
 
     log_str = Expander.expansion_str("log_file")
 
-    with when("+include_iter_foms"):
+    with when("+ior_include_iter_foms"):
         iter_regex = ""
         for metric in metrics[0:3]:  # iter is non-float
             iter_regex += (
