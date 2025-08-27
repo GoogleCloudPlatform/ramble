@@ -179,6 +179,14 @@ class IntelMlc(ExecutableApplication):
         units="MB/s",
     )
 
+    figure_of_merit(
+        "vm.nr_hugepages",
+        fom_type=FomType.INFO,
+        fom_regex=r"vm.nr_hugepages\s+=\s+(?P<nr_hp>[0-9]+)",
+        group_name="nr_hp",
+        units="",
+    )
+
     def _compact_thread_indices(self, n_threads, max_thread, spread_divisions):
         if n_threads > max_thread:
             logger.die(
