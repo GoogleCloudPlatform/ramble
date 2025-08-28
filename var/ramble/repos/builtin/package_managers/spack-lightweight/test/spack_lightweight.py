@@ -118,3 +118,76 @@ def test_spack_auxiliary_files(request):
         data = f.read()
         assert "opt_target" not in data
         assert "x86_64" in data
+
+
+def test_spack_push_to_cache(workspace_name, mock_applications):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "--wf",
+        "ensure_installed",
+        "-p",
+        "spack",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "n_ranks=1",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        global_args=global_args,
+    )
+
+    # Add a gcc compiler package
+    workspace(
+        "manage",
+        "software",
+        "--pkg",
+        "gcc",
+        "--spec",
+        "gcc",
+        global_args=global_args,
+    )
+
+    # Add zlib package
+    workspace(
+        "manage",
+        "software",
+        "--pkg",
+        "zlib",
+        "--spec",
+        "zlib",
+        "--compiler",
+        "gcc",
+        global_args=global_args,
+    )
+
+    # Define zlib environment
+    workspace(
+        "manage",
+        "software",
+        "--env",
+        "zlib",
+        "--environment-packages",
+        "zlib",
+        global_args=global_args,
+    )
+
+    workspace(
+        "setup",
+        "--phases",
+        "software_create_env",
+        "software_configure",
+        global_args=global_args,
+    )
+
+    cache_path = os.path.join(ws.root, "test_cache")
+
+    workspace(
+        "push-to-cache", "-d", cache_path, "--dry-run", global_args=global_args
+    )
