@@ -61,7 +61,7 @@ class SpackLightweight(PackageManagerBase):
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
-            raise ApplicationError("Ramble env_path is set to None.")
+            raise PackageManagerError("Ramble env_path is set to None.")
         logger.msg("Installing compilers")
 
         cache_tupl = ("spack-compilers", env_path)
@@ -117,7 +117,7 @@ class SpackLightweight(PackageManagerBase):
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
-            raise ApplicationError("Ramble env_path is set to None.")
+            raise PackageManagerError("Ramble env_path is set to None.")
 
         cache_tupl = ("spack-env", env_path)
         if workspace.check_cache(cache_tupl):
@@ -288,12 +288,12 @@ class SpackLightweight(PackageManagerBase):
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
-            raise ApplicationError("Ramble env_path is set to None.")
+            raise PackageManagerError("Ramble env_path is set to None.")
 
         if not os.path.exists(env_path) or not os.path.isfile(
             os.path.join(env_path, "spack.lock")
         ):
-            raise ApplicationError(
+            raise PackageManagerError(
                 f"Spack environment {env_path} does not exist, or has not been concretized."
             )
 

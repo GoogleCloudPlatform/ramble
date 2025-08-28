@@ -16,6 +16,7 @@ from llnl.util.filesystem import *
 
 import ramble.language.package_manager_language
 import ramble.repository
+from ramble.error import PackageManagerError
 from ramble.language.package_manager_language import *
 from ramble.language.shared_language import *
 from ramble.software_environments import ExternalEnvironment
