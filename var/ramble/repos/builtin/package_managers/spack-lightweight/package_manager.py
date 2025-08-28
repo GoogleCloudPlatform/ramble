@@ -378,9 +378,12 @@ class SpackLightweight(PackageManagerBase):
             software_env = software_envs.render_environment(
                 app_context, app_inst.expander, self, require=require_env
             )
-            compiler_specs = software_envs.compiler_specs_for_environment(
-                software_env
-            )
+            compiler_specs = [
+                spec
+                for spec, _ in software_envs.compiler_specs_for_environment(
+                    software_env
+                )
+            ]
 
             self.runner.push_to_spack_cache(
                 workspace.spack_cache_path, compiler_specs
