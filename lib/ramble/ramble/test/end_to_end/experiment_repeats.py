@@ -233,3 +233,4 @@ ramble:
             # Assert that the last experiment is not included in the stats
             assert "summary::max = 2.0 minutes" in data
             assert "summary::mean = 1.5 minutes" in data
+            assert "mode:\n      value = Sleep" in data

@@ -1714,10 +1714,13 @@ ramble:
                                     if name not in fom_summary.keys():
                                         fom_summary[name] = []
                                     stat_name = fom["origin_type"]
+                                    if not stat_name.startswith("summary::"):
+                                        display_name = "value"
+                                    else:
+                                        display_name = stat_name
                                     value = fom["value"]
                                     units = fom["units"]
-
-                                    output = f"{stat_name} = {value} {units}\n"
+                                    output = f"{display_name} = {value} {units}\n"
                                     fom_summary[name].append(output)
 
                                 for fom_name, fom_val_list in fom_summary.items():
