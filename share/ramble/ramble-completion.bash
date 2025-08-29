@@ -679,7 +679,7 @@ _ramble_workspace_analyze() {
 }
 
 _ramble_workspace_push_to_cache() {
-    RAMBLE_COMPREPLY="-h --help -d --where --exclude-where --filter-tags --profile-phase"
+    RAMBLE_COMPREPLY="-h --help --dry-run -d --where --exclude-where --filter-tags --profile-phase"
 }
 
 _ramble_workspace_info() {

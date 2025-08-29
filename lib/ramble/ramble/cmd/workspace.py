@@ -590,6 +590,9 @@ def workspace_push_to_cache(args):
     current_pipeline = ramble.pipeline.pipelines.pushtocache
     ws = ramble.cmd.require_active_workspace(cmd_name="workspace pushtocache")
 
+    if args.dry_run:
+        ws.dry_run = True
+
     filters = ramble.filters.Filters(
         phase_filters="*",
         include_where_filters=args.where,
@@ -606,6 +609,14 @@ def workspace_push_to_cache(args):
 
 def workspace_push_to_cache_setup_parser(subparser):
     """push workspace envs to a given buildcache"""
+
+    subparser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="perform a dry run. Acts like it will push "
+        + "to a cache, but will not actually create a cache.",
+    )
 
     subparser.add_argument(
         "-d", dest="cache_path", default=None, required=True, help="Path to cache."
