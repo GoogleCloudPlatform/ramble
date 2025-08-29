@@ -1853,6 +1853,8 @@ ramble:
             if scope_name is None:
                 return
 
+            logger.all_msg(f" Removed scope: {scope_name}")
+
             # Delete unused variables from requested scope.
             to_remove = set()
             scope_section = self._get_scope_section(scope_name)
@@ -1883,7 +1885,8 @@ ramble:
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_used_variables(self)
 
-            if prev_exp != app_inst.variables[app_inst.keywords.experiment_template_name]:
+            if app_inst.repeats.is_repeat_base or app_inst.repeats.repeat_index is None:
+                # Either there are no repeats, or this is the base
                 if prev_exp is not None:
                     _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
 
@@ -2190,6 +2193,7 @@ ramble:
 
             if len(scope_parts) >= 3:  # Extract experiment section
                 joined_scope_part = ":".join(scope_parts[2:])
+                logger.all_msg(f"  Scope part: {joined_scope_part}")
                 if joined_scope_part not in base_section[namespace.experiment]:
                     logger.die(
                         f"No experiment matches requested scope {joined_scope_part} "
