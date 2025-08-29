@@ -2832,12 +2832,36 @@ def test_workspace_config_squash(workspace_name, capsys):
             "zlib",
             "--wf",
             "ensure_installed",
+            "-e",
+            "zlib-repeats",
             "-v",
             "n_ranks=1",
             "-v",
             "n_nodes=1",
             "-p",
             "spack",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Add repeats for one set of experiments.
+        config(
+            "add",
+            "applications:zlib:workloads:ensure_installed:experiments:zlib-repeats:n_repeats:5",
             global_args=global_args,
         )
 
