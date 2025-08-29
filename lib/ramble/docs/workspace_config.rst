@@ -1208,6 +1208,201 @@ template. This means the workspace's configs directory should have two files:
 ``execute_slurm.tpl`` and ``execute_pbs.tpl`` which will be template submission
 scripts to each of the batch systems.
 
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Workflow Manager Control
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+A Workflow Manager in Ramble is a component responsible for defining how an
+experiment's jobs are submitted, monitored, and managed. They provide an
+abstraction layer over different batch scheduling systems (like Slurm, GKE,
+Google Batch, etc.) or local execution environments, allowing the same
+experiment definition to be run across various platforms without modification.
+
+Key Responsibilities
+~~~~~~~~~~~~~~~~~~~~
+
+- **Job Submission**: Generating and executing the commands required to submit a
+  job to the target environment (e.g., using `sbatch` for Slurm).
+- **Status Monitoring**: Providing mechanisms to query the status of a running
+  or completed job.
+- **Environment Setup**: Configuring the execution environment, which can
+  include setting up hostfiles for MPI, defining environment variables, and
+  inserting necessary pragmas or headers into job scripts.
+- **Templating**: Rendering specialized scripts for different stages of the
+  workflow, such as `setup`, `execute`, and `analyze`.
+
+Using a Workflow Manager
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default workflow manager is ``user-defined`` which will execute experiments
+locally, sequentially, and have only a basic definition for ``mpi_command``.
+Users can override these beahviors by customizing the values for
+``mpi_command`` and ``batch_submit`` rather than having Ramble provided
+definitions for these. The ``user-defined`` workflow manager is added to
+workspace configuration files when they are written by default.
+
+To use a specific workflow manager for your experiments, you specify it in your
+`ramble.yaml` configuration file within the `config` section.
+
+.. code-block:: yaml
+
+   ramble:
+     config:
+       workflow_manager: slurm
+
+If no workflow manager is specified, Ramble defaults to the `user-managed`
+workflow manager, which provides sensible defaults for running experiments
+directly on the local machine.
+
+Alternatively, when generating a specific set of experiments, you can assign a
+workflow manager directly using the `ramble workspace manage experiments`
+command. This will add the workflow manager configuration to the scope of the
+experiments being created within your `ramble.yaml`. Use the
+`--workflow-manager` (or `--wm`) flag to specify which manager to use.
+
+This approach is useful when you need different sets of experiments within the
+same workspace to use different workflow managers, rather than setting one
+globally.
+
+.. code-block:: console
+
+   $ ramble workspace manage experiments --workflow-manager slurm <application_name>
+
+Built-in Workflow Managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ramble comes with several built-in workflow managers. You can list them by
+running:
+
+.. code-block:: console
+
+   $ ramble list --type workflow_managers
+
+A few common examples include:
+
+- **user-managed**: The default manager for local execution. It runs the
+  experiment commands directly without a batch scheduler.
+- **slurm**: A comprehensive manager for submitting jobs to the Slurm Workload
+  Manager. It handles `sbatch` script generation, job status queries with
+  `squeue` and `sacct`, and cancellation with `scancel`.
+
+Configuration and Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Workflow managers expose configurable variables that can be set in your
+`ramble.yaml`. These are defined in the workflow manager's definition file using
+the `workflow_manager_variable` directive.
+
+Common built-in variables include:
+
+- ``workflow_banner``: A descriptive banner added to generated execution scripts.
+- ``workflow_pragmas``: System-specific directives or headers inserted into job
+  scripts (e.g., `#SBATCH` directives for Slurm).
+- ``workflow_hostfile_cmd``: The command used to generate a hostfile for MPI jobs.
+- ``hostfile``: The path where the hostfile will be stored.
+- ``mpi_command``: The command prefix for running MPI applications (e.g., `mpirun`,
+  `srun`).
+- ``batch_submit``: The command used to execute each experiment, or submit them
+  to a workload manager instead.
+
+Letting the Workflow Manager Take the Lead
+''''''''''''''''''''''''''''''''''''''''''
+
+To get the most out of a workflow manager, it's often best to let it control
+key aspects of the job submission and execution environment. If you define
+certain variables in your workspace configuration, you may inadvertently
+override the specialized settings provided by the workflow manager.
+
+For a seamless experience, consider **not** defining the following variables in
+your `ramble.yaml`, allowing the selected workflow manager's defaults to take
+effect:
+
+- ``batch_submit``: Workflow managers typically generate this command to correctly
+  interface with the batch scheduler (e.g., `sbatch` for Slurm).
+- ``mpi_command``: Many workflow managers provide an optimized command for launching
+  MPI applications that is integrated with the scheduler (e.g., using `srun`
+  instead of a generic `mpirun`).
+- ``hostlist``: The workflow manager sometimes knows how to obtain the correct list
+  of nodes allocated to a job from the scheduler (e.g., from `$SLURM_JOB_NODELIST`).
+
+By leaving these variables unset, you allow Ramble to use the tailored definitions
+from the workflow manager, leading to more robust and portable experiments.
+
+Additionally, if the workflow manager you are using does not contain
+definitions for required variables, you will be presented with an error
+requiring you to fix this.
+
+Example: Customizing the Slurm Workflow Manager
+'''''''''''''''''''''''''''''''''''''''''''''''
+
+The `slurm` workflow manager provides additional variables for fine-tuning job
+submissions. You can override these in the `variables` section of your
+`ramble.yaml`.
+
+.. code-block:: yaml
+
+   ramble:
+     config:
+       workflow_manager: slurm
+     variables:
+       slurm_partition: debug
+       n_nodes: 4
+       extra_sbatch_headers: |
+         #SBATCH --constraint=gpu
+         #SBATCH --time=01:00:00
+
+This configuration directs Ramble to submit the job to the `debug` partition,
+request 4 nodes, and add extra `sbatch` headers for GPU constraints and a time
+limit.
+
+Creating a Custom Workflow Manager
+''''''''''''''''''''''''''''''''''
+
+While Ramble's built-in workflow managers cover many common use cases, you can
+also create your own to support a new scheduler or a custom execution environment.
+This involves creating a new Python class that inherits from `WorkflowManagerBase`.
+
+For detailed instructions, please refer to the developer guides.
+
+Interacting with Batch Systems
+''''''''''''''''''''''''''''''
+
+Workflow managers that interface with batch systems often provide more ways to
+interact with jobs than just submitting them. They can also include commands
+for checking the status of a job, canceling it, or waiting for it to complete.
+Ramble exposes this functionality through the `ramble on` command's
+`--executor` flag.
+
+By default, `ramble on` executes the command defined in the `batch_submit`
+variable. However, you can specify other commands to run instead. For example,
+the `slurm` workflow manager defines the following commands:
+
+- **batch_submit**: Submits the job to Slurm. This is the default action.
+- **batch_query**: Checks the status of the submitted job.
+- **batch_cancel**: Cancels a running job.
+- **batch_wait**: Blocks until the job has finished.
+
+You can use these commands with the `--executor` flag like so:
+
+.. code-block:: console
+
+   # Submit a job
+   $ ramble on
+
+   # Check the status of the job
+   $ ramble on --executor "{batch_query}"
+
+   # Cancel the job
+   $ ramble on --executor "{batch_cancel}"
+
+   # Wait for the job to complete
+   $ ramble on --executor "{batch_wait}"
+
+This allows you to manage the entire lifecycle of a batch job directly from the
+command line. To see the available commands for a specific workflow manager,
+run `ramble info --type workflow_managers <workflow_manager_name>`.
+
 -----------------
 Experiment Chains
 -----------------
