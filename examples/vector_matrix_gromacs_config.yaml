@@ -35,13 +35,13 @@ ramble:
   software:
     packages:
       gcc9:
-        pkg_spec: gcc@9.4.0 target=x86_64
-        compiler_spec: gcc@9.4.0
+        pkg_spec: gcc@9.5.0 target=x86_64
+        compiler_spec: gcc@9.5.0
       intel-mpi:
         pkg_spec: intel-oneapi-mpi@2021.13.1 target=x86_64
         compiler: gcc9
       gromacs:
-        pkg_spec: gromacs@2021.6
+        pkg_spec: gromacs@2024
         compiler: gcc9
     environments:
       gromacs:

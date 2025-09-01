@@ -41,8 +41,8 @@ ramble:
   software:
     packages:
       gcc9:
-        pkg_spec: gcc@9.3.0 target=x86_64
-        compiler_spec: gcc@9.3.0
+        pkg_spec: gcc@9.5.0 target=x86_64
+        compiler_spec: gcc@9.5.0
       ompi412:
         pkg_spec: openmpi@4.1.2 +legacylaunchers +pmi +thread_multiple +cxx target=x86_64
         compiler: gcc9
