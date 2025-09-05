@@ -1363,7 +1363,10 @@ While Ramble's built-in workflow managers cover many common use cases, you can
 also create your own to support a new scheduler or a custom execution environment.
 This involves creating a new Python class that inherits from `WorkflowManagerBase`.
 
-For detailed instructions, please refer to the developer guides.
+Workflow managers are written similar to all other object definitions in
+Ramble. For a complete example, the 
+`SLURM workflow manager <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/workflow_managers/slurm/workflow_manager.py>`_
+can be used to see how workflow managers can function.
 
 Interacting with Batch Systems
 ''''''''''''''''''''''''''''''
