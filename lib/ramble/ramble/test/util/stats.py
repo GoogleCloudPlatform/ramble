@@ -42,6 +42,79 @@ import ramble.util.stats
             "s",
             (0.18, "", "summary::cv"),
         ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalLower95(),
+            [1, 2, 3, 4, 5],
+            "s",
+            (1.0, "s", "summary::ci_95_lower"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalUpper95(),
+            [1, 2, 3, 4, 5],
+            "s",
+            (5.0, "s", "summary::ci_95_upper"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalLower95(),
+            [1],
+            "s",
+            ("NA", "", "summary::ci_95_lower"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalUpper95(),
+            [1],
+            "s",
+            ("NA", "", "summary::ci_95_upper"),
+        ),
+        # Test case with a larger sample size to verify z-score approximation
+        (
+            ramble.util.stats.StatsConfidenceIntervalLower95(),
+            list(range(1, 31)),
+            "s",
+            (12.0, "s", "summary::ci_95_lower"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalUpper95(),
+            list(range(1, 31)),
+            "s",
+            (19.0, "s", "summary::ci_95_upper"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalLower99(),
+            list(range(1, 31)),
+            "s",
+            (11.0, "s", "summary::ci_99_lower"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalUpper99(),
+            list(range(1, 31)),
+            "s",
+            (20.0, "s", "summary::ci_99_upper"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalLower90(),
+            list(range(1, 31)),
+            "s",
+            (13.0, "s", "summary::ci_90_lower"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalUpper90(),
+            list(range(1, 31)),
+            "s",
+            (18.0, "s", "summary::ci_90_upper"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalLower50(),
+            list(range(1, 31)),
+            "s",
+            (14.0, "s", "summary::ci_50_lower"),
+        ),
+        (
+            ramble.util.stats.StatsConfidenceIntervalUpper50(),
+            list(range(1, 31)),
+            "s",
+            (17.0, "s", "summary::ci_50_upper"),
+        ),
     ],
 )
 def test_stats_for_repeat_foms(statistic, input_values, input_units, output):
