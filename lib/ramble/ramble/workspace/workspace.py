@@ -1853,8 +1853,6 @@ ramble:
             if scope_name is None:
                 return
 
-            logger.all_msg(f" Removed scope: {scope_name}")
-
             # Delete unused variables from requested scope.
             to_remove = set()
             scope_section = self._get_scope_section(scope_name)
@@ -2193,7 +2191,6 @@ ramble:
 
             if len(scope_parts) >= 3:  # Extract experiment section
                 joined_scope_part = ":".join(scope_parts[2:])
-                logger.all_msg(f"  Scope part: {joined_scope_part}")
                 if joined_scope_part not in base_section[namespace.experiment]:
                     logger.die(
                         f"No experiment matches requested scope {joined_scope_part} "
