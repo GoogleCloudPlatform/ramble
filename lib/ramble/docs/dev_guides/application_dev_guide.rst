@@ -337,7 +337,7 @@ package manager variant:
 .. code-block:: python
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc9", pkg_spec="gcc@9.5.0")
 
         software_spec(
             "impi",

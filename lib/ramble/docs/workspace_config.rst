@@ -1121,7 +1121,7 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
     software:
       packages:
         gcc9:
-          pkg_spec: gcc@9.3.0 target=x86_64
+          pkg_spec: gcc@9.5.0 target=x86_64
         mpich:
           pkg_spec: mpich@4.0.2 target=x86_64
           compiler: gcc9
@@ -1186,7 +1186,7 @@ variable can be used to submit the same experiment to multiple batch systems.
     software:
       packages:
         gcc9:
-          pkg_spec: gcc@9.3.0 target=x86_64
+          pkg_spec: gcc@9.5.0 target=x86_64
         impi2021:
           pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9

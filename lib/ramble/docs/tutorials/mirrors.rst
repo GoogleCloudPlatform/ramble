@@ -99,7 +99,7 @@ will look something like this:
       software:
         packages:
           gcc9:
-            pkg_spec: gcc@9.3.0
+            pkg_spec: gcc@9.5.0
           intel-mpi:
             pkg_spec: intel-oneapi-mpi@2021.11.0
             compiler: gcc9
