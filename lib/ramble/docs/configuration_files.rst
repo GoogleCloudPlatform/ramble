@@ -590,8 +590,8 @@ Below is an annotated example of the software dictionary.
     software:
       packages:
         gcc9: # Abstract name to refer to this package
-          pkg_spec: gcc@9.3.0 target=x86_64 # Spack spec for this package
-          compiler_spec: gcc@9.3.0 # Spack compiler spec for this package
+          pkg_spec: gcc@9.5.0 target=x86_64 # Spack spec for this package
+          compiler_spec: gcc@9.5.0 # Spack compiler spec for this package
         impi2021:
           pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
           compiler: gcc9 # Other package name to use as compiler for this package

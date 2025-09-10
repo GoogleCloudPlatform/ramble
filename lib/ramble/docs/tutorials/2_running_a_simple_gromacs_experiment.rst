@@ -114,7 +114,7 @@ With this command, you should see output similar to the following:
   # compilers #
   #############
   gcc9:
-      pkg_spec: gcc@9.3.0
+      pkg_spec: gcc@9.5.0
 
       When:
           package_manager_family=spack
