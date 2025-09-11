@@ -166,9 +166,10 @@ overrides_base_name = "overrides-"
 
 def first_existing(dictionary, keys):
     """Get the value of the first key in keys that is in the dictionary."""
-    try:
-        return next(k for k in keys if k in dictionary)
-    except StopIteration:
+    for k in keys:
+        if k in dictionary:
+            return k
+    else:
         raise KeyError(f"None of {keys} is in dict!")
 
 
