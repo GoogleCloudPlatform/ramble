@@ -556,16 +556,11 @@ class Expander:
         try:
             math_ast = ast.parse(str(var), mode="eval")
             value = self.eval_math(math_ast.body)
+        except (MathEvaluationError, AttributeError, ValueError, SyntaxError):
+            return var
+        else:
             if isinstance(value, list):
                 return value
-            return var
-        except MathEvaluationError:
-            return var
-        except AttributeError:
-            return var
-        except ValueError:
-            return var
-        except SyntaxError:
             return var
 
     def expand_var_name(
