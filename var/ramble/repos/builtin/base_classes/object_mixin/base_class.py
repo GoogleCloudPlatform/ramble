@@ -22,7 +22,8 @@ class ObjectMixin:
         app_inst = self._get_app_inst()
         return app_inst.expander.satisfies(when_key, app_inst.object_variants)
 
-    def get_required_variables(self):
+    @property
+    def required_variables(self):
         """Get all the required variables based on the mode and when conditions."""
         required_vars = self.required_vars
         filtered_vars = {}
@@ -36,6 +37,7 @@ class ObjectMixin:
                     }
         return filtered_vars
 
+    @property
     def selected_variables(self):
         """Extract all variables which would be included based
         on the current variants.
@@ -53,6 +55,7 @@ class ObjectMixin:
                 selected_vars[var.name] = var
         return selected_vars
 
+    @property
     def selected_environment_variables(self):
         """Extract all environment variables which would be included based
         on the current variants.

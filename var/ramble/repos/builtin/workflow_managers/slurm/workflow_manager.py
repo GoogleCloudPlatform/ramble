@@ -175,6 +175,7 @@ class Slurm(WorkflowManagerBase):
         dest_path="batch_helpers",
     )
 
+    @property
     def template_render_vars(self):
         vars = {}
         app_inst = self.app_inst

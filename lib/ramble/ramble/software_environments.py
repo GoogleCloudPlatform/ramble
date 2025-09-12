@@ -305,7 +305,7 @@ class TemplatePackage(SoftwarePackage):
         name = expander.expand_var(self.name, merge_used_stage=False)
         pm_name = package_manager.name
         pkg_info = self.pkg_info
-        pm_prefix = package_manager.spec_prefix()
+        pm_prefix = package_manager.spec_prefix
 
         raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix)
         raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix)
@@ -719,7 +719,7 @@ class SoftwareEnvironments:
             env_name (str): Name of the rendered environment to mark as used
         """
 
-        pm_name = package_manager.spec_prefix()
+        pm_name = package_manager.spec_prefix
         if pm_name in self._rendered_environments:
             if env_name in self._rendered_environments[pm_name]:
                 self._rendered_environments[pm_name][env_name].mark_used()
