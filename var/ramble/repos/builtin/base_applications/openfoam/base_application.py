@@ -15,7 +15,7 @@ from ramble.expander import Expander
 class Openfoam(ExecutableApplication):
     """Base application definition for OpenFoam"""
 
-    name = "openfoamorg"
+    name = "openfoam"
 
     maintainers("douglasjacobsen")
 
