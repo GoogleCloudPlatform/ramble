@@ -257,6 +257,26 @@ class Slurm(WorkflowManagerBase):
             fom_type=FomType.INFO,
         )
 
+    # Capture slurm configs before the workload runs, just so that the configs
+    # match closer when the job is submitted.
+    register_builtin(
+        "capture_slurm_config", required=True, injection_method="prepend"
+    )
+
+    def capture_slurm_config(self):
+        return [
+            "scontrol show config > {experiment_run_dir}/.slurm_config",
+        ]
+
+    for fom in ["TopologyParam", "TopologyPlugin"]:
+        figure_of_merit(
+            f"slurm-config-{fom}",
+            fom_regex=rf"\s*{fom}\s*=\s*(?P<val>\S+)",
+            group_name="val",
+            log_file="{experiment_run_dir}/.slurm_config",
+            fom_type=FomType.INFO,
+        )
+
 
 class SlurmRunner:
     """Runner for executing slurm commands"""
