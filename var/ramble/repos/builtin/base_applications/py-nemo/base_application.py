@@ -18,6 +18,8 @@ from spack.util.path import canonicalize_path
 class PyNemo(ExecutableApplication):
     """Define a base class for PyNemo applications."""
 
+    name = "py-nemo"
+
     tags(
         "machine-learning",
         "llm",
