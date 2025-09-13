@@ -166,6 +166,7 @@ ramble:
         with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
             content = f.read()
             assert "scontrol show hostnames" in content
+            assert "scontrol show config" in content
             assert "#SBATCH -N 1" in content
             assert "#SBATCH -J hostname_local_test_slurm" in content
             assert "#SBATCH --ntasks-per-node 1" in content
@@ -201,7 +202,7 @@ ramble:
             content = f.read()
             # Since it uses the default execute_experiment tpl, no slurm content is present
             assert "#SBATCH" not in content
-            assert "scontrol" not in content
+            assert "scontrol show hostnames" not in content
 
 
 def test_slurm_workflow_variant(request):
