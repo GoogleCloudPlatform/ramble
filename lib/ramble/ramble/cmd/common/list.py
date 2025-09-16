@@ -181,11 +181,10 @@ def html(obj_names, out, object_type):
         if object_type == ramble.repository.ObjectTypes.applications and obj.workloads:
             out.write("<dt>Workloads:</dt>\n")
             out.write("<dd>\n")
-            out.write('<dl class="docutils">\n')
             for when_set in obj.workloads:
                 for workload in obj.workloads[when_set].values():
-                    out.write(f"<dt>{workload.name}</dt>\n")
-                    out.write("<dd>\n")
+                    out.write("<details>\n")
+                    out.write(f"<summary>{workload.name}</summary>\n")
                     out.write('<dl class="docutils">\n')
                     if workload.executables:
                         out.write("<dt>Executables:</dt>\n")
@@ -211,8 +210,7 @@ def html(obj_names, out, object_type):
                         out.write("</dl>\n")
                         out.write("</dd>\n")
                     out.write("</dl>\n")
-                    out.write("</dd>\n")
-            out.write("</dl>\n")
+                    out.write("</details>\n")
             out.write("</dd>\n")
 
         out.write("</dl>\n")
