@@ -53,7 +53,13 @@ def test_list_format_version_json():
 @pytest.mark.maybeslow
 def test_list_format_html():
     output = list("--format", "html")
-    assert '<div class="section" id="hostname">' in output
+    assert '<div class="section" id="gromacs">' in output
+    assert "<dt>Workloads:</dt>" in output
+    assert "<dt>water_gmx50</dt>" in output
+    assert "<dt>Executables:</dt>" in output
+    assert "pre-process, execute-gen" in output
+    assert "<dt>Variables:</dt>" in output
+    assert "<dt>mdrun</dt>" in output
 
 
 @pytest.mark.maybeslow
