@@ -5,6 +5,7 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+from html import escape
 
 from ramble.util import format
 
@@ -78,11 +79,44 @@ class ObjectMixin:
 
         return selected_env_vars
 
-    def format_doc(self, **kwargs):
-        """Doc formatting for Sphinx"""
-        return format.format_doc(self.__doc__, **kwargs)
-
     def add_inmem_fom_value(self, fom_map_key, value):
         """Add an in-memory FOM value"""
         app_inst = self._get_app_inst()
         app_inst.add_inmem_fom_value(fom_map_key, value)
+
+    def _github_url(self, obj_def):
+        """Link to an object file on github."""
+        return (
+            "https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/"
+            + f'{obj_def["dir_name"]}/'
+            + self.name
+            + f'/{obj_def["file_name"]}'
+        )
+
+    def to_html_docs(self, out, obj_def):
+        """Writes HTML documentation for this object."""
+        out.write('<dl class="docutils">\n')
+
+        out.write(f'<dt>Ramble {obj_def["dir_name"]}:</dt>\n')
+        out.write('<dd><ul class="first last simple">\n')
+        out.write(
+            "<li>"
+            '<a class="reference external" '
+            f'href="{self._github_url(obj_def)}">'
+            f'{self.name}/{obj_def["file_name"]}</a>'
+            "</li>\n"
+        )
+        out.write("</ul></dd>\n")
+
+        out.write("<dt>Description:</dt>\n")
+        out.write("<dd>\n")
+        out.write(escape(format.format_doc(self.__doc__, indent=2), True))
+        out.write("\n")
+        out.write("</dd>\n")
+
+        self._format_docs_details(out)
+
+        out.write("</dl>\n")
+
+    def _format_docs_details(self, _out):
+        """Hook for objects to add extra documentation."""

@@ -11,7 +11,6 @@ import argparse
 import math
 import os
 import sys
-from html import escape  # novm
 
 from llnl.util.tty.colify import colify
 
@@ -36,18 +35,6 @@ def name_only(objs, out, object_type):
     if out.isatty():
         logger.msg(f'{len(objs)} {obj_def["dir_name"]}')
     colify(objs, indent=indent, output=out)
-
-
-def github_url(objs, object_type):
-    """Link to an object file on github."""
-    obj_def = ramble.repository.type_definitions[object_type]
-    url = (
-        "https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/"
-        + f'{obj_def["dir_name"]}/'
-        + "{0}"
-        + f'/{obj_def["file_name"]}'
-    )
-    return url.format(objs.name)
 
 
 def rows_for_ncols(elts, ncols):
@@ -144,78 +131,7 @@ def html(obj_names, out, object_type):
         head(2, span_id, obj.name)
         span_id += 1
 
-        out.write('<dl class="docutils">\n')
-
-        # out.write('<dt>Homepage:</dt>\n')
-        # out.write('<dd><ul class="first last simple">\n')
-        # out.write(('<li>'
-        #            '<a class="reference external" href="%s">%s</a>'
-        #            '</li>\n') % (obj.homepage, escape(obj.homepage, True)))
-        # out.write('</ul></dd>\n')
-
-        out.write(f'<dt>Ramble {obj_def["dir_name"]}:</dt>\n')
-        out.write('<dd><ul class="first last simple">\n')
-        out.write(
-            "<li>"
-            '<a class="reference external" '
-            f'href="{github_url(obj, object_type)}">'
-            f'{obj.name}/{obj_def["file_name"]}</a>'
-            "</li>\n"
-        )
-        out.write("</ul></dd>\n")
-
-        # if obj.versions:
-        #     out.write('<dt>Versions:</dt>\n')
-        #     out.write('<dd>\n')
-        #     out.write(', '.join(
-        #         str(v) for v in reversed(sorted(obj.versions))))
-        #     out.write('\n')
-        #     out.write('</dd>\n')
-
-        out.write("<dt>Description:</dt>\n")
-        out.write("<dd>\n")
-        out.write(escape(obj.format_doc(indent=2), True))
-        out.write("\n")
-        out.write("</dd>\n")
-
-        if object_type == ramble.repository.ObjectTypes.applications and obj.workloads:
-            out.write("<dt>Workloads:</dt>\n")
-            out.write("<dd>\n")
-            out.write('<dl class="docutils">\n')
-            for when_set in obj.workloads:
-                for workload in obj.workloads[when_set].values():
-                    out.write(f"<dt>{workload.name}</dt>\n")
-                    out.write("<dd>\n")
-                    out.write('<dl class="docutils">\n')
-                    if workload.executables:
-                        out.write("<dt>Executables:</dt>\n")
-                        out.write("<dd>\n")
-                        out.write(", ".join(workload.executables))
-                        out.write("</dd>\n")
-                    if workload.inputs:
-                        out.write("<dt>Inputs:</dt>\n")
-                        out.write("<dd>\n")
-                        out.write(", ".join(workload.inputs))
-                        out.write("</dd>\n")
-                    if workload.variables:
-                        out.write("<dt>Variables:</dt>\n")
-                        out.write("<dd>\n")
-                        out.write('<dl class="docutils">\n')
-                        for var_when_set in workload.variables:
-                            for var in workload.variables[var_when_set]:
-                                out.write(f"<dt>{var.name}</dt>\n")
-                                if var.description:
-                                    out.write("<dd>\n")
-                                    out.write(escape(var.description, True))
-                                    out.write("</dd>\n")
-                        out.write("</dl>\n")
-                        out.write("</dd>\n")
-                    out.write("</dl>\n")
-                    out.write("</dd>\n")
-            out.write("</dl>\n")
-            out.write("</dd>\n")
-
-        out.write("</dl>\n")
+        obj.to_html_docs(out, obj_def)
 
         out.write('<hr class="docutils"/>\n')
         out.write("</div>\n")

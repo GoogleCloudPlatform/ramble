@@ -16,6 +16,7 @@ import shutil
 import stat
 import string
 import time
+from html import escape
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -3353,3 +3354,39 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self._objects():
             logger.debug(f"Setting required variables for {obj.name}")
             self.keywords.update_keys(obj.required_variables)
+
+    def _format_docs_details(self, out):
+        if self.workloads:
+            out.write("<dt>Workloads:</dt>\n")
+            out.write("<dd>\n")
+            for when_set in self.workloads:
+                for workload in self.workloads[when_set].values():
+                    out.write("<details>\n")
+                    out.write(f"<summary>{workload.name}</summary>\n")
+                    out.write('<dl class="docutils">\n')
+                    if workload.executables:
+                        out.write("<dt>Executables:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write(", ".join(workload.executables))
+                        out.write("</dd>\n")
+                    if workload.inputs:
+                        out.write("<dt>Inputs:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write(", ".join(workload.inputs))
+                        out.write("</dd>\n")
+                    if workload.variables:
+                        out.write("<dt>Variables:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write('<dl class="docutils">\n')
+                        for var_when_set in workload.variables:
+                            for var in workload.variables[var_when_set]:
+                                out.write(f"<dt>{var.name}</dt>\n")
+                                if var.description:
+                                    out.write("<dd>\n")
+                                    out.write(escape(var.description, True))
+                                    out.write("</dd>\n")
+                        out.write("</dl>\n")
+                        out.write("</dd>\n")
+                    out.write("</dl>\n")
+                    out.write("</details>\n")
+            out.write("</dd>\n")
