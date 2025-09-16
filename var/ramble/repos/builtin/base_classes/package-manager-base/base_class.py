@@ -119,6 +119,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         """
         return os.path.join(workspace.software_dir, self.name)
 
+    @property
     def environment_required(self):
         app_inst = self.app_inst
         if hasattr(app_inst, "software_specs"):
@@ -145,6 +146,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         """
         return pkg.spec
 
+    @property
     def spec_prefix(self):
         """Return this package manager's spec prefix
 
@@ -274,6 +276,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         an experiment's execution environment"""
         return []
 
+    @property
     def environment_unload_commands(self) -> List[str]:
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""

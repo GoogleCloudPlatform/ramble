@@ -123,6 +123,7 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
                 # Skip a particular entry if any of the vars are not defined
                 continue
 
+    @property
     def template_render_vars(self):
         """Define variables to be used in template rendering"""
         return {}

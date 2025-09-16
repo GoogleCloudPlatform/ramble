@@ -81,7 +81,7 @@ class SpackLightweight(PackageManagerBase):
                 self.keywords.env_name
             )
 
-            require_env = self.environment_required()
+            require_env = self.environment_required
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
                 app_context, app_inst.expander, self, require=require_env
@@ -164,7 +164,7 @@ class SpackLightweight(PackageManagerBase):
             env_context = app_inst.expander.expand_var_name(
                 self.keywords.env_name
             )
-            require_env = self.environment_required()
+            require_env = self.environment_required
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
                 env_context, app_inst.expander, self, require=require_env
@@ -346,7 +346,7 @@ class SpackLightweight(PackageManagerBase):
                 workspace.software_mirror_stats.errors.add(i)
 
         except RunnerError as e:
-            if self.environment_required():
+            if self.environment_required:
                 logger.die(e)
             pass
 
@@ -355,7 +355,7 @@ class SpackLightweight(PackageManagerBase):
     def _push_to_spack_cache(self, workspace, app_inst=None):
 
         # Test if experiment requires an environment
-        env_required = self.environment_required()
+        env_required = self.environment_required
 
         env_path = app_inst.expander.env_path
         cache_tupl = ("push-to-cache", env_path)
@@ -374,7 +374,7 @@ class SpackLightweight(PackageManagerBase):
                 self.keywords.env_name
             )
             software_envs = workspace.software_environments
-            require_env = self.environment_required()
+            require_env = self.environment_required
             software_env = software_envs.render_environment(
                 app_context, app_inst.expander, self, require=require_env
             )
@@ -392,7 +392,7 @@ class SpackLightweight(PackageManagerBase):
             # push_to_spack_cache deactivates env, this is here for safety.
             self.runner.deactivate()
         except RunnerError as e:
-            if self.environment_required():
+            if self.environment_required:
                 logger.die(e)
             pass
 
@@ -484,7 +484,7 @@ class SpackLightweight(PackageManagerBase):
             self.runner.deactivate()
 
         except RunnerError as e:
-            if self.environment_required():
+            if self.environment_required:
                 logger.die(e)
             pass
 

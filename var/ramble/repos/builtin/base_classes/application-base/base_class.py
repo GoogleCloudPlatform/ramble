@@ -227,6 +227,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         ramble.util.directives.define_directive_methods(self)
 
+    @property
     def experiment_lock(self):
         """Create a lock for the experiment directory, and return it"""
         if self._exp_lock is None:
@@ -489,7 +490,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._env_variable_sets = env_variable_sets.copy()
 
         new_env_vars = {}
-        for env_var in self.selected_environment_variables().values():
+        for env_var in self.selected_environment_variables.values():
             action = "set"
             value = env_var.value
 
@@ -570,7 +571,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Define missing variables
         for _, obj in self._objects():
-            for var, val in obj.selected_variables().items():
+            for var, val in obj.selected_variables.items():
                 if var not in self.variables:
                     self.define_variable(var, val.default)
 
@@ -738,7 +739,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             var_objs.append(self.workflow_manager)
 
         for var_obj in var_objs:
-            for var in var_obj.selected_variables().values():
+            for var in var_obj.selected_variables.values():
                 if var.name not in self.variables:
                     self.variables[var.name] = var.default
 
@@ -1130,7 +1131,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self._modifier_instances.append(mod_inst)
 
             # Add this modifiers required variables for validation
-            self.keywords.update_keys(mod_inst.get_required_variables())
+            self.keywords.update_keys(mod_inst.required_variables)
 
         for mod_inst in self._modifier_instances:
             # Ensure no expand vars are set correctly for modifiers
@@ -1144,7 +1145,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.object_variants.merge_multi_value_variants(obj_variants)
 
             # Define any missing modifier variables
-            for var, val in mod_inst.selected_variables().items():
+            for var, val in mod_inst.selected_variables.items():
                 if var not in self.variables:
                     self.define_variable(var, val.default)
 
@@ -1306,6 +1307,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
             self.variables[input_conf["input_name"]] = input_path
 
+    @property
     def selected_variables(self):
         """Extract all variables which would be included based
         on the current variants. This overrides the one defined in
@@ -1331,6 +1333,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return wl_vars
 
+    @property
     def selected_environment_variables(self):
         """Extract all environment variables which would be included based
         on the current variants. This overrides the one defined in
@@ -1363,7 +1366,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return selected_env_vars
 
-    def get_environment_variable_sets(self):
+    @property
+    def environment_variable_sets(self):
         """Get environment variable sets for all objects.
 
         Returns:
@@ -1381,9 +1385,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for env_var_obj in env_var_objs:
             obj_env_vars = {}
-            for (
-                env_var
-            ) in env_var_obj.selected_environment_variables().values():
+            for env_var in env_var_obj.selected_environment_variables.values():
                 obj_env_vars[env_var.name] = env_var.value
 
             if obj_env_vars:
@@ -1900,7 +1902,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         _check_shell_support(self)
 
-        exp_lock = self.experiment_lock()
+        exp_lock = self.experiment_lock
 
         self._define_commands(self._executable_graph, self.success_list)
         self._define_formatted_executables()
@@ -2090,7 +2092,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     }
                 )
 
-        with lk.WriteTransaction(self.experiment_lock()):
+        with lk.WriteTransaction(self.experiment_lock):
             with open(inventory_file, "w+") as f:
                 spack.util.spack_json.dump(self.hash_inventory, f)
 
@@ -2281,7 +2283,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         files, f_defs, inmem_defs = self._analysis_dicts(criteria_list)
 
-        exp_lock = self.experiment_lock()
+        exp_lock = self.experiment_lock
 
         fom_values = {}
         # Iterate over files. We already know they exist
@@ -3006,7 +3008,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         )
 
         if os.path.isfile(status_path):
-            exp_lock = self.experiment_lock()
+            exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
@@ -3062,7 +3064,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         status_path = os.path.join(exp_dir, self._status_file_name)
 
         if os.path.exists(exp_dir):
-            exp_lock = self.experiment_lock()
+            exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, "w+") as f:
                     spack.util.spack_json.dump(status_data, f)
@@ -3164,7 +3166,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         )
 
         # Process environment variable actions
-        for env_var_set in self.get_environment_variable_sets():
+        for env_var_set in self.environment_variable_sets:
             for action, conf in env_var_set.items():
                 (env_cmds, _) = action_funcs[action](
                     conf, self.expander, set(), shell=shell
@@ -3302,8 +3304,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     self.keywords.update_keys({old_var: var_attr})
                 self.variables[var_name] = tpl_config["dest_path"]
                 self.keywords.update_keys({var_name: var_attr})
-            if callable(getattr(obj, "template_render_vars", None)):
-                render_vars = obj.template_render_vars()
+            if hasattr(obj, "template_render_vars"):
+                render_vars = obj.template_render_vars
                 self.variables.update(render_vars)
                 for name in render_vars.keys():
                     self.keywords.update_keys({name: var_attr})
@@ -3350,4 +3352,4 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Set required variables from all objects"""
         for _, obj in self._objects():
             logger.debug(f"Setting required variables for {obj.name}")
-            self.keywords.update_keys(obj.get_required_variables())
+            self.keywords.update_keys(obj.required_variables)

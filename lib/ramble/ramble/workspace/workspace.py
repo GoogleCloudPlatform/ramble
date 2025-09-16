@@ -1355,7 +1355,7 @@ ramble:
                 # Do not define missing required variables that are defined in
                 # the associated package and workflow managers.
                 # TODO: should include consideration for when clause, right now
-                # the `selected_variables` method cannot be used due to no associated
+                # the `selected_variables` property cannot be used due to no associated
                 # expander at this stage.
                 if key not in workspace_vars and key not in obj_var_names:
                     vars_dict[key] = ""
@@ -1465,7 +1465,7 @@ ramble:
             app_inst.build_modifier_instances()
             app_inst.add_expand_vars(self)
             if app_inst.package_manager is not None:
-                pkgman_prefixes.add(app_inst.package_manager.spec_prefix())
+                pkgman_prefixes.add(app_inst.package_manager.spec_prefix)
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
@@ -1474,7 +1474,7 @@ ramble:
             env_name = app_inst.expander.expand_var(env_name_str)
 
             spec_prefix = (
-                f"{app_inst.package_manager.spec_prefix()}" if len(pkgman_prefixes) > 1 else ""
+                f"{app_inst.package_manager.spec_prefix}" if len(pkgman_prefixes) > 1 else ""
             )
 
             if app_inst.package_manager is None:

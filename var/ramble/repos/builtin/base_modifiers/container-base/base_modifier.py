@@ -77,7 +77,7 @@ class ContainerBase(BasicModifier):
             path = None
             # If using spack, load spack environment before getting container runtime exec path
             if check_software_env and app_inst.package_manager is not None:
-                if app_inst.package_manager.spec_prefix() == "spack":
+                if app_inst.package_manager.spec_prefix == "spack":
                     app_inst.package_manager.runner.activate()
                     _, base = app_inst.package_manager.runner.get_package_path(
                         runtime
