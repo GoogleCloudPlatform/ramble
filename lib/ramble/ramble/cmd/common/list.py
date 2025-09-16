@@ -177,6 +177,44 @@ def html(obj_names, out, object_type):
         out.write(escape(obj.format_doc(indent=2), True))
         out.write("\n")
         out.write("</dd>\n")
+
+        if object_type == ramble.repository.ObjectTypes.applications and obj.workloads:
+            out.write("<dt>Workloads:</dt>\n")
+            out.write("<dd>\n")
+            out.write('<dl class="docutils">\n')
+            for when_set in obj.workloads:
+                for workload in obj.workloads[when_set].values():
+                    out.write(f"<dt>{workload.name}</dt>\n")
+                    out.write("<dd>\n")
+                    out.write('<dl class="docutils">\n')
+                    if workload.executables:
+                        out.write("<dt>Executables:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write(", ".join(workload.executables))
+                        out.write("</dd>\n")
+                    if workload.inputs:
+                        out.write("<dt>Inputs:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write(", ".join(workload.inputs))
+                        out.write("</dd>\n")
+                    if workload.variables:
+                        out.write("<dt>Variables:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write('<dl class="docutils">\n')
+                        for var_when_set in workload.variables:
+                            for var in workload.variables[var_when_set]:
+                                out.write(f"<dt>{var.name}</dt>\n")
+                                if var.description:
+                                    out.write("<dd>\n")
+                                    out.write(escape(var.description, True))
+                                    out.write("</dd>\n")
+                        out.write("</dl>\n")
+                        out.write("</dd>\n")
+                    out.write("</dl>\n")
+                    out.write("</dd>\n")
+            out.write("</dl>\n")
+            out.write("</dd>\n")
+
         out.write("</dl>\n")
 
         out.write('<hr class="docutils"/>\n')
