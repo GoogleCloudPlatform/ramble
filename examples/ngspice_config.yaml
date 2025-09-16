@@ -1,0 +1,55 @@
+# This is a ramble workspace config file.
+#
+# It describes the experiments, the software stack
+# and all variables required for ramble to configure
+# experiments.
+# As an example, experiments can be defined as follows.
+# applications:
+#   hostname: # Application name, as seen in `ramble list`
+#     variables:
+#       iterations: '5'
+#     workloads:
+#       serial: # Workload name, as seen in `ramble info <app>`
+#         variables:
+#           type: 'test'
+#         experiments:
+#           single_node: # Arbitrary experiment name
+#             variables:
+#               n_ranks: '{processes_per_node}'
+
+ramble:
+  variants:
+    package_manager: spack
+  env_vars:
+    set:
+      OMP_NUM_THREADS: '{n_threads}'
+  variables:
+    processes_per_node: 16
+    mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
+    batch_submit: '{execute_experiment}'
+  applications:
+    ngspice:
+      workloads:
+        c1355:
+          experiments:
+            c1355_single_rank:
+              variables:
+                n_ranks: 1
+        c3540_ann:
+          experiments:
+            c3540_ann_single_rank:
+              variables:
+                n_ranks: 1
+        
+  software:
+    packages:
+      gcc12:
+        pkg_spec: gcc@12.3.0
+        compiler_spec: gcc@12.3.0
+      ngspice:
+        pkg_spec: ngspice@44  build=bin
+        compiler: gcc12
+    environments:
+      ngspice:
+        packages:
+        - ngspice
