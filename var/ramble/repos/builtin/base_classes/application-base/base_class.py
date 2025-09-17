@@ -3372,7 +3372,26 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     if workload.inputs:
                         out.write("<dt>Inputs:</dt>\n")
                         out.write("<dd>\n")
-                        out.write(", ".join(workload.inputs))
+                        all_input_defs = {}
+                        for input_conf in self.inputs.values():
+                            for (
+                                input_name,
+                                input_def,
+                            ) in input_conf.items():
+                                if input_name not in all_input_defs:
+                                    all_input_defs[input_name] = input_def
+
+                        out.write('<dl class="docutils">\n')
+                        for input_name in workload.inputs:
+                            out.write(f"<dt>{escape(input_name, True)}</dt>\n")
+                            input_def = all_input_defs.get(input_name)
+                            if input_def and input_def.get("description"):
+                                out.write("<dd>\n")
+                                out.write(
+                                    escape(input_def["description"], True)
+                                )
+                                out.write("</dd>\n")
+                        out.write("</dl>\n")
                         out.write("</dd>\n")
                     if workload.variables:
                         out.write("<dt>Variables:</dt>\n")

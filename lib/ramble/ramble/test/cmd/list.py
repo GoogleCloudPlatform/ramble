@@ -56,11 +56,14 @@ def test_list_format_html():
     assert '<div class="section" id="gromacs">' in output
     assert "<dt>Workloads:</dt>" in output
     assert "<details>" in output
-    assert "<summary>water_gmx50</summary>" in output
+    assert "<summary>lignocellulose</summary>" in output
     assert "<dt>Executables:</dt>" in output
-    assert "pre-process, execute-gen" in output
+    assert "execute" in output
     assert "<dt>Variables:</dt>" in output
     assert "<dt>mdrun</dt>" in output
+    # Assert on input_file descriptions
+    assert "<dt>lignocellulose</dt>" in output
+    assert "A model of cellulose and lignocellulosic biomass in an aqueous solution" in output
     assert "</details>" in output
 
 
