@@ -421,6 +421,13 @@ class Openfoam(ExecutableApplication):
         file="{experiment_run_dir}/log.simpleFoam",
     )
 
+    success_criteria(
+        "nan",
+        mode="string",
+        anti_match=r".*[+-=\s]nan",
+        file="{experiment_run_dir}/log.simpleFoam",
+    )
+
     def _prepare_analysis(self, workspace, app_inst=None):
         conf_path = self.expander.expand_var(self.config_file)
 
