@@ -424,7 +424,7 @@ class Openfoam(ExecutableApplication):
     success_criteria(
         "nan",
         mode="string",
-        anti_match=r".*[+-=\s]nan",
+        anti_match=r".*?[+-=\s]nan",
         file="{experiment_run_dir}/log.simpleFoam",
     )
 
