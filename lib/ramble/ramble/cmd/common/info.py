@@ -344,8 +344,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         # Otherwise, print it as a raw string.
         if isinstance(to_print, list):
             if isinstance(next(iter(internal_attr)), dict):
+                to_print = []
                 for attr_dict in internal_attr:
-                    to_print = list(attr_dict.keys())
+                    to_print.extend(list(attr_dict.keys()))
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {str(to_print)}\n")

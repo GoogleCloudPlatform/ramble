@@ -243,7 +243,11 @@ def _get_modifier_outputs():
             ["test var modified", "['+variable_modification_active', 'info_mode=test']"],
         ),
         ("executable_modifiers", "exec_modifier_name", "+exec_modifier_active"),
-        ("env_var_modifications", "", ""),  # TODO: Fix this test once info is fixed
+        (
+            "env_var_modifications",
+            ["ENV_VAR_MOD", "APP_ENV_VAR"],
+            ["ENV_VAR_MOD_SET", "info_mode=info-mode", "APPEND", "unset", "PREPEND"],
+        ),
         (
             "package_manager_requirements",
             "",
