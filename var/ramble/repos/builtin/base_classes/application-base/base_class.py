@@ -226,6 +226,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.workflow_manager = None
 
+        self.result = ExperimentResult(self)
+
         ramble.util.directives.define_directive_methods(self)
 
     @property
@@ -2261,6 +2263,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             logger.warn(
                 f"Experiment has status {self.get_status()}. Skipping analysis..\n"
             )
+            self.result.finalize()
             return
 
         def format_context(context_match, context_format):
@@ -2451,7 +2454,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.set_status(status)
 
-        self._init_result()
+        self.result.finalize()
 
         for criteria_obj in criteria_list.all_criteria():
             if criteria_obj.ok():
@@ -2585,7 +2588,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         else:
             self.set_status(status=ExperimentStatus.FAILED)
 
-        self._init_result()
+        self.result.finalize()
 
         logger.debug(
             f"Calculating statistics for {self.repeats.n_repeats} repeats of {base_exp_name}"
@@ -2739,10 +2742,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.result.contexts = results
 
         workspace.insert_result(self.result.to_dict(), first_repeat_exp)
-
-    def _init_result(self):
-        if self.result is None:
-            self.result = ExperimentResult(self)
 
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""

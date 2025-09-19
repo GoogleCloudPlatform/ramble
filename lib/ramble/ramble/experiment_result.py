@@ -47,27 +47,38 @@ class ExperimentResult:
 
     def __init__(self, app_inst):
         """Build up the result from the given app instance"""
+        self._app_inst = app_inst
+        self.name = None
+        self.status = ExperimentStatus.UNKNOWN
+        self.n_repeats = None
+        self.experiment_chain = []
+        self.tags = []
+        self.contexts = []
+        self.success_criteria = {}
+        self.software = {}
+        self.keys = {}
+        self.raw_variables = {}
+        self.variables = {}
+        self.variants = []
+
+    def finalize(self):
+        app_inst = self._app_inst
         self.name = app_inst.expander.experiment_namespace
 
         self.status = app_inst.get_ramble_status()
 
-        # Most libs can handle this str enum, but convert it to help out
-        self.status = self.status.value
-
         self.n_repeats = app_inst.repeats.n_repeats
         self.experiment_chain = app_inst.chain_order.copy()
         self.tags = list(app_inst.experiment_tags)
-        self.contexts = []
-        self.success_criteria = {}
-        self.software = {}
 
-        self.keys = {}
+        # Most libs can handle this str enum, but convert it to help out
+        self.status = self.status.value
+
         for key in app_inst.keywords.keys:
             if app_inst.keywords.is_key_level(key):
                 self.keys[key] = app_inst.expander.expand_var_name(key)
 
         self.raw_variables = {}
-        self.variables = {}
         for var, val in app_inst.variables.items():
             self.raw_variables[var] = val
             if var not in app_inst.keywords.keys or not app_inst.keywords.is_key_level(var):
@@ -91,6 +102,10 @@ class ExperimentResult:
         output = {}
         obj_keys = {}
 
+        # Remove app_inst to prevent pickle issues
+        app_inst = self._app_inst
+        delattr(self, "_app_inst")
+
         obj_dict = copy.deepcopy(self.__dict__)
 
         if "keys" in obj_dict:
@@ -101,5 +116,8 @@ class ExperimentResult:
                 output.update(obj_keys)
             else:
                 output[output_val] = obj_dict[lookup_key]
+
+        # Add app_inst back into object
+        self._app_inst = app_inst
 
         return output
