@@ -11,6 +11,7 @@ from typing import Optional
 import ramble.definitions.requirements
 import ramble.language.language_helpers
 import ramble.language.shared_language
+from ramble.definitions.variables import EnvironmentVariableModifications
 from ramble.language.language_base import DirectiveError
 
 
@@ -247,35 +248,20 @@ def env_var_modification(
         if when_set not in mod.env_var_modifications:
             mod.env_var_modifications[when_set] = {}
 
-        # Set requires a dict, everything else requires a list.
-        if method == "set":
-            if method not in mod.env_var_modifications[when_set]:
-                mod.env_var_modifications[when_set][method] = {}
-            mod.env_var_modifications[when_set][method][name] = modification
-            return
-
-        if method not in mod.env_var_modifications[when_set]:
-            mod.env_var_modifications[when_set][method] = []
-
-        # If unset, exit early
-        if method == "unset":
-            mod.env_var_modifications[when_set][method].append(name)
-            return
-
-        append_dict = {}
-        separator = ":"
-        if method == "append" and "separator" in kwargs:
-            separator = kwargs["separator"]
-
-        append_name = "paths"
-        if separator != ":":
-            append_name = "vars"
-            append_dict["var-separator"] = separator
-
-        append_dict[append_name] = {}
-        append_dict[append_name][name] = modification
-
-        mod.env_var_modifications[when_set][method].append(append_dict.copy())
+        if name not in mod.env_var_modifications[when_set]:
+            mod.env_var_modifications[when_set][name] = EnvironmentVariableModifications(
+                name=name,
+                modification=modification,
+                method=method,
+                when=when_list,
+                **kwargs,
+            )
+        else:
+            mod.env_var_modifications[when_set][name].add_modification(
+                modification=modification,
+                method=method,
+                **kwargs,
+            )
 
     return _env_var_modification
 
