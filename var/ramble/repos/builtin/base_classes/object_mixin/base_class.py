@@ -13,6 +13,32 @@ from ramble.util import format
 class ObjectMixin:
     """A mixin class for Ramble objects"""
 
+    def __str__(self):
+        return self.name
+
+    def copy(self):
+        """Generic copy method for Ramble objects."""
+        new_copy = type(self)(self._file_path)
+        if hasattr(self, "_verbosity"):
+            new_copy._verbosity = self._verbosity
+        return new_copy
+
+    def all_pipeline_phases(self, pipeline):
+        """Iterator over all phases within a specified pipeline
+
+        Iterate over all phases (and their graph nodes) within a pipeline.
+
+        Args:
+            pipeline (str): Name of pipeline to extract phases for
+
+        Yields:
+            phase_name (str): Name of phase
+            phase_note (ramble.util.graph.GraphNode): Object representing a
+                node in the phase graph
+        """
+        if pipeline in self.phase_definitions:
+            yield from self.phase_definitions[pipeline].items()
+
     def _get_app_inst(self):
         # This helper gets the app_inst for different object types
         if hasattr(self, "app_inst"):

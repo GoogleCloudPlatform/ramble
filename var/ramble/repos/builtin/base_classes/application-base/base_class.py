@@ -684,9 +684,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if node in phases:
                 yield node.key
 
-    def __str__(self):
-        return self.name
-
     def print_vars(self, header="", vars_to_print=None, indent=""):
         print_vars = vars_to_print
         if not print_vars:

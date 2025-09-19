@@ -74,10 +74,9 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
     def copy(self):
         """Deep copy a modifier instance"""
-        new_copy = type(self)(self._file_path)
+        new_copy = super().copy()
         new_copy._on_executables = self._on_executables.copy()
         new_copy._usage_mode = self._usage_mode
-        new_copy._verbosity = self._verbosity
 
         return new_copy
 
@@ -175,9 +174,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         """
         pass
 
-    def __str__(self):
-        return self.name
-
     def modded_variables(self, app, extra_vars=None):
         mods = {}
 
@@ -264,10 +260,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                 continue
 
             yield from self.package_manager_requirements[when_set]
-
-    def all_pipeline_phases(self, pipeline):
-        if pipeline in self.phase_definitions:
-            yield from self.phase_definitions[pipeline].items()
 
     def no_expand_vars(self):
         """Iterator over non-expandable variables in current mode
