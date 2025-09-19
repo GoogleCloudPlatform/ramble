@@ -127,12 +127,3 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
     def template_render_vars(self):
         """Define variables to be used in template rendering"""
         return {}
-
-    def copy(self):
-        """Deep copy a workflow manager instance"""
-        new_copy = type(self)(self._file_path)
-
-        return new_copy
-
-    def __str__(self):
-        return self.name

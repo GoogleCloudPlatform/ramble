@@ -99,13 +99,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         # Turn `runner` into a property for delayed init
         return None
 
-    def copy(self):
-        """Deep copy a package manager instance"""
-        new_copy = type(self)(self._file_path)
-        new_copy._verbosity = self._verbosity
-
-        return new_copy
-
     def package_manager_dir(self, workspace):
         """Get the path to the package manager's software environment directory
 
@@ -155,25 +148,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         """
         prefix = self._spec_prefix or self.name
         return spack.util.naming.spack_module_to_python_module(prefix)
-
-    def __str__(self):
-        return self.name
-
-    def all_pipeline_phases(self, pipeline):
-        """Iterator over all phases within a specified pipeline
-
-        Iterate over all phases (and their graph nodes) within a pipeline.
-
-        Args:
-            pipeline (str): Name of pipeline to extract phases for
-
-        Yields:
-            phase_name (str): Name of phase
-            phase_note (ramble.util.graph.GraphNode): Object representing a
-                node in the phase graph
-        """
-        if pipeline in self.phase_definitions:
-            yield from self.phase_definitions[pipeline].items()
 
     def set_application(self, app_inst):
         """Add an internal reference to the application instance this package
