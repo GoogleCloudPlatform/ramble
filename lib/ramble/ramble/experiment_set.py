@@ -489,6 +489,8 @@ class ExperimentSet:
         for tracking_vars, repeats in renderer.render_objects(
             tracking_group, exclude_where=exclude_where, ignore_used=False, fatal=False
         ):
+            if repeats.repeat_index:
+                continue
             app_inst = self._prepare_experiment(
                 workload_template_name,
                 experiment_template_name,
