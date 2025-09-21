@@ -5,6 +5,7 @@
 # except according to those terms.
 
 import os
+import sys
 
 import pytest
 
@@ -143,14 +144,18 @@ def test_spack_push_to_cache(workspace_name, mock_applications):
         global_args=global_args,
     )
 
-    # Add a gcc compiler package
+    # Add a compiler package
+    if sys.platform == "darwin":
+        compiler_spec = "apple-clang"
+    else:
+        compiler_spec = "gcc"
     workspace(
         "manage",
         "software",
         "--pkg",
-        "gcc",
+        "comp",
         "--spec",
-        "gcc",
+        compiler_spec,
         global_args=global_args,
     )
 
@@ -163,7 +168,7 @@ def test_spack_push_to_cache(workspace_name, mock_applications):
         "--spec",
         "zlib",
         "--compiler",
-        "gcc",
+        "comp",
         global_args=global_args,
     )
 
