@@ -115,7 +115,7 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
 
         # Apply any existing variables in the group to the workload
         for workload in workloads:
-            for when_set in app.workloads.keys():
+            for when_set in app.workloads:
                 if workload in app.workloads[when_set]:
                     if name in app.workload_group_vars:
                         for var in app.workload_group_vars[name]:

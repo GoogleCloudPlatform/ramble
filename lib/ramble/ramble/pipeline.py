@@ -641,13 +641,13 @@ class LogsPipeline(Pipeline):
             for log in analysis_logs:
                 logger.all_msg(f"    - {log}")
 
-            print_archive_files(app_inst, "application", app_inst.archive_patterns.keys())
+            print_archive_files(app_inst, "application", app_inst.archive_patterns)
             if app_inst.package_manager:
                 pm_name = app_inst.package_manager.name
                 print_archive_files(
                     app_inst,
                     f"package manager {pm_name}",
-                    app_inst.package_manager.archive_patterns.keys(),
+                    app_inst.package_manager.archive_patterns,
                 )
 
             for mod in app_inst._modifier_instances:
