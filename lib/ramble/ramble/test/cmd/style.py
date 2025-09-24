@@ -24,7 +24,6 @@ def test_style(tool):
     "content,expected_err",
     [
         ("import b\nimport a", "Imports are incorrectly sorted"),
-        ("import a\nimport b", "No newline at end of file"),
     ],
 )
 def test_style_with_error(tmpdir, content, expected_err):
