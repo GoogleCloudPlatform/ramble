@@ -869,8 +869,8 @@ def add_from_file(filename, scope=None):
 
     # update all sections from config dict
     # We have to iterate on keys to keep overrides from the file
-    for section in data.keys():
-        if section in section_schemas.keys():
+    for section in data:
+        if section in section_schemas:
             # Special handling for compiler scope difference
             # Has to be handled after we choose a section
             if scope is None:

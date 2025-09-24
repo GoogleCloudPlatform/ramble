@@ -166,12 +166,12 @@ def _unpack_when_set_if_needed(internal_attr: dict):
         if isinstance(first_val, dict):
             # unpack to a list of dicts so dicts with same keys don't overwrite
             unpacked_dict = []
-            for when_key, inner_dict in internal_attr.items():
+            for inner_dict in internal_attr.values():
                 unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
-            for when_key, inner_list in internal_attr.items():
+            for inner_list in internal_attr.values():
                 unpacked_list.extend(inner_list)
             return unpacked_list
         else:
@@ -291,8 +291,8 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
 
     indentation = " " * 4
 
-    for _, context_dict in internal_attr.items():
-        for _, fom_dict in context_dict.items():
+    for context_dict in internal_attr.values():
+        for fom_dict in context_dict.values():
             if not verbose:
                 to_print = list(fom_dict.keys())
 

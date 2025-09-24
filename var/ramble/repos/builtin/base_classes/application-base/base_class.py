@@ -500,7 +500,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             add = True
             for env_var_set in self._env_variable_sets:
                 if action in env_var_set:
-                    if env_var.name in env_var_set[action].keys():
+                    if env_var.name in env_var_set[action]:
                         add = False
 
             if add:

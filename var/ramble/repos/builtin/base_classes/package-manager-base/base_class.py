@@ -66,7 +66,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
 
         if getattr(self, "families", None) is None:
             self.families = ramble.definitions.families.Families(
-                self.origin_type, list(self.class_families.keys())
+                self.origin_type, list(self.class_families)
             )
 
         ramble.util.class_attributes.convert_class_attributes(self)

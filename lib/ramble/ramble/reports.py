@@ -124,7 +124,7 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
                     exp_copy.pop("CONTEXTS")
                     exp_copy[ReportVars.CONTEXT.value] = context["name"]
                     for name, val in fom.items():
-                        if name in _FOM_DICT_MAPPING.keys():
+                        if name in _FOM_DICT_MAPPING:
                             exp_copy[_FOM_DICT_MAPPING[name]] = val
                         elif name == "fom_type":
                             exp_copy["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
