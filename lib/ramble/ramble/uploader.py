@@ -99,9 +99,16 @@ class Experiment:
         import copy
 
         j = copy.deepcopy(self.__dict__)
+        data_copy = copy.deepcopy(self.data)
 
-        j["foms"] = json.dumps(self.foms)
-        j["data"] = json.dumps(self.data, default=vars)
+        # These two fields will be deprecated in an upcoming release.
+        # For now we avoid setting them to a reduced set of information to
+        # maintain backwards database compatibiilty but also avoiding
+        # large un-needed uploads
+        data_copy["CONTEXTS"] = []
+
+        j["foms"] = json.dumps(None)
+        j["data"] = json.dumps(data_copy, default=vars)
         return j
 
 
