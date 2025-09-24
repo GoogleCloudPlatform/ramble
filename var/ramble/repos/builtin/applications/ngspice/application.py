@@ -51,7 +51,7 @@ class Ngspice(ExecutableApplication):
         use_mpi=True,
     )
 
-    all_workloads = [
+    normal_workloads = [
         "c1355",
         "c1908",
         "c2670",
@@ -62,7 +62,7 @@ class Ngspice(ExecutableApplication):
         "c7552",
         "c880",
     ]
-    for normal_workload in all_workloads:
+    for normal_workload in normal_workloads:
         workload(
             normal_workload,
             executables=["execute"],
@@ -81,7 +81,16 @@ class Ngspice(ExecutableApplication):
             workloads=[normal_workload],
         )
 
-    for ann_workload in all_workloads:
+    ann_workloads = [
+        "c1355",
+        "c1908",
+        "c2670",
+        "c3540",
+        "c499",
+        "c6288",
+        "c880",
+    ]
+    for ann_workload in ann_workloads:
         workload(
             ann_workload + "_ann",
             executables=["execute"],
