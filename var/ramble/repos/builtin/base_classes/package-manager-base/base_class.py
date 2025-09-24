@@ -115,15 +115,16 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     @property
     def environment_required(self):
         app_inst = self.app_inst
-        if hasattr(app_inst, "software_specs"):
-            for definitions in app_inst.software_specs.values():
-                for info in definitions:
-                    if self.app_inst.expander.satisfies(
-                        info.when, variant_set=self.object_variants
-                    ):
-                        return True
+        if not hasattr(app_inst, "software_specs"):
+            return False
 
-        return False
+        return any(
+            self.app_inst.expander.satisfies(
+                info.when, variant_set=self.object_variants
+            )
+            for definitions in app_inst.software_specs.values()
+            for info in definitions
+        )
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg

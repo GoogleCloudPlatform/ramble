@@ -52,17 +52,14 @@ class ObjectMixin:
     @property
     def required_variables(self):
         """Get all the required variables based on the mode and when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.satisfy_when(var_props["when"]):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra when prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars
+        if not self.required_vars:
+            return {}
+
+        return {
+            var_name: {k: var_props[k] for k in var_props.keys() - {"when"}}
+            for var_name, var_props in self.required_vars.items()
+            if self.satisfy_when(var_props["when"])
+        }
 
     @property
     def selected_variables(self):
@@ -72,15 +69,12 @@ class ObjectMixin:
         Returns:
             (dict) Keys are variable names, values are variable instances
         """
-
-        selected_vars = {}
-        for when_key, var_list in self.object_variables.items():
-            if not self.satisfy_when(when_key):
-                continue
-
-            for var in var_list:
-                selected_vars[var.name] = var
-        return selected_vars
+        return {
+            var.name: var
+            for when_key, var_list in self.object_variables.items()
+            if self.satisfy_when(when_key)
+            for var in var_list
+        }
 
     @property
     def selected_environment_variables(self):
@@ -91,19 +85,12 @@ class ObjectMixin:
             (dict) Keys are environment variable names, values are environment
             variable instances
         """
-
-        selected_env_vars = {}
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.satisfy_when(when_key):
-                continue
-
-            for env_var in env_var_list:
-                selected_env_vars[env_var.name] = env_var
-
-        return selected_env_vars
+        return {
+            env_var.name: env_var
+            for when_key, env_var_list in self.object_environment_variables.items()
+            if self.satisfy_when(when_key)
+            for env_var in env_var_list
+        }
 
     def add_inmem_fom_value(self, fom_map_key, value):
         """Add an in-memory FOM value"""
@@ -112,12 +99,8 @@ class ObjectMixin:
 
     def _github_url(self, obj_def):
         """Link to an object file on github."""
-        return (
-            "https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/"
-            + f'{obj_def["dir_name"]}/'
-            + self.name
-            + f'/{obj_def["file_name"]}'
-        )
+        base_url = "https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin"
+        return f'{base_url}/{obj_def["dir_name"]}/{self.name}/{obj_def["file_name"]}'
 
     def to_html_docs(self, out, obj_def):
         """Writes HTML documentation for this object."""

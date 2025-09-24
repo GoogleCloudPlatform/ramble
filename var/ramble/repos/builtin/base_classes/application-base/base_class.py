@@ -658,33 +658,32 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f"\tAvailable pipelinese are {self._pipelines}",
             )
 
-        phases = set()
-        final_added_index = None
-        if pipeline in self._pipeline_graphs:
-            for idx, phase in enumerate(
-                self._pipeline_graphs[pipeline].walk()
-            ):
-                if self.expander.satisfies(
-                    phase.when, variant_set=self.object_variants
-                ):
-                    for phase_filter in phase_filters:
-                        if fnmatch.fnmatch(phase.key, phase_filter):
-                            phases.add(phase)
-                            final_added_index = idx
+        if pipeline not in self._pipeline_graphs:
+            return
 
+        ordered_phases = list(self._pipeline_graphs[pipeline].walk())
+
+        selected_phases = set()
+        last_match_idx = -1
+
+        for i, phase in enumerate(ordered_phases):
+            if self.expander.satisfies(
+                phase.when, variant_set=self.object_variants
+            ) and any(fnmatch.fnmatch(phase.key, pf) for pf in phase_filters):
+                selected_phases.add(phase)
+                last_match_idx = i
+
+        final_phases = selected_phases
         include_phase_deps = ramble.config.get(
             "config:include_phase_dependencies"
         )
-        if include_phase_deps:
-            for idx, phase in enumerate(
-                self._pipeline_graphs[pipeline].walk()
-            ):
-                if idx < final_added_index and phase not in phases:
-                    phases.add(phase)
+        if include_phase_deps and last_match_idx > -1:
+            dependencies = ordered_phases[:last_match_idx]
+            final_phases.update(dependencies)
 
-        for node in self._pipeline_graphs[pipeline].walk():
-            if node in phases:
-                yield node.key
+        for phase in ordered_phases:
+            if phase in final_phases:
+                yield phase.key
 
     def print_vars(self, header="", vars_to_print=None, indent=""):
         print_vars = vars_to_print
@@ -1438,8 +1437,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             logs = list(set(logs) | analysis_logs.keys())
 
             for log in logs:
-                self._command_list.append('rm -f "%s"' % log)
-                self._command_list.append('touch "%s"' % log)
+                self._command_list.append(f'rm -f "{log}"')
+                self._command_list.append(f'touch "{log}"')
 
             for exec_node in exec_graph.walk():
                 exec_vars = {"executable_name": exec_node.key}
@@ -1669,12 +1668,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._input_fetchers = {}
 
         # Batch 'when' evaluation to avoid repeat expander calls
-        when_satisfied = set()
-        for when_set in self.inputs.keys():
+        when_satisfied = {
+            when_set
+            for when_set in self.inputs.keys()
             if self.expander.satisfies(
                 when_set, variant_set=self.object_variants
-            ):
-                when_satisfied.add(when_set)
+            )
+        }
 
         inputs = {}
         workloads = (
