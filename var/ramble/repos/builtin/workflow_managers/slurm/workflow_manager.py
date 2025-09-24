@@ -284,7 +284,15 @@ class Slurm(WorkflowManagerBase):
         return status
 
     # Extract some job-related FOMs
-    for fom in ["id", "status", "nodes", "start", "end", "elapsed_time"]:
+    for fom in [
+        "id",
+        "status",
+        "nodes",
+        "start",
+        "end",
+        "elapsed_time",
+        "exit_code",
+    ]:
         figure_of_merit(
             f"job-{fom}",
             fom_regex=rf"\s*job_{fom}:\s*(?P<val>.*)",
