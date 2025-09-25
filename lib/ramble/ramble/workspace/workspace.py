@@ -1128,10 +1128,6 @@ ramble:
                     if fnmatch.fnmatch(section, pattern):
                         keep = False
 
-            # Disallow all repo configuration sections, as they are not valid
-            if fnmatch.fnmatch(section, "*repos"):
-                keep = False
-
             if keep:
                 section_dict = ramble.config.get(section)
                 if section_dict:
