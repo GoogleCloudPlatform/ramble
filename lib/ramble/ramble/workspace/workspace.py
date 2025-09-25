@@ -1850,21 +1850,27 @@ ramble:
                 used_variables (set): Set of used definitions that should be kept.
             """
 
-            if scope_name is None:
-                return
+            changed = False
 
             # Delete unused variables from requested scope.
             to_remove = set()
             scope_section = self._get_scope_section(scope_name)
+
+            if scope_section is None:
+                return changed
+
             if namespace.variables in scope_section:
                 for var in scope_section[namespace.variables]:
                     if var not in used_variables:
                         to_remove.add(var)
                 for var in to_remove:
                     del scope_section[namespace.variables][var]
+                    changed = True
 
                 if not scope_section[namespace.variables]:
                     del scope_section[namespace.variables]
+
+            return changed
 
         # Build software environments to determine which variables are used
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
@@ -1879,6 +1885,7 @@ ramble:
         app_used_vars = set()
         wl_used_vars = set()
         exp_used_vars = set()
+        changed = False
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_used_variables(self)
@@ -1886,21 +1893,25 @@ ramble:
             if app_inst.repeats.is_repeat_base or app_inst.repeats.repeat_index is None:
                 # Either there are no repeats, or this is the base
                 if prev_exp is not None:
-                    _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
+                    changed = changed or _remove_scoped_variables(
+                        f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars
+                    )
 
                 prev_exp = app_inst.variables[app_inst.keywords.experiment_template_name]
                 exp_used_vars = set()
 
             if prev_wl != app_inst.variables[app_inst.keywords.workload_template_name]:
                 if prev_wl is not None:
-                    _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
+                    changed = changed or _remove_scoped_variables(
+                        f"{prev_app}:{prev_wl}", wl_used_vars
+                    )
 
                 prev_wl = app_inst.variables[app_inst.keywords.workload_template_name]
                 wl_used_vars = set()
 
             if prev_app != app_inst.variables[app_inst.keywords.application_name]:
                 if prev_app is not None:
-                    _remove_scoped_variables(prev_app, app_used_vars)
+                    changed = changed or _remove_scoped_variables(prev_app, app_used_vars)
 
                 prev_app = app_inst.variables[app_inst.keywords.application_name]
                 app_used_vars = set()
@@ -1913,17 +1924,22 @@ ramble:
             exp_used_vars = exp_used_vars.union(app_inst.expander._used_variables)
 
         if prev_exp is not None:
-            _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
+            changed = changed or _remove_scoped_variables(
+                f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars
+            )
 
         if prev_wl is not None:
-            _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
+            changed = changed or _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
 
         if prev_app is not None:
-            _remove_scoped_variables(prev_app, app_used_vars)
+            changed = changed or _remove_scoped_variables(prev_app, app_used_vars)
 
-        _remove_scoped_variables("workspace", workspace_used_variables)
+        changed = changed or _remove_scoped_variables("workspace", workspace_used_variables)
 
-        self._write_config(config_section)
+        if changed:
+            self._write_config(config_section)
+        else:
+            logger.all_msg("No variables were changed.")
 
     def simplify_software(self):
         # First drop unused experiment templates from app dict so environments aren't rendered
@@ -1965,25 +1981,41 @@ ramble:
         software_environments = self.software_environments
         experiment_set = self.build_experiment_set()
 
+        changed = False
+
+        software_dict = None
+        package_dict = None
+        environments_dict = None
+
         software_dict = ramble.config.config.get_config(
             namespace.software, scope=self.ws_file_config_scope_name()
         )
-        package_dict = software_dict[namespace.packages]
-        environments_dict = software_dict[namespace.environments]
+
+        if namespace.packages in software_dict:
+            package_dict = software_dict[namespace.packages]
+        if namespace.environments in software_dict:
+            environments_dict = software_dict[namespace.environments]
 
         tty.debug("Removing configurations that do not spark joy.")
-        for pkg in software_environments.unused_packages():
-            if pkg.name in package_dict:
-                tty.debug(f"Removing {pkg.name} from software packages")
-                package_dict.pop(pkg.name)
-        for env in software_environments.unused_environments():
-            if env.name in environments_dict:
-                tty.debug(f"Removing {env.name} from software environments")
-                environments_dict.pop(env.name)
+        if package_dict:
+            for pkg in software_environments.unused_packages():
+                if pkg.name in package_dict:
+                    tty.debug(f"Removing {pkg.name} from software packages")
+                    package_dict.pop(pkg.name)
+                    changed = True
+        if environments_dict:
+            for env in software_environments.unused_environments():
+                if env.name in environments_dict:
+                    tty.debug(f"Removing {env.name} from software environments")
+                    environments_dict.pop(env.name)
+                    changed = True
 
-        ramble.config.config.update_config(
-            namespace.software, software_dict, scope=self.ws_file_config_scope_name()
-        )
+        if changed:
+            ramble.config.config.update_config(
+                namespace.software, software_dict, scope=self.ws_file_config_scope_name()
+            )
+        else:
+            logger.all_msg("No changes were made to software configuration sections.")
 
     @property
     def latest_archive_path(self):
@@ -2172,6 +2204,13 @@ ramble:
 
         else:
             scope_parts = scope.split(":")
+
+            if (
+                namespace.application
+                not in self.config_sections["workspace"]["yaml"][namespace.ramble]
+            ):
+                return None
+
             base_section = self.config_sections["workspace"]["yaml"][namespace.ramble][
                 namespace.application
             ]
