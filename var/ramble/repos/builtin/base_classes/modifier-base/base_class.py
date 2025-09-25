@@ -248,7 +248,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             if not self.expander.satisfies(when_set, self.object_variants):
                 continue
 
-            yield from self.env_var_modifications[when_set].items()
+            yield from env_var_mods.values()
 
     def all_package_manager_requirements(self):
         for when_set in self.package_manager_requirements:

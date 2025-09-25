@@ -3174,14 +3174,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         command.append(cmd)
 
         for mod_inst in self._modifier_instances:
-            for action, conf in mod_inst.all_env_var_modifications():
-                (env_cmds, _) = action_funcs[action](
-                    conf, self.expander, set(), shell=shell
-                )
-
-                for cmd in env_cmds:
-                    if cmd:
-                        command.append(cmd)
+            for env_var_mod in mod_inst.all_env_var_modifications():
+                for method in env_var_mod.all_methods:
+                    if getattr(env_var_mod, method):
+                        conf = {env_var_mod.name: env_var_mod.set}
+                        (env_cmds, _) = action_funcs[method](
+                            getattr(env_var_mod, method),
+                            self.expander,
+                            set(),
+                            shell=shell,
+                        )
+                        for cmd in env_cmds:
+                            if cmd:
+                                command.append(cmd)
 
         return command
 
