@@ -15,8 +15,8 @@ from llnl.util.tty.colify import colified
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
 import ramble.util.colors
+from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
-from ramble.workload import WorkloadVariable
 
 supported_formats = enum.Enum("formats", ["text", "lists"])
 
@@ -203,7 +203,7 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
             color.cprint(f"{color_name}:")
             for sub_name, sub_val in vals.items():
                 # Avoid showing duplicate names for variables
-                if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
+                if isinstance(sub_val, Variable) and sub_name == sub_val.name:
                     to_print = f"{indentation}{sub_val}"
                 else:
                     color_sub_name = ramble.util.colors.nested_1(sub_name)

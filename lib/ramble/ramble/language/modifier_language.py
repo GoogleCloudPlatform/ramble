@@ -11,7 +11,7 @@ from typing import Optional
 import ramble.definitions.requirements
 import ramble.language.language_helpers
 import ramble.language.shared_language
-from ramble.definitions.variables import EnvironmentVariableModifications
+from ramble.definitions.variables import EnvironmentVariableModifications, VariableModification
 from ramble.language.language_base import DirectiveError
 
 
@@ -99,8 +99,6 @@ def variable_modification(
     """
 
     def _execute_variable_modification(mod):
-        import ramble.workload
-
         supported_methods = ["append", "prepend", "set"]
         if method not in supported_methods:
             raise DirectiveError(
@@ -120,7 +118,7 @@ def variable_modification(
             mod.variable_modifications[when_set][name] = []
 
         mod.variable_modifications[when_set][name].append(
-            ramble.workload.WorkloadVariableModification(
+            VariableModification(
                 name=name,
                 modification=modification,
                 method=method,
@@ -296,7 +294,6 @@ def modifier_variable(
     """
 
     def _define_modifier_variable(mod):
-        import ramble.workload
 
         all_modes = ramble.language.language_helpers.merge_definitions(
             mode, modes, mod.modes, "mode", "modes", "modifier_variable"

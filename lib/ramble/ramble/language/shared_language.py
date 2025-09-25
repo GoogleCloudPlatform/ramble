@@ -798,7 +798,7 @@ def variable(
     """
 
     def _define_variable(obj):
-        import ramble.workload
+        import ramble.definitions.variables
 
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, error_context
@@ -810,7 +810,7 @@ def variable(
             obj.object_variables[when_set] = []
 
         obj.object_variables[when_set].append(
-            ramble.workload.WorkloadVariable(
+            ramble.definitions.variables.Variable(
                 name,
                 default=default,
                 description=description,
@@ -854,7 +854,7 @@ def environment_variable(
             when, obj, name, "environment_variable"
         )
 
-        workload_env_var = ramble.workload.WorkloadEnvironmentVariable(
+        workload_env_var = ramble.definitions.variables.EnvironmentVariable(
             name, value=value, description=description, when=when_list, **kwargs
         )
 

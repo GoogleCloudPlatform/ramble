@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.definitions.variables
 import ramble.language.language_helpers
 import ramble.language.shared_language
 import ramble.workload
@@ -266,7 +267,7 @@ def workload_variable(
             when, app, name, "workload_variable"
         )
 
-        workload_var = ramble.workload.WorkloadVariable(
+        workload_var = ramble.definitions.variables.Variable(
             name,
             default=default,
             description=description,
