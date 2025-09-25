@@ -70,6 +70,10 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
         self._verbosity = "short"
 
+        self._mod_regex = re.compile(
+            self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
+        )
+
         ramble.util.directives.define_directive_methods(self)
 
     def copy(self):
@@ -101,7 +105,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         else:
             non_disabled_modes = set(self.modes)
             non_disabled_modes.remove("disabled")
-            if len(non_disabled_modes) > 1 or len(non_disabled_modes) == 0:
+            if len(non_disabled_modes) != 1:
                 raise InvalidModeError(
                     "Cannot auto determine usage "
                     f"mode for modifier {self.name}"
@@ -142,9 +146,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                     f"type of {type(on_executables)}"
                 )
 
-            self._on_executables = []
-            for exec_name in on_executables:
-                self._on_executables.append(exec_name)
+            self._on_executables = list(on_executables)
         else:
             self._on_executables = ["*"]
 
@@ -194,7 +196,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                             else:
                                 prev_val = ""
 
-                            if prev_val != "" and prev_val is not None:
+                            if prev_val:
                                 sep = var_mod.separator
                             else:
                                 sep = ""
@@ -213,20 +215,14 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         return mods
 
     def applies_to_executable(self, executable):
-        apply = False
+        """Check if this modifier applies to a given executable name."""
+        if any(
+            fnmatch.fnmatch(executable, pattern)
+            for pattern in self._on_executables
+        ):
+            return True
 
-        mod_regex = re.compile(
-            self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
-        )
-        for pattern in self._on_executables:
-            if fnmatch.fnmatch(executable, pattern):
-                apply = True
-
-        exec_match = mod_regex.match(executable)
-        if exec_match:
-            apply = True
-
-        return apply
+        return bool(self._mod_regex.match(executable))
 
     def apply_executable_modifiers(
         self, executable_name, executable, app_inst=None
