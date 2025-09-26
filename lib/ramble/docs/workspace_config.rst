@@ -174,6 +174,10 @@ Supported functions are:
 * ``max()`` (maximum)
 * ``ceil()`` (ceiling of input)
 * ``floor()`` (floor of input)
+* ``log2()`` (Base-2 logarithm of input)
+* ``log10()`` (Base-10 logarithm of input)
+* ``sqrt()`` (Square root of input)
+
 * ``range()`` (construct range, see :ref:`ramble vector logic<ramble-vector-logic>` for more information)
 * ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
 * ``randrange`` (from `random.randrange`)
