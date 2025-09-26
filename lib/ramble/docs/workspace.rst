@@ -178,6 +178,21 @@ will activate a workspace until it is deactivated, while
 
 will activate a workspace for the specific command.
 
+To indicate the activated workspace, an option ``-p`` can be supplied to the ``activate`` command.
+This updates the shell prompt to display the name of the currently active workspace.
+
+.. code-block:: console
+
+    $ ramble workspace activate -p <name_or_path>
+
+Alternatively, a config ``enable_workspace_prompt`` exists, to allow controlling for this behavior
+at the desired configuration granularity.
+
+.. code-block:: console
+
+    $ ramble config add 'config:enable_workspace_prompt:true'
+
+
 ------------------------------
 Printing Workspace Information
 ------------------------------

@@ -181,6 +181,8 @@ properties["config"]["n_repeats"] = {"type": "string", "default": "0"}
 
 properties["config"]["repeat_success_strict"] = {"type": "boolean", "default": True}
 
+properties["config"]["enable_workspace_prompt"] = {"type": "boolean", "default": False}
+
 
 #: Full schema with metadata
 schema = {

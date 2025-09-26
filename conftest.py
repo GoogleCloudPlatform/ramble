@@ -23,6 +23,7 @@ import ramble.config
 import ramble.paths
 import ramble.repository
 import ramble.stage
+import ramble.workspace
 from ramble.fetch_strategy import FetchError, FetchStrategyComposite, URLFetchStrategy
 from ramble.util.file_util import is_dry_run_path
 
@@ -565,6 +566,14 @@ def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
     mock_path = tmpdir_factory.mktemp("mock-workspace-path")
     with ramble.config.override("config:workspace_dirs", str(mock_path)):
         yield mock_path
+
+
+@pytest.fixture()
+def workspace_deactivate():
+    """Deactivates any active workspace after a test."""
+    yield
+    ramble.workspace._active_workspace = None
+    os.environ.pop("RAMBLE_WORKSPACE", None)
 
 
 @pytest.fixture

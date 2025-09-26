@@ -28,19 +28,15 @@ import spack.util.spack_yaml as syaml
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
+    "mutable_config",
+    "mutable_mock_workspace_path",
+    "mutable_mock_apps_repo",
+    "workspace_deactivate",
 )
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 on = RambleCommand("on")
-
-
-@pytest.fixture()
-def workspace_deactivate():
-    yield
-    ramble.workspace._active_workspace = None
-    os.environ.pop("RAMBLE_WORKSPACE", None)
 
 
 def add_basic(ws):
@@ -152,6 +148,64 @@ def test_workspace_activate_fails(mutable_mock_workspace_path):
     workspace("create", "foo")
     out = workspace("activate", "foo")
     assert "To set up shell support" in out
+
+
+def test_workspace_activate_prompt(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    # Assert no prompt modification
+    output = workspace("activate", workspace_name, "--sh")
+    assert "PS1" not in output
+
+    # Assert prompt mod with --prompt
+    output = workspace("activate", workspace_name, "--sh", "--prompt")
+    assert "export RAMBLE_OLD_PS1=" in output
+    assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+
+    # Assert prompt mod with config value
+    with ramble.config.override("config:enable_workspace_prompt", True):
+        output = workspace("activate", workspace_name, "--sh")
+        assert "export RAMBLE_OLD_PS1=" in output
+        assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+
+
+def test_workspace_activate_by_name(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    output = workspace("activate", workspace_name, "--sh")
+    assert f"export RAMBLE_WORKSPACE={ws.root}" in output
+
+
+def test_workspace_activate_by_dir(tmpdir):
+    with tmpdir.as_cwd():
+        workspace("create", "-d", "foo")
+        output = workspace("activate", "--dir", "foo", "--sh")
+        ws_path = os.path.abspath("foo")
+        assert f"export RAMBLE_WORKSPACE={ws_path}" in output
+
+
+def test_workspace_activate_temp():
+    """Test `ramble workspace activate --temp`."""
+    # Test without prompt decoration
+    output = workspace("activate", "--temp", "--sh")
+
+    match = re.search(r"export RAMBLE_WORKSPACE=([^;]+)", output)
+    workspace_path = match.group(1)
+
+    assert os.path.isdir(workspace_path)
+    assert ramble.workspace.is_workspace_dir(workspace_path)
+
+
+def test_workspace_activate_non_existent():
+    output = workspace("activate", "non-existent-ws", "--sh", fail_on_error=False)
+    assert "No such workspace: 'non-existent-ws'" in output
+
+
+def test_workspace_activate_no_args():
+    output = workspace("activate", fail_on_error=False)
+    assert "ramble workspace activate requires a workspace name, directory, or --temp" in output
 
 
 def test_workspace_list(mutable_mock_workspace_path):
