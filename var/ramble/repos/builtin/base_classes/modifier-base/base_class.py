@@ -244,7 +244,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         return pre_execs, post_execs
 
     def all_env_var_modifications(self):
-        for when_set in self.env_var_modifications:
+        for when_set, env_var_mods in self.env_var_modifications.items():
             if not self.expander.satisfies(when_set, self.object_variants):
                 continue
 
