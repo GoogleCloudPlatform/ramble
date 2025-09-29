@@ -884,3 +884,35 @@ def test_config_edit_file(mutable_config, config_section, mock_editor):
     args = section_args(config_section)
 
     assert ramble.cmd.config.config_edit(args)
+
+
+def test_command_alias(mutable_empty_config):
+    import io
+    from contextlib import redirect_stdout
+
+    from ramble import main
+
+    # Test alias 'l' -> 'list'
+    config("add", "config:aliases:l:list")
+    f = io.StringIO()
+    with redirect_stdout(f):
+        ret = main.main(argv=["l"])
+    assert ret == 0
+    output = f.getvalue()
+    assert "gromacs" in output
+
+    # Test that an alias cannot override a built-in command
+    config("add", "config:aliases:list:info")
+    # `list` should run `list`, not `info`
+    f = io.StringIO()
+    with redirect_stdout(f):
+        ret = main.main(argv=["list"])
+    output = f.getvalue()
+    assert ret == 0
+    assert "ramble info" not in output
+
+    # Test alias to non-existent command
+    config("add", "config:aliases:bad:nonexistent")
+    with pytest.raises(SystemExit) as e:
+        main.main(argv=["bad"])
+    assert e.value.code != 0

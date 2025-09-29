@@ -18,6 +18,7 @@ from llnl.util.argparsewriter import ArgparseCompletionWriter, ArgparseRstWriter
 from llnl.util.tty.colify import colify
 
 import ramble.cmd
+import ramble.config
 import ramble.main
 import ramble.paths
 from ramble.main import section_descriptions
@@ -249,7 +250,9 @@ def names(args, out):
     commands = copy.copy(ramble.cmd.all_commands())
 
     if args.aliases:
-        commands.extend(ramble.main.aliases.keys())
+        aliases = ramble.config.get("config:aliases")
+        if aliases:
+            commands.extend(aliases.keys())
 
     colify(commands, output=out)
 
