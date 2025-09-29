@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import copy
 from typing import List, Optional
 
 import ramble.util.colors as rucolor
@@ -25,6 +26,213 @@ def _title_color(title: str, n_indent: int = 0):
         out_str = rucolor.nested_4(f"{title}")
 
     return out_str
+
+
+class Variable:
+    """Class representing a variable definition"""
+
+    def __init__(
+        self,
+        name: str,
+        default=None,
+        description: str = None,
+        values=None,
+        expandable: bool = True,
+        track_used: bool = True,
+        when=None,
+        **kwargs,
+    ):
+        """Constructor for a new variable
+
+        Args:
+            name (str): Name of variable
+            default: Default value of variable
+            description (str): Description of variable
+            values: List of suggested values for variable
+            expandable (bool): True if variable can be expanded, False otherwise
+            track_used (bool): True if variable should be considered used,
+                               False to ignore it for vectorizing experiments
+            when (list | None): List of when conditions to apply to directive
+        """
+        self.name = name
+        self.default = default
+        self.description = description
+        self.values = values.copy() if isinstance(values, list) else [values]
+        self.expandable = expandable
+        self.track_used = track_used
+        self.when = when.copy() if when else []
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of this variable
+
+        Args:
+          n_indent (int): Number of spaces to indent string lines with
+
+        Returns:
+            (str): Representation of this variable
+        """
+        indentation = " " * n_indent
+
+        if verbose:
+            print_attrs = ["Description", "Default", "Values"]
+
+            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            for print_attr in print_attrs:
+                name = print_attr
+                if print_attr == "Values":
+                    name = "Suggested Values"
+                attr_name = print_attr.lower()
+
+                attr_val = getattr(self, attr_name, None)
+                if attr_val:
+                    out_str += (
+                        f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                        f'{str(attr_val).replace("@", "@@")}\n'
+                    )
+        else:
+            out_str = f"{indentation}{self.name}"
+
+        return out_str
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+
+class VariableModification:
+    """Class representing a variable modification"""
+
+    def __init__(
+        self,
+        name: str,
+        modification: str,
+        method: str = "set",
+        separator: str = " ",
+        when=None,
+        **kwargs,
+    ):
+        """Constructor for a new variable modification
+
+        Args:
+            name (str): The variable to modify
+            modification (str): The value to modify 'name' with
+            method (str): How the modification should be applied
+            mode (str): Single mode to group this modification into
+            modes (str): List of modes to group this modification into
+            separator (str): Optional separator to use when modifying with 'append' or
+                            'prepend' methods.
+            when (list | None): List of when conditions this modification should apply in
+
+        Supported values are 'append', 'prepend', and 'set':
+            'append' will add the modification to the end of 'name'
+            'prepend' will add the modification to the beginning of 'name'
+            'set' (Default) will overwrite 'name' with the modification
+        """
+        self.name = name
+        self.modification = modification
+        self.method = method
+        self.separator = separator
+        self.when = when.copy() if when else []
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of this variable
+
+        Args:
+          n_indent (int): Number of spaces to indent string lines with
+
+        Returns:
+            (str): Representation of this variable
+        """
+        indentation = " " * n_indent
+
+        print_attrs = ["Modification", "Method", "Separator", "When"]
+
+        out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+        for print_attr in print_attrs:
+            name = print_attr
+            attr_name = print_attr.lower()
+
+            attr_val = getattr(self, attr_name, None)
+            if attr_val:
+                if print_attr == "Separator":
+                    attr_val = f"'{attr_val}'"
+                out_str += (
+                    f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                    f'{str(attr_val).replace("@", "@@")}\n'
+                )
+        return out_str
+
+    def copy(self):
+        return copy.deepcopy(self)
+
+
+class EnvironmentVariable:
+    """Class representing an environment variable"""
+
+    def __init__(
+        self,
+        name: str,
+        value=None,
+        description: str = None,
+        when=None,
+        **kwargs,
+    ):
+        """EnvironmentVariable constructor
+
+        Args:
+            name (str): Name of environment variable
+            value: Value to set environment variable to
+            description (str): Description of the environment variable
+            when (list | None): List of when conditions to apply to directive
+        """
+        self.name = name
+        self.value = value
+        self.description = description
+        self.when = when.copy() if when else []
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of environment variable
+
+        Args:
+            n_indent (int): Number of spaces to indent string representation by
+
+        Returns:
+            (str): String representing this environment variable
+        """
+        indentation = " " * n_indent
+
+        if verbose:
+            print_attrs = ["Description", "Value"]
+            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            for name in print_attrs:
+                attr_name = name.lower()
+                attr_val = getattr(self, attr_name, None)
+                if attr_val:
+                    out_str += (
+                        f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                        f'{str(attr_val).replace("@", "@@")}\n'
+                    )
+        else:
+            out_str = f"{indentation}{self.name}"
+
+        return out_str
+
+    def copy(self):
+        return copy.deepcopy(self)
 
 
 class EnvironmentVariableModifications:
@@ -122,6 +330,9 @@ class EnvironmentVariableModifications:
             out_str = f"{indentation}{self.name}"
 
         return out_str
+
+    def copy(self):
+        return copy.deepcopy(self)
 
     def add_modification(
         self,

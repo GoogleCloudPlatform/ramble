@@ -9,6 +9,7 @@
 
 import pytest
 
+import ramble.definitions.variables
 import ramble.workload
 import ramble.workspace
 
@@ -415,7 +416,7 @@ def test_set_variables_and_variants(mutable_mock_apps_repo):
 
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
-    test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
+    test_wl2.add_variable(ramble.definitions.variables.Variable("n_ranks", default="1"))
     executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     executable_application_instance.internals = {}
@@ -442,7 +443,7 @@ def test_define_commands(mutable_mock_apps_repo):
 
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
-    test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
+    test_wl2.add_variable(ramble.definitions.variables.Variable("n_ranks", default="1"))
     executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     executable_application_instance.internals = {}
@@ -508,7 +509,7 @@ ramble:
 
     test_wl = ramble.workload.Workload("test_wl", executables=["foo"], inputs=["input"])
     test_wl2 = ramble.workload.Workload("test_wl2", executables=["bar"], inputs=["input"])
-    test_wl2.add_variable(ramble.workload.WorkloadVariable("n_ranks", default="1"))
+    test_wl2.add_variable(ramble.definitions.variables.Variable("n_ranks", default="1"))
     executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
 
     executable_application_instance.internals = {}
