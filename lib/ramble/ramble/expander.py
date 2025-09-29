@@ -112,6 +112,11 @@ supported_list_function_pointers = {
 }
 
 
+supported_modules = {
+    "math": math,
+}
+
+
 formatter = string.Formatter()
 
 
@@ -937,6 +942,15 @@ class Expander:
             func = supported_scalar_function_with_self_arg_pointers[node.func.id]
             return func(self, *args, **kwargs)
         else:
+            parts = node.func.id.split("_", 1)
+            if len(parts) == 2:
+                module_name, func_name = parts
+                if module_name in supported_modules:
+                    module = supported_modules[module_name]
+                    if hasattr(module, func_name):
+                        func = getattr(module, func_name)
+                        return func(*args, **kwargs)
+
             raise MathEvaluationError(
                 f"Undefined function {node.func.id} used.\n" "returning unexapanded string"
             )

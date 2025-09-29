@@ -186,6 +186,9 @@ Supported functions are:
 * ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
 * ``maybe(var_name, default="")`` (returns the expanded ``var_name`` if it is defined, otherwise returns ``default``)
 
+Besides the above listed, any functions from the ``math`` module can be used in Ramble by referencing ``math_<function_name>``.
+For instance, ``math_log(<num>, <base>)`` invokes the ``math.log(<num>, <base>)`` function.
+
 String slicing is supported:
 
 * ``str[start:end:step]`` (string slicing)
