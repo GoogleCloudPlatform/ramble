@@ -2916,6 +2916,98 @@ def test_workspace_config_squash(workspace_name, capsys):
             assert "test_var: test_value" not in data
 
 
+def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
+    test_vars_include = """variables:
+  foo: bar
+  n_ranks: 1
+  test_var: test_value
+"""
+
+    test_software_include = """software:
+  packages:
+    gcc:
+      pkg_spec: gcc@9.3.0 target=x86_64
+  environments:
+    gcc:
+      packages:
+      - gcc
+"""
+
+    global_args = ["-w", workspace_name]
+
+    include_root = str(tmpdir)
+
+    with ramble.workspace.create(workspace_name) as ws:
+        with open(f"{os.path.join(include_root, 'variables.yaml')}", "w+") as f:
+            f.write(test_vars_include)
+
+        with open(f"{os.path.join(include_root, 'software.yaml')}", "w+") as f:
+            f.write(test_software_include)
+
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-e",
+            "zlib-repeats",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Add repeats for one set of experiments.
+        config(
+            "add",
+            "applications:zlib:workloads:ensure_installed:experiments:zlib-repeats:n_repeats:5",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        workspace("manage", "includes", "--add", include_root, global_args=global_args)
+
+        config_output = config("get", "variables", global_args=global_args)
+
+        assert "foo: bar" in config_output
+
+        ws.write()
+
+        output = workspace("config", "--simplify-software", global_args=global_args)
+
+        assert "No changes were made to software configuration sections" in output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "pkg_spec: gcc@9.3.0" not in data
+            assert "gcc" not in data
+
+        output = workspace("config", "--simplify-variables", global_args=global_args)
+
+        assert "No variables were changed" in output
+
+
 def test_workspace_experiment_logs(workspace_name):
     global_args = ["-w", workspace_name]
 
