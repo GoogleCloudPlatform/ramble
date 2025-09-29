@@ -128,7 +128,7 @@ class Workload:
 
         Args:
             env_var (ramble.definitions.variables.EnvironmentVariable): New environment variable to
-            add to this workload
+                add to this workload
         """
         when_key = frozenset(env_var.when)
         if when_key not in self.environment_variables:
@@ -206,7 +206,7 @@ class Workload:
 
         Returns:
             (ramble.definitions.variables.Variable | None): Variable instance if it exists, None if
-            it is not found
+                it is not found
         """
         named_vars = []
         for var_list in self.variables.values():
@@ -223,7 +223,7 @@ class Workload:
 
         Returns:
             (ramble.definitions.variables.EnvironmentVariable | None): Environment variable
-            instance if it exists, None if it is not found
+                instance if it exists, None if it is not found
         """
         named_env_vars = []
         for env_var_list in self.environment_variables.values():
