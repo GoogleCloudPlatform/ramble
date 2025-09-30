@@ -51,9 +51,6 @@ from spack.util.executable import CommandNotFoundError
 #: names of profile statistics
 stat_names = pstats.Stats.sort_arg_dict_default
 
-#: top-level aliases for Ramble commands
-aliases = {"rm": "remove"}
-
 #: help levels in order of detail (i.e., number of commands shown)
 levels = ["short", "long"]
 
@@ -789,6 +786,46 @@ def print_setup_info(*info):
             logger.die("shell must be sh or csh")
 
 
+def resolve_alias(cmd_name, cmd):
+    """Resolves aliases in the given command.
+
+    Args:
+        cmd_name: command name.
+        cmd: command line arguments.
+
+    Returns:
+        new command name and arguments.
+    """
+    all_commands = ramble.cmd.all_commands()
+    aliases = ramble.config.get("config:aliases")
+
+    if aliases:
+        for key, value in aliases.items():
+            if " " in key:
+                logger.warn(
+                    f"Alias '{key}' (mapping to '{value}') contains a space"
+                    ", which is not supported."
+                )
+            if key in all_commands:
+                logger.warn(
+                    f"Alias '{key}' (mapping to '{value}') attempts to override"
+                    " built-in command."
+                )
+
+    if cmd_name not in all_commands:
+        if aliases:
+            alias = aliases.get(cmd_name)
+        else:
+            alias = None
+
+        if alias is not None:
+            alias_parts = shlex.split(alias)
+            cmd_name = alias_parts[0]
+            cmd = alias_parts + cmd[1:]
+
+    return cmd_name, cmd
+
+
 def _main(argv=None):
     """Logic for the main entry point for the Ramble command.
 
@@ -897,7 +934,7 @@ def _main(argv=None):
 
     # Try to load the particular command the caller asked for.
     cmd_name = args.command[0]
-    cmd_name = aliases.get(cmd_name, cmd_name)
+    cmd_name, args.command = resolve_alias(cmd_name, args.command)
 
     # set up a bootstrap context, if asked.
     # bootstrap context needs to include parsing the command, b/c things
@@ -910,14 +947,14 @@ def _main(argv=None):
     #   # bootstrap_context = bootstrap.ensure_bootstrap_configuration()
 
     with bootstrap_context:
-        return finish_parse_and_run(parser, cmd_name, workspace_format_error)
+        return finish_parse_and_run(parser, cmd_name, args, workspace_format_error)
 
 
-def finish_parse_and_run(parser, cmd_name, workspace_format_error):
+def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):
     """Finish parsing after we know the command to run."""
     # add the found command to the parser and re-run then re-parse
     command = parser.add_command(cmd_name)
-    args, unknown = parser.parse_known_args()
+    args, unknown = parser.parse_known_args(main_args.command)
 
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
@@ -946,9 +983,9 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     set_working_dir()
 
     # now we can actually execute the command.
-    if args.ramble_profile or args.sorted_profile:
+    if main_args.ramble_profile or main_args.sorted_profile:
         _profile_wrapper(command, parser, args, unknown)
-    elif args.pdb:
+    elif main_args.pdb:
         import pdb
 
         pdb.runctx("_invoke_command(command, parser, args, unknown)", globals(), locals())

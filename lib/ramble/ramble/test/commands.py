@@ -10,9 +10,12 @@ import os
 
 import pytest
 
+import ramble.config
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
 from ramble.util.logger import logger
+
+command = RambleCommand("commands")
 
 
 def test_missing_command():
@@ -32,8 +35,6 @@ def test_available_command():
 
 
 def test_command_output(tmpdir):
-    command = RambleCommand("commands")
-
     formats = ["subcommands", "rst", "names", "bash"]
     for f in formats:
         file = os.path.join(tmpdir, f"outfile.{f}")
@@ -43,3 +44,10 @@ def test_command_output(tmpdir):
     target = os.path.join(tmpdir, "outfile.names")
     header = os.path.join(tmpdir, "outfile.subcommands")
     command("--update", target, "--header", header, "-a")
+
+
+def test_command_alias_output(mutable_config):
+    with ramble.config.override("config:aliases", {"ws": "workspace"}):
+        out = command("-a", output=str)
+        assert "ws" in out
+        assert "workspace" in out
