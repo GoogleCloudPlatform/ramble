@@ -60,7 +60,7 @@ class SpackPip(Spack, Pip):
         run_before=["software_configure"],
     )
 
-    def _software_create_env_pip(self, workspace, app_inst=None, pip_spec=None):
+    def _software_create_env_pip(self, workspace, app_inst=None):
         """Create the virtual env for the experiment"""
 
         logger.msg("Creating venv + pip environment")
@@ -88,14 +88,16 @@ class SpackPip(Spack, Pip):
             if isinstance(software_env, ExternalEnvironment):
                 self.runner.copy_from_external_env(software_env.external_env)
             else:
-                self.runner.pip_add_spec(pip_spec)
+                for pkg_spec in software_envs.package_specs_for_environment(
+                    software_env
+                ):
+                    self.runner.pip_add_spec(pkg_spec)
                 self.runner.generate_requirement_file()
 
     def _software_create_env(self, workspace, app_inst=None):
         """Create both the Spack environment and the Pip venv."""
         Spack._software_create_env(self, workspace, app_inst)
-        pip_spec = app_inst.expander.expand_var_name(app_inst.pip_spec).lstrip("{").rstrip("}")
-        self._software_create_env_pip(workspace, app_inst, pip_spec)
+        self._software_create_env_pip(workspace, app_inst)
 
     register_phase(
         "software_configure", pipeline="mirror", run_before=["mirror_software"]
