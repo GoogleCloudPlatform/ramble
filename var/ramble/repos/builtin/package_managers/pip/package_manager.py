@@ -152,7 +152,7 @@ class Pip(PackageManagerBase):
                         )
                         and pkg not in installed_pkgs
                     ):
-                        logger.die(
+                        logger.warn(
                             f"Package {pkg} is not installed "
                             f"in environment {env_context}, but is "
                             f"required by the {mod_inst.name} modifier "
