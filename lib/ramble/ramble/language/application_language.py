@@ -6,10 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.language.language_base
+import ramble.definitions.variables
 import ramble.language.language_helpers
 import ramble.language.shared_language
-import ramble.success_criteria
 import ramble.workload
 from ramble.language.language_base import DirectiveError
 
@@ -117,7 +116,7 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
 
         # Apply any existing variables in the group to the workload
         for workload in workloads:
-            for when_set in app.workloads.keys():
+            for when_set in app.workloads:
                 if workload in app.workloads[when_set]:
                     if name in app.workload_group_vars:
                         for var in app.workload_group_vars[name]:
@@ -268,7 +267,7 @@ def workload_variable(
             when, app, name, "workload_variable"
         )
 
-        workload_var = ramble.workload.WorkloadVariable(
+        workload_var = ramble.definitions.variables.Variable(
             name,
             default=default,
             description=description,

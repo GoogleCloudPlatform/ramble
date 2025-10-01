@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import datetime
 import os
 
 from ramble.experiment_result import ExperimentStatus
@@ -111,6 +112,13 @@ class Slurm(WorkflowManagerBase):
         "The path can contain workspace path variables such as $workspace_config.",
     )
 
+    variant(
+        "slurm_include_default_sbatch_headers",
+        default=True,
+        values=[True, False],
+        description="Whether a set of default headers (such as #SBATCH --exclusive) should be included",
+    )
+
     register_template(
         name="batch_submit",
         src_path="batch_submit.tpl",
@@ -168,18 +176,29 @@ class Slurm(WorkflowManagerBase):
         dest_path="batch_helpers",
     )
 
+    @property
     def template_render_vars(self):
         vars = {}
-        expander = self.app_inst.expander
+        app_inst = self.app_inst
+        expander = app_inst.expander
         # Adding pre-defined and custom headers
         pragmas = [
-            ("#SBATCH -N {n_nodes}"),
-            ("#SBATCH --ntasks-per-node {processes_per_node}"),
-            ("#SBATCH -J {job_name}"),
-            ("#SBATCH -o {experiment_run_dir}/slurm-%j.out"),
-            ("#SBATCH -e {experiment_run_dir}/slurm-%j.err"),
-            ("#SBATCH --gpus-per-node {gpus_per_node}"),
+            "#SBATCH -N {n_nodes}",
+            "#SBATCH -J {job_name}",
+            "#SBATCH -o {experiment_run_dir}/slurm-%j.out",
+            "#SBATCH -e {experiment_run_dir}/slurm-%j.err",
         ]
+        if expander.satisfies(
+            "+slurm_include_default_sbatch_headers",
+            variant_set=app_inst.object_variants,
+        ):
+            pragmas.extend(
+                [
+                    "#SBATCH --ntasks-per-node {processes_per_node}",
+                    "#SBATCH --gpus-per-node {gpus_per_node}",
+                    "#SBATCH --exclusive",
+                ]
+            )
         partition = expander.expand_var_name("slurm_partition")
         if partition:
             pragmas.append("#SBATCH -p {slurm_partition}")
@@ -196,6 +215,39 @@ class Slurm(WorkflowManagerBase):
             "workflow_hostfile_cmd": self.runner.get_hostfile_cmd(),
         }
 
+    def _get_job_termination_overhead(self):
+        # Get the duration between script end time and job termination time.
+        run_dir = self.app_inst.expander.experiment_run_dir
+        end_time_file = os.path.join(run_dir, ".slurm_script_end_time")
+        job_id_file = os.path.join(run_dir, ".slurm_job")
+        if not os.path.isfile(end_time_file) or not os.path.isfile(
+            job_id_file
+        ):
+            return
+        with open(end_time_file) as f:
+            script_end_time = float(f.read().strip())
+        with open(job_id_file) as f:
+            job_id = f.read().strip()
+        sacct_cmd = Executable("sacct")
+        try:
+            job_end_time_str = sacct_cmd(
+                "-j", job_id, "-X", "-n", "--format=End", output=str
+            ).strip()
+            # sacct by default reports timestamp in local timezone
+            # TODO: can use more convenient method with python 3.7+
+            job_end_time = datetime.datetime.strptime(
+                job_end_time_str, "%Y-%m-%dT%H:%M:%S"
+            ).timestamp()
+            duration = int(job_end_time - script_end_time)
+        except (ProcessError, ValueError) as e:
+            logger.warn(f"Failed to get job end time with error {e}")
+        else:
+            fom_key = "slurm-job-termination-overhead"
+            self.figure_of_merit(
+                "job-termination-overhead", units="s", fom_map_key=fom_key
+            )
+            self.add_inmem_fom_value(fom_key, duration)
+
     def _prepare_analysis(self, workspace):
         if workspace.dry_run:
             return
@@ -207,6 +259,7 @@ class Slurm(WorkflowManagerBase):
         except ProcessError as e:
             # Only log a warning as this is not considered a critical step
             logger.warn(f"batch_query returns error {e}")
+        self._get_job_termination_overhead()
 
     def get_status(self, workspace):
         expander = self.app_inst.expander
@@ -231,12 +284,50 @@ class Slurm(WorkflowManagerBase):
         return status
 
     # Extract some job-related FOMs
-    for fom in ["id", "status", "nodes", "start", "end"]:
+    for fom in [
+        "id",
+        "status",
+        "nodes",
+        "start",
+        "end",
+        "elapsed_time",
+        "exit_code",
+    ]:
         figure_of_merit(
             f"job-{fom}",
             fom_regex=rf"\s*job_{fom}:\s*(?P<val>.*)",
             group_name="val",
             log_file="{experiment_run_dir}/.slurm_job_info",
+            fom_type=FomType.INFO,
+        )
+
+    # Capture sbatch script end time, in epoch seconds
+    register_builtin(
+        "capture_sbatch_script_end_time",
+        required=True,
+        injection_method="append",
+    )
+
+    def capture_sbatch_script_end_time(self):
+        return ["date +%s > {experiment_run_dir}/.slurm_script_end_time"]
+
+    # Capture slurm configs before the workload runs, just so that the configs
+    # match closer when the job is submitted.
+    register_builtin(
+        "capture_slurm_config", required=True, injection_method="prepend"
+    )
+
+    def capture_slurm_config(self):
+        return [
+            "scontrol show config > {experiment_run_dir}/.slurm_config",
+        ]
+
+    for fom in ["TopologyParam", "TopologyPlugin"]:
+        figure_of_merit(
+            f"slurm-config-{fom}",
+            fom_regex=rf"\s*{fom}\s*=\s*(?P<val>\S+)",
+            group_name="val",
+            log_file="{experiment_run_dir}/.slurm_config",
             fom_type=FomType.INFO,
         )
 

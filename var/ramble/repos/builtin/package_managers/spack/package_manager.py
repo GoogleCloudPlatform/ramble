@@ -84,7 +84,7 @@ class Spack(SpackLightweight):
 
         cache = workspace.pkg_path_cache[self.name]
         app_context = app_inst.expander.expand_var_name(self.keywords.env_name)
-        require_env = self.environment_required()
+        require_env = self.environment_required
         software_environments = workspace.software_environments
         software_environment = software_environments.render_environment(
             app_context, app_inst.expander, self, require=require_env

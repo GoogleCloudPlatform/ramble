@@ -34,6 +34,7 @@ import collections
 import contextlib
 import copy
 import functools
+import itertools
 import os
 import re
 import sys
@@ -66,7 +67,6 @@ import ramble.schema.package_manager_repos
 # Objects
 import ramble.schema.repos
 import ramble.schema.software
-import ramble.schema.spack
 import ramble.schema.success_criteria
 import ramble.schema.variables
 import ramble.schema.variants
@@ -91,7 +91,6 @@ section_schemas = {
     "licenses": ramble.schema.licenses.schema,
     "mirrors": ramble.schema.mirrors.schema,
     "modifiers": ramble.schema.modifiers.schema,
-    "spack": ramble.schema.spack.schema,
     "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
     "applications": ramble.schema.applications.schema,
@@ -167,9 +166,10 @@ overrides_base_name = "overrides-"
 
 def first_existing(dictionary, keys):
     """Get the value of the first key in keys that is in the dictionary."""
-    try:
-        return next(k for k in keys if k in dictionary)
-    except StopIteration:
+    for k in keys:
+        if k in dictionary:
+            return k
+    else:
         raise KeyError(f"None of {keys} is in dict!")
 
 
@@ -489,7 +489,7 @@ class Configuration:
         return [
             s
             for s in self.scopes.values()
-            if (type(s) == ConfigScope or type(s) == SingleFileScope)  # noqa: E721
+            if (type(s) is ConfigScope or type(s) is SingleFileScope)
         ]
 
     def highest_precedence_scope(self):
@@ -841,8 +841,6 @@ def _config():
     defaults = InternalConfigScope("_builtin", config_defaults)
     cfg.push_scope(defaults)
 
-    # TODO: do we need the configuration here from Spack?
-
     # add each scope
     for name, path in configuration_paths:
         cfg.push_scope(ConfigScope(name, path))
@@ -871,8 +869,8 @@ def add_from_file(filename, scope=None):
 
     # update all sections from config dict
     # We have to iterate on keys to keep overrides from the file
-    for section in data.keys():
-        if section in section_schemas.keys():
+    for section in data:
+        if section in section_schemas:
             # Special handling for compiler scope difference
             # Has to be handled after we choose a section
             if scope is None:
@@ -895,7 +893,7 @@ def add(fullpath, scope=None):
     has_existing_value = True
     path = ""
     override = False
-    for idx, name in enumerate(components[:-1]):
+    for idx, name in enumerate(itertools.islice(components, len(components) - 1)):
         # First handle double colons in constructing path
         colon = "::" if override else ":" if path else ""
         path += colon + name

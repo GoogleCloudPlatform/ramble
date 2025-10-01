@@ -131,6 +131,13 @@ class Gromacs(ExecutableApplication):
         description="GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP",
     )
 
+    input_file(
+        "water_33m",
+        url=f"file://{os.path.join(os.getcwd(), 'water_33m.tar.gz')}",
+        sha256="c38032a728f957cf90dd36f3f42c8018b98ea1f0a26b384b91bcbd6bc7ce410c",
+        description="A cubic box with 33 million water molecules (~100 million atoms). This deck is provided by Dr. Carsten Kutzner.",
+    )
+
     workload(
         "water_gmx50",
         executables=["pre-process", "execute-gen"],
@@ -172,6 +179,7 @@ class Gromacs(ExecutableApplication):
         executables=["pre-process", "execute-gen"],
         input="JCP_benchmarks",
     )
+    workload("water_33m", executables=["execute"], input="water_33m")
 
     workload_group(
         "all_workloads",
@@ -189,6 +197,7 @@ class Gromacs(ExecutableApplication):
             "rnase_cubic",
             "ion_channel",
             "adh_dodec",
+            "water_33m",
         ],
     )
 
@@ -297,6 +306,12 @@ class Gromacs(ExecutableApplication):
         default="{lignocellulose}/lignocellulose-rf.tpr",
         description="Input path for lignocellulose",
         workload="lignocellulose",
+    )
+    workload_variable(
+        "input_path",
+        default="{water_33m}/box_with_33M_waters_default.tpr",
+        description="Input path for water_33m",
+        workload="water_33m",
     )
     workload_variable(
         "type",

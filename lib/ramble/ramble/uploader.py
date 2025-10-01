@@ -99,9 +99,16 @@ class Experiment:
         import copy
 
         j = copy.deepcopy(self.__dict__)
+        data_copy = copy.deepcopy(self.data)
 
-        j["foms"] = json.dumps(self.foms)
-        j["data"] = json.dumps(self.data, default=vars)
+        # These two fields will be deprecated in an upcoming release.
+        # For now we avoid setting them to a reduced set of information to
+        # maintain backwards database compatibiilty but also avoiding
+        # large un-needed uploads
+        data_copy["CONTEXTS"] = []
+
+        j["foms"] = json.dumps(None)
+        j["data"] = json.dumps(data_copy, default=vars)
         return j
 
 
@@ -285,7 +292,7 @@ class BigQueryUploader(Uploader):
             logger.msg("Upload FOMs...")
             errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
 
-        for errors, name in zip([errors1, errors2], ["exp", "fom"]):
+        for errors, name in zip((errors1, errors2), ("exp", "fom")):
             if errors == []:
                 logger.msg(f"New rows have been added in {name}")
             else:

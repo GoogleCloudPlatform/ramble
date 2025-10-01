@@ -37,6 +37,27 @@ class Wrfv4(ExecutableApplication):
 
         required_package("wrf")
 
+    variant(
+        "wrf_tiles",
+        default=False,
+        values=[True, False],
+        description="Whether to define tiles for WRF or not",
+    )
+
+    variant(
+        "wrf_explicit_x",
+        default=False,
+        values=[True, False],
+        description="Whether to set explicit nprocs_x in the namelist or not",
+    )
+
+    variant(
+        "wrf_explicit_y",
+        default=False,
+        values=[True, False],
+        description="Whether to set explicit nprocs_y in the namelist or not",
+    )
+
     input_file(
         "CONUS_2p5km",
         url="https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus2.5km.tar.gz",
@@ -82,24 +103,109 @@ class Wrfv4(ExecutableApplication):
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
+
+    executable(
+        "define_nprocs_x",
+        template=[
+            "awk '/e_sn.*=/ {print $0 RS \" nprocs_x                            = {nprocs_x},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
+            "mv {experiment_run_dir}/temp_namelist.input {experiment_run_dir}/namelist.input",
+        ],
+        redirect="",
+        output_capture="",
+        when="+wrf_explicit_x",
+    )
+
+    executable(
+        "define_nprocs_y",
+        template=[
+            "awk '/e_sn.*=/ {print $0 RS \" nprocs_y                            = {nprocs_y},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
+            "mv {experiment_run_dir}/temp_namelist.input {experiment_run_dir}/namelist.input",
+        ],
+        redirect="",
+        output_capture="",
+        when="+wrf_explicit_y",
+    )
+
     executable("execute", "wrf.exe", use_mpi=True)
 
     workload(
         "CONUS_2p5km",
-        executables=["copy", "cleanup", "execute"],
+        executables=[
+            "copy",
+            "cleanup",
+            "define_nprocs_y",
+            "define_nprocs_x",
+            "execute",
+        ],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["copy", "cleanup", "fix_12km", "execute"],
+        executables=[
+            "copy",
+            "cleanup",
+            "define_nprocs_y",
+            "define_nprocs_x",
+            "fix_12km",
+            "execute",
+        ],
         input="CONUS_12km",
     )
 
     workload(
         "Maria_1km",
-        executables=["copy", "cleanup", "execute"],
+        executables=[
+            "copy",
+            "cleanup",
+            "define_nprocs_y",
+            "define_nprocs_x",
+            "execute",
+        ],
         input="Maria_1km",
+    )
+
+    workload_group(
+        "all_workloads", workloads=["CONUS_2p5km", "CONUS_12km", "Maria_1km"]
+    )
+
+    with when("+wrf_tiles"):
+        environment_variable(
+            "NUM_WRF_TILES",
+            value="{num_tiles}",
+            description="Number of tiles to use in WRF domain",
+            workload_group="all_workloads",
+        )
+
+        workload_variable(
+            "num_tiles",
+            default="1",
+            description="Number of tiles to use in WRF domain",
+            workload_group="all_workloads",
+        )
+
+    workload_variable(
+        "nprocs_x",
+        default="{n_ranks}",
+        description="Number of process in the x dimension",
+        workload_group="all_workloads",
+        when=["+wrf_explicit_x"],
+    )
+
+    workload_variable(
+        "nprocs_y",
+        default="{n_ranks}",
+        description="Number of process in the y dimension",
+        workload_group="all_workloads",
+        when=["+wrf_explicit_y", "~wrf_explicit_x"],
+    )
+
+    workload_variable(
+        "nprocs_y",
+        default="1",
+        description="Number of process in the y dimension",
+        workload_group="all_workloads",
+        when=["+wrf_explicit_y", "+wrf_explicit_x"],
     )
 
     workload_variable(

@@ -6,196 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import copy
 from typing import List, Optional
 
 import ramble.util.colors as rucolor
-
-
-class WorkloadVariable:
-    """Class representing a variable definition"""
-
-    def __init__(
-        self,
-        name: str,
-        default=None,
-        description: str = None,
-        values=None,
-        expandable: bool = True,
-        track_used: bool = True,
-        when=None,
-        **kwargs,
-    ):
-        """Constructor for a new variable
-
-        Args:
-            name (str): Name of variable
-            default: Default value of variable
-            description (str): Description of variable
-            values: List of suggested values for variable
-            expandable (bool): True if variable can be expanded, False otherwise
-            track_used (bool): True if variable should be considered used,
-                               False to ignore it for vectorizing experiments
-            when (list | None): List of when conditions to apply to directive
-        """
-        self.name = name
-        self.default = default
-        self.description = description
-        self.values = values.copy() if isinstance(values, list) else [values]
-        self.expandable = expandable
-        self.track_used = track_used
-        self.when = when.copy() if when else []
-
-    def __str__(self):
-        if not hasattr(self, "_str_indent"):
-            self._str_indent = 0
-        return self.as_str(n_indent=self._str_indent)
-
-    def as_str(self, n_indent: int = 0):
-        """String representation of this variable
-
-        Args:
-          n_indent (int): Number of spaces to indent string lines with
-
-        Returns:
-            (str): Representation of this variable
-        """
-        indentation = " " * n_indent
-
-        print_attrs = ["Description", "Default", "Values"]
-
-        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
-        for print_attr in print_attrs:
-            name = print_attr
-            if print_attr == "Values":
-                name = "Suggested Values"
-            attr_name = print_attr.lower()
-
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
-        return out_str
-
-    def copy(self):
-        return copy.deepcopy(self)
-
-
-class WorkloadVariableModification:
-    """Class representing a variable modification"""
-
-    def __init__(
-        self,
-        name: str,
-        modification: str,
-        method: str = "set",
-        separator: str = " ",
-        when=None,
-        **kwargs,
-    ):
-        """Constructor for a new variable modification
-
-        Args:
-            name (str): The variable to modify
-            modification (str): The value to modify 'name' with
-            method (str): How the modification should be applied
-            mode (str): Single mode to group this modification into
-            modes (str): List of modes to group this modification into
-            separator (str): Optional separator to use when modifying with 'append' or
-                            'prepend' methods.
-            when (list | None): List of when conditions this modification should apply in
-
-        Supported values are 'append', 'prepend', and 'set':
-            'append' will add the modification to the end of 'name'
-            'prepend' will add the modification to the beginning of 'name'
-            'set' (Default) will overwrite 'name' with the modification
-        """
-        self.name = name
-        self.modification = modification
-        self.method = method
-        self.separator = separator
-        self.when = when.copy() if when else []
-
-    def __str__(self):
-        if not hasattr(self, "_str_indent"):
-            self._str_indent = 0
-        return self.as_str(n_indent=self._str_indent)
-
-    def as_str(self, n_indent: int = 0):
-        """String representation of this variable
-
-        Args:
-          n_indent (int): Number of spaces to indent string lines with
-
-        Returns:
-            (str): Representation of this variable
-        """
-        indentation = " " * n_indent
-
-        print_attrs = ["Modification", "Method", "Separator", "When"]
-
-        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
-        for print_attr in print_attrs:
-            name = print_attr
-            attr_name = print_attr.lower()
-
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                if print_attr == "Separator":
-                    attr_val = f"'{attr_val}'"
-                out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
-        return out_str
-
-    def copy(self):
-        return copy.deepcopy(self)
-
-
-class WorkloadEnvironmentVariable:
-    """Class representing an environment variable in a workload"""
-
-    def __init__(
-        self,
-        name: str,
-        value=None,
-        description: str = None,
-        when=None,
-        **kwargs,
-    ):
-        """WorkloadEnvironmentVariable constructor
-
-        Args:
-            name (str): Name of environment variable
-            value: Value to set environment variable to
-            description (str): Description of the environment variable
-            when (list | None): List of when conditions to apply to directive
-        """
-        self.name = name
-        self.value = value
-        self.description = description
-        self.when = when.copy() if when else []
-
-    def as_str(self, n_indent: int = 0):
-        """String representation of environment variable
-
-        Args:
-            n_indent (int): Number of spaces to indent string representation by
-
-        Returns:
-            (str): String representing this environment variable
-        """
-        indentation = " " * n_indent
-
-        print_attrs = ["Description", "Value"]
-
-        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
-        for name in print_attrs:
-            attr_name = name.lower()
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                out_str += f'{indentation}    {name}: {attr_val.replace("@", "@@")}\n'
-        return out_str
-
-    def copy(self):
-        return copy.deepcopy(self)
+from ramble.definitions.variables import EnvironmentVariable, Variable
 
 
 class Workload:
@@ -242,7 +56,7 @@ class Workload:
             self._str_indent = 0
         return self.as_str(n_indent=self._str_indent)
 
-    def as_str(self, n_indent: int = 0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of this workload
 
         Args:
@@ -276,7 +90,7 @@ class Workload:
                 for var in var_list:
                     var_dict[var.name] = var
                 for var_name in sorted(var_dict.keys()):
-                    out_str += var_dict[var_name].as_str(n_indent + 12)
+                    out_str += var_dict[var_name].as_str(n_indent=(n_indent + 12), verbose=verbose)
 
         if self.environment_variables:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
@@ -290,28 +104,31 @@ class Workload:
 
                 env_var_dict = {}
                 for env_var in env_var_list:
-                    env_var_dict[var.name] = env_var
+                    env_var_dict[env_var.name] = env_var
                 for env_var_name in sorted(env_var_dict.keys()):
-                    out_str += env_var_dict[env_var_name].as_str(n_indent + 12)
+                    out_str += env_var_dict[env_var_name].as_str(
+                        n_indent=(n_indent + 12), verbose=verbose
+                    )
 
         return out_str
 
-    def add_variable(self, variable: WorkloadVariable):
+    def add_variable(self, variable: Variable):
         """Add a variable to this workload
 
         Args:
-            variable (WorkloadVariable): New variable to add to this workload
+            variable (ramble.definitions.variables.Variable): New variable to add to this workload
         """
         when_key = frozenset(variable.when)
         if when_key not in self.variables:
             self.variables[when_key] = []
         self.variables[when_key].append(variable)
 
-    def add_environment_variable(self, env_var: WorkloadEnvironmentVariable):
+    def add_environment_variable(self, env_var: EnvironmentVariable):
         """Add an environment variable to this workload
 
         Args:
-            env_var (WorkloadEnvironmentVariable): New environment variable to add to this workload
+            env_var (ramble.definitions.variables.EnvironmentVariable): New environment variable to
+                add to this workload
         """
         when_key = frozenset(env_var.when)
         if when_key not in self.environment_variables:
@@ -388,7 +205,8 @@ class Workload:
             var_name (str): Name of variable to find
 
         Returns:
-            (WorkloadVariable | None): Variable instance if it exists, None if it is not found
+            (ramble.definitions.variables.Variable | None): Variable instance if it exists, None if
+                it is not found
         """
         named_vars = []
         for var_list in self.variables.values():
@@ -404,8 +222,8 @@ class Workload:
             env_var_name (str): Name of environment variable to find
 
         Returns:
-            (WorkloadEnvironmentVariable | None): Environment variable instance
-                                                  if it exists, None if it is not found
+            (ramble.definitions.variables.EnvironmentVariable | None): Environment variable
+                instance if it exists, None if it is not found
         """
         named_env_vars = []
         for env_var_list in self.environment_variables.values():

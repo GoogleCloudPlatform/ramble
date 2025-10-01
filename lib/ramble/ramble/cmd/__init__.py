@@ -17,7 +17,6 @@ from ruamel.yaml.error import MarkedYAMLError
 from llnl.util.filesystem import join_path
 from llnl.util.lang import attr_setdefault
 
-import ramble.config
 import ramble.error
 import ramble.paths
 import ramble.workspace
@@ -25,7 +24,6 @@ from ramble.error import RambleCommandError
 from ramble.util.logger import logger
 
 import spack.extensions
-import spack.util.string
 
 # cmd has a submodule called "list" so preserve the python list module
 python_list = list

@@ -47,6 +47,10 @@ class Basic(ExecutableApplication):
         "my_var", default="1.0", description="Example var", workload="test_wl"
     )
 
+    workload_variable(
+        "foo.bar", default="", description="Example var", workload="test_wl"
+    )
+
     environment_variable(
         "TEST_ENV", value="1", description="test var", workload="test_wl"
     )

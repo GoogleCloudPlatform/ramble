@@ -20,7 +20,7 @@ python = RambleCommand("python")
 
 def test_python():
     out = python("-c", "import ramble; print(ramble.ramble_version)")
-    assert out.strip() == ramble.ramble_version
+    assert ramble.ramble_version in out.strip()
 
 
 def test_python_interpreter_path():

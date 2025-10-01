@@ -89,7 +89,7 @@ class Pip(PackageManagerBase):
         self.runner.create_env(env_path)
 
         env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
-        require_env = self.environment_required()
+        require_env = self.environment_required
         software_envs = workspace.software_environments
         software_env = software_envs.render_environment(
             env_context, app_inst.expander, self, require=require_env
@@ -124,7 +124,7 @@ class Pip(PackageManagerBase):
             workspace.add_to_cache(cache_tupl)
 
         env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
-        if self.environment_required():
+        if self.environment_required:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.install()
@@ -175,7 +175,7 @@ class Pip(PackageManagerBase):
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
-        if self.environment_required():
+        if self.environment_required:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.define_path_vars(
@@ -188,7 +188,7 @@ class Pip(PackageManagerBase):
         Args:
             pkg (RenderedPackage): Reference to a rendered package
             all_pkgs (dict): All related packages
-            compiler (boolean): True if this pkg is used as a compiler
+            compiler (bool): True if this pkg is used as a compiler
         """
         return pkg.spec
 

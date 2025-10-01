@@ -17,16 +17,13 @@ import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
-import ramble.cmd.common.arguments
 import ramble.cmd.common.arguments as arguments
 import ramble.config
-import ramble.context
 import ramble.expander
 import ramble.experiment_set
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
-import ramble.uploader
 import ramble.util.colors as rucolor
 import ramble.workspace
 import ramble.workspace.shell
@@ -175,8 +172,11 @@ def workspace_activate(args):
 
     # Activate new workspace
     active_workspace = ramble.workspace.Workspace(workspace_path)
+    enable_prompt = args.prompt or ramble.config.get("config:enable_workspace_prompt")
     cmds += ramble.workspace.shell.activate_header(
-        ws=active_workspace, shell=args.shell, prompt=workspace_prompt if args.prompt else None
+        ws=active_workspace,
+        shell=args.shell,
+        prompt=workspace_prompt if enable_prompt else None,
     )
     env_mods.extend(ramble.workspace.shell.activate(ws=active_workspace))
     cmds += env_mods.shell_modifications(args.shell)
@@ -593,6 +593,9 @@ def workspace_push_to_cache(args):
     current_pipeline = ramble.pipeline.pipelines.pushtocache
     ws = ramble.cmd.require_active_workspace(cmd_name="workspace pushtocache")
 
+    if args.dry_run:
+        ws.dry_run = True
+
     filters = ramble.filters.Filters(
         phase_filters="*",
         include_where_filters=args.where,
@@ -609,6 +612,14 @@ def workspace_push_to_cache(args):
 
 def workspace_push_to_cache_setup_parser(subparser):
     """push workspace envs to a given buildcache"""
+
+    subparser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="perform a dry run. Acts like it will push "
+        + "to a cache, but will not actually create a cache.",
+    )
 
     subparser.add_argument(
         "-d", dest="cache_path", default=None, required=True, help="Path to cache."

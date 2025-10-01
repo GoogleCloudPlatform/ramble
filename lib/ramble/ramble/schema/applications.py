@@ -17,7 +17,6 @@ from llnl.util.lang import union_dicts
 import ramble.schema.env_vars
 import ramble.schema.formatted_executables
 import ramble.schema.internals
-import ramble.schema.licenses
 import ramble.schema.modifiers
 import ramble.schema.success_criteria
 import ramble.schema.types

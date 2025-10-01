@@ -44,7 +44,7 @@ def add_mode(mod_inst, mode_num=1):
     mode_name = "TestMode%s" % mode_num
     mode_desc = "This is a test mode"
 
-    mod_inst.mode(mode_name, description=mode_desc)  # noqa: F405
+    mod_inst.mode(mode_name, description=mode_desc)
 
     mode_def = {"name": mode_name, "description": mode_desc}
 
@@ -416,7 +416,6 @@ def test_executable_modifier_directive(mod_class):
         mod_name = test_def
 
         assert mod_name in mod_inst.executable_modifiers[frozenset()]
-        assert mod_name == mod_inst.executable_modifiers[frozenset()][mod_name]
 
 
 def add_env_var_modification(mod_inst, env_var_mod_num=1):
@@ -442,17 +441,14 @@ def test_env_var_modification_directive(mod_class):
     assert hasattr(mod_inst, "env_var_modifications")
 
     for test_def in test_defs:
-        method = test_def["method"]
         mode = test_def["mode"]
+        name = test_def["name"]
+
         mode_when = frozenset([f"{mod_inst.name}_mode={mode}"])
 
-        assert method in mod_inst.env_var_modifications[mode_when]
-        if method == "set":
-            assert test_def["name"] in mod_inst.env_var_modifications[mode_when][method]
-            assert (
-                test_def["modification"]
-                == mod_inst.env_var_modifications[mode_when][method][test_def["name"]]
-            )
+        assert name in mod_inst.env_var_modifications[mode_when]
+        env_var_mod = mod_inst.env_var_modifications[mode_when][name]
+        assert test_def["modification"] == env_var_mod.set[name]
 
 
 def add_modifier_variable(mod_inst, mod_var_num=1):

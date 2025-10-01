@@ -20,12 +20,35 @@ class IntelMlc(ExecutableApplication):
 
     required_package("intel-mlc")
 
-    executable(
-        "execute_bw",
-        "{intel-mlc_path}/{exec_name} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
+    with when("package_manager_family=spack"):
+        software_spec(
+            "intel-mlc",
+            pkg_spec="intel-mlc",
+        )
+
+    variant(
+        "configure_hugepage",
+        default=False,
+        values=[False, True],
+        description="When true, configure hugepage setting",
     )
 
-    workload("max_bandwidth", executables=["execute_bw"])
+    executable(
+        "configure_hugepage",
+        template=[
+            "sudo sysctl -w vm.nr_hugepages={nr_hugepages}",
+            "sudo sysctl -p",
+        ],
+        use_mpi=False,
+        when=["+configure_hugepage"],
+    )
+
+    executable(
+        "execute_bw",
+        "{mlc_exec_path} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
+    )
+
+    workload("max_bandwidth", executables=["configure_hugepage", "execute_bw"])
 
     workload_group("all_workloads", workloads=["max_bandwidth"])
 
@@ -34,6 +57,13 @@ class IntelMlc(ExecutableApplication):
         default="mlc",
         values=["mlc", "mlc.exe"],
         description="Name of executable to use for Intel MLC",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "mlc_exec_path",
+        default="{intel-mlc_path}/bin/{exec_name}",
+        description="Path to MLC executable",
         workload_group="all_workloads",
     )
 
@@ -85,6 +115,13 @@ class IntelMlc(ExecutableApplication):
         "spread_divisions",
         default="2",
         description="Number of blocks to spread threads over",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "nr_hugepages",
+        default="4000",
+        description="Number of hugepages to configure",
         workload_group="all_workloads",
     )
 
@@ -140,6 +177,14 @@ class IntelMlc(ExecutableApplication):
         fom_regex=r"Stream-triad like\s*:\s+(?P<bw>[0-9\.]+)",
         group_name="bw",
         units="MB/s",
+    )
+
+    figure_of_merit(
+        "vm.nr_hugepages",
+        fom_type=FomType.INFO,
+        fom_regex=r"vm.nr_hugepages\s+=\s+(?P<nr_hp>[0-9]+)",
+        group_name="nr_hp",
+        units="",
     )
 
     def _compact_thread_indices(self, n_threads, max_thread, spread_divisions):

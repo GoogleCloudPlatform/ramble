@@ -19,8 +19,6 @@ import ramble.pipeline
 import ramble.repository
 import ramble.stage
 import ramble.util.path
-import ramble.workspace
-import ramble.workspace.shell
 from ramble.main import RambleCommand
 from ramble.util.logger import logger
 

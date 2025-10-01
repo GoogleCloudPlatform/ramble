@@ -10,7 +10,7 @@ from ramble.appkit import *
 
 
 class Hostname(ExecutableApplication):
-    """This is an example application that will simply run the hostname command"""  # noqa: E501
+    """This is an example application that will simply run the hostname command"""
 
     name = "hostname"
 

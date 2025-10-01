@@ -12,6 +12,7 @@ directives, which are to allow functions to be invoked at class level
 
 import copy
 import functools
+import inspect
 from collections.abc import Sequence  # novm
 from typing import Any, Dict, List
 
@@ -221,31 +222,8 @@ class DirectiveMeta(type):
                 if DirectiveMeta._when_constraints_from_context:
                     # Check that directives not yet supporting the when= argument
                     # are not used inside the context manager
-                    if decorated_function.__name__ not in [
-                        "software_spec",
-                        "required_package",
-                        "define_compiler",
-                        "package_manager_config",
-                        "register_builtin",
-                        "register_phase",
-                        "register_template",
-                        "figure_of_merit",
-                        "figure_of_merit_context",
-                        "formatted_executable",
-                        "register_validator",
-                        "variable",
-                        "workload_variable",
-                        "modifier_variable",
-                        "required_variable",
-                        "package_manager_variable",
-                        "workflow_manager_variable",
-                        "environment_variable",
-                        "env_var_modification",
-                        "workload",
-                        "executable",
-                        "executable_modifier",
-                        "input_file",
-                    ]:
+                    sig = inspect.signature(decorated_function)
+                    if "when" not in sig.parameters:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'
                             ' context since it does not support a "when=" '

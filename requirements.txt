@@ -10,3 +10,5 @@ tqdm
 deprecation
 pandas
 matplotlib
+setuptools
+scipy

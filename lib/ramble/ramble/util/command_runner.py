@@ -5,6 +5,7 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+import time
 from typing import List
 
 from ramble.util.executable import which
@@ -29,6 +30,7 @@ class CommandRunner:
         self.name = name
         self.dry_run = dry_run
         self.shell = shell
+        self.elapsed_time = 0
         required = not self.dry_run
         try:
             if path is None:
@@ -116,6 +118,7 @@ class CommandRunner:
         logger.msg("")
         logger.msg(banner)
         logger.msg(finished_str)
+        logger.msg(f"** Took {self.elapsed_time} seconds")
         logger.msg(banner)
         logger.msg("")
 
@@ -137,6 +140,7 @@ class CommandRunner:
 
         self._cmd_start(executable, args)
         out_str = None
+        start_time = time.time()
         try:
             if active_stream is None:
                 if return_output:
@@ -153,6 +157,7 @@ class CommandRunner:
                 logger.error(e)
                 error = True
             pass
+        self.elapsed_time = time.time() - start_time
 
         if error:
             err = f"Error running {self.name} command: {executable} " + " ".join(args)

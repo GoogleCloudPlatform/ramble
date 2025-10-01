@@ -59,7 +59,7 @@ def workflow_manager_variable(
     return _define_wm_variable
 
 
-@workflow_manager_directive(dicts=())
+@workflow_manager_directive("class_families")
 def workflow_manager_family(*names: str, **kwargs):
     """Add a new family to this workflow manager
 
@@ -68,7 +68,7 @@ def workflow_manager_family(*names: str, **kwargs):
     """
 
     def _define_workflow_manager_family(wm):
-        families_from_base = getattr(wm, "families", [])
-        wm.families = list(sorted(set(families_from_base + list(names))))
+        for name in names:
+            wm.class_families[name] = True
 
     return _define_workflow_manager_family

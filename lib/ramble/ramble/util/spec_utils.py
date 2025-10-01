@@ -70,9 +70,9 @@ class SoftwareSpec:
         for key, val in self_dict.items():
             yield f"software:packages:{self.name}:{key}:{val}"
 
-    def as_str(self, indent=0):
-        base_indent = " " * indent
-        indentation = " " * (indent + 4)
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        base_indent = " " * n_indent
+        indentation = " " * (n_indent + 4)
         self_dict = self.to_dict()
         color_name = ramble.util.colors.section_title(self.name)
         output = f"{base_indent}{color_name}:\n"

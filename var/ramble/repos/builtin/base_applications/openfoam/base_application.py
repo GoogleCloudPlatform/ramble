@@ -15,7 +15,7 @@ from ramble.expander import Expander
 class Openfoam(ExecutableApplication):
     """Base application definition for OpenFoam"""
 
-    name = "openfoamorg"
+    name = "openfoam"
 
     maintainers("douglasjacobsen")
 
@@ -418,6 +418,13 @@ class Openfoam(ExecutableApplication):
         "simpleFoam_completed",
         mode="string",
         match="Finalising parallel run",
+        file="{experiment_run_dir}/log.simpleFoam",
+    )
+
+    success_criteria(
+        "nan",
+        mode="string",
+        anti_match=r".*?[+-=\s]nan",
         file="{experiment_run_dir}/log.simpleFoam",
     )
 

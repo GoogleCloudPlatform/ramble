@@ -171,10 +171,14 @@ ramble:
                 assert "Core Time = 11.111 s" in data
                 assert "Core Time = 22.222 s" in data
                 assert "summary::mean = 16.666 s" in data
+                assert "summary::harmonic_mean = 14.815 s" in data
+                assert "summary::median = 16.666 s" in data
                 assert "summary::variance = 61.727 s^2" in data
+                assert "summary::stdev = 7.857 s" in data
+                assert "summary::cv = 0.471" in data
 
         # When --summary-only, only the base experiments are included
-        workspace("analyze", "-s", global_args=["-w", workspace_name])  # noqa: E501
+        workspace("analyze", "-s", global_args=["-w", workspace_name])
         result_file = glob.glob(os.path.join(ws1.root, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
@@ -229,3 +233,4 @@ ramble:
             # Assert that the last experiment is not included in the stats
             assert "summary::max = 2.0 minutes" in data
             assert "summary::mean = 1.5 minutes" in data
+            assert "mode:\n      value = Sleep" in data

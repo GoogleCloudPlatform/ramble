@@ -11,6 +11,7 @@ from enum import Enum
 from typing import Any, Callable, Optional, Union
 
 import ramble.error
+import ramble.util.colors as rucolor
 
 reserved_variants = {
     "modifier",
@@ -32,6 +33,39 @@ class VariantSet:
         self.multi_value_variants = {}
         self.experiment_variants = {}
         self._set_cache = None
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of this variant set
+
+        Args:
+            n_indent (int): Number of spaces to indent string with
+            verbose: Print verbose
+
+        Returns:
+            (str): Representation of this variant set
+        """
+        to_print = []
+        for variant in self.default_variants.values():
+            to_print.append(variant)
+
+        for variant_set in self.multi_value_variants.values():
+            for variant in variant_set:
+                to_print.append(variant)
+
+        for variant in self.experiment_variants.values():
+            to_print.append(variant)
+
+        if verbose:
+            out_str = "\n".join(v.as_str(verbose=True) for v in to_print)
+        else:
+            out_str = "  ".join(v.as_str(verbose=False) for v in to_print)
+
+        return out_str
 
     def copy(self):
         new_set = VariantSet()
@@ -284,28 +318,33 @@ class Variant:
                 return f"~{self.name}"
         return f"{self.name}={str(self.default)}"
 
-    def as_str(self, indent=0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String documentation of this variant
 
         Returns:
             str: String for information of this variant
         """
-        indentation = " " * indent
-        out_str = f"{indentation}Variant: {self.name}\n"
-        attrs = [
-            ("Description", "description"),
-            ("Default", "default"),
-            ("Values", "values"),
-        ]
-        for print_name, attr_name in attrs:
-            if hasattr(self, attr_name):
-                value = getattr(self, attr_name, None)
-                if value is not None:
-                    out_str += f"{indentation}  {print_name}: {value}"
+        indentation = " " * n_indent
+
+        if verbose:
+            out_str = rucolor.section_title(f"{indentation}{self.name}:\n")
+            attrs = [
+                ("Description", "description"),
+                ("Default", "default"),
+                ("Values", "values"),
+            ]
+            for print_name, attr_name in attrs:
+                if hasattr(self, attr_name):
+                    value = getattr(self, attr_name, None)
+                    if value is not None:
+                        out_str += f"{indentation}    {rucolor.nested_1(print_name)}: {value}\n"
+        else:
+            out_str = self.name
+
         return out_str
 
     def __str__(self):
-        return self.as_str(indent=0)
+        return self.as_str(n_indent=0)
 
 
 def validate_variant(variant: str):

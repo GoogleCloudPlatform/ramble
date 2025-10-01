@@ -28,19 +28,15 @@ import spack.util.spack_yaml as syaml
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
+    "mutable_config",
+    "mutable_mock_workspace_path",
+    "mutable_mock_apps_repo",
+    "workspace_deactivate",
 )
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 on = RambleCommand("on")
-
-
-@pytest.fixture()
-def workspace_deactivate():
-    yield
-    ramble.workspace._active_workspace = None
-    os.environ.pop("RAMBLE_WORKSPACE", None)
 
 
 def add_basic(ws):
@@ -152,6 +148,64 @@ def test_workspace_activate_fails(mutable_mock_workspace_path):
     workspace("create", "foo")
     out = workspace("activate", "foo")
     assert "To set up shell support" in out
+
+
+def test_workspace_activate_prompt(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    # Assert no prompt modification
+    output = workspace("activate", workspace_name, "--sh")
+    assert "PS1" not in output
+
+    # Assert prompt mod with --prompt
+    output = workspace("activate", workspace_name, "--sh", "--prompt")
+    assert "export RAMBLE_OLD_PS1=" in output
+    assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+
+    # Assert prompt mod with config value
+    with ramble.config.override("config:enable_workspace_prompt", True):
+        output = workspace("activate", workspace_name, "--sh")
+        assert "export RAMBLE_OLD_PS1=" in output
+        assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+
+
+def test_workspace_activate_by_name(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    output = workspace("activate", workspace_name, "--sh")
+    assert f"export RAMBLE_WORKSPACE={ws.root}" in output
+
+
+def test_workspace_activate_by_dir(tmpdir):
+    with tmpdir.as_cwd():
+        workspace("create", "-d", "foo")
+        output = workspace("activate", "--dir", "foo", "--sh")
+        ws_path = os.path.abspath("foo")
+        assert f"export RAMBLE_WORKSPACE={ws_path}" in output
+
+
+def test_workspace_activate_temp():
+    """Test `ramble workspace activate --temp`."""
+    # Test without prompt decoration
+    output = workspace("activate", "--temp", "--sh")
+
+    match = re.search(r"export RAMBLE_WORKSPACE=([^;]+)", output)
+    workspace_path = match.group(1)
+
+    assert os.path.isdir(workspace_path)
+    assert ramble.workspace.is_workspace_dir(workspace_path)
+
+
+def test_workspace_activate_non_existent():
+    output = workspace("activate", "non-existent-ws", "--sh", fail_on_error=False)
+    assert "No such workspace: 'non-existent-ws'" in output
+
+
+def test_workspace_activate_no_args():
+    output = workspace("activate", fail_on_error=False)
+    assert "ramble workspace activate requires a workspace name, directory, or --temp" in output
 
 
 def test_workspace_list(mutable_mock_workspace_path):
@@ -2832,12 +2886,36 @@ def test_workspace_config_squash(workspace_name, capsys):
             "zlib",
             "--wf",
             "ensure_installed",
+            "-e",
+            "zlib-repeats",
             "-v",
             "n_ranks=1",
             "-v",
             "n_nodes=1",
             "-p",
             "spack",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Add repeats for one set of experiments.
+        config(
+            "add",
+            "applications:zlib:workloads:ensure_installed:experiments:zlib-repeats:n_repeats:5",
             global_args=global_args,
         )
 
@@ -2890,3 +2968,121 @@ def test_workspace_config_squash(workspace_name, capsys):
             data = f.read()
             assert "foo: bar" not in data
             assert "test_var: test_value" not in data
+
+
+def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
+    test_vars_include = """variables:
+  foo: bar
+  n_ranks: 1
+  test_var: test_value
+"""
+
+    test_software_include = """software:
+  packages:
+    gcc:
+      pkg_spec: gcc@9.3.0 target=x86_64
+  environments:
+    gcc:
+      packages:
+      - gcc
+"""
+
+    global_args = ["-w", workspace_name]
+
+    include_root = str(tmpdir)
+
+    with ramble.workspace.create(workspace_name) as ws:
+        with open(f"{os.path.join(include_root, 'variables.yaml')}", "w+") as f:
+            f.write(test_vars_include)
+
+        with open(f"{os.path.join(include_root, 'software.yaml')}", "w+") as f:
+            f.write(test_software_include)
+
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-e",
+            "zlib-repeats",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Add repeats for one set of experiments.
+        config(
+            "add",
+            "applications:zlib:workloads:ensure_installed:experiments:zlib-repeats:n_repeats:5",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        workspace("manage", "includes", "--add", include_root, global_args=global_args)
+
+        config_output = config("get", "variables", global_args=global_args)
+
+        assert "foo: bar" in config_output
+
+        ws.write()
+
+        output = workspace("config", "--simplify-software", global_args=global_args)
+
+        assert "No changes were made to software configuration sections" in output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "pkg_spec: gcc@9.3.0" not in data
+            assert "gcc" not in data
+
+        output = workspace("config", "--simplify-variables", global_args=global_args)
+
+        assert "No variables were changed" in output
+
+
+def test_workspace_experiment_logs(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        output = workspace("experiment-logs", global_args=global_args)
+
+        expected_output = os.sep.join(
+            ["experiments", "basic", "test_wl", "generated", "generated.out"]
+        )
+        assert expected_output in output

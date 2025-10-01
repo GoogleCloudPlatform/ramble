@@ -150,8 +150,7 @@ env_vars:
     )
 
 
-# DEPRECATED: Remove `spack` when removed
-@pytest.mark.parametrize("section_key", ["spack", "software"])
+@pytest.mark.parametrize("section_key", ["software"])
 def test_merged_software_section(mock_low_high_config, section_key):
     low_path = mock_low_high_config.scopes["low"].path
     high_path = mock_low_high_config.scopes["high"].path
@@ -885,3 +884,29 @@ def test_config_edit_file(mutable_config, config_section, mock_editor):
     args = section_args(config_section)
 
     assert ramble.cmd.config.config_edit(args)
+
+
+def test_command_alias(mutable_empty_config):
+    import io
+    from contextlib import redirect_stdout
+
+    from ramble import main
+
+    # Test alias 'l' -> 'list'
+    config("add", "config:aliases:l:list")
+    f = io.StringIO()
+    with redirect_stdout(f):
+        ret = main.main(argv=["l"])
+    assert ret == 0
+    output = f.getvalue()
+    assert "gromacs" in output
+
+    # Test that an alias cannot override a built-in command
+    config("add", "config:aliases:list:info")
+    # `list` should run `list`, not `info`
+    f = io.StringIO()
+    with redirect_stdout(f):
+        ret = main.main(argv=["list"])
+    output = f.getvalue()
+    assert ret == 0
+    assert "ramble info" not in output

@@ -16,6 +16,7 @@ import shutil
 import stat
 import string
 import time
+from html import escape
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -56,7 +57,7 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions, format
+from ramble.util import constants, conversions
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -67,6 +68,8 @@ from ramble.workspace import namespace
 import spack.util.compression
 import spack.util.executable
 import spack.util.spack_json
+
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
 _NULL_CONTEXT = "null"
 
@@ -123,9 +126,8 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
     return profiler(phase_func)
 
 
-class ApplicationBase(metaclass=ApplicationMeta):
+class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     name = None
-    object_variants = None
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
@@ -153,10 +155,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
-            self.object_variants = ramble.variants.VariantSet()
-
         ramble.util.class_attributes.convert_class_attributes(self)
+
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
 
         self.keywords = ramble.keywords.keywords.copy()
 
@@ -194,6 +197,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._input_lock = None
         self._software_lock = None
         self._experiment_graph = None
+        # A dict storing fom values, currently it only stores inmem FOMs
+        self._fom_map = {}
 
         # Ensure we always have the application name, and this is never empty
         self.license_names = self.license_names + [self.name]
@@ -221,8 +226,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self.workflow_manager = None
 
+        self.result = ExperimentResult(self)
+
         ramble.util.directives.define_directive_methods(self)
 
+    @property
     def experiment_lock(self):
         """Create a lock for the experiment directory, and return it"""
         if self._exp_lock is None:
@@ -240,10 +248,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
         new_clone = type(self)(self._file_path)
         self.generated_experiments.append(new_clone)
 
-        if self.variables:
-            new_clone.set_variables(self.variables.copy(), self.experiment_set)
-        if self.variants:
-            new_clone.set_variants(self.variants)
+        clone_variables = {} if not self.variables else self.variables
+        clone_variants = {} if not self.variants else self.variants
+        new_clone.set_variables_and_variants(
+            clone_variables, clone_variants, self.experiment_set
+        )
         if self._env_variable_sets:
             new_clone.set_env_variable_sets(self._env_variable_sets.copy())
         if self.internals:
@@ -272,47 +281,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
             return False
 
         return True
-
-    def set_variants(self, variants):
-        """Set variants within an experiment instance, and process their
-        contents.
-
-        Args:
-            variants (dict): Dictionary of variant controls for this
-                             experiment.
-        """
-
-        self.variants = variants.copy()
-
-        for name, value in variants.items():
-            expanded_value = self.expander.expand_var(value, typed=True)
-            self.object_variants.experiment_variant(name, expanded_value)
-
-        self._set_package_manager()
-        self._set_workflow_manager()
-
-        for _, obj in self._objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            obj_variants = getattr(obj, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_default_variants(
-                    getattr(obj, "object_variants")
-                )
-                self.object_variants.merge_multi_value_variants(obj_variants)
-
-        base_chain = self.__class__.__mro__
-        for cls in base_chain:
-            if hasattr(cls, "name") and getattr(cls, "name") is not None:
-                self.object_variants.multi_value_variant(
-                    "application_name", value=cls.name
-                )
-
-        self.object_variants.default_variant(
-            "workload_name",
-            default=self.expander.workload_name,
-            description="Name of experiment workload",
-        )
 
     def _validate_workload(self, workload_name):
         """Checks if a workload name is valid and returns the workload that
@@ -376,43 +344,43 @@ class ApplicationBase(metaclass=ApplicationMeta):
         Use this instead of get_workload() if calling before variants are set,
         e.g. in set_variables()
         """
-        matching_workloads = []
         if not workload_name:
             workload_name = self.expander.workload_name
 
+        found_workload = False
         for when_set, workloads in self.workloads.items():
             if workload_name in workloads:
-                matching_workloads.append(workloads[workload_name])
+                found_workload = True
+                yield workloads[workload_name]
 
-        if not matching_workloads:
+        if not found_workload:
             raise ApplicationError(
                 f"Workload {workload_name} is not defined "
                 f"as a workload of application {self.name}."
             )
 
-        return matching_workloads
-
     def get_all_workloads(self):
         """Retrieves all workloads satisfying current `when` conditions."""
-        all_workloads = []
+        all_workloads_names = set()
+        found = False
         for when_set, workloads in self.workloads.items():
             if self.expander.satisfies(when_set, self.object_variants):
-                for workload in workloads:
-                    if workload in all_workloads:
+                for workload_name, workload in workloads.items():
+                    if workload_name in all_workloads_names:
                         logger.die(
-                            f"Workload {workload} is defined with "
+                            f"Workload {workload_name} is defined with "
                             "overlapping `when` conditions. Ensure that "
                             "conditions are mutually exclusive."
                         )
-                    all_workloads.append(workloads[workload])
+                    all_workloads_names.add(workload_name)
+                    yield workload
+                    found = True
 
-        if not all_workloads:
+        if not found:
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
                 f"  {self.object_variants.as_set()}"
             )
-
-        return all_workloads
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
@@ -447,11 +415,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         }
                     )
 
-            # Define any missing package manager variables
-            for var, val in self.package_manager.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
-
     def _set_workflow_manager(self):
         workflow_name = conversions.canonical_none(
             self.object_variants.value(namespace.workflow_manager)
@@ -473,12 +436,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 "Valid workflow managers can be listed via:\n"
                 "\tramble list --type workflow_managers"
             )
-
-        if self.workflow_manager is not None:
-            # Define any missing workflow manager variables
-            for var, val in self.workflow_manager.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
 
     def set_success_list(self, success_criteria):
         self.success_list = ramble.success_criteria.ScopedCriteriaList()
@@ -536,14 +493,14 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._env_variable_sets = env_variable_sets.copy()
 
         new_env_vars = {}
-        for env_var in self.selected_environment_variables().values():
+        for env_var in self.selected_environment_variables.values():
             action = "set"
             value = env_var.value
 
             add = True
             for env_var_set in self._env_variable_sets:
                 if action in env_var_set:
-                    if env_var.name in env_var_set[action].keys():
+                    if env_var.name in env_var_set[action]:
                         add = False
 
             if add:
@@ -551,20 +508,63 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self._env_variable_sets.append({"set": new_env_vars})
 
-    def set_variables(self, variables, experiment_set):
-        """Set internal reference to variables
+    def set_variables_and_variants(self, variables, variants, experiment_set):
+        """Set internal reference to variables and variants
 
         Also, create an application specific expander class.
+
+        Args:
+            variables (dict): Dictionary of variable definitions for this
+                             experiment.
+            variants (dict): Dictionary of variant controls for this
+                             experiment.
+            experiment_set: Reference to experiment set, for expanding
+                            referenced variables.
         """
 
-        self.variables = variables
+        self.variables = variables.copy()
+        self.variants = variants.copy()
         self.experiment_set = experiment_set
         self.expander = ramble.expander.Expander(
             self.variables, self.experiment_set
         )
 
+        # Define experiment variants
+        for name, value in variants.items():
+            expanded_value = self.expander.expand_var(value, typed=True)
+            self.object_variants.experiment_variant(name, expanded_value)
+
+        # Set up remaining variants
+        self._set_package_manager()
+        self._set_workflow_manager()
+
+        for _, obj in self._objects(
+            exclude_types=[ramble.repository.ObjectTypes.applications]
+        ):
+            obj_variants = getattr(obj, "object_variants", None)
+            if obj_variants is not None:
+                self.object_variants.merge_default_variants(
+                    getattr(obj, "object_variants")
+                )
+                self.object_variants.merge_multi_value_variants(obj_variants)
+
+        base_chain = self.__class__.__mro__
+        for cls in base_chain:
+            if hasattr(cls, "name") and getattr(cls, "name") is not None:
+                self.object_variants.multi_value_variant(
+                    "application_name", value=cls.name
+                )
+
+        # Define workload_name variant as early as possible
+        self.object_variants.default_variant(
+            "workload_name",
+            default=self.expander.workload_name,
+            description="Name of experiment workload",
+        )
+
         self.no_expand_vars = set()
         workloads = self.get_workloads()
+
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
                 if self.expander.satisfies(var_when_set, self.object_variants):
@@ -572,10 +572,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
 
-        # Define missing workload variables
-        for var, val in self.selected_variables().items():
-            if var not in self.variables:
-                self.define_variable(var, val.default)
+        # Define missing variables
+        for _, obj in self._objects():
+            for var, val in obj.selected_variables.items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
         if experiment_set and experiment_set._workspace:
@@ -657,38 +658,32 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 f"\tAvailable pipelinese are {self._pipelines}",
             )
 
-        phases = set()
-        final_added_index = None
-        if pipeline in self._pipeline_graphs:
-            for idx, phase in enumerate(
-                self._pipeline_graphs[pipeline].walk()
-            ):
-                if self.expander.satisfies(
-                    phase.when, variant_set=self.object_variants
-                ):
-                    for phase_filter in phase_filters:
-                        if fnmatch.fnmatch(phase.key, phase_filter):
-                            phases.add(phase)
-                            final_added_index = idx
+        if pipeline not in self._pipeline_graphs:
+            return
 
+        ordered_phases = list(self._pipeline_graphs[pipeline].walk())
+
+        selected_phases = set()
+        last_match_idx = -1
+
+        for i, phase in enumerate(ordered_phases):
+            if self.expander.satisfies(
+                phase.when, variant_set=self.object_variants
+            ) and any(fnmatch.fnmatch(phase.key, pf) for pf in phase_filters):
+                selected_phases.add(phase)
+                last_match_idx = i
+
+        final_phases = selected_phases
         include_phase_deps = ramble.config.get(
             "config:include_phase_dependencies"
         )
-        if include_phase_deps:
-            for idx, phase in enumerate(
-                self._pipeline_graphs[pipeline].walk()
-            ):
-                if idx < final_added_index and phase not in phases:
-                    phases.add(phase)
+        if include_phase_deps and last_match_idx > -1:
+            dependencies = ordered_phases[:last_match_idx]
+            final_phases.update(dependencies)
 
-        phase_order = []
-        for node in self._pipeline_graphs[pipeline].walk():
-            if node in phases:
-                phase_order.append(node.key)
-        return phase_order
-
-    def __str__(self):
-        return self.name
+        for phase in ordered_phases:
+            if phase in final_phases:
+                yield phase.key
 
     def print_vars(self, header="", vars_to_print=None, indent=""):
         print_vars = vars_to_print
@@ -743,7 +738,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             var_objs.append(self.workflow_manager)
 
         for var_obj in var_objs:
-            for var in var_obj.selected_variables().values():
+            for var in var_obj.selected_variables.values():
                 if var.name not in self.variables:
                     self.variables[var.name] = var.default
 
@@ -828,9 +823,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
         color.cprint(f"{indent}{header}:")
         for exp in self.chain_order:
             color.cprint(f"{indent}- {exp}")
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
 
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):
@@ -1138,7 +1130,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             self._modifier_instances.append(mod_inst)
 
             # Add this modifiers required variables for validation
-            self.keywords.update_keys(mod_inst.get_required_variables())
+            self.keywords.update_keys(mod_inst.required_variables)
 
         for mod_inst in self._modifier_instances:
             # Ensure no expand vars are set correctly for modifiers
@@ -1146,15 +1138,15 @@ class ApplicationBase(metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
-            # Define any missing modifier variables
-            for var, val in mod_inst.selected_variables().items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
-
             # Set standard variants for all modifiers
             obj_variants = getattr(mod_inst, "object_variants", None)
             if obj_variants is not None:
                 self.object_variants.merge_multi_value_variants(obj_variants)
+
+            # Define any missing modifier variables
+            for var, val in mod_inst.selected_variables.items():
+                if var not in self.variables:
+                    self.define_variable(var, val.default)
 
     def validate_experiment(
         self, warn_validation=True, die_on_validate_error=True
@@ -1178,7 +1170,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     continue
 
                 for name, validator in validator_defs.items():
-                    valid = expander.evaluate_predicate(validator["predicate"])
+                    try:
+                        valid = expander.evaluate_predicate(
+                            validator["predicate"]
+                        )
+                    except ramble.expander.ExpanderError:
+                        valid = False
                     if not valid:
                         msg = expander.expand_var(validator["message"])
                         err_msg = (
@@ -1309,9 +1306,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
             )
             self.variables[input_conf["input_name"]] = input_path
 
+    @property
     def selected_variables(self):
         """Extract all variables which would be included based
-        on the current variants.
+        on the current variants. This overrides the one defined in
+        the base mixin.
 
         Returns:
             (dict) Keys are variable names, values are variable instances
@@ -1333,9 +1332,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         return wl_vars
 
+    @property
     def selected_environment_variables(self):
         """Extract all environment variables which would be included based
-        on the current variants.
+        on the current variants. This overrides the one defined in
+        the base mixin.
 
         Returns:
             (dict) Keys are environment variable names, values are environment
@@ -1364,7 +1365,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         return selected_env_vars
 
-    def get_environment_variable_sets(self):
+    @property
+    def environment_variable_sets(self):
         """Get environment variable sets for all objects.
 
         Returns:
@@ -1382,9 +1384,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         for env_var_obj in env_var_objs:
             obj_env_vars = {}
-            for (
-                env_var
-            ) in env_var_obj.selected_environment_variables().values():
+            for env_var in env_var_obj.selected_environment_variables.values():
                 obj_env_vars[env_var.name] = env_var.value
 
             if obj_env_vars:
@@ -1433,16 +1433,12 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         )
                         logs.append(expanded_log)
 
-            analysis_logs, _ = self._analysis_dicts(success_list)
-
-            for log in analysis_logs:
-                logs.append(log)
-
-            logs = list(dict.fromkeys(logs))
+            analysis_logs, _, _ = self._analysis_dicts(success_list)
+            logs = list(set(logs) | analysis_logs.keys())
 
             for log in logs:
-                self._command_list.append('rm -f "%s"' % log)
-                self._command_list.append('touch "%s"' % log)
+                self._command_list.append(f'rm -f "{log}"')
+                self._command_list.append(f'touch "{log}"')
 
             for exec_node in exec_graph.walk():
                 exec_vars = {"executable_name": exec_node.key}
@@ -1637,7 +1633,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var("{experiment_run_dir}"),
-                template_name,  # noqa: F541
+                template_name,
             )
             self.variables[template_name] = expand_path
 
@@ -1672,12 +1668,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
         self._input_fetchers = {}
 
         # Batch 'when' evaluation to avoid repeat expander calls
-        when_satisfied = set()
-        for when_set in self.inputs.keys():
+        when_satisfied = {
+            when_set
+            for when_set in self.inputs.keys()
             if self.expander.satisfies(
                 when_set, variant_set=self.object_variants
-            ):
-                when_satisfied.add(when_set)
+            )
+        }
 
         inputs = {}
         workloads = (
@@ -1905,7 +1902,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         _check_shell_support(self)
 
-        exp_lock = self.experiment_lock()
+        exp_lock = self.experiment_lock
 
         self._define_commands(self._executable_graph, self.success_list)
         self._define_formatted_executables()
@@ -2095,7 +2092,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     }
                 )
 
-        with lk.WriteTransaction(self.experiment_lock()):
+        with lk.WriteTransaction(self.experiment_lock):
             with open(inventory_file, "w+") as f:
                 spack.util.spack_json.dump(self.hash_inventory, f)
 
@@ -2162,7 +2159,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
             # Copy all figure of merit files
             criteria_list = self.success_list
-            analysis_files, _ = self._analysis_dicts(criteria_list)
+            analysis_files, _, _ = self._analysis_dicts(criteria_list)
             for file in analysis_files.keys():
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
@@ -2207,6 +2204,32 @@ class ApplicationBase(metaclass=ApplicationMeta):
         """
         pass
 
+    def _extract_inmem_foms(self, inmem_fom_defs, fom_values):
+        """Extract in-memory FOMs"""
+        for context, foms in inmem_fom_defs.items():
+            if context not in fom_values:
+                fom_values[context] = {}
+            foms = inmem_fom_defs[context]["foms"]
+            for fom in foms:
+                fom_conf = inmem_fom_defs[context]["foms"][fom]
+                # Currently inmem FOM does not have semantics for expanded vars,
+                # so use the already expanded name and unit
+                fom_name = fom_conf["fom_name_expanded"]
+                # TODO: this can be extended to support derived FOMs,
+                # since the `fom_values` contains resolved file-based FOMs
+                fom_map_key = fom_conf["fom_map_key"]
+                if fom_map_key not in self._fom_map:
+                    continue
+                fom_value = self._fom_map.get(fom_map_key)
+                expanded_fom_value = self.expander.expand_var(fom_value)
+                fom_values[context][fom_name] = {
+                    "value": expanded_fom_value,
+                    "units": fom_conf["units_expanded"],
+                    "origin": fom_conf["origin"],
+                    "origin_type": fom_conf["origin_type"],
+                    "fom_type": fom_conf["fom_type"],
+                }
+
     register_phase(
         "analyze_experiments",
         pipeline="analyze",
@@ -2240,6 +2263,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
             logger.warn(
                 f"Experiment has status {self.get_status()}. Skipping analysis..\n"
             )
+            self.result.finalize()
             return
 
         def format_context(context_match, context_format):
@@ -2253,17 +2277,16 @@ class ApplicationBase(metaclass=ApplicationMeta):
             context_string = context_format.format(**context_val)
             return context_string
 
-        fom_values = {}
-
         criteria_list = self.success_list
         if not criteria_list:
             criteria_list = ramble.success_criteria.ScopedCriteriaList()
         criteria_list.reset()
 
-        files, definitions = self._analysis_dicts(criteria_list)
+        files, f_defs, inmem_defs = self._analysis_dicts(criteria_list)
 
-        exp_lock = self.experiment_lock()
+        exp_lock = self.experiment_lock
 
+        fom_values = {}
         # Iterate over files. We already know they exist
         with lk.ReadTransaction(exp_lock):
             for file, file_conf in files.items():
@@ -2298,9 +2321,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         # Iterate over contexts and add matched contexts to active_contexts
                         for context, foms in file_conf["contexts"].items():
                             if not context == _NULL_CONTEXT:
-                                context_conf = definitions[context][
-                                    "definition"
-                                ]
+                                context_conf = f_defs[context]["definition"]
                                 context_match = context_conf["regex"].match(
                                     line
                                 )
@@ -2320,7 +2341,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                         fom_values[context_name] = {}
 
                             for fom in foms:
-                                fom_conf = definitions[context]["foms"][fom]
+                                fom_conf = f_defs[context]["foms"][fom]
                                 fom_match = fom_conf["regex"].match(line)
 
                                 if fom_match:
@@ -2395,6 +2416,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                                     "fom_type"
                                                 ],
                                             }
+        self._extract_inmem_foms(inmem_defs, fom_values)
 
         # Test all non-file based success criteria
         for criteria_obj in criteria_list.all_criteria():
@@ -2403,7 +2425,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     criteria_obj.mark_found()
 
         # If an app has no FOMs defined, don't fail it for that
-        success = (not definitions) or False
+        success = (not f_defs and not inmem_defs) or False
         for fom in fom_values.values():
             for value in fom.values():
                 if (
@@ -2432,7 +2454,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         self.set_status(status)
 
-        self._init_result()
+        self.result.finalize()
 
         for criteria_obj in criteria_list.all_criteria():
             if criteria_obj.ok():
@@ -2566,7 +2588,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         else:
             self.set_status(status=ExperimentStatus.FAILED)
 
-        self._init_result()
+        self.result.finalize()
 
         logger.debug(
             f"Calculating statistics for {self.repeats.n_repeats} repeats of {base_exp_name}"
@@ -2721,10 +2743,6 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         workspace.insert_result(self.result.to_dict(), first_repeat_exp)
 
-    def _init_result(self):
-        if self.result is None:
-            self.result = ExperimentResult(self)
-
     def _new_file_dict(self):
         """Create a dictionary to represent a new log file"""
         return {"success_criteria": [], "contexts": {}}
@@ -2739,12 +2757,13 @@ class ApplicationBase(metaclass=ApplicationMeta):
 
         Returns:
             files (dict): All files that need to be processed
-            contexts (dict): Any contexts that have been defined
-            foms (dict): All figures of merit that need to be extracted
+            file_fom_defs (dict): Definitions of all file-backed FOMs to be extracted
+            inmem_fom_defs (dict): Definitions of all in-memory FOMs to be extracted
         """
 
         files = {}
-        definitions = {}
+        file_fom_defs = {}
+        inmem_fom_defs = {}
 
         # Add the application defined criteria
         criteria_list.flush_scope("application_definition")
@@ -2867,32 +2886,38 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 "definitions and 'when' conditions."
                             )
 
-                        # Copy context definition for contexts used by a FOM
-                        if context not in definitions:
-                            definitions[context] = {
-                                "definition": {},
-                                "foms": {},
-                            }
-                            if context != _NULL_CONTEXT:
-                                regex_str = self.expander.expand_var(
-                                    all_contexts[context]["regex"]
-                                )
-                                definitions[context]["definition"] = {
-                                    "regex": re.compile(regex_str),
-                                    "format": all_contexts[context][
-                                        "output_format"
-                                    ],
+                        def _preset_context_dict(dest_def_dict, context):
+                            # Copy context definition for contexts used by a FOM
+                            if context not in dest_def_dict:
+                                dest_def_dict[context] = {
+                                    "definition": {},
+                                    "foms": {},
                                 }
+                                if context != _NULL_CONTEXT:
+                                    regex_str = self.expander.expand_var(
+                                        all_contexts[context]["regex"]
+                                    )
+                                    dest_def_dict[context]["definition"] = {
+                                        "regex": re.compile(regex_str),
+                                        "format": all_contexts[context][
+                                            "output_format"
+                                        ],
+                                    }
 
                         for fom, source_def in source_foms.items():
-                            if fom in definitions[context]["foms"]:
+                            is_inmem = source_def["fom_map_key"] is not None
+                            dest_def_dict = (
+                                inmem_fom_defs if is_inmem else file_fom_defs
+                            )
+                            _preset_context_dict(dest_def_dict, context)
+                            if fom in dest_def_dict[context]["foms"]:
                                 logger.warn(
                                     f"FOM {fom} already defined in context {context} by "
-                                    f"{definitions[context]['foms'][fom]['origin']}. "
+                                    f"{dest_def_dict[context]['foms'][fom]['origin']}. "
                                     f"Overwriting with new definition from {source.name}"
                                 )
                             else:
-                                definitions[context]["foms"][fom] = {}
+                                dest_def_dict[context]["foms"][fom] = {}
 
                             def _expand_var(var):
                                 return self.expander.expand_var(
@@ -2911,12 +2936,21 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 "origin": source.name,
                                 "origin_type": source.origin_type,
                                 "contexts": set(source_def["contexts"]),
-                                "group": _expand_var(source_def["group_name"]),
+                                "group": (
+                                    ""
+                                    if is_inmem
+                                    else _expand_var(source_def["group_name"])
+                                ),
                                 "units": _expand_var(source_def["units"]),
-                                "regex": re.compile(
-                                    _expand_var(source_def["regex"])
+                                "regex": (
+                                    ""
+                                    if is_inmem
+                                    else re.compile(
+                                        _expand_var(source_def["regex"])
+                                    )
                                 ),
                                 "fom_type": source_def["fom_type"].to_dict(),
+                                "fom_map_key": source_def["fom_map_key"],
                                 # If expansion works (i.e., it doesn't rely on the matched fom
                                 # groups), then cache it here to avoid repeated expansion later.
                                 "units_expanded": _try_expand_var_or_none(
@@ -2927,8 +2961,10 @@ class ApplicationBase(metaclass=ApplicationMeta):
                                 ),
                             }
 
-                            definitions[context]["foms"][fom] = fom_def
+                            dest_def_dict[context]["foms"][fom] = fom_def
 
+                            if is_inmem:
+                                continue
                             log_path = _expand_var(source_def["log_file"])
                             # Ensure log path is absolute. If not, prepend the experiment run dir
                             if (
@@ -2950,7 +2986,11 @@ class ApplicationBase(metaclass=ApplicationMeta):
                             logger.debug("Log = %s" % log_path)
                             logger.debug("Conf = %s" % fom_def)
 
-        return files, definitions
+        return files, file_fom_defs, inmem_fom_defs
+
+    def add_inmem_fom_value(self, fom_map_key, value):
+        """Add value to an in-memory FOM"""
+        self._fom_map[fom_map_key] = value
 
     def read_status(self):
         """Read status from an experiment's status file, if possible.
@@ -2965,7 +3005,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         )
 
         if os.path.isfile(status_path):
-            exp_lock = self.experiment_lock()
+            exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path) as f:
                     status_data = spack.util.spack_json.load(f)
@@ -3021,7 +3061,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
         status_path = os.path.join(exp_dir, self._status_file_name)
 
         if os.path.exists(exp_dir):
-            exp_lock = self.experiment_lock()
+            exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, "w+") as f:
                     spack.util.spack_json.dump(status_data, f)
@@ -3123,7 +3163,7 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         )
 
         # Process environment variable actions
-        for env_var_set in self.get_environment_variable_sets():
+        for env_var_set in self.environment_variable_sets:
             for action, conf in env_var_set.items():
                 (env_cmds, _) = action_funcs[action](
                     conf, self.expander, set(), shell=shell
@@ -3134,14 +3174,19 @@ class ApplicationBase(metaclass=ApplicationMeta):
                         command.append(cmd)
 
         for mod_inst in self._modifier_instances:
-            for action, conf in mod_inst.all_env_var_modifications():
-                (env_cmds, _) = action_funcs[action](
-                    conf, self.expander, set(), shell=shell
-                )
-
-                for cmd in env_cmds:
-                    if cmd:
-                        command.append(cmd)
+            for env_var_mod in mod_inst.all_env_var_modifications():
+                for method in env_var_mod.all_methods:
+                    if getattr(env_var_mod, method):
+                        conf = {env_var_mod.name: env_var_mod.set}
+                        (env_cmds, _) = action_funcs[method](
+                            getattr(env_var_mod, method),
+                            self.expander,
+                            set(),
+                            shell=shell,
+                        )
+                        for cmd in env_cmds:
+                            if cmd:
+                                command.append(cmd)
 
         return command
 
@@ -3261,8 +3306,8 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     self.keywords.update_keys({old_var: var_attr})
                 self.variables[var_name] = tpl_config["dest_path"]
                 self.keywords.update_keys({var_name: var_attr})
-            if callable(getattr(obj, "template_render_vars", None)):
-                render_vars = obj.template_render_vars()
+            if hasattr(obj, "template_render_vars"):
+                render_vars = obj.template_render_vars
                 self.variables.update(render_vars)
                 for name in render_vars.keys():
                     self.keywords.update_keys({name: var_attr})
@@ -3305,24 +3350,63 @@ class ApplicationBase(metaclass=ApplicationMeta):
                     self.workflow_manager,
                 )
 
-    def get_required_variables(self):
-        """Get all the required variables based on the when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.expander.satisfies(
-                    var_props["when"], self.object_variants
-                ):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra modes prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars
-
     def set_required_variables(self):
         """Set required variables from all objects"""
         for _, obj in self._objects():
             logger.debug(f"Setting required variables for {obj.name}")
-            self.keywords.update_keys(obj.get_required_variables())
+            self.keywords.update_keys(obj.required_variables)
+
+    def _format_docs_details(self, out):
+        if self.workloads:
+            out.write("<dt>Workloads:</dt>\n")
+            out.write("<dd>\n")
+            for when_set in self.workloads:
+                for workload in self.workloads[when_set].values():
+                    out.write("<details>\n")
+                    out.write(f"<summary>{workload.name}</summary>\n")
+                    out.write('<dl class="docutils">\n')
+                    if workload.executables:
+                        out.write("<dt>Executables:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write(", ".join(workload.executables))
+                        out.write("</dd>\n")
+                    if workload.inputs:
+                        out.write("<dt>Inputs:</dt>\n")
+                        out.write("<dd>\n")
+                        all_input_defs = {}
+                        for input_conf in self.inputs.values():
+                            for (
+                                input_name,
+                                input_def,
+                            ) in input_conf.items():
+                                if input_name not in all_input_defs:
+                                    all_input_defs[input_name] = input_def
+
+                        out.write('<dl class="docutils">\n')
+                        for input_name in workload.inputs:
+                            out.write(f"<dt>{escape(input_name, True)}</dt>\n")
+                            input_def = all_input_defs.get(input_name)
+                            if input_def and input_def.get("description"):
+                                out.write("<dd>\n")
+                                out.write(
+                                    escape(input_def["description"], True)
+                                )
+                                out.write("</dd>\n")
+                        out.write("</dl>\n")
+                        out.write("</dd>\n")
+                    if workload.variables:
+                        out.write("<dt>Variables:</dt>\n")
+                        out.write("<dd>\n")
+                        out.write('<dl class="docutils">\n')
+                        for var_when_set in workload.variables:
+                            for var in workload.variables[var_when_set]:
+                                out.write(f"<dt>{var.name}</dt>\n")
+                                if var.description:
+                                    out.write("<dd>\n")
+                                    out.write(escape(var.description, True))
+                                    out.write("</dd>\n")
+                        out.write("</dl>\n")
+                        out.write("</dd>\n")
+                    out.write("</dl>\n")
+                    out.write("</details>\n")
+            out.write("</dd>\n")

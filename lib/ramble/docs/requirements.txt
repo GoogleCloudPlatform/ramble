@@ -9,3 +9,4 @@ deprecation
 pytest
 pandas
 matplotlib
+scipy

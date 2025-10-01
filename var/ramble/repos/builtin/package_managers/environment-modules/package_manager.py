@@ -49,7 +49,7 @@ class EnvironmentModules(PackageManagerBase):
                 self.keywords.env_name
             )
 
-            require_env = self.environment_required()
+            require_env = self.environment_required
 
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(

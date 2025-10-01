@@ -11,20 +11,21 @@ import fnmatch
 import re
 from typing import List
 
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.error import InvalidModeError, ModifierError
 from ramble.language.modifier_language import ModifierMeta, mode
 from ramble.language.shared_language import SharedMeta
-from ramble.util import format
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class ModifierBase(metaclass=ModifierMeta):
+
+class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
     name = None
-    object_variants = None
     origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(
         ("modifier_builtin", "{obj_name}", "{name}")
@@ -55,8 +56,9 @@ class ModifierBase(metaclass=ModifierMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
-            self.object_variants = ramble.variants.VariantSet()
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
@@ -64,19 +66,26 @@ class ModifierBase(metaclass=ModifierMeta):
         self._on_executables = ["*"]
         self.expander = None
         self._usage_mode = None
+        self.app_inst = None
 
         self._verbosity = "short"
+
+        self._mod_regex = re.compile(
+            self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
+        )
 
         ramble.util.directives.define_directive_methods(self)
 
     def copy(self):
         """Deep copy a modifier instance"""
-        new_copy = type(self)(self._file_path)
+        new_copy = super().copy()
         new_copy._on_executables = self._on_executables.copy()
         new_copy._usage_mode = self._usage_mode
-        new_copy._verbosity = self._verbosity
 
         return new_copy
+
+    def satisfy_when(self, when_key):
+        return self.expander.satisfies(when_key, self.object_variants)
 
     def set_usage_mode(self, mode):
         """Set the usage mode for this modifier.
@@ -96,7 +105,7 @@ class ModifierBase(metaclass=ModifierMeta):
         else:
             non_disabled_modes = set(self.modes)
             non_disabled_modes.remove("disabled")
-            if len(non_disabled_modes) > 1 or len(non_disabled_modes) == 0:
+            if len(non_disabled_modes) != 1:
                 raise InvalidModeError(
                     "Cannot auto determine usage "
                     f"mode for modifier {self.name}"
@@ -137,9 +146,7 @@ class ModifierBase(metaclass=ModifierMeta):
                     f"type of {type(on_executables)}"
                 )
 
-            self._on_executables = []
-            for exec_name in on_executables:
-                self._on_executables.append(exec_name)
+            self._on_executables = list(on_executables)
         else:
             self._on_executables = ["*"]
 
@@ -154,6 +161,7 @@ class ModifierBase(metaclass=ModifierMeta):
         self.object_variants.merge_multi_value_variants(app.object_variants)
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
+        self.app_inst = app
 
     def define_variable(self, var_name, var_value):
         """Define a variable within this modifier's expander instance"""
@@ -167,12 +175,6 @@ class ModifierBase(metaclass=ModifierMeta):
         the name of the resulting experiment.
         """
         pass
-
-    def __str__(self):
-        return self.name
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
 
     def modded_variables(self, app, extra_vars=None):
         mods = {}
@@ -194,7 +196,7 @@ class ModifierBase(metaclass=ModifierMeta):
                             else:
                                 prev_val = ""
 
-                            if prev_val != "" and prev_val is not None:
+                            if prev_val:
                                 sep = var_mod.separator
                             else:
                                 sep = ""
@@ -213,20 +215,14 @@ class ModifierBase(metaclass=ModifierMeta):
         return mods
 
     def applies_to_executable(self, executable):
-        apply = False
+        """Check if this modifier applies to a given executable name."""
+        if any(
+            fnmatch.fnmatch(executable, pattern)
+            for pattern in self._on_executables
+        ):
+            return True
 
-        mod_regex = re.compile(
-            self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
-        )
-        for pattern in self._on_executables:
-            if fnmatch.fnmatch(executable, pattern):
-                apply = True
-
-        exec_match = mod_regex.match(executable)
-        if exec_match:
-            apply = True
-
-        return apply
+        return bool(self._mod_regex.match(executable))
 
     def apply_executable_modifiers(
         self, executable_name, executable, app_inst=None
@@ -252,18 +248,14 @@ class ModifierBase(metaclass=ModifierMeta):
             if not self.expander.satisfies(when_set, self.object_variants):
                 continue
 
-            yield from self.env_var_modifications[when_set].items()
+            yield from env_var_mods.values()
 
     def all_package_manager_requirements(self):
-        for when_set, reqs in self.package_manager_requirements.items():
+        for when_set in self.package_manager_requirements:
             if not self.expander.satisfies(when_set, self.object_variants):
                 continue
 
             yield from self.package_manager_requirements[when_set]
-
-    def all_pipeline_phases(self, pipeline):
-        if pipeline in self.phase_definitions:
-            yield from self.phase_definitions[pipeline].items()
 
     def no_expand_vars(self):
         """Iterator over non-expandable variables in current mode
@@ -279,48 +271,6 @@ class ModifierBase(metaclass=ModifierMeta):
             for var in var_list:
                 if not var.expandable:
                     yield var.name
-
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-
-        mod_variables = {}
-
-        for when_key, var_list in self.object_variables.items():
-            if not self.expander.satisfies(when_key, self.object_variants):
-                continue
-
-            for var in var_list:
-                mod_variables[var.name] = var
-
-        return mod_variables
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-
-        mod_environment_variables = {}
-
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.expander.satisfies(when_key, self.object_variants):
-                continue
-
-            for env_var in env_var_list:
-                mod_environment_variables[env_var.name] = env_var
-
-        return mod_environment_variables
 
     def artifact_inventory(self, workspace, app_inst=None):
         """Return an inventory of modifier artifacts
@@ -343,19 +293,3 @@ class ModifierBase(metaclass=ModifierMeta):
         processing to output files, before FOMs are extracted.
         """
         pass
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.expander.satisfies(
-                    var_props["when"], self.object_variants
-                ):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra when prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars

@@ -8,9 +8,10 @@
 
 from typing import Optional
 
-import ramble.language.language_base
+import ramble.definitions.requirements
 import ramble.language.language_helpers
 import ramble.language.shared_language
+from ramble.definitions.variables import EnvironmentVariableModifications, VariableModification
 from ramble.language.language_base import DirectiveError
 
 
@@ -98,8 +99,6 @@ def variable_modification(
     """
 
     def _execute_variable_modification(mod):
-        import ramble.workload
-
         supported_methods = ["append", "prepend", "set"]
         if method not in supported_methods:
             raise DirectiveError(
@@ -119,7 +118,7 @@ def variable_modification(
             mod.variable_modifications[when_set][name] = []
 
         mod.variable_modifications[when_set][name].append(
-            ramble.workload.WorkloadVariableModification(
+            VariableModification(
                 name=name,
                 modification=modification,
                 method=method,
@@ -185,7 +184,9 @@ def executable_modifier(name, when=None, **kwargs):
         if when_set not in mod.executable_modifiers:
             mod.executable_modifiers[when_set] = {}
 
-        mod.executable_modifiers[when_set][name] = name
+        mod.executable_modifiers[when_set][name] = {
+            "when": when_list,
+        }
 
     return _executable_modifier
 
@@ -245,35 +246,20 @@ def env_var_modification(
         if when_set not in mod.env_var_modifications:
             mod.env_var_modifications[when_set] = {}
 
-        # Set requires a dict, everything else requires a list.
-        if method == "set":
-            if method not in mod.env_var_modifications[when_set]:
-                mod.env_var_modifications[when_set][method] = {}
-            mod.env_var_modifications[when_set][method][name] = modification
-            return
-
-        if method not in mod.env_var_modifications[when_set]:
-            mod.env_var_modifications[when_set][method] = []
-
-        # If unset, exit early
-        if method == "unset":
-            mod.env_var_modifications[when_set][method].append(name)
-            return
-
-        append_dict = {}
-        separator = ":"
-        if method == "append" and "separator" in kwargs:
-            separator = kwargs["separator"]
-
-        append_name = "paths"
-        if separator != ":":
-            append_name = "vars"
-            append_dict["var-separator"] = separator
-
-        append_dict[append_name] = {}
-        append_dict[append_name][name] = modification
-
-        mod.env_var_modifications[when_set][method].append(append_dict.copy())
+        if name not in mod.env_var_modifications[when_set]:
+            mod.env_var_modifications[when_set][name] = EnvironmentVariableModifications(
+                name=name,
+                modification=modification,
+                method=method,
+                when=when_list,
+                **kwargs,
+            )
+        else:
+            mod.env_var_modifications[when_set][name].add_modification(
+                modification=modification,
+                method=method,
+                **kwargs,
+            )
 
     return _env_var_modification
 
@@ -308,7 +294,6 @@ def modifier_variable(
     """
 
     def _define_modifier_variable(mod):
-        import ramble.workload
 
         all_modes = ramble.language.language_helpers.merge_definitions(
             mode, modes, mod.modes, "mode", "modes", "modifier_variable"
@@ -394,13 +379,13 @@ def package_manager_requirement(
             mod.package_manager_requirements[when_set] = []
 
         mod.package_manager_requirements[when_set].append(
-            {
-                "command": command,
-                "validation_type": validation_type,
-                "regex": regex,
-                "package_manager": package_manager,
-                "when": when_list,
-            }
+            ramble.definitions.requirements.PackageManagerRequirement(
+                command=command,
+                validation_type=validation_type,
+                regex=regex,
+                package_manager=package_manager,
+                when=when_list,
+            )
         )
 
     return _new_package_manager_requirement

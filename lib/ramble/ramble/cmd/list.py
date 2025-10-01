@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import ramble.cmd.common.list
-import ramble.repository
 
 description = "list and search available objects"
 section = "basic"

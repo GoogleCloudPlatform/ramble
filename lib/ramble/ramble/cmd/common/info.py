@@ -15,8 +15,8 @@ from llnl.util.tty.colify import colified
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
 import ramble.util.colors
+from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
-from ramble.workload import WorkloadVariable
 
 supported_formats = enum.Enum("formats", ["text", "lists"])
 
@@ -29,6 +29,7 @@ obj_attribute_map = {
     "builtins": None,
     "package_manager_configs": None,
     "required_packages": None,
+    "object_variants": None,
     "compilers": None,
     "software_specs": None,
     "archive_patterns": None,
@@ -37,6 +38,7 @@ obj_attribute_map = {
     "templates": None,
     "validators": None,
     "object_variables": None,
+    "object_environment_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -52,6 +54,8 @@ obj_attribute_map = {
     "env_var_modifications": None,
     "required_vars": None,
     "package_manager_requirements": None,
+    # Package / workflow manager specific:
+    "families": None,
 }
 
 
@@ -162,16 +166,12 @@ def _unpack_when_set_if_needed(internal_attr: dict):
         if isinstance(first_val, dict):
             # unpack to a list of dicts so dicts with same keys don't overwrite
             unpacked_dict = []
-            for when_key, inner_dict in internal_attr.items():
-                if not when_key:
-                    unpacked_dict.append(inner_dict)
-                else:
-                    for when_condition in when_key:
-                        unpacked_dict.append(inner_dict)
+            for inner_dict in internal_attr.values():
+                unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
-            for when_key, inner_list in internal_attr.items():
+            for inner_list in internal_attr.values():
                 unpacked_list.extend(inner_list)
             return unpacked_list
         else:
@@ -193,16 +193,17 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
     sub items. These need to be iterated over, and we need to escape existing
     characters that would normally be used to color strings.
     """
+    i = 0
     for name, vals in internal_attr.items():
+        i += 1
         if pattern and not fnmatch.fnmatch(name, pattern):
             continue
-
         if isinstance(vals, dict):
             color_name = ramble.util.colors.section_title(name)
             color.cprint(f"{color_name}:")
             for sub_name, sub_val in vals.items():
                 # Avoid showing duplicate names for variables
-                if isinstance(sub_val, WorkloadVariable) and sub_name == sub_val.name:
+                if isinstance(sub_val, Variable) and sub_name == sub_val.name:
                     to_print = f"{indentation}{sub_val}"
                 else:
                     color_sub_name = ramble.util.colors.nested_1(sub_name)
@@ -229,11 +230,17 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
         elif isinstance(vals, list):
             for val in vals:
                 if hasattr(val, "as_str"):
-                    color.cprint(f"{val.as_str()}")
+                    color.cprint(f"{val.as_str(verbose=True)}")
                 else:
                     color.cprint(f"{str(val)}")
         else:
-            color.cprint(f"{str(vals)}")
+            if hasattr(vals, "as_str"):
+                color.cprint(f"{vals.as_str(verbose=True)}")
+            else:
+                color.cprint(f"{str(vals)}")
+                #  Necessary to add a line break after unformmated sections
+                if i == len(internal_attr.keys()):
+                    color.cprint("")
 
 
 # Attributes that need special print functions
@@ -284,8 +291,8 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
 
     indentation = " " * 4
 
-    for _, context_dict in internal_attr.items():
-        for _, fom_dict in context_dict.items():
+    for context_dict in internal_attr.values():
+        for fom_dict in context_dict.values():
             if not verbose:
                 to_print = list(fom_dict.keys())
 
@@ -336,9 +343,8 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         #     otherwise filter it and print using the format specification
         # Otherwise, print it as a raw string.
         if isinstance(to_print, list):
-            if isinstance(next(iter(internal_attr)), dict):
-                for attr_dict in internal_attr:
-                    to_print = list(attr_dict.keys())
+            if internal_attr and isinstance(next(iter(internal_attr)), dict):
+                to_print = [key for attr_dict in internal_attr for key in attr_dict]
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {str(to_print)}\n")
@@ -352,14 +358,24 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                     _print_verbose_dict_attr(attr_dict, pattern=pattern, indentation=indentation)
             # If the attribute is not a dict or list of dict, print using the existing format rules
             else:
-                to_print = fnmatch.filter(map(str, internal_attr), pattern)
-                if format == supported_formats.lists:
-                    color.cprint("    " + str(list(to_print)))
-                elif format == supported_formats.text:
-                    color.cprint(colified(to_print, tty=True, indent=4))
-                color.cprint("")
+                if hasattr(next(iter(internal_attr)), "as_str"):
+                    for obj in internal_attr:
+                        if pattern and not fnmatch.fnmatch(obj.name, pattern):
+                            continue
+
+                        color.cprint(f"{obj.as_str(verbose=True)}")
+                else:
+                    to_print = fnmatch.filter(map(str, internal_attr), pattern)
+                    if format == supported_formats.lists:
+                        color.cprint("    " + str(list(to_print)))
+                    elif format == supported_formats.text:
+                        color.cprint(colified(to_print, tty=True, indent=4))
+                    color.cprint("")
         else:
-            color.cprint(f"{indentation}" + str(internal_attr))
+            if hasattr(internal_attr, "as_str"):
+                color.cprint(f"{internal_attr.as_str(verbose=True)}")
+            else:
+                color.cprint(f"{indentation}" + str(internal_attr) + "\n")
 
 
 def print_attribute_header(attr, verbose=False):

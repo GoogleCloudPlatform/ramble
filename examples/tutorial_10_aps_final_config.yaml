@@ -31,7 +31,7 @@ ramble:
   software:
     packages:
       gcc9:
-        pkg_spec: gcc@9.4.0
+        pkg_spec: gcc@9.5.0
       intel-mpi:
         pkg_spec: intel-oneapi-mpi@2021.13.1
         compiler: gcc9

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import glob
+import itertools
 import os
 import shlex
 import shutil
@@ -159,7 +160,7 @@ class Pipeline:
 
             logger.add_log(exp_log_path)
 
-            phase_list = app_inst.get_pipeline_phases(self.name, self.filters.phases)
+            phase_list = list(app_inst.get_pipeline_phases(self.name, self.filters.phases))
 
             disable_progress = (
                 ramble.config.get("config:disable_progress_bar", False)
@@ -347,10 +348,10 @@ class ArchivePipeline(Pipeline):
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
 
-        for filename in [
+        for filename in (
             ramble.workspace.Workspace.inventory_file_name,
             ramble.workspace.Workspace.hash_file_name,
-        ]:
+        ):
             src = os.path.join(self.workspace.root, filename)
             if os.path.exists(src):
                 dest = src.replace(self.workspace.root, archive_path)
@@ -395,7 +396,7 @@ class ArchivePipeline(Pipeline):
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
 
-        for pattern in self.archive_patterns:
+        for pattern in itertools.chain(self.archive_patterns, ["results.*"]):
             # Escape workspace root incase it contains glob characters.
             pattern_path = glob.escape(self.workspace.root) + os.sep + pattern
             for file in glob.glob(pattern_path):
@@ -635,19 +636,19 @@ class LogsPipeline(Pipeline):
             logger.all_msg(f"Experiment: {exp}")
             logger.all_msg(f"    Experiment log file: {log_file}")
 
-            analysis_logs, _ = app_inst._analysis_dicts(self.workspace.success_list)
+            analysis_logs, _, _ = app_inst._analysis_dicts(app_inst.success_list)
 
             logger.all_msg("    Auxiliary experiment logs:")
             for log in analysis_logs:
                 logger.all_msg(f"    - {log}")
 
-            print_archive_files(app_inst, "application", app_inst.archive_patterns.keys())
+            print_archive_files(app_inst, "application", app_inst.archive_patterns)
             if app_inst.package_manager:
                 pm_name = app_inst.package_manager.name
                 print_archive_files(
                     app_inst,
                     f"package manager {pm_name}",
-                    app_inst.package_manager.archive_patterns.keys(),
+                    app_inst.package_manager.archive_patterns,
                 )
 
             for mod in app_inst._modifier_instances:

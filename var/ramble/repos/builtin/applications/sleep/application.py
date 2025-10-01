@@ -100,4 +100,12 @@ class Sleep(ExecutableApplication):
         units="ms",
     )
 
+    figure_of_merit(
+        "mode",
+        fom_regex=r"\s*(?P<mode>(Sleep|Wake)) for.*",
+        group_name="mode",
+        units="",
+        fom_type=FomType.INFO,
+    )
+
     success_criteria("printed_sleep_time", mode="string", match=echo_regex)

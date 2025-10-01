@@ -61,7 +61,7 @@ class SpackLightweight(PackageManagerBase):
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
-            raise ApplicationError("Ramble env_path is set to None.")
+            raise PackageManagerError("Ramble env_path is set to None.")
         logger.msg("Installing compilers")
 
         cache_tupl = ("spack-compilers", env_path)
@@ -81,7 +81,7 @@ class SpackLightweight(PackageManagerBase):
                 self.keywords.env_name
             )
 
-            require_env = self.environment_required()
+            require_env = self.environment_required
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
                 app_context, app_inst.expander, self, require=require_env
@@ -89,12 +89,15 @@ class SpackLightweight(PackageManagerBase):
 
             if software_env is not None:
                 for (
-                    compiler_spec
+                    pkg_spec,
+                    compiler_spec,
                 ) in software_envs.compiler_specs_for_environment(
                     software_env
                 ):
-                    logger.debug(f"Installing compiler: {compiler_spec}")
-                    self.runner.install_compiler(compiler_spec)
+                    logger.debug(
+                        f"Installing compiler: {compiler_spec} with pkg_spec {pkg_spec}"
+                    )
+                    self.runner.install_compiler(pkg_spec, compiler_spec)
 
         except RunnerError as e:
             logger.die(e)
@@ -114,7 +117,7 @@ class SpackLightweight(PackageManagerBase):
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
-            raise ApplicationError("Ramble env_path is set to None.")
+            raise PackageManagerError("Ramble env_path is set to None.")
 
         cache_tupl = ("spack-env", env_path)
         if workspace.check_cache(cache_tupl):
@@ -161,7 +164,7 @@ class SpackLightweight(PackageManagerBase):
             env_context = app_inst.expander.expand_var_name(
                 self.keywords.env_name
             )
-            require_env = self.environment_required()
+            require_env = self.environment_required
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
                 env_context, app_inst.expander, self, require=require_env
@@ -270,7 +273,7 @@ class SpackLightweight(PackageManagerBase):
         for mod_inst in app_inst._modifier_instances:
             for req in mod_inst.all_package_manager_requirements():
                 expanded_req = {}
-                for key, val in req.items():
+                for key, val in vars(req).items():
                     expanded_req[key] = app_inst.expander.expand_var(val)
                 self.runner.validate_command(**expanded_req)
 
@@ -285,12 +288,12 @@ class SpackLightweight(PackageManagerBase):
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
-            raise ApplicationError("Ramble env_path is set to None.")
+            raise PackageManagerError("Ramble env_path is set to None.")
 
         if not os.path.exists(env_path) or not os.path.isfile(
             os.path.join(env_path, "spack.lock")
         ):
-            raise ApplicationError(
+            raise PackageManagerError(
                 f"Spack environment {env_path} does not exist, or has not been concretized."
             )
 
@@ -343,7 +346,7 @@ class SpackLightweight(PackageManagerBase):
                 workspace.software_mirror_stats.errors.add(i)
 
         except RunnerError as e:
-            if self.environment_required():
+            if self.environment_required:
                 logger.die(e)
             pass
 
@@ -352,7 +355,7 @@ class SpackLightweight(PackageManagerBase):
     def _push_to_spack_cache(self, workspace, app_inst=None):
 
         # Test if experiment requires an environment
-        env_required = self.environment_required()
+        env_required = self.environment_required
 
         env_path = app_inst.expander.env_path
         cache_tupl = ("push-to-cache", env_path)
@@ -371,13 +374,16 @@ class SpackLightweight(PackageManagerBase):
                 self.keywords.env_name
             )
             software_envs = workspace.software_environments
-            require_env = self.environment_required()
+            require_env = self.environment_required
             software_env = software_envs.render_environment(
                 app_context, app_inst.expander, self, require=require_env
             )
-            compiler_specs = software_envs.compiler_specs_for_environment(
-                software_env
-            )
+            compiler_specs = [
+                spec
+                for spec, _ in software_envs.compiler_specs_for_environment(
+                    software_env
+                )
+            ]
 
             self.runner.push_to_spack_cache(
                 workspace.spack_cache_path, compiler_specs
@@ -386,7 +392,7 @@ class SpackLightweight(PackageManagerBase):
             # push_to_spack_cache deactivates env, this is here for safety.
             self.runner.deactivate()
         except RunnerError as e:
-            if self.environment_required():
+            if self.environment_required:
                 logger.die(e)
             pass
 
@@ -478,7 +484,7 @@ class SpackLightweight(PackageManagerBase):
             self.runner.deactivate()
 
         except RunnerError as e:
-            if self.environment_required():
+            if self.environment_required:
                 logger.die(e)
             pass
 
@@ -889,7 +895,7 @@ class SpackRunner(CommandRunner):
                         env_var.group("var"), env_var.group("val")
                     )
 
-    def install_compiler(self, spec):
+    def install_compiler(self, pkg_spec, compiler_spec):
         """
         Ensure a compiler is installed, before using it to install packages
         within an environment.
@@ -914,7 +920,7 @@ class SpackRunner(CommandRunner):
         comp_info_args = []
         if self.compiler_config_dir:
             comp_info_args.extend(["-C", self.env_path])
-        comp_info_args.extend(["compiler", "info", spec])
+        comp_info_args.extend(["compiler", "info", compiler_spec])
 
         compiler_find_flags = ramble.config.get(
             f"{self.compiler_find_config_name}:flags"
@@ -930,7 +936,7 @@ class SpackRunner(CommandRunner):
             self._cmd_start(self.spack, comp_info_args)
             self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
             self._cmd_end(self.spack, comp_info_args)
-            logger.msg(f"{spec} is already an available compiler")
+            logger.msg(f"{compiler_spec} is already an available compiler")
             return
         except ProcessError:
 
@@ -943,16 +949,16 @@ class SpackRunner(CommandRunner):
                 for flag in shlex.split(install_flags):
                     args.append(flag)
 
-            args.append(spec)
+            args.append(pkg_spec)
 
             self.execute(self.installer, args)
 
-            self.load_compiler(spec)
+            self.load_compiler(pkg_spec)
 
             self.execute(self.spack, compiler_find_args)
 
             if not self.dry_run:
-                self.compilers.append(spec)
+                self.compilers.append(pkg_spec)
 
                 if self.active:
                     self.spack.add_default_env(self.env_key, active_env)

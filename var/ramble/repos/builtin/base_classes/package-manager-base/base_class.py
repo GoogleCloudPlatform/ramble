@@ -10,20 +10,23 @@
 import os
 from typing import List
 
+import ramble.definitions.families
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
-from ramble.util import format
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
+ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
-class PackageManagerBase(metaclass=PackageManagerMeta):
+
+class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     name = None
-    object_variants = None
+    origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("package_manager_builtin", "{obj_name}", "{name}")
     )
@@ -53,13 +56,18 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     #: Do not include @ here in order not to unnecessarily ping the users.
     maintainers: List[str] = []
     tags: List[str] = []
-    families: List[str] = []
 
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
-            self.object_variants = ramble.variants.VariantSet()
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
+
+        if getattr(self, "families", None) is None:
+            self.families = ramble.definitions.families.Families(
+                self.origin_type, list(self.class_families)
+            )
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
@@ -73,14 +81,14 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         ramble.util.directives.define_directive_methods(self)
 
         self.object_variants.default_variant(
-            "package_manager",
+            self.origin_type,
             default=self.name,
             description="Name of package manager for an experiment",
         )
 
         for family in self.families:
             self.object_variants.multi_value_variant(
-                "package_manager_family",
+                self.families.family_type,
                 value=family,
             )
 
@@ -90,13 +98,6 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     def runner(self):
         # Turn `runner` into a property for delayed init
         return None
-
-    def copy(self):
-        """Deep copy a package manager instance"""
-        new_copy = type(self)(self._file_path)
-        new_copy._verbosity = self._verbosity
-
-        return new_copy
 
     def package_manager_dir(self, workspace):
         """Get the path to the package manager's software environment directory
@@ -111,57 +112,19 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """
         return os.path.join(workspace.software_dir, self.name)
 
+    @property
     def environment_required(self):
         app_inst = self.app_inst
-        if hasattr(app_inst, "software_specs"):
-            for definitions in app_inst.software_specs.values():
-                for info in definitions:
-                    if self.app_inst.expander.satisfies(
-                        info.when, variant_set=self.object_variants
-                    ):
-                        return True
+        if not hasattr(app_inst, "software_specs"):
+            return False
 
-        return False
-
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-        all_vars = {}
-        for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for var in var_list:
-                all_vars[var.name] = var
-        return all_vars
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-        all_env_vars = {}
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for env_var in env_var_list:
-                all_env_vars[env_var.name] = env_var
-        return all_env_vars
+        return any(
+            self.app_inst.expander.satisfies(
+                info.when, variant_set=self.object_variants
+            )
+            for definitions in app_inst.software_specs.values()
+            for info in definitions
+        )
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
@@ -177,6 +140,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """
         return pkg.spec
 
+    @property
     def spec_prefix(self):
         """Return this package manager's spec prefix
 
@@ -186,35 +150,12 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         prefix = self._spec_prefix or self.name
         return spack.util.naming.spack_module_to_python_module(prefix)
 
-    def __str__(self):
-        return self.name
-
-    def format_doc(self, **kwargs):
-        return format.format_doc(self.__doc__, **kwargs)
-
-    def all_pipeline_phases(self, pipeline):
-        """Iterator over all phases within a specified pipeline
-
-        Iterate over all phases (and their graph nodes) within a pipeline.
-
-        Args:
-            pipeline (str): Name of pipeline to extract phases for
-
-        Yields:
-            phase_name (str): Name of phase
-            phase_note (ramble.util.graph.GraphNode): Object representing a
-                node in the phase graph
-        """
-        if pipeline in self.phase_definitions:
-            yield from self.phase_definitions[pipeline].items()
-
     def set_application(self, app_inst):
         """Add an internal reference to the application instance this package
         manager instance is attached to.
 
         Args:
-            app_inst (ramble.base_cls.builtin.ApplicationBase): The experiment this
-                package manager will act on.
+            app_inst: The experiment this package manager will act on.
         """
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
@@ -241,27 +182,18 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         )
 
         software_environments = workspace.software_environments
-        software_environments.render_environment(
+        software_env = software_environments.render_environment(
             app_context, self.app_inst.expander, self, require=False
         )
+        if software_env is not None:
+            software_environments.define_compiler_packages(
+                software_env, self.app_inst.expander
+            )
+
+        for _, contents in workspace.all_auxiliary_software_files():
+            self.app_inst.expander.expand_var(contents)
 
         return self.app_inst.expander._used_variables
-
-    def get_required_variables(self):
-        """Get all the required variables based on the mode and when conditions."""
-        required_vars = self.required_vars
-        filtered_vars = {}
-        if required_vars:
-            for var_name, var_props in required_vars.items():
-                if self.app_inst.expander.satisfies(
-                    var_props["when"], self.app_inst.object_variants
-                ):
-                    filtered_vars[var_name] = {
-                        # Exclude the extra when prop
-                        k: var_props[k]
-                        for k in var_props.keys() - {"when"}
-                    }
-        return filtered_vars
 
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
@@ -292,8 +224,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         Args:
             workspace (ramble.workspace.Workspace): Reference to the workspace
                 that is currently being acted on.
-            app_inst (ramble.base_cls.builtin.ApplicationBase): Reference to the
-                application instance that owns the results.
+            app_inst: Reference to the application instance that owns the results.
 
         """
         if app_inst.result is None:
@@ -320,6 +251,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         an experiment's execution environment"""
         return []
 
+    @property
     def environment_unload_commands(self) -> List[str]:
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import ast
+import itertools
 import math
 import operator
 import random
@@ -19,7 +20,7 @@ from typing import Dict, FrozenSet, List, Union
 import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
-from ramble.util.path import substitute_path_variables
+from ramble.util.path import substitute_config_variables
 
 import spack.util.naming
 
@@ -87,6 +88,9 @@ supported_scalar_function_pointers = {
     "min": min,
     "ceil": math.ceil,
     "floor": math.floor,
+    "log2": math.log2,
+    "log10": math.log10,
+    "sqrt": math.sqrt,
     "randrange": random.randrange,
     "randint": random.randint,
     "simplify_str": spack.util.naming.simplify_name,
@@ -105,6 +109,11 @@ supported_scalar_function_with_self_arg_pointers = {
 
 supported_list_function_pointers = {
     "range": range,
+}
+
+
+supported_modules = {
+    "math": math,
 }
 
 
@@ -555,16 +564,11 @@ class Expander:
         try:
             math_ast = ast.parse(str(var), mode="eval")
             value = self.eval_math(math_ast.body)
+        except (MathEvaluationError, AttributeError, ValueError, SyntaxError):
+            return var
+        else:
             if isinstance(value, list):
                 return value
-            return var
-        except MathEvaluationError:
-            return var
-        except AttributeError:
-            return var
-        except ValueError:
-            return var
-        except SyntaxError:
             return var
 
     def expand_var_name(
@@ -599,6 +603,7 @@ class Expander:
             allow_passthrough=allow_passthrough,
             typed=typed,
             merge_used_stage=merge_used_stage,
+            replace_escaped_braces=replace_escaped_braces,
         )
 
     def expand_var(
@@ -672,7 +677,7 @@ class Expander:
             self.merge_used_variable_stage()
 
         if isinstance(value, str):
-            return substitute_path_variables(value, local_replacements=self.replacement_paths)
+            return substitute_config_variables(value, local_replacements=self.replacement_paths)
         else:
             return value
 
@@ -723,7 +728,7 @@ class Expander:
                                set of used variables or not.
 
         Returns:
-            boolean: True or False, based if the experiment's variants satisfy
+            (bool): True or False, based if the experiment's variants satisfy
                      the input requirement.
         """
 
@@ -839,16 +844,16 @@ class Expander:
         others will generate integers (if the inputs are integers).
         """
         try:
-            if isinstance(node, ast.Num):
-                return self._ast_num(node)
-            elif isinstance(node, ast.Constant):
+            if hasattr(ast, "Constant") and isinstance(node, ast.Constant):
                 return self._ast_constant(node)
+            elif hasattr(ast, "Num") and isinstance(node, ast.Num):  # Deprecated, removed in 3.14
+                return self._ast_num(node)
             elif isinstance(node, ast.Name):
                 return self._ast_name(node)
             # TODO: Remove when we drop support for 3.6
             # DEPRECATED: Remove due to python 3.8
             # See: https://docs.python.org/3/library/ast.html#node-classes
-            elif isinstance(node, ast.Str):
+            elif hasattr(ast, "Str") and isinstance(node, ast.Str):  # Deprecated, removed in 3.14
                 return node.s
             elif isinstance(node, ast.Attribute):
                 return self._ast_attr(node)
@@ -937,6 +942,15 @@ class Expander:
             func = supported_scalar_function_with_self_arg_pointers[node.func.id]
             return func(self, *args, **kwargs)
         else:
+            parts = node.func.id.split("_", 1)
+            if len(parts) == 2:
+                module_name, func_name = parts
+                if module_name in supported_modules:
+                    module = supported_modules[module_name]
+                    if hasattr(module, func_name):
+                        func = getattr(module, func_name)
+                        return func(*args, **kwargs)
+
             raise MathEvaluationError(
                 f"Undefined function {node.func.id} used.\n" "returning unexapanded string"
             )
@@ -948,7 +962,7 @@ class Expander:
 
             result = self.eval_math(node.values[0])
 
-            for value in node.values[1:]:
+            for value in itertools.islice(node.values, 1, None):
                 result = op(result, self.eval_math(value))
 
             return result
@@ -982,7 +996,7 @@ class Expander:
 
             if len(node.ops) > 1:
                 cur_left = cur_right
-                for comp, right in zip(node.ops, node.comparators)[1:]:
+                for comp, right in itertools.islice(zip(node.ops, node.comparators), 1, None):
                     op = supported_math_operators[type(comp)]
                     cur_right = self.eval_math(right)
 

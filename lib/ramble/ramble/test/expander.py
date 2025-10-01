@@ -137,6 +137,15 @@ def build_variant_set():
         ("0b10 >> 1", "1", set(), 1),
         # Can be a handy way to select experiments to run
         ("(1 << {experiment_index} & 0b1011010) == 0", "True", set(), 1),
+        ("$HOSTNAME", "$HOSTNAME", set(), 1),
+        ("${HOSTNAME}", "${HOSTNAME}", set(), 1),
+        ("log2(8)", "3.0", set(), 1),
+        ("log10(100)", "2.0", set(), 1),
+        ("sqrt(16)", "4.0", set(), 1),
+        # Can also reference functions available in the math module directly
+        ("math_sqrt(64)", "8.0", set(), 1),
+        ("math_log(9, 3)", "2.0", set(), 1),
+        ("math_not_exist(1)", "math_not_exist(1)", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):

@@ -98,13 +98,14 @@ def figure_of_merit_context(name, regex, output_format, when=None, **kwargs):
 @shared_directive("figures_of_merit")
 def figure_of_merit(
     name,
-    fom_regex,
-    group_name,
+    fom_regex=None,
+    group_name=None,
     log_file="{log_file}",
     units="",
     contexts=None,
     fom_type: FomType = FomType.UNDEFINED,
     when=None,
+    fom_map_key=None,
     **kwargs,
 ):
     """Adds a figure of merit to track for this object
@@ -122,9 +123,16 @@ def figure_of_merit(
                                    should exist in.
       fom_type (ramble.util.foms.FomType): The type of figure of merit
       when (list | None): List of when conditions to apply to directive
+      fom_map_key: If supplied, this is treated as an in-memory (as opposed to file-based)
+                   figure of merit, and its value is extracted using this key
     """
 
     def _execute_figure_of_merit(obj):
+        if fom_map_key is None:
+            if fom_regex is None or group_name is None:
+                raise ramble.language.language_base.DirectiveError(
+                    "`fom_regex` and `group_name` are required for defining file-based FOM"
+                )
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "figure_of_merit"
         )
@@ -146,6 +154,7 @@ def figure_of_merit(
             "fom_type": fom_type,
             "when": when_list,
             "origin_type": obj.origin_type if hasattr(obj, "origin_type") else "",
+            "fom_map_key": fom_map_key,
         }
 
     return _execute_figure_of_merit
@@ -789,7 +798,7 @@ def variable(
     """
 
     def _define_variable(obj):
-        import ramble.workload
+        import ramble.definitions.variables
 
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, error_context
@@ -801,7 +810,7 @@ def variable(
             obj.object_variables[when_set] = []
 
         obj.object_variables[when_set].append(
-            ramble.workload.WorkloadVariable(
+            ramble.definitions.variables.Variable(
                 name,
                 default=default,
                 description=description,
@@ -845,7 +854,7 @@ def environment_variable(
             when, obj, name, "environment_variable"
         )
 
-        workload_env_var = ramble.workload.WorkloadEnvironmentVariable(
+        workload_env_var = ramble.definitions.variables.EnvironmentVariable(
             name, value=value, description=description, when=when_list, **kwargs
         )
 
@@ -891,7 +900,7 @@ def environment_variable(
     return _execute_environment_variable
 
 
-@shared_directive(dicts=())
+@shared_directive("class_variants")
 def variant(
     name: str,
     default: Optional[Any] = None,
@@ -912,12 +921,15 @@ def variant(
         """
         ramble.variants.validate_variant(name)
 
-        if obj.object_variants is None:
-            obj.object_variants = ramble.variants.VariantSet()
+        args_dict = {
+            "name": name,
+            "default": default,
+            "description": description,
+            "values": values,
+        }
+        args_dict.update(kwargs)
 
-        obj.object_variants.default_variant(
-            name, default=default, description=description, values=values
-        )
+        obj.class_variants[name] = args_dict
 
     return _define_variant
 
@@ -963,9 +975,20 @@ def required_variable(
                 when, obj, var, "required_variable"
             )
 
+        if results_level not in ["key", "variable"]:
+            raise ramble.language.language_base.DirectiveError(
+                "The results_level argument for required variable "
+                f"{var} is set to {results_level}.\n"
+                "Valid options are 'key' or 'variable'."
+            )
+
+        output_level = ramble.keywords.output_level.variable
+        if results_level == "key":
+            output_level = ramble.keywords.output_level.key
+
         obj.required_vars[var] = {
             "type": ramble.keywords.key_type.required,
-            "level": ramble.keywords.output_level.variable,
+            "level": output_level,
             "description": description,
             # Extra prop that's only used for filtering
             "when": when_list,

@@ -22,12 +22,7 @@ import stat
 import sys
 import traceback
 import types
-
-try:
-    from collections.abc import Mapping  # novm
-except ImportError:
-    from collections.abc import Mapping
-
+from collections.abc import Mapping
 from enum import Enum
 
 import ruamel.yaml as yaml
@@ -278,7 +273,7 @@ def list_object_files(obj_inst, object_type):
 
 
 def all_object_names(object_type=default_type):
-    """Convenience wrapper around ``ramble.repository.all_object_names()``."""  # noqa: E501
+    """Convenience wrapper around ``ramble.repository.all_object_names()``."""
     return paths[object_type].all_object_names()
 
 
@@ -303,7 +298,7 @@ def set_path(repo, object_type=default_type):
     Overwrite ``path`` and register it as an importer in
     ``sys.meta_path`` if it is a ``Repo`` or ``RepoPath``.
     """
-    global paths
+    global paths  # noqa: F824
     paths[object_type] = repo
 
     # make the new repo_path an importer if needed
@@ -336,7 +331,7 @@ def use_repositories(*paths_and_repos, object_type=default_type):
     Returns:
         Corresponding RepoPath object
     """
-    global paths
+    global paths  # noqa: F824
 
     # Construct a temporary RepoPath object from
     temporary_repositories = RepoPath(*paths_and_repos, object_type=object_type)
@@ -887,7 +882,7 @@ class RepoPath:
         return self.repo_for_obj(spec).get(spec)
 
     def get_obj_class(self, obj_name):
-        """Find a class for the spec's object and return the class object."""  # noqa: E501
+        """Find a class for the spec's object and return the class object."""
         return self.repo_for_obj(obj_name).get_obj_class(obj_name)
 
     @autospec
@@ -1532,11 +1527,9 @@ class RepoLoader(_PrependFileLoader):
         super().__init__(self.fullname, self.object_py, prepend=self._object_prepend)
 
     def is_package(self, fullname):
-        parent_dir = os.path.dirname(self.path)
-        # Use the presence of __init__.py to determine if load it as a package.
-        # TODO: since every Ramble object already has a containing directory,
-        # it might make sense to treat all of them as python packages.
-        return os.path.isfile(os.path.join(parent_dir, "__init__.py"))
+        # Since every Ramble object already has a containing directory,
+        # we can treat all of them as python packages.
+        return True
 
 
 class RepositoryNamespaceLoader:

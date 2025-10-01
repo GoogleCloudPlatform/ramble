@@ -325,7 +325,21 @@ class WhenDirectives(ExecutableApplication):
 
     required_variable(
         "test_app_required_variable",
-        results_level="key",
+        results_level="variable",
         description="Test required variable",
         when=["+app_required_variable"],
+    )
+
+    variant(
+        "app_required_key",
+        default=False,
+        values=[True, False],
+        description="Test required key",
+    )
+
+    required_variable(
+        "test_app_required_key",
+        results_level="key",
+        description="Test required key",
+        when=["+app_required_key"],
     )

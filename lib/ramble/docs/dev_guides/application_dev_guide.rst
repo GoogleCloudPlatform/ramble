@@ -337,7 +337,7 @@ package manager variant:
 .. code-block:: python
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc9", pkg_spec="gcc@9.5.0")
 
         software_spec(
             "impi",
@@ -405,10 +405,28 @@ definition needs to contain a complete definition of at least one workload.
 This includes its executables, input files, and workload variables.
 
 Once this is complete, a workspace can be configured (following
-:ref:`workspace-config`) to create experiments from the new workload. After
-setting up the workspace, requested experiments directories will be created
-following :ref:`workspace-structure`. In order to debug any issues with the
-experiments, you can use the dry-run option from :ref:`workspace-setup`.
+:ref:`workspace-config`) to create experiments from the new workload.
+
+In order to have Ramble generate a workspace configuration, you can use the
+``workspace manage`` command from :ref:`workspace-manage`. For example:
+
+.. code-block::
+
+  $ ramble workspace manage experiments <app_name> --wf <workload_name> -v n_nodes=1 -v n_ranks=1
+
+
+The ``--dry-run`` option, from :ref:`workspace-setup`, can be used when setting
+up the workspace to avoid expensive operations (like download inputs, or
+installing software). The resulting workspace will not be functional, but this
+option can be useful to iterate quickly with the rendered templates or debug
+issues in the resulting configuration. Before attempting to actually execute
+the experiments, ensure the workspace was set up without using ``--dry-run``.
+
+After setting up the workspace, requested experiments directories will be
+created following :ref:`workspace-structure`. The execution scripts will be
+rendered into the experiment directories, and can be compared with what was
+manually executed to begin with.
+
 Additionally, you can filter the experiments you want to setup using the
 ``--where`` option, as in :ref:`filter-experiments`
 
@@ -426,3 +444,25 @@ have the output file from :ref:`collect-output`, you can copy it into one of
 the experiment directories to allow analyze to extract the correct information
 without having to execute the experiment.
 
+^^^^^^^^^^^^^
+Writing Tests
+^^^^^^^^^^^^^
+
+Tests added to a ``test`` directory alongside the object definition file get picked by
+Ramble's unit testing facility. This applies to all Ramble object types. As an example,
+the tests defined under `tunables <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/tunables/test>`_
+can be run via ``ramble unit-test``.
+
+.. code-block:: console
+
+    # Run all unit tests
+    $ ramble unit-test
+
+    # Target specific tests
+    $ ramble unit-test -k tunables
+
+For testing custom Ramble object repositories, the ``--repo-path`` option can be used.
+
+.. code-block:: console
+
+    $ ramble unit-test --repo-path /path/to/custom/repo

@@ -55,7 +55,8 @@ def test_object_validation(workspace_name):
     )
     ws._re_read()
     out = workspace("setup", global_args=global_args)
-    assert "Warning:" not in out
+    assert "Warning: Validator 'validate_var_check'" not in out
+    assert "Warning: Validator 'validate_undefined_var_check'" in out
 
     # Validator without fail_on_invalid should only issue a warning
     workspace(

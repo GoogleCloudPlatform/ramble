@@ -21,30 +21,24 @@ import llnl.util.filesystem as fs
 import llnl.util.tty as tty
 import llnl.util.tty.log as log
 
-import ramble.cmd.common.list as list_cmd
 import ramble.config
 import ramble.context
 import ramble.error
 import ramble.experiment_set
-import ramble.fetch_strategy
 import ramble.keywords
-import ramble.paths
 import ramble.repository
 import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
 import ramble.software_environments
-import ramble.util.env
 import ramble.util.hashing
 import ramble.util.install_cache
 import ramble.util.lock as lk
-import ramble.util.matrices
 import ramble.util.path
 import ramble.util.version
-import ramble.util.web
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util import constants
+from ramble.util import constants, object_utils
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
@@ -1357,7 +1351,7 @@ ramble:
                 # Do not define missing required variables that are defined in
                 # the associated package and workflow managers.
                 # TODO: should include consideration for when clause, right now
-                # the `selected_variables` method cannot be used due to no associated
+                # the `selected_variables` property cannot be used due to no associated
                 # expander at this stage.
                 if key not in workspace_vars and key not in obj_var_names:
                     vars_dict[key] = ""
@@ -1467,7 +1461,7 @@ ramble:
             app_inst.build_modifier_instances()
             app_inst.add_expand_vars(self)
             if app_inst.package_manager is not None:
-                pkgman_prefixes.add(app_inst.package_manager.spec_prefix())
+                pkgman_prefixes.add(app_inst.package_manager.spec_prefix)
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
@@ -1476,12 +1470,13 @@ ramble:
             env_name = app_inst.expander.expand_var(env_name_str)
 
             spec_prefix = (
-                f"{app_inst.package_manager.spec_prefix()}" if len(pkgman_prefixes) > 1 else ""
+                f"{app_inst.package_manager.spec_prefix}" if len(pkgman_prefixes) > 1 else ""
             )
 
             if app_inst.package_manager is None:
                 continue
 
+            compiler_packages = {}
             compiler_dicts = [app_inst.compilers]
             for mod_inst in app_inst._modifier_instances:
                 compiler_dicts.append(mod_inst.compilers)
@@ -1511,6 +1506,7 @@ ramble:
                                 newly_created_packages.add(comp)
                                 packages_dict[comp] = syaml.syaml_dict()
 
+                            compiler_packages[comp] = False
                             packages_dict[comp].update(info.to_dict(prefix=spec_prefix))
                             for conf in info.config_opts():
                                 ramble.config.add(conf, scope=self.ws_file_config_scope_name())
@@ -1550,6 +1546,10 @@ ramble:
                             ):
                                 packages_dict[spec_name] = syaml.syaml_dict()
 
+                            # Check for usage of compilers
+                            if info.compiler in compiler_packages:
+                                compiler_packages[info.compiler] = True
+
                             packages_dict[spec_name].update(info.to_dict(prefix=spec_prefix))
 
                             if spec_name not in app_packages:
@@ -1560,6 +1560,18 @@ ramble:
                     environments_dict[env_name] = syaml.syaml_dict()
 
                 environments_dict[env_name][namespace.packages] = app_packages.copy()
+
+            # Ensure all compilers in this experiment are used.
+            comp_list = []
+            for name, used in compiler_packages.items():
+                if not used:
+                    comp_list.append(name)
+            if comp_list:
+                logger.warn(
+                    "Unused compiler(s) found in experiment: "
+                    + app_inst.expander.experiment_namespace
+                )
+                logger.warn(f"   {comp_list}")
 
         ramble.config.config.update_config(
             namespace.software, full_software_dict, scope=self.ws_file_config_scope_name()
@@ -1698,10 +1710,13 @@ ramble:
                                     if name not in fom_summary.keys():
                                         fom_summary[name] = []
                                     stat_name = fom["origin_type"]
+                                    if not stat_name.startswith("summary::"):
+                                        display_name = "value"
+                                    else:
+                                        display_name = stat_name
                                     value = fom["value"]
                                     units = fom["units"]
-
-                                    output = f"{stat_name} = {value} {units}\n"
+                                    output = f"{display_name} = {value} {units}\n"
                                     fom_summary[name].append(output)
 
                                 for fom_name, fom_val_list in fom_summary.items():
@@ -1727,6 +1742,11 @@ ramble:
 
                             if software_key in exp and exp[software_key]:
                                 self.write_software_info(f, exp)
+
+                        if exp["VARIANTS"]:
+                            f.write("  Experiment variants:\n")
+                            for variant in exp["VARIANTS"]:
+                                f.write(f"  - {variant}\n")
 
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")
@@ -1762,7 +1782,6 @@ ramble:
             from ruamel.yaml import RoundTripDumper
 
             class RambleSafeDumper(RoundTripDumper):
-
                 def ignore_aliases(self, _data):
                     """Make the dumper NEVER print YAML aliases."""
                     return True
@@ -1827,23 +1846,29 @@ ramble:
                 used_variables (set): Set of used definitions that should be kept.
             """
 
-            if scope_name is None:
-                return
+            changed = False
 
             # Delete unused variables from requested scope.
             to_remove = set()
             scope_section = self._get_scope_section(scope_name)
+
+            if scope_section is None:
+                return changed
+
             if namespace.variables in scope_section:
                 for var in scope_section[namespace.variables]:
                     if var not in used_variables:
                         to_remove.add(var)
                 for var in to_remove:
                     del scope_section[namespace.variables][var]
+                    changed = True
 
                 if not scope_section[namespace.variables]:
                     del scope_section[namespace.variables]
 
-        # Build experiment sets to determine which variables are used
+            return changed
+
+        # Build software environments to determine which variables are used
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
         experiment_set = self.build_experiment_set()
 
@@ -1856,27 +1881,33 @@ ramble:
         app_used_vars = set()
         wl_used_vars = set()
         exp_used_vars = set()
+        changed = False
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_used_variables(self)
 
-            if prev_exp != app_inst.variables[app_inst.keywords.experiment_template_name]:
+            if app_inst.repeats.is_repeat_base or app_inst.repeats.repeat_index is None:
+                # Either there are no repeats, or this is the base
                 if prev_exp is not None:
-                    _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
+                    changed = changed or _remove_scoped_variables(
+                        f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars
+                    )
 
                 prev_exp = app_inst.variables[app_inst.keywords.experiment_template_name]
                 exp_used_vars = set()
 
             if prev_wl != app_inst.variables[app_inst.keywords.workload_template_name]:
                 if prev_wl is not None:
-                    _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
+                    changed = changed or _remove_scoped_variables(
+                        f"{prev_app}:{prev_wl}", wl_used_vars
+                    )
 
                 prev_wl = app_inst.variables[app_inst.keywords.workload_template_name]
                 wl_used_vars = set()
 
             if prev_app != app_inst.variables[app_inst.keywords.application_name]:
                 if prev_app is not None:
-                    _remove_scoped_variables(prev_app, app_used_vars)
+                    changed = changed or _remove_scoped_variables(prev_app, app_used_vars)
 
                 prev_app = app_inst.variables[app_inst.keywords.application_name]
                 app_used_vars = set()
@@ -1889,17 +1920,22 @@ ramble:
             exp_used_vars = exp_used_vars.union(app_inst.expander._used_variables)
 
         if prev_exp is not None:
-            _remove_scoped_variables(f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars)
+            changed = changed or _remove_scoped_variables(
+                f"{prev_app}:{prev_wl}:{prev_exp}", exp_used_vars
+            )
 
         if prev_wl is not None:
-            _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
+            changed = changed or _remove_scoped_variables(f"{prev_app}:{prev_wl}", wl_used_vars)
 
         if prev_app is not None:
-            _remove_scoped_variables(prev_app, app_used_vars)
+            changed = changed or _remove_scoped_variables(prev_app, app_used_vars)
 
-        _remove_scoped_variables("workspace", workspace_used_variables)
+        changed = changed or _remove_scoped_variables("workspace", workspace_used_variables)
 
-        self._write_config(config_section)
+        if changed:
+            self._write_config(config_section)
+        else:
+            logger.all_msg("No variables were changed.")
 
     def simplify_software(self):
         # First drop unused experiment templates from app dict so environments aren't rendered
@@ -1941,25 +1977,41 @@ ramble:
         software_environments = self.software_environments
         experiment_set = self.build_experiment_set()
 
+        changed = False
+
+        software_dict = None
+        package_dict = None
+        environments_dict = None
+
         software_dict = ramble.config.config.get_config(
             namespace.software, scope=self.ws_file_config_scope_name()
         )
-        package_dict = software_dict[namespace.packages]
-        environments_dict = software_dict[namespace.environments]
+
+        if namespace.packages in software_dict:
+            package_dict = software_dict[namespace.packages]
+        if namespace.environments in software_dict:
+            environments_dict = software_dict[namespace.environments]
 
         tty.debug("Removing configurations that do not spark joy.")
-        for pkg in software_environments.unused_packages():
-            if pkg.name in package_dict:
-                tty.debug(f"Removing {pkg.name} from software packages")
-                package_dict.pop(pkg.name)
-        for env in software_environments.unused_environments():
-            if env.name in environments_dict:
-                tty.debug(f"Removing {env.name} from software environments")
-                environments_dict.pop(env.name)
+        if package_dict:
+            for pkg in software_environments.unused_packages():
+                if pkg.name in package_dict:
+                    tty.debug(f"Removing {pkg.name} from software packages")
+                    package_dict.pop(pkg.name)
+                    changed = True
+        if environments_dict:
+            for env in software_environments.unused_environments():
+                if env.name in environments_dict:
+                    tty.debug(f"Removing {env.name} from software environments")
+                    environments_dict.pop(env.name)
+                    changed = True
 
-        ramble.config.config.update_config(
-            namespace.software, software_dict, scope=self.ws_file_config_scope_name()
-        )
+        if changed:
+            ramble.config.config.update_config(
+                namespace.software, software_dict, scope=self.ws_file_config_scope_name()
+            )
+        else:
+            logger.all_msg("No changes were made to software configuration sections.")
 
     @property
     def latest_archive_path(self):
@@ -2148,6 +2200,13 @@ ramble:
 
         else:
             scope_parts = scope.split(":")
+
+            if (
+                namespace.application
+                not in self.config_sections["workspace"]["yaml"][namespace.ramble]
+            ):
+                return None
+
             base_section = self.config_sections["workspace"]["yaml"][namespace.ramble][
                 namespace.application
             ]
@@ -2347,12 +2406,6 @@ ramble:
         Returns:
             (int) Number of modifiers added to workspace
         """
-
-        class Filters:
-            def __init__(self):
-                self.filter = []
-                self.search_description = False
-
         on_exec_list = None
         if on_executable is not None:
             on_exec_list = syaml.syaml_list()
@@ -2363,12 +2416,8 @@ ramble:
         if namespace.modifiers not in base_section:
             base_section[namespace.modifiers] = syaml.syaml_list()
 
-        filters = Filters()
-        filters.filter.append(name_pattern)
-
         mod_type = ramble.repository.ObjectTypes.modifiers
-        objs = set(ramble.repository.all_object_names(mod_type))
-        mod_names = list_cmd.filter_by_name(objs, filters, mod_type)
+        mod_names = object_utils.filter_by_name([name_pattern], False, mod_type)
 
         if len(mod_names) < 1:
             logger.error(f"No modifiers found matching name pattern of {name_pattern}")
