@@ -396,7 +396,8 @@ class ArchivePipeline(Pipeline):
                     shutil.copyfile(src, dest)
 
         for pattern in self.archive_patterns:
-            pattern_path = self.workspace.root + os.sep + pattern
+            # Escape workspace root incase it contains glob characters.
+            pattern_path = glob.escape(self.workspace.root) + os.sep + pattern
             for file in glob.glob(pattern_path):
                 dest_dir = os.path.dirname(
                     file.replace(self.workspace.root, self.workspace.latest_archive_path)
