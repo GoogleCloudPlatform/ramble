@@ -1187,6 +1187,45 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         else:
                             logger.warn(err_msg)
 
+    def _generate_cleanup_cmd(self, key):
+        commands = []
+        all_cleanups = {}
+        for when_set, named_cleanups in self.cleanups.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                all_cleanups.update(named_cleanups)
+
+        for name, cleanup_props in all_cleanups.items():
+            if not cleanup_props.get(key):
+                continue
+
+            if cleanup_props["directory"]:
+                dir = self.expander.expand_var(cleanup_props["directory"])
+            else:
+                dir = self.expander.experiment_run_dir
+            regex = self.expander.expand_var(cleanup_props["regex"])
+            if cleanup_props["recurse"]:
+                recurse_opt = ""
+            else:
+                recurse_opt = "-maxdepth 1"
+            regex_opts = f"-regextype posix-extended -regex '{regex}'"
+            delete_opts = "-exec rm -rf {} +"
+            find_cmd = f"find '{dir}' -mindepth 1 {recurse_opt} {regex_opts} {delete_opts}"
+
+            commands.append(f"# {key}-cleanup: {name}")
+            commands.append(find_cmd)
+
+        return commands
+
+    register_builtin("pre_cleanup", required=True, injection_method="prepend")
+
+    def pre_cleanup(self):
+        return self._generate_cleanup_cmd("pre")
+
+    register_builtin("post_cleanup", required=True, injection_method="append")
+
+    def post_cleanup(self):
+        return self._generate_cleanup_cmd("post")
+
     def _get_filtered_executables(self) -> dict:
         """Returns a dict of executables that satisfy `when` conditions"""
         filtered_executables = {}

@@ -319,3 +319,54 @@ def license_name(name, **kwargs):
         obj.license_names = list(dict.fromkeys(license_from_base + [name]))
 
     return _execute_license_name
+
+
+@application_directive("cleanups")
+def cleanup(
+    name,
+    regex,
+    directory=None,
+    recurse=False,
+    description="",
+    pre=False,
+    post=False,
+    when=None,
+    **kwargs,
+):
+    """Adds a cleanup operation to the application.
+
+    This directive defines a cleanup step that removes files matching a
+    regular expression from a specified directory.
+
+    Args:
+        name (str): Name of the cleanup operation.
+        regex (str): Regex passed to `find` to match files and directories to be deleted.
+        directory (str): The directory to perform the cleanup in. Defaults to {experiment_run_dir}.
+        recurse (bool): Whether to search for files recursively in subdirectories.
+        description (str): Description of the cleanup operation.
+        pre (bool): Whether to run this cleanup before the main application execution.
+        post (bool): Whether to run this cleanup after the main application execution.
+        when (list | None): List of when conditions to apply to this directive.
+    """
+
+    def _define_cleanup(obj):
+        if not pre and not post:
+            raise ramble.language.language_base.DirectiveError(
+                f"Cleanup directive '{name}' must set at least one of 'pre' or 'post' to True."
+            )
+        when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "cleanup")
+        when_set = frozenset(when_list)
+        if when_set not in obj.cleanups:
+            obj.cleanups[when_set] = {}
+
+        obj.cleanups[when_set][name] = {
+            "description": description,
+            "regex": regex,
+            "directory": directory,
+            "recurse": recurse,
+            "pre": pre,
+            "post": post,
+            "when": when_list,
+        }
+
+    return _define_cleanup
