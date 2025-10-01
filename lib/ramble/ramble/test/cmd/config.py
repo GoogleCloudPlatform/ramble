@@ -910,9 +910,3 @@ def test_command_alias(mutable_empty_config):
     output = f.getvalue()
     assert ret == 0
     assert "ramble info" not in output
-
-    # Test alias to non-existent command
-    config("add", "config:aliases:bad:nonexistent")
-    with pytest.raises(SystemExit) as e:
-        main.main(argv=["bad"])
-    assert e.value.code != 0

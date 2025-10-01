@@ -172,8 +172,11 @@ def workspace_activate(args):
 
     # Activate new workspace
     active_workspace = ramble.workspace.Workspace(workspace_path)
+    enable_prompt = args.prompt or ramble.config.get("config:enable_workspace_prompt")
     cmds += ramble.workspace.shell.activate_header(
-        ws=active_workspace, shell=args.shell, prompt=workspace_prompt if args.prompt else None
+        ws=active_workspace,
+        shell=args.shell,
+        prompt=workspace_prompt if enable_prompt else None,
     )
     env_mods.extend(ramble.workspace.shell.activate(ws=active_workspace))
     cmds += env_mods.shell_modifications(args.shell)
