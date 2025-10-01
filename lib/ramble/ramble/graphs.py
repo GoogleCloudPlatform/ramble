@@ -9,12 +9,15 @@
 import enum
 import graphlib
 import itertools
+import re
 from collections import defaultdict
 
 import ramble.error
+import ramble.expander
 import ramble.util.graph
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
+from ramble.workspace import namespace
 
 
 class AttributeGraph:
@@ -449,6 +452,45 @@ class ExecutableGraph(AttributeGraph):
                 f"builtin {builtin_name} matches more than one node ({full_names})"
             )
         return self.node_definitions[full_names[0]]
+
+
+class FormattedExecutableGraph(AttributeGraph):
+    """Graph that handles formatted executables"""
+
+    node_type = "formatted executable"
+
+    def __init__(self, formatted_execs: dict, obj_inst):
+        """Constructs a new FormattedExecutableGraph and evaluates dependencies"""
+        super().__init__(obj_inst)
+        self._formatted_executable_dependencies = defaultdict(list)
+
+        # Define all graph nodes
+        for exec_name, exec_def in formatted_execs.items():
+            exec_node = ramble.util.graph.GraphNode(exec_name, attribute=exec_def)
+            super().add_node(exec_node)
+
+        # Search for internal dependencies and define edges
+        for exec_node in self.node_definitions.values():
+            formatted_conf = exec_node.attribute
+
+            capture_group = r"(\w+)"
+            expansion_pattern = re.compile(
+                rf"{ramble.expander.Expander.expansion_str(capture_group)}"
+            )
+            expansion_strs = set()
+
+            if namespace.prefix in formatted_conf:
+                expansion_strs.update(expansion_pattern.findall(formatted_conf[namespace.prefix]))
+            if namespace.commands in formatted_conf:
+                for line in formatted_conf[namespace.commands]:
+                    expansion_strs.update(expansion_pattern.findall(line))
+            dep_nodes = []
+            for expansion_str in expansion_strs:
+                if expansion_str in self.node_definitions.keys():
+                    dep_node = self.node_definitions[expansion_str]
+                    dep_nodes.append(dep_node)
+
+            super().define_edges(exec_node, dep_nodes)
 
 
 class GraphError(ramble.error.RambleError):

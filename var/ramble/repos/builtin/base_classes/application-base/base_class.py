@@ -1574,6 +1574,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if obj and hasattr(obj, "formatted_executables"):
                 formatted_exec_groups.append(obj.formatted_executables)
 
+        all_execs = {}
+
         for formatted_exec_group in formatted_exec_groups:
             for when_set, formatted_exec_defs in formatted_exec_group.items():
                 if not self.expander.satisfies(
@@ -1588,45 +1590,53 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             "definition already exists."
                         )
 
-                    n_indentation = 0
-                    if namespace.indentation in formatted_conf:
-                        n_indentation = int(
-                            formatted_conf[namespace.indentation]
+                    if var_name in all_execs:
+                        raise FormattedExecutableError(
+                            f"Formatted executable {var_name} already defined."
                         )
 
-                    prefix = ""
-                    if namespace.prefix in formatted_conf:
-                        prefix = formatted_conf[namespace.prefix]
+                    all_execs[var_name] = formatted_conf
 
-                    join_separator = "\n"
-                    if namespace.join_separator in formatted_conf:
-                        join_separator = formatted_conf[
-                            namespace.join_separator
-                        ].replace(r"\n", "\n")
+        # Set formatted executable dependencies and order
+        formatted_exec_graph = ramble.graphs.FormattedExecutableGraph(
+            all_execs, obj_inst=self
+        )
+        for node in formatted_exec_graph.walk():
+            formatted_conf = node.attribute
 
-                    indentation = " " * n_indentation
+            # Create the formatted command for the executable
+            n_indentation = 0
+            if namespace.indentation in formatted_conf:
+                n_indentation = int(formatted_conf[namespace.indentation])
 
-                    commands_to_format = self._command_list
-                    if namespace.commands in formatted_conf:
-                        commands_to_format = formatted_conf[
-                            namespace.commands
-                        ].copy()
+            prefix = ""
+            if namespace.prefix in formatted_conf:
+                prefix = formatted_conf[namespace.prefix]
 
-                    formatted_lines = []
-                    for command in commands_to_format:
-                        # Do not replace escaped braces here, to allow them to
-                        # be replace properly when templates are written.
-                        expanded = self.expander.expand_var(
-                            command, replace_escaped_braces=False
-                        )
-                        for out_line in expanded.split("\n"):
-                            formatted_lines.append(
-                                indentation + prefix + out_line
-                            )
+            join_separator = "\n"
+            if namespace.join_separator in formatted_conf:
+                join_separator = formatted_conf[
+                    namespace.join_separator
+                ].replace(r"\n", "\n")
 
-                    self.variables[var_name] = join_separator.join(
-                        formatted_lines
-                    )
+            indentation = " " * n_indentation
+
+            commands_to_format = self._command_list
+            if namespace.commands in formatted_conf:
+                commands_to_format = formatted_conf[namespace.commands].copy()
+
+            formatted_lines = []
+            for command in commands_to_format:
+                # Do not replace escaped braces here, to allow them to
+                # be replace properly when templates are written.
+                expanded = self.expander.expand_var(
+                    command, replace_escaped_braces=False
+                )
+
+                for out_line in expanded.split("\n"):
+                    formatted_lines.append(indentation + prefix + out_line)
+
+            self.variables[node.key] = join_separator.join(formatted_lines)
 
     def _derive_variables_for_template_path(self, workspace):
         """Define variables for template paths (for add_expand_vars)"""
