@@ -331,6 +331,13 @@ class Slurm(WorkflowManagerBase):
             fom_type=FomType.INFO,
         )
 
+    success_criteria(
+        "job-status-check",
+        mode="fom_comparison",
+        fom_name="job-status",
+        formula="'{value}' == 'COMPLETE'",
+    )
+
 
 class SlurmRunner:
     """Runner for executing slurm commands"""

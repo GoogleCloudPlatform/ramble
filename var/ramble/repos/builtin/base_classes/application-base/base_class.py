@@ -2780,6 +2780,15 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for mod in self._modifier_instances:
             success_lists.append(("modifier_definition", mod.success_criteria))
 
+        if self.workflow_manager is not None:
+            criteria_list.flush_scope("workflow_manager_definition")
+            success_lists.append(
+                (
+                    "workflow_manager_definition",
+                    self.workflow_manager.success_criteria,
+                )
+            )
+
         for success_scope, success_list in success_lists:
             for criteria, conf in success_list.items():
                 if not self.expander.satisfies(
