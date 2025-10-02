@@ -16,7 +16,8 @@ import ramble.util.stats
     [
         (ramble.util.stats.StatsMin(), [-2, 0, 2, 5.5], "s", (-2, "s", "summary::min")),
         (ramble.util.stats.StatsMax(), [-2, 0, 2, 5.5], "s", (5.5, "s", "summary::max")),
-        (ramble.util.stats.StatsMean(), [-2, 0, 2, 5.5], "s", (1.4, "s", "summary::mean")),
+        # Test for scientific notation support
+        (ramble.util.stats.StatsMean(), [-2, 0, 2, 5.5, 1.45e1], "s", (4, "s", "summary::mean")),
         (
             ramble.util.stats.StatsHarmonicMean(),
             [2, 3, 5],
