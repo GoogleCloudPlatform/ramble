@@ -6,30 +6,21 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import decimal
 import math
 import statistics
 
 from scipy.stats import t
 
 
-def decimal_places(value):
+def _decimal_places(value):
     """Returns the number of decimal places of a value"""
-
-    val_str = str(value)
-    if "." not in val_str:
-        return 0
-    else:
-        return len(val_str.split(".")[1])
+    return -decimal.Decimal(str(value)).as_tuple().exponent
 
 
-def max_decimal_places(list):
+def _max_decimal_places(values):
     """Returns the max decimal places of a list of values"""
-
-    max = 0
-    for val in list:
-        if decimal_places(val) > max:
-            max = decimal_places(val)
-    return max
+    return max(_decimal_places(v) for v in values)
 
 
 class StatsBase:
@@ -67,7 +58,7 @@ class StatsMean(StatsBase):
     name = "mean"
 
     def compute(self, values):
-        return round(statistics.mean(values), max_decimal_places(values))
+        return round(statistics.mean(values), _max_decimal_places(values))
 
 
 class StatsHarmonicMean(StatsBase):
@@ -75,7 +66,7 @@ class StatsHarmonicMean(StatsBase):
 
     def compute(self, values):
         try:
-            return round(statistics.harmonic_mean(values), max_decimal_places(values))
+            return round(statistics.harmonic_mean(values), _max_decimal_places(values))
         except statistics.StatisticsError:
             return "NA"
 
@@ -84,7 +75,7 @@ class StatsMedian(StatsBase):
     name = "median"
 
     def compute(self, values):
-        return round(statistics.median(values), max_decimal_places(values))
+        return round(statistics.median(values), _max_decimal_places(values))
 
 
 class StatsVar(StatsBase):
@@ -95,7 +86,7 @@ class StatsVar(StatsBase):
         return f"{unit}^2"
 
     def compute(self, values):
-        return round(statistics.variance(values), max_decimal_places(values))
+        return round(statistics.variance(values), _max_decimal_places(values))
 
 
 class StatsStdev(StatsBase):
@@ -103,7 +94,7 @@ class StatsStdev(StatsBase):
     min_count = 2
 
     def compute(self, values):
-        return round(statistics.stdev(values), max_decimal_places(values))
+        return round(statistics.stdev(values), _max_decimal_places(values))
 
 
 class StatsCoefficientOfVariation(StatsBase):
@@ -118,7 +109,7 @@ class StatsCoefficientOfVariation(StatsBase):
         if not mean:
             return "NA"
         return round(
-            statistics.stdev(values) / statistics.mean(values), max_decimal_places(values)
+            statistics.stdev(values) / statistics.mean(values), _max_decimal_places(values)
         )
 
     def get_unit(self, unit):
@@ -160,7 +151,7 @@ class StatsConfidenceIntervalLower99(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.99)
-        return round(mean - margin_of_error, max_decimal_places(values))
+        return round(mean - margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalUpper99(StatsBase):
@@ -170,7 +161,7 @@ class StatsConfidenceIntervalUpper99(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.99)
-        return round(mean + margin_of_error, max_decimal_places(values))
+        return round(mean + margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalLower95(StatsBase):
@@ -180,7 +171,7 @@ class StatsConfidenceIntervalLower95(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.95)
-        return round(mean - margin_of_error, max_decimal_places(values))
+        return round(mean - margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalUpper95(StatsBase):
@@ -190,7 +181,7 @@ class StatsConfidenceIntervalUpper95(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.95)
-        return round(mean + margin_of_error, max_decimal_places(values))
+        return round(mean + margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalLower90(StatsBase):
@@ -200,7 +191,7 @@ class StatsConfidenceIntervalLower90(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.90)
-        return round(mean - margin_of_error, max_decimal_places(values))
+        return round(mean - margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalUpper90(StatsBase):
@@ -210,7 +201,7 @@ class StatsConfidenceIntervalUpper90(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.90)
-        return round(mean + margin_of_error, max_decimal_places(values))
+        return round(mean + margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalLower50(StatsBase):
@@ -220,7 +211,7 @@ class StatsConfidenceIntervalLower50(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.50)
-        return round(mean - margin_of_error, max_decimal_places(values))
+        return round(mean - margin_of_error, _max_decimal_places(values))
 
 
 class StatsConfidenceIntervalUpper50(StatsBase):
@@ -230,7 +221,7 @@ class StatsConfidenceIntervalUpper50(StatsBase):
     def compute(self, values):
         mean = statistics.mean(values)
         margin_of_error = _calculate_margin_of_error(values, 0.50)
-        return round(mean + margin_of_error, max_decimal_places(values))
+        return round(mean + margin_of_error, _max_decimal_places(values))
 
 
 all_stats = [
