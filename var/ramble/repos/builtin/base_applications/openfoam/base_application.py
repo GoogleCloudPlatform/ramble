@@ -7,7 +7,9 @@
 # except according to those terms.
 
 import os
+import re
 
+import ramble.util.stats
 from ramble.appkit import *
 from ramble.expander import Expander
 
@@ -85,6 +87,14 @@ class Openfoam(ExecutableApplication):
         default="system/snappyHexMeshDict",
         description="Path to hexh mesh file",
         workloads=["motorbike*"],
+    )
+
+    workload_variable(
+        "file_handler",
+        default="uncollated",
+        description="Control how processes write output",
+        values=["uncollated", "collated", "masterUncollated"],
+        workloads=["*"],
     )
 
     workload_variable(
@@ -224,6 +234,7 @@ class Openfoam(ExecutableApplication):
             'foamDictionary -entry "endTime" -set "{end_time}" {control_path}',
             'foamDictionary -entry "writeInterval" -set "{write_interval}" {control_path}',
             'foamDictionary -entry "startFrom" -set "{start_from}" {control_path}',
+            'foamDictionary -entry "OptimizationSwitches{dict_delim}fileHandler" -set "{file_handler}" {control_path}',
             'foamDictionary system/fvSolution -entry relaxationFactors{dict_delim}fields -add "{}"',
             'foamDictionary system/fvSolution -entry relaxationFactors{dict_delim}fields{dict_delim}p -set "0.3"',
             'foamDictionary system/fvSolution -entry solvers{dict_delim}p{dict_delim}nPreSweeps -set "0"',
@@ -361,33 +372,24 @@ class Openfoam(ExecutableApplication):
 
     figure_of_merit(
         "snappyHexMesh Ranks",
-        log_file=config_file,
-        fom_regex=r"snappyHexMesh ranks: (?P<ranks>[0-9]+)",
-        group_name="ranks",
+        fom_map_key="snappy-hex-ranks",
         units="",
     )
 
-    figure_of_merit(
-        "simpleFoam Time",
-        log_file=(log_prefix + "simpleFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)",
-        group_name="foam_time",
-        units="s",
+    simple_foam_exec_regex = (
+        r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)"
     )
-
     figure_of_merit(
         "simpleFoam Time",
         log_file=(log_prefix + "simpleFoam"),
-        fom_regex=r"\s*ExecutionTime = (?P<foam_time>[0-9]+\.?[0-9]*)",
+        fom_regex=simple_foam_exec_regex,
         group_name="foam_time",
         units="s",
     )
 
     figure_of_merit(
         "simpleFoam Ranks",
-        log_file=config_file,
-        fom_regex=r"simpleFoam ranks: (?P<ranks>[0-9]+)",
-        group_name="ranks",
+        fom_map_key="simple-foam-ranks",
         units="",
     )
 
@@ -401,9 +403,7 @@ class Openfoam(ExecutableApplication):
 
     figure_of_merit(
         "potentialFoam Ranks",
-        log_file=config_file,
-        fom_regex=r"potentialFoam ranks: (?P<ranks>[0-9]+)",
-        group_name="ranks",
+        fom_map_key="potential-foam-ranks",
         units="",
     )
 
@@ -428,15 +428,53 @@ class Openfoam(ExecutableApplication):
         file="{experiment_run_dir}/log.simpleFoam",
     )
 
-    def _prepare_analysis(self, workspace, app_inst=None):
-        conf_path = self.expander.expand_var(self.config_file)
+    figure_of_merit(
+        "simpleFoam Number of Timesteps",
+        fom_map_key="simple-foam-time-n-timesteps",
+        units="",
+    )
+    for stat in ramble.util.stats.all_stats:
+        figure_of_merit(
+            f"simpleFoam Timestep {stat.name}",
+            fom_map_key=f"simple-foam-time-{stat.name}",
+            units=stat.get_unit("s"),
+        )
 
-        with open(conf_path, "w+") as f:
-            hex_ranks = self.expander.expand_var("{n_ranks_hex}")
-            simple_ranks = self.expander.expand_var("{n_ranks}")
-            f.write(f"snappyHexMesh ranks: {hex_ranks}\n")
-            f.write(f"simpleFoam ranks: {simple_ranks}\n")
-            f.write(f"potentialFoam ranks: {simple_ranks}\n")
+    def _prepare_analysis(self, workspace, app_inst=None):
+        hex_ranks = self.expander.expand_var("{n_ranks_hex}")
+        simple_ranks = self.expander.expand_var("{n_ranks}")
+        self.add_inmem_fom_value("snappy-hex-ranks", hex_ranks)
+        self.add_inmem_fom_value("simple-foam-ranks", simple_ranks)
+        self.add_inmem_fom_value("potential-foam-ranks", simple_ranks)
+
+        sf_log = self.expander.expand_var(
+            "{experiment_run_dir}" + os.sep + "log.simpleFoam"
+        )
+        if os.path.isfile(sf_log):
+            exec_times = []
+            exec_regex = re.compile(self.simple_foam_exec_regex)
+            with open(sf_log) as f:
+                for line in f.readlines():
+                    m = exec_regex.match(line)
+                    if m:
+                        exec_times.append(float(m.group("foam_time")))
+
+            self.add_inmem_fom_value(
+                "simple-foam-time-n-timesteps", len(exec_times)
+            )
+
+            # Drop first time, to avoid init time
+            if len(exec_times) > 1:
+                timestep_times = []
+                for i in range(0, len(exec_times) - 1):
+                    timestep_times.append(exec_times[i + 1] - exec_times[i])
+
+                # Compute statistics from other times
+                for stat in ramble.util.stats.all_stats:
+                    self.add_inmem_fom_value(
+                        f"simple-foam-time-{stat.name}",
+                        stat.compute(timestep_times),
+                    )
 
     def _define_commands(self, exec_graph, success_list):
         export_prefix = self.expander.expand_var_name("export_prefix")
