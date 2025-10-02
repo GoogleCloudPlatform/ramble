@@ -27,6 +27,7 @@ obj_attribute_map = {
     "figure_of_merit_contexts": None,
     "figures_of_merit": None,
     "builtins": None,
+    "cleanups": None,
     "package_manager_configs": None,
     "required_packages": None,
     "object_variants": None,

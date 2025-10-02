@@ -22,6 +22,7 @@ from ramble.util import object_utils
                 "basic",
                 "basic-inherited",
                 "basic-inherited-nolicense",
+                "cleanup-test",
                 "import-test",
                 "input-test",
             ],
