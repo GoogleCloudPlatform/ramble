@@ -29,11 +29,13 @@ class ScopedCriteriaList:
 
     _valid_scopes = [
         "application_definition",
+        "workflow_manager_definition",
         "modifier_definition",
         "experiment",
     ]
     _flush_scopes = {
         "experiment": ["experiment"],
+        "workflow_manager_definition": ["workflow_manager_definition"],
         "modifier_definition": ["modifier_definition"],
         "application_definition": ["application_definition"],
     }
