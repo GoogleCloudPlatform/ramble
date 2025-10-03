@@ -584,7 +584,19 @@ class ExecutePipeline(Pipeline):
             exec_name = exec_parts[0]
             exec_args = exec_parts[1:]
 
-            executor = Executable(exec_name)
+            executor = which(exec_name)
+            if executor is None:
+                # attempt searching inside the run directory
+                if not os.path.isabs(exec_name):
+                    alt_exec_path = os.path.join(app_inst.expander.experiment_run_dir, exec_name)
+                    executor = which(alt_exec_path)
+
+            if executor is None:
+                # Attempt the execution, even though it won't succeed.
+                # The raised os error gives better reason for troubleshooting
+                # (like whether the exec doesn't exist, or due to missing permission.)
+                executor = Executable(exec_name)
+
             executor(*exec_args)
 
 
