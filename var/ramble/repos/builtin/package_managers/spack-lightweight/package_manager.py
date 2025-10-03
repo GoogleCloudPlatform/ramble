@@ -10,6 +10,7 @@ import os
 import re
 import shlex
 import shutil
+import sys
 
 import llnl.util.filesystem as fs
 
@@ -17,7 +18,7 @@ from ramble.pkgmankit import *
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
-from spack.util.executable import ProcessError
+from spack.util.executable import ProcessError, which
 
 
 class SpackLightweight(PackageManagerBase):
@@ -135,7 +136,7 @@ class SpackLightweight(PackageManagerBase):
         for config_dict in package_manager_config_dicts:
             for _, config in config_dict.items():
                 keep_config = app_inst.expander.satisfies(
-                    config["when"], variant_set=app_inst.object_variants
+                    config["when"], variant_set=self.experiment_variants()
                 )
                 if keep_config:
                     self.runner.add_config(config["config"])
@@ -188,7 +189,8 @@ class SpackLightweight(PackageManagerBase):
                 for pkg, conf in app_inst.required_packages.items():
                     if (
                         app_inst.expander.satisfies(
-                            conf["when"], variant_set=app_inst.object_variants
+                            conf["when"],
+                            variant_set=self.experiment_variants(),
                         )
                         and pkg not in added_packages
                     ):
@@ -204,7 +206,9 @@ class SpackLightweight(PackageManagerBase):
                         if (
                             app_inst.expander.satisfies(
                                 conf["when"],
-                                variant_set=app_inst.object_variants,
+                                variant_set=self.experiment_variants(
+                                    single_modifier=mod_inst
+                                ),
                             )
                             and pkg not in added_packages
                         ):
@@ -423,6 +427,7 @@ class SpackLightweight(PackageManagerBase):
                 "name": self.runner.env_path.replace(
                     workspace.root + os.path.sep, ""
                 ),
+                "package_manager": self.name,
                 "digest": self.runner.inventory_hash(),
             }
         )
@@ -718,6 +723,9 @@ class SpackRunner(CommandRunner):
             self.spack_dir, "share", "spack", script
         )
 
+        self.bs_python = CommandRunner(
+            "python", command=sys.executable, dry_run=dry_run
+        )
         self.concretized = False
         self.hash = None
         self.env_path = None
@@ -741,6 +749,14 @@ class SpackRunner(CommandRunner):
             ramble.config.get(f"{self.concretize_config_name}:prefix")
         )
         self.concretizer.add_default_arg("concretize")
+
+    def get_spack_python(self):
+        if self.dry_run:
+            return self.bs_python
+        return which(
+            "python",
+            path=os.path.join(self.env_path, "ramble", "bin"),
+        )
 
     def get_version(self):
         """Get spack's version"""
