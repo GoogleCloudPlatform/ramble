@@ -165,6 +165,16 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
 
+        self.object_variants.merge_default_variants(app_inst.object_variants)
+
+        for name, value in app_inst.variants.items():
+            expanded_value = app_inst.expander.expand_var(value, typed=True)
+            self.object_variants.experiment_variant(name, expanded_value)
+
+        self.object_variants.merge_multi_value_variants(
+            app_inst.object_variants
+        )
+
     def build_used_variables(self, workspace):
         """Build a set of all used variables
 
@@ -261,3 +271,38 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""
         return []
+
+    def _extract_specs(
+        self, attr_name="software_specs", app_inst=None, prefixed=False
+    ):
+        specs = {}
+        for _, obj in app_inst._objects():
+            software_dict = getattr(obj, attr_name, {})
+            for name, definitions in software_dict.items():
+                for info in definitions:
+                    if app_inst.expander.satisfies(
+                        info.when, variant_set=self.object_variants
+                    ):
+                        if name not in specs:
+                            specs[name] = []
+
+                        new_info = info.copy()
+                        if prefixed:
+                            new_info.prefix = self._spec_prefix
+
+                        specs[name].append(new_info)
+        return specs
+
+    def get_experiment_specs(self, app_inst=None, prefixed=False):
+        if app_inst is None:
+            return {}
+        return self._extract_specs(
+            attr_name="software_specs", app_inst=app_inst, prefixed=prefixed
+        )
+
+    def get_experiment_compilers(self, app_inst=None, prefixed=False):
+        if app_inst is None:
+            return {}
+        return self._extract_specs(
+            attr_name="compilers", app_inst=app_inst, prefixed=prefixed
+        )

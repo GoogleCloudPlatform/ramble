@@ -52,8 +52,8 @@ class SoftwareSpec:
         self.compiler_spec = compiler_spec
         self.when = when.copy()
 
-    def to_dict(self, prefix: str = None):
-        prefix_base = prefix if prefix is not None else self.prefix
+    def to_dict(self, apply_prefix: bool = False):
+        prefix_base = self.prefix if apply_prefix else ""
         prefix_str = f"{prefix_base}_" if prefix_base else ""
 
         attrs = ["pkg_spec", "compiler", "compiler_spec"]
@@ -87,7 +87,7 @@ class SoftwareSpec:
         return output
 
     def __str__(self):
-        self_dict = self.to_dict(prefix="")
+        self_dict = self.to_dict()
         self_dict["prefix"] = self.prefix
         return str(self_dict)
 
