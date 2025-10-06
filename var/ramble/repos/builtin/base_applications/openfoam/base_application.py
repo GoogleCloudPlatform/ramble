@@ -88,7 +88,12 @@ class Openfoam(ExecutableApplication):
         description="Path to hexh mesh file",
         workloads=["motorbike*"],
     )
-
+    workload_variable(
+        "decomposition_method",
+        default="",
+        description="Set the decomposition method. Empty string means no change",
+        workloads=["motorbike*"],
+    )
     workload_variable(
         "file_handler",
         default="uncollated",
@@ -218,6 +223,8 @@ class Openfoam(ExecutableApplication):
             ". $WM_PROJECT_DIR/bin/tools/RunFunctions",
             'foamDictionary -entry "numberOfSubdomains" -set "{n_ranks_hex}" {decomposition_path}',
             'foamDictionary -entry "{coeffs_dict}{dict_delim}n" -set "({min({n_ranks_hex}, {processes_per_node})} {ceil({n_ranks_hex}/{processes_per_node})} 1)" {decomposition_path}',
+            # Only set if the user explicitly gives us a value
+            'if [ -n "{decomposition_method}" ]; then foamDictionary -entry "method" -set "{decomposition_method}" {decomposition_path}; fi',
             'foamDictionary -entry "castellatedMeshControls{dict_delim}maxLocalCells" -set "{max_local_cells}" {hex_mesh_path}',
             'foamDictionary -entry "castellatedMeshControls{dict_delim}maxGlobalCells" -set "{max_global_cells}" {hex_mesh_path}',
             'sed "s/(20 8 8)/{mesh_size}/" -i {block_mesh_path}',
