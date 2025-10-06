@@ -41,6 +41,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         "execute",
         "logs",
     ]
+    _allow_unprefixed_specs = True
 
     _spec_groups = [
         ("compilers", "Compilers"),
@@ -98,6 +99,10 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     def runner(self):
         # Turn `runner` into a property for delayed init
         return None
+
+    @property
+    def allow_unprefixed_specs(self):
+        return getattr(self, "_allow_unprefixed_specs", True)
 
     def package_manager_dir(self, workspace):
         """Get the path to the package manager's software environment directory
