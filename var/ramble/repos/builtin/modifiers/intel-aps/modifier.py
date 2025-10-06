@@ -151,13 +151,14 @@ class IntelAps(BasicModifier):
                     template=["spack unload intel-oneapi-vtune"],
                 )
             )
+            report_path = f'"{{experiment_run_dir}}/{_REPORT_PREFIX}{executable_name}.html"'
             post_exec.append(
                 CommandExecutable(
                     f"gen-aps-{executable_name}",
                     template=[
                         'echo "APS Results for executable {executable_name}"',
                         # Prints text summary as well as generating an html report
-                        "aps-report -D {aps_log_dir}",
+                        "aps-report -D {aps_log_dir} -H " + report_path,
                     ],
                     mpi=False,
                     redirect="{log_file}",
@@ -180,7 +181,7 @@ class IntelAps(BasicModifier):
                             f" {stat_level} is less than {min_level}"
                         )
                     else:
-                        report_path = f'"{{experiment_run_dir}}/{_REPORT_PREFIX}{report}.txt"'
+                        report_path = f'"{{experiment_run_dir}}/{_REPORT_PREFIX}{executable_name}{report}.txt"'
                         cmds.add(
                             f"aps-report {opts} {{aps_log_dir}} > {report_path} 2>&1"
                         )
