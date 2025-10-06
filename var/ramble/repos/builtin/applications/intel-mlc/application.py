@@ -18,9 +18,8 @@ class IntelMlc(ExecutableApplication):
 
     tags("memory-benchmark", "intel-tool")
 
-    required_package("intel-mlc")
-
     with when("package_manager_family=spack"):
+        required_package("intel-mlc")
         software_spec(
             "intel-mlc",
             pkg_spec="intel-mlc",
