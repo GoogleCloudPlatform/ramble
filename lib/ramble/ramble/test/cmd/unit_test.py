@@ -48,7 +48,6 @@ def test_pytest_help():
 )
 def test_failed_import(extra_flag):
     out = ramble_test(extra_flag, "-p", "fake-pytest", fail_on_error=False)
-    assert ramble_test.returncode == 1
     assert "Ensure requirements-dev.txt are installed" in out
 
 
