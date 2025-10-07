@@ -147,24 +147,41 @@ _ramble_shell_wrapper() {
                         fi
                         ;;
                     create)
-                        _a=" $@"
-                        if [ "${_a#* -a}" != "$_a" ] || \
-                           [ "${_a#* --activate}" != "$_a" ];
-                        then
+                        _a=" $@ "
+                        # Do not invalidate cache for help flags
+                        if [[ "$_a" =~ " -h " ]] || [[ "$_a" =~ " --help " ]]; then
+                            command ramble $_rmb_flags workspace create "$@"
+                        elif [[ "$_a" =~ " -a " ]] || [[ "$_a" =~ " --activate " ]]; then
                             # With -a, the command writes only the activation command
                             # into stdout (`ramble workspace activate <ws>`.)
                             # And the eval routes that command back to the wrapper to
                             # inject shell args, etc.
                             _activate_cmd="$(command ramble $_rmb_flags workspace create "$@")"
-                            eval $_activate_cmd
-                            _workspace="$(echo $_activate_cmd | awk '{print $NF}')"
-                            echo "==> Created and activated workspace in $_workspace"
+                            if [ $? -eq 0 ]; then
+                                unset RAMBLE_WORKSPACES
+                                eval $_activate_cmd
+                                _workspace="$(echo $_activate_cmd | awk '{print $NF}')"
+                                echo "==> Created and activated workspace in $_workspace"
+                            fi
                         else
                             command ramble $_rmb_flags workspace create "$@"
+                            if [ $? -eq 0 ]; then
+                                unset RAMBLE_WORKSPACES
+                            fi
                         fi
                         ;;
                     *)
-                        command ramble $_rmb_flags workspace $_rmb_arg "$@"
+                        _a=" $@ "
+                        if [[ ( "$_rmb_arg" = "rm" || "$_rmb_arg" = "remove" ) ]] && \
+                           [[ ! "$_a" =~ " -h " ]] && [[ ! "$_a" =~ " --help " ]];
+                        then
+                            command ramble $_rmb_flags workspace $_rmb_arg "$@"
+                            if [ $? -eq 0 ]; then
+                                unset RAMBLE_WORKSPACES
+                            fi
+                        else
+                            command ramble $_rmb_flags workspace $_rmb_arg "$@"
+                        fi
                         ;;
                 esac
             fi
