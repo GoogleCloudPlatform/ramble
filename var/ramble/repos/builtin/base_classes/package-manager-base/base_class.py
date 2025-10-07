@@ -125,7 +125,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
 
         return any(
             self.app_inst.expander.satisfies(
-                info.when, variant_set=self.object_variants
+                info.when, variant_set=self.experiment_variants()
             )
             for definitions in app_inst.software_specs.values()
             for info in definitions
@@ -164,16 +164,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         """
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
-
-        self.object_variants.merge_default_variants(app_inst.object_variants)
-
-        for name, value in app_inst.variants.items():
-            expanded_value = app_inst.expander.expand_var(value, typed=True)
-            self.object_variants.experiment_variant(name, expanded_value)
-
-        self.object_variants.merge_multi_value_variants(
-            app_inst.object_variants
-        )
 
     def build_used_variables(self, workspace):
         """Build a set of all used variables
@@ -276,12 +266,19 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         self, attr_name="software_specs", app_inst=None, prefixed=False
     ):
         specs = {}
-        for _, obj in app_inst._objects():
+        for obj_type, obj in app_inst._objects():
+            single_modifier = None
+            if obj_type == ramble.repository.ObjectTypes.modifiers:
+                single_modifier = obj
+            spec_variants = self.experiment_variants(
+                single_modifier=single_modifier
+            )
+
             software_dict = getattr(obj, attr_name, {})
             for name, definitions in software_dict.items():
                 for info in definitions:
                     if app_inst.expander.satisfies(
-                        info.when, variant_set=self.object_variants
+                        info.when, variant_set=spec_variants
                     ):
                         if name not in specs:
                             specs[name] = []

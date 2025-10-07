@@ -291,7 +291,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for when_set, workloads in self.workloads.items():
             if workload_name in workloads:
                 workload_found = True
-                if self.expander.satisfies(when_set, self.object_variants):
+                if self.expander.satisfies(
+                    when_set, self.experiment_variants()
+                ):
                     if workload:
                         logger.die(
                             f"Workload {workload_name} is defined with "
@@ -364,7 +366,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         all_workloads_names = set()
         found = False
         for when_set, workloads in self.workloads.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+            if self.expander.satisfies(when_set, self.experiment_variants()):
                 for workload_name, workload in workloads.items():
                     if workload_name in all_workloads_names:
                         logger.die(
@@ -379,12 +381,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if not found:
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
-                f"  {self.object_variants.as_set()}"
+                f"  {self.experiment_variants().as_set()}"
             )
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
-            self.object_variants.value(namespace.package_manager)
+            self.experiment_variants().value(namespace.package_manager)
         )
 
         if pkgman_name is not None:
@@ -404,7 +406,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self.package_manager is not None:
             for pkgname, config in self.required_packages.items():
                 if self.expander.satisfies(
-                    config["when"], variant_set=self.object_variants
+                    config["when"], variant_set=self.experiment_variants()
                 ):
                     self.keywords.update_keys(
                         {
@@ -417,7 +419,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_workflow_manager(self):
         workflow_name = conversions.canonical_none(
-            self.object_variants.value(namespace.workflow_manager)
+            self.experiment_variants().value(namespace.workflow_manager)
         )
 
         # Map None to the default of user-managed
@@ -538,16 +540,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._set_package_manager()
         self._set_workflow_manager()
 
-        for _, obj in self._objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            obj_variants = getattr(obj, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_default_variants(
-                    getattr(obj, "object_variants")
-                )
-                self.object_variants.merge_multi_value_variants(obj_variants)
-
         base_chain = self.__class__.__mro__
         for cls in base_chain:
             if hasattr(cls, "name") and getattr(cls, "name") is not None:
@@ -567,7 +559,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
-                if self.expander.satisfies(var_when_set, self.object_variants):
+                if self.expander.satisfies(
+                    var_when_set, self.experiment_variants()
+                ):
                     for var in var_list:
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
@@ -668,7 +662,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for i, phase in enumerate(ordered_phases):
             if self.expander.satisfies(
-                phase.when, variant_set=self.object_variants
+                phase.when, variant_set=self.experiment_variants()
             ) and any(fnmatch.fnmatch(phase.key, pf) for pf in phase_filters):
                 selected_phases.add(phase)
                 last_match_idx = i
@@ -1138,11 +1132,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
-            # Set standard variants for all modifiers
-            obj_variants = getattr(mod_inst, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_multi_value_variants(obj_variants)
-
             # Define any missing modifier variables
             for var, val in mod_inst.selected_variables.items():
                 if var not in self.variables:
@@ -1165,7 +1154,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self._objects():
             for when_set, validator_defs in obj.validators.items():
                 if not self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -1234,7 +1223,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for when_set, executables in all_executables.items():
             full_executables.update(executables)
             if self.expander.satisfies(
-                when_set, variant_set=self.object_variants
+                when_set, variant_set=self.experiment_variants()
             ):
                 for executable in executables:
                     if executable in filtered_executables:
@@ -1286,7 +1275,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self._objects():
             for when_set, builtins in obj.builtins.items():
                 if self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     builtin_objects.append(obj)
                     all_builtins.append(builtins)
@@ -1369,12 +1358,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         workloads = self.get_workloads()
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
-                if self.expander.satisfies(var_when_set, self.object_variants):
+                if self.expander.satisfies(
+                    var_when_set, self.experiment_variants()
+                ):
                     for var in var_list:
                         wl_vars[var.name] = var
 
         for when_key, var_list in self.object_variables.items():
-            if self.expander.satisfies(when_key, self.object_variants):
+            if self.expander.satisfies(when_key, self.experiment_variants()):
                 for var in var_list:
                     wl_vars[var.name] = var
 
@@ -1399,7 +1390,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 when_set,
                 env_var_list,
             ) in workload.environment_variables.items():
-                if self.expander.satisfies(when_set, self.object_variants):
+                if self.expander.satisfies(
+                    when_set, self.experiment_variants()
+                ):
                     for env_var in env_var_list:
                         selected_env_vars[env_var.name] = env_var
 
@@ -1407,7 +1400,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             when_set,
             env_var_list,
         ) in self.object_environment_variables.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+            if self.expander.satisfies(when_set, self.experiment_variants()):
                 for env_var in env_var_list:
                     selected_env_vars[env_var.name] = env_var
 
@@ -1627,7 +1620,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for formatted_exec_group in formatted_exec_groups:
             for when_set, formatted_exec_defs in formatted_exec_group.items():
                 if not self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -1730,7 +1723,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             when_set
             for when_set in self.inputs.keys()
             if self.expander.satisfies(
-                when_set, variant_set=self.object_variants
+                when_set, variant_set=self.experiment_variants()
             )
         }
 
@@ -2850,7 +2843,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for success_scope, success_list in success_lists:
             for criteria, conf in success_list.items():
                 if not self.expander.satisfies(
-                    conf["when"], variant_set=self.object_variants
+                    conf["when"], variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -2922,7 +2915,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 source_context_defs,
             ) in source.figure_of_merit_contexts.items():
                 if self.expander.satisfies(
-                    when_fs, variant_set=self.object_variants
+                    when_fs, variant_set=self.experiment_variants()
                 ):
                     for context, context_def in source_context_defs.items():
                         all_contexts[context] = context_def
@@ -2934,7 +2927,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # figures_of_merit[frozenset(when_list)][frozenset(context_list)][fom_name]
             for when_fs, source_contexts in source.figures_of_merit.items():
                 if not self.expander.satisfies(
-                    when_fs, variant_set=self.object_variants
+                    when_fs, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -3330,7 +3323,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for obj_type, obj in self._objects():
             for when_set, tpl in obj.templates.items():
                 if not self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 

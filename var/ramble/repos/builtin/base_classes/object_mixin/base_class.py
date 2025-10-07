@@ -7,6 +7,7 @@
 # except according to those terms.
 from html import escape
 
+from ramble.repository import ObjectTypes, get_base_class
 from ramble.util import format
 
 
@@ -45,9 +46,54 @@ class ObjectMixin:
             return self.app_inst
         return self
 
-    def satisfy_when(self, when_key):
+    def _get_object_type(self):
+        ApplicationBase = get_base_class("application-base")
+        PackageManagerBase = get_base_class("package-manager-base")
+        WorkflowManagerBase = get_base_class("workflow-manager-base")
+        ModifierBase = get_base_class("modifier-base")
+
+        if isinstance(self, ApplicationBase):
+            return ObjectTypes.applications
+        elif isinstance(self, PackageManagerBase):
+            return ObjectTypes.package_managers
+        elif isinstance(self, WorkflowManagerBase):
+            return ObjectTypes.workflow_managers
+        elif isinstance(self, ModifierBase):
+            return ObjectTypes.modifiers
+        return None
+
+    def satisfy_when(self, when_key, variant_set=None):
         app_inst = self._get_app_inst()
-        return app_inst.expander.satisfies(when_key, app_inst.object_variants)
+        experiment_variants = self.experiment_variants()
+        return app_inst.expander.satisfies(when_key, experiment_variants)
+
+    def experiment_variants(self, single_modifier=None):
+        """Construct a VariantSet for this experiment.
+
+        Apply some merging logic to VariantSet combination, in order to
+        provide scoped variant definitions.
+
+        Args:
+            include_modifier (ModifierBase): A single modifier to merge in to resulting set
+
+        Returns:
+            VariantSet: Merged variants for the experiment.
+        """
+        app_inst = self._get_app_inst()
+
+        self_type = self._get_object_type()
+        new_set = self.object_variants.copy()
+
+        exclude_types = [self_type]
+
+        if single_modifier is not None:
+            exclude_types.append(ObjectTypes.modifiers)
+            new_set.merge_variants(single_modifier.object_variants)
+
+        for _, obj in app_inst._objects(exclude_types=exclude_types):
+            new_set.merge_variants(obj.object_variants)
+
+        return new_set
 
     @property
     def required_variables(self):

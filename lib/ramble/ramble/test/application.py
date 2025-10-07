@@ -429,7 +429,7 @@ def test_set_variables_and_variants(mutable_mock_apps_repo):
 
     assert executable_application_instance.variables["n_ranks"] == "1"
 
-    variant_set = executable_application_instance.object_variants.as_set()
+    variant_set = executable_application_instance.experiment_variants().as_set()
     assert "workflow_manager=slurm" in variant_set
     assert "package_manager=spack" not in variant_set
 

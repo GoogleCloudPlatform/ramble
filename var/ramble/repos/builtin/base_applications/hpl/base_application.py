@@ -401,7 +401,9 @@ class Hpl(ExecutableApplication):
             for when_key, var_list in self.get_workload(
                 "standard"
             ).variables.items():
-                if self.expander.satisfies(when_key, self.object_variants):
+                if self.expander.satisfies(
+                    when_key, self.experiment_variants()
+                ):
                     for var in var_list:
                         if var.name not in self.variables:
                             self.define_variable(var.name, var.default)
