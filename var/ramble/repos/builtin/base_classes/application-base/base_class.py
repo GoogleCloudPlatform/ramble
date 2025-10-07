@@ -1226,11 +1226,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     def post_cleanup(self):
         return self._generate_cleanup_cmd("post")
 
-    def _get_filtered_executables(self) -> dict:
-        """Returns a dict of executables that satisfy `when` conditions"""
+    def _get_filtered_and_full_executables(self):
+        """Returns a dict of executables that satisfy `when` conditions, and a dict of all the executables"""
         filtered_executables = {}
         all_executables = self.executables.copy()
+        full_executables = {}
         for when_set, executables in all_executables.items():
+            full_executables.update(executables)
             if self.expander.satisfies(
                 when_set, variant_set=self.object_variants
             ):
@@ -1242,7 +1244,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         )
                 filtered_executables.update(executables)
 
-        return filtered_executables
+        return filtered_executables, full_executables
 
     def _define_custom_executables(self):
         # Define custom executables
@@ -1250,8 +1252,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for name, conf in self.internals[
                 namespace.custom_executables
             ].items():
+                filtered_executabls, _ = (
+                    self._get_filtered_and_full_executables()
+                )
                 if (
-                    name in self._get_filtered_executables()
+                    name in filtered_executabls
                     or name in self.custom_executables
                 ):
                     experiment_namespace = self.expander.expand_var_name(
@@ -1286,7 +1291,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     builtin_objects.append(obj)
                     all_builtins.append(builtins)
 
-        filtered_executables = self._get_filtered_executables()
+        filtered_executables, full_executables = (
+            self._get_filtered_and_full_executables()
+        )
         filtered_executables.update(self.custom_executables)
 
         filtered_exec_order = []
@@ -1296,6 +1303,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             ):
                 filtered_exec_order.append(executable)
             else:
+                if executable not in full_executables:
+                    logger.die(f"Executable {executable} is not defined.")
                 logger.debug(
                     f"Skipping executable {executable}. `When` conditions not satisfied."
                 )
@@ -2175,7 +2184,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # Copy all log files from executables
             exec_logs = set()
             workload = self.get_workload()
-            filtered_executables = self._get_filtered_executables()
+            filtered_executables, _ = self._get_filtered_and_full_executables()
             for exec_name in workload.executables:
                 if exec_name in filtered_executables:
                     exec_obj = filtered_executables[exec_name]

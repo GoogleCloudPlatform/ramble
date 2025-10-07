@@ -598,3 +598,20 @@ def test_workload_groups_inherited(mutable_mock_apps_repo):
             if var.default == "3.0":
                 found = True
         assert found
+
+
+def test_undefined_executable_dies(mutable_mock_apps_repo, capsys):
+    """Test that an undefined executable causes a fatal error."""
+    executable_application_instance = mutable_mock_apps_repo.get("basic")
+    expansion_vars = basic_exp_dict()
+    executable_application_instance.expander = ramble.expander.Expander(expansion_vars, None)
+    # Create a workload with an executable that is not defined
+    undefined_exec_wl = ramble.workload.Workload(
+        "wl_with_undefined_exec", executables=["undefined_exec"]
+    )
+    executable_application_instance.workloads[_FS]["wl_with_undefined_exec"] = undefined_exec_wl
+
+    with pytest.raises(SystemExit):
+        executable_application_instance._get_executable_graph("wl_with_undefined_exec")
+    captured = capsys.readouterr()
+    assert "Executable undefined_exec is not defined." in captured.err
