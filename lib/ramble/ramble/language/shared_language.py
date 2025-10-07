@@ -209,9 +209,8 @@ def software_spec(
 ):
     """Defines a new software spec needed for this object.
 
-    Adds a new software spec (for spack to use) that this object
+    Adds a new software spec that this object
     needs to execute properly.
-    Only adds specs to object that use spack.
 
     Specs can be described as an mpi spec, which means they
     will depend on the MPI library within the resulting spack
