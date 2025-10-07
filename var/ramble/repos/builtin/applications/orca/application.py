@@ -32,12 +32,11 @@ class Orca(ExecutableApplication):
         description="Input deck archive for ORCA",
     )
 
-    tmp_file_patt1 = os.path.join("{scratch_dir}", "*_Compound_*")
-    tmp_file_patt2 = os.path.join("{scratch_dir}", "*txt")
-    executable(
-        "clear_prior_checkpoints",
-        f"rm -f {tmp_file_patt1} {tmp_file_patt2}",
-        use_mpi=False,
+    cleanup(
+        name="clear_prior_checkpoints",
+        regex=r".*_Compound_.*|.*\.txt$",
+        directory="{scratch_dir}",
+        pre=True,
     )
 
     executable(
@@ -66,7 +65,6 @@ class Orca(ExecutableApplication):
     workload(
         "standard",
         executables=[
-            "clear_prior_checkpoints",
             "copy_input",
             "configure_nprocs",
             "run_orca",
