@@ -212,7 +212,7 @@ class Openfoam(ExecutableApplication):
             "mkdir -p constant/geometry",
             "cp {geometry_path} constant/triSurface/.",
             "cp {geometry_path} constant/geometry/.",
-            "ln -sf {experiment_run_dir}0/U.orig {experiment_run_dir}/0/U",
+            "ln -sf {experiment_run_dir}/0/U.orig {experiment_run_dir}/0/U",
         ],
         use_mpi=False,
     )
