@@ -2858,6 +2858,9 @@ def test_workspace_config_squash(workspace_name, capsys):
   foo: bar
   n_ranks: 1
   test_var: test_value
+  test_multiline_str: |-
+    This is a multi-line
+    String in YAML
 """
 
     test_software_include = """software:
@@ -2949,6 +2952,7 @@ def test_workspace_config_squash(workspace_name, capsys):
         assert "test_var: test_value" in config_output
         assert "gcc" in config_output
         assert "pkg_spec: gcc@9.3.0" in config_output
+        assert "test_multiline_str: |-" in config_output
 
         with open(ws.config_file_path, "w+") as f:
             f.write(config_output)
