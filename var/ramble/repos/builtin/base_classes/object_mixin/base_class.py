@@ -67,7 +67,7 @@ class ObjectMixin:
         experiment_variants = self.experiment_variants()
         return app_inst.expander.satisfies(when_key, experiment_variants)
 
-    def experiment_variants(self, include_modifier=None):
+    def experiment_variants(self, include_modifier=None, allow_caching=True):
         """Construct a VariantSet for this experiment.
 
         Apply some merging logic to VariantSet combination, in order to
@@ -79,6 +79,18 @@ class ObjectMixin:
         Returns:
             VariantSet: Merged variants for the experiment.
         """
+
+        if allow_caching:
+            if not hasattr(self, "_variant_cache"):
+                setattr(self, "_variant_cache", {})
+
+            cache_key = f"{self.origin_type}::{self.name}"
+            if include_modifier is not None:
+                cache_key += f"-{include_modifier.origin_type}::{include_modifier.name}::{include_modifier._usage_mode}"
+
+            if cache_key in self._variant_cache:
+                return self._variant_cache[cache_key]
+
         app_inst = self._get_app_inst()
 
         self_type = self._get_object_type()
@@ -92,6 +104,9 @@ class ObjectMixin:
 
         for _, obj in app_inst._objects(exclude_types=exclude_types):
             new_set.merge_variants(obj.object_variants)
+
+        if allow_caching:
+            self._variant_cache[cache_key] = new_set
 
         return new_set
 

@@ -366,7 +366,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         all_workloads_names = set()
         found = False
         for when_set, workloads in self.workloads.items():
-            if self.expander.satisfies(when_set, self.experiment_variants()):
+            if self.expander.satisfies(
+                when_set, self.experiment_variants(allow_caching=False)
+            ):
                 for workload_name, workload in workloads.items():
                     if workload_name in all_workloads_names:
                         logger.die(
@@ -381,12 +383,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if not found:
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
-                f"  {self.experiment_variants().as_set()}"
+                f"  {self.experiment_variants(allow_caching=False).as_set()}"
             )
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
-            self.experiment_variants().value(namespace.package_manager)
+            self.experiment_variants(allow_caching=False).value(
+                namespace.package_manager
+            )
         )
 
         if pkgman_name is not None:
@@ -406,7 +410,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self.package_manager is not None:
             for pkgname, config in self.required_packages.items():
                 if self.expander.satisfies(
-                    config["when"], variant_set=self.experiment_variants()
+                    config["when"],
+                    variant_set=self.experiment_variants(allow_caching=False),
                 ):
                     self.keywords.update_keys(
                         {
@@ -419,7 +424,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_workflow_manager(self):
         workflow_name = conversions.canonical_none(
-            self.experiment_variants().value(namespace.workflow_manager)
+            self.experiment_variants(allow_caching=False).value(
+                namespace.workflow_manager
+            )
         )
 
         # Map None to the default of user-managed
@@ -560,7 +567,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
                 if self.expander.satisfies(
-                    var_when_set, self.experiment_variants()
+                    var_when_set, self.experiment_variants(allow_caching=False)
                 ):
                     for var in var_list:
                         if not var.expandable:

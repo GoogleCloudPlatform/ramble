@@ -272,7 +272,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             if obj_type == ramble.repository.ObjectTypes.modifiers:
                 include_modifier = obj
             spec_variants = self.experiment_variants(
-                include_modifier=include_modifier
+                include_modifier=include_modifier, allow_caching=False
             )
 
             software_dict = getattr(obj, attr_name, {})

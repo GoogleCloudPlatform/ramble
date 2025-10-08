@@ -181,7 +181,9 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             extra_vars = {}
 
         for when_set, var_mod_dict in self.variable_modifications.items():
-            if self.expander.satisfies(when_set, self.experiment_variants()):
+            if self.expander.satisfies(
+                when_set, self.experiment_variants(allow_caching=False)
+            ):
                 for var, var_mods in var_mod_dict.items():
                     for var_mod in var_mods:
                         if var_mod.method in ["append", "prepend"]:
