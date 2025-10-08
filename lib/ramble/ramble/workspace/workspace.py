@@ -1133,7 +1133,7 @@ ramble:
                 if section_dict:
                     workspace_dict["ramble"][section] = section_dict
 
-        print(f"\n{syaml.dump(workspace_dict)}")
+        print(f"\n{syaml.dump(workspace_dict, Dumper=syaml.OrderedLineDumper)}")
 
     def add_experiments(
         self,
