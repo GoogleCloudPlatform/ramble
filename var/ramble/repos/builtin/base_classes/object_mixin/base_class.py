@@ -7,7 +7,7 @@
 # except according to those terms.
 from html import escape
 
-from ramble.repository import ObjectTypes, get_base_class
+from ramble.repository import ObjectTypes
 from ramble.util import format
 
 
@@ -47,18 +47,13 @@ class ObjectMixin:
         return self
 
     def _get_object_type(self):
-        ApplicationBase = get_base_class("application-base")
-        PackageManagerBase = get_base_class("package-manager-base")
-        WorkflowManagerBase = get_base_class("workflow-manager-base")
-        ModifierBase = get_base_class("modifier-base")
-
-        if isinstance(self, ApplicationBase):
+        if self.origin_type == "application":
             return ObjectTypes.applications
-        elif isinstance(self, PackageManagerBase):
+        elif self.origin_type == "package_manager":
             return ObjectTypes.package_managers
-        elif isinstance(self, WorkflowManagerBase):
+        elif self.origin_type == "workflow_manager":
             return ObjectTypes.workflow_managers
-        elif isinstance(self, ModifierBase):
+        elif self.origin_type == "modifier":
             return ObjectTypes.modifiers
         return None
 
