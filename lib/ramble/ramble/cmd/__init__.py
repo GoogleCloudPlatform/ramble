@@ -318,8 +318,8 @@ def find_workspace_path(args):
             if not ws:
                 return None
 
-    # if we get here, env isn't the name of a spack environment; it has
-    # to be a path to an environment, or there is something wrong.
+    # if we get here, ws isn't the name of a ramble workspace; it has
+    # to be a path to a workspace, or there is something wrong.
     if ramble.workspace.is_workspace_dir(ws):
         return ws
 

@@ -62,8 +62,8 @@ all_strategies = []
 CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE = (
     "The contents of {subject} look like {content_type}.  Either the URL"
     " you are trying to use does not exist or you have an internet gateway"
-    " issue.  You can remove the bad archive using 'spack clean"
-    " <package>', then try again using the correct URL."
+    " issue. You can remove the bad archive using 'ramble clean',"
+    " then try again using the correct URL."
 )
 
 
