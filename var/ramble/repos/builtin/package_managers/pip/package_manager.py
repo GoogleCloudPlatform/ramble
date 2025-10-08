@@ -154,7 +154,7 @@ class Pip(PackageManagerBase):
                         app_inst.expander.satisfies(
                             conf["when"],
                             variant_set=self.experiment_variants(
-                                single_modifier=mod_inst
+                                include_modifier=mod_inst
                             ),
                         )
                         and pkg not in installed_pkgs

@@ -41,7 +41,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         "execute",
         "logs",
     ]
-    _allow_unprefixed_specs = True
 
     _spec_groups = [
         ("compilers", "Compilers"),
@@ -79,6 +78,8 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         self.app_inst = None
         self.keywords = None
 
+        self._allow_unprefixed_specs = True
+
         ramble.util.directives.define_directive_methods(self)
 
         self.object_variants.default_variant(
@@ -102,7 +103,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
 
     @property
     def allow_unprefixed_specs(self):
-        return getattr(self, "_allow_unprefixed_specs", True)
+        return self._allow_unprefixed_specs
 
     def package_manager_dir(self, workspace):
         """Get the path to the package manager's software environment directory
@@ -267,11 +268,11 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     ):
         specs = {}
         for obj_type, obj in app_inst._objects():
-            single_modifier = None
+            include_modifier = None
             if obj_type == ramble.repository.ObjectTypes.modifiers:
-                single_modifier = obj
+                include_modifier = obj
             spec_variants = self.experiment_variants(
-                single_modifier=single_modifier
+                include_modifier=include_modifier
             )
 
             software_dict = getattr(obj, attr_name, {})

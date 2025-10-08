@@ -67,7 +67,7 @@ class ObjectMixin:
         experiment_variants = self.experiment_variants()
         return app_inst.expander.satisfies(when_key, experiment_variants)
 
-    def experiment_variants(self, single_modifier=None):
+    def experiment_variants(self, include_modifier=None):
         """Construct a VariantSet for this experiment.
 
         Apply some merging logic to VariantSet combination, in order to
@@ -86,9 +86,9 @@ class ObjectMixin:
 
         exclude_types = [self_type]
 
-        if single_modifier is not None:
+        if include_modifier is not None:
             exclude_types.append(ObjectTypes.modifiers)
-            new_set.merge_variants(single_modifier.object_variants)
+            new_set.merge_variants(include_modifier.object_variants)
 
         for _, obj in app_inst._objects(exclude_types=exclude_types):
             new_set.merge_variants(obj.object_variants)

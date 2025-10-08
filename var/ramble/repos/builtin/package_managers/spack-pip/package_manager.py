@@ -23,8 +23,6 @@ class SpackPip(PackageManagerBase):
 
     maintainers("douglasjacobsen")
 
-    _allow_unprefixed_specs = False
-
     package_manager_family("spack")
     package_manager_family("pip")
 
@@ -36,10 +34,11 @@ class SpackPip(PackageManagerBase):
     def __init__(self, file_path):
         # Let parents run first; then we enforce our runner.
         super().__init__(file_path)
+        self._allow_unprefixed_specs = False
 
         self.spack_mgr = Spack(file_path)
-        self.spack_mgr._allow_unprefixed_specs = False
         self.pip_mgr = Pip(file_path)
+        self.spack_mgr._allow_unprefixed_specs = False
         self.pip_mgr._allow_unprefixed_specs = False
 
     def set_application(self, app_inst):
