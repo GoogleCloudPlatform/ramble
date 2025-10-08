@@ -55,6 +55,22 @@ class Basic(ExecutableApplication):
         "TEST_ENV", value="1", description="test var", workload="test_wl"
     )
 
+    environment_variable(
+        "TEST_APPEND_ENV",
+        method="append",
+        value="3",
+        description="test append var",
+        workload="test_wl",
+    )
+
+    environment_variable(
+        "TEST_PREPEND_ENV",
+        method="prepend",
+        value="4",
+        description="test prepend var",
+        workload="test_wl",
+    )
+
     archive_pattern("{experiment_run_dir}/archive_test.*")
 
     figure_of_merit(

@@ -492,10 +492,40 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self._env_variable_sets = env_variable_sets.copy()
 
-        new_env_vars = {}
+        new_env_vars = {
+            "set": {},
+            "append": [],
+            "prepend": [],
+        }
         for env_var in self.selected_environment_variables.values():
-            action = "set"
+            action = env_var.method
             value = env_var.value
+            new_set = new_env_vars[action]
+
+            if action == "append":
+                found = False
+                for group in new_set:
+                    if (
+                        "var-separator" in group
+                        and group["var-separator"] == env_var.separator
+                    ):
+                        new_set = group["vars"]
+                        break
+                if not found:
+                    append_set = {
+                        "var-separator": env_var.separator,
+                        "vars": {},
+                    }
+                    new_set.append(append_set)
+                    new_set = append_set["vars"]
+            elif action == "prepend":
+                if not new_set:
+                    prepend_set = {"paths": {}}
+                    new_set.append(prepend_set)
+
+                new_set = new_set[0]["paths"]
+            else:
+                new_set = new_env_vars["set"]
 
             add = True
             for env_var_set in self._env_variable_sets:
@@ -504,9 +534,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         add = False
 
             if add:
-                new_env_vars[env_var.name] = value
+                new_set[env_var.name] = value
 
-        self._env_variable_sets.append({"set": new_env_vars})
+        for action in ["set", "append", "prepend"]:
+            if not new_env_vars[action]:
+                del new_env_vars[action]
+        self._env_variable_sets.append(new_env_vars)
 
     def set_variables_and_variants(self, variables, variants, experiment_set):
         """Set internal reference to variables and variants

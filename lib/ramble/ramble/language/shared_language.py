@@ -827,6 +827,8 @@ def environment_variable(
     name,
     value,
     description,
+    method="set",
+    append_separator=",",
     workload=None,
     workloads=None,
     workload_group=None,
@@ -840,6 +842,8 @@ def environment_variable(
         name (str): Name of environment variable to define
         value (str): Value to set env-var to
         description (str): Description of the env-var
+        method (str): The method to use when defining the env-var.
+                      Can be "set", "append", or "prepend"
         workload (str): Name of app workload this env-var should be added to
         workloads (list(str)): List of app workload names this env-var should be
                                added to
@@ -849,12 +853,25 @@ def environment_variable(
     """
 
     def _execute_environment_variable(obj):
+        supported_methods = ["set", "append", "prepend"]
+        if method not in supported_methods:
+            raise ramble.language.language_base.DirectiveError(
+                "environment_variable directive given an invalid method of "
+                f"{method}. Supported methods are {str(supported_methods)}"
+            )
+
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "environment_variable"
         )
 
         workload_env_var = ramble.definitions.variables.EnvironmentVariable(
-            name, value=value, description=description, when=when_list, **kwargs
+            name,
+            value=value,
+            description=description,
+            method=method,
+            append_separator=append_separator,
+            when=when_list,
+            **kwargs,
         )
 
         if workload or workloads or workload_group:
