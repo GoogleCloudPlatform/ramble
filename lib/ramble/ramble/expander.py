@@ -13,6 +13,7 @@ import operator
 import random
 import re
 import string
+import sys
 import warnings
 from contextlib import contextmanager
 from typing import Dict, FrozenSet, List, Union
@@ -43,9 +44,34 @@ def _re_search(regex, s):
     return re.search(regex, s) is not None
 
 
-def _safe_str_node_check(node):
-    # ast.Str was deprecated. short-circuit the test for it to avoid issues with newer python.
-    return hasattr(ast, "Str") and isinstance(node, ast.Str)
+# TODO: These conditional defines should be removed when support for
+# older Python versions are dropped.
+if sys.version_info >= (3, 8):
+
+    def _is_str_node(node):
+        return False
+
+    def _is_num_node(node):
+        return False
+
+else:
+
+    def _is_str_node(node):
+        return isinstance(node, ast.Str)
+
+    def _is_num_node(node):
+        return isinstance(node, ast.Num)
+
+
+if sys.version_info >= (3, 9):
+
+    def _is_index_node(node):
+        return False
+
+else:
+
+    def _is_index_node(node):
+        return isinstance(node, ast.Index)
 
 
 def _maybe(expander, var_name, default=""):
@@ -846,14 +872,11 @@ class Expander:
         try:
             if hasattr(ast, "Constant") and isinstance(node, ast.Constant):
                 return self._ast_constant(node)
-            elif hasattr(ast, "Num") and isinstance(node, ast.Num):  # Deprecated, removed in 3.14
+            elif _is_num_node(node):
                 return self._ast_num(node)
             elif isinstance(node, ast.Name):
                 return self._ast_name(node)
-            # TODO: Remove when we drop support for 3.6
-            # DEPRECATED: Remove due to python 3.8
-            # See: https://docs.python.org/3/library/ast.html#node-classes
-            elif hasattr(ast, "Str") and isinstance(node, ast.Str):  # Deprecated, removed in 3.14
+            elif _is_str_node(node):
                 return node.s
             elif isinstance(node, ast.Attribute):
                 return self._ast_attr(node)
@@ -1031,7 +1054,7 @@ class Expander:
                     self.__raise_syntax_error(node)
                 return val
         # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
-        elif isinstance(node.left, ast.Constant) or _safe_str_node_check(node.left):
+        elif isinstance(node.left, ast.Constant) or _is_str_node(node.left):
             lhs_value = self.eval_math(node.left)
 
             found = False
@@ -1041,7 +1064,7 @@ class Expander:
                         rhs_value = self.eval_math(elt)
                         if lhs_value == rhs_value:
                             found = True
-                elif isinstance(comp, ast.Constant) or _safe_str_node_check(comp):
+                elif isinstance(comp, ast.Constant) or _is_str_node(comp):
                     # Attempt evaluating `"str" in "string"`
                     rhs_value = self.eval_math(comp)
                     if isinstance(rhs_value, str) and lhs_value in rhs_value:
@@ -1106,11 +1129,9 @@ class Expander:
                     op_dict = self.expand_var_name(operand, typed=True)
 
                     key = None
-                    # TODO: Remove after support for python 3.9 is dropped
-                    # DEPRECATED: ast.Index was dropped in python 3.9
-                    if hasattr(ast, "Index") and isinstance(slice_node, ast.Index):
+                    if _is_index_node(slice_node):
                         key = self.eval_math(slice_node.value)
-                    elif isinstance(slice_node, ast.Constant) or _safe_str_node_check(slice_node):
+                    elif isinstance(slice_node, ast.Constant) or _is_str_node(slice_node):
                         key = self.eval_math(slice_node)
 
                     if key is None:
