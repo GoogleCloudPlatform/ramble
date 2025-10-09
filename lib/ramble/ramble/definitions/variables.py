@@ -183,6 +183,8 @@ class EnvironmentVariable:
         name: str,
         value=None,
         description: str = None,
+        method: str = "set",
+        append_separator: str = ",",
         when=None,
         **kwargs,
     ):
@@ -192,11 +194,16 @@ class EnvironmentVariable:
             name (str): Name of environment variable
             value: Value to set environment variable to
             description (str): Description of the environment variable
+            method (str): Method to use when defining the env-var.
+                          Can be "set", "append", or "prepend"
+            append_separator (str): Separator to use when method is "append", otherwise ignored.
             when (list | None): List of when conditions to apply to directive
         """
         self.name = name
         self.value = value
         self.description = description
+        self.method = method
+        self.separator = append_separator
         self.when = when.copy() if when else []
 
     def __str__(self):
@@ -216,7 +223,9 @@ class EnvironmentVariable:
         indentation = " " * n_indent
 
         if verbose:
-            print_attrs = ["Description", "Value"]
+            print_attrs = ["Description", "Value", "Method"]
+            if self.method == "append":
+                print_attrs.append("Separator")
             out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
             for name in print_attrs:
                 attr_name = name.lower()

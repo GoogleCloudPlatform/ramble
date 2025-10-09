@@ -233,3 +233,49 @@ def test_object_env_var_order(
                     break
 
         assert all(found_order)
+
+
+def test_object_env_var_methods(
+    workspace_name,
+    mutable_mock_apps_repo,
+):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        env_var_regexes = [
+            re.compile(r"export TEST_ENV=1;"),
+            re.compile(r"export TEST_APPEND_ENV=\"\${TEST_APPEND_ENV},3\";"),
+            re.compile(r"export TEST_PREPEND_ENV=\"4:\${TEST_PREPEND_ENV}\";"),
+        ]
+
+        found_vars = []
+
+        rendered_script = os.path.join(
+            ws.experiment_dir, "basic", "test_wl", "generated", "execute_experiment"
+        )
+
+        with open(rendered_script) as f:
+            for line in f.readlines():
+                for regex in env_var_regexes:
+                    if regex.search(line):
+                        found_vars.append(True)
+
+        assert len(found_vars) == len(env_var_regexes)
