@@ -500,46 +500,68 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for env_var in self.selected_environment_variables.values():
             action = env_var.method
             value = env_var.value
-            new_set = new_env_vars[action]
+            # Pull out base group from the new_env_vars dict, based on the env_var's action.
+            new_group = new_env_vars[action]
 
             if action == "append":
+                # If action is append, we need to pull out the append actions.
+                # Here, the value in the dict is a list (instead of a dict) to allow
+                # for different separators.
+                # We need to find the group (if it exists) with the correct separator,
+                # and add the new env-var to that group.
                 found = False
-                for group in new_set:
+                for group in new_group:
                     if (
                         "var-separator" in group
                         and group["var-separator"] == env_var.separator
                     ):
-                        new_set = group["vars"]
+                        found = True
+                        new_group = group["vars"]
                         break
+
                 if not found:
+                    # Create a group, if it wasn't found previously, and
+                    # add to the append action's group.
                     append_set = {
                         "var-separator": env_var.separator,
                         "vars": {},
                     }
-                    new_set.append(append_set)
-                    new_set = append_set["vars"]
+                    new_group.append(append_set)
+                    new_group = append_set["vars"]
             elif action == "prepend":
-                if not new_set:
+                # If action is prepend, we need to pull out the prepend actions.
+                # Here, the value is again a list instead of a dict.
+                # However, we don't allow different separators
+                # when prepending. So, here we simply grab the first entry in the list.
+                if not new_group:
                     prepend_set = {"paths": {}}
-                    new_set.append(prepend_set)
+                    new_group.append(prepend_set)
 
-                new_set = new_set[0]["paths"]
+                new_group = new_group[0]["paths"]
             else:
-                new_set = new_env_vars["set"]
+                # If action is set, just pull out the value
+                new_group = new_env_vars["set"]
 
             add = True
+            # Find the env var set with a matching action, and
+            # decide of the env-var should be added or not.
             for env_var_set in self._env_variable_sets:
                 if action in env_var_set:
                     if env_var.name in env_var_set[action]:
                         add = False
 
             if add:
-                new_set[env_var.name] = value
+                new_group[env_var.name] = value
 
+        # Remove any actions that don't have env-vars, to prevent them
+        # from being actioned later.
         for action in ["set", "append", "prepend"]:
             if not new_env_vars[action]:
                 del new_env_vars[action]
-        self._env_variable_sets.append(new_env_vars)
+
+        # Add the new env vars to the object's environment variable sets.
+        if new_env_vars:
+            self._env_variable_sets.append(new_env_vars)
 
     def set_variables_and_variants(self, variables, variants, experiment_set):
         """Set internal reference to variables and variants
