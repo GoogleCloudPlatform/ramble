@@ -57,13 +57,15 @@ class ScopedCriteriaList:
                 f"Possible scopes are: {self._valid_scopes}"
             )
 
-    def add_criteria(self, scope, name, mode, *args, **kwargs):
+    def add_criteria(self, scope, name, mode, *args, owning_object=None, **kwargs):
         self.validate_scope(scope)
         exists = self.find_criteria(name)
         if exists:
             logger.die(f"Success criteria {name} is not unique.")
 
-        self.criteria[scope].append(SuccessCriteria(name, mode, *args, **kwargs))
+        self.criteria[scope].append(
+            SuccessCriteria(name, mode, *args, owning_object=owning_object, **kwargs)
+        )
 
     def flush_scope(self, scope):
         """Remove criteria within a scope, and lower level scopes
@@ -89,7 +91,8 @@ class ScopedCriteriaList:
 
     def all_criteria(self):
         for scope in self._valid_scopes:
-            yield from self.criteria[scope]
+            for criteria in self.criteria[scope]:
+                yield criteria, scope
 
     def find_criteria(self, name):
         for scope in self._valid_scopes:
@@ -119,6 +122,7 @@ class SuccessCriteria:
         fom_context="null",
         formula=None,
         anti_match=None,
+        owning_object=None,
     ):
         self.name = name
         if mode not in self._valid_modes:
@@ -133,6 +137,7 @@ class SuccessCriteria:
         self.fom_formula = None
         self.found = False
         self.anti_found = False
+        self.owner = owning_object
 
         if mode == "string":
             if match is None and anti_match is None:

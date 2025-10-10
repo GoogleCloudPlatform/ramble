@@ -16,6 +16,10 @@ class ObjectMixin:
     def __str__(self):
         return self.name
 
+    @property
+    def scoped_name(self):
+        return f"{self.origin_type}::{self.name}"
+
     def copy(self):
         """Generic copy method for Ramble objects."""
         new_copy = type(self)(self._file_path)

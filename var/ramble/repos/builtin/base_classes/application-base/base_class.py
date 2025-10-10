@@ -814,7 +814,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Add variables from success criteria
         criteria_list = self.success_list
-        for criteria in criteria_list.all_criteria():
+        for criteria, _ in criteria_list.all_criteria():
             if criteria.mode == "fom_comparison":
                 self.expander.expand_var(criteria.fom_formula)
                 self.expander.expand_var(criteria.fom_name)
@@ -2532,7 +2532,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._extract_inmem_foms(inmem_defs, fom_values)
 
         # Test all non-file based success criteria
-        for criteria_obj in criteria_list.all_criteria():
+        for criteria_obj, _ in criteria_list.all_criteria():
             if criteria_obj.file is None:
                 if criteria_obj.passed(app_inst=self, fom_values=fom_values):
                     criteria_obj.mark_found()
@@ -2569,11 +2569,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.result.finalize()
 
-        for criteria_obj in criteria_list.all_criteria():
-            if criteria_obj.ok():
-                self.result.success_criteria[criteria_obj.name] = "PASSED"
+        for criteria_obj, criteria_scope in criteria_list.all_criteria():
+            if criteria_obj.owner is not None:
+                criteria_name = (
+                    f"{criteria_obj.owner.scoped_name}::{criteria_obj.name}"
+                )
             else:
-                self.result.success_criteria[criteria_obj.name] = "FAILED"
+                criteria_name = (
+                    f"config::{criteria_scope}::{criteria_obj.name}"
+                )
+            if criteria_obj.ok():
+                self.result.success_criteria[criteria_name] = "PASSED"
+            else:
+                self.result.success_criteria[criteria_name] = "FAILED"
 
         for context, fom_map in fom_values.items():
             context_map = {
@@ -2882,7 +2890,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         criteria_list.flush_scope("application_definition")
 
         success_lists = [
-            ("application_definition", self.success_criteria),
+            ("application_definition", self, self.success_criteria),
         ]
 
         logger.debug(
@@ -2891,18 +2899,21 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self._modifier_instances:
             criteria_list.flush_scope("modifier_definition")
         for mod in self._modifier_instances:
-            success_lists.append(("modifier_definition", mod.success_criteria))
+            success_lists.append(
+                ("modifier_definition", mod, mod.success_criteria)
+            )
 
         if self.workflow_manager is not None:
             criteria_list.flush_scope("workflow_manager_definition")
             success_lists.append(
                 (
                     "workflow_manager_definition",
+                    self.workflow_manager,
                     self.workflow_manager.success_criteria,
                 )
             )
 
-        for success_scope, success_list in success_lists:
+        for success_scope, obj, success_list in success_lists:
             for criteria, conf in success_list.items():
                 if not self.expander.satisfies(
                     conf["when"], variant_set=self.object_variants
@@ -2927,6 +2938,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         match=match,
                         file=conf["file"],
                         anti_match=anti_match,
+                        owning_object=obj,
                     )
                 elif conf["mode"] == "fom_comparison":
                     criteria_list.add_criteria(
@@ -2936,16 +2948,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         fom_name=conf["fom_name"],
                         fom_context=conf["fom_context"],
                         formula=conf["formula"],
+                        owning_object=obj,
                     )
 
         criteria_list.add_criteria(
             scope="application_definition",
             name="_application_function",
             mode="application_function",
+            owning_object=self,
         )
 
         # Extract file paths for all criteria
-        for criteria in criteria_list.all_criteria():
+        for criteria, _ in criteria_list.all_criteria():
             log_path = self.expander.expand_var(criteria.file)
 
             # Ensure log path is absolute. If not, prepend the experiment run directory
