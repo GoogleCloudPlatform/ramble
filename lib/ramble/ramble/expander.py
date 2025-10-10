@@ -39,8 +39,6 @@ def _join_str(seq, sep=","):
 
 
 def _re_search(regex, s):
-    import re
-
     return re.search(regex, s) is not None
 
 

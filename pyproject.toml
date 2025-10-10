@@ -44,6 +44,10 @@ known_third_party = ["ruamel", "jsonschema"]
 
 [tool.coverage.run]
 parallel = true
+# subprocess assumes parallel=true
+# This patch allows coverage.py to accurately capture
+# subprocess calls.
+patch = ["subprocess"]
 data_file = "./tests-coverage/.coverage"
 include = [
   "**/bin/ramble",
@@ -80,12 +84,6 @@ exclude_lines = [
     'if 0:',
     'if False:',
     'if __name__ == .__main__.:',
-
-    # Ignore import statements:
-    # Imports (and defs) are not counted due to coverage being run after
-    # these modules are already initialized.
-    '^import .*',
-    '^from .* import .*',
 ]
 ignore_errors = true
 include = [
