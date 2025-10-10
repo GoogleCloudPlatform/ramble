@@ -31,7 +31,8 @@ from ramble.util.command_runner import (
 
 # Rename logger to tty to preserve old behavior
 from ramble.util.logger import logger
-from ramble.util.logger import logger as tty
+
+tty = logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
 PackageManagerBase = ramble.repository.get_base_class("package-manager-base")

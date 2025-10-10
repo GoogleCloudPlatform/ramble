@@ -27,7 +27,8 @@ from ramble.util.file_util import get_file_path
 
 # Rename logger to tty to preserve old behavior
 from ramble.util.logger import logger
-from ramble.util.logger import logger as tty
+
+tty = logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
 ModifierBase = ramble.repository.get_base_class("modifier-base")
