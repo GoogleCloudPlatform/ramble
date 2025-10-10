@@ -47,9 +47,9 @@ if [ $? != 0 ]; then
     ERROR=1
 fi
 
-export UNIT_TEST_COVERAGE_ADDOPTS=""
+export UNIT_TEST_COVERAGE_PREFIX=""
 if [[ "$UNIT_TEST_COVERAGE" == "true" ]]; then
-  export UNIT_TEST_COVERAGE_ADDOPTS="--cov --cov-report= --cov-config=pyproject.toml"
+  export UNIT_TEST_COVERAGE_PREFIX="coverage run --rcfile=pyproject.toml"
 fi
 
 export PYTEST_ADDOPTS=""
@@ -65,12 +65,16 @@ fi
 #-----------------------------------------------------------
 
 if [[ "$LONG" == "true" ]]; then
-  $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS}
+  ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose
 else
-  $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS} --fast
+  ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose --fast
 fi
 if [ $? != 0 ]; then
     ERROR=1
+fi
+
+if [[ "$UNIT_TEST_COVERAGE" == "true" ]]; then
+  coverage combine
 fi
 
 if [[ "$PUSH_CODECOV" ]]; then

@@ -56,15 +56,21 @@ steps:
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         if [ $$coverage_err -gt 0 ]; then
-          if [ $$coverage_err == 2 ]; then
-            echo "Code coverage dropped below the minimum level."
-            echo " ***** Coverage decreased"
-          else
-            echo "Code coverage report generation failed."
-            echo " ***** Coverage report generic error"
-          fi
+          python3 -c 'import sys; exit(0 if sys.version_info >= (3, 9) else 1)'
+          py_version_check_err=$$?
+          if [ $$py_version_check_err -eq 0 ]; then
+            if [ $$coverage_err == 2 ]; then
+              echo "Code coverage dropped below the minimum level."
+              echo " ***** Coverage decreased"
+            else
+              echo "Code coverage report generation failed."
+              echo " ***** Coverage report generic error"
+            fi
 
-          error=1
+            error=1
+          else
+            echo "Skipping coverage check for python version < 3.9, as the coverage number is not accurate"
+          fi
         fi
 
         # $$ characters are required for cloud-build:

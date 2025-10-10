@@ -2,10 +2,10 @@
 pytest
 flake8
 black
-coverage
+coverage>=7.10;python_version>="3.9"
+coverage;python_version<"3.9"
 pre-commit
 pytest-xdist
-pytest-cov
 pytest-clarity
 line_profiler
 isort
