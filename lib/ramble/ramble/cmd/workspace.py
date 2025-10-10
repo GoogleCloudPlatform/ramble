@@ -892,7 +892,9 @@ def workspace_info(args):
                     if args.executables:
                         color.cprint(rucolor.nested_4("        Executables: "))
                         app_inst.add_expand_vars(ws)
-                        exec_graph = app_inst._executable_graph
+                        exec_graph = app_inst._get_executable_graph(
+                            app_inst.expander.workload_name
+                        )
                         for executable in exec_graph.walk():
                             color.cprint(f"          {executable.key}")
 
