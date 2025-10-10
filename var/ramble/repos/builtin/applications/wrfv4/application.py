@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import shutil
 
 from ramble.appkit import *
 from ramble.expander import Expander
@@ -48,14 +49,21 @@ class Wrfv4(ExecutableApplication):
         "wrf_explicit_x",
         default=False,
         values=[True, False],
-        description="Whether to set explicit nprocs_x in the namelist or not",
+        description="Whether to set explicit nproc_x in the namelist or not",
     )
 
     variant(
         "wrf_explicit_y",
         default=False,
         values=[True, False],
-        description="Whether to set explicit nprocs_y in the namelist or not",
+        description="Whether to set explicit nproc_y in the namelist or not",
+    )
+
+    variant(
+        "wrf_clean_after_run",
+        default=False,
+        values=[True, False],
+        description="Whether to clean execution artifacts after completion or not",
     )
 
     input_file(
@@ -105,9 +113,9 @@ class Wrfv4(ExecutableApplication):
     )
 
     executable(
-        "define_nprocs_x",
+        "define_nproc_x",
         template=[
-            "awk '/e_sn.*=/ {print $0 RS \" nprocs_x                            = {nprocs_x},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
+            "awk '/e_sn.*=/ {print $0 RS \" nproc_x                            = {nproc_x},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
             "mv {experiment_run_dir}/temp_namelist.input {experiment_run_dir}/namelist.input",
         ],
         redirect="",
@@ -116,9 +124,9 @@ class Wrfv4(ExecutableApplication):
     )
 
     executable(
-        "define_nprocs_y",
+        "define_nproc_y",
         template=[
-            "awk '/e_sn.*=/ {print $0 RS \" nprocs_y                            = {nprocs_y},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
+            "awk '/e_sn.*=/ {print $0 RS \" nproc_y                            = {nproc_y},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
             "mv {experiment_run_dir}/temp_namelist.input {experiment_run_dir}/namelist.input",
         ],
         redirect="",
@@ -128,14 +136,26 @@ class Wrfv4(ExecutableApplication):
 
     executable("execute", "wrf.exe", use_mpi=True)
 
+    executable(
+        "post-exec-clean",
+        template=[
+            "rm -f {experiment_run_dir}/*.dat ",
+            "rm -f {experiment_run_dir}/wrfout*",
+            "rm -f {experiment_run_dir}/wrfrst*",
+            "rm -f {experiment_run_dir}/wrfinput*",
+        ],
+        when=["+wrf_clean_after_run"],
+    )
+
     workload(
         "CONUS_2p5km",
         executables=[
             "copy",
             "cleanup",
-            "define_nprocs_y",
-            "define_nprocs_x",
+            "define_nproc_y",
+            "define_nproc_x",
             "execute",
+            "post-exec-clean",
         ],
         input="CONUS_2p5km",
     )
@@ -145,10 +165,11 @@ class Wrfv4(ExecutableApplication):
         executables=[
             "copy",
             "cleanup",
-            "define_nprocs_y",
-            "define_nprocs_x",
+            "define_nproc_y",
+            "define_nproc_x",
             "fix_12km",
             "execute",
+            "post-exec-clean",
         ],
         input="CONUS_12km",
     )
@@ -158,9 +179,10 @@ class Wrfv4(ExecutableApplication):
         executables=[
             "copy",
             "cleanup",
-            "define_nprocs_y",
-            "define_nprocs_x",
+            "define_nproc_y",
+            "define_nproc_x",
             "execute",
+            "post-exec-clean",
         ],
         input="Maria_1km",
     )
@@ -185,7 +207,7 @@ class Wrfv4(ExecutableApplication):
         )
 
     workload_variable(
-        "nprocs_x",
+        "nproc_x",
         default="{n_ranks}",
         description="Number of process in the x dimension",
         workload_group="all_workloads",
@@ -193,7 +215,7 @@ class Wrfv4(ExecutableApplication):
     )
 
     workload_variable(
-        "nprocs_y",
+        "nproc_y",
         default="{n_ranks}",
         description="Number of process in the y dimension",
         workload_group="all_workloads",
@@ -201,7 +223,7 @@ class Wrfv4(ExecutableApplication):
     )
 
     workload_variable(
-        "nprocs_y",
+        "nproc_y",
         default="1",
         description="Number of process in the y dimension",
         workload_group="all_workloads",
@@ -291,7 +313,7 @@ class Wrfv4(ExecutableApplication):
         "Complete",
         mode="string",
         match=r".*?wrf: SUCCESS COMPLETE WRF",
-        file="{experiment_run_dir}/rsl.out.0000",
+        file="{experiment_run_dir}/rsl.out.base",
     )
 
     archive_pattern("{experiment_run_dir}/rsl.out.*")
@@ -301,16 +323,22 @@ class Wrfv4(ExecutableApplication):
         import glob
         import re
 
-        # Generate stats file
+        experiment_dir = self.expander.expand_var_name("experiment_run_dir")
 
+        # Generate stats file
         file_list = glob.glob(
             os.path.join(
-                self.expander.expand_var_name("experiment_run_dir"),
+                experiment_dir,
                 "rsl.out.*",
             )
         )
 
         if file_list:
+            # Copy first file to rsl.out.base...
+            shutil.copyfile(
+                file_list[0], os.path.join(experiment_dir, "rsl.out.base")
+            )
+
             timing_regex = re.compile(
                 r"Timing for main.*:\s+(?P<main_time>[0-9]+\.[0-9]*).*"
             )
