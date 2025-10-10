@@ -483,7 +483,11 @@ class Openfoam(ExecutableApplication):
                         stat.compute(timestep_times),
                     )
 
-    def _define_commands(self, exec_graph, success_list):
+    register_phase(
+        "define_exports", pipeline="setup", run_before=["make_experiments"]
+    )
+
+    def _define_exports(self, workspace, app_inst=None):
         export_prefix = self.expander.expand_var_name("export_prefix")
         export_vars = self.expander.expand_var_name("export_variables").split(
             ","
@@ -496,5 +500,3 @@ class Openfoam(ExecutableApplication):
         export_str = " ".join(export_args)
 
         self.define_variable("workload_exports", export_str)
-
-        super()._define_commands(exec_graph, success_list)

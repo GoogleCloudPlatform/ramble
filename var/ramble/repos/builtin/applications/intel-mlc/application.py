@@ -221,30 +221,19 @@ class IntelMlc(ExecutableApplication):
             cur_node = (cur_node + 1) % spread_divisions
         return threads
 
-    def add_expand_vars(self, workspace):
-        if not self._vars_are_expanded:
-            self._generate_input_file(workspace, self)
-            super().add_expand_vars(workspace)
+    register_phase(
+        "generate_input_variables",
+        pipeline="setup",
+        run_before=["make_experiments"],
+    )
 
-    def _generate_input_file(self, workspace, app_inst=None):
-        workload = app_inst.get_workload()
-
-        thread_dist = app_inst.expander.expand_var_name("thread_distribution")
-        if thread_dist == "{thread_distribution}":
-            possible_vars = workload.find_variable("thread_distribution")
-            assert len(possible_vars) == 1
-            thread_dist = possible_vars[0].default
-
+    def _generate_input_variables(self, workspace, app_inst=None):
         ppn = int(app_inst.expander.expand_var_name("processes_per_node"))
         n_threads = int(app_inst.expander.expand_var_name("n_threads"))
-
+        thread_dist = app_inst.expander.expand_var_name("thread_distribution")
         spread_divisions = app_inst.expander.expand_var_name(
             "spread_divisions"
         )
-        if spread_divisions == "{spread_divisions}":
-            possible_vars = workload.find_variable("spread_divisions")
-            assert len(possible_vars) == 1
-            spread_divisions = possible_vars[0].default
 
         try:
             spread_divisions = int(spread_divisions)
