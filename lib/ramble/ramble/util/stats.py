@@ -12,6 +12,8 @@ import statistics
 
 from scipy.stats import t
 
+NA = "NA"
+
 
 def _decimal_places(value):
     """Returns the number of decimal places of a value"""
@@ -36,7 +38,7 @@ class StatsBase:
     def report(self, values, unit):
         label = f"summary::{self.name}"
         if len(values) < self.min_count:
-            return ("NA", "", label)
+            return (NA, "", label)
         return (self.compute(values), self.get_unit(unit), label)
 
 
@@ -68,7 +70,7 @@ class StatsHarmonicMean(StatsBase):
         try:
             return round(statistics.harmonic_mean(values), _max_decimal_places(values))
         except statistics.StatisticsError:
-            return "NA"
+            return NA
 
 
 class StatsMedian(StatsBase):
@@ -107,7 +109,7 @@ class StatsCoefficientOfVariation(StatsBase):
         # While CV isn't particularly meaningful when negative values are present,
         # calculate anyway and leave the interpretation to individual experiments.
         if not mean:
-            return "NA"
+            return NA
         return round(
             statistics.stdev(values) / statistics.mean(values), _max_decimal_places(values)
         )

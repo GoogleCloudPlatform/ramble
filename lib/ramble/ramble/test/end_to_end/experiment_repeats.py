@@ -186,6 +186,17 @@ ramble:
             assert "gromacs.water_bare.pme_single_rank.1" not in data
             assert "gromacs.water_bare.pme_single_rank.2" not in data
 
+        # Assert that "NA" stats are not displayed
+        os.remove(result_file)
+        workspace(
+            "analyze", "-s", "--where", "'{type}' == 'rf'", global_args=["-w", workspace_name]
+        )
+        with open(result_file) as f:
+            data = f.read()
+            assert "summary::n_total_repeats = 1 repeats" in data
+            assert "summary::mean = 11.111 s" in data
+            assert "= NA" not in data
+
 
 @pytest.mark.long
 def test_repeat_stats(mutable_config, mutable_mock_workspace_path, workspace_name):
