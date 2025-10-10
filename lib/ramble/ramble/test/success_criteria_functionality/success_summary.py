@@ -68,6 +68,6 @@ ramble:
             with open(os.path.join(ws.root, "results.latest.txt")) as f:
                 data = f.read()
                 assert "Success criteria summary:" in data
-                assert "_application_function = PASSED" in data
-                assert "always-pass = PASSED" in data
-                assert "always-fail = FAILED" in data
+                assert "application::basic::_application_function = PASSED" in data
+                assert "config::experiment::always-pass = PASSED" in data
+                assert "config::experiment::always-fail = FAILED" in data

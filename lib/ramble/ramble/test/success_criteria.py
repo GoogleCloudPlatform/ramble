@@ -65,12 +65,16 @@ def test_criteria_list(tmpdir):
     criteria_list = ramble.success_criteria.ScopedCriteriaList()
 
     criteria_list.add_criteria(
-        "application_definition", "test-success", "string", r".*Success string.*", log_path
+        "application_definition",
+        "test-success",
+        "string",
+        r".*Success string.*",
+        log_path,
     )
 
     criteria_list.add_criteria("experiment", "test-exp", "string", r".*Experiment.*", log_path)
 
-    remark_all(list(criteria_list.all_criteria()), log_path)
+    remark_all([criteria for criteria, _ in criteria_list.all_criteria()], log_path)
 
     assert criteria_list.passed()
 
@@ -82,6 +86,6 @@ def test_criteria_list(tmpdir):
         anti_match=r"From",
     )
 
-    remark_all(list(criteria_list.all_criteria()), log_path)
+    remark_all([criteria for criteria, _ in criteria_list.all_criteria()], log_path)
 
     assert not criteria_list.passed()
