@@ -1357,7 +1357,7 @@ class SpackRunner(CommandRunner):
         self.deactivate()  # need to not be in env to find the user compiler
 
         for compiler_spec in compiler_specs:
-            tty.debug("Pushing " + compiler_spec)
+            logger.debug("Pushing " + compiler_spec)
             args = base_args.copy()
             args.append(compiler_spec)
 

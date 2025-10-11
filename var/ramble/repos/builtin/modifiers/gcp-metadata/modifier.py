@@ -212,10 +212,10 @@ class GcpMetadata(BasicModifier):
         with open(log_path) as f:
             for raw_host in f.readlines():
                 physical_host = raw_host[1:].strip()
-                tty.debug(f"  Host line: {physical_host}")
+                logger.debug(f"  Host line: {physical_host}")
                 all_hosts.add(physical_host)
                 levels = physical_host.split("/")
-                tty.debug(f"   Levels: {levels}")
+                logger.debug(f"   Levels: {levels}")
                 if len(levels) == 3:
                     level0_groups.add(levels[0])
                     level1_groups.add(levels[1])

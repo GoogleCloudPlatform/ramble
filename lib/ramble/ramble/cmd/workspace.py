@@ -1294,8 +1294,6 @@ def workspace_manage_experiments(args):
     ws = ramble.cmd.find_workspace(args)
 
     if ws is None:
-        import tempfile
-
         logger.warn("No active workspace found. Defaulting to `--dry-run`")
 
         root = tempfile.TemporaryDirectory()

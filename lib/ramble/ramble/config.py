@@ -1166,9 +1166,7 @@ def merge_yaml(dest, source):
         for dk in dest_keys:
             dest[dk] = dest.pop(dk)
 
-        import ruamel.yaml
-
-        return ruamel.yaml.comments.CommentedMap(dest)
+        return yaml.comments.CommentedMap(dest)
 
     # If we reach here source and dest are either different types or are
     # not both lists or dicts: replace with source.
