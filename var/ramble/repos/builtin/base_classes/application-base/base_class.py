@@ -2825,6 +2825,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         calcs.append(statistic.report(fom_values, fom_units))
 
                     for calc in calcs:
+                        if calc[0] == ramble.util.stats.NA:
+                            continue
                         fom_calc_dict = {
                             "value": calc[0],
                             "units": calc[1],
