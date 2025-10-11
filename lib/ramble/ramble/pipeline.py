@@ -576,7 +576,7 @@ class ExecutePipeline(Pipeline):
                 logger.debug(f"{app_inst.name} is a repeat base. Skipping execution.")
                 continue
 
-            app_inst.add_expand_vars(self.workspace)
+            app_inst.define_variables_for_template_path(self.workspace)
             exec_str = app_inst.expander.expand_var(self.executor)
             if resolve_env_vars:
                 exec_str = os.path.expandvars(exec_str)

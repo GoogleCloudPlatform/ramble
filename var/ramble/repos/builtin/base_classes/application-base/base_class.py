@@ -770,7 +770,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             (set): All variable names used by this experiment.
         """
         self.build_modifier_instances()
-        self.add_expand_vars(workspace)
+        self.define_variables_for_template_path(workspace)
 
         backup_variables = self.variables.copy()
 
@@ -882,7 +882,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):
         """Run a phase, by getting its function pointer"""
-        self.add_expand_vars(workspace)
         if self.is_template:
             logger.debug(f"{self.name} is a template. Skipping phases")
             return
@@ -1078,7 +1077,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             ]
 
                     # Expand the chained experiment vars, so we can build the execution command
-                    new_inst.add_expand_vars(workspace)
+                    new_inst.define_variables_for_template_path(workspace)
                     chain_cmd = new_inst.expander.expand_var(
                         cur_exp_def[namespace.command]
                     )
@@ -1329,7 +1328,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
 
     def _get_executable_graph(self, workload_name):
-        """Return executables for add_expand_vars"""
+        """Construct and return an executable graph
+
+        Builds an executable graph for a given workload.
+
+        Returns:
+            ExecutableGraph: Graph of executables for workload
+        """
         self._define_custom_executables()
         exec_order = self.get_workload(workload_name).executables
         # Use yaml defined executable order, if defined
@@ -1391,7 +1396,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         return executable_graph
 
     def _set_input_path(self):
-        """Put input_path into self.variables[input_file] for add_expand_vars"""
+        """Define input file path variables
+
+        Define variables for each input file, of the format:
+            '{input_file_name}' = <path_to_input>
+        """
         self._inputs_and_fetchers(self.expander.workload_name)
 
         for input_file, input_conf in self._input_fetchers.items():
@@ -1748,7 +1757,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
-    def _derive_variables_for_template_path(self, workspace):
+    def define_variables_for_template_path(self, workspace):
         """Define variables for all workspace and object template paths"""
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
@@ -1775,16 +1784,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.variables.update(render_vars)
                 for name in render_vars.keys():
                     self.keywords.update_keys({name: var_attr})
-
-    def add_expand_vars(self, workspace):
-        """Add application specific expansion variables
-
-        Applications require several variables to be defined to function properly.
-        """
-        if not self._vars_are_expanded:
-
-            self._derive_variables_for_template_path(workspace)
-            self._vars_are_expanded = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
