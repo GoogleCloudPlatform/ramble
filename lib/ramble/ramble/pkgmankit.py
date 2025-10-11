@@ -28,11 +28,7 @@ from ramble.util.command_runner import (
     RunnerError,
     ValidationFailedError,
 )
-
-# Rename logger to tty to preserve old behavior
 from ramble.util.logger import logger
-
-tty = logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
 PackageManagerBase = ramble.repository.get_base_class("package-manager-base")

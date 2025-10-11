@@ -32,9 +32,5 @@ from ramble.util.command_runner import (
 )
 from ramble.util.file_util import get_file_path
 from ramble.util.foms import FomType
-
-# Import new logger as tty to preserve old behavior
 from ramble.util.logger import logger
-
-tty = logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
