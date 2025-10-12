@@ -108,18 +108,6 @@ def check_info_basic(output):
     assert "Software Stack" in output
 
 
-def check_info_zlib(output):
-    assert "zlib" in output
-    assert "ensure_installed" in output
-
-    assert "Application" in output
-    assert "Workload" in output
-    assert "Experiment" in output
-    assert "Software Stack" in output
-    assert "Template Package" in output
-    assert "Template Environment" in output
-
-
 def check_results(ws):
     fn = ws.dump_results(output_formats=["text", "json", "yaml"])
     assert os.path.exists(os.path.join(ws.root, fn + ".txt"))
