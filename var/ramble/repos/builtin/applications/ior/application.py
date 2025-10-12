@@ -205,7 +205,7 @@ class Ior(ExecutableApplication):
         elif "float" in variant:
             summary_regex += r"\s+(?P<" + metric_name + r">[0-9]+\.[0-9]+)"
         else:
-            tty.error("Incorrect metric for FOMs")
+            logger.error("Incorrect metric for FOMs")
 
     figure_of_merit_context(
         "summary", regex=summary_regex, output_format="{Operation}"
