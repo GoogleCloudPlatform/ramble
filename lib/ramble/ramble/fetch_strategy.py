@@ -1599,12 +1599,8 @@ class FetcherConflict(FetchError):
 class InvalidArgsError(FetchError):
     """Raised when a version can't be deduced from a set of arguments."""
 
-    def __init__(self, pkg=None, version=None, **args):
+    def __init__(self, **args):
         msg = "Could not guess a fetch strategy"
-        if pkg:
-            msg += f" for {pkg}"
-            if version:
-                msg += f"@{version}"
         long_msg = f"with arguments: {args}"
         super().__init__(msg, long_msg)
 
