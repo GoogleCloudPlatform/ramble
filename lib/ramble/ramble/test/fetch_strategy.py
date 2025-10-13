@@ -265,12 +265,12 @@ class TestGitFetchStrategy:
 
         clone_call = None
         for call in mock_git.call_args_list:
-            if "clone" in call.args:
+            if "clone" in call[0]:
                 clone_call = call
                 break
 
         assert clone_call is not None
-        assert "https://example.com/repo.git" in clone_call.args
+        assert "https://example.com/repo.git" in clone_call[0]
 
         assert os.path.isdir(fetcher.stage.source_path)
 
@@ -281,11 +281,11 @@ class TestGitFetchStrategy:
 
         calls = mock_git.call_args_list
 
-        assert "clone" in calls[0].args
-        assert "https://example.com/repo.git" in calls[0].args
+        assert "clone" in calls[0][0]
+        assert "https://example.com/repo.git" in calls[0][0]
 
-        assert "checkout" in calls[1].args
-        assert "abcdef" in calls[1].args
+        assert "checkout" in calls[1][0]
+        assert "abcdef" in calls[1][0]
 
         assert os.path.isdir(fetcher.stage.source_path)
 
@@ -296,13 +296,13 @@ class TestGitFetchStrategy:
 
         submodule_call = None
         for call in mock_git.call_args_list:
-            if "submodule" in call.args:
+            if "submodule" in call[0]:
                 submodule_call = call
                 break
 
         assert submodule_call is not None
-        assert "update" in submodule_call.args
-        assert "--init" in submodule_call.args
-        assert "--recursive" in submodule_call.args
+        assert "update" in submodule_call[0]
+        assert "--init" in submodule_call[0]
+        assert "--recursive" in submodule_call[0]
 
         assert os.path.isdir(fetcher.stage.source_path)
