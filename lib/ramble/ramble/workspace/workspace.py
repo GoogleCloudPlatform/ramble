@@ -1460,7 +1460,7 @@ ramble:
         pkgman_prefixes = set()
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
-            app_inst.add_expand_vars(self)
+            app_inst.define_variables_for_template_path(self)
             if app_inst.package_manager is not None:
                 pkgman_prefixes.add(app_inst.package_manager.spec_prefix)
                 force_prefix = force_prefix or not app_inst.package_manager.allow_unprefixed_specs
@@ -1469,7 +1469,7 @@ ramble:
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
-            app_inst.add_expand_vars(self)
+            app_inst.define_variables_for_template_path(self)
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
 

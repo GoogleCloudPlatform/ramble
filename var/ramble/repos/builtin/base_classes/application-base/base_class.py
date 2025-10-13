@@ -771,11 +771,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             (set): All variable names used by this experiment.
         """
         self.build_modifier_instances()
-        self.add_expand_vars(workspace)
+        self.define_variables_for_template_path(workspace)
 
         backup_variables = self.variables.copy()
 
-        self._define_commands(self._executable_graph, self.success_list)
+        self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
 
         ########################
@@ -883,7 +883,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):
         """Run a phase, by getting its function pointer"""
-        self.add_expand_vars(workspace)
         if self.is_template:
             logger.debug(f"{self.name} is a template. Skipping phases")
             return
@@ -1079,7 +1078,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             ]
 
                     # Expand the chained experiment vars, so we can build the execution command
-                    new_inst.add_expand_vars(workspace)
+                    new_inst.define_variables_for_template_path(workspace)
                     chain_cmd = new_inst.expander.expand_var(
                         cur_exp_def[namespace.command]
                     )
@@ -1325,7 +1324,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
 
     def _get_executable_graph(self, workload_name):
-        """Return executables for add_expand_vars"""
+        """Construct and return an executable graph
+
+        Builds an executable graph for a given workload.
+
+        Returns:
+            ExecutableGraph: Graph of executables for workload
+        """
         self._define_custom_executables()
         exec_order = self.get_workload(workload_name).executables
         # Use yaml defined executable order, if defined
@@ -1387,7 +1392,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         return executable_graph
 
     def _set_input_path(self):
-        """Put input_path into self.variables[input_file] for add_expand_vars"""
+        """Define input file path variables
+
+        Define variables for each input file, of the format:
+            '{input_file_name}' = <path_to_input>
+        """
         self._inputs_and_fetchers(self.expander.workload_name)
 
         for input_file, input_conf in self._input_fetchers.items():
@@ -1495,7 +1504,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return obj_env_var_sets
 
-    def _define_commands(self, exec_graph, success_list=None):
+    def _define_commands(self, exec_graph=None, success_list=None):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -1503,6 +1512,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """
         if len(self._command_list) > 0:
             return
+
+        exec_graph = getattr(self, "_executable_graph", exec_graph)
+        if exec_graph is None:
+            self._executable_graph = self._get_executable_graph(
+                self.expander.workload_name
+            )
+            exec_graph = self._executable_graph
 
         # Do not replace escaped braces here, to allow them to
         # be replace properly when templates are written.
@@ -1741,8 +1757,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
-    def _derive_variables_for_template_path(self, workspace):
-        """Define variables for template paths (for add_expand_vars)"""
+    def define_variables_for_template_path(self, workspace):
+        """Define variables for all workspace and object template paths"""
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var("{experiment_run_dir}"),
@@ -1750,23 +1766,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
             self.variables[template_name] = expand_path
 
-    def add_expand_vars(self, workspace):
-        """Add application specific expansion variables
-
-        Applications require several variables to be defined to function properly.
-        This method defines these variables, including:
-        - command: set to the commands needed to execute the experiment
-        - spack_setup: set to an empty string, so spack applications can override this
-        """
-        if not self._vars_are_expanded:
-            self._executable_graph = self._get_executable_graph(
-                self.expander.workload_name
-            )
-            self._set_input_path()
-
-            self._derive_variables_for_template_path(workspace)
-            self._define_object_template_vars(workspace)
-            self._vars_are_expanded = True
+        var_attr = {
+            "type": ramble.keywords.key_type.reserved,
+            "level": ramble.keywords.output_level.variable,
+        }
+        for obj, tpl_config in self._object_templates(workspace):
+            var_name = tpl_config["var_name"]
+            if var_name is not None:
+                if var_name in self.variables:
+                    old_var = f"_old_{var_name}"
+                    self.variables[old_var] = self.variables[var_name]
+                    self.keywords.update_keys({old_var: var_attr})
+                self.variables[var_name] = tpl_config["dest_path"]
+                self.keywords.update_keys({var_name: var_attr})
+            if hasattr(obj, "template_render_vars"):
+                render_vars = obj.template_render_vars
+                self.variables.update(render_vars)
+                for name in render_vars.keys():
+                    self.keywords.update_keys({name: var_attr})
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
@@ -2017,7 +2034,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         exp_lock = self.experiment_lock
 
-        self._define_commands(self._executable_graph, self.success_list)
+        self._set_input_path()
+        self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
 
         with lk.WriteTransaction(exp_lock):
@@ -3429,26 +3447,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f_out.write(rendered)
                 f_out.write("\n")
             os.chmod(out_path, perm)
-
-    def _define_object_template_vars(self, workspace):
-        var_attr = {
-            "type": ramble.keywords.key_type.reserved,
-            "level": ramble.keywords.output_level.variable,
-        }
-        for obj, tpl_config in self._object_templates(workspace):
-            var_name = tpl_config["var_name"]
-            if var_name is not None:
-                if var_name in self.variables:
-                    old_var = f"_old_{var_name}"
-                    self.variables[old_var] = self.variables[var_name]
-                    self.keywords.update_keys({old_var: var_attr})
-                self.variables[var_name] = tpl_config["dest_path"]
-                self.keywords.update_keys({var_name: var_attr})
-            if hasattr(obj, "template_render_vars"):
-                render_vars = obj.template_render_vars
-                self.variables.update(render_vars)
-                for name in render_vars.keys():
-                    self.keywords.update_keys({name: var_attr})
 
     def _objects(self, exclude_types=None):
         """Return a tuple for each object instance associated with the app_inst.
