@@ -200,6 +200,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # A dict storing fom values, currently it only stores inmem FOMs
         self._fom_map = {}
 
+        if not self.name:
+            logger.warn(
+                f"Application {self.__class__.__name__} is missing explicit name."
+            )
+            self.name = self.__class__.__name__
+
         # Ensure we always have the application name, and this is never empty
         self.license_names = self.license_names + [self.name]
 
