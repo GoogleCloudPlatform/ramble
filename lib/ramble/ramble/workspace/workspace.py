@@ -1456,12 +1456,16 @@ ramble:
 
         experiment_set = self.build_experiment_set(die_on_validate_error=False)
 
+        force_prefix = False
         pkgman_prefixes = set()
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
             app_inst.add_expand_vars(self)
             if app_inst.package_manager is not None:
                 pkgman_prefixes.add(app_inst.package_manager.spec_prefix)
+                force_prefix = force_prefix or not app_inst.package_manager.allow_unprefixed_specs
+
+        force_prefix = force_prefix or len(pkgman_prefixes) > 1
 
         for _, app_inst, _ in experiment_set.all_experiments():
             app_inst.build_modifier_instances()
@@ -1469,47 +1473,33 @@ ramble:
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
 
-            spec_prefix = (
-                f"{app_inst.package_manager.spec_prefix}" if len(pkgman_prefixes) > 1 else ""
-            )
-
             if app_inst.package_manager is None:
                 continue
 
-            compiler_packages = {}
-            compiler_dicts = [app_inst.compilers]
-            for mod_inst in app_inst._modifier_instances:
-                compiler_dicts.append(mod_inst.compilers)
-
-            for compiler_dict in compiler_dicts:
-                for comp, definitions in compiler_dict.items():
-                    for info in definitions:
-                        keep_comp = app_inst.expander.satisfies(
-                            info.when, variant_set=app_inst.object_variants
+            compiler_packages = app_inst.package_manager.get_experiment_compilers(
+                app_inst=app_inst, prefixed=force_prefix
+            )
+            for comp, definitions in compiler_packages.items():
+                for info in definitions:
+                    if (
+                        not quiet
+                        and comp in packages_dict
+                        and info.conflict_dict(packages_dict[comp])
+                    ):
+                        logger.debug(f"  Spec 1: {str(info)}")
+                        logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
+                        raise RambleConflictingDefinitionError(
+                            f"Compiler {comp} would be defined " "in multiple conflicting ways"
                         )
-                        if keep_comp:
-                            if (
-                                not quiet
-                                and comp in packages_dict
-                                and info.conflict_dict(packages_dict[comp])
-                            ):
-                                logger.debug(f"  Spec 1: {str(info)}")
-                                logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
-                                raise RambleConflictingDefinitionError(
-                                    f"Compiler {comp} would be defined "
-                                    "in multiple conflicting ways"
-                                )
 
-                            if comp not in packages_dict or (
-                                force and comp not in newly_created_packages
-                            ):
-                                newly_created_packages.add(comp)
-                                packages_dict[comp] = syaml.syaml_dict()
+                    if comp not in packages_dict or (force and comp not in newly_created_packages):
+                        newly_created_packages.add(comp)
+                        packages_dict[comp] = syaml.syaml_dict()
 
-                            compiler_packages[comp] = False
-                            packages_dict[comp].update(info.to_dict(prefix=spec_prefix))
-                            for conf in info.config_opts():
-                                ramble.config.add(conf, scope=self.ws_file_config_scope_name())
+                    compiler_packages[comp] = False
+                    packages_dict[comp].update(info.to_dict(apply_prefix=force_prefix))
+                    for conf in info.config_opts():
+                        ramble.config.add(conf, scope=self.ws_file_config_scope_name())
 
             logger.debug(f"Trying to define packages for {env_name}")
             app_packages = []
@@ -1517,43 +1507,36 @@ ramble:
                 if namespace.packages in environments_dict[env_name]:
                     app_packages = environments_dict[env_name][namespace.packages].copy()
 
-            software_dicts = [app_inst.software_specs]
-            for mod_inst in app_inst._modifier_instances:
-                software_dicts.append(mod_inst.software_specs)
-
-            for software_dict in software_dicts:
-                for spec_name, definitions in software_dict.items():
-                    for info in definitions:
-                        keep_pkg = app_inst.expander.satisfies(
-                            info.when, variant_set=app_inst.object_variants
+            software_packages = app_inst.package_manager.get_experiment_specs(
+                app_inst=app_inst, prefixed=force_prefix
+            )
+            for spec_name, definitions in software_packages.items():
+                for info in definitions:
+                    logger.debug(f"    Found spec: {spec_name}")
+                    if (
+                        not quiet
+                        and spec_name in packages_dict
+                        and info.conflict_dict(packages_dict[spec_name])
+                    ):
+                        logger.debug(f"  Spec 1: {str(info)}")
+                        logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
+                        raise RambleConflictingDefinitionError(
+                            f"Package {spec_name} would be defined in multiple " "conflicting ways"
                         )
-                        if keep_pkg:
-                            logger.debug(f"    Found spec: {spec_name}")
-                            if (
-                                not quiet
-                                and spec_name in packages_dict
-                                and info.conflict_dict(packages_dict[spec_name])
-                            ):
-                                logger.debug(f"  Spec 1: {str(info)}")
-                                logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
-                                raise RambleConflictingDefinitionError(
-                                    f"Package {spec_name} would be defined in multiple "
-                                    "conflicting ways"
-                                )
 
-                            if spec_name not in packages_dict or (
-                                force and spec_name not in newly_created_packages
-                            ):
-                                packages_dict[spec_name] = syaml.syaml_dict()
+                    if spec_name not in packages_dict or (
+                        force and spec_name not in newly_created_packages
+                    ):
+                        packages_dict[spec_name] = syaml.syaml_dict()
 
-                            # Check for usage of compilers
-                            if info.compiler in compiler_packages:
-                                compiler_packages[info.compiler] = True
+                    # Check for usage of compilers
+                    if info.compiler in compiler_packages:
+                        compiler_packages[info.compiler] = True
 
-                            packages_dict[spec_name].update(info.to_dict(prefix=spec_prefix))
+                    packages_dict[spec_name].update(info.to_dict(apply_prefix=force_prefix))
 
-                            if spec_name not in app_packages:
-                                app_packages.append(spec_name)
+                    if spec_name not in app_packages:
+                        app_packages.append(spec_name)
 
             if app_packages:
                 if env_name not in environments_dict:

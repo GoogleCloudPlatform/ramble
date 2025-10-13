@@ -20,6 +20,7 @@ import ramble.software_info
 import ramble.stage
 from ramble.error import ApplicationError
 from ramble.pkgmankit import *
+from ramble.util.executable import which
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
@@ -124,7 +125,8 @@ class Pip(PackageManagerBase):
             workspace.add_to_cache(cache_tupl)
 
         env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
-        if self.environment_required:
+        logger.debug(f" Required environment: {self.environment_required}")
+        try:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.install()
@@ -133,22 +135,27 @@ class Pip(PackageManagerBase):
             for pkg, conf in app_inst.required_packages.items():
                 if (
                     app_inst.expander.satisfies(
-                        conf["when"], variant_set=app_inst.object_variants
+                        conf["when"], variant_set=self.experiment_variants()
                     )
                     and pkg not in installed_pkgs
                 ):
                     logger.die(
                         f"Package {pkg} is not installed "
                         f"in environment {env_context}, but is "
-                        f"required by the {self.name} application "
-                        "definition"
+                        f"required by the {app_inst.name} application "
+                        "definition\n",
+                        f"{self.experiment_variants().as_set()}\n",
+                        f"{conf['when']}",
                     )
 
             for mod_inst in app_inst._modifier_instances:
                 for pkg, conf in mod_inst.required_packages.items():
                     if (
                         app_inst.expander.satisfies(
-                            conf["when"], variant_set=app_inst.object_variants
+                            conf["when"],
+                            variant_set=self.experiment_variants(
+                                include_modifier=mod_inst
+                            ),
                         )
                         and pkg not in installed_pkgs
                     ):
@@ -158,6 +165,10 @@ class Pip(PackageManagerBase):
                             f"required by the {mod_inst.name} modifier "
                             "definition"
                         )
+        except RunnerError as e:
+            if self.environment_required:
+                logger.die(e)
+            pass
 
     register_phase(
         "define_package_paths",
@@ -215,6 +226,7 @@ class Pip(PackageManagerBase):
                 "name": self.runner.env_path.replace(
                     workspace.root + os.path.sep, ""
                 ),
+                "package_manager": self.name,
                 "digest": self.runner.inventory_hash(),
             }
         )
@@ -337,6 +349,14 @@ class PipRunner(CommandRunner):
         # Ensure subsequent commands use the created env now.
         self.env_path = env_path
 
+    def reset_bs_python(self, exec=None, path=None):
+        if isinstance(exec, Executable):
+            self.bs_python = exec
+        elif isinstance(path, str):
+            self.bs_python = which("python", path=path)
+        else:
+            self.bs_python = which("python")
+
     def _get_venv_python(self):
         if self.dry_run:
             return self.bs_python.copy()
@@ -368,9 +388,6 @@ class PipRunner(CommandRunner):
             with open(lock_file, "w") as f:
                 f.write(out)
         self.installed = True
-
-    def get_bootstrap_python(self):
-        return self.bs_python
 
     def _get_activate_script_path(self):
         return os.path.join(self.env_path, self._venv_name, "bin", "activate")

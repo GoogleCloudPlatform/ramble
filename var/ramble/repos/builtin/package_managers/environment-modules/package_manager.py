@@ -85,6 +85,7 @@ class EnvironmentModules(PackageManagerBase):
         self.app_inst.hash_inventory["software"].append(
             {
                 "name": env_path.replace(workspace.root + os.path.sep, ""),
+                "package_manager": self.name,
                 "digest": env_hash,
             }
         )

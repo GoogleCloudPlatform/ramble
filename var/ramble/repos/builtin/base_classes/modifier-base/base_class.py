@@ -85,7 +85,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         return new_copy
 
     def satisfy_when(self, when_key):
-        return self.expander.satisfies(when_key, self.object_variants)
+        return self.expander.satisfies(when_key, self.experiment_variants())
 
     def set_usage_mode(self, mode):
         """Set the usage mode for this modifier.
@@ -151,17 +151,15 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             self._on_executables = ["*"]
 
     def inherit_from_application(self, app):
+        self.app_inst = app
         self.expander = app.expander.copy()
-        self.object_variants.merge_default_variants(app.object_variants)
 
         for name, value in app.variants.items():
             expanded_value = self.expander.expand_var(value, typed=True)
             self.object_variants.experiment_variant(name, expanded_value)
 
-        self.object_variants.merge_multi_value_variants(app.object_variants)
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
-        self.app_inst = app
 
     def define_variable(self, var_name, var_value):
         """Define a variable within this modifier's expander instance"""
@@ -183,7 +181,9 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             extra_vars = {}
 
         for when_set, var_mod_dict in self.variable_modifications.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+            if self.expander.satisfies(
+                when_set, self.experiment_variants(allow_caching=False)
+            ):
                 for var, var_mods in var_mod_dict.items():
                     for var_mod in var_mods:
                         if var_mod.method in ["append", "prepend"]:
@@ -230,7 +230,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         pre_execs = []
         post_execs = []
         for when_set, exec_mods in self.executable_modifiers.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+            if self.expander.satisfies(when_set, self.experiment_variants()):
                 for exec_mod in exec_mods:
                     mod_func = getattr(self, exec_mod)
 
@@ -245,14 +245,18 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
     def all_env_var_modifications(self):
         for when_set, env_var_mods in self.env_var_modifications.items():
-            if not self.expander.satisfies(when_set, self.object_variants):
+            if not self.expander.satisfies(
+                when_set, self.experiment_variants()
+            ):
                 continue
 
             yield from env_var_mods.values()
 
     def all_package_manager_requirements(self):
         for when_set in self.package_manager_requirements:
-            if not self.expander.satisfies(when_set, self.object_variants):
+            if not self.expander.satisfies(
+                when_set, self.experiment_variants()
+            ):
                 continue
 
             yield from self.package_manager_requirements[when_set]
@@ -265,7 +269,9 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         """
 
         for when_key, var_list in self.object_variables.items():
-            if not self.expander.satisfies(when_key, self.object_variants):
+            if not self.expander.satisfies(
+                when_key, self.experiment_variants()
+            ):
                 continue
 
             for var in var_list:
