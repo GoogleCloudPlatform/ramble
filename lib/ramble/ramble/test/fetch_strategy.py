@@ -6,8 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 """Perform tests of the fetch_strategy functions"""
+import contextlib
 import os
 import shutil
+from pathlib import Path
 from unittest import mock
 
 import pytest
@@ -306,3 +308,447 @@ class TestGitFetchStrategy:
         assert "--recursive" in submodule_call[0]
 
         assert os.path.isdir(fetcher.stage.source_path)
+
+
+class TestVCSFetchStrategy:
+    @pytest.fixture
+    def mock_tar(self, monkeypatch):
+        """Mock the tar executable."""
+        mock_tar_exe = mock.MagicMock()
+        mock_tar_exe.add_default_arg = mock.Mock()
+
+        def mock_which(name, required=False):
+            if name == "tar":
+                return mock_tar_exe
+            return mock.MagicMock()
+
+        monkeypatch.setattr(fetch_strategy, "which", mock.MagicMock(side_effect=mock_which))
+        return mock_tar_exe
+
+    class DummyVCS(fetch_strategy.VCSFetchStrategy):
+        url_attr = "dummy_url"
+        optional_attrs = ["revision"]
+
+    def test_init(self):
+        """Test initialization of VCSFetchStrategy."""
+        fetcher = self.DummyVCS(dummy_url="some_url", revision="123")
+        assert fetcher.url == "some_url"
+        assert fetcher.revision == "123"
+
+    def test_init_no_url(self):
+        """Test that __init__ raises ValueError if url_attr is missing."""
+        with pytest.raises(ValueError, match="requires dummy_url argument"):
+            self.DummyVCS(revision="123")
+
+    def test_check_and_expand(self):
+        """Test that check() and expand() run without error."""
+        fetcher = self.DummyVCS(dummy_url="some_url")
+        fetcher.stage = mock.MagicMock()
+        fetcher.check()
+        fetcher.expand()
+
+    def test_archive(self, tmp_path, mock_tar):
+        """Test the archive method."""
+        source_path = tmp_path / "source"
+        source_path.mkdir()
+        (source_path / "file.txt").write_text("content")
+
+        stage = mock.MagicMock()
+        stage.path = str(tmp_path)
+        stage.source_path = str(source_path)
+        stage.srcdir = None
+
+        fetcher = self.DummyVCS(dummy_url="some_url")
+        fetcher.stage = stage
+
+        destination = str(tmp_path / "archive.tar.gz")
+        fetcher.archive(destination)
+
+        mock_tar.assert_called_once_with("-czf", destination, "source")
+
+    def test_archive_with_srcdir(self, tmp_path, mock_tar, monkeypatch):
+        """Test the archive method with stage.srcdir set."""
+        source_path = tmp_path / "source"
+        source_path.mkdir()
+        (source_path / "file.txt").write_text("content")
+
+        stage = mock.MagicMock()
+        stage.path = str(tmp_path)
+        stage.source_path = str(source_path)
+        stage.srcdir = "renamed-source"
+
+        fetcher = self.DummyVCS(dummy_url="some_url")
+        fetcher.stage = stage
+
+        @contextlib.contextmanager
+        def mock_temp_rename(src, dest):
+            os.rename(src, dest)
+            yield
+            os.rename(dest, src)
+
+        monkeypatch.setattr(fetch_strategy, "temp_rename", mock_temp_rename)
+
+        destination = str(tmp_path / "archive.tar.gz")
+        fetcher.archive(destination)
+
+        mock_tar.assert_called_once_with("-czf", destination, "renamed-source")
+        assert source_path.exists()
+        assert not (tmp_path / "renamed-source").exists()
+
+    def test_archive_with_exclude(self, tmp_path, mock_tar):
+        """Test the archive method with exclude patterns."""
+        source_path = tmp_path / "source"
+        source_path.mkdir()
+        (source_path / "file.txt").write_text("content")
+
+        stage = mock.MagicMock()
+        stage.path = str(tmp_path)
+        stage.source_path = str(source_path)
+        stage.srcdir = None
+
+        fetcher = self.DummyVCS(dummy_url="some_url")
+        fetcher.stage = stage
+
+        destination = str(tmp_path / "archive.tar.gz")
+        fetcher.archive(destination, exclude=[".git", "*.log"])
+
+        calls = [mock.call("--exclude=.git"), mock.call("--exclude=*.log")]
+        mock_tar.add_default_arg.assert_has_calls(calls, any_order=True)
+        mock_tar.assert_called_once_with("-czf", destination, "source")
+
+    def test_str(self):
+        """Test __str__ method."""
+        fetcher = self.DummyVCS(dummy_url="some_url")
+        assert str(fetcher) == "VCS: some_url"
+
+
+class TestCvsFetchStrategy:
+    @pytest.fixture
+    def mock_vcs_executables(self, monkeypatch):
+        """Mock vcs executables."""
+        mocks = {"tar": mock.MagicMock(), "cvs": mock.MagicMock()}
+        mocks["tar"].add_default_arg = mock.Mock()
+
+        def mock_which(name, required=False):
+            if name in mocks:
+                return mocks[name]
+            return mock.MagicMock()
+
+        monkeypatch.setattr(fetch_strategy, "which", mock.MagicMock(side_effect=mock_which))
+        return mocks
+
+    @pytest.fixture
+    def fetcher(self, tmp_path):
+        """Create a CvsFetchStrategy with a mock stage."""
+        f = fetch_strategy.CvsFetchStrategy(
+            cvs=":pserver:anonymous@example.com:/cvsroot%module=my-module"
+        )
+
+        stage = mock.MagicMock()
+        stage.path = str(tmp_path)
+        stage.source_path = str(tmp_path / "source")
+        os.makedirs(stage.source_path)
+        stage.expanded = False
+        f.stage = stage
+
+        return f
+
+    def test_init(self):
+        fetcher = fetch_strategy.CvsFetchStrategy(cvs="url", branch="my-branch", date="2025-10-12")
+        assert fetcher.url == "url"
+        assert fetcher.branch == "my-branch"
+        assert fetcher.date == "2025-10-12"
+
+    def test_cachable(self):
+        fetcher = fetch_strategy.CvsFetchStrategy(cvs="url")
+        assert not fetcher.cachable
+
+        fetcher.branch = "a-branch"
+        assert fetcher.cachable
+
+        fetcher.branch = None
+        fetcher.date = "a-date"
+        assert fetcher.cachable
+
+    def test_source_id(self):
+        fetcher = fetch_strategy.CvsFetchStrategy(cvs="url")
+        assert fetcher.source_id() is None
+
+        fetcher.branch = "my-branch"
+        assert fetcher.source_id() == "id-branch=my-branch"
+
+        fetcher.date = "2025-10-12"
+        assert fetcher.source_id() == "id-branch=my-branch-date=2025-10-12"
+
+        fetcher.branch = None
+        assert fetcher.source_id() == "id-date=2025-10-12"
+
+    def test_mirror_id(self):
+        fetcher = fetch_strategy.CvsFetchStrategy(
+            cvs=":pserver:anonymous@example.com:/cvsroot/my-module%module=my-module"
+        )
+        assert fetcher.mirror_id() is None
+
+        fetcher.branch = "my-branch"
+        expected_id = (
+            os.path.join("cvs", "cvsroot", "my-module%module=my-module") + "%branch=my-branch"
+        )
+        assert fetcher.mirror_id() == expected_id
+
+    def test_fetch(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_cvs = mock_vcs_executables["cvs"]
+        monkeypatch.setattr(
+            fetch_strategy, "get_single_file", mock.MagicMock(return_value="my-module")
+        )
+        monkeypatch.setattr(fetch_strategy.shutil, "move", mock.Mock())
+
+        fetcher.fetch()
+
+        mock_cvs.assert_called_once_with(
+            "-z9",
+            "-d",
+            ":pserver:anonymous@example.com:/cvsroot",
+            "checkout",
+            "my-module",
+        )
+        fetch_strategy.get_single_file.assert_called_once_with(".")
+        fetch_strategy.shutil.move.assert_called_once_with("my-module", fetcher.stage.source_path)
+        assert fetcher.stage.srcdir == "my-module"
+
+    def test_archive(self, fetcher, mock_vcs_executables):
+        source_path = fetcher.stage.source_path
+        (Path(source_path) / "file.txt").touch()
+        fetcher.stage.srcdir = None
+
+        destination = os.path.join(fetcher.stage.path, "archive.tar.gz")
+        fetcher.archive(destination)
+
+        mock_tar = mock_vcs_executables["tar"]
+        mock_tar.add_default_arg.assert_called_once_with("--exclude=CVS")
+        mock_tar.assert_called_once_with("-czf", destination, "source")
+
+    def test_reset(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_cvs = mock_vcs_executables["cvs"]
+        mock_remove_untracked = mock.Mock()
+        monkeypatch.setattr(fetcher, "_remove_untracked_files", mock_remove_untracked)
+
+        with fetch_strategy.working_dir(fetcher.stage.path):
+            fetcher.reset()
+
+        mock_remove_untracked.assert_called_once()
+        mock_cvs.assert_called_once_with("update", "-C", ".")
+
+    def test_remove_untracked_files(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_cvs = mock_vcs_executables["cvs"]
+        mock_cvs.return_value = "? file.txt\n? dir/"
+
+        source_path = fetcher.stage.source_path
+        (Path(source_path) / "file.txt").touch()
+        (Path(source_path) / "dir").mkdir()
+
+        mock_unlink = mock.Mock()
+        monkeypatch.setattr(os, "unlink", mock_unlink)
+
+        def mock_isfile(p):
+            return p == "file.txt"
+
+        monkeypatch.setattr(os.path, "isfile", mock.Mock(side_effect=mock_isfile))
+
+        with fetch_strategy.working_dir(source_path):
+            fetcher._remove_untracked_files()
+
+        mock_cvs.assert_called_once_with("-qn", "update", output=str)
+        mock_unlink.assert_called_once_with("file.txt")
+
+    def test_str(self):
+        fetcher = fetch_strategy.CvsFetchStrategy(cvs="url")
+        assert str(fetcher) == "[cvs] url"
+
+
+class TestSvnFetchStrategy:
+    @pytest.fixture
+    def mock_vcs_executables(self, monkeypatch):
+        """Mock vcs executables."""
+        mocks = {"tar": mock.MagicMock(), "svn": mock.MagicMock()}
+        mocks["tar"].add_default_arg = mock.Mock()
+
+        def mock_which(name, required=False):
+            if name in mocks:
+                return mocks[name]
+            return mock.MagicMock()
+
+        monkeypatch.setattr(fetch_strategy, "which", mock.MagicMock(side_effect=mock_which))
+        return mocks
+
+    @pytest.fixture
+    def fetcher(self, tmp_path):
+        """Create a SvnFetchStrategy with a mock stage."""
+        f = fetch_strategy.SvnFetchStrategy(svn="http://example.com/svn/trunk")
+
+        stage = mock.MagicMock()
+        stage.path = str(tmp_path)
+        stage.source_path = str(tmp_path / "source")
+        os.makedirs(stage.source_path)
+        stage.expanded = False
+        f.stage = stage
+
+        return f
+
+    def test_init(self):
+        fetcher = fetch_strategy.SvnFetchStrategy(svn="url", revision="12345")
+        assert fetcher.url == "url"
+        assert fetcher.revision == "12345"
+
+    def test_cachable(self):
+        fetcher = fetch_strategy.SvnFetchStrategy(svn="url")
+        assert not fetcher.cachable
+        fetcher.revision = "12345"
+        assert fetcher.cachable
+
+    def test_source_id(self):
+        fetcher = fetch_strategy.SvnFetchStrategy(svn="url")
+        assert fetcher.source_id() is None
+        fetcher.revision = "12345"
+        assert fetcher.source_id() == "12345"
+
+    def test_mirror_id(self):
+        fetcher = fetch_strategy.SvnFetchStrategy(svn="http://example.com/svn/trunk")
+        assert fetcher.mirror_id() is None
+        fetcher.revision = "12345"
+        assert fetcher.mirror_id() == "svn//svn/trunk/12345"
+
+    def test_fetch(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_svn = mock_vcs_executables["svn"]
+        monkeypatch.setattr(
+            fetch_strategy, "get_single_file", mock.MagicMock(return_value="trunk")
+        )
+        monkeypatch.setattr(fetch_strategy.shutil, "move", mock.Mock())
+
+        fetcher.fetch()
+
+        mock_svn.assert_called_once_with(
+            "checkout", "--force", "--quiet", "http://example.com/svn/trunk"
+        )
+        fetch_strategy.get_single_file.assert_called_once_with(".")
+        fetch_strategy.shutil.move.assert_called_once_with("trunk", fetcher.stage.source_path)
+        assert fetcher.stage.srcdir == "trunk"
+
+    def test_archive(self, fetcher, mock_vcs_executables):
+        mock_tar = mock_vcs_executables["tar"]
+        (Path(fetcher.stage.source_path) / "file.txt").touch()
+        fetcher.stage.srcdir = None
+
+        destination = os.path.join(fetcher.stage.path, "archive.tar.gz")
+        fetcher.archive(destination)
+
+        mock_tar.add_default_arg.assert_called_once_with("--exclude=.svn")
+        mock_tar.assert_called_once_with("-czf", destination, "source")
+
+    def test_reset(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_svn = mock_vcs_executables["svn"]
+        mock_remove_untracked = mock.Mock()
+        monkeypatch.setattr(fetcher, "_remove_untracked_files", mock_remove_untracked)
+
+        with fetch_strategy.working_dir(fetcher.stage.path):
+            fetcher.reset()
+
+        mock_remove_untracked.assert_called_once()
+        mock_svn.assert_called_once_with("revert", ".", "-R")
+
+    def test_str(self):
+        fetcher = fetch_strategy.SvnFetchStrategy(svn="url")
+        assert str(fetcher) == "[svn] url"
+
+
+class TestHgFetchStrategy:
+    @pytest.fixture
+    def mock_vcs_executables(self, monkeypatch):
+        """Mock vcs executables."""
+        mocks = {"tar": mock.MagicMock(), "hg": mock.MagicMock()}
+        mocks["tar"].add_default_arg = mock.Mock()
+
+        def mock_which(name, required=False):
+            if name in mocks:
+                return mocks[name]
+            return mock.MagicMock()
+
+        monkeypatch.setattr(fetch_strategy, "which", mock.MagicMock(side_effect=mock_which))
+        return mocks
+
+    @pytest.fixture
+    def fetcher(self, tmp_path):
+        """Create a HgFetchStrategy with a mock stage."""
+        f = fetch_strategy.HgFetchStrategy(hg="http://example.com/hg/repo")
+
+        stage = mock.MagicMock()
+        stage.path = str(tmp_path)
+        stage.source_path = str(tmp_path / "source")
+        os.makedirs(stage.source_path)
+        stage.expanded = False
+        f.stage = stage
+
+        return f
+
+    def test_init(self):
+        fetcher = fetch_strategy.HgFetchStrategy(hg="url", revision="12345")
+        assert fetcher.url == "url"
+        assert fetcher.revision == "12345"
+
+    def test_cachable(self):
+        fetcher = fetch_strategy.HgFetchStrategy(hg="url")
+        assert not fetcher.cachable
+        fetcher.revision = "12345"
+        assert fetcher.cachable
+
+    def test_source_id(self):
+        fetcher = fetch_strategy.HgFetchStrategy(hg="url")
+        assert fetcher.source_id() is None
+        fetcher.revision = "12345"
+        assert fetcher.source_id() == "12345"
+
+    def test_mirror_id(self):
+        fetcher = fetch_strategy.HgFetchStrategy(hg="http://example.com/hg/repo")
+        assert fetcher.mirror_id() is None
+        fetcher.revision = "12345"
+        assert fetcher.mirror_id() == "hg//hg/repo/12345"
+
+    def test_fetch(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_hg = mock_vcs_executables["hg"]
+        monkeypatch.setattr(fetch_strategy, "get_single_file", mock.MagicMock(return_value="repo"))
+        monkeypatch.setattr(fetch_strategy.shutil, "move", mock.Mock())
+
+        fetcher.fetch()
+
+        mock_hg.assert_called_once_with("clone", "http://example.com/hg/repo")
+        fetch_strategy.get_single_file.assert_called_once_with(".")
+        fetch_strategy.shutil.move.assert_called_once_with("repo", fetcher.stage.source_path)
+        assert fetcher.stage.srcdir == "repo"
+
+    def test_archive(self, fetcher, mock_vcs_executables):
+        mock_tar = mock_vcs_executables["tar"]
+        (Path(fetcher.stage.source_path) / "file.txt").touch()
+        fetcher.stage.srcdir = None
+
+        destination = os.path.join(fetcher.stage.path, "archive.tar.gz")
+        fetcher.archive(destination)
+
+        mock_tar.add_default_arg.assert_called_once_with("--exclude=.hg")
+        mock_tar.assert_called_once_with("-czf", destination, "source")
+
+    def test_reset(self, fetcher, mock_vcs_executables, monkeypatch):
+        mock_hg = mock_vcs_executables["hg"]
+        mock_rmtree = mock.Mock()
+        mock_move = mock.Mock()
+        monkeypatch.setattr(shutil, "rmtree", mock_rmtree)
+        monkeypatch.setattr(shutil, "move", mock_move)
+
+        with fetch_strategy.working_dir(fetcher.stage.path):
+            fetcher.reset()
+
+        mock_hg.assert_called_once_with("clone", fetcher.stage.source_path, "scrubbed-source-tmp")
+        mock_rmtree.assert_called_once_with(fetcher.stage.source_path, ignore_errors=True)
+        mock_move.assert_called_once_with("scrubbed-source-tmp", fetcher.stage.source_path)
+
+    def test_str(self):
+        fetcher = fetch_strategy.HgFetchStrategy(hg="url")
+        assert str(fetcher) == "[hg] url"
