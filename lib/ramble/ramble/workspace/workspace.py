@@ -234,13 +234,6 @@ def root(name):
     return _root(name)
 
 
-def license_path(name):
-    """Get the path to the shared license include for a workspace by name."""
-    shared_license_path = os.path.join(workspace_shared_path, workspace_shared_license_path)
-    os.path.join(root(name), shared_license_path)
-    return _root(name)
-
-
 def exists(name):
     """Whether a workspace with this name exists or not."""
     if not valid_workspace_name(name):

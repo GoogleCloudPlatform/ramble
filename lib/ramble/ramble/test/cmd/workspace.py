@@ -108,18 +108,6 @@ def check_info_basic(output):
     assert "Software Stack" in output
 
 
-def check_info_zlib(output):
-    assert "zlib" in output
-    assert "ensure_installed" in output
-
-    assert "Application" in output
-    assert "Workload" in output
-    assert "Experiment" in output
-    assert "Software Stack" in output
-    assert "Template Package" in output
-    assert "Template Environment" in output
-
-
 def check_results(ws):
     fn = ws.dump_results(output_formats=["text", "json", "yaml"])
     assert os.path.exists(os.path.join(ws.root, fn + ".txt"))
@@ -206,6 +194,44 @@ def test_workspace_activate_non_existent():
 def test_workspace_activate_no_args():
     output = workspace("activate", fail_on_error=False)
     assert "ramble workspace activate requires a workspace name, directory, or --temp" in output
+
+
+def test_workspace_deactivate(workspace_name):
+    """Test `ramble workspace deactivate`."""
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    # Test deactivation of a workspace
+    ramble.workspace.activate(ws)
+    output = workspace("deactivate", "--sh")
+    assert "unset RAMBLE_WORKSPACE;" in output
+    ramble.workspace.deactivate()
+
+    # Test deactivation restores prompt
+    ramble.workspace.activate(ws)
+    os.environ["RAMBLE_OLD_PS1"] = "old_prompt"
+    output = workspace("deactivate", "--sh")
+    assert 'PS1="$RAMBLE_OLD_PS1";' in output
+    assert "unset RAMBLE_OLD_PS1;" in output
+    del os.environ["RAMBLE_OLD_PS1"]
+    ramble.workspace.deactivate()
+
+    # Test deactivation fails when no workspace is active
+    if ramble.workspace.ramble_workspace_var in os.environ:
+        del os.environ[ramble.workspace.ramble_workspace_var]
+    output = workspace("deactivate", "--sh", fail_on_error=False)
+    assert "No workspace is currently active." in output
+
+    # Test deactivation fails without shell args
+    output = workspace("deactivate", fail_on_error=False)
+    assert "To set up shell support" in output
+
+    # Test deactivation fails with ambiguous flags
+    ramble.workspace.activate(ws)
+    output = workspace(
+        "deactivate", "--sh", global_args=["-w", workspace_name], fail_on_error=False
+    )
+    assert "is ambiguous" in output
 
 
 def test_workspace_list(mutable_mock_workspace_path):
