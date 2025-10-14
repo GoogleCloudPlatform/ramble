@@ -23,6 +23,8 @@ class DisabledModifier(ModifierBase):
 
     name = "disabled"
 
+    modifier_conflict(None)
+
     def __init__(self, instance_to_disable):
         super().__init__(instance_to_disable._file_path)
 
