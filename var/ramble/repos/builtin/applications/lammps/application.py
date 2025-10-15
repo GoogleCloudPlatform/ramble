@@ -775,6 +775,14 @@ class Lammps(ExecutableApplication):
         fom_type=FomType.THROUGHPUT,
     )
 
+    figure_of_merit(
+        "Number of Atoms",
+        fom_regex=r"Loop.*with (?P<atoms>[0-9]+) atoms",
+        group_name="atoms",
+        units="",
+        fom_type=FomType.INFO,
+    )
+
     for func_name in ["Pair", "Neigh", "Comm", "Output", "Modifier"]:
         func_time_regex = (
             func_name
