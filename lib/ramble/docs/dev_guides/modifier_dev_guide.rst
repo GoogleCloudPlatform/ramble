@@ -233,3 +233,26 @@ Ramble modifiers support variants, just as applications do (see
 Variants can be used to control the behavior of many of the
 directives within a modifier, and their use follows the discussion
 in :ref:`application-dev-conditional-logic`.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Multi-modifier Conflicts
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble supports repeating modifier definitions within the ``modifiers``
+configuration section. This can be useful (when applying varying modes of the
+same modifier) but can also present a challenge to modifier developers.
+Modifiers are not inherently able to be replicated multiple times on the same
+experiment without providing some unexpected behaviors.
+
+In the modifier language, Ramble allows modifiers to define how they should
+conflict with other modifier definitions when aspects of their definitions
+overlap.
+
+The ``modifier_conflict`` language feature can be used to control what Ramble's
+behavior should be when repeated definitions of the same modifier exist. An
+enum is provided in ``ramble.util.conflicts`` named ``MODIFIER_CONFLICT`` to
+understand what options exist.
+
+This language feature supports the ``when`` and variant logic that was
+previously described, which can allow the conflict behavior to change based on
+variant settings.
