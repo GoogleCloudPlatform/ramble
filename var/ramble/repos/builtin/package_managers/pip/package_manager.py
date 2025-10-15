@@ -40,6 +40,12 @@ class Pip(PackageManagerBase):
     archive_pattern(os.path.join("{env_path}", "requirements.txt"))
     archive_pattern(os.path.join("{env_path}", "requirements.lock"))
 
+    package_manager_variable(
+        "pip_site_packages_path",
+        default="",
+        description="Path to site-packages directory for pip venv. Set during workspace setup.",
+    )
+
     def __init__(self, file_path):
         super().__init__(file_path)
 
@@ -185,6 +191,21 @@ class Pip(PackageManagerBase):
         env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
+
+        # Detect site-packages path from env.
+
+        lib_path = os.path.join(
+            app_inst.expander.expand_var_name("env_path"), ".venv", "lib64"
+        )
+
+        if os.path.exists(lib_path):
+            for root, dirs, _ in os.walk(lib_path):
+                for dir in dirs:
+                    if dir.endswith("site-packages"):
+                        app_inst.define_variable(
+                            "pip_site_packages_path", os.path.join(root, dir)
+                        )
+                        break
 
         if self.environment_required:
             self.runner.set_dry_run(workspace.dry_run)
