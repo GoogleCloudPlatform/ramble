@@ -30,6 +30,7 @@ attributes = RambleCommand("attributes")
         ["--tags", "--modifiers", "-a"],
         ["--tags", "--modifiers", "-a", "--by-attribute"],
         ["--tags", "--modifiers", "-a"],
+        ["--tags", "--by-attribute", "test-app"],
     ],
 )
 def test_attributes_runs(flags):
