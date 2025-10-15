@@ -418,10 +418,10 @@ def modifier_conflict(
                 else:
                     conflict_value = MODIFIER_CONFLICT[conflict_type]
             elif isinstance(conflict_type, int):
-                if conflict_type not in MODIFIER_CONFLICT._value2member_map_:
+                try:
+                    conflict_value = MODIFIER_CONFLICT(conflict_type)
+                except ValueError:
                     usage_error = True
-                else:
-                    conflict_value = MODIFIER_CONFLICT._value2member_map_[conflict_type]
             elif isinstance(conflict_type, MODIFIER_CONFLICT):
                 conflict_value = conflict_type
             else:
