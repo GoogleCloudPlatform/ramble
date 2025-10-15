@@ -22,6 +22,8 @@ class TestMod(BasicModifier):
     mode("test", description="This is a test mode")
     default_mode("test")
 
+    modifier_conflict(MODIFIER_CONFLICT.name_mode_executables)
+
     mode(
         "app-scope", description="This is a test mode at the application scope"
     )
