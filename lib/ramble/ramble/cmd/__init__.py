@@ -7,14 +7,9 @@
 # except according to those terms.
 
 
-import argparse
 import os
 import re
 
-import ruamel.yaml as yaml
-from ruamel.yaml.error import MarkedYAMLError
-
-from llnl.util.filesystem import join_path
 from llnl.util.lang import attr_setdefault
 
 import ramble.error
@@ -144,43 +139,6 @@ def get_command(cmd_name):
     return getattr(get_module(cmd_name), pname)
 
 
-def elide_list(line_list, max_num=10):
-    """Takes a long list and limits it to a smaller number of elements,
-    replacing intervening elements with '...'.  For example::
-
-        elide_list([1,2,3,4,5,6], 4)
-
-    gives::
-
-        [1, 2, 3, '...', 6]
-    """
-    if len(line_list) > max_num:
-        return line_list[: max_num - 1] + ["..."] + line_list[-1:]
-    else:
-        return line_list
-
-
-def ramble_is_git_repo():
-    """Ensure that this instance of Ramble is a git clone."""
-    return is_git_repo(ramble.paths.prefix)
-
-
-def is_git_repo(path):
-    dotgit_path = join_path(path, ".git")
-    if os.path.isdir(dotgit_path):
-        # we are in a regular git repo
-        return True
-    if os.path.isfile(dotgit_path):
-        # we might be in a git worktree
-        try:
-            with open(dotgit_path, "rb") as f:
-                dotgit_content = yaml.load(f)
-            return os.path.isdir(dotgit_content.get("gitdir", dotgit_path))
-        except MarkedYAMLError:
-            pass
-    return False
-
-
 class PythonNameError(ramble.error.RambleError):
     """Exception class thrown for impermissible python names"""
 
@@ -195,18 +153,6 @@ class CommandNameError(ramble.error.RambleError):
     def __init__(self, name):
         self.name = name
         super().__init__(f"{name} is not a permissible Ramble command name.")
-
-
-########################################
-# argparse types for argument validation
-########################################
-def extant_file(f):
-    """
-    Argparse type for files that exist.
-    """
-    if not os.path.isfile(f):
-        raise argparse.ArgumentTypeError("%s does not exist" % f)
-    return f
 
 
 def require_active_workspace(cmd_name):
