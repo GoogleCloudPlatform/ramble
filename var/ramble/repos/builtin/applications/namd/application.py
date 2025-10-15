@@ -131,25 +131,13 @@ class Namd(ExecutableApplication):
         ("decalanin", ["alanin.namd"]),
         ("tcl-forces", ["tclforces.namd"]),
     ]
+    all_benchmark_workloads = [wl[0] for wl in benchmark_workloads]
+
     for wl_def in benchmark_workloads:
         workload(
             wl_def[0],
             executables=["copy_inputs", "execute"],
             inputs=[wl_def[0]],
-        )
-
-        workload_variable(
-            "namd_flags",
-            default="+ppn {processes_per_node} +setcpuaffinity",
-            description="Flags for running NAMD",
-            workloads=[wl_def[0]],
-        )
-
-        workload_variable(
-            "input_path",
-            default=Expander.expansion_str(wl_def[0]),
-            description=f"Path to the {wl_def[0]} inputs",
-            workloads=[wl_def[0]],
         )
 
         workload_variable(
@@ -159,6 +147,31 @@ class Namd(ExecutableApplication):
             description="Input file for namd",
             workloads=[wl_def[0]],
         )
+
+    workload_group("all_benchmarks", workloads=all_benchmark_workloads)
+
+    workload_variable(
+        "namd_flags",
+        default="+ppn {processes_per_node} +setcpuaffinity",
+        description="Flags for running NAMD",
+        workload_group="all_benchmarks",
+    )
+
+    workload_variable(
+        "input_path",
+        description="Path to the workload inputs",
+        workload_defaults={
+            "stmv": "{stmv}",
+            "ApoA1": "{ApoA1}",
+            "ATPase": "{ATPase}",
+            "20STMV": "{20STMV}",
+            "tiny": "{tiny}",
+            "interactive_BPTI": "{interactive_BPTI}",
+            "ER-GRE": "{ER-GRE}",
+            "decalanin": "{decalanin}",
+            "tcl-forces": "{tcl-forces}",
+        },
+    )
 
     log_file_str = Expander.expansion_str(keywords.log_file)
 
