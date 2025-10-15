@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import re
 
 import pytest
 
@@ -37,7 +38,15 @@ ramble:
       workloads:
         import:
           experiments:
-            test_import: {}
+            test_import:
+              internals:
+                custom_executables:
+                  echo_test:
+                    template:
+                    - 'echo "purelib_path: {pip_purelib_path}"'
+                    - 'echo "platlib_path: {pip_platlib_path}"'
+                executable_injection:
+                - name: echo_test
   software:
     packages:
       requests:
@@ -74,3 +83,22 @@ ramble:
         assert "Executing phase software_install" in content
         assert "pip/pip-test/requirements.txt" in content
         assert "freeze" in content
+
+    # Check for the site-packages path definitions
+    execute_script = os.path.join(
+        ws.experiment_dir,
+        "pip-test",
+        "import",
+        "test_import",
+        "execute_experiment",
+    )
+    with open(execute_script) as f:
+        content = f.read()
+        assert (
+            re.search(r'echo "purelib_path:.*site-packages"', content)
+            is not None
+        )
+        assert (
+            re.search(r'echo "platlib_path:.*site-packages"', content)
+            is not None
+        )
