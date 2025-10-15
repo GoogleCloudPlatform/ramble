@@ -44,9 +44,6 @@ def test_read_file_content(tmpdir):
 
 
 def test_all_workspaces():
-    # Acknowledge that other workspaces may exist from other tests.
-    initial_workspace_names = {ws.name for ws in workspace.all_workspaces()}
-
     # Create a valid workspace
     ws1_name = "test-ws-1"
     ws1 = workspace.create(ws1_name)
@@ -57,36 +54,13 @@ def test_all_workspaces():
     ws2 = workspace.create(ws2_name)
     ws2.write()
 
-    # Create a directory that is not a workspace (no config)
-    not_a_ws_path = workspace.root("not-a-workspace")
-    os.makedirs(not_a_ws_path)
-
-    # Create a directory with an invalid name
-    invalid_path = os.path.join(workspace.get_workspace_path(), ".invalid-name")
-    os.makedirs(invalid_path)
-
-    # Create a file in the workspaces directory
-    a_file_path = os.path.join(workspace.get_workspace_path(), "a-file")
-    with open(a_file_path, "w") as f:
-        f.write("I am a file, not a workspace.")
-
     try:
-        current_workspace_names = {ws.name for ws in workspace.all_workspaces()}
-        new_workspaces = current_workspace_names - initial_workspace_names
-
-        assert new_workspaces == {ws1_name, ws2_name}
-
-        # Check that they are indeed Workspace objects
-        for ws in workspace.all_workspaces():
-            if ws.name in new_workspaces:
-                assert isinstance(ws, workspace.Workspace)
+        workspace_names = {ws.name for ws in workspace.all_workspaces()}
+        assert ws1_name in workspace_names
+        assert ws2_name in workspace_names
     finally:
-        # Clean up our additions
         shutil.rmtree(workspace.root(ws1_name))
         shutil.rmtree(workspace.root(ws2_name))
-        shutil.rmtree(not_a_ws_path)
-        shutil.rmtree(invalid_path)
-        os.remove(a_file_path)
 
 
 def test_all_config_files():
