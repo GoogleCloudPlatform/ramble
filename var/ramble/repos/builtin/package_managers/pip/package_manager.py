@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ast
 import os
 import re
 import shutil
@@ -14,10 +15,6 @@ import urllib.parse
 
 import llnl.util.filesystem as fs
 
-import ramble.config
-import ramble.fetch_strategy
-import ramble.software_info
-import ramble.stage
 from ramble.error import ApplicationError
 from ramble.pkgmankit import *
 from ramble.util.executable import which
@@ -26,6 +23,11 @@ from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
 
 from spack.util.executable import Executable
+
+# The collection of attributes pulled from Python sysconfig.get_paths()
+# This is used to expose the two site_packages paths of a given Python
+# installation.
+_SYSCONFIG_PATH_ATTRIBUTES = ("purelib", "platlib")
 
 
 class Pip(PackageManagerBase):
@@ -40,11 +42,12 @@ class Pip(PackageManagerBase):
     archive_pattern(os.path.join("{env_path}", "requirements.txt"))
     archive_pattern(os.path.join("{env_path}", "requirements.lock"))
 
-    package_manager_variable(
-        "pip_site_packages_path",
-        default="",
-        description="Path to site-packages directory for pip venv. Set during workspace setup.",
-    )
+    for attr_name in _SYSCONFIG_PATH_ATTRIBUTES:
+        package_manager_variable(
+            f"pip_{attr_name}_path",
+            default="",
+            description=f"Path to {attr_name} site-packages directory for pip venv. Set during workspace setup.",
+        )
 
     def __init__(self, file_path):
         super().__init__(file_path)
@@ -192,20 +195,7 @@ class Pip(PackageManagerBase):
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
 
-        # Detect site-packages path from env.
-
-        lib_path = os.path.join(
-            app_inst.expander.expand_var_name("env_path"), ".venv", "lib64"
-        )
-
-        if os.path.exists(lib_path):
-            for root, dirs, _ in os.walk(lib_path):
-                for dir in dirs:
-                    if dir.endswith("site-packages"):
-                        app_inst.define_variable(
-                            "pip_site_packages_path", os.path.join(root, dir)
-                        )
-                        break
+        self.runner.define_site_package_paths(app_inst)
 
         if self.environment_required:
             self.runner.set_dry_run(workspace.dry_run)
@@ -563,6 +553,20 @@ class PipRunner(CommandRunner):
                     f"Variable {pkg}_path defined. "
                     + "Skipping extraction from pip"
                 )
+
+    def define_site_package_paths(self, app_inst):
+        """Define site_package paths into variables"""
+        self._check_env_configured()
+        logger.debug("Resolving site package paths")
+        exe = self._get_venv_python()
+        paths_info_raw = exe(
+            "-c", "import sysconfig; print(sysconfig.get_paths())", output=str
+        )
+        paths_info = ast.literal_eval(paths_info_raw)
+        for attr_name in _SYSCONFIG_PATH_ATTRIBUTES:
+            attr_value = paths_info.get(attr_name)
+            if attr_value is not None:
+                app_inst.define_variable(f"pip_{attr_name}_path", attr_value)
 
     def add_spec(self, spec):
         """Add a package spec to the pip environment"""
