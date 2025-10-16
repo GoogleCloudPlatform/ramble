@@ -25,6 +25,7 @@ config:
   report_dirs: ~/.ramble/reports
   include_phase_dependencies: false
   resolve_variables_in_subprocesses: false
+  stage_method: cp
   spack:
     install:
       flags: --reuse
