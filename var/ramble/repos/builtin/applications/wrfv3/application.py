@@ -79,16 +79,11 @@ class Wrfv3(ExecutableApplication):
 
     workload_variable(
         "input_path",
-        default="{CONUS_12km}",
-        description="Path for CONUS 12km inputs.",
-        workloads=["CONUS_12km"],
-    )
-
-    workload_variable(
-        "input_path",
-        default="{CONUS_2p5km}",
-        description="Path for CONUS 2.5km inputs.",
-        workloads=["CONUS_2p5km"],
+        description="Path for workload inputs.",
+        workload_defaults={
+            "CONUS_12km": "{CONUS_12km}",
+            "CONUS_2p5km": "{CONUS_2p5km}",
+        },
     )
 
     log_str = os.path.join(
