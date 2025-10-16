@@ -223,12 +223,13 @@ def input_file(
 @application_directive("workload_group_vars")
 def workload_variable(
     name,
-    default,
-    description,
+    default=None,
+    description="",
     values=None,
     workload=None,
     workloads=None,
     workload_group=None,
+    workload_defaults=None,
     expandable: bool = True,
     track_used: bool = True,
     when=None,
@@ -249,7 +250,10 @@ def workload_variable(
         values (list): Optional list of suggested values for this variable
         workload (str): Single workload this variable is used in
         workloads (list): List of modes this variable is used in
-        workload_group (str): Name of workload group this variable is used in
+        workload_group (str): Name of workload group this variable is used in.
+        workload_defaults (dict): Dictionary mapping workload names to default values.
+                                  Mututally exclusive with workload, workloads, workload_group,
+                                  and default.
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
@@ -267,6 +271,31 @@ def workload_variable(
             when, app, name, "workload_variable"
         )
 
+        # If a workload map is passed, handle that.
+        if workload_defaults:
+            if any([workload, workloads, workload_group, default]):
+                raise DirectiveError(
+                    "workload_defaults cannot be used with workload, workloads, "
+                    "workload_group, or default"
+                )
+
+            for wl_name, wl_default in workload_defaults.items():
+                workload_var = ramble.definitions.variables.Variable(
+                    name,
+                    default=wl_default,
+                    description=description or f"Default for {name} for {wl_name}",
+                    values=values,
+                    expandable=expandable,
+                    when=when_list,
+                    **kwargs,
+                )
+                for when_set, app_workloads in app.workloads.items():
+                    if wl_name in app_workloads:
+                        app.workloads[when_set][wl_name].add_variable(workload_var.copy())
+            return
+
+        # Handle the remainder of the workload_variable directive, if
+        # workload_defaults was not passed
         workload_var = ramble.definitions.variables.Variable(
             name,
             default=default,

@@ -16,8 +16,13 @@ from ramble.util.logger import logger
 SUB_INDENT = 2
 
 
-def _get_spec(pkg_info: dict, spec_name: str, prefix: str, default=None) -> str:
-    return pkg_info.get(f"{prefix}_{spec_name}", pkg_info.get(spec_name, default))
+def _get_spec(
+    pkg_info: dict, spec_name: str, prefix: str, allow_unprefixed=True, default=None
+) -> str:
+    if allow_unprefixed:
+        return pkg_info.get(f"{prefix}_{spec_name}", pkg_info.get(spec_name, default))
+    else:
+        return pkg_info.get(f"{prefix}_{spec_name}", default)
 
 
 def _is_dict_empty(rendered: defaultdict):
@@ -306,14 +311,18 @@ class TemplatePackage(SoftwarePackage):
         pm_name = package_manager.name
         pkg_info = self.pkg_info
         pm_prefix = package_manager.spec_prefix
+        pm_allow_unprefixed = package_manager.allow_unprefixed_specs
 
-        raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix)
-        raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix)
-        raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix)
+        raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix, pm_allow_unprefixed)
+        raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix, pm_allow_unprefixed)
+        raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix, pm_allow_unprefixed)
 
         spec = expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec else None
         if not spec:
-            raise RambleSoftwareEnvironmentError(f"Package {name} is missing a valid spec")
+            if pm_allow_unprefixed:
+                raise RambleSoftwareEnvironmentError(f"Package {name} is missing a valid spec")
+            else:
+                return None
 
         compiler = (
             expander.expand_var(raw_compiler, merge_used_stage=False) if raw_compiler else None
@@ -622,20 +631,21 @@ class TemplateEnvironment(SoftwareEnvironment):
                 )
             expander.flush_used_variable_stage()
             rendered_pkg = matching_template.render_package(expander, package_manager)
-            if rendered_pkg.spec is not None:
-                expander.merge_used_variable_stage()
-                if rendered_pkg.name in all_packages[pm_name]:
-                    if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
-                        raise RambleSoftwareEnvironmentError(
-                            f"Environment {name} defined multiple "
-                            "times in inconsistent ways.\n"
-                            f"Package with differences is {rendered_pkg.name}"
-                        )
-                    rendered_pkg = all_packages[pm_name][rendered_pkg.name]
-                else:
-                    all_packages[pm_name][rendered_pkg.name] = rendered_pkg
-            matching_template.add_rendered_package(rendered_pkg, all_packages, pm_name)
-            new_env.add_package(rendered_pkg)
+            if rendered_pkg is not None:
+                if rendered_pkg.spec is not None:
+                    expander.merge_used_variable_stage()
+                    if rendered_pkg.name in all_packages[pm_name]:
+                        if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
+                            raise RambleSoftwareEnvironmentError(
+                                f"Environment {name} defined multiple "
+                                "times in inconsistent ways.\n"
+                                f"Package with differences is {rendered_pkg.name}"
+                            )
+                        rendered_pkg = all_packages[pm_name][rendered_pkg.name]
+                    else:
+                        all_packages[pm_name][rendered_pkg.name] = rendered_pkg
+                matching_template.add_rendered_package(rendered_pkg, all_packages, pm_name)
+                new_env.add_package(rendered_pkg)
 
         return new_env
 

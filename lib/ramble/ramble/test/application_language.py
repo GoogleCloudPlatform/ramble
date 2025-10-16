@@ -12,6 +12,7 @@ import pytest
 
 from ramble import language
 from ramble.appkit import *  # noqa
+from ramble.language.language_base import DirectiveError
 
 app_types = [
     ApplicationBase,  # noqa: F405
@@ -355,3 +356,37 @@ def test_license_name_directive(app_class):
     app_inst.license_name(new_license_name)
 
     assert new_license_name in app_inst.license_names
+
+
+def test_workload_variable_workload_defaults_works():
+    class BrokenWorkloadDefaults(ExecutableApplication):  # noqa: F405
+        name = "broken-workload-defaults"
+
+    broken_app = BrokenWorkloadDefaults("/not/a/path")
+    broken_app.executable("test", "echo '{test_var}'")
+    broken_app.workload("test", executables=["test"])
+    broken_app.workload_variable(
+        "test_var", description="Test var", workload_defaults={"test": "test_value"}
+    )
+
+    workload = broken_app.workloads[frozenset()]["test"]
+    workload_var = workload.find_variable("test_var")
+
+    assert workload_var
+
+
+def test_workload_variable_workload_defaults_error():
+    class BrokenWorkloadDefaults(ExecutableApplication):  # noqa: F405
+        name = "broken-workload-defaults"
+
+    broken_app = BrokenWorkloadDefaults("/not/a/path")
+    broken_app.executable("test", "echo '{test_var}'")
+    broken_app.workload("test", executables=["test"])
+    with pytest.raises(DirectiveError) as err:
+        broken_app.workload_variable(
+            "test_var",
+            description="Test var",
+            workload_defaults={"test": "test_value"},
+            workloads=["test"],
+        )
+        assert "workload_defaults cannot be used with workload, workloads" in err

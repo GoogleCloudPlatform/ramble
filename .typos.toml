@@ -19,6 +19,7 @@ extend-ignore-re = [
 "reord" = "reord"
 "PN" = "PN" # fixing tPN in IOR
 "repositor" = "repositor" # Fixing partial name without singular / plural suffix
+"cachable" = "cachable"
 
 [default.extend-identifiers]
 "ATPase" = "ATPase"

@@ -208,6 +208,9 @@ class SpackStack(ExecutableApplication):
     def evaluate_success(self):
         import spack.util.spack_yaml as syaml
 
+        if not self.expander.satisfies("package_manager_family=spack"):
+            return True
+
         spack_file = self.expander.expand_var("{env_path}/spack.yaml")
         spec_list = []
 

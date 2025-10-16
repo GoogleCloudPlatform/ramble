@@ -290,7 +290,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for when_set, workloads in self.workloads.items():
             if workload_name in workloads:
                 workload_found = True
-                if self.expander.satisfies(when_set, self.object_variants):
+                if self.expander.satisfies(
+                    when_set, self.experiment_variants()
+                ):
                     if workload:
                         logger.die(
                             f"Workload {workload_name} is defined with "
@@ -363,7 +365,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         all_workloads_names = set()
         found = False
         for when_set, workloads in self.workloads.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+            if self.expander.satisfies(
+                when_set, self.experiment_variants(allow_caching=False)
+            ):
                 for workload_name, workload in workloads.items():
                     if workload_name in all_workloads_names:
                         logger.die(
@@ -378,12 +382,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if not found:
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
-                f"  {self.object_variants.as_set()}"
+                f"  {self.experiment_variants(allow_caching=False).as_set()}"
             )
 
     def _set_package_manager(self):
         pkgman_name = conversions.canonical_none(
-            self.object_variants.value(namespace.package_manager)
+            self.experiment_variants(allow_caching=False).value(
+                namespace.package_manager
+            )
         )
 
         if pkgman_name is not None:
@@ -403,7 +409,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self.package_manager is not None:
             for pkgname, config in self.required_packages.items():
                 if self.expander.satisfies(
-                    config["when"], variant_set=self.object_variants
+                    config["when"],
+                    variant_set=self.experiment_variants(allow_caching=False),
                 ):
                     self.keywords.update_keys(
                         {
@@ -416,7 +423,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_workflow_manager(self):
         workflow_name = conversions.canonical_none(
-            self.object_variants.value(namespace.workflow_manager)
+            self.experiment_variants(allow_caching=False).value(
+                namespace.workflow_manager
+            )
         )
 
         # Map None to the default of user-managed
@@ -592,16 +601,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._set_package_manager()
         self._set_workflow_manager()
 
-        for _, obj in self._objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            obj_variants = getattr(obj, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_default_variants(
-                    getattr(obj, "object_variants")
-                )
-                self.object_variants.merge_multi_value_variants(obj_variants)
-
         base_chain = self.__class__.__mro__
         for cls in base_chain:
             if hasattr(cls, "name") and getattr(cls, "name") is not None:
@@ -621,7 +620,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
-                if self.expander.satisfies(var_when_set, self.object_variants):
+                if self.expander.satisfies(
+                    var_when_set, self.experiment_variants(allow_caching=False)
+                ):
                     for var in var_list:
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
@@ -722,7 +723,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         for i, phase in enumerate(ordered_phases):
             if self.expander.satisfies(
-                phase.when, variant_set=self.object_variants
+                phase.when, variant_set=self.experiment_variants()
             ) and any(fnmatch.fnmatch(phase.key, pf) for pf in phase_filters):
                 selected_phases.add(phase)
                 last_match_idx = i
@@ -769,11 +770,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             (set): All variable names used by this experiment.
         """
         self.build_modifier_instances()
-        self.add_expand_vars(workspace)
+        self.define_variables_for_template_path(workspace)
 
         backup_variables = self.variables.copy()
 
-        self._define_commands(self._executable_graph, self.success_list)
+        self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
 
         ########################
@@ -881,7 +882,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     # Phase execution helpers
     def run_phase(self, pipeline, phase, workspace):
         """Run a phase, by getting its function pointer"""
-        self.add_expand_vars(workspace)
         if self.is_template:
             logger.debug(f"{self.name} is a template. Skipping phases")
             return
@@ -1077,7 +1077,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             ]
 
                     # Expand the chained experiment vars, so we can build the execution command
-                    new_inst.add_expand_vars(workspace)
+                    new_inst.define_variables_for_template_path(workspace)
                     chain_cmd = new_inst.expander.expand_var(
                         cur_exp_def[namespace.command]
                     )
@@ -1192,11 +1192,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
-            # Set standard variants for all modifiers
-            obj_variants = getattr(mod_inst, "object_variants", None)
-            if obj_variants is not None:
-                self.object_variants.merge_multi_value_variants(obj_variants)
-
             # Define any missing modifier variables
             for var, val in mod_inst.selected_variables.items():
                 if var not in self.variables:
@@ -1219,7 +1214,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self._objects():
             for when_set, validator_defs in obj.validators.items():
                 if not self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -1288,7 +1283,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for when_set, executables in all_executables.items():
             full_executables.update(executables)
             if self.expander.satisfies(
-                when_set, variant_set=self.object_variants
+                when_set, variant_set=self.experiment_variants()
             ):
                 for executable in executables:
                     if executable in filtered_executables:
@@ -1328,7 +1323,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
 
     def _get_executable_graph(self, workload_name):
-        """Return executables for add_expand_vars"""
+        """Construct and return an executable graph
+
+        Builds an executable graph for a given workload.
+
+        Returns:
+            ExecutableGraph: Graph of executables for workload
+        """
         self._define_custom_executables()
         exec_order = self.get_workload(workload_name).executables
         # Use yaml defined executable order, if defined
@@ -1340,7 +1341,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self._objects():
             for when_set, builtins in obj.builtins.items():
                 if self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     builtin_objects.append(obj)
                     all_builtins.append(builtins)
@@ -1390,7 +1391,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         return executable_graph
 
     def _set_input_path(self):
-        """Put input_path into self.variables[input_file] for add_expand_vars"""
+        """Define input file path variables
+
+        Define variables for each input file, of the format:
+            '{input_file_name}' = <path_to_input>
+        """
         self._inputs_and_fetchers(self.expander.workload_name)
 
         for input_file, input_conf in self._input_fetchers.items():
@@ -1423,12 +1428,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         workloads = self.get_workloads()
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
-                if self.expander.satisfies(var_when_set, self.object_variants):
+                if self.expander.satisfies(
+                    var_when_set, self.experiment_variants()
+                ):
                     for var in var_list:
                         wl_vars[var.name] = var
 
         for when_key, var_list in self.object_variables.items():
-            if self.expander.satisfies(when_key, self.object_variants):
+            if self.expander.satisfies(when_key, self.experiment_variants()):
                 for var in var_list:
                     wl_vars[var.name] = var
 
@@ -1453,7 +1460,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 when_set,
                 env_var_list,
             ) in workload.environment_variables.items():
-                if self.expander.satisfies(when_set, self.object_variants):
+                if self.expander.satisfies(
+                    when_set, self.experiment_variants()
+                ):
                     for env_var in env_var_list:
                         selected_env_vars[env_var.name] = env_var
 
@@ -1461,7 +1470,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             when_set,
             env_var_list,
         ) in self.object_environment_variables.items():
-            if self.expander.satisfies(when_set, self.object_variants):
+            if self.expander.satisfies(when_set, self.experiment_variants()):
                 for env_var in env_var_list:
                     selected_env_vars[env_var.name] = env_var
 
@@ -1494,7 +1503,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return obj_env_var_sets
 
-    def _define_commands(self, exec_graph, success_list=None):
+    def _define_commands(self, exec_graph=None, success_list=None):
         """Populate the internal list of commands based on executables
 
         Populates self._command_list with a list of the executable commands that
@@ -1502,6 +1511,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """
         if len(self._command_list) > 0:
             return
+
+        exec_graph = getattr(self, "_executable_graph", exec_graph)
+        if exec_graph is None:
+            self._executable_graph = self._get_executable_graph(
+                self.expander.workload_name
+            )
+            exec_graph = self._executable_graph
 
         # Do not replace escaped braces here, to allow them to
         # be replace properly when templates are written.
@@ -1681,7 +1697,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for formatted_exec_group in formatted_exec_groups:
             for when_set, formatted_exec_defs in formatted_exec_group.items():
                 if not self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -1740,8 +1756,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
-    def _derive_variables_for_template_path(self, workspace):
-        """Define variables for template paths (for add_expand_vars)"""
+    def define_variables_for_template_path(self, workspace):
+        """Define variables for all workspace and object template paths"""
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var("{experiment_run_dir}"),
@@ -1749,23 +1765,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
             self.variables[template_name] = expand_path
 
-    def add_expand_vars(self, workspace):
-        """Add application specific expansion variables
-
-        Applications require several variables to be defined to function properly.
-        This method defines these variables, including:
-        - command: set to the commands needed to execute the experiment
-        - spack_setup: set to an empty string, so spack applications can override this
-        """
-        if not self._vars_are_expanded:
-            self._executable_graph = self._get_executable_graph(
-                self.expander.workload_name
-            )
-            self._set_input_path()
-
-            self._derive_variables_for_template_path(workspace)
-            self._define_object_template_vars(workspace)
-            self._vars_are_expanded = True
+        var_attr = {
+            "type": ramble.keywords.key_type.reserved,
+            "level": ramble.keywords.output_level.variable,
+        }
+        for obj, tpl_config in self._object_templates(workspace):
+            var_name = tpl_config["var_name"]
+            if var_name is not None:
+                if var_name in self.variables:
+                    old_var = f"_old_{var_name}"
+                    self.variables[old_var] = self.variables[var_name]
+                    self.keywords.update_keys({old_var: var_attr})
+                self.variables[var_name] = tpl_config["dest_path"]
+                self.keywords.update_keys({var_name: var_attr})
+            if hasattr(obj, "template_render_vars"):
+                render_vars = obj.template_render_vars
+                self.variables.update(render_vars)
+                for name in render_vars.keys():
+                    self.keywords.update_keys({name: var_attr})
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
@@ -1784,7 +1801,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             when_set
             for when_set in self.inputs.keys()
             if self.expander.satisfies(
-                when_set, variant_set=self.object_variants
+                when_set, variant_set=self.experiment_variants()
             )
         }
 
@@ -2016,7 +2033,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         exp_lock = self.experiment_lock
 
-        self._define_commands(self._executable_graph, self.success_list)
+        self._set_input_path()
+        self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
 
         with lk.WriteTransaction(exp_lock):
@@ -2917,7 +2935,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for success_scope, obj, success_list in success_lists:
             for criteria, conf in success_list.items():
                 if not self.expander.satisfies(
-                    conf["when"], variant_set=self.object_variants
+                    conf["when"], variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -2992,7 +3010,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 source_context_defs,
             ) in source.figure_of_merit_contexts.items():
                 if self.expander.satisfies(
-                    when_fs, variant_set=self.object_variants
+                    when_fs, variant_set=self.experiment_variants()
                 ):
                     for context, context_def in source_context_defs.items():
                         all_contexts[context] = context_def
@@ -3004,7 +3022,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # figures_of_merit[frozenset(when_list)][frozenset(context_list)][fom_name]
             for when_fs, source_contexts in source.figures_of_merit.items():
                 if not self.expander.satisfies(
-                    when_fs, variant_set=self.object_variants
+                    when_fs, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -3400,7 +3418,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for obj_type, obj in self._objects():
             for when_set, tpl in obj.templates.items():
                 if not self.expander.satisfies(
-                    when_set, variant_set=self.object_variants
+                    when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
@@ -3428,26 +3446,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f_out.write(rendered)
                 f_out.write("\n")
             os.chmod(out_path, perm)
-
-    def _define_object_template_vars(self, workspace):
-        var_attr = {
-            "type": ramble.keywords.key_type.reserved,
-            "level": ramble.keywords.output_level.variable,
-        }
-        for obj, tpl_config in self._object_templates(workspace):
-            var_name = tpl_config["var_name"]
-            if var_name is not None:
-                if var_name in self.variables:
-                    old_var = f"_old_{var_name}"
-                    self.variables[old_var] = self.variables[var_name]
-                    self.keywords.update_keys({old_var: var_attr})
-                self.variables[var_name] = tpl_config["dest_path"]
-                self.keywords.update_keys({var_name: var_attr})
-            if hasattr(obj, "template_render_vars"):
-                render_vars = obj.template_render_vars
-                self.variables.update(render_vars)
-                for name in render_vars.keys():
-                    self.keywords.update_keys({name: var_attr})
 
     def _objects(self, exclude_types=None):
         """Return a tuple for each object instance associated with the app_inst.

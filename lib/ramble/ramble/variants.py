@@ -78,11 +78,16 @@ class VariantSet:
                 dest_attr_set[name] = variant.copy()
 
         for name, var_list in self.multi_value_variants.items():
-            new_set.multi_value_variants[name] = []
+            new_set.multi_value_variants[name] = set()
             for variant in var_list:
-                new_set.multi_value_variants[name].append(variant.copy())
+                new_set.multi_value_variants[name].add(variant.copy())
 
         return new_set
+
+    def merge_variants(self, in_set):
+        self.merge_default_variants(in_set)
+        self.merge_experiment_variants(in_set)
+        self.merge_multi_value_variants(in_set)
 
     def merge_default_variants(self, in_set):
         """Merge another variant set's default variants into this variant set.
@@ -95,6 +100,18 @@ class VariantSet:
         for name, variant in in_set.default_variants.items():
             if name not in self.default_variants:
                 self.default_variants[name] = variant.copy()
+
+    def merge_experiment_variants(self, in_set):
+        """Merge another variant set's experiment variants into this variant set.
+
+        Args:
+            in_set: VariantSet to merge into self
+        """
+
+        self._set_cache = None
+        for name, variant in in_set.experiment_variants.items():
+            if name not in self.experiment_variants:
+                self.experiment_variants[name] = variant.copy()
 
     def merge_multi_value_variants(self, in_set):
         """Merge another variant set's multi value variants into this variant set.

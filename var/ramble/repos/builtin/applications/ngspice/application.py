@@ -22,12 +22,17 @@ class Ngspice(ExecutableApplication):
     tags("circuit-simulation", "mini-app")
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.3.0")
+
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.13.1",
+        )
 
         software_spec(
             "ngspice",
             pkg_spec="ngspice@44 build=bin",
-            compiler="gcc12",
+            compiler="gcc14",
         )
 
         required_package("ngspice")

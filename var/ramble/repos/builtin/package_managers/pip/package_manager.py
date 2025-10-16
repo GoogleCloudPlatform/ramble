@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ast
 import os
 import re
 import shutil
@@ -14,17 +15,19 @@ import urllib.parse
 
 import llnl.util.filesystem as fs
 
-import ramble.config
-import ramble.fetch_strategy
-import ramble.software_info
-import ramble.stage
 from ramble.error import ApplicationError
 from ramble.pkgmankit import *
+from ramble.util.executable import which
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
 
 from spack.util.executable import Executable
+
+# The collection of attributes pulled from Python sysconfig.get_paths()
+# This is used to expose the two site_packages paths of a given Python
+# installation.
+_SYSCONFIG_PATH_ATTRIBUTES = ("purelib", "platlib")
 
 
 class Pip(PackageManagerBase):
@@ -38,6 +41,13 @@ class Pip(PackageManagerBase):
 
     archive_pattern(os.path.join("{env_path}", "requirements.txt"))
     archive_pattern(os.path.join("{env_path}", "requirements.lock"))
+
+    for attr_name in _SYSCONFIG_PATH_ATTRIBUTES:
+        package_manager_variable(
+            f"pip_{attr_name}_path",
+            default="",
+            description=f"Path to {attr_name} site-packages directory for pip venv. Set during workspace setup.",
+        )
 
     def __init__(self, file_path):
         super().__init__(file_path)
@@ -124,7 +134,8 @@ class Pip(PackageManagerBase):
             workspace.add_to_cache(cache_tupl)
 
         env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
-        if self.environment_required:
+        logger.debug(f" Required environment: {self.environment_required}")
+        try:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)
             self.runner.install()
@@ -133,22 +144,27 @@ class Pip(PackageManagerBase):
             for pkg, conf in app_inst.required_packages.items():
                 if (
                     app_inst.expander.satisfies(
-                        conf["when"], variant_set=app_inst.object_variants
+                        conf["when"], variant_set=self.experiment_variants()
                     )
                     and pkg not in installed_pkgs
                 ):
                     logger.die(
                         f"Package {pkg} is not installed "
                         f"in environment {env_context}, but is "
-                        f"required by the {self.name} application "
-                        "definition"
+                        f"required by the {app_inst.name} application "
+                        "definition\n",
+                        f"{self.experiment_variants().as_set()}\n",
+                        f"{conf['when']}",
                     )
 
             for mod_inst in app_inst._modifier_instances:
                 for pkg, conf in mod_inst.required_packages.items():
                     if (
                         app_inst.expander.satisfies(
-                            conf["when"], variant_set=app_inst.object_variants
+                            conf["when"],
+                            variant_set=self.experiment_variants(
+                                include_modifier=mod_inst
+                            ),
                         )
                         and pkg not in installed_pkgs
                     ):
@@ -158,6 +174,10 @@ class Pip(PackageManagerBase):
                             f"required by the {mod_inst.name} modifier "
                             "definition"
                         )
+        except RunnerError as e:
+            if self.environment_required:
+                logger.die(e)
+            pass
 
     register_phase(
         "define_package_paths",
@@ -174,6 +194,8 @@ class Pip(PackageManagerBase):
         env_path = app_inst.expander.env_path
         if not env_path:
             raise ApplicationError("Ramble env_path is set to None")
+
+        self.runner.define_site_package_paths(app_inst)
 
         if self.environment_required:
             self.runner.set_dry_run(workspace.dry_run)
@@ -215,6 +237,7 @@ class Pip(PackageManagerBase):
                 "name": self.runner.env_path.replace(
                     workspace.root + os.path.sep, ""
                 ),
+                "package_manager": self.name,
                 "digest": self.runner.inventory_hash(),
             }
         )
@@ -337,6 +360,14 @@ class PipRunner(CommandRunner):
         # Ensure subsequent commands use the created env now.
         self.env_path = env_path
 
+    def reset_bs_python(self, exec=None, path=None):
+        if isinstance(exec, Executable):
+            self.bs_python = exec
+        elif isinstance(path, str):
+            self.bs_python = which("python", path=path)
+        else:
+            self.bs_python = which("python")
+
     def _get_venv_python(self):
         if self.dry_run:
             return self.bs_python.copy()
@@ -368,9 +399,6 @@ class PipRunner(CommandRunner):
             with open(lock_file, "w") as f:
                 f.write(out)
         self.installed = True
-
-    def get_bootstrap_python(self):
-        return self.bs_python
 
     def _get_activate_script_path(self):
         return os.path.join(self.env_path, self._venv_name, "bin", "activate")
@@ -525,6 +553,20 @@ class PipRunner(CommandRunner):
                     f"Variable {pkg}_path defined. "
                     + "Skipping extraction from pip"
                 )
+
+    def define_site_package_paths(self, app_inst):
+        """Define site_package paths into variables"""
+        self._check_env_configured()
+        logger.debug("Resolving site package paths")
+        exe = self._get_venv_python()
+        paths_info_raw = exe(
+            "-c", "import sysconfig; print(sysconfig.get_paths())", output=str
+        )
+        paths_info = ast.literal_eval(paths_info_raw)
+        for attr_name in _SYSCONFIG_PATH_ATTRIBUTES:
+            attr_value = paths_info.get(attr_name)
+            if attr_value is not None:
+                app_inst.define_variable(f"pip_{attr_name}_path", attr_value)
 
     def add_spec(self, spec):
         """Add a package spec to the pip environment"""

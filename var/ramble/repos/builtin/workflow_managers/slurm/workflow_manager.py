@@ -190,7 +190,7 @@ class Slurm(WorkflowManagerBase):
         ]
         if expander.satisfies(
             "+slurm_include_default_sbatch_headers",
-            variant_set=app_inst.object_variants,
+            variant_set=app_inst.experiment_variants(),
         ):
             pragmas.extend(
                 [

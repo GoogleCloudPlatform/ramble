@@ -429,7 +429,7 @@ def test_set_variables_and_variants(mutable_mock_apps_repo):
 
     assert executable_application_instance.variables["n_ranks"] == "1"
 
-    variant_set = executable_application_instance.object_variants.as_set()
+    variant_set = executable_application_instance.experiment_variants().as_set()
     assert "workflow_manager=slurm" in variant_set
     assert "package_manager=spack" not in variant_set
 
@@ -463,7 +463,7 @@ def test_define_commands(mutable_mock_apps_repo):
     assert "mpirun" in executable_application_instance.variables["command"]
 
 
-def test_derive_variables_for_template_path(mutable_mock_apps_repo, workspace_name):
+def test_define_variables_for_template_path(mutable_mock_apps_repo, workspace_name):
     """_set_default_variables_for_template_path"""
     test_config = """
 ramble:
@@ -524,7 +524,7 @@ ramble:
     executable_application_instance._define_formatted_executables()
 
     test_answer = "/workspace/experiments/bar/test_wl2/baz/execute_experiment"
-    executable_application_instance._derive_variables_for_template_path(ws1)
+    executable_application_instance.define_variables_for_template_path(ws1)
     assert executable_application_instance.variables["execute_experiment"] == test_answer
 
 

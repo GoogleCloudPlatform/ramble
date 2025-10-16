@@ -291,27 +291,23 @@ class Gromacs(ExecutableApplication):
     )
     workload_variable(
         "input_path",
-        default="{water_gmx50_bare}/{size}",
-        description="Input path for water GMX50",
-        workload="water_gmx50",
-    )
-    workload_variable(
-        "input_path",
-        default="{water_bare_hbonds}/{size}",
-        description="Input path for water bare hbonds",
-        workload="water_bare",
-    )
-    workload_variable(
-        "input_path",
-        default="{lignocellulose}/lignocellulose-rf.tpr",
-        description="Input path for lignocellulose",
-        workload="lignocellulose",
-    )
-    workload_variable(
-        "input_path",
-        default="{water_33m}/box_with_33M_waters_default.tpr",
-        description="Input path for water_33m",
-        workload="water_33m",
+        description="Input path for workload",
+        workload_defaults={
+            "water_gmx50": "{water_gmx50_bare}/{size}",
+            "water_bare": "{water_bare_hbonds}/{size}",
+            "lignocellulose": "{lignocellulose}/lignocellulose-rf.tpr",
+            "water_33m": "{water_33m}/box_with_33M_waters_default.tpr",
+            "hecbiosim": "{HECBioSim}/HECBioSim/{type}/benchmark.tpr",
+            "benchpep": "{BenchPEP}/benchPEP.tpr",
+            "benchmem": "{BenchMEM}/benchMEM.tpr",
+            "benchrib": "{BenchRIB}/benchRIB.tpr",
+            "benchpep_h": "{BenchPEP_h}/benchPEP-h.tpr",
+            "stmv_rf": "{JCP_benchmarks}/stmv",
+            "stmv_pme": "{JCP_benchmarks}/stmv",
+            "ion_channel": "{JCP_benchmarks}/{workload_name}",
+            "rnase_cubic": "{JCP_benchmarks}/{workload_name}",
+            "adh_dodec": "{JCP_benchmarks}/{workload_name}",
+        },
     )
     workload_variable(
         "type",
@@ -330,36 +326,6 @@ class Gromacs(ExecutableApplication):
         "hEGFRtetramerPair"
         "",
         workload="hecbiosim",
-    )
-    workload_variable(
-        "input_path",
-        default="{HECBioSim}/HECBioSim/{type}/benchmark.tpr",
-        description="Input path for hecbiosim",
-        workload="hecbiosim",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchPEP}/benchPEP.tpr",
-        description="Input path for Bench PEP workload",
-        workload="benchpep",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchMEM}/benchMEM.tpr",
-        description="Input path for Bench MEM workload",
-        workload="benchmem",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchRIB}/benchRIB.tpr",
-        description="Input path for Bench RIB workload",
-        workload="benchrib",
-    )
-    workload_variable(
-        "input_path",
-        default="{BenchPEP_h}/benchPEP-h.tpr",
-        description="Input path for Bench PEP-h workload",
-        workload="benchpep_h",
     )
     workload_variable(
         "type",
