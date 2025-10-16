@@ -399,3 +399,76 @@ def cleanup(
         }
 
     return _define_cleanup
+
+
+@application_directive("executables")
+def stage_files(
+    src,
+    dst,
+    name=None,
+    when=None,
+    **kwargs,
+):
+    """Adds an executable that stages an input file or directory.
+
+    Defines a new executable that copies or links a file or directory
+    from a source to a destination. This is useful for staging input
+    files that are not managed by the `input_file` directive.
+
+    The staging method is controlled by the `stage_method` configuration
+    option, which can be set to 'cp', 'rsync', 'symbolic_link', or 'hard_link'.
+
+    Args:
+        src (str): The source path of the file or directory.
+        dst (str): The destination path.
+        name (str, optional): The name of the executable. Defaults to 'stage-files'.
+        when (list | None): List of when conditions to apply to this directive.
+    """
+
+    def _execute_stage_files(app):
+        import os
+
+        import ramble.config
+        from ramble.util.executable import CommandExecutable
+
+        cfg = ramble.config.config
+        stage_method = cfg.get("config", {}).get("stage_method", "cp")
+
+        exec_name = name if name else "stage-files"
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, app, exec_name, "stage_files"
+        )
+        when_set = frozenset(when_list)
+        if when_set not in app.executables:
+            app.executables[when_set] = {}
+
+        if exec_name in app.executables[when_set]:
+            raise DirectiveError(
+                f"stage_files directive on application {app.name} is creating "
+                f"has name attribute of '{exec_name}' which already exists "
+                "as an executable. Please provide a unique name attribute."
+            )
+
+        # Prepare the core staging command
+        if stage_method == "rsync":
+            stage_cmd = f"rsync -r {src} {dst}"
+        elif stage_method == "hard_link":
+            stage_cmd = f"ln {src} {dst}"
+        elif stage_method == "symbolic_link":
+            stage_cmd = f"ln -s {src} {dst}"
+        else:  # stage_method == "cp"
+            stage_cmd = f"cp -r {src} {dst}"
+
+        # Prepend mkdir if dst has a parent directory
+        parent_dir = os.path.dirname(dst)
+        if parent_dir and parent_dir != ".":
+            template = f"mkdir -p {parent_dir} && {stage_cmd}"
+        else:
+            template = stage_cmd
+
+        app.executables[when_set][exec_name] = CommandExecutable(
+            name=exec_name, template=template, **kwargs
+        )
+
+    return _execute_stage_files
