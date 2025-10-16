@@ -25,7 +25,6 @@ ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
 
 class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
-    name = None
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("workflow_manager_builtin", "{obj_name}", "{name}")
