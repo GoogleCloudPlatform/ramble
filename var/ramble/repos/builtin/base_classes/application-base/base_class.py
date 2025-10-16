@@ -144,11 +144,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     ]
     _language_classes = [ApplicationMeta, SharedMeta]
 
-    #: Lists of strings which contains GitHub usernames of attributes.
-    #: Do not include @ here in order not to unnecessarily ping the users.
-    maintainers: List[str] = []
-    tags: List[str] = []
-
     license_names: List[str] = []
 
     def __init__(self, file_path):
@@ -217,8 +212,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.experiment_hash = None
 
         self.application_class = "ApplicationBase"
-
-        self._verbosity = "short"
 
         self.license_path = ""
         self.license_file = ""

@@ -9,7 +9,6 @@
 
 import fnmatch
 import re
-from typing import List
 
 import ramble.repository
 import ramble.util.class_attributes
@@ -52,11 +51,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
     modifier_class = "ModifierBase"
 
-    #: Lists of strings which contains GitHub usernames of attributes.
-    #: Do not include @ here in order not to unnecessarily ping the users.
-    maintainers: List[str] = []
-    tags: List[str] = []
-
     disabled = False
 
     modifier_conflict(MODIFIER_CONFLICT["name_executables"])
@@ -76,8 +70,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         self.expander = None
         self._usage_mode = None
         self.app_inst = None
-
-        self._verbosity = "short"
 
         self._mod_regex = re.compile(
             self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"

@@ -7,6 +7,7 @@
 # except according to those terms.
 import os
 from html import escape
+from typing import List
 
 from ramble.repository import ObjectTypes
 from ramble.util import format
@@ -17,6 +18,13 @@ class ObjectMixin:
     """A mixin class for Ramble objects"""
 
     _name = None
+
+    #: Lists of strings which contains GitHub usernames of attributes.
+    #: Do not include @ here in order not to unnecessarily ping the users.
+    maintainers: List[str] = []
+    tags: List[str] = []
+
+    _verbosity = "short"
 
     def __str__(self):
         return self.name
