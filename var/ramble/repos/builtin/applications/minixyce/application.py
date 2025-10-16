@@ -44,12 +44,10 @@ class Minixyce(ExecutableApplication):
         use_mpi=True,
     )
 
-    executable(
-        "get_simple_network",
-        template=[
-            "cp {minixyce_path}/doc/tests/{workload_name}.net {experiment_run_dir}/{workload_name}.net"
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-network-file",
+        src="{minixyce_path}/doc/tests/{workload_name}.net",
+        dst="{experiment_run_dir}/{workload_name}.net",
     )
 
     executable(
@@ -86,7 +84,7 @@ class Minixyce(ExecutableApplication):
 
     cir_workloads = ["cir1", "cir2", "cir3", "cir4", "cir5"]
     for cir_workload in cir_workloads:
-        workload(cir_workload, executables=["get_simple_network", "execute"])
+        workload(cir_workload, executables=["stage-network-file", "execute"])
 
     rc_workloads = ["RC_ladder", "RLC_ladder", "RC_ladder2", "RLC_ladder2"]
     for workload_name in rc_workloads:

@@ -39,10 +39,10 @@ class Orca(ExecutableApplication):
         pre=True,
     )
 
-    executable(
-        "copy_input",
-        f"cp -R {os.path.join('{input_path}', '*')} {{scratch_dir}}",
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src=os.path.join("{input_path}", "*"),
+        dst="{scratch_dir}",
     )
 
     # The only way to configure total ranks launched is by changing the PAL nprocs keyword
@@ -65,7 +65,7 @@ class Orca(ExecutableApplication):
     workload(
         "standard",
         executables=[
-            "copy_input",
+            "stage-input",
             "configure_nprocs",
             "run_orca",
         ],

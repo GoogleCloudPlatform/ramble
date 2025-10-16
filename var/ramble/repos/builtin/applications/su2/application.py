@@ -47,7 +47,7 @@ class Su2(ExecutableApplication):
         expand=False,
     )
 
-    executable("link-inputs", template=["ln -s {input_path}/* ."])
+    stage_files(src="{input_path}/*", dst=".")
 
     executable(
         "execute",
@@ -57,7 +57,7 @@ class Su2(ExecutableApplication):
 
     workload(
         "inv_channel",
-        executables=["link-inputs", "execute"],
+        executables=["stage-files", "execute"],
         inputs=["inv_channel_in", "inv_mesh_in"],
     )
 

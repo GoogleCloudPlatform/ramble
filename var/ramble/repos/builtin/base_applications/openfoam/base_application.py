@@ -36,7 +36,10 @@ class Openfoam(ExecutableApplication):
             wl,
             executables=[
                 "clean",
-                "get_inputs",
+                "stage_input",
+                "stage_trisurface",
+                "stage_geometry",
+                "stage_U",
                 "configure_mesh",
                 "surfaceFeatures",
                 "blockMesh",
@@ -204,18 +207,18 @@ class Openfoam(ExecutableApplication):
 
     executable("clean", template=["rm -rf processor* constant system log.*"])
 
-    executable(
-        "get_inputs",
-        template=[
-            "cp -Lr {input_path}/* {experiment_run_dir}/.",
-            "mkdir -p constant/triSurface",
-            "mkdir -p constant/geometry",
-            "cp {geometry_path} constant/triSurface/.",
-            "cp {geometry_path} constant/geometry/.",
-            "ln -sf {experiment_run_dir}/0/U.orig {experiment_run_dir}/0/U",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage_input", src="{input_path}/*", dst="{experiment_run_dir}/."
     )
+    stage_files(
+        name="stage_trisurface",
+        src="{geometry_path}",
+        dst="constant/triSurface/.",
+    )
+    stage_files(
+        name="stage_geometry", src="{geometry_path}", dst="constant/geometry/."
+    )
+    stage_files(name="stage_U", src="0/U", dst="0/U.orig")
 
     executable(
         "configure_mesh",

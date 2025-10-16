@@ -50,16 +50,16 @@ class Hpcc(ExecutableApplication):
         description="Input/Config file for HPCC benchmark",
     )
 
-    executable(
-        "copy-config",
-        template="cp -R {workload_input_dir}/* {experiment_run_dir}/.",
-        use_mpi=False,
+    stage_files(
+        name="stage-config",
+        src="{workload_input_dir}/*",
+        dst="{experiment_run_dir}/.",
     )
 
     executable("execute", "hpcc", use_mpi=True)
 
     workload(
-        "standard", executables=["copy-config", "execute"], input="hpccinf"
+        "standard", executables=["stage-config", "execute"], input="hpccinf"
     )
 
     workload_variable(
