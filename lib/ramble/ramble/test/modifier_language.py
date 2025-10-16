@@ -521,3 +521,19 @@ def test_require_condition_creates_when_list(mod_class):
 
     for i in range(4):
         assert f"test-mod_mode=mode_{i}" in when_list
+
+
+def test_modifier_conflict_usage_error():
+    class BrokenModifier(BasicModifier):  # noqa: F405
+        name = "broken-modifier"
+
+    broken_mod = BrokenModifier("/not/a/path")
+
+    err_str = (
+        "modifier_conflict directive on modifier broken-modifier was given "
+        "an invalid value for the conflict_type argument."
+        "This argument needs to be an integer or string based on the MODIFIER_CONFLICT enum.\n"
+        "The provided value was 80"
+    )
+    with pytest.raises(DirectiveError, match=err_str):
+        broken_mod.modifier_conflict(80)
