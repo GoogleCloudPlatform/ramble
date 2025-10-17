@@ -31,6 +31,7 @@ import ramble.schema.package_manager_repos
 import ramble.schema.repos
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.tables
 import ramble.schema.variables
 import ramble.schema.variants
 import ramble.schema.workflow_manager_repos
@@ -53,6 +54,7 @@ properties = union_dicts(
     ramble.schema.repos.properties,
     ramble.schema.software.properties,
     ramble.schema.success_criteria.properties,
+    ramble.schema.tables.properties,
     ramble.schema.variables.properties,
     ramble.schema.variants.properties,
     ramble.schema.env_vars.properties,

@@ -19,6 +19,7 @@ import ramble.schema.formatted_executables
 import ramble.schema.internals
 import ramble.schema.modifiers
 import ramble.schema.success_criteria
+import ramble.schema.tables
 import ramble.schema.types
 import ramble.schema.variables
 import ramble.schema.variants
@@ -96,14 +97,15 @@ tags_def = {"type": "array", "default": [], "items": {"type": "string"}}
 repeats_def = union_dicts(ramble.schema.types.string_or_num, {"default": 0})
 
 sub_props = union_dicts(
-    ramble.schema.variables.properties,
-    ramble.schema.variants.properties,
-    ramble.schema.success_criteria.properties,
     ramble.schema.env_vars.properties,
+    ramble.schema.formatted_executables.properties,
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,
+    ramble.schema.success_criteria.properties,
+    ramble.schema.tables.properties,
+    ramble.schema.variables.properties,
+    ramble.schema.variants.properties,
     ramble.schema.zips.properties,
-    ramble.schema.formatted_executables.properties,
     {
         "chained_experiments": chained_experiment_def,
         "template": {"type": "boolean"},
