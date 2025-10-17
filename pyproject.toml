@@ -104,3 +104,16 @@ omit = [
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[tool.mypy]
+# TODO: Add in more files for type-checking
+# For now, only type-check the util directory
+files = ["lib/ramble/ramble/util/**/*.py"]
+ignore_errors = true
+ignore_missing_imports = true
+allow_redefinition = true
+
+[[tool.mypy.overrides]]
+# Only enable ramble modules
+module = "ramble.*"
+ignore_errors = false

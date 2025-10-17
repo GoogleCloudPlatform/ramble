@@ -39,6 +39,7 @@ import os
 import re
 import sys
 from contextlib import contextmanager
+from typing import Any, Dict, List
 
 import ruamel.yaml as yaml
 from ruamel.yaml.error import MarkedYAMLError
@@ -83,7 +84,7 @@ import spack.util.spack_yaml as syaml
 from spack.util.cpus import cpus_available
 
 #: Dict from section names -> schema for that section
-section_schemas = {
+section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,
     "config": ramble.schema.config.schema,
     "env_vars": ramble.schema.env_vars.schema,
@@ -794,7 +795,7 @@ def override(path_or_scope, value=None):
 
 #: configuration scopes added on the command line
 #: set by ``ramble.main.main()``.
-command_line_scopes = []
+command_line_scopes: List[str] = []
 
 
 def _add_platform_scope(cfg, scope_type, name, path):
