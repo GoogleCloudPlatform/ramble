@@ -22,8 +22,8 @@ import stat
 import sys
 import traceback
 import types
-from collections.abc import Mapping
 from enum import Enum
+from typing import Mapping
 
 import ruamel.yaml as yaml
 
@@ -390,7 +390,7 @@ class FastObjectChecker(Mapping):
     """
 
     #: Global cache, reused by every instance
-    _paths_cache = {}
+    _paths_cache: Mapping[str, str] = {}
 
     def __init__(self, objects_path, object_file_name, object_type):
         # The path of the repository managed by this instance

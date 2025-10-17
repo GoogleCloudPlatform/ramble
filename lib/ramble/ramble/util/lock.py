@@ -11,7 +11,13 @@ import os
 import stat
 
 import llnl.util.lock
-from llnl.util.lock import *  # noqa
+from llnl.util.lock import (
+    LockError,
+    LockTimeoutError,
+    LockUpgradeError,
+    ReadTransaction,
+    WriteTransaction,
+)
 
 import ramble.config
 import ramble.error
@@ -79,3 +85,14 @@ def check_lock_safety(path):
                 "restrict permissions on {} or enable locks."
             ).format(path)
             raise ramble.error.RambleError(msg, long_msg)
+
+
+__all__ = [
+    "LockError",
+    "LockTimeoutError",
+    "LockUpgradeError",
+    "ReadTransaction",
+    "WriteTransaction",
+    "Lock",
+    "check_lock_safety",
+]

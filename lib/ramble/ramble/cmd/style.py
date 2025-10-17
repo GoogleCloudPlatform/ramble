@@ -121,8 +121,8 @@ pattern_exemptions = {
     for file_pattern, error_dict in pattern_exemptions.items()
 }
 
-# Tools run in the given order, with flake8 as the last check.
-tool_names = ["isort", "black", "flake8"]
+# Tools run in the given order
+tool_names = ["isort", "black", "flake8", "mypy"]
 
 tools = {}
 
@@ -255,10 +255,11 @@ def setup_parser(subparser):
 def print_tool_header(tool, file_list):
     print("=======================================================")
     print(f"{tool}: running {tool} checks on ramble.")
-    print()
-    print("Modified files:")
-    for filename in file_list:
-        print(f"  {filename.strip()}")
+    if file_list:
+        print()
+        print("Modified files:")
+        for filename in file_list:
+            print(f"  {filename.strip()}")
     print("=======================================================")
 
 
@@ -499,6 +500,22 @@ def run_isort(isort_cmd, file_list, args):
         returncode |= isort_cmd.returncode
     print_output(output, args)
     print_tool_result("isort", returncode)
+    return returncode
+
+
+@tool("mypy")
+def run_mypy(mypy_cmd, file_list, args):
+    del file_list
+    print_tool_header("mypy", [])
+
+    config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
+    mypy_args = ("--config-file", config_file)
+
+    output = mypy_cmd(*mypy_args, fail_on_error=False, output=str, error=str)
+    returncode = mypy_cmd.returncode
+
+    print_output(output, args)
+    print_tool_result("mypy", returncode)
     return returncode
 
 

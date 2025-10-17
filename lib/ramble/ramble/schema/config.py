@@ -11,11 +11,12 @@
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/config.py
    :lines: 15-
 """
+from typing import Any, Dict
 
 import spack.schema.config
 
 #: Properties for inclusion in other schemas
-properties = {
+properties: Dict[str, Any] = {
     "config": {**spack.schema.config.properties["config"]},
 }
 
@@ -194,7 +195,7 @@ schema = {
 }
 
 
-def update(data):
+def update(data: Dict[str, Any]) -> bool:
     """Update the data in place to remove deprecated properties.
 
     Args:

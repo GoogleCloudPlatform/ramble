@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import copy
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import ramble.util.colors
 
@@ -41,16 +41,16 @@ class SoftwareSpec:
         name: str,
         pkg_spec: str,
         prefix: str = "",
-        compiler: str = None,
-        compiler_spec: str = None,
-        when: List[str] = None,
+        compiler: Optional[str] = None,
+        compiler_spec: Optional[str] = None,
+        when: Optional[List[str]] = None,
     ):
         self.name = name
         self.pkg_spec = pkg_spec
         self.prefix = prefix
         self.compiler = compiler
         self.compiler_spec = compiler_spec
-        self.when = when.copy()
+        self.when = when.copy() if when else []
 
     def to_dict(self, apply_prefix: bool = False):
         prefix_base = self.prefix if apply_prefix else ""

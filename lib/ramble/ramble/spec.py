@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import io
+from typing import Mapping
 
 import llnl.util.tty.color as clr
 
@@ -21,7 +22,7 @@ HASH, DEP, AT, COLON, COMMA, ON, OFF, PCT, EQ, ID, VAL, FILE = range(12)
 #: Regex for fully qualified spec names. (e.g., builtin.hdf5)
 spec_id_re = r"\w[\w.-]*"
 
-color_formats = {}
+color_formats: Mapping[str, str] = {}
 
 default_format = "{name}"
 
