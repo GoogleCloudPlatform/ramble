@@ -1182,6 +1182,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 mod_inst = DisabledModifier(mod_inst)
 
+            mod_inst.check_conflicts(self._modifier_instances)
             self._modifier_instances.append(mod_inst)
 
             # Add this modifiers required variables for validation

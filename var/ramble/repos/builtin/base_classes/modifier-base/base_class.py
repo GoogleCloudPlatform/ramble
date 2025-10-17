@@ -15,9 +15,18 @@ import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
-from ramble.error import InvalidModeError, ModifierError
-from ramble.language.modifier_language import ModifierMeta, mode
+from ramble.error import (
+    ConflictingModifiersError,
+    InvalidModeError,
+    ModifierError,
+)
+from ramble.language.modifier_language import (
+    ModifierMeta,
+    mode,
+    modifier_conflict,
+)
 from ramble.language.shared_language import SharedMeta
+from ramble.util.conflicts import MODIFIER_CONFLICT
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
@@ -51,6 +60,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
     disabled = False
 
+    modifier_conflict(MODIFIER_CONFLICT["name_executables"])
     mode("disabled", description="Mode to disable all modifier functionality")
 
     def __init__(self, file_path):
@@ -160,6 +170,156 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
         modded_vars = self.modded_variables(app)
         self.expander._variables.update(modded_vars)
+
+    @property
+    def conflict_value(self):
+        """
+        Evaluate when sets to determine the most restrictive conflict that is currently satisfied.
+        """
+        value = None
+        for when_set, conflict_value in self.modifier_conflicts.items():
+            if self.expander.satisfies(when_set, self.object_variants):
+                if value is None:
+                    value = conflict_value
+                else:
+                    if conflict_value.value < value.value:
+                        value = conflict_value
+        return value
+
+    def check_conflicts(self, existing_modifiers):
+        """Evaluate conflicts with other existing modifiers.
+
+
+        Iterate over (input) existing modifiers, and evaluate if they conflict based on
+        this modifier's conflict setting.
+
+        Args:
+            existing_modifiers: Existing modifiers in a list
+        """
+        conflict_value = self.conflict_value
+
+        if conflict_value is None:
+            return
+
+        self_idx = len(existing_modifiers)
+
+        for mod_idx, mod_inst in enumerate(existing_modifiers):
+            if mod_inst is self:
+                self_idx = mod_idx
+                continue
+
+            if conflict_value == MODIFIER_CONFLICT.name:
+                if mod_inst.name == self.name:
+                    comp_str = mod_inst.config_str(index=mod_idx, indent=4)
+                    self_str = self.config_str(index=self_idx, indent=4)
+                    raise ConflictingModifiersError(
+                        f"Two modifier definitions conflict by having the same name.\n"
+                        f"Modifier 1:\n"
+                        f"{comp_str}"
+                        f"Modifier 2:\n"
+                        f"{self_str}"
+                    )
+
+            elif conflict_value == MODIFIER_CONFLICT.name_mode:
+                if (
+                    mod_inst.name == self.name
+                    and mod_inst._usage_mode == self._usage_mode
+                ):
+                    comp_str = mod_inst.config_str(
+                        index=mod_idx, include_mode=True, indent=4
+                    )
+                    self_str = self.config_str(
+                        index=self_idx, include_mode=True, indent=4
+                    )
+                    raise ConflictingModifiersError(
+                        "Two modifier definitions conflict by having the same "
+                        "name and mode.\n"
+                        f"Modifier 1:\n"
+                        f"{comp_str}"
+                        f"Modifier 2:\n"
+                        f"{self_str}"
+                    )
+
+            elif conflict_value == MODIFIER_CONFLICT.name_executables:
+                if mod_inst.name == self.name:
+                    compare_set = set(mod_inst._on_executables)
+                    self_set = set(self._on_executables)
+                    intersect = self_set.intersection(compare_set)
+                    if intersect:
+                        comp_str = mod_inst.config_str(
+                            index=mod_idx, include_executables=True, indent=4
+                        )
+                        self_str = self.config_str(
+                            index=self_idx, include_executables=True, indent=4
+                        )
+                        raise ConflictingModifiersError(
+                            "Two modifier definitions conflict by having the same "
+                            "name and overlapping on_executable.\n"
+                            f"Modifier 1:\n"
+                            f"{comp_str}"
+                            f"Modifier 2:\n"
+                            f"{self_str}"
+                        )
+
+            elif conflict_value == MODIFIER_CONFLICT.name_mode_executables:
+                if (
+                    mod_inst.name == self.name
+                    and mod_inst._usage_mode == self._usage_mode
+                ):
+                    compare_set = set(mod_inst._on_executables)
+                    self_set = set(self._on_executables)
+                    intersect = self_set.intersection(compare_set)
+                    if intersect:
+                        comp_str = mod_inst.config_str(
+                            index=mod_idx,
+                            include_mode=True,
+                            include_executables=True,
+                            indent=4,
+                        )
+                        self_str = self.config_str(
+                            index=self_idx,
+                            include_mode=True,
+                            include_executables=True,
+                            indent=4,
+                        )
+                        raise ConflictingModifiersError(
+                            "Two modifier definitions conflict by having the same "
+                            "name, mode, and overlapping on_executable.\n"
+                            f"Modifier 1:\n"
+                            f"{comp_str}"
+                            f"Modifier 2:\n"
+                            f"{self_str}"
+                        )
+
+    def config_str(
+        self,
+        index=None,
+        include_mode=False,
+        include_executables=False,
+        indent=0,
+    ):
+        """Construct a string representation of this modifier's configuration
+
+        Args:
+            index (int): Index of this modifier to include if provided
+            include_mode (bool): Whether to include the mode of the modifier in the configuration or not
+            include_executables (bool): Whether to include the on_executables attribute or not
+            indent (int): Number of spaces to prefix the config with
+
+        Returns:
+            (str) String representation of the modifier's configuration
+        """
+        indentation = " " * indent
+        out_str = f"{indentation}Name: {self.name}\n"
+        if index is not None:
+            out_str += f"{indentation}Index: {index}\n"
+        if include_mode:
+            out_str += f"{indentation}Mode: {self._usage_mode}\n"
+        if include_executables and self._on_executables:
+            out_str += f"{indentation}On Executables\n"
+            for exec in self._on_executables:
+                out_str += f"{indentation}- {exec}\n"
+        return out_str
 
     def define_variable(self, var_name, var_value):
         """Define a variable within this modifier's expander instance"""

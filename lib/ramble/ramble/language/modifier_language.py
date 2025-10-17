@@ -389,3 +389,61 @@ def package_manager_requirement(
         )
 
     return _new_package_manager_requirement
+
+
+@modifier_directive("modifier_conflicts")
+def modifier_conflict(
+    conflict_type,
+    when=None,
+    **kwargs,
+):
+    """Define a conflict with other modifiers on the same experiment.
+
+    Allowed values are defined in the MODIFIER_CONFLICT class in conflicts.py
+
+    Args:
+        conflict_type: Either a string or integer based on the options in
+                       ramble.util.conflicts.MODIFIER_CONFLICT
+    """
+
+    def _define_modifier_conflict(mod):
+        from ramble.util.conflicts import MODIFIER_CONFLICT
+
+        conflict_value = None
+        usage_error = False
+        if conflict_type is not None:
+            if isinstance(conflict_type, str):
+                if conflict_type not in MODIFIER_CONFLICT._member_names_:
+                    usage_error = True
+                else:
+                    conflict_value = MODIFIER_CONFLICT[conflict_type]
+            elif isinstance(conflict_type, int):
+                try:
+                    conflict_value = MODIFIER_CONFLICT(conflict_type)
+                except ValueError:
+                    usage_error = True
+            elif isinstance(conflict_type, MODIFIER_CONFLICT):
+                conflict_value = conflict_type
+            else:
+                usage_error = True
+
+        if usage_error:
+            raise DirectiveError(
+                f"modifier_conflict directive on modifier {mod.name} was given "
+                f"an invalid value for the conflict_type argument."
+                "This argument needs to be an integer or string based on the "
+                "MODIFIER_CONFLICT enum.\n"
+                f"The provided value was {conflict_type}"
+            )
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, mod, mod.name, "modifier_conflict"
+        )
+        when_set = frozenset(when_list)
+
+        if conflict_value is None and when_set in mod.modifier_conflicts:
+            del mod.modifier_conflicts[when_set]
+        else:
+            mod.modifier_conflicts[when_set] = conflict_value
+
+    return _define_modifier_conflict

@@ -150,6 +150,12 @@ class ModifierError(RambleError):
     """
 
 
+class ConflictingModifiersError(ModifierError):
+    """
+    Exception raised when two modifiers on the same experiment conflict
+    """
+
+
 class InvalidModeError(ModifierError):
     """
     Exception raised when an invalid mode is passed
