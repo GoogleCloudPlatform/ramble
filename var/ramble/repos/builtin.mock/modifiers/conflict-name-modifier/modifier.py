@@ -17,4 +17,4 @@ class ConflictNameModifier(BasicModifier):
 
     default_mode("standard")
 
-    modifier_conflict("name")
+    modifier_conflict("name_only")

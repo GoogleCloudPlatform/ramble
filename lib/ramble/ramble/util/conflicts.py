@@ -11,7 +11,7 @@ from enum import Enum
 
 class MODIFIER_CONFLICT(Enum):
     # Conflict on identical name only
-    name = 0
+    name_only = 0
 
     # Conflict on name, and mode
     name_mode = 1

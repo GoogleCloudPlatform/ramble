@@ -208,7 +208,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                 self_idx = mod_idx
                 continue
 
-            if conflict_value == MODIFIER_CONFLICT.name:
+            if conflict_value == MODIFIER_CONFLICT.name_only:
                 if mod_inst.name == self.name:
                     comp_str = mod_inst.config_str(index=mod_idx, indent=4)
                     self_str = self.config_str(index=self_idx, indent=4)
