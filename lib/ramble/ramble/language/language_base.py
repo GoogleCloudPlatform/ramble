@@ -14,7 +14,7 @@ import copy
 import functools
 import inspect
 from collections.abc import Sequence  # novm
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Set
 
 import llnl.util.lang
 
@@ -25,7 +25,7 @@ __all__ = ["DirectiveMeta", "DirectiveError"]
 
 #: These are variant names used by ramble internally; applications can't use
 #: them
-reserved_names = []
+reserved_names: List[str] = []
 
 namespaces = [
     "ramble.app",
@@ -61,12 +61,12 @@ class DirectiveMeta(type):
     """
 
     # Set of all known directives
-    _directive_names = set()
-    _directive_init_values = {}
-    _directives_to_be_executed = []
-    _directive_functions = {}
-    _directive_classes = {}
-    _when_constraints_from_context = []
+    _directive_names: Set[str] = set()
+    _directive_init_values: Dict[str, Any] = {}
+    _directives_to_be_executed: List[Callable[..., Any]] = []
+    _directive_functions: Dict[str, Callable[..., Any]] = {}
+    _directive_classes: Dict[str, type] = {}
+    _when_constraints_from_context: List[str] = []
     _default_args: List[dict] = []
 
     push_to_context = _push_to_context

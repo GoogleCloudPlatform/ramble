@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from typing import List, Optional
+from typing import Dict, FrozenSet, List, Optional
 
 import ramble.util.colors as rucolor
 from ramble.definitions.variables import EnvironmentVariable, Variable
@@ -14,6 +14,10 @@ from ramble.definitions.variables import EnvironmentVariable, Variable
 
 class Workload:
     """Class representing a single workload"""
+
+    executables: List[str]
+    inputs: List[str]
+    tags: List[str]
 
     def __init__(
         self,
@@ -36,8 +40,8 @@ class Workload:
             tags = []
 
         self.name = name
-        self.variables = {}
-        self.environment_variables = {}
+        self.variables: Dict[FrozenSet[str], List[Variable]] = {}
+        self.environment_variables: Dict[FrozenSet[str], List[EnvironmentVariable]] = {}
 
         attr_names = ["executables", "inputs", "tags"]
         attr_vals = [executables, inputs, tags]
