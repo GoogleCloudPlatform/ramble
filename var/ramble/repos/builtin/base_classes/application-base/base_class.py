@@ -127,7 +127,6 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
 
 
 class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
-    name = None
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
@@ -201,6 +200,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._fom_map = {}
 
         # Ensure we always have the application name, and this is never empty
+        self._file_path = file_path
+
         self.license_names = self.license_names + [self.name]
 
         self.hash_inventory = {
@@ -214,8 +215,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "modifier_artifacts": [],
         }
         self.experiment_hash = None
-
-        self._file_path = file_path
 
         self.application_class = "ApplicationBase"
 

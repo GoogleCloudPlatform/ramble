@@ -5,17 +5,30 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+import os
 from html import escape
 
 from ramble.repository import ObjectTypes
 from ramble.util import format
+from ramble.util.logger import logger
 
 
 class ObjectMixin:
     """A mixin class for Ramble objects"""
 
+    _name = None
+
     def __str__(self):
         return self.name
+
+    @property
+    def name(self):
+        if not self._name:
+            logger.warn(
+                f"Application {self.__class__.__name__} is missing explicit name."
+            )
+            self._name = os.path.basename(os.path.dirname(self._file_path))
+        return self._name
 
     @property
     def scoped_name(self):

@@ -473,8 +473,7 @@ def add_modifier_variable(mod_inst, mod_var_num=1):
 def test_modifier_variable_directive(mod_class):
     test_defs = []
 
-    mod_inst = mod_class("/not/a/path")
-    mod_inst.name = "mock-test-mod"
+    mod_inst = mod_class("/invalid/mock-test-mod/path.py")
     test_defs.append(add_modifier_variable(mod_inst))
 
     for test_def in test_defs:
@@ -504,8 +503,7 @@ def test_modifier_class_attributes(mod_class):
 
 @pytest.mark.parametrize("mod_class", mod_types)
 def test_require_condition_creates_when_list(mod_class):
-    mod_inst = mod_class("/not/a/path")
-    mod_inst.name = "test-mod"
+    mod_inst = mod_class("/invalid/test-mod/path.py")
     for i in range(4):
         mod_inst.mode(f"mode_{i}", description="mode")
 

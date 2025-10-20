@@ -25,7 +25,6 @@ ObjectMixin = ramble.repository.get_base_class("object_mixin")
 
 
 class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
-    name = None
     origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("package_manager_builtin", "{obj_name}", "{name}")
