@@ -108,7 +108,12 @@ directory = "htmlcov"
 [tool.mypy]
 # TODO: Add in more files for type-checking
 # For now, only type-check the util directory
-files = ["lib/ramble/ramble/util/**/*.py"]
+files = [
+  "lib/ramble/ramble/util/**/*.py",
+  "lib/ramble/ramble/schema/**/*.py",
+  "lib/ramble/ramble/language/**/*.py",
+  "lib/ramble/ramble/definitions/**/*.py",
+]
 ignore_errors = true
 ignore_missing_imports = true
 allow_redefinition = true

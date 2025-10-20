@@ -196,9 +196,9 @@ class VariantSet:
     def _define_variant(
         self,
         name: str,
-        variant_type: int,
+        variant_type: variant_types,
         default: Optional[Any] = None,
-        description: str = "",
+        description: Optional[str] = "",
         values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         """Define a variant within this set.
@@ -299,7 +299,7 @@ class Variant:
         self,
         name: str,
         default: Optional[Any] = None,
-        description: str = "",
+        description: Optional[str] = "",
         values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         self.name = name

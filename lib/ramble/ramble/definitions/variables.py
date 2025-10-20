@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import copy
-from typing import List, Optional
+from typing import Any, Dict, List, Optional, Set
 
 import ramble.util.colors as rucolor
 
@@ -35,7 +35,7 @@ class Variable:
         self,
         name: str,
         default=None,
-        description: str = None,
+        description: Optional[str] = None,
         values=None,
         expandable: bool = True,
         track_used: bool = True,
@@ -182,7 +182,7 @@ class EnvironmentVariable:
         self,
         name: str,
         value=None,
-        description: str = None,
+        description: Optional[str] = None,
         method: str = "set",
         append_separator: str = ",",
         when=None,
@@ -278,10 +278,10 @@ class EnvironmentVariableModifications:
         """
         self.name = name
         self.when = when.copy() if when else []
-        self.set = {}
-        self.unset = {}
-        self.prepend = []
-        self.append = []
+        self.set: Dict[str, str] = {}
+        self.unset: Set[str] = set()
+        self.prepend: List[Dict[str, Dict[str, str]]] = []
+        self.append: List[Dict[str, Any]] = []
 
         self.add_modification(
             modification=modification,

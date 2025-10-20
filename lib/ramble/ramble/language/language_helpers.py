@@ -8,7 +8,7 @@
 
 import fnmatch
 from collections import OrderedDict
-from typing import Any, List, Union
+from typing import Any, List, Optional, Union
 
 from ramble.language.language_base import DirectiveError
 
@@ -131,7 +131,11 @@ def require_definition(
 
 
 def require_condition(
-    obj, directive_name: str, single_arg_name: str = None, multiple_arg_name: str = None, **kwargs
+    obj,
+    directive_name: str,
+    single_arg_name: Optional[str] = None,
+    multiple_arg_name: Optional[str] = None,
+    **kwargs,
 ):
     """Require at least one condition for a type in a directive, and converts all conditions to
     when conditions
@@ -155,25 +159,26 @@ def require_condition(
     Returns:
         List of all when conditions
     """
+    single_arg_val = kwargs.get(single_arg_name) if single_arg_name else None
+    multiple_arg_val = kwargs.get(multiple_arg_name) if multiple_arg_name else None
+    when_arg_val = kwargs.get("when")
 
-    if not (kwargs[single_arg_name] or kwargs[multiple_arg_name] or kwargs["when"]):
+    if not (single_arg_val or multiple_arg_val or when_arg_val):
         raise DirectiveError(
             f"Directive {directive_name} requires at least one of "
             f"{single_arg_name} or {multiple_arg_name} or when to be defined."
         )
 
-    when_list = []
-    if "when" in kwargs:
+    if when_arg_val is not None:
         when_list = build_when_list(kwargs["when"], obj, obj.name, directive_name)
-
-    single_arg_val = kwargs[single_arg_name] if single_arg_name in kwargs else ""
-    multiple_arg_vals = kwargs[multiple_arg_name] if multiple_arg_name in kwargs else []
+    else:
+        when_list = []
 
     # If args are modifier modes, convert to when conditions
     if single_arg_name == "mode" or multiple_arg_name == "modes":
         all_modes = merge_definitions(
             single_arg_val,
-            multiple_arg_vals,
+            multiple_arg_val,
             obj.modes,
             "mode",
             "modes",

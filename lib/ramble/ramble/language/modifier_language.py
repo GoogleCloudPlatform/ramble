@@ -325,8 +325,8 @@ def modifier_variable(
 def package_manager_requirement(
     command: str,
     validation_type: str,
-    mode: str = None,
-    modes: list = None,
+    mode: Optional[str] = None,
+    modes: Optional[list] = None,
     regex=None,
     package_manager: str = "*",
     when=None,
