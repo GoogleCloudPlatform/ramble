@@ -6,9 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import FrozenSet
+
 from ramble.test.application import basic_exp_dict
 
-_FS = frozenset()
+_FS: FrozenSet[str] = frozenset()
 
 
 def test_basic_inheritance(mutable_mock_apps_repo):

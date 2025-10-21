@@ -37,7 +37,7 @@ class ExperimentSet:
 
     # In order of lowest to highest precedence
     _contexts = Enum(
-        "contexts",
+        "_contexts",
         ["global_conf", "base", "workspace", "application", "workload", "experiment", "required"],
     )
 

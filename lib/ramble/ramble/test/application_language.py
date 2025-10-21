@@ -7,6 +7,8 @@
 # except according to those terms.
 """Perform tests of the Application class"""
 
+from typing import FrozenSet
+
 import deprecation
 import pytest
 
@@ -19,7 +21,7 @@ app_types = [
     ExecutableApplication,  # noqa: F405
 ]
 
-_FS = frozenset()
+_FS: FrozenSet[str] = frozenset()
 
 
 @deprecation.fail_if_not_removed

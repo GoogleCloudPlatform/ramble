@@ -783,14 +783,14 @@ def _upload_file(src_file, dest_file):
 pipelines = Enum(
     "pipelines",
     [
-        AnalyzePipeline.name,
-        ArchivePipeline.name,
-        MirrorPipeline.name,
-        SetupPipeline.name,
-        PushToCachePipeline.name,
-        ExecutePipeline.name,
-        PushDeploymentPipeline.name,
-        LogsPipeline.name,
+        "analyze",
+        "archive",
+        "mirror",
+        "setup",
+        "pushtocache",
+        "execute",
+        "pushdeployment",
+        "logs",
     ],
 )
 

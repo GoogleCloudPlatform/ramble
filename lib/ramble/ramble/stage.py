@@ -15,6 +15,7 @@ import os
 import shutil
 import stat
 import sys
+from typing import Dict
 
 import llnl.util.lang
 import llnl.util.tty as tty
@@ -213,7 +214,7 @@ class InputStage:
     """
 
     """Shared dict of all stage locks."""
-    stage_locks = {}
+    stage_locks: Dict[str, ramble.util.lock.Lock] = {}
 
     """Most staging is managed by Ramble.  DIYStage is one exception."""
     managed_by_ramble = True

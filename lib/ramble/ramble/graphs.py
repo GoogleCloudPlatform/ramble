@@ -11,6 +11,7 @@ import graphlib
 import itertools
 import re
 from collections import defaultdict
+from typing import DefaultDict
 
 import ramble.error
 import ramble.expander
@@ -462,7 +463,7 @@ class FormattedExecutableGraph(AttributeGraph):
     def __init__(self, formatted_execs: dict, obj_inst):
         """Constructs a new FormattedExecutableGraph and evaluates dependencies"""
         super().__init__(obj_inst)
-        self._formatted_executable_dependencies = defaultdict(list)
+        self._formatted_executable_dependencies: DefaultDict[str, list] = defaultdict(list)
 
         # Define all graph nodes
         for exec_name, exec_def in formatted_execs.items():
