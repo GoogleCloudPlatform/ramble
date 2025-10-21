@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/formatted_executables.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 #: Properties for inclusion in other schemas
 properties = {

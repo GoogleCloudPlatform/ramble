@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/software.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 import ramble.namespace
 

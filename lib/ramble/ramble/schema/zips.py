@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/zips.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 
 zip_def = {"type": "array", "default": [], "items": {"type": "string"}}

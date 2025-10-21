@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/licenses.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 import spack.schema.environment
 

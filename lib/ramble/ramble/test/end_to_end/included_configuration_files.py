@@ -138,7 +138,7 @@ software:
         assert search_files_for_string(
             out_files,
             "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz",
-        )  # noqa
+        )
 
         # Test software directories
         software_dirs = ["wrfv4", "wrfv4-portable"]

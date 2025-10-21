@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/variants.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 variants_def = {
     "type": ["object", "null"],
