@@ -7,6 +7,8 @@
 # except according to those terms.
 """Perform tests of the Application class"""
 
+from typing import FrozenSet
+
 import pytest
 
 import ramble.definitions.variables
@@ -17,7 +19,7 @@ pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
 )
 
-_FS = frozenset()
+_FS: FrozenSet[str] = frozenset()
 
 
 def basic_exp_dict():

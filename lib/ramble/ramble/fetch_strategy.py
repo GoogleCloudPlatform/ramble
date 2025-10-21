@@ -33,6 +33,7 @@ import re
 import shutil
 import sys
 import urllib.parse
+from typing import List, Optional
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import (
@@ -105,12 +106,13 @@ class FetchStrategy:
     #: The URL attribute must be specified either at the package class
     #: level, or as a keyword argument to ``version()``.  It is used to
     #: distinguish fetchers for different versions in the package DSL.
-    url_attr = None
+    url_attr: Optional[str] = None
 
     #: Optional attributes can be used to distinguish fetchers when :
     #: classes have multiple ``url_attrs`` at the top-level.
     # optional attributes in version() args.
-    optional_attrs = []
+    optional_attrs: List[str] = []
+    url: Optional[str] = None
 
     def __init__(self, **kwargs):
         # The stage is initialized late, so that fetch strategies can be
@@ -681,6 +683,11 @@ class VCSFetchStrategy(FetchStrategy):
 
     """
 
+    branch: Optional[str] = None
+    tag: Optional[str] = None
+    commit: Optional[str] = None
+    revision: Optional[str] = None
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -835,6 +842,10 @@ class GitFetchStrategy(VCSFetchStrategy):
     ]
 
     git_version_re = r"git version (\S+)"
+
+    submodules: bool = False
+    submodules_delete: bool = False
+    get_full_repo: bool = False
 
     def __init__(self, **kwargs):
         # Discards the keywords in kwargs that may conflict with the next call

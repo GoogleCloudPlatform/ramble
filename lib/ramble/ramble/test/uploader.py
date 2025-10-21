@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import Dict
+
 import pytest
 
 import ramble.config
@@ -16,7 +18,7 @@ from ramble.uploader import ConfigError, upload_results
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
-_empty_results = {"experiments": []}
+_empty_results: Dict[str, list] = {"experiments": []}
 
 workspace = RambleCommand("workspace")
 

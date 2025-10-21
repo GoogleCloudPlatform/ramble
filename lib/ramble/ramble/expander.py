@@ -16,7 +16,7 @@ import string
 import sys
 import warnings
 from contextlib import contextmanager
-from typing import Dict, FrozenSet, List, Union
+from typing import Dict, FrozenSet, List, Optional, Union
 
 import ramble.error
 import ramble.keywords
@@ -598,11 +598,11 @@ class Expander:
     def expand_var_name(
         self,
         var_name: str,
-        extra_vars: Dict = None,
+        extra_vars: Optional[Dict] = None,
         allow_passthrough: bool = True,
         typed: bool = False,
         merge_used_stage: bool = True,
-        replace_escaped_braces: bool = None,
+        replace_escaped_braces: Optional[bool] = None,
     ):
         """Convert a variable name to an expansion string, and expand it
 
@@ -633,11 +633,11 @@ class Expander:
     def expand_var(
         self,
         var: str,
-        extra_vars: Dict = None,
+        extra_vars: Optional[Dict] = None,
         allow_passthrough: bool = True,
         typed: bool = False,
         merge_used_stage: bool = True,
-        replace_escaped_braces=None,
+        replace_escaped_braces: Optional[bool] = None,
     ):
         """Perform expansion of a string
 

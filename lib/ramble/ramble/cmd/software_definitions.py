@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import sys
+from typing import Dict, List
 
 import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
@@ -22,7 +23,7 @@ unused_compilers = {}
 definitions = {}
 conflicts = {}
 used_by = {}
-specs = {"pkg_spec": {}, "compiler_spec": {}}
+specs: Dict[str, Dict[str, List[str]]] = {"pkg_spec": {}, "compiler_spec": {}}
 spec_headers = {
     "pkg_spec": "Software Packages",
     "compiler_spec": "Compiler Definitions",

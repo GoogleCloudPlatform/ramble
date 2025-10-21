@@ -11,6 +11,7 @@ import itertools
 import os
 import sys
 import tempfile
+from typing import Callable, Dict
 
 import llnl.util.tty as tty
 import llnl.util.tty.color as color
@@ -1770,7 +1771,7 @@ def workspace(parser, args, unknown_args):
         action(args)
 
 
-manage_subcommand_functions = {}
+manage_subcommand_functions: Dict[str, Callable] = {}
 
 
 def workspace_manage(args):

@@ -10,11 +10,13 @@
 import hashlib
 import os
 import sys
+from typing import FrozenSet
 
 import pytest
 
 from llnl.util.filesystem import resolve_link_target_relative_to_the_link
 
+import ramble.caches
 import ramble.filters
 import ramble.mirror
 import ramble.pipeline
@@ -34,7 +36,7 @@ pytestmark = [
     ),
 ]
 
-_FS = frozenset()
+_FS: FrozenSet[str] = frozenset()
 
 
 class MockFetcher:

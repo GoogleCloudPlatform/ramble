@@ -18,7 +18,7 @@ import ramble.util.colors
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 
-supported_formats = enum.Enum("formats", ["text", "lists"])
+supported_formats = enum.Enum("supported_formats", ["text", "lists"])
 
 obj_attribute_map = {
     "maintainers": None,

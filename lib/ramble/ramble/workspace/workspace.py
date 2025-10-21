@@ -15,7 +15,7 @@ import os
 import re
 import shutil
 from collections import defaultdict
-from typing import List, Set
+from typing import Optional, Set
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
@@ -2274,10 +2274,10 @@ ramble:
 
     def remove_modifier(
         self,
-        remove_index: int = None,
-        scope_pattern: str = None,
-        name_pattern: str = None,
-        mode_pattern: str = None,
+        remove_index: Optional[int] = None,
+        scope_pattern: Optional[str] = None,
+        name_pattern: Optional[str] = None,
+        mode_pattern: Optional[str] = None,
         dry_run: bool = False,
     ):
         """Remove an arbitrary number of modifiers from this workspace based
@@ -2361,10 +2361,10 @@ ramble:
 
     def add_modifier(
         self,
-        scope: str = None,
-        name_pattern: str = None,
-        mode: str = None,
-        on_executable: List[str] = None,
+        scope: Optional[str] = None,
+        name_pattern: Optional[str] = None,
+        mode: Optional[str] = None,
+        on_executable: Optional[str] = None,
         dry_run: bool = False,
     ):
         """Add an arbitrary number of modifiers to this workspace within a single scope
@@ -2375,7 +2375,7 @@ ramble:
                           If multiple modifiers match, all will be added with
                           the additional arguments.
             mode: Mode to set within the new modifier definitions
-            on_executable: List of strings to set for the on_executable
+            on_executable: A list string to set for the on_executable
                            attribute of the new modifier definitions.
             dry_run: Whether to print the config instead of editing it, or to edit it directly.
 

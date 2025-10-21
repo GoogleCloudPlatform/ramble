@@ -11,6 +11,7 @@ import datetime
 import os
 import re
 from enum import Enum
+from typing import List
 
 import llnl.util.filesystem as fs
 
@@ -754,7 +755,7 @@ class ComparisonPlot(PlotGenerator):
 
 class MultiLinePlot(ScalingPlotGenerator):
     plot_type = "multi_line"
-    series_to_plot = []
+    series_to_plot: List[str] = []
 
     def default_better(self):
         return BetterDirection.HIGHER

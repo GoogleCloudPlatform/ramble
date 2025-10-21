@@ -7,9 +7,11 @@
 # except according to those terms.
 
 from collections import defaultdict
+from typing import DefaultDict, Dict, List, Set
 
 import ramble.error
 import ramble.util.colors as rucolor
+from ramble.expander import Expander
 from ramble.namespace import namespace
 from ramble.util.logger import logger
 
@@ -222,6 +224,8 @@ class RenderedPackage(SoftwarePackage):
 class TemplatePackage(SoftwarePackage):
     """Class representing a template software package"""
 
+    _rendered_packages: DefaultDict[str, Dict[str, RenderedPackage]]
+
     def __init__(
         self,
         name: str,
@@ -297,7 +301,7 @@ class TemplatePackage(SoftwarePackage):
             out_str = super().info(indent, verbosity, color_level, only_used=only_used) + out_str
         return out_str
 
-    def render_package(self, expander: object, package_manager):
+    def render_package(self, expander: Expander, package_manager):
         """Render a SoftwarePackage from this TemplatePackage
 
         Args:
@@ -317,7 +321,9 @@ class TemplatePackage(SoftwarePackage):
         raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix, pm_allow_unprefixed)
         raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix, pm_allow_unprefixed)
 
-        spec = expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec else None
+        spec = (
+            expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec is not None else None
+        )
         if not spec:
             if pm_allow_unprefixed:
                 raise RambleSoftwareEnvironmentError(f"Package {name} is missing a valid spec")
@@ -325,11 +331,13 @@ class TemplatePackage(SoftwarePackage):
                 return None
 
         compiler = (
-            expander.expand_var(raw_compiler, merge_used_stage=False) if raw_compiler else None
+            expander.expand_var(raw_compiler, merge_used_stage=False)
+            if raw_compiler is not None
+            else None
         )
         compiler_spec = (
             expander.expand_var(raw_compiler_spec, merge_used_stage=False)
-            if raw_compiler_spec
+            if raw_compiler_spec is not None
             else None
         )
 
@@ -355,7 +363,7 @@ class TemplatePackage(SoftwarePackage):
         else:
             return new_pkg
 
-    def add_rendered_package(self, new_package: object, all_packages: dict, pm_name: str):
+    def add_rendered_package(self, new_package: RenderedPackage, all_packages: dict, pm_name: str):
         """Add a rendered package to this template's list of rendered packages
 
         Args:
@@ -381,7 +389,7 @@ class SoftwareEnvironment:
         """
 
         self.name = name
-        self._packages = []
+        self._packages: List[SoftwarePackage] = []
         self._environment_type = "Base"
         self._used = False
 
@@ -441,7 +449,7 @@ class SoftwareEnvironment:
         """
         return self.info(indent=0)
 
-    def add_package(self, package: object):
+    def add_package(self, package: "SoftwarePackage"):
         """Add a package definition to this environment
 
         Args:
@@ -510,6 +518,9 @@ class RenderedEnvironment(SoftwareEnvironment):
 
 class TemplateEnvironment(SoftwareEnvironment):
     """Class representing a template software environment"""
+
+    _package_names: Set[str]
+    _rendered_environments: DefaultDict[str, Dict[str, "RenderedEnvironment"]]
 
     def __init__(self, name: str):
         """TemplateEnvironment constructor
@@ -590,7 +601,7 @@ class TemplateEnvironment(SoftwareEnvironment):
 
     def render_environment(
         self,
-        expander: object,
+        expander: Expander,
         all_package_templates: dict,
         all_packages: dict,
         package_manager,
@@ -668,7 +679,10 @@ class TemplateEnvironment(SoftwareEnvironment):
             self._rendered_environments[pm_name][environment.name] = environment
             all_environments[pm_name][environment.name] = environment
             for template_pkg, rendered_pkg in zip(self._packages, environment._packages):
-                template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
+                if isinstance(rendered_pkg, RenderedPackage) and isinstance(
+                    template_pkg, TemplatePackage
+                ):
+                    template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
 
 
 class SoftwareEnvironments:
@@ -785,7 +799,7 @@ class SoftwareEnvironments:
                             new_env.add_package_name(package)
                     self._environment_templates[env_template] = new_env
 
-    def define_compiler_packages(self, environment: RenderedEnvironment, expander):
+    def define_compiler_packages(self, environment: RenderedEnvironment, expander: Expander):
         """Define packages for compilers in this environment
 
         If compilers referenced by (environment) are not defined, create
@@ -799,7 +813,7 @@ class SoftwareEnvironments:
         """
         pm_name = environment.package_manager_name
         for pkg in environment._packages:
-            if pkg.compiler:
+            if isinstance(pkg, RenderedPackage) and pkg.compiler:
                 cur_compiler = pkg.compiler
                 # Re-render compiler package to ensure variables are marked as used.
                 if cur_compiler in self._rendered_packages[pm_name]:
@@ -846,7 +860,7 @@ class SoftwareEnvironments:
                             f"by package {pkg.name}"
                         )
 
-    def compiler_specs_for_environment(self, environment: object):
+    def compiler_specs_for_environment(self, environment: RenderedEnvironment):
         """Iterator over compiler specs for a given environment
 
         Assumes all compilers have been defined via
@@ -863,7 +877,7 @@ class SoftwareEnvironments:
         root_compilers = []
         pm_name = environment.package_manager_name
         for pkg in environment._packages:
-            if pkg.compiler:
+            if isinstance(pkg, RenderedPackage) and pkg.compiler:
                 if pkg.compiler not in self._rendered_packages[pm_name]:
                     raise RambleSoftwareEnvironmentError(
                         f"Compiler {pkg.compiler} used, but not "
@@ -877,12 +891,12 @@ class SoftwareEnvironments:
         for comp in root_compilers:
             comp_pkg = self._rendered_packages[pm_name][comp]
 
-            if comp_pkg.compiler:
+            if isinstance(comp_pkg, RenderedPackage) and comp_pkg.compiler:
                 cur_compiler = comp_pkg.compiler
 
                 while cur_compiler and cur_compiler not in dep_compilers:
                     dep_compilers.append(cur_compiler)
-                    if comp_pkg.compiler:
+                    if isinstance(comp_pkg, RenderedPackage) and comp_pkg.compiler:
                         cur_compiler = self._rendered_packages[pm_name][comp_pkg.compiler].name
 
         for comp in reversed(root_compilers + dep_compilers):
@@ -891,7 +905,7 @@ class SoftwareEnvironments:
                 all_packages=self._rendered_packages, compiler=False
             ), comp_pkg.spec_str(all_packages=self._rendered_packages, compiler=True)
 
-    def package_specs_for_environment(self, environment: object):
+    def package_specs_for_environment(self, environment: SoftwareEnvironment):
         """Iterator over package specs for a given environment
 
         Assumes all compilers have been defined via
@@ -922,7 +936,7 @@ class SoftwareEnvironments:
         used_compilers = set()
         compiler_warnings = []
         for pkg in environment._packages:
-            if pkg.compiler and pkg.compiler in pkg_names:
+            if isinstance(pkg, RenderedPackage) and pkg.compiler and pkg.compiler in pkg_names:
                 compiler_warnings.append((pkg.name, pkg.compiler))
 
         logger.debug(f" Used compilers: {used_compilers}")
@@ -936,7 +950,7 @@ class SoftwareEnvironments:
                 logger.warn(f"    Package: {pkg_name}, Compiler: {comp_name}")
             logger.warn("This might cause problems when installing the packages.")
 
-    def render_environment(self, env_name: str, expander: object, package_manager, require=True):
+    def render_environment(self, env_name: str, expander: Expander, package_manager, require=True):
         """Render an environment needed by an experiment
 
         Args:
