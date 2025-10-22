@@ -107,7 +107,7 @@ ramble:
         assert search_files_for_string(
             out_files,
             "Would download https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz",
-        )  # noqa
+        )
 
         # Test software directories
         software_dirs = ["gromacs"]

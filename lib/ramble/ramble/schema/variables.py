@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/variables.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 variables_def = {
     "type": ["object", "null"],

@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/success_criteria.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 
 success_criteria_def = {

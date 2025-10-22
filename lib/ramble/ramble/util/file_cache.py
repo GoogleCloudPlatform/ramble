@@ -125,7 +125,7 @@ class FileCache:
         # TODO: the locking code.
         class WriteContextManager:
 
-            def __enter__(cm):  # noqa
+            def __enter__(cm):
                 cm.orig_filename = self.cache_path(key)
                 cm.orig_file = None
                 if os.path.exists(cm.orig_filename):
@@ -136,7 +136,7 @@ class FileCache:
 
                 return cm.orig_file, cm.tmp_file
 
-            def __exit__(cm, type, value, traceback):  # noqa
+            def __exit__(cm, type, value, traceback):
                 if cm.orig_file:
                     cm.orig_file.close()
                 cm.tmp_file.close()

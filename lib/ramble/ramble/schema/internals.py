@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/internals.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 from llnl.util.lang import union_dicts
 
