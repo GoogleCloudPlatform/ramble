@@ -252,7 +252,7 @@ def _can_update_config_file(scope_dir, cfg_file):
     return dir_ok and cfg_ok
 
 
-def config_update(args):
+def config_update(args) -> None:
     # Read the configuration files
     ramble.config.config.get_config(args.section, scope=args.scope)
     updates: List[ramble.config.ConfigScope] = list(
