@@ -21,7 +21,7 @@ from ramble.language.workflow_manager_language import (
 )
 from ramble.util.naming import NS_SEPARATOR
 
-ObjectMixin = ramble.repository.get_base_class("object_mixin")
+ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
 
 class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):

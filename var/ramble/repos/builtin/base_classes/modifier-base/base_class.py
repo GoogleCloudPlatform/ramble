@@ -30,7 +30,7 @@ from ramble.util.conflicts import MODIFIER_CONFLICT
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
-ObjectMixin = ramble.repository.get_base_class("object_mixin")
+ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
 
 class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
