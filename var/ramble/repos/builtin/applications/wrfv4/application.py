@@ -94,15 +94,12 @@ class Wrfv4(ExecutableApplication):
         output_capture=OUTPUT_CAPTURE.ALL,
     )
     stage_files(
-        name="stage-input",
         src="{input_path}/*",
         dst="{experiment_run_dir}/.",
     )
     stage_files(
-        name="link-run-files",
         src="{wrf_path}/run/*",
         dst="{experiment_run_dir}/.",
-        method="link",
     )
     executable(
         "fix_12km",
@@ -152,8 +149,7 @@ class Wrfv4(ExecutableApplication):
     workload(
         "CONUS_2p5km",
         executables=[
-            "stage-input",
-            "link-run-files",
+            "stage-files",
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",
@@ -166,8 +162,7 @@ class Wrfv4(ExecutableApplication):
     workload(
         "CONUS_12km",
         executables=[
-            "stage-input",
-            "link-run-files",
+            "stage-files",
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",
@@ -181,8 +176,7 @@ class Wrfv4(ExecutableApplication):
     workload(
         "Maria_1km",
         executables=[
-            "stage-input",
-            "link-run-files",
+            "stage-files",
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",

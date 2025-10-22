@@ -60,22 +60,21 @@ class Wrfv3(ExecutableApplication):
         dst="{experiment_run_dir}/.",
     )
     stage_files(
-        name="link-run-files",
+        name="stage-run-files",
         src="{wrf_path}/run/*",
         dst="{experiment_run_dir}/.",
-        method="link",
     )
     executable("execute", "wrf.exe", use_mpi=True)
 
     workload(
         "CONUS_2p5km",
-        executables=["cleanup", "stage-input", "link-run-files", "execute"],
+        executables=["cleanup", "stage-input", "stage-run-files", "execute"],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["cleanup", "stage-input", "link-run-files", "execute"],
+        executables=["cleanup", "stage-input", "stage-run-files", "execute"],
         input="CONUS_12km",
     )
 

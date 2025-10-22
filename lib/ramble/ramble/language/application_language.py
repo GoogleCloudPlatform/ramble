@@ -443,7 +443,10 @@ def stage_files(
         if when_set not in app.executables:
             app.executables[when_set] = {}
 
-        if exec_name in app.executables[when_set]:
+        if (
+            exec_name in app.executables[when_set]
+            and not app.executables[when_set][exec_name].allow_extension
+        ):
             raise DirectiveError(
                 f"stage_files directive on application {app.name} is creating "
                 f"has name attribute of '{exec_name}' which already exists "
@@ -460,15 +463,18 @@ def stage_files(
         else:  # stage_method == "cp"
             stage_cmd = f"cp -r {src} {dst}"
 
+        template = [stage_cmd]
+
         # Prepend mkdir if dst has a parent directory
         parent_dir = os.path.dirname(dst)
         if parent_dir and parent_dir != ".":
-            template = f"mkdir -p {parent_dir} && {stage_cmd}"
-        else:
-            template = stage_cmd
+            template.insert(0, f"mkdir -p {parent_dir}")
 
-        app.executables[when_set][exec_name] = CommandExecutable(
-            name=exec_name, template=template, **kwargs
-        )
+        if exec_name in app.executables[when_set]:
+            app.executables[when_set][exec_name].add_template(template)
+        else:
+            app.executables[when_set][exec_name] = CommandExecutable(
+                name=exec_name, template=template, allow_extension=True, **kwargs
+            )
 
     return _execute_stage_files
