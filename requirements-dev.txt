@@ -9,5 +9,8 @@ pytest-xdist
 pytest-clarity
 line_profiler
 isort
-codecov-cli
+# codecov-cli relies on test-results-parser, which currently has a dep pin on
+# a pyo3 version that is not compatible with 3.14: https://github.com/codecov/test-results-parser/blob/main/Cargo.toml#L14.
+# Also see https://github.com/codecov/test-results-parser/issues/86.
+codecov-cli;python_version<"3.14"
 mypy
