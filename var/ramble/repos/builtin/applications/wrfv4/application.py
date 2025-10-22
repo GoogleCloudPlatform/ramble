@@ -93,14 +93,13 @@ class Wrfv4(ExecutableApplication):
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
-    executable(
-        "copy",
-        template=[
-            "cp -R {input_path}/* {experiment_run_dir}/.",
-            "ln -s {wrf_path}/run/* {experiment_run_dir}/.",
-        ],
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
+    stage_files(
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
+    )
+    stage_files(
+        src="{wrf_path}/run/*",
+        dst="{experiment_run_dir}/.",
     )
     executable(
         "fix_12km",
@@ -150,7 +149,7 @@ class Wrfv4(ExecutableApplication):
     workload(
         "CONUS_2p5km",
         executables=[
-            "copy",
+            "stage-files",
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",
@@ -163,7 +162,7 @@ class Wrfv4(ExecutableApplication):
     workload(
         "CONUS_12km",
         executables=[
-            "copy",
+            "stage-files",
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",
@@ -177,7 +176,7 @@ class Wrfv4(ExecutableApplication):
     workload(
         "Maria_1km",
         executables=[
-            "copy",
+            "stage-files",
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",

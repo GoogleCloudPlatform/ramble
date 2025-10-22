@@ -101,29 +101,20 @@ class QuantumEspresso(ExecutableApplication):
         description="O Pseudopotential for WATER_EXX benchmark",
     )
 
-    executable(
-        "copy_inputs",
-        "cp "
-        + os.path.join(Expander.expansion_str("input_path"), "*")
-        + " "
-        + os.path.join(Expander.expansion_str("experiment_run_dir"), "."),
-        use_mpi=False,
+    stage_files(
+        name="copy_inputs",
+        src=os.path.join(Expander.expansion_str("input_path"), "*"),
+        dst=os.path.join(Expander.expansion_str("experiment_run_dir"), "."),
     )
-    executable(
-        "copy_potential1",
-        template=[
-            "mkdir -p {experiment_run_dir}/pseudo",
-            "cp {potential1} {experiment_run_dir}/pseudo/.",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="copy_potential1",
+        src="{potential1}",
+        dst="{experiment_run_dir}/pseudo/.",
     )
-    executable(
-        "copy_potential2",
-        template=[
-            "mkdir -p {experiment_run_dir}/pseudo",
-            "cp {potential2} {experiment_run_dir}/pseudo/.",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="copy_potential2",
+        src="{potential2}",
+        dst="{experiment_run_dir}/pseudo/.",
     )
 
     executable("execute", "pw.x {flags} < {input_file}", use_mpi=True)

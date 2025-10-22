@@ -9,3 +9,4 @@ config:
         link_type: symlink
     include:
       - test_include: include.yaml
+    stage_method: 'cp'

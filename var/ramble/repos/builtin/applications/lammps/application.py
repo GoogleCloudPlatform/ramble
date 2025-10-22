@@ -129,10 +129,10 @@ class Lammps(ExecutableApplication):
         target_dir="{application_input_dir}/lammps-input-stage",
         description="Stage of lammps source from release",
     )
-    executable(
-        "copy",
-        template=["cp {input_path} {experiment_run_dir}/input.txt"],
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{input_path}",
+        dst="{experiment_run_dir}/input.txt",
     )
     executable(
         "configure-reaxff",
@@ -198,36 +198,32 @@ class Lammps(ExecutableApplication):
         use_mpi=False,
     )
 
-    executable(
-        "copy-cube",
-        template=[
-            "cp "
-            + os.path.join("{intel_test_path}", "mW*.data")
-            + " {experiment_run_dir}"
-            + os.path.sep
-            + "."
-            "cp "
-            + os.path.join("{intel_test_path}", "mW.sw")
-            + " {experiment_run_dir}"
-            + os.path.sep
-            + "."
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-cube",
+        src=os.path.join("{intel_test_path}", "mW*.data"),
+        dst="{experiment_run_dir}/.",
+    )
+    stage_files(
+        name="stage-cube-sw",
+        src=os.path.join("{intel_test_path}", "mW.sw"),
+        dst="{experiment_run_dir}/.",
     )
 
-    executable(
-        "copy-contents",
-        template=[
-            "cp {input_path}/* {experiment_run_dir}/.",
-            "cp {input_file} input.txt",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-contents",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
+    )
+    stage_files(
+        name="stage-input-file",
+        src="{input_file}",
+        dst="input.txt",
     )
 
     workload(
         "lj",
         executables=[
-            "copy",
+            "stage-input",
             "configure-size-scale",
             "configure-run-timesteps",
             "execute",
@@ -261,7 +257,7 @@ class Lammps(ExecutableApplication):
     workload(
         "eam",
         executables=[
-            "copy",
+            "stage-input",
             "configure-size-scale",
             "configure-run-timesteps",
             "execute",
@@ -295,7 +291,7 @@ class Lammps(ExecutableApplication):
     workload(
         "chain",
         executables=[
-            "copy",
+            "stage-input",
             "set-data-path",
             "configure-run-timesteps",
             "execute",
@@ -313,7 +309,7 @@ class Lammps(ExecutableApplication):
 
     workload(
         "chute",
-        executables=["copy", "configure-run-timesteps", "execute"],
+        executables=["stage-input", "configure-run-timesteps", "execute"],
         input="chute",
     )
     with default_args(workloads=["chute"]):
@@ -327,7 +323,7 @@ class Lammps(ExecutableApplication):
 
     workload(
         "rhodo",
-        executables=["copy", "set-data-path", "execute"],
+        executables=["stage-input", "set-data-path", "execute"],
         inputs=["rhodo", "lammps-stage"],
     )
     with default_args(workloads=["rhodo"]):
@@ -342,7 +338,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.airebo",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-size-scale",
             "configure-timestep-variables",
@@ -387,7 +383,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.dpd",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-size-scale",
             "configure-timestep-variables",
@@ -432,7 +428,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.eam",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-size-scale",
             "configure-timestep-variables",
@@ -477,7 +473,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.lc",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-timestep-variables",
             "execute",
@@ -506,7 +502,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.lj",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-size-scale",
             "configure-timestep-variables",
@@ -551,7 +547,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.rhodo",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-timestep-variables",
             "execute",
@@ -580,7 +576,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.sw",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-size-scale",
             "configure-timestep-variables",
@@ -625,7 +621,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.tersoff",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-size-scale",
             "configure-timestep-variables",
@@ -670,7 +666,7 @@ class Lammps(ExecutableApplication):
     workload(
         "intel.water",
         executables=[
-            "copy",
+            "stage-input",
             "change-root",
             "configure-timestep-variables",
             "execute",
@@ -698,7 +694,12 @@ class Lammps(ExecutableApplication):
 
     workload(
         "hns-reaxff",
-        executables=["copy-contents", "configure-reaxff", "execute"],
+        executables=[
+            "stage-contents",
+            "stage-input-file",
+            "configure-reaxff",
+            "execute",
+        ],
         inputs=["lammps-stage"],
     )
     with default_args(workloads=["hns-reaxff"]):

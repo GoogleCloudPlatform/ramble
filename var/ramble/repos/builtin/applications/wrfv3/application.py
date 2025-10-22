@@ -54,26 +54,27 @@ class Wrfv3(ExecutableApplication):
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
-    executable(
-        "copy",
-        template=[
-            "cp -R {input_path}/* {experiment_run_dir}/.",
-            "ln -s {wrf_path}/run/* {experiment_run_dir}/.",
-        ],
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
+    stage_files(
+        name="stage-input",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
+    )
+    stage_files(
+        name="stage-run-files",
+        src="{wrf_path}/run/*",
+        dst="{experiment_run_dir}/.",
     )
     executable("execute", "wrf.exe", use_mpi=True)
 
     workload(
         "CONUS_2p5km",
-        executables=["cleanup", "copy", "execute"],
+        executables=["cleanup", "stage-input", "stage-run-files", "execute"],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["cleanup", "copy", "execute"],
+        executables=["cleanup", "stage-input", "stage-run-files", "execute"],
         input="CONUS_12km",
     )
 

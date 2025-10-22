@@ -44,22 +44,21 @@ class Roms(ExecutableApplication):
 
     executable("execute", "romsM {input_deck}", use_mpi=True)
 
-    executable(
-        "copy_input", "cp {input_path} {experiment_run_dir}/.", use_mpi=False
+    stage_files(
+        name="stage-input",
+        src="{input_path}",
+        dst="{experiment_run_dir}/.",
     )
 
-    executable(
-        "copy_varinfo",
-        template=[
-            "mkdir -p {experiment_run_dir}/ROMS/External/",
-            "cp {varinfo} {experiment_run_dir}/ROMS/External/",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-varinfo",
+        src="{varinfo}",
+        dst="{experiment_run_dir}/ROMS/External/",
     )
 
     workload(
         "benchmark_1",
-        executables=["copy_input", "copy_varinfo", "execute"],
+        executables=["stage-input", "stage-varinfo", "execute"],
         inputs=["bm1", "varinfo"],
     )
 

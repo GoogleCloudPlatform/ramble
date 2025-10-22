@@ -39,8 +39,10 @@ class Elk(ExecutableApplication):
     )
 
     executable("execute", "{install_prefix}/elk_openmpi", use_mpi=True)
-    executable(
-        "copy", "cp {input_path}/elk.in {experiment_run_dir}/.", use_mpi=False
+    stage_files(
+        name="stage-input",
+        src="{input_path}/elk.in",
+        dst="{experiment_run_dir}/.",
     )
     executable(
         "update_input",
@@ -49,7 +51,9 @@ class Elk(ExecutableApplication):
     )
 
     workload(
-        "Cu", executables=["copy", "update_input", "execute"], input="examples"
+        "Cu",
+        executables=["stage-input", "update_input", "execute"],
+        input="examples",
     )
 
     workload_variable(

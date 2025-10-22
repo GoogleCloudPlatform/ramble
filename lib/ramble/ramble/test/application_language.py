@@ -392,3 +392,33 @@ def test_workload_variable_workload_defaults_error():
             workloads=["test"],
         )
         assert "workload_defaults cannot be used with workload, workloads" in err
+
+
+@pytest.mark.parametrize(
+    "stage_method,template_contents",
+    [
+        ("cp", "cp -r src"),
+        ("rsync", "rsync -r src"),
+        ("symbolic_link", "ln -s src"),
+        ("hard_link", "ln src"),
+    ],
+)
+def test_stage_files_directive(stage_method, template_contents):
+    import ramble.config
+
+    with ramble.config.override("config:stage_method", stage_method):
+
+        class TestApp(ExecutableApplication):  # noqa: F405
+            name = "test-app"
+
+        app_inst = TestApp("/not/a/path")
+        app_inst.stage_files(src="src", dst="dst")
+
+        assert "stage-files" in app_inst.executables[frozenset()]
+        exec = app_inst.executables[frozenset()]["stage-files"]
+
+        found = False
+        for line in exec.template:
+            if template_contents in line:
+                found = True
+        assert found

@@ -37,9 +37,14 @@ class IntelHpl(HplBase):
     # - Prepare calling for the script runme_intel64_prv
     #   (We call this runner script instead of the underlying xhpl_intel64_dynamic
     #    since it sets up derived env var HPL_HOST_NODE for numa placement control.)
-    # - Link in the xhpl_intel64_dynamic binary to the running dir
+    # - Copy in the xhpl_intel64_dynamic binary to the running dir
     #   (This is needed due to runme_intel64_prv invoking it using "./")
     # - Account for newer directory layout from mkl 2024
+    stage_files(
+        name="stage-binary",
+        src="${hpl_bench_dir}/xhpl_intel64_dynamic",
+        dst="{experiment_run_dir}/.",
+    )
     executable(
         "prepare",
         template=[
@@ -48,7 +53,6 @@ hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack"
 if [ ! -d ${hpl_bench_dir} ]; then
     hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/share/mkl/benchmarks/mp_linpack"
 fi
-ln -sf ${hpl_bench_dir}/xhpl_intel64_dynamic {experiment_run_dir}/.
 hpl_run="${hpl_bench_dir}/runme_intel64_prv"
     """.strip()
         ],
@@ -63,8 +67,8 @@ hpl_run="${hpl_bench_dir}/runme_intel64_prv"
         use_mpi=True,
     )
 
-    workload("standard", executables=["prepare", "execute"])
-    workload("calculator", executables=["prepare", "execute"])
+    workload("standard", executables=["prepare", "stage-binary", "execute"])
+    workload("calculator", executables=["prepare", "stage-binary", "execute"])
 
     workload_group("standard", workloads=["standard"], mode="append")
     workload_group("calculator", workloads=["calculator"], mode="append")

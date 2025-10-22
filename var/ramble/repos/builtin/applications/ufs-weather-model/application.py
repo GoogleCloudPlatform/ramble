@@ -58,15 +58,15 @@ class UfsWeatherModel(ExecutableApplication):
 
     executable("execute", "ufs_weather_model", use_mpi=True)
 
-    executable(
-        "copy_input",
-        template=["cp -pR {input_path}/* {experiment_run_dir}"],
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}",
     )
 
     workload(
         "simple_test_case",
-        executables=["copy_input", "execute"],
+        executables=["stage-input", "execute"],
         input="simple_test_case",
     )
 
@@ -237,7 +237,7 @@ class UfsWeatherModel(ExecutableApplication):
 
     workload(
         "control_c48_intel",
-        executables=["copy_input", "execute"],
+        executables=["stage-input", "execute"],
         inputs=restart_file_names,
     )
 

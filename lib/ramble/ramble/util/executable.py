@@ -73,6 +73,7 @@ class CommandExecutable:
         redirect="{log_file}",
         output_capture=OUTPUT_CAPTURE.DEFAULT,
         run_in_background=False,
+        allow_extension=False,
         **kwargs,
     ):
         """Create a CommandExecutable instance
@@ -107,6 +108,7 @@ class CommandExecutable:
         self.output_capture = output_capture
         self.run_in_background = run_in_background
         self.variables = variables.copy()
+        self.allow_extension = allow_extension
 
     def copy(self):
         """Replicate a CommandExecutable instance"""
@@ -135,6 +137,12 @@ class CommandExecutable:
             self_str += f"    {color_attr}: {getattr(self, attr)}\n"
 
         return self_str
+
+    def add_template(self, commands):
+        if isinstance(commands, list):
+            self.template.extend(commands)
+        else:
+            self.template.append(commands)
 
 
 class CommandExecutableError(ramble.error.RambleError):

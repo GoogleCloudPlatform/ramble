@@ -108,10 +108,10 @@ class Namd(ExecutableApplication):
         description="Tcl forces (decalanin)",
     )
 
-    executable(
-        "copy_inputs",
-        "cp {input_path}/* {experiment_run_dir}/.",
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
     )
     executable("execute", "namd2 {namd_flags} {input_file}", use_mpi=True)
 
@@ -136,7 +136,7 @@ class Namd(ExecutableApplication):
     for wl_def in benchmark_workloads:
         workload(
             wl_def[0],
-            executables=["copy_inputs", "execute"],
+            executables=["stage-input", "execute"],
             inputs=[wl_def[0]],
         )
 
