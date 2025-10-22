@@ -51,11 +51,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     package_manager_class = "PackageManagerBase"
     requires_software_environment = True
 
-    #: Lists of strings which contains GitHub usernames of attributes.
-    #: Do not include @ here in order not to unnecessarily ping the users.
-    maintainers: List[str] = []
-    tags: List[str] = []
-
     def __init__(self, file_path):
         super().__init__()
 
@@ -71,8 +66,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
-
-        self._verbosity = "short"
 
         self.app_inst = None
         self.keywords = None

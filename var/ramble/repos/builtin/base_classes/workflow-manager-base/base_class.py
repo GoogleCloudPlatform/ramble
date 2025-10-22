@@ -7,7 +7,7 @@
 # except according to those terms.
 """Define base classes for workflow manager definitions"""
 
-from typing import Collection, Iterator, List
+from typing import Collection, Iterator
 
 import ramble.definitions.families
 import ramble.util.class_attributes
@@ -35,8 +35,6 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
         "setup",
         "execute",
     ]
-    maintainers: List[str] = []
-    tags: List[str] = []
 
     workflow_manager_variable(
         "workflow_banner",
