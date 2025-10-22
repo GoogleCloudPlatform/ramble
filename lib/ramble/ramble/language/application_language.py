@@ -421,7 +421,7 @@ def stage_files(
     Args:
         src (str): The source path of the file or directory.
         dst (str): The destination path.
-        name (str, optional): The name of the executable. Defaults to 'stage-files'.
+        name (str | None): The name of the executable. Defaults to 'stage-files'.
         when (list | None): List of when conditions to apply to this directive.
     """
 
