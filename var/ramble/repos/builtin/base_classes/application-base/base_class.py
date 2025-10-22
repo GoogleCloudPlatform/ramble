@@ -69,7 +69,7 @@ import spack.util.compression
 import spack.util.executable
 import spack.util.spack_json
 
-ObjectMixin = ramble.repository.get_base_class("object_mixin")
+ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
 _NULL_CONTEXT = "null"
 

@@ -21,7 +21,7 @@ from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
-ObjectMixin = ramble.repository.get_base_class("object_mixin")
+ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
 
 class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
