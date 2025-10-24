@@ -76,8 +76,8 @@ class Ior(ExecutableApplication):
     )
     workload_variable(
         "additional_args",
-        default="",
-        description="Additional args to pass",
+        default="-C -e",
+        description="Additional args to pass. The default aims to suppress the use of page cache.",
         workload_group="all_workloads",
     )
 
