@@ -52,3 +52,19 @@ def nested_3(s):
 
 def nested_4(s):
     return level4_color + s + plain_format
+
+
+def title_color(title: str, n_indent: int = 0):
+    """Set the appropriate color for titles based on indentation"""
+    if n_indent == 0:
+        out_str = section_title(f"{title}")
+    elif n_indent == 4:
+        out_str = nested_1(f"{title}")
+    elif n_indent == 8:
+        out_str = nested_2(f"{title}")
+    elif n_indent == 12:
+        out_str = nested_3(f"{title}")
+    else:
+        out_str = nested_4(f"{title}")
+
+    return out_str

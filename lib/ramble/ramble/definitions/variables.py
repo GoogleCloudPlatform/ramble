@@ -12,22 +12,6 @@ from typing import Any, Dict, List, Optional, Set
 import ramble.util.colors as rucolor
 
 
-def _title_color(title: str, n_indent: int = 0):
-    """Set the appropriate color for titles based on indentation"""
-    if n_indent == 0:
-        out_str = rucolor.section_title(f"{title}")
-    elif n_indent == 4:
-        out_str = rucolor.nested_1(f"{title}")
-    elif n_indent == 8:
-        out_str = rucolor.nested_2(f"{title}")
-    elif n_indent == 12:
-        out_str = rucolor.nested_3(f"{title}")
-    elif n_indent == 16:
-        out_str = rucolor.nested_4(f"{title}")
-
-    return out_str
-
-
 class Variable:
     """Class representing a variable definition"""
 
@@ -81,7 +65,7 @@ class Variable:
         if verbose:
             print_attrs = ["Description", "Default", "Values"]
 
-            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            out_str = rucolor.title_color(f"{indentation}{self.name}:\n", n_indent)
             for print_attr in print_attrs:
                 name = print_attr
                 if print_attr == "Values":
@@ -91,7 +75,7 @@ class Variable:
                 attr_val = getattr(self, attr_name, None)
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                        f"{indentation}    {rucolor.title_color(name, n_indent=n_indent + 4)}: "
                         f'{str(attr_val).replace("@", "@@")}\n'
                     )
         else:
@@ -156,7 +140,7 @@ class VariableModification:
 
         print_attrs = ["Modification", "Method", "Separator", "When"]
 
-        out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+        out_str = rucolor.title_color(f"{indentation}{self.name}:\n", n_indent)
         for print_attr in print_attrs:
             name = print_attr
             attr_name = print_attr.lower()
@@ -166,7 +150,7 @@ class VariableModification:
                 if print_attr == "Separator":
                     attr_val = f"'{attr_val}'"
                 out_str += (
-                    f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                    f"{indentation}    {rucolor.title_color(name, n_indent=n_indent + 4)}: "
                     f'{str(attr_val).replace("@", "@@")}\n'
                 )
         return out_str
@@ -226,13 +210,13 @@ class EnvironmentVariable:
             print_attrs = ["Description", "Value", "Method"]
             if self.method == "append":
                 print_attrs.append("Separator")
-            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            out_str = rucolor.title_color(f"{indentation}{self.name}:\n", n_indent)
             for name in print_attrs:
                 attr_name = name.lower()
                 attr_val = getattr(self, attr_name, None)
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {_title_color(name, n_indent=n_indent + 4)}: "
+                        f"{indentation}    {rucolor.title_color(name, n_indent=n_indent + 4)}: "
                         f'{str(attr_val).replace("@", "@@")}\n'
                     )
         else:
@@ -307,20 +291,20 @@ class EnvironmentVariableModifications:
 
         if verbose:
             n = 0
-            out_str = _title_color(f"{indentation}{self.name}:\n", n_indent)
+            out_str = rucolor.title_color(f"{indentation}{self.name}:\n", n_indent)
             for method in self.all_methods:
                 if getattr(self, method):
                     if n > 0:
                         out_str += "\n"
                     out_str += (
-                        f"{indentation}    {_title_color('method', n_indent=n_indent + 4)}: "
-                        f"{method}\n"
+                        f"{indentation}    "
+                        f"{rucolor.title_color('method', n_indent=n_indent + 4)}: {method}\n"
                     )
                     n += 1
                     if method == "set":
                         out_str += (
                             f"{indentation}    "
-                            f"{_title_color('modification', n_indent=n_indent + 4)}: "
+                            f"{rucolor.title_color('modification', n_indent=n_indent + 4)}: "
                             f"{self.set[self.name]}\n"
                         )
                     elif method in ["prepend", "append"]:
@@ -328,12 +312,12 @@ class EnvironmentVariableModifications:
                             for attr, val in method_dict.items():
                                 out_str += (
                                     f"{indentation}    "
-                                    f"{_title_color(attr, n_indent=n_indent + 4)}: {val}\n"
+                                    f"{rucolor.title_color(attr, n_indent=n_indent + 4)}: {val}\n"
                                 )
                     if self.when:
                         out_str += (
-                            f"{indentation}    {_title_color('when', n_indent=n_indent + 4)}: "
-                            f"{self.when}\n"
+                            f"{indentation}    "
+                            f"{rucolor.title_color('when', n_indent=n_indent + 4)}: {self.when}\n"
                         )
         else:
             out_str = f"{indentation}{self.name}"

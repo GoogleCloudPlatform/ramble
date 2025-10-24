@@ -9,9 +9,13 @@
 import json
 import os
 
+import llnl.util.tty.color as color
+from llnl.util.tty.colify import colified
+
 import ramble.cmd
 import ramble.reports
 import ramble.uploader
+import ramble.util.colors as rucolor
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
@@ -28,6 +32,11 @@ def setup_parser(subparser):
         "upload", help=results_upload.__doc__, description=results_upload.__doc__
     )
     upload_parser.add_argument("filename", help="path of file to upload")
+
+    index_parser = sp.add_parser(
+        "index", help=results_index.__doc__, description=results_index.__doc__
+    )
+    index_parser.add_argument("-f", "--file", help="path of results file")
 
     report_parser = sp.add_parser(
         "report", help=results_report.__doc__, description=results_report.__doc__
@@ -209,6 +218,27 @@ def _load_results(args):
     return results_dict
 
 
+def _print_attr_dict(attr_dict: dict, n_indent=0):
+    for attr, values in attr_dict.items():
+        indentation = " " * n_indent
+        color.cprint(f"{indentation}{rucolor.title_color(attr, n_indent)}:")
+        if isinstance(values, dict):
+            _print_attr_dict(values, n_indent + 4)
+        else:
+            color.cprint(colified(sorted(values), tty=True, indent=n_indent + 4))
+
+
+def results_index(args):
+    """List attributes in results including FOMs and template variables"""
+
+    results_dict = _load_results(args)
+    result_index = ramble.reports.generate_result_index(results_dict)
+    for obj_name, obj_dict in result_index.items():
+        if obj_dict:
+            color.cprint(rucolor.title_color(f'{obj_name.replace("_", " ").title()}:'))
+            _print_attr_dict(obj_dict, n_indent=4)
+
+
 def results_report(args):
     """Create a report with charts from Ramble experiment results."""
     results_dict = _load_results(args)
@@ -225,5 +255,9 @@ def results_report(args):
 
 
 def results(parser, args):
-    action = {"upload": results_upload, "report": results_report}
+    action = {
+        "upload": results_upload,
+        "index": results_index,
+        "report": results_report,
+    }
     action[args.results_command](args)

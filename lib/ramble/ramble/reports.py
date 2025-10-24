@@ -11,11 +11,12 @@ import datetime
 import os
 import re
 from enum import Enum
-from typing import List
+from typing import Dict, List
 
 import llnl.util.filesystem as fs
 
 import ramble.config
+import ramble.repository
 import ramble.util.path
 from ramble.keywords import keywords
 from ramble.util.file_util import create_symlink
@@ -56,6 +57,10 @@ _FOM_DICT_MAPPING = {
 }
 
 INVENTORY_FILENAME = "inventory.yaml"
+OBJECT_NAMES = {}
+for obj in ramble.repository.ObjectTypes:
+    singular = ramble.repository.type_definitions[obj]["singular"]
+    OBJECT_NAMES[singular] = obj.name
 
 
 def to_numeric_if_possible(series):
@@ -82,18 +87,17 @@ def is_repeat_child(experiment):
         return False
 
 
-def prepare_data(results: dict, where_query) -> pd.DataFrame:
-    """Creates a Pandas DataFrame from the results dictionary to use for reports.
+def filter_exp_results(experiments: list):
+    """Filters a list of experiment results to remove failed experiments and
+    duplicate data.
 
-    Transforms nested results dictionary into a flat dataframe. Each row equals
-    one FOM from one context of one experiment, with columns including
-    associated experiment variables (except paths and commands).
+    When repeats are used, this removes individual repeats and returns only the
+    summary statistics.
     """
-
-    unnest_context = []
+    filtered_exps = []
     skip_exps = []
-    # first unnest dictionaries
-    for exp in results["experiments"]:
+
+    for exp in experiments:
         if exp["name"] in skip_exps or is_repeat_child(exp):
             logger.debug(f"Skipping import of experiment {exp['name']}")
             continue
@@ -115,59 +119,73 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
                         skip_exps.append(repeat_exp_name)
                     else:
                         skip_exps.append(exp_name + f".{n}")
+            filtered_exps.append(exp)
 
-            for context in exp["CONTEXTS"]:
-                for fom in context["foms"]:
-                    # Expand to one row/FOM/context w/ a copy of the experiment vars and metadata
-                    exp_copy = copy.deepcopy(exp)
+    return filtered_exps
 
-                    # Remove context dict and add the current FOM values
-                    exp_copy.pop("CONTEXTS")
-                    exp_copy[ReportVars.CONTEXT.value] = context["name"]
-                    for name, val in fom.items():
-                        if name in _FOM_DICT_MAPPING:
-                            exp_copy[_FOM_DICT_MAPPING[name]] = val
-                        elif name == "fom_type":
-                            exp_copy["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
-                            exp_copy[ReportVars.BETTER_DIRECTION.value] = BetterDirection.from_str(
-                                fom["fom_type"][ReportVars.BETTER_DIRECTION.value]
-                            )
 
-                        # older data exports may not have fom_type stored
-                        if "fom_type" not in exp_copy:
-                            exp_copy["fom_type"] = FomType.UNDEFINED
-                            exp_copy[ReportVars.BETTER_DIRECTION.value] = (
-                                BetterDirection.INDETERMINATE
-                            )
+def prepare_data(results: dict, where_query) -> pd.DataFrame:
+    """Creates a Pandas DataFrame from the results dictionary to use for reports.
 
-                    # Exclude vars that aren't needed for analysis, mainly paths and commands
-                    dir_regex = r"_dir$"
-                    path_regex = r"_path$"
-                    vars_to_ignore = [
-                        keywords.batch_submit,
-                        keywords.log_file,
-                        "command",
-                        "execute_experiment",
-                    ]
-                    for key, value in exp["RAMBLE_VARIABLES"].items():
-                        if key in vars_to_ignore:
-                            continue
-                        if re.search(dir_regex, key):
-                            continue
-                        if re.search(path_regex, key):
-                            continue
-                        exp_copy[key] = value
+    Transforms nested results dictionary into a flat dataframe. Each row equals
+    one FOM from one context of one experiment, with columns including
+    associated experiment variables (except paths and commands).
+    """
+    filtered_exps = filter_exp_results(results["experiments"])
 
-                    for key, value in exp["RAMBLE_RAW_VARIABLES"].items():
-                        if key in vars_to_ignore:
-                            continue
-                        if re.search(dir_regex, key):
-                            continue
-                        if re.search(path_regex, key):
-                            continue
-                        exp_copy["RAW" + key] = value
+    unnest_context = []
+    # first unnest dictionaries
+    for exp in filtered_exps:
+        for context in exp["CONTEXTS"]:
+            for fom in context["foms"]:
+                # Expand to one row/FOM/context w/ a copy of the experiment vars and metadata
+                exp_copy = copy.deepcopy(exp)
 
-                    unnest_context.append(exp_copy)
+                # Remove context dict and add the current FOM values
+                exp_copy.pop("CONTEXTS")
+                exp_copy[ReportVars.CONTEXT.value] = context["name"]
+                for name, val in fom.items():
+                    if name in _FOM_DICT_MAPPING:
+                        exp_copy[_FOM_DICT_MAPPING[name]] = val
+                    elif name == "fom_type":
+                        exp_copy["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
+                        exp_copy[ReportVars.BETTER_DIRECTION.value] = BetterDirection.from_str(
+                            fom["fom_type"][ReportVars.BETTER_DIRECTION.value]
+                        )
+
+                    # older data exports may not have fom_type stored
+                    if "fom_type" not in exp_copy:
+                        exp_copy["fom_type"] = FomType.UNDEFINED
+                        exp_copy[ReportVars.BETTER_DIRECTION.value] = BetterDirection.INDETERMINATE
+
+                # Exclude vars that aren't needed for analysis, mainly paths and commands
+                dir_regex = r"_dir$"
+                path_regex = r"_path$"
+                vars_to_ignore = [
+                    keywords.batch_submit,
+                    keywords.log_file,
+                    "command",
+                    "execute_experiment",
+                ]
+                for key, value in exp["RAMBLE_VARIABLES"].items():
+                    if key in vars_to_ignore:
+                        continue
+                    if re.search(dir_regex, key):
+                        continue
+                    if re.search(path_regex, key):
+                        continue
+                    exp_copy[key] = value
+
+                for key, value in exp["RAMBLE_RAW_VARIABLES"].items():
+                    if key in vars_to_ignore:
+                        continue
+                    if re.search(dir_regex, key):
+                        continue
+                    if re.search(path_regex, key):
+                        continue
+                    exp_copy["RAW" + key] = value
+
+                unnest_context.append(exp_copy)
 
     results_df = pd.DataFrame.from_dict(unnest_context)
 
@@ -895,3 +913,98 @@ def make_report(results_df, ws_name, args):
         logger.all_msg("Symlinks updated:")
         for path in symlinks_created:
             logger.all_msg(f"  {path}")
+
+
+def generate_result_index(results: dict, where_query=None):
+    """Creates an index of the results file
+
+    Index format is:
+    {
+        "applications": {
+            application_name: {
+                workload: {
+                    "Contexts": set(),
+                    "FOMs": set(),
+                    "Template Variables": set(),
+                }
+            }
+        }
+        "modifiers": {
+            modifier_name: {
+                "Contexts": set(),
+                "FOMs": set(),
+            }
+        (all other object types)
+    }
+
+    """
+    filtered_exps = filter_exp_results(results["experiments"])
+
+    result_index: Dict[str, dict] = {}
+    for obj_name in OBJECT_NAMES.values():
+        result_index[obj_name] = {}
+
+    template_patterns: Dict[str, dict] = {}
+    # first unnest dictionaries
+    for exp in filtered_exps:
+        if exp["application_name"] not in result_index["applications"]:
+            result_index["applications"][exp["application_name"]] = {}
+        app_dict = result_index["applications"][exp["application_name"]]
+
+        if exp["workload_name"] not in app_dict:
+            app_dict[exp["workload_name"]] = {
+                "Contexts": set(),
+                "FOMs": set(),
+                "Template Variables": set(),
+            }
+        if exp["application_name"] not in template_patterns:
+            template_patterns[exp["application_name"]] = {}
+        if exp["workload_name"] not in template_patterns[exp["application_name"]]:
+            template_patterns[exp["application_name"]][exp["workload_name"]] = set()
+
+        template_patterns[exp["application_name"]][exp["workload_name"]].add(
+            exp["RAMBLE_RAW_VARIABLES"]["experiment_template_name"]
+        )
+
+        for context in exp["CONTEXTS"]:
+            if not context["foms"]:
+                continue
+            app_dict[exp["workload_name"]]["Contexts"].add(context["name"])
+            for fom in context["foms"]:
+                if fom["origin"] == exp["application_name"]:
+                    # If it's a repeat summary, add summary FOMs and stat names
+                    if fom["name"] == "Experiment Summary":
+                        summary_shortname = fom["origin_type"].split("::")[1]
+                        if "Experiment Summary" not in app_dict[exp["workload_name"]]:
+                            app_dict[exp["workload_name"]]["Experiment Summary"] = set()
+                        app_dict[exp["workload_name"]]["Experiment Summary"].add(summary_shortname)
+                    else:
+                        if fom["origin_type"].startswith("summary::"):
+                            summary_shortname = fom["origin_type"].split("::")[1]
+                            if "FOM Summary Statistics" not in app_dict[exp["workload_name"]]:
+                                app_dict[exp["workload_name"]]["FOM Summary Statistics"] = set()
+                            app_dict[exp["workload_name"]]["FOM Summary Statistics"].add(
+                                summary_shortname
+                            )
+
+                        app_dict[exp["workload_name"]]["FOMs"].add(fom["name"])
+                else:
+                    # All other objects
+                    if fom["origin_type"] in OBJECT_NAMES.keys():
+                        obj_dict = result_index[OBJECT_NAMES[fom["origin_type"]]]
+                        if fom["origin"] not in obj_dict:
+                            obj_dict[fom["origin"]] = {"FOMs": set()}
+                        obj_dict[fom["origin"]]["FOMs"].add(fom["name"])
+
+    # Extract template variables used to parameterize experiments
+    capture_group = r"(\w+)"
+    expansion_pattern = re.compile(rf"{ramble.expander.Expander.expansion_str(capture_group)}")
+
+    for app, wl_and_patterns in template_patterns.items():
+        for workload, patterns in wl_and_patterns.items():
+            expansion_strs = set()
+            for pattern in patterns:
+                expansion_strs.update(expansion_pattern.findall(pattern))
+            result_index["applications"][app][workload]["Template Variables"] = expansion_strs
+
+    return result_index
