@@ -39,7 +39,7 @@ class Openfoam(ExecutableApplication):
                 "stage_input",
                 "stage_trisurface",
                 "stage_geometry",
-                "stage_U",
+                "stage_0",
                 "configure_mesh",
                 "surfaceFeatures",
                 "blockMesh",
@@ -218,7 +218,7 @@ class Openfoam(ExecutableApplication):
     stage_files(
         name="stage_geometry", src="{geometry_path}", dst="constant/geometry/."
     )
-    stage_files(name="stage_U", src="0/U", dst="0/U.orig")
+    stage_files(name="stage_0", src="0/U", dst="0/U.orig")
 
     executable(
         "configure_mesh",
