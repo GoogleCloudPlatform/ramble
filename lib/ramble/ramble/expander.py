@@ -38,6 +38,14 @@ def _join_str(seq, sep=","):
     return sep.join(str(i) for i in seq)
 
 
+def _upper_str(in_str):
+    return in_str.upper()
+
+
+def _lower_str(in_str):
+    return in_str.lower()
+
+
 def _re_search(regex, s):
     return re.search(regex, s) is not None
 
@@ -120,6 +128,8 @@ supported_scalar_function_pointers = {
     "simplify_str": spack.util.naming.simplify_name,
     "join_str": _join_str,
     "re_search": _re_search,
+    "upper_str": _upper_str,
+    "lower_str": _lower_str,
 }
 
 # Format Spec Regex:
