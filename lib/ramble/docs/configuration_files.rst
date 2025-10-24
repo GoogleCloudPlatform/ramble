@@ -40,6 +40,7 @@ Currently, Ramble supports the following configuration sections:
 * :ref:`repos <repos-config>`
 * :ref:`software <software-config>`
 * :ref:`success_criteria <success-criteria-config>`
+* :ref:`tables <tables-config>`
 * :ref:`variables <variables-config>`
 * :ref:`variants <variants-config>`
 
@@ -142,6 +143,7 @@ In the above ``[optional_definitions]`` can include any of:
 * :ref:`internals <internals-config>`
 * :ref:`modifiers <modifiers-config>`
 * :ref:`success_criteria <success-criteria-config>`
+* :ref:`tables <tables-config>`
 * :ref:`variables <variables-config>`
 * :ref:`variants <variants-config>`
 
@@ -675,6 +677,89 @@ use when determining if they were successful or not. Its format is as follows:
 For more information about using success criteria, see the
 :ref:`success criteria documentation<success-criteria>`.
 
+.. _tables-config:
+
+---------------
+Tables Section:
+---------------
+
+The tables section is used to define tables that should be generated when a
+workspace is analyzed. Its format is as follows:
+
+.. code-block:: yaml
+
+     tables:
+     - name: "table_name_template"
+       [optional table attributes]
+       columns:
+       - name: "column_name_template"
+         [column_attributes]
+
+
+In the tables section, a list of tables can be provided. Tables can also be
+included in the :ref:`applications<application-config>` section. In this case,
+tables are scoped to the section they are added in (i.e. a table added within a
+specific application name will only generate data for that application's
+experiments, and likewise for workloads and experiment blocks).
+
+In the above, ``[optional table attributes]`` includes any of the following:
+
+.. code-block:: yaml
+
+   group_by:
+   - "list of column names"
+   - "to group (collapse) data by"
+   group_method: "max" # Method of applying the grouping
+   sort_by:
+   - "list of column names"
+   - "to sort data by"
+   where:
+   - "list of expressions"
+   - "to filter experiments"
+   - "to build table from"
+
+The ``group_method`` can be selected from any `groupby method supported by
+Pandas dataframes
+<https://pandas.pydata.org/docs/reference/groupby.html#dataframegroupby-computations-descriptive-stats>`_.
+
+Additionally, ``[column_attributes]`` can include any of the following:
+
+.. code-block:: yaml
+
+   columns:
+   - name: "column name template"
+     where:
+     - "list of expressions"
+     - "to filter experiments"
+     - "when building this column"
+     expression: "Ramble-style expression for column value"
+     figure_of_merit: "Figure of merit name for column value"
+     figure_of_merit_context: "Context name to extract figure of merit from"
+     figure_of_merit_origin_type: "Origin type to extract figure of merit from"
+
+One of ``expression`` and ``figure_of_merit`` are required for each column. If
+a context is not provided, Ramble will attempt to auto-detect the context.
+Similarly, if the origin type is not provided, Ramble will auto detect the
+origin type.
+
+Columns are built in YAML order. The ``expression`` attribute can be used to
+refer to values from other columns that are defined before the current column.
+
+Both ``table_name_template`` and ``column_name_template`` can include Ramble
+variables, to automatically generate new tables and columns. As an example:
+
+.. code-block:: yaml
+
+   tables:
+   - name: '{workload_name} status'
+     columns:
+     - name: Experiment
+       expression: '{experiment_name}'
+     - name: Status
+       expression: '{experiment_status}'
+
+Will automatically create one table per workload, with the status summary of
+that workload's experiments.
 
 .. _variables-config:
 
