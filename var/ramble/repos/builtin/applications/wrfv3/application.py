@@ -48,33 +48,39 @@ class Wrfv3(ExecutableApplication):
         description="12 km resolution mesh of the continental United States.",
     )
 
-    executable(
-        "cleanup",
-        "rm -f rsl.* wrfout*",
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
-    )
-    stage_files(
-        name="stage-input",
-        src="{input_path}/*",
-        dst="{experiment_run_dir}/.",
-    )
     stage_files(
         name="stage-run-files",
         src="{wrf_path}/run/*",
         dst="{experiment_run_dir}/.",
     )
+
+    stage_files(
+        name="stage-input",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
+    )
+
+    executable(
+        "setup",
+        template=[
+            "rm -f rsl.* wrfout* namelist*",
+            "cp {input_path}/namelist.* {experiment_run_dir}/.",
+        ],
+        use_mpi=False,
+        output_capture=OUTPUT_CAPTURE.ALL,
+    )
+
     executable("execute", "wrf.exe", use_mpi=True)
 
     workload(
         "CONUS_2p5km",
-        executables=["cleanup", "stage-input", "stage-run-files", "execute"],
+        executables=["setup", "stage-input", "stage-run-files", "execute"],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["cleanup", "stage-input", "stage-run-files", "execute"],
+        executables=["setup", "stage-input", "stage-run-files", "execute"],
         input="CONUS_12km",
     )
 
