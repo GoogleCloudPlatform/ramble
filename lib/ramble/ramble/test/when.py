@@ -234,10 +234,11 @@ test inheritance 12.0
 
         ws._re_read()
 
-        with pytest.raises(RambleCommandError):
-
-            captured = workspace("analyze", global_args=global_args)
-            assert "context 'test_context_when'" in captured
+        with pytest.raises(
+            RambleCommandError,
+            match=r"Command output:\n\n.*context 'test_context_when'.*is not found",
+        ):
+            workspace("analyze", global_args=global_args)
 
 
 def test_same_fom_name_different_context(workspace_name):

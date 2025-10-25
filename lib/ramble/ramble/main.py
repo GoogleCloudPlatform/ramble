@@ -717,8 +717,13 @@ class RambleCommand:
         if fail_on_error and self.returncode not in (None, 0):
             self._log_command_output(out)
             raise RambleCommandError(
-                "Command exited with code %d: %s(%s)"
-                % (self.returncode, self.command_name, ", ".join("'%s'" % a for a in argv))
+                "Command exited with code %d: %s(%s).\nCommand output:\n\n%s"
+                % (
+                    self.returncode,
+                    self.command_name,
+                    ", ".join("'%s'" % a for a in argv),
+                    out.getvalue(),
+                )
             )
 
         return out.getvalue()
