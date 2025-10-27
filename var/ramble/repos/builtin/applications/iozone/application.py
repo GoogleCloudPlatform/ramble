@@ -19,9 +19,9 @@ class Iozone(ExecutableApplication):
     tags("storage-benchmark", "io-benchmark", "filesystem")
 
     with when("package_manager_family=spack"):
-        # Use gcc < 10, as otherwise spack install fails due to gcc10's default nocommon flag
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
-        software_spec("iozone", pkg_spec="iozone@3_506", compiler="gcc9")
+        # gcc >= 10 compilation errors were addressed in https://github.com/spack/spack-packages/pull/2073.
+        define_compiler("gcc15", pkg_spec="gcc@15.2.0")
+        software_spec("iozone", pkg_spec="iozone@3_506", compiler="gcc15")
         required_package("iozone")
 
     register_template(
