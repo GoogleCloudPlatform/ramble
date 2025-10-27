@@ -230,7 +230,6 @@ def _print_attr_dict(attr_dict: dict, n_indent=0):
 
 def results_index(args):
     """List attributes in results including FOMs and template variables"""
-
     results_dict = _load_results(args)
     result_index = ramble.reports.generate_result_index(results_dict)
     for obj_name, obj_dict in result_index.items():
@@ -243,8 +242,9 @@ def results_report(args):
     """Create a report with charts from Ramble experiment results."""
     results_dict = _load_results(args)
 
-    ws_name = results_dict["workspace_name"]
-    if not ws_name:
+    if "workspace_name" in results_dict:
+        ws_name = results_dict["workspace_name"]
+    else:
         ws_name = "unknown_workspace"
 
     if args.workspace:

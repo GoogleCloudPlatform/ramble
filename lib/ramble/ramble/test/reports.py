@@ -25,7 +25,13 @@ import pytest
 from matplotlib.backends.backend_pdf import PdfPages
 
 import ramble.reports
+from ramble.main import RambleCommand
 from ramble.util import foms
+
+import spack.util.spack_json as sjson
+import spack.util.spack_yaml as syaml
+
+results = RambleCommand("results")
 
 single_experiments = [
     {
@@ -44,7 +50,7 @@ single_experiments = [
                         "name": "fom_1",
                         "value": 42.0,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                     },
@@ -52,7 +58,7 @@ single_experiments = [
                         "name": "fom_2",
                         "value": 50,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                     },
@@ -76,7 +82,7 @@ single_experiments = [
                         "name": "fom_1",
                         "value": 28.0,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                     },
@@ -84,7 +90,7 @@ single_experiments = [
                         "name": "fom_2",
                         "value": 55,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                     },
@@ -111,7 +117,7 @@ repeat_experiments = [
                     {
                         "value": 2,
                         "units": "repeats",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "summary::n_total_repeats",
                         "name": "Experiment Summary",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
@@ -119,7 +125,7 @@ repeat_experiments = [
                     {
                         "value": 2,
                         "units": "repeats",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "summary::n_successful_repeats",
                         "name": "Experiment Summary",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
@@ -127,7 +133,7 @@ repeat_experiments = [
                     {
                         "value": 28.0,
                         "units": "s",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "summary::min",
                         "name": "fom_1",
                         "fom_type": {"name": "TIME", "better_direction": "LOWER"},
@@ -135,7 +141,7 @@ repeat_experiments = [
                     {
                         "value": 30.0,
                         "units": "s",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "summary::max",
                         "name": "fom_1",
                         "fom_type": {"name": "TIME", "better_direction": "LOWER"},
@@ -143,7 +149,7 @@ repeat_experiments = [
                     {
                         "value": 29.0,
                         "units": "s",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "summary::mean",
                         "name": "fom_1",
                         "fom_type": {"name": "TIME", "better_direction": "LOWER"},
@@ -169,7 +175,7 @@ repeat_experiments = [
                         "name": "fom_1",
                         "value": 28.0,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "TIME", "better_direction": "LOWER"},
                     },
@@ -177,7 +183,7 @@ repeat_experiments = [
                         "name": "fom_2",
                         "value": 55,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                     },
@@ -202,7 +208,7 @@ repeat_experiments = [
                         "name": "fom_1",
                         "value": 30.0,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "TIME", "better_direction": "LOWER"},
                     },
@@ -210,7 +216,7 @@ repeat_experiments = [
                         "name": "fom_2",
                         "value": 55,
                         "units": "",
-                        "origin": "dummy_app",
+                        "origin": "test_app",
                         "origin_type": "application",
                         "fom_type": {"name": "MEASURE", "better_direction": "INDETERMINATE"},
                     },
@@ -220,10 +226,10 @@ repeat_experiments = [
     },
 ]
 
-results = {"experiments": single_experiments}
+single_exp_results = {"experiments": single_experiments}
 
 all_experiments = repeat_experiments + single_experiments
-repeat_results = {"experiments": all_experiments}
+repeat_exp_results = {"experiments": all_experiments}
 
 
 def create_test_exp(
@@ -281,7 +287,6 @@ def create_test_exp(
     ],
 )
 def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
-
     report_name = "unit_test"
     report_dir_path = tmpdir_factory.mktemp(report_name)
     pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
@@ -303,7 +308,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
             fom_name,
             fom1,
             "",
-            "dummy_app",
+            "test_app",
             "application",
             foms.FomType.MEASURE,
             foms.BetterDirection.INDETERMINATE,
@@ -324,7 +329,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
             fom_name,
             fom2,
             "",
-            "dummy_app",
+            "test_app",
             "application",
             foms.FomType.MEASURE,
             foms.BetterDirection.INDETERMINATE,
@@ -348,7 +353,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     split_by = "simplified_workload_namespace"
 
     where_query = None
-    results_df = ramble.reports.prepare_data(results, where_query)
+    results_df = ramble.reports.prepare_data(single_exp_results, where_query)
     plot = plot_type(test_spec, normalize, report_dir_path, results_df, logx, logy, split_by)
 
     with PdfPages(pdf_path) as pdf_report:
@@ -364,7 +369,7 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
 
 def test_repeat_import(mutable_mock_workspace_path):
     where_query = None
-    results_df = ramble.reports.prepare_data(repeat_results, where_query)
+    results_df = ramble.reports.prepare_data(repeat_exp_results, where_query)
 
     # DF contains only summary exp and not individual repeats
     assert "repeat_exp_1" in results_df.values
@@ -387,10 +392,10 @@ def test_fom_plot(mutable_mock_workspace_path, tmpdir_factory):
     pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
 
     where_query = None
-    for exp in results["experiments"]:
+    for exp in single_exp_results["experiments"]:
         exp.update({"simplified_experiment_namespace": "test_exp"})
 
-    results_df = ramble.reports.prepare_data(results, where_query)
+    results_df = ramble.reports.prepare_data(single_exp_results, where_query)
 
     plot = ramble.reports.FomPlot(None, False, report_dir_path, results_df, False, False, None)
     with PdfPages(pdf_path) as pdf_report:
@@ -406,7 +411,7 @@ def test_compare_plot(mutable_mock_workspace_path, tmpdir_factory):
     pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
 
     where_query = None
-    results_df = ramble.reports.prepare_data(results, where_query)
+    results_df = ramble.reports.prepare_data(single_exp_results, where_query)
 
     spec = ["fom_1", "n_nodes"]
     plot = ramble.reports.ComparisonPlot(
@@ -421,7 +426,7 @@ def test_compare_plot(mutable_mock_workspace_path, tmpdir_factory):
 
 def test_where_query(mutable_mock_workspace_path):
     where_query = 'fom_name == "fom_1"'
-    results_df = ramble.reports.prepare_data(results, where_query)
+    results_df = ramble.reports.prepare_data(single_exp_results, where_query)
     filtered_foms = results_df["fom_name"].tolist()
 
     assert "fom_1" in filtered_foms
@@ -498,3 +503,144 @@ def test_multiple_groupby(mutable_mock_workspace_path, tmpdir_factory, capsys):
             report_dir_path, "strong-scaling_fom_1_vs_n_nodes_test_wl_1_x_test_wl_1_x_app_v1.png"
         )
     )
+
+
+@pytest.mark.parametrize("format", ["json", "yaml"])
+def test_index_printing(mutable_mock_workspace_path, tmpdir_factory, format):
+    exp_results = {
+        "experiments": [
+            {
+                "application_name": "test_app",
+                "workload_name": "test_workload",
+                "RAMBLE_STATUS": "SUCCESS",
+                "name": "single_exp_1",
+                "RAMBLE_VARIABLES": {"repeat_index": "0"},
+                "RAMBLE_RAW_VARIABLES": {
+                    "experiment_template_name": "template_{variable_to_include_single}",
+                },
+                "CONTEXTS": [
+                    {
+                        "name": "null",
+                        "foms": [
+                            {
+                                "name": "fom_1",
+                                "origin": "test_app",
+                                "origin_type": "application",
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                "application_name": "test_app",
+                "workload_name": "test_workload",
+                "RAMBLE_STATUS": "SUCCESS",
+                "name": "repeat_exp_1",
+                "N_REPEATS": 2,
+                "RAMBLE_VARIABLES": {"repeat_index": 0},
+                "RAMBLE_RAW_VARIABLES": {
+                    "experiment_template_name": "template_{variable_to_include_repeat}",
+                },
+                "CONTEXTS": [
+                    {
+                        "name": "null",
+                        "foms": [
+                            {
+                                "origin": "test_app",
+                                "origin_type": "summary::n_total_repeats",
+                                "name": "Experiment Summary",
+                            },
+                            {
+                                "origin": "test_app",
+                                "origin_type": "summary::n_successful_repeats",
+                                "name": "Experiment Summary",
+                            },
+                            {
+                                "origin": "test_app",
+                                "origin_type": "summary::mean",
+                                "name": "fom_1",
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                # Exclude experiment because it's a repeat child
+                "application_name": "test_app",
+                "workload_name": "test_workload",
+                "RAMBLE_STATUS": "SUCCESS",
+                "name": "repeat_exp_1.1",
+                "N_REPEATS": 0,
+                "RAMBLE_VARIABLES": {"repeat_index": 1},
+                "RAMBLE_RAW_VARIABLES": {
+                    "experiment_template_name": "{repeat_exp_template}_variable_to_exclude}"
+                },
+                "CONTEXTS": [
+                    {
+                        "name": "null",
+                        "foms": [
+                            {
+                                "name": "repeat_fom_to_exclude",
+                                "origin": "test_app",
+                                "origin_type": "application",
+                            },
+                        ],
+                    },
+                ],
+            },
+            {
+                # Exclude experiment because it failed
+                "application_name": "test_app",
+                "workload_name": "test_workload",
+                "RAMBLE_STATUS": "FAILED",
+                "name": "single_exp_1",
+                "N_REPEATS": 0,
+                "RAMBLE_VARIABLES": {"repeat_index": "0"},
+                "RAMBLE_RAW_VARIABLES": {
+                    "experiment_template_name": "{single_exp_template}_variable_to_exclude}"
+                },
+                "CONTEXTS": [
+                    {
+                        "name": "null",
+                        "foms": [
+                            {
+                                "name": "single_fom_to_exclude",
+                                "origin": "test_app",
+                                "origin_type": "application",
+                            },
+                        ],
+                    },
+                ],
+            },
+        ],
+    }
+
+    results_dir_path = tmpdir_factory.mktemp("unit_test")
+    results_file = os.path.join(results_dir_path, f"results.{format}")
+
+    with open(results_file, "w+") as f:
+        if format == "json":
+            sjson.dump(exp_results, f)
+        elif format == "yaml":
+            syaml.dump(exp_results, stream=f)
+
+    result_index = results("index", "-f", results_file)
+
+    include = [
+        "test_workload",
+        "fom_1",
+        "variable_to_include_repeat",
+        "variable_to_include_single",
+    ]
+    exclude = [
+        "repeat_exp_template",
+        "single_exp_template",
+        "repeat_fom_to_exclude",
+        "single_fom_to_exclude",
+    ]
+
+    for include_str in include:
+        assert include_str in result_index
+
+    for exclude_str in exclude:
+        assert exclude_str not in result_index
