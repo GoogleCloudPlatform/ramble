@@ -19,7 +19,7 @@ import ramble.filters
 import ramble.pipeline
 import ramble.workspace
 from ramble.error import RambleCommandError
-from ramble.main import RambleCommand
+from ramble.main import RambleCommand, main
 from ramble.namespace import namespace
 from ramble.test.dry_run_helpers import search_files_for_string
 from ramble.util import constants
@@ -1051,6 +1051,40 @@ def test_edit_override_gets_correct_path():
         ws_args = ["-D", ws2.root]
         output = workspace("edit", "-c", "--print-file", global_args=ws_args).strip()
         assert output == config_path
+
+
+def test_edit_with_faulty_config(workspace_name, capsys):
+    """Tests that `ramble workspace edit` works with a faulty config."""
+    bad_config = """
+ramble # Missing colon!
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment: {}
+"""
+    try:
+        ws = ramble.workspace.create(workspace_name)
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        with open(config_path, "w") as f:
+            f.write(bad_config)
+
+        argv = ["-w", workspace_name, "workspace", "edit", "-c", "-p"]
+        # Use main instead of RambleCommand, as this tests the error handling
+        # only in the former.
+        main(argv)
+        captured = capsys.readouterr()
+        assert config_path in captured.out
+    finally:
+        main(["-w", workspace_name, "workspace", "remove", "-y"])
 
 
 def test_dryrun_setup(workspace_name):
