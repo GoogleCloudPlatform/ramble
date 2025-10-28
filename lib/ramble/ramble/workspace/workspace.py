@@ -200,12 +200,6 @@ def all_workspace_names():
     return names
 
 
-def all_workspaces():
-    """Generator for all named workspaces."""
-    for name in all_workspace_names():
-        yield read(name)
-
-
 def active_workspace():
     """Returns the active workspace when there is any"""
     return _active_workspace

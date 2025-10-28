@@ -43,26 +43,6 @@ def test_read_file_content(tmpdir):
         assert test_workspace.read_file_content(fname) == "test content read"
 
 
-def test_all_workspaces():
-    # Create a valid workspace
-    ws1_name = "test-ws-1"
-    ws1 = workspace.create(ws1_name)
-    ws1.write()
-
-    # Create another valid workspace
-    ws2_name = "test-ws-2"
-    ws2 = workspace.create(ws2_name)
-    ws2.write()
-
-    try:
-        workspace_names = {ws.name for ws in workspace.all_workspaces()}
-        assert ws1_name in workspace_names
-        assert ws2_name in workspace_names
-    finally:
-        shutil.rmtree(workspace.root(ws1_name))
-        shutil.rmtree(workspace.root(ws2_name))
-
-
 def test_all_config_files():
     ws_name = "test-ws-config-files"
     ws_root = workspace.root(ws_name)
