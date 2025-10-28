@@ -455,13 +455,13 @@ def stage_files(
 
         # Prepare the core staging command
         if stage_method == "rsync":
-            stage_cmd = f"rsync -r {src} {dst}"
+            stage_cmd = f"rsync -Lr {src} {dst}"
         elif stage_method == "hard_link":
             stage_cmd = f"ln {src} {dst}"
         elif stage_method == "symbolic_link":
             stage_cmd = f"ln -s {src} {dst}"
         else:  # stage_method == "cp"
-            stage_cmd = f"cp -r {src} {dst}"
+            stage_cmd = f"cp -Lr {src} {dst}"
 
         template = [stage_cmd]
 
