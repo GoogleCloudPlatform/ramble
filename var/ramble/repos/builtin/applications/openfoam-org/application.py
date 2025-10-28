@@ -30,19 +30,6 @@ class OpenfoamOrg(OpenfoamBase):
 
         required_package("openfoam-org")
 
-    executable(
-        "get_inputs",
-        template=[
-            "cp -Lr {input_path}/* {experiment_run_dir}/.",
-            "mkdir -p constant/triSurface",
-            "mkdir -p constant/geometry",
-            "cp {geometry_path} constant/triSurface/.",
-            "cp {geometry_path} constant/geometry/.",
-            "ln -sf {experiment_run_dir}0/U.orig {experiment_run_dir}/0/U",
-        ],
-        use_mpi=False,
-    )
-
     workload_variable(
         "dict_delim",
         description="Delimiter for dictionary entries",
