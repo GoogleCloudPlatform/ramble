@@ -33,11 +33,26 @@ class Info(BasicModifier):
         description="Keep required directives off by default for testing",
     )
 
+    variant(
+        "enable_auto_env_var",
+        default=False,
+        values=[True, False],
+        description="Turn on auto env vars",
+    )
+
     variable(
         "obj_var_name",
         default="default_obj_val",
         description="An obj var",
         when=["variant_name=a_variant_val"],
+    )
+
+    variable(
+        "obj_auto_env_var",
+        default="abc",
+        description="A variable with env-var generation",
+        env_var_name="OBJ_AUTO_ENV_VAR",
+        when=["+enable_auto_env_var"],
     )
 
     environment_variable(
