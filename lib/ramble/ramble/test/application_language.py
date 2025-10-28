@@ -397,8 +397,8 @@ def test_workload_variable_workload_defaults_error():
 @pytest.mark.parametrize(
     "stage_method,template_contents",
     [
-        ("cp", "cp -r src"),
-        ("rsync", "rsync -r src"),
+        ("cp", "cp -Lr src"),
+        ("rsync", "rsync -Lr src"),
         ("symbolic_link", "ln -s src"),
         ("hard_link", "ln src"),
     ],
