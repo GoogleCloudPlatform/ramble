@@ -89,8 +89,10 @@ class Iozone(ExecutableApplication):
     workload_variable(
         "rsh_alternative",
         default="ssh",
-        description="Alternative for rsh",
+        description="Alternative remote access mechanism of rsh",
         workload="cluster",
+        # iozone.c uses `getenv("RSH")` to decide on its remote access mechanism
+        environment_variable_name="RSH",
     )
 
     workload_variable(
@@ -108,14 +110,6 @@ class Iozone(ExecutableApplication):
     workload_variable(
         "iozone_bin_path",
         default="{iozone_path}/bin/iozone",
-        workload="cluster",
-    )
-
-    # iozone.c uses `getenv("RSH")` to decide on its remote access mechanism
-    environment_variable(
-        "RSH",
-        value="{rsh_alternative}",
-        description="Alternative remote access",
         workload="cluster",
     )
 

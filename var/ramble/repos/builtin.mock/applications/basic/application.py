@@ -36,6 +36,8 @@ class Basic(ExecutableApplication):
     workload("working_wl", executable="echo")
     workload("template_wl", executable="template")
 
+    workload_group("test_wl_group", workloads=["test_wl"])
+
     workload_variable(
         "my_base_var",
         default="0.0",
@@ -49,6 +51,28 @@ class Basic(ExecutableApplication):
 
     workload_variable(
         "foo.bar", default="", description="Example var", workload="test_wl"
+    )
+
+    workload_variable(
+        "auto_env_var",
+        environment_variable_name="MY_AUTO_ENV_VAR",
+        default="",
+        workload="test_wl",
+    )
+
+    workload_variable(
+        "auto_env_var_wg",
+        environment_variable_name="MY_AUTO_ENV_VAR_WG",
+        default="def",
+        workload_group="test_wl_group",
+    )
+
+    workload_variable(
+        "auto_env_var_wl_defaults",
+        environment_variable_name="MY_AUTO_ENV_VAR_WL_DEFAULTS",
+        workload_defaults={
+            "test_wl": "test_wl",
+        },
     )
 
     environment_variable(

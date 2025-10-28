@@ -279,3 +279,71 @@ def test_object_env_var_methods(
                         found_vars.append(True)
 
         assert len(found_vars) == len(env_var_regexes)
+
+
+def test_auto_env_vars(workspace_name, mock_applications, mock_modifiers):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            app_with_auto_env_var:
+              variables:
+                auto_env_var: 123
+            app_with_obj_env_var:
+              variants:
+                enable_auto_env_var: true
+        test_wl2:
+          experiments:
+            wl_no_match_auto_env_var:
+              variables:
+                auto_env_var: 123
+  modifiers:
+  - name: info
+"""
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+    ws._re_read()
+
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+    # Test1: workload variable generates env var export
+    script = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "app_with_auto_env_var", "execute_experiment"
+    )
+    with open(script) as f:
+        data = f.read()
+        assert 'export MY_AUTO_ENV_VAR="123";' in data
+        assert 'export MY_AUTO_ENV_VAR_WL_DEFAULTS="test_wl"' in data
+        assert 'export MY_AUTO_ENV_VAR_WG="def"' in data
+        assert "OBJ_AUTO_ENV_VAR" not in data
+
+    # Test2: modifier generates env var export
+    script = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "app_with_obj_env_var", "execute_experiment"
+    )
+    with open(script) as f:
+        data = f.read()
+        assert 'export OBJ_AUTO_ENV_VAR="abc";' in data
+
+    # Test3: no env-var export generated with unmatching workload
+    script = os.path.join(
+        ws.experiment_dir, "basic", "test_wl2", "wl_no_match_auto_env_var", "execute_experiment"
+    )
+    with open(script) as f:
+        data = f.read()
+        assert "MY_AUTO_ENV_VAR" not in data
+        assert "MY_AUTO_ENV_VAR_WL_DEFAULTS" not in data
+        assert "MY_AUTO_ENV_VAR_WG" not in data
+        assert "OBJ_AUTO_ENV_VAR" not in data

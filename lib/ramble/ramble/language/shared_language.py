@@ -779,6 +779,7 @@ def variable(
     track_used: bool = False,
     when=None,
     error_context="variable",
+    environment_variable_name: Optional[str] = None,
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -793,6 +794,8 @@ def variable(
                            False if not. Can help with allowing lists without vectorizing
                            experiments.
         when (list | None): List of when conditions to apply to directive
+        environment_variable_name (str | None): If not None, an environment variable of this name
+                                                will be defined with the value of this variable.
     """
 
     def _define_variable(obj):
@@ -817,6 +820,20 @@ def variable(
                 **kwargs,
             )
         )
+
+        if environment_variable_name is not None:
+            if when_set not in obj.object_environment_variables:
+                obj.object_environment_variables[when_set] = []
+
+            obj.object_environment_variables[when_set].append(
+                ramble.definitions.variables.EnvironmentVariable(
+                    environment_variable_name,
+                    value=f"{{{name}}}",
+                    description=description,
+                    method="set",
+                    when=when_list,
+                )
+            )
 
     return _define_variable
 
