@@ -505,6 +505,21 @@ def test_multiple_groupby(mutable_mock_workspace_path, tmpdir_factory, capsys):
     )
 
 
+def test_unneeded_vars_are_ignored(mutable_mock_workspace_path):
+    for exp in single_exp_results["experiments"]:
+        for var_group in ["RAMBLE_VARIABLES", "RAMBLE_RAW_VARIABLES"]:
+            exp[var_group]["command"] = "test_command"
+            exp[var_group]["experiment_run_dir"] = "/test/dir"
+            exp[var_group]["test_file_path"] = "/test/file"
+
+    where_query = None
+    results_df = ramble.reports.prepare_data(single_exp_results, where_query)
+
+    assert "command" not in results_df.columns
+    assert "experiment_run_dir" not in results_df.columns
+    assert "test_file_path" not in results_df.columns
+
+
 @pytest.mark.parametrize("format", ["json", "yaml"])
 def test_index_printing(mutable_mock_workspace_path, tmpdir_factory, format):
     exp_results = {
