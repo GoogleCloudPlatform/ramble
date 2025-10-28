@@ -233,7 +233,7 @@ def workload_variable(
     expandable: bool = True,
     track_used: bool = True,
     when=None,
-    env_var_name=None,
+    environment_variable_name=None,
     **kwargs,
 ):
     """Define a new variable to be used in experiments
@@ -260,8 +260,8 @@ def workload_variable(
                            False if not. Can help with allowing lists without vectorizing
                            experiments.
         when (list | None): List of when conditions to apply to directive
-        env_var_name (str | None): If not None, an environment variable of this name
-                                   will be defined with the value of this variable.
+        environment_variable_name (str | None): If not None, an environment variable of this name
+                                                will be defined with the value of this variable.
     """
 
     def _execute_workload_variable(app):
@@ -274,9 +274,9 @@ def workload_variable(
             when, app, name, "workload_variable"
         )
 
-        if env_var_name is not None:
+        if environment_variable_name is not None:
             env_var = ramble.definitions.variables.EnvironmentVariable(
-                env_var_name,
+                environment_variable_name,
                 value=f"{{{name}}}",
                 description=description,
                 method="set",

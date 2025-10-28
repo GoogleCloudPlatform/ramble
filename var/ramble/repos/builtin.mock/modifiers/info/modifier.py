@@ -51,7 +51,7 @@ class Info(BasicModifier):
         "obj_auto_env_var",
         default="abc",
         description="A variable with env-var generation",
-        env_var_name="OBJ_AUTO_ENV_VAR",
+        environment_variable_name="OBJ_AUTO_ENV_VAR",
         when=["+enable_auto_env_var"],
     )
 

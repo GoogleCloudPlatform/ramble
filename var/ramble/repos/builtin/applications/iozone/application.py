@@ -92,7 +92,7 @@ class Iozone(ExecutableApplication):
         description="Alternative remote access mechanism of rsh",
         workload="cluster",
         # iozone.c uses `getenv("RSH")` to decide on its remote access mechanism
-        env_var_name="RSH",
+        environment_variable_name="RSH",
     )
 
     workload_variable(

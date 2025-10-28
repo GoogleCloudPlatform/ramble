@@ -55,21 +55,21 @@ class Basic(ExecutableApplication):
 
     workload_variable(
         "auto_env_var",
-        env_var_name="MY_AUTO_ENV_VAR",
+        environment_variable_name="MY_AUTO_ENV_VAR",
         default="",
         workload="test_wl",
     )
 
     workload_variable(
         "auto_env_var_wg",
-        env_var_name="MY_AUTO_ENV_VAR_WG",
+        environment_variable_name="MY_AUTO_ENV_VAR_WG",
         default="def",
         workload_group="test_wl_group",
     )
 
     workload_variable(
         "auto_env_var_wl_defaults",
-        env_var_name="MY_AUTO_ENV_VAR_WL_DEFAULTS",
+        environment_variable_name="MY_AUTO_ENV_VAR_WL_DEFAULTS",
         workload_defaults={
             "test_wl": "test_wl",
         },
