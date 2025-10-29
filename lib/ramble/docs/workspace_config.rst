@@ -195,6 +195,9 @@ String slicing is supported:
 
 * ``str[start:end:step]`` (string slicing)
 
+In addition to the listed, any string methods can be used by referencing ``str_<method_name>``.
+For example, ``str_capitalize(<str>)`` invokes the ``<str>.capitalize()`` method.
+
 Dictionary references are supported:
 
 * ``dict_name["key"]`` (dictionary subscript)

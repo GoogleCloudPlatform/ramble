@@ -148,6 +148,10 @@ def build_variant_set():
         ("math_not_exist(1)", "math_not_exist(1)", set(), 1),
         ("upper_str('foo')", "FOO", set(), 1),
         ("lower_str('FOO')", "foo", set(), 1),
+        ("str_capitalize('foo')", "Foo", set(), 1),
+        ("str_lstrip('AAAbbb', 'A')", "bbb", set(), 1),
+        ("str_join('.', str_split('a b c 1'))", "a.b.c.1", set(), 1),
+        ("str_no_such_method('a')", "str_no_such_method('a')", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):

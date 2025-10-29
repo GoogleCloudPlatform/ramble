@@ -976,7 +976,13 @@ class Expander:
             parts = node.func.id.split("_", 1)
             if len(parts) == 2:
                 module_name, func_name = parts
-                if module_name in supported_modules:
+                # Special handling for function calls prefixed with `str_`
+                if module_name == "str" and len(args) > 0:
+                    s = str(args[0])
+                    if hasattr(s, func_name) and callable(getattr(s, func_name)):
+                        s_method = getattr(s, func_name)
+                        return s_method(*args[1:], **kwargs)
+                elif module_name in supported_modules:
                     module = supported_modules[module_name]
                     if hasattr(module, func_name):
                         func = getattr(module, func_name)
