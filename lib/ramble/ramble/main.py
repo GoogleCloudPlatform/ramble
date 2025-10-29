@@ -921,7 +921,7 @@ def _main(argv=None):
         except jsonschema.exceptions.ValidationError as e:
             e.print_context()
             workspace_format_error = e
-        except ruamel.yaml.parser.ParserError as e:
+        except (ruamel.yaml.parser.ParserError, ruamel.yaml.scanner.ScannerError) as e:
             workspace_format_error = e
 
     # ------------------------------------------------------------------------
