@@ -69,6 +69,7 @@ import ramble.schema.package_manager_repos
 import ramble.schema.repos
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.tables
 import ramble.schema.variables
 import ramble.schema.variants
 import ramble.schema.workflow_manager_repos
@@ -94,6 +95,7 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "modifiers": ramble.schema.modifiers.schema,
     "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
+    "tables": ramble.schema.tables.schema,
     "applications": ramble.schema.applications.schema,
     "variables": ramble.schema.variables.schema,
     "variants": ramble.schema.variants.schema,

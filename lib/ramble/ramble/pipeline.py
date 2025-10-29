@@ -24,6 +24,7 @@ import ramble.config
 import ramble.expander
 import ramble.experiment_result
 import ramble.fetch_strategy
+import ramble.results_table
 import ramble.software_environments
 import ramble.stage
 import ramble.uploader
@@ -69,6 +70,10 @@ class Pipeline:
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
         self.workspace.software_environments = self._software_environments
         self._experiment_set = workspace.build_experiment_set()
+
+    @property
+    def experiment_set(self):
+        return self._experiment_set
 
     def _construct_experiment_hashes(self):
         """Hash all of the experiments.
@@ -296,6 +301,8 @@ class AnalyzePipeline(Pipeline):
             print_results=self.print_results,
             summary_only=self.summary_only,
         )
+
+        self.workspace.dump_tables(self.experiment_set, self.filters)
 
         if self.upload_results:
             ramble.uploader.upload_results(self.workspace.results)

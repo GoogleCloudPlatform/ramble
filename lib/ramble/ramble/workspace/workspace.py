@@ -27,6 +27,7 @@ import ramble.error
 import ramble.experiment_set
 import ramble.keywords
 import ramble.repository
+import ramble.results_table
 import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
@@ -56,6 +57,9 @@ _active_workspace = None
 
 #: Subdirectory where workspace configs are stored
 workspace_config_path = "configs"
+
+#: Name of subdirectory within workspace where tables are stored
+workspace_tables_path = "tables"
 
 #: Name of subdirectory within workspaces where logs are stored
 workspace_log_path = "logs"
@@ -457,6 +461,8 @@ class Workspace:
         )
 
         self.workspace_hash = None
+
+        self.results_tables = ramble.results_table.ResultsTables()
 
         self.specs = []
 
@@ -1625,6 +1631,19 @@ ramble:
                         f.write(f"      {text}\n")
                         pkg_info_set.add(text)
 
+    def dump_tables(self, experiment_set, filters):
+        tables_config = ramble.config.get("tables", [])
+
+        if tables_config:
+            for table_conf in tables_config:
+                self.results_tables.add_table_template(table_conf)
+
+        if self.results_tables.num_tables > 0:
+            self.results_tables.build_tables(experiment_set, filters)
+
+            fs.mkdirp(self.tables_dir)
+            self.results_tables.output_tables(self.tables_dir, self.date_string())
+
     def dump_results(self, output_formats=None, print_results=False, summary_only=False):
         """
         Write out result file in desired format
@@ -2076,6 +2095,11 @@ ramble:
         return os.path.join(self.root, workspace_software_path)
 
     @property
+    def tables_dir(self):
+        """Path to the tables directory"""
+        return os.path.join(self.root, workspace_tables_path)
+
+    @property
     def log_dir(self):
         """Path to the logs directory"""
         return os.path.join(self.root, workspace_log_path)
@@ -2146,6 +2170,7 @@ ramble:
             namespace.workspace: root,
             "workspace_configs": os.path.join(root, workspace_config_path),
             "workspace_software": os.path.join(root, workspace_software_path),
+            "workspace_tables": os.path.join(root, workspace_tables_path),
             "workspace_logs": os.path.join(root, workspace_log_path),
             "workspace_inputs": os.path.join(root, workspace_input_path),
             "workspace_experiments": os.path.join(root, workspace_experiment_path),
@@ -2606,6 +2631,10 @@ ramble:
         """Return the software dictionary for this workspace"""
         software_dict = ramble.config.config.get_config(namespace.software)
         return software_dict
+
+    def get_workspace_tables(self):
+        """Return a dict of workspace tables"""
+        return ramble.config.config.get_config(namespace.tables)
 
     def get_applications(self):
         """Get the dictionary of applications"""

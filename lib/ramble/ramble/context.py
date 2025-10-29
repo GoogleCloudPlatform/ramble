@@ -38,6 +38,7 @@ class Context:
         self.zips = {}
         self.matrices = []
         self.tags = []
+        self.tables = []
         self.is_template = False
         self.n_repeats = 0
 
@@ -95,6 +96,8 @@ class Context:
             self.formatted_executables.update(in_context.formatted_executables)
         if in_context.success_criteria:
             self.success_criteria.extend(in_context.success_criteria)
+        if in_context.tables:
+            self.tables.extend(in_context.tables)
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -158,6 +161,9 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.zips in in_dict:
         new_context.zips = in_dict[namespace.zips]
+
+    if namespace.tables in in_dict:
+        new_context.tables = in_dict[namespace.tables].copy()
 
     if namespace.tags in in_dict:
         new_context.tags = in_dict[namespace.tags].copy()

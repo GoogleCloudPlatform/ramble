@@ -26,6 +26,7 @@ class namespace:
     template = "template"
     chained_experiments = "chained_experiments"
     modifiers = "modifiers"
+    tables = "tables"
     tags = "tags"
     n_repeats = "n_repeats"
     formatted_executables = "formatted_executables"

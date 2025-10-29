@@ -67,6 +67,7 @@ class ExperimentSet:
         workspace_context.zips = workspace.get_workspace_zips()
         workspace_context.variants = workspace.get_workspace_variants()
         workspace_context.success_criteria = workspace.get_workspace_success_criteria()
+        workspace_context.tables = workspace.get_workspace_tables()
 
         try:
             self.keywords.check_reserved_keys(workspace_context.variables)
@@ -505,6 +506,8 @@ class ExperimentSet:
             used_variables = used_variables.union(exp_used_variables)
         render_group.used_variables = used_variables.copy()
 
+        workload_names = set()
+
         rendered_experiments = set()
         for experiment_vars, repeats in renderer.render_objects(
             render_group, exclude_where=exclude_where
@@ -573,10 +576,46 @@ class ExperimentSet:
                         )
                     pass
 
+                workload_names.add(app_inst.expander.workload_name)
+
                 app_inst.set_success_list(final_context.success_criteria)
                 rendered_experiments.add(final_exp_namespace)
                 self.experiments[final_exp_namespace] = app_inst
                 self.experiment_order.append(final_exp_namespace)
+
+            self.define_scoped_tables(workload_names, experiment_template_name)
+
+    def define_scoped_tables(self, workload_names, experiment_template_name):
+        # Generate focused tables for results
+        app_context = self._context[self._contexts["application"]]
+        for table in app_context.tables:
+            results_table = self._workspace.results_tables.add_table_template(table)
+            results_table.add_where(
+                f"'{{application_name}}' == '{app_context.context_name}'",
+            )
+
+        wl_context = self._context[self._contexts["workload"]]
+        for table in wl_context.tables:
+            for workload_name in workload_names:
+                results_table = self._workspace.results_tables.add_table_template(table)
+                results_table.add_where(
+                    [
+                        f"'{{application_name}}' == '{app_context.context_name}'",
+                        f"'{{workload_name}}' == '{workload_name}'",
+                    ]
+                )
+
+        exp_context = self._context[self._contexts["experiment"]]
+        for table in exp_context.tables:
+            for workload_name in workload_names:
+                results_table = self._workspace.results_tables.add_table_template(table)
+                results_table.add_where(
+                    [
+                        f"'{{application_name}}' == '{app_context.context_name}'",
+                        f"'{{workload_name}}' == '{workload_name}'",
+                        f"'{experiment_template_name}' in '{{experiment_name}}'",
+                    ]
+                )
 
     def build_experiment_chains(self):
         base_experiments = self.experiment_order.copy()
