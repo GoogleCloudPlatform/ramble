@@ -52,62 +52,37 @@ class PyNemo(ExecutableApplication):
     )
     workload_variable(
         "cuda_visible_devices",
+        environment_variable_name="CUDA_VISIBLE_DEVICES",
         default="0,1,2,3,4,5,6,7",
         description="Comma delimited list of CUDA device IDs.",
         workload_group="pretraining",
     )
-    environment_variable(
-        "CUDA_VISIBLE_DEVICES",
-        value="{cuda_visible_devices}",
-        description="Comma delimited list of CUDA device IDs",
-        workload_group="pretraining",
-    )
     workload_variable(
         "transformers_offline",
+        environment_variable_name="TRANSFORMERS_OFFLINE",
         default="0",
-        description="Whether transformers are offline (0) or not (1)",
-        workload_group="pretraining",
-    )
-    environment_variable(
-        "TRANSFORMERS_OFFLINE",
-        value="{transformers_offline}",
         description="Whether transformers are offline (0) or not (1)",
         workload_group="pretraining",
     )
     workload_variable(
         "torch_nccl_avoid_record_streams",
+        environment_variable_name="TORCH_NCCL_AVOID_RECORD_STREAMS",
         default="1",
-        description="Avoid (1) recording streams for Torch NCCL, or not (0)",
-        workload_group="pretraining",
-    )
-    environment_variable(
-        "TORCH_NCCL_AVOID_RECORD_STREAMS",
-        value="{torch_nccl_avoid_record_streams}",
         description="Avoid (1) recording streams for Torch NCCL, or not (0)",
         workload_group="pretraining",
     )
     workload_variable(
         "nccl_nvls_enable",
+        environment_variable_name="NCCL_NVLS_ENABLE",
         default="0",
-        description="Enable (1) NCCL NVLS or not (0)",
-        workload_group="pretraining",
-    )
-    environment_variable(
-        "NCCL_NVLS_ENABLE",
-        value="{nccl_nvls_enable}",
         description="Enable (1) NCCL NVLS or not (0)",
         workload_group="pretraining",
     )
     workload_variable(
         "results_mount",
+        environment_variable_name="NEMO_CONTAINER_MOUNTS",
         default="{experiment_run_dir}:{experiment_run_dir}",
         description="Container mount for results data",
-        workload_group="pretraining",
-    )
-    environment_variable(
-        "NEMO_CONTAINER_MOUNTS",
-        value="{results_mount}",
-        description="All container mounts in an environment variable",
         workload_group="pretraining",
     )
     workload_variable(
