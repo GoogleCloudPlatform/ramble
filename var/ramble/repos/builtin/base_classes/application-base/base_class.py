@@ -3297,6 +3297,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         action_funcs = ramble.util.env.action_funcs
 
+        license_set = set()
         for scope in config_scopes:
             license_conf = ramble.config.config.get_config(
                 "licenses", scope=scope
@@ -3307,9 +3308,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     if app_licenses:
                         # Append logic to source file which contains the exports
                         shell = ramble.config.get("config:shell")
-                        command.append(
+                        license_set.add(
                             f"{source_str(shell)} {{license_input_dir}}/{constants.LICENSE_INC_NAME}"
                         )
+
+        command.extend(license_set)
 
         # Process environment variable actions
         for env_var_set in self.environment_variable_sets:
