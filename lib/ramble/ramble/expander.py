@@ -38,14 +38,6 @@ def _join_str(seq, sep=","):
     return sep.join(str(i) for i in seq)
 
 
-def _upper_str(in_str):
-    return in_str.upper()
-
-
-def _lower_str(in_str):
-    return in_str.lower()
-
-
 def _re_search(regex, s):
     return re.search(regex, s) is not None
 
@@ -128,8 +120,6 @@ supported_scalar_function_pointers = {
     "simplify_str": spack.util.naming.simplify_name,
     "join_str": _join_str,
     "re_search": _re_search,
-    "upper_str": _upper_str,
-    "lower_str": _lower_str,
 }
 
 # Format Spec Regex:
@@ -976,7 +966,13 @@ class Expander:
             parts = node.func.id.split("_", 1)
             if len(parts) == 2:
                 module_name, func_name = parts
-                if module_name in supported_modules:
+                # Special handling for function calls prefixed with `str_`
+                if module_name == "str" and len(args) > 0:
+                    s = str(args[0])
+                    if hasattr(s, func_name) and callable(getattr(s, func_name)):
+                        s_method = getattr(s, func_name)
+                        return s_method(*args[1:], **kwargs)
+                elif module_name in supported_modules:
                     module = supported_modules[module_name]
                     if hasattr(module, func_name):
                         func = getattr(module, func_name)
