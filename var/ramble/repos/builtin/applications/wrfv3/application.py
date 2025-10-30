@@ -49,14 +49,16 @@ class Wrfv3(ExecutableApplication):
     )
 
     stage_files(
-        name="stage-run-files",
-        src="{wrf_path}/run/*",
-        dst="{experiment_run_dir}/.",
+        stages=[
+            ("{wrf_path}/run/*", "{experiment_run_dir}/."),
+            ("{input_path}/*", "{experiment_run_dir}/."),
+        ]
     )
 
     stage_files(
-        name="stage-input",
-        src="{input_path}/*",
+        name="stage-namelist",
+        method="cp",
+        src="{input_path}/namelist.*",
         dst="{experiment_run_dir}/.",
     )
 
@@ -64,7 +66,6 @@ class Wrfv3(ExecutableApplication):
         "setup",
         template=[
             "rm -f rsl.* wrfout* namelist*",
-            "cp {input_path}/namelist.* {experiment_run_dir}/.",
         ],
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -74,13 +75,13 @@ class Wrfv3(ExecutableApplication):
 
     workload(
         "CONUS_2p5km",
-        executables=["setup", "stage-input", "stage-run-files", "execute"],
+        executables=["stage-files", "stage-namelist", "setup", "execute"],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["setup", "stage-input", "stage-run-files", "execute"],
+        executables=["stage-files", "stage-namelist", "setup", "execute"],
         input="CONUS_12km",
     )
 
