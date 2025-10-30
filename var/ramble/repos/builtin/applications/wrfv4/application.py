@@ -88,20 +88,23 @@ class Wrfv4(ExecutableApplication):
     )
 
     stage_files(
-        src="{wrf_path}/run/*",
-        dst="{experiment_run_dir}/.",
+        stages=[
+            ("{wrf_path}/run/*", "{experiment_run_dir}/."),
+            ("{input_path}/*", "{experiment_run_dir}/."),
+        ]
     )
 
     stage_files(
-        src="{input_path}/*",
+        name="stage-namelist",
+        src="{input_path}/namelist.*",
         dst="{experiment_run_dir}/.",
+        method="cp",
     )
 
     executable(
         "setup",
         template=[
             "rm -f rsl.* wrfout* namelist*",
-            "cp {input_path}/namelist.* {experiment_run_dir}/.",
         ],
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -156,6 +159,7 @@ class Wrfv4(ExecutableApplication):
         "CONUS_2p5km",
         executables=[
             "stage-files",
+            "stage-namelist",
             "setup",
             "define_nproc_y",
             "define_nproc_x",
@@ -169,6 +173,7 @@ class Wrfv4(ExecutableApplication):
         "CONUS_12km",
         executables=[
             "stage-files",
+            "stage-namelist",
             "setup",
             "define_nproc_y",
             "define_nproc_x",
@@ -183,6 +188,7 @@ class Wrfv4(ExecutableApplication):
         "Maria_1km",
         executables=[
             "stage-files",
+            "stage-namelist",
             "setup",
             "define_nproc_y",
             "define_nproc_x",

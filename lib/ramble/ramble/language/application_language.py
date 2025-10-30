@@ -431,9 +431,11 @@ def cleanup(
 
 @application_directive("executables")
 def stage_files(
-    src,
-    dst,
+    src=None,
+    dst=None,
+    stages=None,
     name=None,
+    method="user-defined",
     when=None,
     **kwargs,
 ):
@@ -447,20 +449,31 @@ def stage_files(
     option, which can be set to 'cp', 'rsync', 'symbolic_link', or 'hard_link'.
 
     Args:
-        src (str): The source path of the file or directory.
-        dst (str): The destination path.
+        src (str | None): The source path of the file or directory.
+        dst (str | None): The destination path. If src is passed in, and dst is
+                          not, dst defaults to the experiment_run_dir.
+        stages (list(tuple(str, str)) | None): A list of tuples describing pairs
+                                               of src, dest locations to stage.
         name (str | None): The name of the executable. Defaults to 'stage-files'.
+        method (str): The method to use for this stage. Can be one of:
+                      "user-defined", "cp", "rsync", "symbolic_link", "hard_link"
         when (list | None): List of when conditions to apply to this directive.
     """
+
+    valid_methods = ["user-defined", "cp", "rsync", "symbolic_link", "hard_link"]
+
+    method_map = {
+        "cp": "cp -Lr",
+        "rsync": "rsync -Lr",
+        "symbolic_link": "ln -sf",
+        "hard_link": "ln -f",
+    }
 
     def _execute_stage_files(app):
         import os
 
         import ramble.config
         from ramble.util.executable import CommandExecutable
-
-        cfg = ramble.config.config
-        stage_method = cfg.get("config", {}).get("stage_method", "cp")
 
         exec_name = name if name else "stage-files"
 
@@ -481,28 +494,40 @@ def stage_files(
                 "as an executable. Please provide a unique name attribute."
             )
 
-        # Prepare the core staging command
-        if stage_method == "rsync":
-            stage_cmd = f"rsync -Lr {src} {dst}"
-        elif stage_method == "hard_link":
-            stage_cmd = f"ln {src} {dst}"
-        elif stage_method == "symbolic_link":
-            stage_cmd = f"ln -s {src} {dst}"
-        else:  # stage_method == "cp"
-            stage_cmd = f"cp -Lr {src} {dst}"
-
-        template = [stage_cmd]
-
-        # Prepend mkdir if dst has a parent directory
-        parent_dir = os.path.dirname(dst)
-        if parent_dir and parent_dir != ".":
-            template.insert(0, f"mkdir -p {parent_dir}")
-
-        if exec_name in app.executables[when_set]:
-            app.executables[when_set][exec_name].add_template(template)
-        else:
-            app.executables[when_set][exec_name] = CommandExecutable(
-                name=exec_name, template=template, allow_extension=True, **kwargs
+        if method not in valid_methods:
+            raise DirectiveError(
+                f"stage_files directive on application {app.name} was given an "
+                f"invalid method argument of {method}.\n"
+                f"Valid methods include: {valid_methods}"
             )
+
+        stage_method = method
+        if stage_method == "user-defined":
+            cfg = ramble.config.config
+            stage_method = cfg.get("config", {}).get("stage_method", "cp")
+        stage_cmd = method_map[stage_method]
+
+        template = []
+
+        if src is not None:
+            if dst is not None:
+                parent_dir = os.path.dirname(dst)
+                if parent_dir and parent_dir != ".":
+                    template.insert(0, f"mkdir -p {parent_dir}")
+                template.append(f"{stage_cmd} {src} {dst}")
+            else:
+                template.append(f"{stage_cmd} {src} {{experiment_run_dir}}/.")
+
+        if isinstance(stages, list):
+            for pair_src, pair_dst in stages:
+                parent_dir = os.path.dirname(pair_dst)
+                if parent_dir and parent_dir != ".":
+                    template.append(f"mkdir -p {parent_dir}")
+
+                template.append(f"{stage_cmd} {pair_src} {pair_dst}")
+
+        app.executables[when_set][exec_name] = CommandExecutable(
+            name=exec_name, template=template, allow_extension=True, **kwargs
+        )
 
     return _execute_stage_files

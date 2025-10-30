@@ -394,31 +394,106 @@ def test_workload_variable_workload_defaults_error():
         assert "workload_defaults cannot be used with workload, workloads" in err
 
 
-@pytest.mark.parametrize(
-    "stage_method,template_contents",
-    [
-        ("cp", "cp -Lr src"),
-        ("rsync", "rsync -Lr src"),
-        ("symbolic_link", "ln -s src"),
-        ("hard_link", "ln src"),
-    ],
-)
-def test_stage_files_directive(stage_method, template_contents):
+def test_stage_files_directive_no_dst():
     import ramble.config
 
-    with ramble.config.override("config:stage_method", stage_method):
+    with ramble.config.override("config:stage_method", "cp"):
 
         class TestApp(ExecutableApplication):  # noqa: F405
             name = "test-app"
 
         app_inst = TestApp("/not/a/path")
-        app_inst.stage_files(src="src", dst="dst")
+        app_inst.stage_files(src="src")
+
+        assert "stage-files" in app_inst.executables[frozenset()]
+        exec = app_inst.executables[frozenset()]["stage-files"]
+        assert exec.template == ["cp -Lr src {experiment_run_dir}/."]
+
+
+def test_stage_files_directive_stages():
+    import ramble.config
+
+    with ramble.config.override("config:stage_method", "cp"):
+
+        class TestApp(ExecutableApplication):  # noqa: F405
+            name = "test-app"
+
+        app_inst = TestApp("/not/a/path")
+        app_inst.stage_files(stages=[("src1", "a/b"), ("src2", "c/d")])
+
+        assert "stage-files" in app_inst.executables[frozenset()]
+        exec = app_inst.executables[frozenset()]["stage-files"]
+        assert exec.template == [
+            "mkdir -p a",
+            "cp -Lr src1 a/b",
+            "mkdir -p c",
+            "cp -Lr src2 c/d",
+        ]
+
+
+def test_stage_files_directive_overwrite():
+    import ramble.config
+
+    with ramble.config.override("config:stage_method", "cp"):
+
+        class TestApp(ExecutableApplication):  # noqa: F405
+            name = "test-app"
+
+        app_inst = TestApp("/not/a/path")
+        app_inst.stage_files(src="src", dst="a/b")
+
+        assert "stage-files" in app_inst.executables[frozenset()]
+        exec = app_inst.executables[frozenset()]["stage-files"]
+        assert exec.template == ["mkdir -p a", "cp -Lr src a/b"]
+
+        app_inst.stage_files(src="src2", dst="c/d")
+        exec = app_inst.executables[frozenset()]["stage-files"]
+        assert exec.template == ["mkdir -p c", "cp -Lr src2 c/d"]
+
+
+@pytest.mark.parametrize(
+    "stage_method,template_contents",
+    [
+        ("cp", "cp -Lr src dst"),
+        ("rsync", "rsync -Lr src dst"),
+        ("symbolic_link", "ln -sf src dst"),
+        ("hard_link", "ln -f src dst"),
+    ],
+)
+def test_stage_files_directive_method(stage_method, template_contents):
+    class TestApp(ExecutableApplication):  # noqa: F405
+        name = "test-app"
+
+    app_inst = TestApp("/not/a/path")
+    app_inst.stage_files(src="src", dst="dst", method=stage_method)
+
+    assert "stage-files" in app_inst.executables[frozenset()]
+    exec = app_inst.executables[frozenset()]["stage-files"]
+
+    assert exec.template == [template_contents]
+
+
+def test_stage_files_directive_user_defined():
+    import ramble.config
+
+    with ramble.config.override("config:stage_method", "rsync"):
+
+        class TestApp(ExecutableApplication):  # noqa: F405
+            name = "test-app"
+
+        app_inst = TestApp("/not/a/path")
+        app_inst.stage_files(src="src", dst="dst", method="user-defined")
 
         assert "stage-files" in app_inst.executables[frozenset()]
         exec = app_inst.executables[frozenset()]["stage-files"]
 
-        found = False
-        for line in exec.template:
-            if template_contents in line:
-                found = True
-        assert found
+        assert exec.template == ["rsync -Lr src dst"]
+
+
+def test_stage_files_directive_invalid_method():
+    class TestApp(ExecutableApplication):  # noqa: F405
+        name = "test-app"
+
+    app_inst = TestApp("/not/a/path")
+    with pytest.raises(DirectiveError):
+        app_inst.stage_files(src="src", dst="dst", method="invalid")
