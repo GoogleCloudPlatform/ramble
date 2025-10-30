@@ -36,11 +36,21 @@ formatters = {}
 #: standard arguments for updating completion scripts
 #: we iterate through these when called with --update-completion
 update_completion_args = {
-    "bash": {
-        "aliases": True,
+    # Default one included in source control
+    # Disable aliases to avoid custom configs leaking into it
+    "bash_no_aliases": {
+        "aliases": False,
         "format": "bash",
         "header": os.path.join(ramble.paths.share_path, "bash", "ramble-completion.in"),
         "update": os.path.join(ramble.paths.share_path, "ramble-completion.bash"),
+    },
+    # Generate a version that supports aliases (including ones defined in `config:aliases`)
+    # This one is not included in source control as it is user-specific
+    "base_with_aliases": {
+        "aliases": True,
+        "format": "bash",
+        "header": os.path.join(ramble.paths.share_path, "bash", "ramble-completion.in"),
+        "update": os.path.join(ramble.paths.share_path, "custom-ramble-completion.bash"),
     },
 }
 
