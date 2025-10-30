@@ -249,7 +249,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         an experiment's execution environment"""
         return []
 
-    @property
     def environment_unload_commands(self) -> List[str]:
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""
