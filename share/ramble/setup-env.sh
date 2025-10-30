@@ -349,6 +349,11 @@ done
 #
 if [ "$_rmb_shell" = bash ]; then
     source $_rmb_share_dir/ramble-completion.bash
+    # The custom version includes support for command aliases, it is
+    # generated via `ramble commands --update-completion`.
+    if [ -f "$_rmb_share_dir/custom-ramble-completion.bash" ]; then
+        source $_rmb_share_dir/custom-ramble-completion.bash
+    fi
 fi
 
 # done: unset sentinel variable as we're no longer initializing

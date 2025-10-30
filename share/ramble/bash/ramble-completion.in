@@ -10,6 +10,8 @@
 #
 #   $ ramble commands --update-completion
 #
+# Running the above command would also generate a version supporting custom aliases.
+#
 # Please do not manually modify this file.
 
 

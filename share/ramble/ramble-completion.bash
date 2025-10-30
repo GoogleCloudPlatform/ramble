@@ -10,6 +10,8 @@
 #
 #   $ ramble commands --update-completion
 #
+# Running the above command would also generate a version supporting custom aliases.
+#
 # Please do not manually modify this file.
 
 
@@ -297,7 +299,7 @@ _ramble_config() {
     then
         RAMBLE_COMPREPLY="-h --help --scope"
     else
-        RAMBLE_COMPREPLY="get blame edit list add remove rm update revert"
+        RAMBLE_COMPREPLY="get blame edit list add remove update revert"
     fi
 }
 
@@ -342,15 +344,6 @@ _ramble_config_add() {
 }
 
 _ramble_config_remove() {
-    if $list_options
-    then
-        RAMBLE_COMPREPLY="-h --help"
-    else
-        RAMBLE_COMREPLY=""
-    fi
-}
-
-_ramble_config_rm() {
     if $list_options
     then
         RAMBLE_COMPREPLY="-h --help"
@@ -473,7 +466,7 @@ _ramble_mirror() {
     then
         RAMBLE_COMPREPLY="-h --help -n --no-checksum"
     else
-        RAMBLE_COMPREPLY="destroy add remove rm set-url list"
+        RAMBLE_COMPREPLY="destroy add remove set-url list"
     fi
 }
 
@@ -491,15 +484,6 @@ _ramble_mirror_add() {
 }
 
 _ramble_mirror_remove() {
-    if $list_options
-    then
-        RAMBLE_COMPREPLY="-h --help --scope"
-    else
-        RAMBLE_COMREPLY=""
-    fi
-}
-
-_ramble_mirror_rm() {
     if $list_options
     then
         RAMBLE_COMPREPLY="-h --help --scope"
@@ -539,7 +523,7 @@ _ramble_repo() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="create list add remove rm"
+        RAMBLE_COMPREPLY="create list add remove"
     fi
 }
 
@@ -566,15 +550,6 @@ _ramble_repo_add() {
 }
 
 _ramble_repo_remove() {
-    if $list_options
-    then
-        RAMBLE_COMPREPLY="-h --help --scope -t --type"
-    else
-        _repos
-    fi
-}
-
-_ramble_repo_rm() {
     if $list_options
     then
         RAMBLE_COMPREPLY="-h --help --scope -t --type"
@@ -632,7 +607,7 @@ _ramble_workspace() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="activate archive deactivate create concretize config setup analyze push-to-cache info edit mirror experiment-logs list ls remove rm generate-config manage"
+        RAMBLE_COMPREPLY="activate archive deactivate create concretize config setup analyze push-to-cache info edit mirror experiment-logs list remove generate-config manage"
     fi
 }
 
@@ -707,20 +682,7 @@ _ramble_workspace_list() {
     RAMBLE_COMPREPLY="-h --help"
 }
 
-_ramble_workspace_ls() {
-    RAMBLE_COMPREPLY="-h --help"
-}
-
 _ramble_workspace_remove() {
-    if $list_options
-    then
-        RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
-    else
-        _workspaces
-    fi
-}
-
-_ramble_workspace_rm() {
     if $list_options
     then
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"

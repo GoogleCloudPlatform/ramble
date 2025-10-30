@@ -2,3 +2,6 @@ __pycache__/
 *.x
 var/ramble/cache
 var/ramble/workspaces
+
+# bash autocomplete with user-defined aliases
+share/ramble/custom-ramble-completion.bash
