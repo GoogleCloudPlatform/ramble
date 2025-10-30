@@ -184,8 +184,6 @@ Supported functions are:
 * ``randint`` (from `random.randint`)
 * ``join_str(iterable, sep=",")`` (concatenate iterable into ``sep``-separated string)
 * ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
-* ``upper_str(str)`` (convert ``str`` to uppercase)
-* ``lower_str(str)`` (convert ``str`` to lowercase)
 * ``maybe(var_name, default="")`` (returns the expanded ``var_name`` if it is defined, otherwise returns ``default``)
 
 Besides the above listed, any functions from the ``math`` module can be used in Ramble by referencing ``math_<function_name>``.
@@ -196,7 +194,7 @@ String slicing is supported:
 * ``str[start:end:step]`` (string slicing)
 
 In addition to the listed, any string methods can be used by referencing ``str_<method_name>``.
-For example, ``str_capitalize(<str>)`` invokes the ``<str>.capitalize()`` method.
+For example, ``str_upper(<str>)`` invokes the ``<str>.upper()`` method.
 
 Dictionary references are supported:
 
