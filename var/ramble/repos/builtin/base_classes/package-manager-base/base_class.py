@@ -7,6 +7,7 @@
 # except according to those terms.
 """Define base classes for package manager definitions"""
 
+import abc
 import os
 from typing import List
 
@@ -244,15 +245,15 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         del workspace
         return []
 
+    @abc.abstractmethod
     def environment_load_commands(self) -> List[str]:
         """Stub method for acquiring the commands to load
         an experiment's execution environment"""
-        return []
 
+    @abc.abstractmethod
     def environment_unload_commands(self) -> List[str]:
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""
-        return []
 
     def _extract_specs(
         self, attr_name="software_specs", app_inst=None, prefixed=False

@@ -136,3 +136,9 @@ class Info(PackageManagerBase):
     )
 
     package_manager_family("info-package-manager")
+
+    def environment_load_commands(self) -> List[str]:
+        return []
+
+    def environment_unload_commands(self) -> List[str]:
+        return []

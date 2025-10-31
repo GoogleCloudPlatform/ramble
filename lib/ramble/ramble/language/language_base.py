@@ -10,6 +10,7 @@
 directives, which are to allow functions to be invoked at class level
 """
 
+import abc
 import copy
 import functools
 import inspect
@@ -55,7 +56,7 @@ def _pop_default_args() -> dict:
     return DirectiveMeta._default_args.pop()
 
 
-class DirectiveMeta(type):
+class DirectiveMeta(abc.ABCMeta):
     """Flushes the directives that were temporarily stored in the staging
     area into the package.
     """

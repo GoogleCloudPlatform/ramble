@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import List
+
 from ramble.pkgmankit import *
 
 
@@ -95,3 +97,9 @@ class UserManaged(PackageManagerBase):
                 pkg_list.append(software_info)
 
         return pkg_list
+
+    def environment_load_commands(self) -> List[str]:
+        return []
+
+    def environment_unload_commands(self) -> List[str]:
+        return []

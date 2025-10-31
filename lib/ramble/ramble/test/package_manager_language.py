@@ -9,11 +9,13 @@
 
 import pytest
 
-from ramble.pkgmankit import *  # noqa
+import ramble.repository
 
-pm_types = [
-    PackageManagerBase,  # noqa: F405
-]
+UserManagedPackageManager = ramble.repository.get_obj_class(
+    "user-managed", ramble.repository.ObjectTypes.package_managers
+)
+
+pm_types = [UserManagedPackageManager]
 
 
 @pytest.mark.parametrize("pm_class", pm_types)
