@@ -70,6 +70,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         self.expander = None
         self._usage_mode = None
         self.app_inst = None
+        self._executable_modification_applied = set()
 
         self._mod_regex = re.compile(
             self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
@@ -375,22 +376,130 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
 
         return bool(self._mod_regex.match(executable))
 
+    def executable_modifier_applied(self, exec_mod):
+        """Check if an executable modifier has been applies alerady
+
+
+        Returns:
+            (bool): True if the executable modifier has been applied. False otherwise
+        """
+        if exec_mod in self._executable_modification_applied:
+            return True
+        return False
+
+    def executable_modifier_usage_filter(filter_name: str):
+        """Decorator for registering a usage filter for executable modifiers"""
+
+        def _decorator(decorated_function):
+            if not hasattr(decorated_function, "_ramble_attributes"):
+                decorated_function._ramble_attributes = {}
+            decorated_function._ramble_attributes["filter_name"] = filter_name
+            return decorated_function
+
+        return _decorator
+
+    @executable_modifier_usage_filter("once")
+    def filter_once(self, exec_mod, executable) -> bool:
+        """Usage filter for only allowing an executable modifier to be applied
+        once in an experiment"""
+        return not self.executable_modifier_applied(exec_mod)
+
+    @executable_modifier_usage_filter("first_mpi")
+    def filter_first_mpi(self, exec_mod, executable) -> bool:
+        """Usage filter for only applying executable modifier to the first MPI
+        executable in an experiment"""
+        return executable.mpi and not self.executable_modifier_applied(
+            exec_mod
+        )
+
+    @executable_modifier_usage_filter("all_mpi")
+    def filter_all_mpi(self, exec_mod, executable) -> bool:
+        """Usage filter for applying an executalbe modifier to only MPI
+        executables in an experiment"""
+        return executable.mpi
+
+    def get_executable_modifier_filter(self, filter_name):
+        """Get the filter function for a usage filter (by name)
+
+        Args:
+            filter_name (str): Name of usage filter to extract for filtering executable modifier
+
+        Returns:
+            Reference to function, if found. None otherwise"""
+
+        filter_names = set()
+        for attr in dir(self):
+            method = getattr(self, attr)
+
+            if callable(method):
+                method_attributes = getattr(method, "_ramble_attributes", {})
+                test_filter_name = None
+                if "filter_name" in method_attributes:
+                    test_filter_name = method_attributes["filter_name"]
+                filter_names.add(test_filter_name)
+                if filter_name == test_filter_name:
+                    return method
+
+        if filter_name is not None and filter_name != "None":
+            logger.die(
+                f"When extracting a usage_filter for an executable_modifier "
+                f"on modifier {self.name} "
+                f"the filter {filter_name} does not exist. Registered filters are: \n"
+                f"{filter_names}"
+            )
+        return None
+
+    def executable_modification_applies(
+        self, exec_mod, filter_name, executable
+    ):
+        """Determine if an executable modifier applies to an executable or not
+
+        Args:
+            exec_mod (str): Name of executable modifier
+            filter_name (str): Name of usage filter to apply
+            executable: CommandExecutable object to check if exec_mod applies to
+
+        """
+        apply = True
+
+        filter_func = self.get_executable_modifier_filter(filter_name)
+
+        if filter_func is not None:
+            apply = filter_func(exec_mod, executable)
+
+        return apply
+
     def apply_executable_modifiers(
         self, executable_name, executable, app_inst=None
     ):
+        """Apply all executable modifiers to an executable
+
+        Args:
+            executable_name (str): Name of executable
+            executable: CommandExecutable object
+            app_inst: Instance of application object
+
+        Returns
+            (list, list): List of CommandExecutable objects that occur before
+                          and after (respectively) to the input executable.
+        """
         pre_execs = []
         post_execs = []
         for when_set, exec_mods in self.executable_modifiers.items():
             if self.expander.satisfies(when_set, self.experiment_variants()):
-                for exec_mod in exec_mods:
-                    mod_func = getattr(self, exec_mod)
+                for exec_mod, mod_conf in exec_mods.items():
+                    if self.executable_modification_applies(
+                        exec_mod, mod_conf["usage_filter"], executable
+                    ):
+                        self._executable_modification_applied.add(exec_mod)
+                        mod_func = getattr(self, exec_mod)
 
-                    pre_exec, post_exec = mod_func(
-                        executable_name, executable, app_inst=app_inst
-                    )
+                        pre_exec, post_exec = mod_func(
+                            executable_name, executable, app_inst=app_inst
+                        )
 
-                    pre_execs.extend(pre_exec)
-                    post_execs.extend(post_exec)
+                        pre_execs.extend(pre_exec)
+                        post_execs.extend(post_exec)
 
         return pre_execs, post_execs
 

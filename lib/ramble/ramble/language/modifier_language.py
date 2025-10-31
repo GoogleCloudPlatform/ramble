@@ -131,7 +131,7 @@ def variable_modification(
 
 
 @modifier_directive("executable_modifiers")
-def executable_modifier(name, when=None, **kwargs):
+def executable_modifier(name, usage_filter=None, when=None, **kwargs):
     """Register an executable modifier
 
     Executable modifiers can modify various aspects of non-builtin application
@@ -166,6 +166,9 @@ def executable_modifier(name, when=None, **kwargs):
     Args:
         name (str): Name of executable modifier to use. Should be the name of a
                     class method.
+        usage_filter (str): Filters the application of this executable modifier.
+                            Modifiers can register filters to select how to apply this.
+                            Valid default options include: None, "once", "first_mpi", "all_mpi"
         when (list | None): List of when conditions this executable modifier should apply in
 
     Each executable modifier needs to return:
@@ -185,6 +188,7 @@ def executable_modifier(name, when=None, **kwargs):
             mod.executable_modifiers[when_set] = {}
 
         mod.executable_modifiers[when_set][name] = {
+            "usage_filter": usage_filter,
             "when": when_list,
         }
 
