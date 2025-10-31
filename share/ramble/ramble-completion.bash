@@ -397,7 +397,7 @@ _ramble_deployment_push() {
 }
 
 _ramble_deployment_pull() {
-    RAMBLE_COMPREPLY="-h --help --deployment-path -p"
+    RAMBLE_COMPREPLY="-h --help --deployment-path -p -u"
 }
 
 _ramble_docs() {

@@ -97,6 +97,7 @@ def deployment_pull_setup_parser(subparser):
     subparser.add_argument(
         "--deployment-path",
         "-p",
+        "-u",
         dest="deployment_path",
         help="Path to deployment that should be pulled",
         required=True,
