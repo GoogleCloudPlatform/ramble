@@ -244,7 +244,7 @@ class Openfoam(ExecutableApplication):
             'foamDictionary -entry "endTime" -set "{end_time}" {control_path}',
             'foamDictionary -entry "writeInterval" -set "{write_interval}" {control_path}',
             'foamDictionary -entry "startFrom" -set "{start_from}" {control_path}',
-            'foamDictionary -entry "OptimizationSwitches{dict_delim}fileHandler" -set "{file_handler}" {control_path}',
+            # 'foamDictionary -entry "OptimizationSwitches{dict_delim}fileHandler" -set "{file_handler}" {control_path}',
             'foamDictionary system/fvSolution -entry relaxationFactors{dict_delim}fields -add "{}"',
             'foamDictionary system/fvSolution -entry relaxationFactors{dict_delim}fields{dict_delim}p -set "0.3"',
             'foamDictionary system/fvSolution -entry solvers{dict_delim}p{dict_delim}nPreSweeps -set "0"',
