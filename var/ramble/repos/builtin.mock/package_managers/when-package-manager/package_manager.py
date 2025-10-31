@@ -64,3 +64,9 @@ class WhenPackageManager(PackageManagerBase):
         description="Test required key",
         when=["+pkg_man_required_key"],
     )
+
+    def environment_load_commands(self) -> List[str]:
+        return []
+
+    def environment_unload_commands(self) -> List[str]:
+        return []
