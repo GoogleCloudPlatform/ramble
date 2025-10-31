@@ -41,7 +41,7 @@ class Hpctoolkit(BasicModifier):
         "hpcprof_exec",
         default="hpcprof",
         values=["hpcprof", "hpcprof-mpi"],
-        description="Executable name for hpcprof",
+        description="Executable name for hpcprof. This can also specify mpi launch prefix (like `mpirun -n 8`) when using `hpcprof-mpi`",
         modes=["dynamic"],
     )
 
@@ -126,5 +126,7 @@ class Hpctoolkit(BasicModifier):
     def _hpcprof_cmd(self):
         cmd_str = "\n".join(self._env_setup) + "\n"
         for db in self._hpctoolkit_databases:
+            prof_db_dir = f"{db}-database"
+            cmd_str += f"rm -rf {prof_db_dir}\n"
             cmd_str += f"{{hpcprof_exec}} {{hpcprof_flags}} {db} &> {db}-hpcprof.out\n"
         return {"hpctoolkit_run_hpcprof": cmd_str}
