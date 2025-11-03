@@ -87,7 +87,7 @@ This success criteria might look like the following:
     - name: 'timing-present'
       mode: 'string'
       match: 'Timing for main.*'
-      file: '{experiment_run_dir}/rsl.out.0000'
+      file: '{experiment_run_dir}/rsl.out.base'
 
 Edit your workspace configuration file with:
 

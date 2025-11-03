@@ -47,7 +47,7 @@ ramble:
               - name: 'timing'
                 mode: 'string'
                 match: '.*Timing for main.*'
-                file: '{experiment_run_dir}/rsl.out.0000'
+                file: '{experiment_run_dir}/rsl.out.base'
               env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
@@ -258,18 +258,16 @@ compilers:
                 assert "spack env activate" in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.0000"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
 
             # Create files that match archive patterns
-            for i in range(0, 5):
-                new_name = "rsl.error.000%s" % i
-                new_file = os.path.join(exp_dir, new_name)
+            new_file = os.path.join(exp_dir, "rsl.error.base")
 
-                f = open(new_file, "w+")
-                f.close()
+            f = open(new_file, "w+")
+            f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
         symlink_results_file = os.path.join(ws1.root, "results.latest.txt")
@@ -315,9 +313,8 @@ compilers:
             assert os.path.isdir(exp_dir)
             assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
-            assert os.path.exists(os.path.join(exp_dir, "rsl.out.0000"))
-            for i in range(0, 5):
-                assert os.path.exists(os.path.join(exp_dir, f"rsl.error.000{i}"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.out.base"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.error.base"))
 
 
 @pytest.mark.maybeslow
@@ -343,7 +340,7 @@ ramble:
               - name: 'timing'
                 mode: 'string'
                 match: '.*Timing for main.*'
-                file: '{experiment_run_dir}/rsl.out.0000'
+                file: '{experiment_run_dir}/rsl.out.base'
               env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
@@ -489,18 +486,16 @@ licenses:
                 assert os.path.join(exp_dir, f"{exp}.out") in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.0000"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
 
             # Create files that match archive patterns
-            for i in range(0, 5):
-                new_name = "rsl.error.000%s" % i
-                new_file = os.path.join(exp_dir, new_name)
+            new_file = os.path.join(exp_dir, "rsl.error.base")
 
-                f = open(new_file, "w+")
-                f.close()
+            f = open(new_file, "w+")
+            f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
         symlink_results_file = os.path.join(ws1.root, "results.latest.txt")
@@ -544,6 +539,5 @@ licenses:
             assert os.path.isdir(exp_dir)
             assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
-            assert os.path.exists(os.path.join(exp_dir, "rsl.out.0000"))
-            for i in range(0, 5):
-                assert os.path.exists(os.path.join(exp_dir, f"rsl.error.000{i}"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.out.base"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.error.base"))

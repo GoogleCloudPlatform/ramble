@@ -57,7 +57,7 @@ ramble:
               - name: 'timing'
                 mode: 'string'
                 match: '.*Timing for main.*'
-                file: '{experiment_run_dir}/rsl.out.0000'
+                file: '{experiment_run_dir}/rsl.out.base'
               env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
