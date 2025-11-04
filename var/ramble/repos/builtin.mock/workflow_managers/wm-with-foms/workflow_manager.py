@@ -32,3 +32,7 @@ class WmWithFoms(WorkflowManagerBase):
         log_file="{experiment_run_dir}/.wm_job_info",
         fom_type=FomType.INFO,
     )
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None

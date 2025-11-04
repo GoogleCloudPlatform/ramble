@@ -184,3 +184,7 @@ class GkeMpi(WorkflowManagerBase):
         if os.path.exists(launcher_log):
             log_file = expander.expand_var_name("log_file")
             shutil.copy2(launcher_log, log_file)
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None

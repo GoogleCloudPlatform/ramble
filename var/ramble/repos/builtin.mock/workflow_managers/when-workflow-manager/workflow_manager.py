@@ -64,3 +64,7 @@ class WhenWorkflowManager(WorkflowManagerBase):
         description="Test required key",
         when=["+wf_man_required_key"],
     )
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None
