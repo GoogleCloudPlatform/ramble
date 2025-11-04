@@ -37,3 +37,7 @@ class UserManaged(WorkflowManagerBase):
         default="{execute_experiment}",
         description="batch_submit script, mostly served as an overridable default",
     )
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None

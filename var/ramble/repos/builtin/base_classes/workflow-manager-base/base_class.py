@@ -7,6 +7,7 @@
 # except according to those terms.
 """Define base classes for workflow manager definitions"""
 
+import abc
 from typing import Collection, Iterator
 
 import ramble.definitions.families
@@ -97,9 +98,9 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
         """Set a reference to the associated app_inst"""
         self.app_inst = app_inst
 
+    @abc.abstractmethod
     def get_status(self, workspace):
         """Return status of a given job"""
-        return None
 
     def conditional_expand(self, templates: Collection[str]) -> Iterator[str]:
         """Return a (potentially empty) iterator of expanded strings

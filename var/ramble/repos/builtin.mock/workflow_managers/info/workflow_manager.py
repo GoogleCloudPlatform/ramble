@@ -135,3 +135,7 @@ class Info(WorkflowManagerBase):
     )
 
     workflow_manager_family("info-workflow-manager")
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None
