@@ -7,10 +7,12 @@
 # except according to those terms.
 
 import os
-import shutil
+import re
 
 from ramble.appkit import *
 from ramble.expander import Expander
+
+from spack.util.executable import Executable, ProcessError
 
 
 class Wrfv4(ExecutableApplication):
@@ -102,9 +104,9 @@ class Wrfv4(ExecutableApplication):
     )
 
     executable(
-        "setup",
+        "cleanup",
         template=[
-            "rm -f rsl.* wrfout* namelist*",
+            "rm -f rsl.* wrfout*",
         ],
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -145,6 +147,21 @@ class Wrfv4(ExecutableApplication):
     executable("execute", "wrf.exe", use_mpi=True)
 
     executable(
+        "copy-logs",
+        template=[
+            'RSL_LOG=`ls -1 {experiment_run_dir} | grep "rsl\\.out\\.[0]\\+" | sort -n | head -n 1`',
+            "cp $RSL_LOG {experiment_run_dir}/rsl.out.base",
+            'RSL_LOG=`ls -1 {experiment_run_dir} | grep "rsl\\.error\\.[0]\\+" | sort -n | head -n 1`',
+            "cp $RSL_LOG {experiment_run_dir}/rsl.error.base",
+            "tar czf rsl_logs.tgz rsl.out.* rsl.error.*",
+            "rm -f rsl.out.* rsl.error.*",
+            "tar xzf rsl_logs.tgz rsl.out.base rsl.error.base",
+        ],
+        redirect="",
+        output_capture="",
+    )
+
+    executable(
         "post-exec-clean",
         template=[
             "rm -f {experiment_run_dir}/*.dat ",
@@ -160,10 +177,11 @@ class Wrfv4(ExecutableApplication):
         executables=[
             "stage-files",
             "stage-namelist",
-            "setup",
+            "cleanup",
             "define_nproc_y",
             "define_nproc_x",
             "execute",
+            "copy-logs",
             "post-exec-clean",
         ],
         input="CONUS_2p5km",
@@ -174,11 +192,12 @@ class Wrfv4(ExecutableApplication):
         executables=[
             "stage-files",
             "stage-namelist",
-            "setup",
+            "cleanup",
             "define_nproc_y",
             "define_nproc_x",
             "fix_12km",
             "execute",
+            "copy-logs",
             "post-exec-clean",
         ],
         input="CONUS_12km",
@@ -189,10 +208,11 @@ class Wrfv4(ExecutableApplication):
         executables=[
             "stage-files",
             "stage-namelist",
-            "setup",
+            "cleanup",
             "define_nproc_y",
             "define_nproc_x",
             "execute",
+            "copy-logs",
             "post-exec-clean",
         ],
         input="Maria_1km",
@@ -310,29 +330,25 @@ class Wrfv4(ExecutableApplication):
         file="{experiment_run_dir}/rsl.out.base",
     )
 
-    archive_pattern("{experiment_run_dir}/rsl.out.*")
-    archive_pattern("{experiment_run_dir}/rsl.error.*")
+    archive_pattern("{experiment_run_dir}/rsl_logs.tgz")
+    archive_pattern("{experiment_run_dir}/rsl.out.base")
+    archive_pattern("{experiment_run_dir}/rsl.error.base")
 
     def _analyze_experiments(self, workspace, app_inst=None):
-        import glob
-        import re
-
         experiment_dir = self.expander.expand_var_name("experiment_run_dir")
 
-        # Generate stats file
-        file_list = glob.glob(
-            os.path.join(
-                experiment_dir,
-                "rsl.out.*",
-            )
-        )
+        tar_file = os.path.join(experiment_dir, "rsl_logs.tgz")
+        out_file = os.path.join(experiment_dir, "rsl.out.base")
 
-        if file_list:
-            # Copy first file to rsl.out.base...
-            shutil.copyfile(
-                file_list[0], os.path.join(experiment_dir, "rsl.out.base")
-            )
+        if os.path.isfile(tar_file) and not os.path.isfile(out_file):
+            tar = Executable("tar")
+            args = ["xzf", tar_file, "-C", experiment_dir, out_file]
+            try:
+                tar(*args)
+            except ProcessError:
+                pass
 
+        if os.path.isfile(out_file):
             timing_regex = re.compile(
                 r"Timing for main.*:\s+(?P<main_time>[0-9]+\.[0-9]*).*"
             )
@@ -341,16 +357,15 @@ class Wrfv4(ExecutableApplication):
             max_time = float("-inf")
             sum_time = 0.0
             count = 0
-            for out_file in file_list:
-                with open(out_file) as f:
-                    for line in f.readlines():
-                        m = timing_regex.match(line)
-                        if m:
-                            time = float(m.group("main_time"))
-                            count += 1
-                            sum_time += time
-                            min_time = min(min_time, time)
-                            max_time = max(max_time, time)
+            with open(out_file) as f:
+                for line in f.readlines():
+                    m = timing_regex.match(line)
+                    if m:
+                        time = float(m.group("main_time"))
+                        count += 1
+                        sum_time += time
+                        min_time = min(min_time, time)
+                        max_time = max(max_time, time)
 
             avg_time = sum_time / max(count, 1)
 
