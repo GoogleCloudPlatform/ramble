@@ -563,7 +563,7 @@ _ramble_results() {
     then
         RAMBLE_COMPREPLY="-h --help"
     else
-        RAMBLE_COMPREPLY="upload report"
+        RAMBLE_COMPREPLY="upload index report"
     fi
 }
 
@@ -574,6 +574,10 @@ _ramble_results_upload() {
     else
         RAMBLE_COMREPLY=""
     fi
+}
+
+_ramble_results_index() {
+    RAMBLE_COMPREPLY="-h --help -f --file"
 }
 
 _ramble_results_report() {
