@@ -43,6 +43,16 @@ class EnvironmentModules(PackageManagerBase):
         run_before=["make_experiments"],
     )
 
+    name_regex = re.compile(r"\s*(?P<name>[\w-]+).*")
+
+    def package_name_from_spec(self, spec):
+        m = self.name_regex.match(spec)
+        pkg_name = None
+        if m:
+            pkg_name = m.group("name")
+
+        return pkg_name
+
     def _generate_loads_content(self, workspace):
         if not hasattr(self, "_load_string"):
             app_context = self.app_inst.expander.expand_var_name(

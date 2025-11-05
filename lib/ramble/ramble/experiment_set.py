@@ -328,6 +328,7 @@ class ExperimentSet:
         app_inst.set_formatted_executables(context.formatted_executables)
 
         if app_inst.package_manager is not None:
+            app_inst.package_manager.define_missing_packages(self._workspace)
             app_inst.define_variable(
                 self.keywords.env_path,
                 os.path.join(

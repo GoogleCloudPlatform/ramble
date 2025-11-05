@@ -44,6 +44,16 @@ class SpackLightweight(PackageManagerBase):
 
         self._runner = None
 
+    name_regex = re.compile(r"\s*(?P<name>[\w-]+).*")
+
+    def package_name_from_spec(self, spec):
+        m = self.name_regex.match(spec)
+        pkg_name = None
+        if m:
+            pkg_name = m.group("name")
+
+        return pkg_name
+
     @property
     def runner(self):
         if self._runner is None:

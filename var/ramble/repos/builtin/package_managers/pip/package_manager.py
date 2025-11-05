@@ -60,6 +60,16 @@ class Pip(PackageManagerBase):
             self._runner = PipRunner()
         return self._runner
 
+    name_regex = re.compile(r"\s*(?P<name>[\w-]+).*")
+
+    def package_name_from_spec(self, spec):
+        m = self.name_regex.match(spec)
+        pkg_name = None
+        if m:
+            pkg_name = m.group("name")
+
+        return pkg_name
+
     register_builtin(
         "pip_activate", required=True, depends_on=["builtin::env_vars"]
     )

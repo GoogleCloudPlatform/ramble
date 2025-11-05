@@ -39,6 +39,9 @@ class UserManaged(PackageManagerBase):
     def __init__(self, file_path):
         super().__init__(file_path)
 
+    def package_name_from_spec(self, spec):
+        return spec
+
     register_phase(
         "define_requirements",
         pipeline="setup",
