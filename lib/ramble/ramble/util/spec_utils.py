@@ -43,6 +43,7 @@ class SoftwareSpec:
         prefix: str = "",
         compiler: Optional[str] = None,
         compiler_spec: Optional[str] = None,
+        inject_if_missing: bool = False,
         when: Optional[List[str]] = None,
     ):
         self.name = name
@@ -50,6 +51,7 @@ class SoftwareSpec:
         self.prefix = prefix
         self.compiler = compiler
         self.compiler_spec = compiler_spec
+        self.inject_if_missing = inject_if_missing
         self.when = when.copy() if when else []
 
     def to_dict(self, apply_prefix: bool = False):
