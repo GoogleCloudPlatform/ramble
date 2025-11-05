@@ -65,6 +65,10 @@ class WhenPackageManager(PackageManagerBase):
         when=["+pkg_man_required_key"],
     )
 
+    def get_package_list(self, workspace):
+        del workspace
+        return []
+
     def environment_load_commands(self) -> List[str]:
         return []
 
