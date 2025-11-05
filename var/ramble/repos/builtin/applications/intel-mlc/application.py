@@ -206,7 +206,7 @@ class IntelMlc(ExecutableApplication):
         threads = []
         cur_indices = []
         numa_index = 0
-        for i in range(0, spread_divisions):
+        for _ in range(0, spread_divisions):
             cur_indices.append(numa_index)
             numa_index += max_thread // spread_divisions
 

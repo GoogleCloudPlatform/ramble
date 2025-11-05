@@ -94,7 +94,7 @@ class SpecParser(spack.parse.Parser):
             else:
                 self.next_token_error("Invalid token found")
         except spack.parse.ParseError as e:
-            raise SpecParseError(e)
+            raise SpecParseError(e) from None
 
         return [app_spec]
 
@@ -214,7 +214,7 @@ class Spec:
                         parent = ".".join(parts[:idx])
                         m = "Attempted to format attribute %s." % attribute
                         m += f"Spec {parent} has no attribute {part}"
-                        raise SpecFormatStringError(m)
+                        raise SpecFormatStringError(m) from None
 
                     if callable(current):
                         raise SpecFormatStringError("Attempted to format callable object")

@@ -1120,7 +1120,7 @@ class SpackRunner(CommandRunner):
             except ProcessError:
                 raise InvalidExternalEnvironment(
                     f"{path} is not a spack environment."
-                )
+                ) from None
 
         found_lock = False
 

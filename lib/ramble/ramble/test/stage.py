@@ -121,11 +121,11 @@ def check_expand_archive(stage, stage_name, expected_file_list):
             contents = _extra_contents
 
         else:
-            assert False
+            raise AssertionError
 
         assert os.path.isfile(fn)
         with open(fn) as _file:
-            _file.read() == contents
+            assert _file.read() == contents
 
 
 def check_fetch(stage, stage_name):

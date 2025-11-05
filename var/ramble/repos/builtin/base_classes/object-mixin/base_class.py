@@ -102,7 +102,7 @@ class ObjectMixin:
 
         if allow_caching:
             if not hasattr(self, "_variant_cache"):
-                setattr(self, "_variant_cache", {})
+                self._variant_cache = {}
 
             cache_key = f"{self.origin_type}::{self.name}"
             if include_modifier is not None:

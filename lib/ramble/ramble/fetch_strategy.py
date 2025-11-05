@@ -363,7 +363,7 @@ class URLFetchStrategy(FetchStrategy):
                       {}\n with error {}".format(
                     url, werr
                 )
-                raise FailedDownloadError(url, msg)
+                raise FailedDownloadError(url, msg) from None
             return response.getcode() is None or response.getcode() == 200
 
     def _fetch_from_url(self, url):
@@ -403,7 +403,7 @@ class URLFetchStrategy(FetchStrategy):
             if save_file and os.path.exists(save_file):
                 os.remove(save_file)
             msg = f"urllib failed to fetch with error {e}"
-            raise FailedDownloadError(url, msg)
+            raise FailedDownloadError(url, msg) from None
 
         with open(save_file, "wb") as _open_file:
             shutil.copyfileobj(response, _open_file)
@@ -1402,7 +1402,7 @@ class S3FetchStrategy(URLFetchStrategy):
             super().__init__(*args, **kwargs)
         except ValueError:
             if not kwargs.get("url"):
-                raise ValueError("S3FetchStrategy requires a url for fetching.")
+                raise ValueError("S3FetchStrategy requires a url for fetching.") from None
 
     @_needs_stage
     def fetch(self):
@@ -1447,7 +1447,7 @@ class GCSFetchStrategy(URLFetchStrategy):
             super().__init__(*args, **kwargs)
         except ValueError:
             if not kwargs.get("url"):
-                raise ValueError("GCSFetchStrategy requires a url for fetching.")
+                raise ValueError("GCSFetchStrategy requires a url for fetching.") from None
 
     @_needs_stage
     def fetch(self):

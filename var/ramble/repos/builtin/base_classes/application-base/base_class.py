@@ -105,7 +105,7 @@ def _check_shell_support(app_inst):
 
 def _run_phase_hook(obj, workspace, pipeline, hook):
     """Helper to enable an object run phase hooks defined in application"""
-    phase_defs = getattr(obj, "phase_definitions")
+    phase_defs = obj.phase_definitions
     if pipeline in phase_defs and hook in phase_defs[pipeline]:
         return
 
@@ -342,7 +342,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             workload_name = self.expander.workload_name
 
         found_workload = False
-        for when_set, workloads in self.workloads.items():
+        for workloads in self.workloads.values():
             if workload_name in workloads:
                 found_workload = True
                 yield workloads[workload_name]
@@ -596,7 +596,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         base_chain = self.__class__.__mro__
         for cls in base_chain:
-            if hasattr(cls, "name") and getattr(cls, "name") is not None:
+            if hasattr(cls, "name") and cls.name is not None:
                 self.object_variants.multi_value_variant(
                     "application_name", value=cls.name
                 )
@@ -2494,9 +2494,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         fom_contexts = []
                                         # if a FOM has contexts, check if each is active
                                         if fom_conf["contexts"]:
-                                            for fom_context in fom_conf[
-                                                "contexts"
-                                            ]:
+                                            for _ in fom_conf["contexts"]:
                                                 context_name = (
                                                     active_contexts[context]
                                                     if context
@@ -3068,7 +3066,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             else:
                                 dest_def_dict[context]["foms"][fom] = {}
 
-                            def _expand_var(var):
+                            def _expand_var(var, extra_vars=extra_vars):
                                 return self.expander.expand_var(
                                     var, extra_vars=extra_vars
                                 )

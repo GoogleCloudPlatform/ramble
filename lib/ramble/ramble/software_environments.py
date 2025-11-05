@@ -817,7 +817,7 @@ class SoftwareEnvironments:
                 cur_compiler = pkg.compiler
                 # Re-render compiler package to ensure variables are marked as used.
                 if cur_compiler in self._rendered_packages[pm_name]:
-                    for template_name, template_def in self._package_templates.items():
+                    for template_def in self._package_templates.values():
                         if cur_compiler in template_def._rendered_packages[pm_name]:
                             expander.flush_used_variable_stage()
                             rendered_pkg = template_def.render_package(

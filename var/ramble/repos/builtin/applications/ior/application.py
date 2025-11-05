@@ -197,7 +197,7 @@ class Ior(ExecutableApplication):
     ]
 
     summary_regex = "(?P<Operation>(read|write))"
-    for metric_name, unit, variant in metrics:
+    for metric_name, _, variant in metrics:
         if "str" in variant:
             summary_regex += r"\s+(?P<" + metric_name + r">\w+)"
         elif "int" in variant:

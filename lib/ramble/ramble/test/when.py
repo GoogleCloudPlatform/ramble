@@ -1215,8 +1215,8 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
         with open(exec_file) as f:
             data = f.read()
 
-            for obj_under_test, exec_test_str in exec_test_str.items():
-                assert (exec_test_str in data) == (obj_under_test == obj)
+            for obj_under_test, test_str in exec_test_str.items():
+                assert (test_str in data) == (obj_under_test == obj)
 
 
 @pytest.mark.parametrize(

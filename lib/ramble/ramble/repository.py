@@ -1176,7 +1176,7 @@ class Repo:
             # handler by wrapping them
             if ramble.config.get("config:debug"):
                 sys.excepthook(*sys.exc_info())
-            raise FailedConstructorError(spec.fullname, *sys.exc_info())
+            raise FailedConstructorError(spec.fullname, *sys.exc_info()) from e
 
     @autospec
     def dump_provenance(self, spec, path):
@@ -1324,7 +1324,7 @@ class Repo:
                 # manually construct the error message in order to give the
                 # user the correct .py where the syntax error is
                 # located
-                raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}")
+                raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}") from None
 
             module.__object__ = self.full_namespace
             module.__loader__ = self
@@ -1442,9 +1442,7 @@ def create_repo(
         else:
             shutil.rmtree(root, ignore_errors=True)
 
-        raise BadRepoError(
-            "Failed to create new repository in %s." % root, f"Caused by {type(e)}: {e}"
-        )
+        raise BadRepoError("Failed to create new repository in %s." % root) from e
 
     return full_path, namespace
 
@@ -1490,7 +1488,7 @@ class RepositoryNamespace(types.ModuleType):
             setattr(self, name, __import__(submodule))
         except ImportError:
             msg = "'{0}' object has no attribute {1}"
-            raise AttributeError(msg.format(type(self), name))
+            raise AttributeError(msg.format(type(self), name)) from None
         return getattr(self, name)
 
 

@@ -72,7 +72,7 @@ class ExperimentSet:
         try:
             self.keywords.check_reserved_keys(workspace_context.variables)
         except ramble.keywords.RambleKeywordError as e:
-            raise RambleVariableDefinitionError(f"Workspace variable error: {e}")
+            raise RambleVariableDefinitionError(f"Workspace variable error: {e}") from None
 
         self._set_context(self._contexts.workspace, workspace_context)
 
@@ -125,7 +125,9 @@ class ExperimentSet:
         try:
             self.keywords.check_reserved_keys(app_context.variables)
         except ramble.keywords.RambleKeywordError as e:
-            raise RambleVariableDefinitionError(f"In application {app_context.context_name}: {e}")
+            raise RambleVariableDefinitionError(
+                f"In application {app_context.context_name}: {e}"
+            ) from None
 
         self._set_context(self._contexts.application, app_context)
 
@@ -136,7 +138,7 @@ class ExperimentSet:
             self.keywords.check_reserved_keys(workload_context.variables)
         except ramble.keywords.RambleKeywordError as e:
             namespace = f"{self.application_namespace}.{workload_context.context_name}"
-            raise RambleVariableDefinitionError(f"In workload {namespace}: {e}")
+            raise RambleVariableDefinitionError(f"In workload {namespace}: {e}") from None
 
         self._set_context(self._contexts.workload, workload_context)
 
@@ -147,7 +149,7 @@ class ExperimentSet:
             self.keywords.check_reserved_keys(experiment_context.variables)
         except ramble.keywords.RambleKeywordError as e:
             namespace = f"{self.workload_namespace}.{experiment_context.templates}"
-            raise RambleVariableDefinitionError(f"In experiment {namespace}: {e}")
+            raise RambleVariableDefinitionError(f"In experiment {namespace}: {e}") from None
 
         self._set_context(self._contexts.experiment, experiment_context)
         self._ingest_experiments(die_on_validate_error=die_on_validate_error)
@@ -573,7 +575,7 @@ class ExperimentSet:
                     if die_on_validate_error:
                         raise RambleVariableDefinitionError(
                             f"In experiment {final_exp_namespace}: {e}"
-                        )
+                        ) from None
                     pass
 
                 workload_names.add(app_inst.expander.workload_name)
