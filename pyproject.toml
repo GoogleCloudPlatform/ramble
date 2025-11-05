@@ -131,6 +131,10 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-# The F and E ignores here are already checked by flake8, and B905 requires Python 3.9 or up.
-ignore = ["B905", "F405", "F403", "E402"]
+# B905 requires Python 3.9 or up.
+ignore = ["B905"]
 extend-select = ["B"]
+
+[tool.ruff.lint.per-file-ignores]
+"lib/ramble/ramble/*kit.py" = ["F403"]
+"var/ramble/repos/**/*.py" = ["F403", "F405"]
