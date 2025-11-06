@@ -105,10 +105,10 @@ def test_variable_modification_directive(mod_class):
 
     when_conditions = 0
     mod_count = 0
-    for when_set, var_mod_dict in mod_inst.variable_modifications.items():
+    for when_set in mod_inst.variable_modifications:
         when_conditions += len(when_set)
         for var_name in mod_inst.variable_modifications[when_set]:
-            for modification in mod_inst.variable_modifications[when_set][var_name]:
+            for _ in mod_inst.variable_modifications[when_set][var_name]:
                 mod_count += 1
     assert mod_count == 3  # Each call to add_variable_modification adds 1 variable modification
     assert when_conditions == 3  # Each modification applies in 3 modes, stored as when conditions
@@ -118,7 +118,7 @@ def test_variable_modification_directive(mod_class):
         mode_name = test_def["mode"]
         mode_when = f"{mod_inst.name}_mode={mode_name}"
 
-        for when_set, var_mod_dict in mod_inst.variable_modifications.items():
+        for when_set in mod_inst.variable_modifications:
             assert mode_when in when_set
             assert var_name in mod_inst.variable_modifications[when_set]
             found_match = (
@@ -137,7 +137,7 @@ def test_variable_modification_directive(mod_class):
         for mode_name in test_def["modes"]:
             mode_when = f"{mod_inst.name}_mode={mode_name}"
 
-            for when_set, var_mod_dict in mod_inst.variable_modifications.items():
+            for when_set in mod_inst.variable_modifications:
                 found_match = (
                     False if len(mod_inst.variable_modifications[when_set][var_name]) > 0 else True
                 )
@@ -337,7 +337,7 @@ def add_figure_of_merit(mod_inst, context_num=1):
         "contexts": contexts.copy(),
     }
 
-    for context in contexts:
+    for _ in contexts:
         mod_inst.figure_of_merit(
             name,
             fom_regex=fom_regex,

@@ -74,13 +74,13 @@ class ScopedCriteriaList:
         """
         self.validate_scope(scope)
 
-        for scope in self._flush_scopes[scope]:
-            logger.debug(f" Flushing scope: {scope}")
+        for s in self._flush_scopes[scope]:
+            logger.debug(f" Flushing scope: {s}")
             logger.debug("    It contained:")
-            for crit in self.criteria[scope]:
+            for crit in self.criteria[s]:
                 logger.debug(f"      {crit.name}")
-            del self.criteria[scope]
-            self.criteria[scope] = []
+            del self.criteria[s]
+            self.criteria[s] = []
 
     def passed(self):
         succeed = True

@@ -184,7 +184,7 @@ class Renderer:
                     var = expander.expand_var(unexpanded_var)
                     matrix[i] = var
         if zips:
-            for zip_group, group_def in zips.items():
+            for group_def in zips.values():
                 for i, unexpanded_var in enumerate(group_def):
                     group_def[i] = expander.expand_var(unexpanded_var)
 
@@ -415,7 +415,7 @@ class Renderer:
         if vector_vars:
             # Check that sizes are the same
             length_mismatch = False
-            for var, val in vector_vars.items():
+            for val in vector_vars.values():
                 if len(val) != max_vector_size:
                     length_mismatch = True
 

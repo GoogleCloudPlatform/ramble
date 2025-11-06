@@ -16,13 +16,9 @@ import llnl.util.filesystem
 from llnl.util.filesystem import *
 
 import ramble.language.application_language
-from ramble.repository import get_base_class
-
-ExecutableApplication = get_base_class("executable-application")
-ApplicationBase = get_base_class("application-base")
-
 from ramble.language.application_language import *
 from ramble.language.shared_language import *
+from ramble.repository import get_base_class
 from ramble.spec import Spec
 from ramble.util.command_runner import (
     CommandRunner,
@@ -34,3 +30,6 @@ from ramble.util.file_util import get_file_path
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
+
+ExecutableApplication = get_base_class("executable-application")
+ApplicationBase = get_base_class("application-base")

@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from typing import List
+from typing import List, Optional
 
 
 class Families:
@@ -15,7 +15,7 @@ class Families:
     def __init__(
         self,
         origin_type: str,
-        families: List[str] = [],
+        families: Optional[List[str]] = None,
     ):
         """Constructor for families object
 
@@ -24,7 +24,7 @@ class Families:
             families: List of families
         """
         self.family_type = f"{origin_type}_family"
-        self.families = families
+        self.families = families if families is not None else []
 
     def __iter__(self):
         """Iterate over families"""

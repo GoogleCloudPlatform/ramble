@@ -684,7 +684,7 @@ class Expander:
             if not passthrough_setting:
                 raise RambleSyntaxError(
                     f"Encountered a passthrough error while expanding {var}\n" f"{e}"
-                )
+                ) from None
 
         logger.debug(f"END OF EXPAND_VAR STACK {value}")
         if typed:
@@ -849,7 +849,7 @@ class Expander:
                 logger.debug(f'   Math input is: "{in_str}"')
                 logger.debug(e)
             except RambleSyntaxError as e:
-                raise RambleSyntaxError(f'{str(e)} in "{in_str}"')
+                raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
             except SyntaxError as e:
                 logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
                 logger.debug(e)

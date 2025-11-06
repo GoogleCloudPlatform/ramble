@@ -64,7 +64,7 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        for extension in ["txt", "json", "yaml"]:
+        for _ in ["txt", "json", "yaml"]:
             with open(os.path.join(ws.root, "results.latest.txt")) as f:
                 data = f.read()
                 assert "Success criteria summary:" in data

@@ -139,7 +139,7 @@ class SpackStack(ExecutableApplication):
         "Stage",
         "Total",
     ]
-    for i, fom_part in enumerate(fom_parts):
+    for fom_part in fom_parts:
         full_regex = r".*?\s*" + fom_part + r":\s+(?P<fom>[0-9\.]+)s"
         figure_of_merit(
             fom_part,

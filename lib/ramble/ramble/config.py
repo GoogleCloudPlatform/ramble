@@ -217,7 +217,7 @@ class ConfigScope:
             with open(filename, "w") as f:
                 syaml.dump_config(data, stream=f, default_flow_style=False)
         except (yaml.YAMLError, OSError) as e:
-            raise ConfigFileError("Error writing to config file: '%s'" % str(e))
+            raise ConfigFileError("Error writing to config file") from e
 
     def clear(self):
         """Empty cached config information."""
@@ -347,7 +347,7 @@ class SingleFileScope(ConfigScope):
             rename(tmp, self.path)
 
         except (yaml.YAMLError, OSError) as e:
-            raise ConfigFileError("Error writing to config file: '%s'" % str(e))
+            raise ConfigFileError("Error writing to config file") from e
 
     def __repr__(self):
         return f"<SingleFileScope: {self.name}: {self.path}>"
@@ -753,7 +753,7 @@ class Configuration:
             data[section] = self.get_config(section)
             syaml.dump_config(data, stream=sys.stdout, default_flow_style=False, blame=blame)
         except (yaml.YAMLError, OSError):
-            raise ConfigError("Error reading configuration: %s" % section)
+            raise ConfigError("Error reading configuration: %s" % section) from None
 
 
 @contextmanager
@@ -1033,13 +1033,15 @@ def read_config_file(filename, schema=None):
         return data
 
     except StopIteration:
-        raise ConfigFileError("Config file is empty or is not a valid YAML dict: %s" % filename)
+        raise ConfigFileError(
+            "Config file is empty or is not a valid YAML dict: %s" % filename
+        ) from None
 
     except MarkedYAMLError as e:
-        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}")
+        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}") from e
 
     except OSError as e:
-        raise ConfigFileError(f"Error reading configuration file {filename}: {str(e)}")
+        raise ConfigFileError(f"Error reading configuration file {filename}") from e
 
 
 def _override(string):

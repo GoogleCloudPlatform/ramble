@@ -132,8 +132,8 @@ class AttributeGraph:
                     exp_name = self._obj_inst.name
                 raise GraphCycleError(
                     f"In experiment {exp_name} a cycle was detected "
-                    f"when processing the {self.node_type} graph.\n" + str(e)
-                )
+                    f"when processing the {self.node_type} graph."
+                ) from e
             self._prepared = True
 
         yield from self._sorted

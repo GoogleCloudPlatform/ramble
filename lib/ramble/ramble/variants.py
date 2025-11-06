@@ -283,7 +283,7 @@ class VariantSet:
                 out_set.add(variant.as_definition())
                 defined_variants.add(name)
 
-        for name, variant_list in self.multi_value_variants.items():
+        for variant_list in self.multi_value_variants.values():
             for variant in variant_list:
                 out_set.add(variant.as_definition())
 

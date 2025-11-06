@@ -4,7 +4,6 @@ from collections import defaultdict
 
 import pycodestyle
 from flake8.formatting.default import Pylint
-from flake8.style_guide import Violation
 
 #: This is a dict that maps:
 #:  filename pattern ->

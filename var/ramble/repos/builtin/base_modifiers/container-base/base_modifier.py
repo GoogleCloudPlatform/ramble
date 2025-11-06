@@ -112,7 +112,7 @@ class ContainerBase(BasicModifier):
         container_env_vars variable.
         """
 
-        def extract_names(itr, name_set=set()):
+        def extract_names(itr, name_set=None):
             """Extract names of environment variables from the environment variable action sets
 
             Given an iterator over environment variable action sets, extract
@@ -120,6 +120,8 @@ class ContainerBase(BasicModifier):
 
             Modifies the name_set argument inplace.
             """
+            if name_set is None:
+                name_set = set()
             for action, conf in itr:
                 if action in ["set", "unset"]:
                     for name in conf:

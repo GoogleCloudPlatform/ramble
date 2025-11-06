@@ -320,7 +320,7 @@ def config_dict(yaml_data):
         raise RambleActiveWorkspaceError(
             "ramble.yaml needs to contain at least one of the "
             f"required keys {ramble.schema.workspace.keys}"
-        )
+        ) from None
 
 
 def get_workspace(args, cmd_name, required=False):
@@ -1816,8 +1816,8 @@ ramble:
                     fs.mkdirp(subdir)
                 except OSError as e:
                     raise ramble.mirror.MirrorError(
-                        "Cannot create directory '%s':" % subdir, str(e)
-                    )
+                        "Cannot create directory '%s':" % subdir
+                    ) from e
 
         self.software_mirror_stats = MirrorStats()
         self.input_mirror_stats = MirrorStats()

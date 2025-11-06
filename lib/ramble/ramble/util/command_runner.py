@@ -38,7 +38,7 @@ class CommandRunner:
             else:
                 self.command = which(command, required=required, path=path)
         except CommandNotFoundError:
-            raise RunnerError(f"Command {name} is not found in path")
+            raise RunnerError(f"Command {name} is not found in path") from None
 
     def get_version(self):
         """Hook to get the version of the executable

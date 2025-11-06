@@ -88,11 +88,11 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
         import json
 
         data = json.load(f)
-        for data in data["experiments"]:
-            pkg_list = data["SOFTWARE"]["spack"]
+        for d in data["experiments"]:
+            pkg_list = d["SOFTWARE"]["spack"]
             names = [pkg["name"] for pkg in pkg_list]
-            assert "SOFTWARE" in data
-            assert "spack" in data["SOFTWARE"]
+            assert "SOFTWARE" in d
+            assert "spack" in d["SOFTWARE"]
             assert "zlib" in names
 
 

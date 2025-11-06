@@ -37,8 +37,7 @@ def extract_matrices(action, name, in_dict):
                         "1 matrix in a matrices definition."
                     )
 
-                for name, val in matrix.items():
-                    matrices.append(val)
+                matrices.extend(matrix.values())
             elif isinstance(matrix, list):
                 matrices.append(matrix)
     return matrices

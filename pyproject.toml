@@ -119,3 +119,22 @@ allow_redefinition = true
 # Only enable ramble modules
 module = "ramble.*"
 ignore_errors = false
+
+# TODO: Add ruff into `ramble style` once it reaches v1.
+# For now, the ruff check can be invoked manually with `ruff check`.
+[tool.ruff]
+extend-include = ["bin/ramble"]
+extend-exclude = [
+  "lib/ramble/external",
+  "lib/ramble/spack",
+  "lib/ramble/llnl",
+]
+
+[tool.ruff.lint]
+# B905 requires Python 3.9 or up.
+ignore = ["B905"]
+extend-select = ["B"]
+
+[tool.ruff.lint.per-file-ignores]
+"lib/ramble/ramble/*kit.py" = ["F403"]
+"var/ramble/repos/**/*.py" = ["F403", "F405"]
