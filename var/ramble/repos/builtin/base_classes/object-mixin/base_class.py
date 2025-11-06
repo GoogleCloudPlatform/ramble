@@ -5,6 +5,7 @@
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+import functools
 import os
 from html import escape
 from typing import List
@@ -210,3 +211,26 @@ class ObjectMixin:
 
     def _format_docs_details(self, _out):
         """Hook for objects to add extra documentation."""
+
+    @staticmethod
+    def workspace_cache(method):
+        """
+        A decorator that caches the result of a ramble object's instance method into the workspace.
+        """
+
+        @functools.wraps(method)
+        def wrapper(obj, *args, **kwargs):
+            # Precondition: the method should be called with a `workspace=` argument.
+            ws = kwargs["workspace"]
+            key = (
+                obj.origin_type,
+                obj.name,
+                method.__name__,
+                args,
+                frozenset(kwargs.items()),
+            )
+            if key not in ws.object_command_cache:
+                ws.object_command_cache[key] = method(obj, *args, **kwargs)
+            return ws.object_command_cache[key]
+
+        return wrapper

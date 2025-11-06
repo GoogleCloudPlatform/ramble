@@ -214,6 +214,10 @@ class Pip(PackageManagerBase):
         """
         return pkg.spec
 
+    @PackageManagerBase.workspace_cache
+    def get_version(self, workspace=None):
+        return self.runner.get_version()
+
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
     ):
@@ -223,7 +227,7 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        pkgman_version = self.runner.get_version()
+        pkgman_version = self.get_version(workspace=workspace)
 
         self.app_inst.hash_inventory["package_manager"].append(
             {

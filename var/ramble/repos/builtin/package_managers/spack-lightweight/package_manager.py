@@ -400,6 +400,10 @@ class SpackLightweight(PackageManagerBase):
                 logger.die(e)
             pass
 
+    @PackageManagerBase.workspace_cache
+    def get_version(self, workspace=None):
+        return self.runner.get_version()
+
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
     ):
@@ -411,7 +415,7 @@ class SpackLightweight(PackageManagerBase):
         self.runner.activate()
 
         try:
-            pkgman_version = self.runner.get_version()
+            pkgman_version = self.get_version(workspace=workspace)
         except RunnerError:
             pkgman_version = "unknown"
 
