@@ -12,9 +12,21 @@ from ramble.appkit import *
 class Zlib(ExecutableApplication):
     name = "zlib"
 
-    software_spec(
-        "zlib", pkg_spec="zlib", when=["package_manager_family=spack"]
+    variant(
+        "injected_compiler",
+        description="This variant enables a compiler spec that needs to be injected",
+        default=False,
+        values=[True, False],
     )
+
+    with when("package_manager_family=spack"):
+        with when("~injected_compiler"):
+            software_spec("zlib", pkg_spec="zlib")
+
+        with when("+injected_compiler"):
+            software_spec(
+                "zlib", pkg_spec="zlib", compiler="injected_compiler"
+            )
 
     executable("list_lib", "ls {zlib_path}/lib", use_mpi=False)
 
