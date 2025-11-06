@@ -137,6 +137,10 @@ class Info(PackageManagerBase):
 
     package_manager_family("info-package-manager")
 
+    def get_package_list(self, workspace):
+        del workspace
+        return []
+
     def environment_load_commands(self) -> List[str]:
         return []
 

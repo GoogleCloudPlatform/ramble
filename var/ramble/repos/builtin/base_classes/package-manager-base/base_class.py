@@ -240,10 +240,10 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             prov_cache[self.name][env_name] = pkg_list
         self.app_inst.result.software[self.output_prefix] = pkg_list
 
+    # Methods that need to be defined by every derived package manager
+    @abc.abstractmethod
     def get_package_list(self, workspace):
         """Method used by add_software_to_results phase to get software provenance info"""
-        del workspace
-        return []
 
     @abc.abstractmethod
     def environment_load_commands(self) -> List[str]:
