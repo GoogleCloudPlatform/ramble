@@ -12,6 +12,7 @@ from typing import Any, Callable, Optional, Union
 
 import ramble.error
 import ramble.util.colors as rucolor
+from ramble.expander import Expander
 
 reserved_variants = {
     "modifier",
@@ -249,7 +250,25 @@ class VariantSet:
 
         return None
 
-    def as_set(self):
+    def _expanded_set(self, expander: Optional[Expander] = None) -> set:
+        """Return an expanded version of the cached set in this variant set.
+
+        Args:
+            expander (ramble.expander.Expander): Expander to use for expanding this set
+
+        Returns:
+            (set): Set of exanded variant definitions
+        """
+
+        if expander is None:
+            return self._set_cache
+
+        expanded_set = set()
+        for variant in self._set_cache:
+            expanded_set.add(expander.expand_var(variant))
+        return expanded_set
+
+    def as_set(self, expander: Optional[Expander] = None) -> set:
         """Construct a set of definitions for this variant set
 
         The set of variant definitions will be used to determine if a when
@@ -257,9 +276,11 @@ class VariantSet:
 
         Returns:
             set: A set consisting of strings with the variant definitions
+            expander (ramble.expander.Expander): Expander to use when expanding
+                                                 variant definitions
         """
         if self._set_cache is not None:
-            return self._set_cache
+            return self._expanded_set(expander)
 
         defined_variants = set()
         out_set = set()
@@ -288,7 +309,7 @@ class VariantSet:
                 out_set.add(variant.as_definition())
 
         self._set_cache = out_set
-        return out_set
+        return self._expanded_set(expander)
 
 
 class Variant:
@@ -317,7 +338,7 @@ class Variant:
             name=self.name, default=self.default, description=self.description, values=self.values
         )
 
-    def as_definition(self):
+    def as_definition(self) -> str:
         """Build a definition for this variant
 
         Format the variant as a string which can be used to test against when
@@ -327,13 +348,6 @@ class Variant:
             str: String definition for this variant
         """
         return self._definition
-
-        if isinstance(self.default, bool):
-            if self.default:
-                return f"+{self.name}"
-            else:
-                return f"~{self.name}"
-        return f"{self.name}={str(self.default)}"
 
     def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String documentation of this variant

@@ -756,10 +756,12 @@ class Expander:
                      the input requirement.
         """
 
-        if variant_set is not None:
-            variant_definitions = variant_set.as_set()
-        else:
-            variant_definitions = set()
+        variant_definitions = set()
+
+        if hasattr(variant_set, "as_set"):
+            for variant in variant_set.as_set():
+                exp_variant = self.expand_var(variant)
+                variant_definitions.add(exp_variant)
 
         satisfied = True
         if reqs is not None:

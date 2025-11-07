@@ -288,3 +288,34 @@ ramble:
         with open(ws.config_file_path) as f:
             data = f.read()
             assert expected_spec in data
+
+
+def test_variant_info_works(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("concretize", global_args=global_args)
+        info_out = workspace("info", "--variants", global_args=global_args)
+
+        assert "application_name=when-variants" in info_out
+        assert "indirect_variant=test-value" in info_out
