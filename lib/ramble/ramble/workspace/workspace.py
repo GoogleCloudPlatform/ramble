@@ -478,6 +478,9 @@ class Workspace:
         # This is currently used as a cache for reading per-object template contents.
         self._inmem_file_cache = {}
 
+        # A workspace-level cache that's used by objects to cache command returns.
+        self.object_command_cache = {}
+
         self.results = self.default_results()
 
         # A cache structured as {pkg_man: {env_name: pkg_list}}.
