@@ -57,6 +57,19 @@ class WhenVariants(ExecutableApplication):
         description="Variant to control whether validation is on or not",
     )
 
+    variant(
+        "indirect_variant",
+        default="{variant_variable}",
+        description="Variant who's value comes from a variable",
+    )
+
+    workload_variable(
+        "variant_variable",
+        default="test-value",
+        description="Variable to control value of variant",
+        workloads=["*"],
+    )
+
     with when("+validation"):
         register_validator(
             "fixed_n_nodes",

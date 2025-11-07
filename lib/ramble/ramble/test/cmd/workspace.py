@@ -530,7 +530,7 @@ def test_workspace_info_complete(workspace_name):
         assert f"Phases for {pipeline}" in output
 
     assert "Variants:" in output
-    assert "package_manager: spack" in output
+    assert "package_manager=spack" in output
 
     assert "Variables from Workspace" in output
     assert "Variables from Experiment" in output

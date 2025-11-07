@@ -887,8 +887,13 @@ def workspace_info(args):
 
                     if args.variants:
                         color.cprint(rucolor.nested_4("        Variants: "))
-                        for key, value in app_inst.variants.items():
-                            color.cprint(f"          {key}: {value}")
+                        variant_set = set()
+                        for _, obj in app_inst._objects():
+                            variant_set = variant_set.union(
+                                obj.experiment_variants().as_set(expander=app_inst.expander)
+                            )
+                        for variant in variant_set:
+                            color.cprint(f"          - {variant}")
 
                     if args.executables:
                         color.cprint(rucolor.nested_4("        Executables: "))

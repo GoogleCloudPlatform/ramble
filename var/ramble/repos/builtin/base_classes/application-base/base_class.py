@@ -598,7 +598,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for cls in base_chain:
             if hasattr(cls, "name") and cls.name is not None:
                 self.object_variants.multi_value_variant(
-                    "application_name", value=cls.name
+                    "application_name",
+                    value=self.expander.application_name,
                 )
 
         # Define workload_name variant as early as possible
