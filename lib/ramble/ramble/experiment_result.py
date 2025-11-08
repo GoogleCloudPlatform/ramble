@@ -84,7 +84,7 @@ class ExperimentResult:
             if var not in app_inst.keywords.keys or not app_inst.keywords.is_key_level(var):
                 self.variables[var] = app_inst.expander.expand_var(val)
 
-        self.variants = sorted(list(app_inst.experiment_variants().as_set()))
+        self.variants = sorted(app_inst.experiment_variants().as_set())
 
     def to_dict(self):
         """Generate a dict for encoders (json, yaml) and uploaders.

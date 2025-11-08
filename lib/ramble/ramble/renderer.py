@@ -344,7 +344,7 @@ class Renderer:
 
                     elif var in defined_zips:
                         zip_len = defined_zips[var]["length"]
-                        idx_vector = [i for i in range(0, zip_len)]
+                        idx_vector = list(range(0, zip_len))
 
                         matrix_size = matrix_size * zip_len
                         vectors.append(idx_vector)

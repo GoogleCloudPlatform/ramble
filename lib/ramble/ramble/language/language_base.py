@@ -92,9 +92,9 @@ class DirectiveMeta(abc.ABCMeta):
                 pass
 
         # De-duplicates directives from base classes
-        attr_dict["_directives_to_be_executed"] = [
-            x for x in llnl.util.lang.dedupe(attr_dict["_directives_to_be_executed"])
-        ]
+        attr_dict["_directives_to_be_executed"] = list(
+            llnl.util.lang.dedupe(attr_dict["_directives_to_be_executed"])
+        )
 
         # Move things to be executed from module scope (where they
         # are collected first) to class scope
@@ -214,7 +214,7 @@ class DirectiveMeta(abc.ABCMeta):
             @functools.wraps(decorated_function)
             def _wrapper(*args, **_kwargs):
                 # First merge default args with kwargs
-                kwargs = dict()
+                kwargs = {}
                 for default_args in DirectiveMeta._default_args:
                     kwargs.update(default_args)
                 kwargs.update(_kwargs)

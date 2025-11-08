@@ -170,7 +170,7 @@ def _check_license(lines, path):
                         logger.warn(f"{path}: copyright date mismatch")
                 found.append(i)
 
-    if len(found) == len(license_lines) and found == list(sorted(found)):
+    if len(found) == len(license_lines) and found == sorted(found):
         return
 
     def old_license(line, path):
@@ -211,7 +211,7 @@ def verify(args):
         if not os.path.exists(path):
             continue
         with open(path) as f:
-            lines = [line for line in f][:license_lines]
+            lines = list(f)[:license_lines]
 
         error = _check_license(lines, path)
         if error:

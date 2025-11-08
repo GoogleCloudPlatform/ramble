@@ -179,7 +179,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         def add_subcommand_group(title, commands):
             """Add informational help group for a specific subcommand set."""
-            cmd_set = {c for c in commands}
+            cmd_set = set(commands)
 
             # make a dict of commands of interest
             cmds = {a.dest: a for a in self.actions if a.dest in cmd_set}

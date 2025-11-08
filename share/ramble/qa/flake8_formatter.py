@@ -36,13 +36,10 @@ pattern_exemptions = {
 
 
 # compile all regular expressions.
-pattern_exemptions = dict(
-    (
-        re.compile(file_pattern),
-        dict((code, [re.compile(p) for p in patterns]) for code, patterns in error_dict.items()),
-    )
+pattern_exemptions = {
+    re.compile(file_pattern): {code: [re.compile(p) for p in patterns] for code, patterns in error_dict.items()}
     for file_pattern, error_dict in pattern_exemptions.items()
-)
+}
 
 
 class SpackFormatter(Pylint):
