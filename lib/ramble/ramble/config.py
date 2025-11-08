@@ -114,7 +114,7 @@ section_schemas: Dict[str, Dict[str, Any]] = {
 # Same as above, but including keys for workspaces
 # this allows us to unify config reading between configs and workspaces
 all_schemas = copy.deepcopy(section_schemas)
-all_schemas.update({key: ramble.schema.workspace.schema for key in ramble.schema.workspace.keys})
+all_schemas.update(dict.fromkeys(ramble.schema.workspace.keys, ramble.schema.workspace.schema))
 
 #: Builtin paths to configuration files in ramble
 configuration_paths = (

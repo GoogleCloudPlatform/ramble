@@ -305,7 +305,7 @@ def _iter_s3_contents(contents, prefix):
 
 
 def _list_s3_objects(client, bucket, prefix, num_entries, start_after=None):
-    list_args = dict(Bucket=bucket, Prefix=prefix[1:], MaxKeys=num_entries)
+    list_args = {"Bucket": bucket, "Prefix": prefix[1:], "MaxKeys": num_entries}
 
     if start_after is not None:
         list_args["StartAfter"] = start_after

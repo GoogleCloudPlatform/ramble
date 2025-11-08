@@ -580,7 +580,7 @@ def maintainers(*names: str, **kwargs):
     def _execute_maintainer(obj):
         maintainers_from_base = getattr(obj, "maintainers", [])
         # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        obj.maintainers = list(sorted(set(maintainers_from_base + list(names))))
+        obj.maintainers = sorted(set(maintainers_from_base + list(names)))
 
     return _execute_maintainer
 
@@ -597,7 +597,7 @@ def tags(*values: str, **kwargs):
     def _execute_tag(obj):
         tags_from_base = getattr(obj, "tags", [])
         # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        obj.tags = list(sorted(set(tags_from_base + list(values))))
+        obj.tags = sorted(set(tags_from_base + list(values)))
 
     return _execute_tag
 
