@@ -20,6 +20,7 @@ pytestmark = pytest.mark.usefixtures(
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
+on = RambleCommand("on")
 
 
 def test_default_arg_works(request):
@@ -319,3 +320,39 @@ def test_variant_info_works(request):
 
         assert "application_name=when-variants" in info_out
         assert "indirect_variant=test-value" in info_out
+
+
+@pytest.mark.parametrize("test_value", ["value1", "value2", "value3"])
+def test_variant_nesting_works(workspace_name, test_value):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        with open(os.path.join(ws.config_dir, "variants.yaml"), "w+") as f:
+            f.write(
+                f"""variants:
+  iterative_variant: {test_value}
+  iterative_variant2: {test_value}"""
+            )
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        exec_out = on("--executor='echo {leaf_value}'", global_args=global_args)
+
+        assert test_value in exec_out

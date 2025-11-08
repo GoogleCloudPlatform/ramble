@@ -166,3 +166,52 @@ class WhenVariants(ExecutableApplication):
             default="unincluded",
             description="Test usage of the `variable` directive",
         )
+
+    variant(
+        "iterative_variant",
+        default="{iterative_variant}",
+        values=["value1", "value2", "value3"],
+        description="Variant that controls variable definitions",
+    )
+
+    variant(
+        "iterative_variant2",
+        default="{iterative_variant2}",
+        values=["value1", "value2", "value3"],
+        description="Variant that controls variable definitions",
+    )
+
+    with when("iterative_variant=value1"):
+        with when("iterative_variant2=value1"):
+            variable(
+                "leaf_variable", default="value1", description="Test variable"
+            )
+        variable(
+            "iterative_variant2",
+            default="sub_value1",
+            description="Test variable",
+        )
+
+    with when("iterative_variant=value2"):
+        with when("iterative_variant2=value2"):
+            variable(
+                "leaf_variable", default="value2", description="Test variable"
+            )
+
+        variable(
+            "iterative_variant2",
+            default="sub_value2",
+            description="Test variable",
+        )
+
+    with when("iterative_variant=value3"):
+        with when("iterative_variant2=value3"):
+            variable(
+                "leaf_variable", default="value3", description="Test variable"
+            )
+
+        variable(
+            "iterative_variant2",
+            default="sub_value3",
+            description="Test variable",
+        )
