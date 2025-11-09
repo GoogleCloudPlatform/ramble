@@ -25,6 +25,8 @@ import ramble.repository
 import ramble.stage
 import ramble.workspace
 from ramble.fetch_strategy import FetchError, FetchStrategyComposite, URLFetchStrategy
+from ramble.pkg_man.builtin.spack_lightweight import SpackRunner
+from ramble.util.command_runner import RunnerError
 from ramble.util.file_util import is_dry_run_path
 
 import spack.platforms
@@ -170,6 +172,15 @@ def mock_pkg_mans_repo_path():
 def mock_wms_repo_path():
     obj_type = ramble.repository.ObjectTypes.workflow_managers
     yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture
+def ensure_spack_runner():
+    """Fixture to check for spack runner and skip if not found."""
+    try:
+        SpackRunner()
+    except RunnerError as e:
+        pytest.skip(f"Spack runner not found, skipping test: {e}")
 
 
 def _get_obj_repo_path(obj_type, extra_repo_path):
