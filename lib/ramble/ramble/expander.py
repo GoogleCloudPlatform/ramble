@@ -759,9 +759,8 @@ class Expander:
         variant_definitions = set()
 
         if hasattr(variant_set, "as_set"):
-            for variant in variant_set.as_set():
-                exp_variant = self.expand_var(variant)
-                variant_definitions.add(exp_variant)
+            for variant in variant_set.as_set(self):
+                variant_definitions.add(variant)
 
         satisfied = True
         if reqs is not None:

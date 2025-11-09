@@ -621,17 +621,31 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
 
-        # Define missing variables
-        for _, obj in self._objects():
-            for var, val in obj.selected_variables.items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
+        self.define_missing_variables()
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
         if experiment_set and experiment_set._workspace:
             self.expander.replacement_paths = (
                 experiment_set._workspace.workspace_paths()
             )
+
+    def define_missing_variables(self):
+        """Iterate over missing variable definitions, and add them until there
+        are no more to add."""
+
+        while True:
+            missing_vars = {}
+            for _, obj in self._objects():
+                for var, val in obj.selected_variables.items():
+                    # Check for its presence in missing_vars, for the "first-defined-wins" semantic
+                    if var not in self.variables and var not in missing_vars:
+                        missing_vars[var] = val.default
+
+            if not missing_vars:
+                break
+
+            for var, default_val in missing_vars.items():
+                self.define_variable(var, default_val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
@@ -774,22 +788,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ########################
         # Define extra variables
         ########################
-
-        var_objs = []
-
-        for mod_inst in self._modifier_instances:
-            var_objs.append(mod_inst)
-
-        if self.package_manager is not None:
-            var_objs.append(self.package_manager)
-
-        if self.workflow_manager is not None:
-            var_objs.append(self.workflow_manager)
-
-        for var_obj in var_objs:
-            for var in var_obj.selected_variables.values():
-                if var.name not in self.variables:
-                    self.variables[var.name] = var.default
+        self.define_missing_variables()
 
         ##########################################
         # Expand used variables to track all usage
@@ -1188,9 +1187,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 mod_inst.expander.add_no_expand_var(var)
 
             # Define any missing modifier variables
-            for var, val in mod_inst.selected_variables.items():
-                if var not in self.variables:
-                    self.define_variable(var, val.default)
+            self.define_missing_variables()
 
     def validate_experiment(
         self, warn_validation=True, die_on_validate_error=True
