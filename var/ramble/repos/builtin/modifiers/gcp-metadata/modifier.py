@@ -65,15 +65,10 @@ class GcpMetadata(BasicModifier):
         description="Optional suffix for {metadata_parallel_prefix}",
     )
 
-    executable_modifier("gcp_metadata_exec")
+    executable_modifier("gcp_metadata_exec", usage_filter="once")
 
     def gcp_metadata_exec(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
-
-        if hasattr(self, "_already_applied"):
-            return [], []
-
-        self._already_applied = True
 
         post_cmds = []
         pre_cmds = []

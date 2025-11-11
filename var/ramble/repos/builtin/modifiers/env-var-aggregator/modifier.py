@@ -78,10 +78,6 @@ class EnvVarAggregator(BasicModifier):
         modes=["explicit"],
     )
 
-    def __init__(self, file_path):
-        super().__init__(file_path)
-        self._applied_aggregation = False
-
     def _aggregate_all_env_vars(self, shell):
         script_lines = []
 
@@ -133,16 +129,13 @@ class EnvVarAggregator(BasicModifier):
 
         return script_lines
 
-    executable_modifier("inject_env_aggregation_script")
+    executable_modifier("inject_env_aggregation_script", usage_filter="once")
 
     def inject_env_aggregation_script(
         self, executable_name, executable, app_inst=None
     ):
         pre_cmds = []
         post_cmds = []
-
-        if self._applied_aggregation or not app_inst:
-            return pre_cmds, post_cmds
 
         item_prefix = app_inst.expander.expand_var_name(
             "aggregated_env_var_item_prefix"
@@ -174,7 +167,5 @@ class EnvVarAggregator(BasicModifier):
             output_capture=None,
         )
         pre_cmds.append(cmd_exec)
-
-        self._applied_aggregation = True
 
         return pre_cmds, post_cmds

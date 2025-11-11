@@ -73,7 +73,7 @@ class RunDirectory(BasicModifier):
         dest_path="postrun_copy.sh",
     )
 
-    executable_modifier("apply_run_directory_change")
+    executable_modifier("apply_run_directory_change", usage_filter="once")
 
     def apply_run_directory_change(
         self, executable_name, executable, app_inst
@@ -89,8 +89,8 @@ class RunDirectory(BasicModifier):
             return pre_cmds, post_cmds
         from ramble.util import executable
 
-        if not getattr(self, "_applied", False):
-            self._applied = True
+        if not getattr(self, "_target_cleaned", False):
+            self._target_cleaned = True
             should_cleanup = self.expander.expand_var_name(
                 "cleanup_target_directory_before_run",
                 typed=True,
