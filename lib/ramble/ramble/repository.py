@@ -11,7 +11,6 @@ import collections
 import contextlib
 import errno
 import functools
-import importlib
 import importlib.machinery
 import importlib.util
 import inspect

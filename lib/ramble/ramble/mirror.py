@@ -17,7 +17,6 @@ to download inputs directly from a mirror (e.g., on an intranet).
 """
 import collections
 import operator
-import os
 import os.path
 
 import ruamel.yaml.error as yaml_error
