@@ -879,7 +879,6 @@ def section_args(section_name):
 
 def test_config_edit_file(mutable_config, config_section, mock_editor):
     import ramble.cmd.config
-    import ramble.util.editor
 
     args = section_args(config_section)
 

@@ -36,7 +36,6 @@ import ramble.util.lock
 from ramble.util.logger import logger
 
 import spack.config
-import spack.paths
 import spack.util.path as sup
 import spack.util.pattern as pattern
 import spack.util.url as url_util

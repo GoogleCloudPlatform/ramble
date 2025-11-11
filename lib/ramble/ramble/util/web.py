@@ -27,7 +27,6 @@ import ramble
 import ramble.config
 from ramble.util.logger import logger
 
-import spack
 import spack.error
 import spack.util.gcs as gcs_util
 import spack.util.s3 as s3_util

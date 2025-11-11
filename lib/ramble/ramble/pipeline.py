@@ -24,7 +24,6 @@ import ramble.config
 import ramble.expander
 import ramble.experiment_result
 import ramble.fetch_strategy
-import ramble.results_table
 import ramble.software_environments
 import ramble.stage
 import ramble.uploader

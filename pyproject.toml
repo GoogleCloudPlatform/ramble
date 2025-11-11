@@ -131,9 +131,10 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
+preview = true
 # B905 requires Python 3.9 or up.
 ignore = ["B905"]
-extend-select = ["B", "C4"]
+extend-select = ["B", "C4", "F401"]
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]
