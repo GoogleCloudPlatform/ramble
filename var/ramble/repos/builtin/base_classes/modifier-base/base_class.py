@@ -427,6 +427,9 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         Returns:
             Reference to function, if found. None otherwise"""
 
+        if filter_name is None or filter_name == "None":
+            return None
+
         filter_names = set()
         for attr in dir(self):
             method = getattr(self, attr)
@@ -438,16 +441,17 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                     test_filter_name = method_attributes["filter_name"]
                 filter_names.add(test_filter_name)
                 if filter_name == test_filter_name:
+                    logger.all_msg(
+                        f" Found matching filter? {filter_name} == {test_filter_name}"
+                    )
                     return method
 
-        if filter_name is not None and filter_name != "None":
-            logger.die(
-                f"When extracting a usage_filter for an executable_modifier "
-                f"on modifier {self.name} "
-                f"the filter {filter_name} does not exist. Registered filters are: \n"
-                f"{filter_names}"
-            )
-        return None
+        logger.die(
+            f"When extracting a usage_filter for an executable_modifier "
+            f"on modifier {self.name} "
+            f"the filter {filter_name} does not exist. Registered filters are: \n"
+            f"{filter_names}"
+        )
 
     def executable_modification_applies(
         self, exec_mod, filter_name, executable
@@ -465,6 +469,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         filter_func = self.get_executable_modifier_filter(filter_name)
 
         if filter_func is not None:
+            logger.all_msg(f" Filter func = {filter_func}")
             apply = filter_func(exec_mod, executable)
 
         return apply
