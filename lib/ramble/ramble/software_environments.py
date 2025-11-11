@@ -470,9 +470,7 @@ class SoftwareEnvironment:
         Returns:
             (bool): True if environments are equivalent, False otherwise
         """
-        equal = self.name == other.name
-
-        if not equal:
+        if not self.name == other.name:
             return False
 
         self_pkgs = {}
