@@ -6,9 +6,15 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
 from enum import Enum
 
 from ramble.namespace import namespace
+from ramble.software_info import SoftwareInfo
+from ramble.util.file_util import get_newest_experiment_file
+from ramble.util.logger import logger
+
+import spack.util.spack_json as sjson
 
 
 # Can use auto() once we're at >= python 3.11
@@ -28,6 +34,7 @@ class ExperimentStatus(str, Enum):
 
 _OUTPUT_MAPPING = {
     "name": "name",
+    "status": "EXPERIMENT_STATUS",
     namespace.n_repeats: "N_REPEATS",
     "keys": "keys",
     "contexts": "CONTEXTS",
@@ -38,12 +45,15 @@ _OUTPUT_MAPPING = {
     namespace.variants: "VARIANTS",
     "experiment_chain": "EXPERIMENT_CHAIN",
     "success_criteria": "SUCCESS_CRITERIA",
+    "object_definitions": "OBJECT_DEFINITIONS",
 }
 
 
 # TODO: would be better to use dataclass after 3.6 support is dropped
 class ExperimentResult:
     """Class containing results and related metadata of an experiment"""
+
+    cache_file_name = "ramble_results_cache.json"
 
     def __init__(self, app_inst):
         """Build up the result from the given app instance"""
@@ -60,8 +70,59 @@ class ExperimentResult:
         self.raw_variables = {}
         self.variables = {}
         self.variants = []
+        self.object_definitions = []
 
-    def finalize(self):
+    def read_cache(self, workspace, app_inst) -> bool:
+        experiment_dir = app_inst.expander.experiment_run_dir
+        cache_file = os.path.join(experiment_dir, self.cache_file_name)
+
+        logger.debug(f"Experiment results cache file is: {cache_file}")
+
+        if not os.path.isfile(cache_file):
+            logger.debug("No valid experiment results cache found. Will create one.")
+            return False
+        cache_timestamp = os.path.getmtime(cache_file)
+
+        newest_file, file_timestamp = get_newest_experiment_file(experiment_dir)
+
+        if file_timestamp is not None and cache_timestamp < file_timestamp:
+            logger.all_msg("Invalidating experiment results cache: timestamp difference")
+            return False
+
+        with open(cache_file) as f:
+            cache_dict = sjson.load(f)
+
+        if (
+            "experiment_hash" not in cache_dict
+            or app_inst.experiment_hash != cache_dict["experiment_hash"]
+        ):
+            logger.all_msg("Invalidating experiment results cache: experiment hash difference")
+            return False
+
+        self.from_dict(cache_dict)
+        logger.all_msg("Reading experiment results from cache file")
+        return True
+
+    def write_cache(self, app_inst):
+        experiment_dir = app_inst.expander.experiment_run_dir
+        cache_file = os.path.join(experiment_dir, self.cache_file_name)
+
+        out_dict = self.to_dict()
+        out_dict["experiment_hash"] = app_inst.experiment_hash
+
+        software_key = _OUTPUT_MAPPING["software"]
+        software_packages = {}
+        if software_key in out_dict:
+            software_packages = out_dict[software_key].copy()
+
+        out_dict[software_key] = {}
+        for key, pkg_list in software_packages.items():
+            out_dict[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
+
+        with open(cache_file, "w+") as f:
+            sjson.dump(out_dict, f)
+
+    def finalize(self, workspace):
         app_inst = self._app_inst
         self.name = app_inst.expander.experiment_namespace
 
@@ -85,6 +146,25 @@ class ExperimentResult:
                 self.variables[var] = app_inst.expander.expand_var(val)
 
         self.variants = sorted(app_inst.experiment_variants().as_set())
+
+        self.object_definitions = app_inst.object_inventory(workspace)
+
+    def from_dict(self, in_dict: dict):
+        """Convert a dict back into a results object
+
+        Args:
+            in_dict (dict): Input dictionary of results from a cache
+        """
+
+        for lookup_key, output_key in _OUTPUT_MAPPING.items():
+            if output_key in in_dict:
+                setattr(self, lookup_key, in_dict[output_key])
+
+        software_key = _OUTPUT_MAPPING["software"]
+        if software_key in in_dict:
+            self.software = {}
+            for key, pkg_list in in_dict[software_key].items():
+                self.software[key] = [SoftwareInfo(**pkg_conf) for pkg_conf in pkg_list]
 
     def to_dict(self):
         """Generate a dict for encoders (json, yaml) and uploaders.
