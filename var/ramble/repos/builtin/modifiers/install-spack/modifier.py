@@ -87,7 +87,7 @@ fi
         modes=["standard", "quiet"],
     )
 
-    executable_modifier("source_installed_spack")
+    executable_modifier("source_installed_spack", usage_filter="once")
 
     def source_installed_spack(
         self, executable_name, executable, app_inst=None
@@ -100,15 +100,13 @@ fi
         if self._usage_mode == "quiet":
             return pre_exec, post_exec
 
-        if not hasattr(self, "_already_applied"):
-            pre_exec.append(
-                CommandExecutable(
-                    "source-installed-spack",
-                    template=[
-                        "{source_spack}",
-                    ],
-                )
+        pre_exec.append(
+            CommandExecutable(
+                "source-installed-spack",
+                template=[
+                    "{source_spack}",
+                ],
             )
+        )
 
-            self._already_applied = True
         return pre_exec, post_exec

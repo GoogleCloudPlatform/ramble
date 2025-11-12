@@ -666,10 +666,6 @@ class NcclEnv(BasicModifier):
         modes=["standard"],
     )
 
-    def __init__(self, file_path):
-        super().__init__(file_path)
-        self._applied = False
-
     def generate_env_var_dict(self, app_inst):
         env_var_set = {}
         set_env_vars = {}
@@ -684,39 +680,42 @@ class NcclEnv(BasicModifier):
 
         return env_var_set
 
-    executable_modifier("define_nccl_env_vars")
+    @ModifierBase.executable_modifier_usage_filter("first_workload_exec")
+    def filter_first_workload_executable(self, exec_mod, executable):
+        # Apply before the first executable from the workload
+        app_inst = self._get_app_inst()
+        workload = app_inst.get_workload()
+        return executable.name == workload.executables[
+            0
+        ] and not self.executable_modifier_applied(exec_mod)
+
+    executable_modifier(
+        "define_nccl_env_vars", usage_filter="first_workload_exec"
+    )
 
     def define_nccl_env_vars(self, executable_name, executable, app_inst=None):
         pre_cmds = []
         post_cmds = []
-        if self._applied:
-            return pre_cmds, post_cmds
 
-        workload = app_inst.get_workload()
+        action_funcs = ramble.util.env.action_funcs
+        shell = ramble.config.get("config:shell")
+        env_var_dict = self.generate_env_var_dict(app_inst)
+        env_var_cmds = []
+        for action, conf in env_var_dict.items():
+            (env_cmds, _) = action_funcs[action](conf, set(), shell=shell)
 
-        # Apply before the first executable from the workload
-        if executable_name == workload.executables[0]:
-            self._applied = True
+            for cmd in env_cmds:
+                if cmd:
+                    env_var_cmds.append(cmd)
 
-            action_funcs = ramble.util.env.action_funcs
-            shell = ramble.config.get("config:shell")
-            env_var_dict = self.generate_env_var_dict(app_inst)
-            env_var_cmds = []
-            for action, conf in env_var_dict.items():
-                (env_cmds, _) = action_funcs[action](conf, set(), shell=shell)
-
-                for cmd in env_cmds:
-                    if cmd:
-                        env_var_cmds.append(cmd)
-
-            pre_cmds.append(
-                ramble.util.executable.CommandExecutable(
-                    "nccl_env_vars",
-                    template=env_var_cmds,
-                    mpi=False,
-                    redirect="",
-                    output_capture="",
-                )
+        pre_cmds.append(
+            ramble.util.executable.CommandExecutable(
+                "nccl_env_vars",
+                template=env_var_cmds,
+                mpi=False,
+                redirect="",
+                output_capture="",
             )
+        )
 
         return pre_cmds, post_cmds

@@ -18,8 +18,6 @@ class ExecutionDate(BasicModifier):
 
     mode("standard", description="Standard execution mode")
 
-    executable_modifier("get_startend_date")
-
     modifier_variable(
         "date_format",
         default="",
@@ -27,13 +25,10 @@ class ExecutionDate(BasicModifier):
         mode="standard",
     )
 
+    executable_modifier("get_startend_date", usage_filter="once")
+
     def get_startend_date(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
-
-        if hasattr(self, "_already_applied"):
-            return [], []
-
-        self._already_applied = True
 
         pre_cmds = []
         post_cmds = []

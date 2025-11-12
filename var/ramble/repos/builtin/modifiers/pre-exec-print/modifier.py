@@ -28,9 +28,7 @@ class PreExecPrint(BasicModifier):
     mode("standard", description="Standard execution mode for pre-print")
     default_mode("standard")
 
-    executable_modifier("pre_exec_print")
-
-    _attr_name = "_applied_pre_exec_print"
+    executable_modifier("pre_exec_print", usage_filter="once")
 
     def pre_exec_print(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
@@ -38,18 +36,19 @@ class PreExecPrint(BasicModifier):
         pre_cmds = []
         post_cmds = []
 
-        if not hasattr(self, self._attr_name):
-            echo_string = "Index: {experiment_index} -- Namespace: {experiment_namespace}"
-            if "pre_exec_print_template" in app_inst.variables:
-                echo_string = "{pre_exec_print_template}"
-            pre_cmds.append(
-                CommandExecutable(
-                    "perform-pre-exec-print",
-                    template=[f'echo "Running: {echo_string}"'],
-                    mpi=False,
-                    redirect="",
-                    output_capture="",
-                )
+        echo_string = (
+            "Index: {experiment_index} -- Namespace: {experiment_namespace}"
+        )
+        if "pre_exec_print_template" in app_inst.variables:
+            echo_string = "{pre_exec_print_template}"
+        pre_cmds.append(
+            CommandExecutable(
+                "perform-pre-exec-print",
+                template=[f'echo "Running: {echo_string}"'],
+                mpi=False,
+                redirect="",
+                output_capture="",
             )
-            setattr(self, self._attr_name, True)
+        )
+
         return pre_cmds, post_cmds
