@@ -18,6 +18,11 @@ import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
+from ramble.software_environments import (
+    RambleSoftwareEnvironmentError,
+    TemplatePackage,
+)
+from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
@@ -210,6 +215,137 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
 
         pass
 
+    def define_missing_packages(self, workspace):
+        """Injection of missing packages that are auto-injected by objects
+
+        This method will iterate over the objects in an experiment, and
+        inject any missing packages that are defined as `inject_if_missing`
+        from their software_spec directives.
+
+        Args:
+            workspace (Workspace): The workspace that contains the software environments
+        """
+
+        require_env = self.environment_required
+        software_envs = workspace.software_environments
+
+        # Inject any missing, but injected compilers
+        for _, obj in self.app_inst._objects():
+            for comps in obj.compilers.values():
+                for comp in comps:
+                    if (
+                        comp.inject_if_missing
+                        and comp.name not in software_envs._package_templates
+                        and self.satisfy_when(
+                            comp.when,
+                            variant_set=obj.experiment_variants(),
+                        )
+                    ):
+                        comp_template = TemplatePackage(
+                            comp.name, comp.to_dict()
+                        )
+                        software_envs._package_templates[comp.name] = (
+                            comp_template
+                        )
+
+        app_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
+        try:
+            software_env = software_envs.render_environment(
+                app_context, self.app_inst.expander, self, require=require_env
+            )
+
+            # If there is no environment required or defined, skip defining
+            # packages.
+            if not require_env and software_env is None:
+                return
+
+            env_packages = set()
+            for pkg_spec in software_envs.package_specs_for_environment(
+                software_env
+            ):
+                env_packages.add(self.package_name_from_spec(pkg_spec))
+
+            for _, obj in self.app_inst._objects():
+                required_compilers = set()
+                # Inject any specs that need to be injected.
+                for specs in obj.software_specs.values():
+                    for spec in specs:
+                        pkg_name = self.package_name_from_spec(spec.pkg_spec)
+
+                        if (
+                            spec.inject_if_missing
+                            and pkg_name not in env_packages
+                            and self.app_inst.expander.satisfies(
+                                spec.when,
+                                variant_set=obj.experiment_variants(),
+                            )
+                        ):
+                            env_packages.add(pkg_name)
+                            new_spec = spec.copy()
+                            software_envs.add_spec_to_environment(
+                                software_env,
+                                new_spec,
+                                self.app_inst.expander,
+                                self,
+                            )
+
+                            if new_spec.compiler is not None:
+                                required_compilers.add(new_spec.compiler)
+
+                # Inject any dependent compilers
+                pm_name = self.spec_prefix
+                compilers_to_define = required_compilers.copy()
+                for compiler in required_compilers:
+                    rendered_compiler = self.app_inst.expander.expand_var(
+                        compiler
+                    )
+                    if (
+                        compiler in software_envs._package_templates
+                        or rendered_compiler
+                        in software_envs._rendered_packages[pm_name]
+                    ):
+                        compilers_to_define.remove(compiler)
+
+                for compiler in compilers_to_define:
+                    rendered_compiler = self.app_inst.expander.expand_var(
+                        compiler
+                    )
+
+                    compiler_name = None
+                    if compiler in obj.compilers:
+                        compiler_name = compiler
+                    elif rendered_compiler in obj.compilers:
+                        compiler_name = rendered_compiler
+
+                    if compiler_name is None:
+                        logger.die(
+                            f"When injecting packages from {obj.origin_type} "
+                            f"{obj.name}, compiler {compiler} (rendered to "
+                            f"{rendered_compiler}) is not defined."
+                        )
+
+                    for compiler_spec in obj.compilers[compiler_name]:
+                        if self.app_inst.expander.satisfies(
+                            compiler_spec.when,
+                            variant_set=obj.experiment_variants(),
+                        ):
+                            compiler_template = TemplatePackage(
+                                compiler_name, compiler_spec.to_dict()
+                            )
+
+                            software_envs._package_templates[compiler_name] = (
+                                compiler_template
+                            )
+                            rendered_compiler = (
+                                compiler_template.render_package(
+                                    self.app_inst.expander, self
+                                )
+                            )
+        except RambleSoftwareEnvironmentError:
+            pass
+
     register_phase(
         "add_software_to_results",
         pipeline="analyze",
@@ -244,6 +380,11 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
     @abc.abstractmethod
     def get_package_list(self, workspace):
         """Method used by add_software_to_results phase to get software provenance info"""
+
+    @abc.abstractmethod
+    def package_name_from_spec(self, spec: str) -> str:
+        """Stub method for extracting a package name
+        from a spec object"""
 
     @abc.abstractmethod
     def environment_load_commands(self) -> List[str]:

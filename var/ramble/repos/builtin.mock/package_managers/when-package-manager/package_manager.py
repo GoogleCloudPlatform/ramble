@@ -69,6 +69,9 @@ class WhenPackageManager(PackageManagerBase):
         del workspace
         return []
 
+    def package_name_from_spec(self, spec: str) -> str:
+        return spec
+
     def environment_load_commands(self) -> List[str]:
         return []
 

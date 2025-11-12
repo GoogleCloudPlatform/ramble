@@ -14,6 +14,7 @@ import ramble.util.colors as rucolor
 from ramble.expander import Expander
 from ramble.namespace import namespace
 from ramble.util.logger import logger
+from ramble.util.spec_utils import SoftwareSpec
 
 SUB_INDENT = 2
 
@@ -55,6 +56,7 @@ class SoftwarePackage:
         self.pkg_info = pkg_info
         self._package_type = "Base"
         self._used = False
+        self.injected = False
 
     def mark_used(self):
         """Mark this package a used"""
@@ -107,7 +109,9 @@ class SoftwarePackage:
         indentation = " " * indent
         color = rucolor.level_func(color_level)
 
-        out_str = color(f"{indentation}{self._package_type} package: {self.name}\n")
+        injected_str = "" if not self.injected else " (injected by ramble)"
+
+        out_str = color(f"{indentation}{self._package_type} package: {self.name} {injected_str}\n")
         return out_str
 
     def __str__(self):
@@ -466,14 +470,22 @@ class SoftwareEnvironment:
         Returns:
             (bool): True if environments are equivalent, False otherwise
         """
-        equal = self.name == other.name and len(self._packages) == len(other._packages)
-
-        if not equal:
+        if not self.name == other.name:
             return False
 
-        for self_pkg, other_pkg in zip(self._packages, other._packages):
-            if self_pkg != other_pkg:
-                return False
+        self_pkgs = {}
+        other_pkgs = {}
+
+        for self_pkg in self._packages:
+            if not self_pkg.injected:
+                self_pkgs[self_pkg.name] = self_pkg
+
+        for other_pkg in other._packages:
+            if not other_pkg.injected:
+                other_pkgs[other_pkg.name] = other_pkg
+
+        if self_pkgs != other_pkgs:
+            return False
 
         return True
 
@@ -853,6 +865,7 @@ class SoftwareEnvironments:
 
                             if rendered_pkg.compiler:
                                 cur_compiler = rendered_pkg.compiler
+
                     if not added:
                         raise RambleSoftwareEnvironmentError(
                             f"Compiler {pkg.compiler} used, but not "
@@ -920,6 +933,45 @@ class SoftwareEnvironments:
 
         for pkg in environment._packages:
             yield pkg.spec_str(all_packages=self._rendered_packages, compiler=False)
+
+    def add_spec_to_environment(
+        self,
+        environment: SoftwareEnvironment,
+        spec: SoftwareSpec,
+        expander: Expander,
+        package_manager,
+    ):
+        """Add a spec to a given environment
+
+        Creates a new template / rendered package (if needed) from the input spec,
+        and adds to the template and rendered environment as a package in the environment.
+
+        Args:
+            environment (SoftwareEnvironment): Rendered environment to add package to
+            spec (ramble.util.spec_utils.SoftwareSpec): Software spec to add to environment
+            expander (ramble.expander.Expander): Experiment's expander object,
+                                                 to render package / environment with
+            package_manager: Package manager from the experiment
+        """
+
+        pm_name = package_manager.spec_prefix
+
+        if spec.name not in self._package_templates:
+            template_package = TemplatePackage(spec.name, spec.to_dict())
+
+            self._package_templates[spec.name] = template_package
+
+        template_package = self._package_templates[spec.name]
+
+        rendered_package = template_package.render_package(expander, package_manager)
+        rendered_package.injected = True
+
+        if rendered_package.name not in self._rendered_packages:
+            template_package.add_rendered_package(
+                rendered_package, self._rendered_packages, pm_name
+            )
+
+        environment.add_package(rendered_package)
 
     def _check_environment(self, environment):
         """Check an environment for common issues

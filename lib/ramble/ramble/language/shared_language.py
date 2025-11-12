@@ -161,7 +161,14 @@ def figure_of_merit(
 
 @shared_directive("compilers")
 def define_compiler(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
+    name,
+    pkg_spec,
+    compiler_spec=None,
+    compiler=None,
+    package_manager=None,
+    inject_if_missing=False,
+    when=None,
+    **kwargs,
 ):
     """Defines the compiler that will be used with this object
 
@@ -175,6 +182,8 @@ def define_compiler(
         compiler (str): Package name to use for compilation
         package_manager (str): Glob supported pattern to match package managers
                                this compiler applies to
+        inject_if_missing (bool): Whether the package should be defined if a
+                                  matching package is not already defined
         when (list | None): List of when conditions to apply to directive
     """
 
@@ -195,7 +204,12 @@ def define_compiler(
 
         obj.compilers[name].append(
             SoftwareSpec(
-                name, pkg_spec, compiler=compiler, compiler_spec=compiler_spec, when=when_list
+                name,
+                pkg_spec,
+                compiler=compiler,
+                compiler_spec=compiler_spec,
+                inject_if_missing=inject_if_missing,
+                when=when_list,
             )
         )
 
@@ -204,7 +218,14 @@ def define_compiler(
 
 @shared_directive("software_specs")
 def software_spec(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
+    name,
+    pkg_spec,
+    compiler_spec=None,
+    compiler=None,
+    package_manager=None,
+    inject_if_missing=False,
+    when=None,
+    **kwargs,
 ):
     """Defines a new software spec needed for this object.
 
@@ -223,6 +244,8 @@ def software_spec(
         compiler (str): Package name to use as compiler for compiling this package
         package_manager (str): Glob supported pattern to match package managers
                                this package applies to
+        inject_if_missing (bool): Whether the package should be added to experiment
+                                  environments automatically or not.
         when (list | None): List of when conditions to apply to directive
     """
 
@@ -244,7 +267,12 @@ def software_spec(
         # Define the spec
         obj.software_specs[name].append(
             SoftwareSpec(
-                name, pkg_spec, compiler=compiler, compiler_spec=compiler_spec, when=when_list
+                name,
+                pkg_spec,
+                compiler=compiler,
+                compiler_spec=compiler_spec,
+                inject_if_missing=inject_if_missing,
+                when=when_list,
             )
         )
 

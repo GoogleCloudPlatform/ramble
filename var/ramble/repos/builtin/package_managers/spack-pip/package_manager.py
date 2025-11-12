@@ -49,6 +49,16 @@ class SpackPip(PackageManagerBase):
         self.spack_mgr.build_used_variables(workspace)
         self.pip_mgr.build_used_variables(workspace)
 
+    def define_missing_packages(self, workspace):
+        self.spack_mgr.define_missing_packages(workspace)
+        self.pip_mgr.define_missing_packages(workspace)
+
+    def package_name_from_spec(self, spec: str) -> str:
+        pkg_name = self.spack_mgr.package_name_from_spec(spec)
+        if not pkg_name:
+            pkg_name = self.pip_mgr.package_name_from_spec(spec)
+        return pkg_name
+
     def populate_inventory(
         self, workspace, force_compute=False, require_exist=False
     ):
