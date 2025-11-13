@@ -52,6 +52,7 @@ class Openfoam(ExecutableApplication):
                 "potentialFoam",
                 "checkMesh",
                 "simpleFoam",
+                "post-exec-clean",
             ],
         )
 
@@ -203,6 +204,21 @@ class Openfoam(ExecutableApplication):
         description="Coeffs dictionary name",
         default="hierarchicalCoeffs",
         workloads=["motorbike*"],
+    )
+
+    variant(
+        "openfoam_clean_after_run",
+        default=False,
+        values=[True, False],
+        description="Whether to clean execution artifacts (processor* dirs) after completion or not",
+    )
+
+    executable(
+        "post-exec-clean",
+        template=[
+            "rm -rf {experiment_run_dir}/processor*",
+        ],
+        when=["+openfoam_clean_after_run"],
     )
 
     executable("clean", template=["rm -rf processor* constant system log.*"])
