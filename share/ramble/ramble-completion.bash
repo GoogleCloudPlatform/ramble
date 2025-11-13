@@ -577,7 +577,7 @@ _ramble_results_upload() {
 }
 
 _ramble_results_index() {
-    RAMBLE_COMPREPLY="-h --help -f --file"
+    RAMBLE_COMPREPLY="-h --help -v --all-vars -f --file"
 }
 
 _ramble_results_report() {
