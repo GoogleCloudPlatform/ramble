@@ -18,6 +18,7 @@
 
 import copy
 import os
+import re
 from typing import Any, Dict, Optional
 
 import pandas as pd
@@ -33,6 +34,7 @@ from ramble.util import foms
 import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
 
+config = RambleCommand("config")
 results = RambleCommand("results")
 
 
@@ -369,6 +371,46 @@ def test_compare_plot(mutable_mock_workspace_path, tmpdir_factory):
 
     assert os.path.isfile(pdf_path)
     assert os.path.isfile(os.path.join(report_dir_path, "fom_1_by_n_nodes.png"))
+
+
+def test_multiline_plot(mutable_mock_workspace_path, mutable_config, tmpdir_factory):
+    results_dir_path = tmpdir_factory.mktemp("unit_test")
+    results_file = os.path.join(results_dir_path, "results.json")
+
+    test_exp_results = {"experiments": all_experiments}
+
+    with open(results_file, "w+") as f:
+        sjson.dump(test_exp_results, f)
+
+    with ramble.config.override("config:report_dirs", results_dir_path):
+        output = results(
+            "report",
+            "-f",
+            results_file,
+            "--multi-line",
+            "fom_1",
+            "n_nodes",
+            "--split-by",
+            "experiment_name",
+        )
+
+    assert "Report generated successfully" in output
+
+    timestamp_capture = re.compile(r"\.(\d{4}-\d{2}-\d{2}_\d{2}\.\d{2}\.\d{2})")
+    ts = timestamp_capture.search(output).group(1)
+    out_path = os.path.join(results_dir_path, f"unknown_workspace.{ts}")
+
+    assert os.path.isdir(out_path)
+    assert os.path.isfile(os.path.join(out_path, f"unknown_workspace.{ts}.multi_line.pdf"))
+
+    inventory_path = os.path.join(out_path, "inventory.yaml")
+    assert os.path.isfile(inventory_path)
+
+    with open(inventory_path) as f:
+        inventory = syaml.load(f)
+
+    for file in inventory["files"]:
+        assert os.path.isfile(os.path.join(out_path, file))
 
 
 def test_where_query(mutable_mock_workspace_path):
