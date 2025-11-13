@@ -25,6 +25,18 @@ from ramble.util.path import substitute_config_variables
 
 import spack.util.naming
 
+_ast_cache: Dict[str, str] = {}
+
+
+def _ast_parse(in_str):
+    """Parse a string into an AST, with caching."""
+    if in_str in _ast_cache:
+        return _ast_cache[in_str]
+
+    math_ast = ast.parse(in_str, mode="eval")
+    _ast_cache[in_str] = math_ast
+    return math_ast
+
 
 def _and(a, b):
     return a and b
@@ -586,7 +598,7 @@ class Expander:
         pulling a list from a different experiment.
         """
         try:
-            math_ast = ast.parse(str(var), mode="eval")
+            math_ast = _ast_parse(str(var))
             value = self.eval_math(math_ast.body)
         except (MathEvaluationError, AttributeError, ValueError, SyntaxError):
             return var
@@ -843,7 +855,7 @@ class Expander:
         """
         with warnings.catch_warnings(record=True) as wal:
             try:
-                math_ast = ast.parse(in_str, mode="eval")
+                math_ast = _ast_parse(in_str)
                 out_str = self.eval_math(math_ast.body)
                 return out_str
             except MathEvaluationError as e:
