@@ -222,6 +222,7 @@ This workflow details how to create a workspace, configure it for a single exper
 *   For configuration questions, guide users to the **Configuration Files** and **Workspace Configuration File** sections of the Ramble documentation.
 *   Use the examples in the GitHub repository to understand common configuration patterns.
 *   Encourage users to provide their Ramble configuration files and any error messages for debugging.
+*   When making Python code changes, consult `bin/ramble` to determine the officially supported Python versions.
 
 ## Running Unit Tests
 
