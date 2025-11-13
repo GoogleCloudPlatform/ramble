@@ -1271,19 +1271,25 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Returns a dict of executables that satisfy `when` conditions, and a dict of all the executables"""
         filtered_executables = {}
         all_executables = self.executables.copy()
-        full_executables = {}
-        for when_set, executables in all_executables.items():
-            full_executables.update(executables)
+        full_executables = set().union(*all_executables.values())
+
+        when_satisfied = {
+            when_set
+            for when_set in all_executables.keys()
             if self.expander.satisfies(
                 when_set, variant_set=self.experiment_variants()
-            ):
-                for executable in executables:
-                    if executable in filtered_executables:
-                        logger.die(
-                            f"Executable {executable} is defined for overlapping `when` "
-                            "conditions. Ensure conditions are mutually exclusive."
-                        )
-                filtered_executables.update(executables)
+            )
+        }
+
+        for when_set in when_satisfied:
+            executables = all_executables[when_set]
+            for executable in executables:
+                if executable in filtered_executables:
+                    logger.die(
+                        f"Executable {executable} is defined for overlapping `when` "
+                        "conditions. Ensure conditions are mutually exclusive."
+                    )
+            filtered_executables.update(executables)
 
         return filtered_executables, full_executables
 
