@@ -441,9 +441,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                     test_filter_name = method_attributes["filter_name"]
                 filter_names.add(test_filter_name)
                 if filter_name == test_filter_name:
-                    logger.all_msg(
-                        f" Found matching filter? {filter_name} == {test_filter_name}"
-                    )
                     return method
 
         logger.die(
@@ -469,7 +466,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         filter_func = self.get_executable_modifier_filter(filter_name)
 
         if filter_func is not None:
-            logger.all_msg(f" Filter func = {filter_func}")
             apply = filter_func(exec_mod, executable)
 
         return apply
