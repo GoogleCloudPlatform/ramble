@@ -263,6 +263,51 @@ class ExperimentSet:
         if not n_threads:
             variables[self.keywords.n_threads] = 1
 
+    def _setup_experiment_minimal(
+        self,
+        workload_template_name,
+        variables,
+        context,
+    ):
+        """Perform minimal setup for an experiment instance."""
+        expander = ramble.expander.Expander(variables, self)
+        self._compute_mpi_vars(expander, variables)
+
+        final_app_name = expander.expand_var_name(
+            self.keywords.application_name, allow_passthrough=False
+        )
+
+        # Define some standard variables before the application is created
+        # to ensure variables and variants can be defined correctly.
+        variables[self.keywords.workload_template_name] = workload_template_name
+        variables[self.keywords.application_name] = final_app_name
+
+        # Setup the application instance
+        app_inst = ramble.repository.get(final_app_name)
+        app_inst.set_variables_and_variants(variables, context.variants, self)
+
+        app_inst.set_required_variables()
+        app_inst.set_active_workload()
+        app_inst.set_modifiers(context.modifiers)
+        app_inst.set_internals(context.internals)
+        app_inst.set_chained_experiments(context.chained_experiments)
+        app_inst.set_env_variable_sets(context.env_variables)
+        app_inst.set_template(context.is_template)
+        app_inst.set_tags(context.tags)
+        app_inst.set_formatted_executables(context.formatted_executables)
+
+        if app_inst.package_manager is not None:
+            app_inst.package_manager.define_missing_packages(self._workspace)
+            app_inst.define_variable(
+                self.keywords.env_path,
+                os.path.join(
+                    app_inst.package_manager.package_manager_dir(self._workspace),
+                    Expander.expansion_str(self.keywords.env_name),
+                ),
+            )
+
+        return app_inst
+
     def _prepare_experiment(
         self,
         workload_template_name,
@@ -295,47 +340,14 @@ class ExperimentSet:
         else:
             variables[self.keywords.repeat_index] = 0
 
-        expander = ramble.expander.Expander(variables, self)
-        self._compute_mpi_vars(expander, variables)
+        app_inst = self._setup_experiment_minimal(workload_template_name, variables, context)
 
-        final_app_name = expander.expand_var_name(
-            self.keywords.application_name, allow_passthrough=False
-        )
-
-        final_wl_name = expander.expand_var_name(
+        final_wl_name = app_inst.expander.expand_var_name(
             self.keywords.workload_name, allow_passthrough=False
         )
+        app_inst.define_variable(self.keywords.workload_name, final_wl_name)
 
-        # Define some standard variables before the application is created
-        # to ensure variables and variants can be defined correctly.
-        variables[self.keywords.workload_template_name] = workload_template_name
-        variables[self.keywords.application_name] = final_app_name
-        variables[self.keywords.workload_name] = final_wl_name
-
-        # Setup the application instance
-        app_inst = ramble.repository.get(final_app_name)
-        app_inst.set_variables_and_variants(variables, context.variants, self)
-
-        app_inst.set_required_variables()
-        app_inst.set_active_workload()
-        app_inst.set_env_variable_sets(context.env_variables)
-        app_inst.set_internals(context.internals)
-        app_inst.set_template(context.is_template)
         app_inst.repeats = repeats
-        app_inst.set_chained_experiments(context.chained_experiments)
-        app_inst.set_modifiers(context.modifiers)
-        app_inst.set_tags(context.tags)
-        app_inst.set_formatted_executables(context.formatted_executables)
-
-        if app_inst.package_manager is not None:
-            app_inst.package_manager.define_missing_packages(self._workspace)
-            app_inst.define_variable(
-                self.keywords.env_path,
-                os.path.join(
-                    app_inst.package_manager.package_manager_dir(self._workspace),
-                    Expander.expansion_str(self.keywords.env_name),
-                ),
-            )
 
         # Setup experiment name after modifiers are defined
         final_exp_name = app_inst.expander.expand_var(
@@ -345,8 +357,6 @@ class ExperimentSet:
         app_inst.define_variable(
             self.keywords.experiment_template_name, exp_template_name + experiment_suffix
         )
-        app_inst.define_variable(self.keywords.application_name, final_app_name)
-        app_inst.define_variable(self.keywords.workload_name, final_wl_name)
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
         app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
@@ -358,20 +368,20 @@ class ExperimentSet:
             self.keywords.simplified_application_namespace,
             (
                 spack.util.naming.simplify_name(
-                    expander.expand_var_name(self.keywords.application_namespace)
+                    app_inst.expander.expand_var_name(self.keywords.application_namespace)
                 )
             ),
         )
         app_inst.define_variable(
             self.keywords.simplified_workload_namespace,
             spack.util.naming.simplify_name(
-                expander.expand_var_name(self.keywords.workload_namespace)
+                app_inst.expander.expand_var_name(self.keywords.workload_namespace)
             ),
         )
         app_inst.define_variable(
             self.keywords.simplified_experiment_namespace,
             spack.util.naming.simplify_name(
-                expander.expand_var_name(self.keywords.experiment_namespace)
+                app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
             ),
         )
         for name, value in self._workspace.workspace_paths().items():
@@ -384,6 +394,28 @@ class ExperimentSet:
         app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
 
         return app_inst
+
+    def _get_used_variables(
+        self,
+        workload_template_name,
+        exp_template_name,
+        variables,
+        context,
+    ):
+        app_inst = self._setup_experiment_minimal(workload_template_name, variables, context)
+
+        # The `_get_used_variables` is only called for the base experiment,
+        # so no need to consider repeat suffix.
+        exp_name = app_inst.expander.expand_var(exp_template_name, allow_passthrough=False)
+
+        app_inst.define_variable(self.keywords.experiment_template_name, exp_template_name)
+        app_inst.define_variable(self.keywords.experiment_name, exp_name)
+
+        app_inst.define_variable(
+            self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
+        )
+        app_inst.set_success_list(context.success_criteria)
+        return app_inst.build_used_variables(self._workspace)
 
     def _ingest_experiments(self, die_on_validate_error=True):
         """Ingest experiments based on the current context.
@@ -495,17 +527,12 @@ class ExperimentSet:
         ):
             if repeats.repeat_index:
                 continue
-            app_inst = self._prepare_experiment(
+            exp_used_variables = self._get_used_variables(
                 workload_template_name,
                 experiment_template_name,
                 tracking_vars,
                 final_context,
-                repeats,
             )
-
-            app_inst.set_success_list(final_context.success_criteria)
-
-            exp_used_variables = app_inst.build_used_variables(self._workspace)
             used_variables = used_variables.union(exp_used_variables)
         render_group.used_variables = used_variables.copy()
 
