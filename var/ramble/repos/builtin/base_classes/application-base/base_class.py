@@ -199,18 +199,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.license_names = self.license_names + [self.name]
 
-        self.hash_inventory = {
-            "application_definition": None,
-            "modifier_definitions": [],
-            "attributes": [],
-            "inputs": [],
-            "software": [],
-            "templates": [],
-            "package_manager": [],
-            "modifier_artifacts": [],
-        }
-        self.experiment_hash = None
-
         self.application_class = "ApplicationBase"
 
         self.license_path = ""
@@ -2075,9 +2063,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         before hashing, to help give useful hashes.
         """
 
-        # Purge workspace name, as this shouldn't affect the experiments
-        if "workspace_name" in variables:
-            del variables["workspace_name"]
+        remove_variables = [
+            "workspace_name",
+            "experiment_hash",
+            "experiment_status",
+            "RAMBLE_STATUS",
+        ]
+
+        # Remove some variables that don't affect the experiment, and change
+        # frequently (or are actually output variables)
+        for var in remove_variables:
+            if var in variables:
+                del variables[var]
 
         # Remove the workspace path from variable definitions before hashing
         for var in variables:
@@ -2086,9 +2083,38 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     workspace.root, "$workspace_root"
                 )
 
+    def variant_inventory(self):
+        """Construct a list of all variants from any object in the experiment,
+        for the experiment's inventory.
+
+        Returns:
+            (list[str]): List of variant definitions from all objects
+        """
+
+        variant_definitions = set()
+
+        for _, obj in self._objects():
+            variant_definitions = variant_definitions.union(
+                obj.experiment_variants(app_inst=self).as_set()
+            )
+
+        return list(sorted(variant_definitions))
+
+    def _purge_inventory(self):
+        self.hash_inventory = {
+            "object_configuration": [],
+            "attributes": [],
+            "inputs": [],
+            "software": [],
+            "templates": [],
+        }
+        self.experiment_hash = None
+
     def populate_inventory(
-        self, workspace, force_compute=False, require_exist=False
-    ):
+        self,
+        workspace,
+        force_compute: bool = False,
+    ) -> bool:
         """Populate this experiment's hash inventory
 
         If an inventory file exists, read it first.
@@ -2102,127 +2128,141 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                            consuming it.
         """
 
+        changed = False
+        self._purge_inventory()
+
         experiment_run_dir = self.expander.experiment_run_dir
         inventory_file = os.path.join(
             experiment_run_dir, self._inventory_file_name
         )
 
-        if os.path.exists(inventory_file) and not force_compute:
+        force = force_compute or ramble.config.get(
+            "config:overwrite_inventories", default=False
+        )
+
+        existing_hash = None
+        if os.path.exists(inventory_file) and not force:
             with open(inventory_file) as f:
-                self.hash_inventory = spack.util.spack_json.load(f)
+                existing_inventory = spack.util.spack_json.load(f)
+            existing_hash = ramble.util.hashing.hash_json(existing_inventory)
 
-        else:
-            # Clean up variables before hashing
-            vars_to_hash = self.variables.copy()
-            self._clean_hash_variables(workspace, vars_to_hash)
+        # Clean up variables before hashing
+        vars_to_hash = self.variables.copy()
+        self._clean_hash_variables(workspace, vars_to_hash)
 
-            # Build inventory of attributes
-            attributes_to_hash = [
-                ("variables", vars_to_hash),
-                ("modifiers", self.modifiers),
-                ("chained_experiments", self.chained_experiments),
-                ("internals", self.internals),
-                ("env_vars", self._env_variable_sets),
-            ]
+        # Build inventory of attributes
+        attributes_to_hash = [
+            ("variables", vars_to_hash),
+            ("modifiers", self.modifiers),
+            ("variants", self.variant_inventory()),
+            ("chained_experiments", self.chained_experiments),
+            ("internals", self.internals),
+            ("env_vars", self._env_variable_sets),
+        ]
 
-            self.hash_inventory["application_definition"] = (
-                ramble.util.hashing.hash_file(self._file_path)
-            )
+        added_objects = {}
+        for obj_type, obj in self._objects():
+            if obj_type not in added_objects:
+                added_objects[obj_type] = set()
 
-            added_mods = set()
-            for mod_inst in self._modifier_instances:
-                if mod_inst.name not in added_mods:
-                    self.hash_inventory["modifier_definitions"].append(
-                        {
-                            "name": mod_inst.name,
-                            "digest": ramble.util.hashing.hash_file(
-                                mod_inst._file_path
-                            ),
-                        }
+            if obj.name not in added_objects[obj_type]:
+                added_objects[obj_type].add(obj.name)
+                object_inventory = {
+                    "name": obj.name,
+                    "object_type": obj_type.name,
+                    "digest": ramble.util.hashing.hash_file(obj._file_path),
+                }
+
+                version_func = getattr(obj, "get_version", None)
+                if version_func is not None and callable(version_func):
+                    object_inventory["version"] = obj.get_version(
+                        workspace=workspace
                     )
-                    added_mods.add(mod_inst.name)
 
-            for attr, attr_dict in attributes_to_hash:
-                self.hash_inventory["attributes"].append(
-                    {
-                        "name": attr,
-                        "digest": ramble.util.hashing.hash_json(attr_dict),
-                    }
+                if obj is not self:
+                    populate_func = getattr(obj, "populate_inventory", None)
+                    if populate_func is not None and callable(populate_func):
+                        obj.populate_inventory(workspace, force)
+
+                artifact_func = getattr(obj, "artifact_inventory", None)
+                if artifact_func is not None and callable(artifact_func):
+                    inventory = obj.artifact_inventory(workspace, self)
+                    if inventory:
+                        if hasattr(obj, "_usage_mode"):
+                            object_inventory["mode"] = obj._usage_mode
+                        object_inventory["artifacts"] = inventory
+
+                self.hash_inventory["object_configuration"].append(
+                    object_inventory
                 )
 
-            # Build inventory of workspace templates
-            for template_name, template_conf in workspace.all_templates():
-                self.hash_inventory["templates"].append(
+        for attr, attr_dict in attributes_to_hash:
+            self.hash_inventory["attributes"].append(
+                {
+                    "name": attr,
+                    "digest": ramble.util.hashing.hash_json(attr_dict),
+                }
+            )
+
+        # Build inventory of workspace templates
+        for template_name, template_conf in workspace.all_templates():
+            self.hash_inventory["templates"].append(
+                {
+                    "name": template_name,
+                    "digest": template_conf["digest"],
+                }
+            )
+
+        # Build inventory of inputs
+        self._inputs_and_fetchers(self.expander.workload_name)
+
+        for input_conf in self._input_fetchers.values():
+            if input_conf["fetcher"].digest:
+                self.hash_inventory["inputs"].append(
                     {
-                        "name": template_name,
-                        "digest": template_conf["digest"],
+                        "name": input_conf["input_name"],
+                        "digest": input_conf["fetcher"].digest,
                     }
                 )
-
-            # Build inventory of inputs
-            self._inputs_and_fetchers(self.expander.workload_name)
-
-            for input_conf in self._input_fetchers.values():
-                if input_conf["fetcher"].digest:
-                    self.hash_inventory["inputs"].append(
-                        {
-                            "name": input_conf["input_name"],
-                            "digest": input_conf["fetcher"].digest,
-                        }
-                    )
-                else:
-                    self.hash_inventory["inputs"].append(
-                        {
-                            "name": input_conf["input_name"],
-                            "digest": ramble.util.hashing.hash_string(
-                                input_conf["fetcher"].url
-                            ),
-                        }
-                    )
-
-        if self.package_manager is not None:
-            self.package_manager.populate_inventory(
-                workspace, force_compute, require_exist
-            )
+            else:
+                self.hash_inventory["inputs"].append(
+                    {
+                        "name": input_conf["input_name"],
+                        "digest": ramble.util.hashing.hash_string(
+                            input_conf["fetcher"].url
+                        ),
+                    }
+                )
 
         self.experiment_hash = ramble.util.hashing.hash_json(
             self.hash_inventory
         )
+
+        # Compare inventory hashes, to validate experiment hasn't changed
+        if existing_hash is not None and self.experiment_hash != existing_hash:
+            logger.die(
+                f"Mismatch on experiment hash for experiment {self.expander.experiment_namespace}.\n"
+                f"  Hash from experiment directory: {existing_hash}\n"
+                f"  Hash computed current config: {self.experiment_hash}\n"
+                "To overwrite the experiment hash, use the global --overwrite-inventories option"
+            )
+
         self.variables[self.keywords.experiment_hash] = self.experiment_hash
 
-    register_phase(
-        "write_inventory", pipeline="setup", run_after=["make_experiments"]
-    )
+        # Write out experiment inventory, if hash is different
+        if existing_hash != self.experiment_hash:
+            changed = True
 
-    def _write_inventory(self, workspace, app_inst=None):
-        """Build and write an inventory of an experiment
+        writable = True
+        if self.repeats.is_repeat_base:
+            writable = False
 
-        Write an inventory file describing all of the contents of this
-        experiment.
-        """
+        if changed and writable:
+            with lk.WriteTransaction(self.experiment_lock):
+                with open(inventory_file, "w+") as f:
+                    spack.util.spack_json.dump(self.hash_inventory, f)
 
-        experiment_run_dir = self.expander.experiment_run_dir
-        inventory_file = os.path.join(
-            experiment_run_dir, self._inventory_file_name
-        )
-
-        # Populate modifier artifacts portion of inventory
-        # This happens here to allow modifiers to hash files
-        # that are downloaded within phases earlier than this.
-        for mod_inst in self._modifier_instances:
-            inventory = mod_inst.artifact_inventory(workspace, app_inst)
-            if inventory:
-                self.hash_inventory["modifier_artifacts"].append(
-                    {
-                        "name": mod_inst.name,
-                        "mode": mod_inst._usage_mode,
-                        "artifacts": inventory,
-                    }
-                )
-
-        with lk.WriteTransaction(self.experiment_lock):
-            with open(inventory_file, "w+") as f:
-                spack.util.spack_json.dump(self.hash_inventory, f)
+        return changed
 
     register_phase("archive_experiments", pipeline="archive")
 

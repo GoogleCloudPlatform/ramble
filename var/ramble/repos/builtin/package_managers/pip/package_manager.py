@@ -237,15 +237,6 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        pkgman_version = self.get_version(workspace=workspace)
-
-        self.app_inst.hash_inventory["package_manager"].append(
-            {
-                "name": self.name,
-                "version": pkgman_version,
-                "digest": hash_string(pkgman_version),
-            }
-        )
         self.app_inst.hash_inventory["software"].append(
             {
                 "name": self.runner.env_path.replace(

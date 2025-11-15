@@ -199,9 +199,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
 
         return self.app_inst.expander._used_variables
 
-    def populate_inventory(
-        self, workspace, force_compute=False, require_exist=False
-    ):
+    def populate_inventory(self, workspace, force_compute=False) -> bool:
         """Stub class method for populating an experiment inventory.
         Specific package managers should implement this to convey inventory
         information to the workspace / experiment.

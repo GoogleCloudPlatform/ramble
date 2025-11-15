@@ -78,15 +78,7 @@ class EnvironmentModules(PackageManagerBase):
 
         return self._load_string
 
-    def populate_inventory(
-        self, workspace, force_compute=False, require_exist=False
-    ):
-        self.app_inst.hash_inventory["package_manager"].append(
-            {
-                "name": self.name,
-            }
-        )
-
+    def populate_inventory(self, workspace, force_compute=False) -> bool:
         env_path = self.app_inst.expander.env_path
         env_hash = ramble.util.hashing.hash_string(
             self._generate_loads_content(workspace)

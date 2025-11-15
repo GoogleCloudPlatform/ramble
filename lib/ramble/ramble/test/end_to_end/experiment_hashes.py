@@ -61,9 +61,9 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
     with open(experiment_inventory) as f:
         data = sjson.load(f)
 
-    assert "application_definition" in data
-    assert data["application_definition"] != ""
-    assert data["application_definition"] is not None
+    assert "object_configuration" in data
+    assert data["object_configuration"] != []
+    assert data["object_configuration"] is not None
 
     # Test Attributes
     expected_attrs = {"variables", "modifiers", "env_vars", "internals", "chained_experiments"}
@@ -98,18 +98,21 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
 
     assert len(expected_envs) == 0
 
-    # Test package manager
-    expected_pkgmans = {"spack"}
-    assert "package_manager" in data
-    for pkgman in data["package_manager"]:
-        if pkgman["name"] in expected_pkgmans:
-            assert pkgman["digest"] != ""
-            assert pkgman["digest"] is not None
-            assert pkgman["version"] != ""
-            assert pkgman["version"] is not None
-            expected_pkgmans.remove(pkgman["name"])
+    # Test objects
+    expected_objects = {}
+    expected_objects["applications"] = {"gromacs"}
+    expected_objects["workflow_managers"] = {"user-managed"}
+    expected_objects["package_managers"] = {"spack"}
+    for object_def in data["object_configuration"]:
+        if "object_type" in object_def:
+            obj_type = object_def["object_type"]
+            if "name" in object_def and object_def["name"] in expected_objects[obj_type]:
+                expected_objects[obj_type].remove(object_def["name"])
+                assert object_def["digest"] != ""
+                assert object_def["digest"] is not None
 
-    assert len(expected_pkgmans) == 0
+    for obj_set in expected_objects.values():
+        assert len(obj_set) == 0
 
     # Test workspace inventory
     assert os.path.isfile(workspace_inventory)

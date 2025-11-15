@@ -11,6 +11,7 @@ import os
 
 import pytest
 
+import ramble.config
 import ramble.workspace
 from ramble.error import ObjectValidationError, RambleCommandError
 from ramble.main import RambleCommand
@@ -96,6 +97,7 @@ test inheritance 12.0
 
         workspace("setup", global_args=global_args)
 
+        ws._re_read()
         with open(output_path, "w+") as f:
             f.write(test_output)
 
@@ -111,8 +113,8 @@ test inheritance 12.0
 
         config("add", "variants:register_fom_context_when:true", global_args=global_args)
 
-        ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -174,7 +176,8 @@ test inheritance 12.0
         config("add", "variants:register_fom_when:true", global_args=global_args)
 
         ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -293,7 +296,8 @@ test inheritance 12.0
         config("add", "variants:register_fom_context_when:true", global_args=global_args)
 
         ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -357,7 +361,8 @@ test inheritance 12.0
 
         ws._re_read()
 
-        output = workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            output = workspace("analyze", global_args=global_args)
 
         assert "Overwriting with new definition from when-directives-inherited" in output
 
@@ -781,7 +786,8 @@ test inheritance 12.0
         config("add", "variants:success_criteria_when:true", global_args=global_args)
 
         ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()

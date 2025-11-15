@@ -296,6 +296,7 @@ class VariantSet:
                         f"When defining variant {name} the value {variant.default} is not valid.\n"
                         f"   Valid values include: {self.default_variants[name].values}"
                     )
+
                 out_set.add(variant.as_definition())
                 defined_variants.add(name)
 

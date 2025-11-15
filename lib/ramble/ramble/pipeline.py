@@ -54,7 +54,6 @@ class Pipeline:
         self.filters = filters
         self.workspace = workspace
         self.force_inventory = False
-        self.require_inventory = False
         self.action_string = "Operating on"
         self.suppress_per_experiment_prints = False
         self.suppress_run_header = False
@@ -69,22 +68,24 @@ class Pipeline:
         self._software_environments = ramble.software_environments.SoftwareEnvironments(workspace)
         self.workspace.software_environments = self._software_environments
         self._experiment_set = workspace.build_experiment_set()
+        self.updated_experiment_hashes = False
 
     @property
     def experiment_set(self):
         return self._experiment_set
 
-    def _construct_experiment_hashes(self):
+    def _construct_experiment_hashes(self) -> bool:
         """Hash all of the experiments.
 
         Populate the workspace inventory information with experiment hash data.
         """
+        changed = False
         for _, app_inst, _ in self._experiment_set.all_experiments():
-            app_inst.populate_inventory(
+            changed = app_inst.populate_inventory(
                 self.workspace,
                 force_compute=self.force_inventory,
-                require_exist=self.require_inventory,
             )
+        return changed
 
     def _construct_workspace_hash(self):
         """Construct workspace inventory
@@ -131,7 +132,7 @@ class Pipeline:
 
     def _prepare(self):
         """Perform preparation for pipeline execution"""
-        pass
+        self.updated_experiment_hashes = self._construct_experiment_hashes()
 
     def _execute(self):
         """Hook for executing the pipeline"""
@@ -205,7 +206,12 @@ class Pipeline:
 
     def _complete(self):
         """Hook for performing pipeline actions after execution is complete"""
-        pass
+        if self.updated_experiment_hashes:
+            try:
+                self._construct_workspace_hash()
+            except FileNotFoundError as e:
+                tty.warn("Unable to construct workspace hash due to missing file")
+                tty.warn(e)
 
     def run(self):
         """Run the full pipeline"""
@@ -249,7 +255,6 @@ class AnalyzePipeline(Pipeline):
         super().__init__(workspace, filters)
         self.action_string = "Analyzing"
         self.output_formats = ["text"] if output_formats is None else output_formats
-        self.require_inventory = True
         self.upload_results = upload
         self.print_results = print_results
         self.summary_only = summary_only
@@ -285,11 +290,11 @@ class AnalyzePipeline(Pipeline):
                 " Make sure your workspace is setup with\n"
                 "    ramble workspace setup"
             )
-        super()._construct_experiment_hashes()
-        super()._construct_workspace_hash()
+
         super()._prepare()
 
     def _complete(self):
+        super()._complete()
         # Calculate statistics for repeats and inject into base experiment results
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
 
@@ -337,10 +342,7 @@ class ArchivePipeline(Pipeline):
             self.create_tar = True
 
     def _prepare(self):
-        super()._construct_experiment_hashes()
-        super()._construct_workspace_hash()
         super()._prepare()
-
         date_str = self.workspace.date_string()
 
         # Use the basename from the path as the name of the workspace.
@@ -416,6 +418,7 @@ class ArchivePipeline(Pipeline):
         create_symlink(archive_path, archive_path_latest)
 
     def _complete(self):
+        super()._complete()
         if self.create_tar:
             tar_extension = ".tar.gz"
             tar = which("tar", required=True)
@@ -459,7 +462,6 @@ class MirrorPipeline(Pipeline):
         self.mirror_path = mirror_path
 
     def _prepare(self):
-        super()._prepare()
         self.workspace.create_mirror(self.mirror_path)
 
     def _complete(self):
@@ -497,14 +499,9 @@ class SetupPipeline(Pipeline):
     def __init__(self, workspace, filters):
         super().__init__(workspace, filters)
         self.force_inventory = True
-        self.require_inventory = False
         self.action_string = "Setting up"
 
     def _prepare(self):
-        # Check if the selected phases require the inventory is successful
-        if "write_inventory" in self.filters.phases or "*" in self.filters.phases:
-            self.require_inventory = True
-
         super()._prepare()
         experiment_file = open(self.workspace.all_experiments_path, "w+")
         shell = ramble.config.get("config:shell")
@@ -512,15 +509,8 @@ class SetupPipeline(Pipeline):
         experiment_file.write(f"#!{shell_path}\n")
         self.workspace.experiments_script = experiment_file
 
-        super()._construct_experiment_hashes()
-
     def _complete(self):
-        try:
-            super()._construct_workspace_hash()
-        except FileNotFoundError as e:
-            tty.warn("Unable to construct workspace hash due to missing file")
-            tty.warn(e)
-
+        super()._complete()
         self.workspace.experiments_script.close()
         experiment_file_path = os.path.join(
             self.workspace.root, self.workspace.all_experiments_path
@@ -543,6 +533,7 @@ class PushToCachePipeline(Pipeline):
         self.workspace.spack_cache_path = self.spack_cache_path
 
     def _complete(self):
+        super()._complete()
         logger.msg(f"Pushed envs to spack cache {self.spack_cache_path}")
 
 
@@ -561,7 +552,6 @@ class ExecutePipeline(Pipeline):
     ):
         super().__init__(workspace, filters)
         self.action_string = "Executing"
-        self.require_inventory = True
         self.executor = executor
         self.suppress_per_experiment_prints = suppress_per_experiment_prints
         self.suppress_run_header = suppress_run_header
@@ -621,7 +611,6 @@ class LogsPipeline(Pipeline):
     ):
         super().__init__(workspace, filters)
         self.action_string = "Getting log information for"
-        self.require_inventory = False
         self.first_only = first_only
         self.suppress_per_experiment_prints = suppress_per_experiment_prints
         self.suppress_run_header = suppress_run_header
@@ -693,7 +682,6 @@ class PushDeploymentPipeline(Pipeline):
         workspace_expander = ramble.expander.Expander(workspace.get_workspace_vars(), None)
 
         self.action_string = "Pushing deployment of"
-        self.require_inventory = True
         self.create_tar = create_tar
 
         if upload_url:
@@ -729,6 +717,7 @@ class PushDeploymentPipeline(Pipeline):
                 yield os.path.join(self.workspace.named_deployment, root, name)
 
     def _complete(self):
+        super()._complete()
         # Create an index.json of the deployment
         deployment_index = {self.index_namespace: []}
         for file in self._deployment_files():

@@ -88,7 +88,9 @@ class ObjectMixin:
         experiment_variants = self.experiment_variants()
         return app_inst.expander.satisfies(when_key, experiment_variants)
 
-    def experiment_variants(self, include_modifier=None, allow_caching=True):
+    def experiment_variants(
+        self, include_modifier=None, allow_caching=True, app_inst=None
+    ):
         """Construct a VariantSet for this experiment.
 
         Apply some merging logic to VariantSet combination, in order to
@@ -112,7 +114,8 @@ class ObjectMixin:
             if cache_key in self._variant_cache:
                 return self._variant_cache[cache_key]
 
-        app_inst = self._get_app_inst()
+        if app_inst is None:
+            app_inst = self._get_app_inst()
 
         self_type = self._get_object_type()
         new_set = self.object_variants.copy()
