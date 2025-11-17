@@ -6,12 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 import time
-from typing import List
+from typing import List, Optional
 
 from ramble.util.executable import which
 from ramble.util.logger import logger
 
-from spack.util.executable import CommandNotFoundError, ProcessError
+from spack.util.executable import CommandNotFoundError, Executable, ProcessError
 
 
 class CommandRunner:
@@ -23,39 +23,53 @@ class CommandRunner:
     Can be inherited to construct custom command runners.
     """
 
-    def __init__(self, name=None, command=None, shell="bash", dry_run=False, path=None):
+    def __init__(
+        self,
+        name: Optional[str] = None,
+        command: Optional[str] = None,
+        shell: str = "bash",
+        dry_run: bool = False,
+        path: Optional[str] = None,
+    ):
         """
         Ensure required command is found in the path
         """
         self.name = name
         self.dry_run = dry_run
         self.shell = shell
-        self.elapsed_time = 0
+        self.elapsed_time: float = 0.0
         required = not self.dry_run
-        try:
-            if path is None:
-                self.command = which(command, required=required)
-            else:
-                self.command = which(command, required=required, path=path)
-        except CommandNotFoundError:
-            raise RunnerError(f"Command {name} is not found in path") from None
+        if command is None:
+            self.command = None
+        else:
+            try:
+                if path is None:
+                    self.command = which(command, required=required)
+                else:
+                    self.command = which(command, required=required, path=path)
+            except CommandNotFoundError:
+                raise RunnerError(f"Command {name} is not found in path") from None
 
-    def get_version(self):
+    def get_version(self) -> str:
         """Hook to get the version of the executable
 
         Should return a string representation of the executable's version.
         """
-        pass
+        raise NotImplementedError
 
-    def set_dry_run(self, dry_run=False):
+    def set_dry_run(self, dry_run: bool = False):
         """
         Set the dry_run state of this runner
         """
         self.dry_run = dry_run
 
     def execute(
-        self, executable, args: List[str], allow_failure: bool = False, return_output: bool = False
-    ):
+        self,
+        executable: Executable,
+        args: List[str],
+        allow_failure: bool = False,
+        return_output: bool = False,
+    ) -> Optional[str]:
         """Wrapper around execution of a command
 
         Handles execution of a command when the execution path is dependent on
@@ -71,16 +85,16 @@ class CommandRunner:
                 executable, args, allow_failure=allow_failure, return_output=return_output
             )
         else:
-            return self._dry_run_print(executable, args, return_output=return_output)
+            return self._dry_run_print(executable, args)
 
-    def _raise_validation_error(self, command, validation_type):
+    def _raise_validation_error(self, command: str, validation_type: str):
         """Wrapper to raise a validation error for this command"""
         raise ValidationFailedError(
             f'Validation of: "{self.name} {command}" failed '
             f' with a validation_type of "{validation_type}"'
         )
 
-    def _dry_run_print(self, executable, args, return_output=False):
+    def _dry_run_print(self, executable: Executable, args: List[str]):
         """Print the command that would be executed if dry-run was false.
 
         Args match the execute method.
@@ -106,7 +120,7 @@ class CommandRunner:
         logger.msg(banner)
         logger.msg("")
 
-    def _cmd_end(self, executable, args):
+    def _cmd_end(self, executable: Executable, args: List[str]):
         """Print a banner for the start of executing a command
 
         Args:
@@ -122,7 +136,13 @@ class CommandRunner:
         logger.msg(banner)
         logger.msg("")
 
-    def _run_command(self, executable, args, allow_failure=False, return_output=False):
+    def _run_command(
+        self,
+        executable: Executable,
+        args: List[str],
+        allow_failure: bool = False,
+        return_output: bool = False,
+    ) -> Optional[str]:
         """Perform execution of executable with args, and optionally return the output
 
         Args:
@@ -171,7 +191,7 @@ class CommandRunner:
 
         if out_str is not None:
             return out_str
-        return
+        return None
 
 
 class RunnerError(Exception):
