@@ -8,12 +8,13 @@
 
 import os
 import re
+from typing import Optional
 
 import ramble
 import ramble.paths
 
 
-def get_version():
+def get_version() -> str:
     """Get a descriptive version of this instance of Ramble.
 
     Outputs '<PEP440 version> (<git commit sha>)'.
@@ -29,7 +30,7 @@ def get_version():
     return version
 
 
-def get_git_hash(path=ramble.paths.prefix):
+def get_git_hash(path: str = ramble.paths.prefix) -> Optional[str]:
     """Get get hash from a path
 
     Outputs '<git commit sha>'.
@@ -40,7 +41,7 @@ def get_git_hash(path=ramble.paths.prefix):
     if os.path.exists(git_path):
         git = spack.util.git.git()
         if not git:
-            return
+            return None
         rev = git(
             "-C",
             path,
@@ -51,9 +52,9 @@ def get_git_hash(path=ramble.paths.prefix):
             fail_on_error=False,
         )
         if git.returncode != 0:
-            return
+            return None
         match = re.match(r"[a-f\d]{7,}$", rev)
         if match:
             return match.group(0)
 
-    return
+    return None
