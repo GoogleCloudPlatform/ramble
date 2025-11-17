@@ -9,7 +9,7 @@
 import decimal
 import math
 import statistics
-from typing import List, Union
+from typing import List, Tuple, Union
 
 from scipy.stats import t
 
@@ -40,7 +40,7 @@ class StatsBase:
     def get_unit(self, unit: str) -> str:
         return unit
 
-    def report(self, values: List[float], unit: str) -> tuple[Union[float, str], str, str]:
+    def report(self, values: List[float], unit: str) -> Tuple[Union[float, str], str, str]:
         label = f"summary::{self.name}"
         if len(values) < self.min_count:
             return (NA, "", label)
