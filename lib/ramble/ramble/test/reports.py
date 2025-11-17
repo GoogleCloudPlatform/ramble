@@ -167,22 +167,22 @@ repeat_experiments = [
             (
                 "null",
                 (
-                    "Experiment Summary",
+                    foms.SummaryFoms.SUMMARY.value,
                     2,
                     "repeats",
                     app_name,
-                    "summary::n_total_repeats",
+                    f"summary::{foms.SummaryFoms.N_TOTAL.value}",
                     foms.FomType.MEASURE,
                 ),
             ),
             (
                 "null",
                 (
-                    "Experiment Summary",
+                    foms.SummaryFoms.SUMMARY.value,
                     2,
                     "repeats",
                     app_name,
-                    "summary::n_successful_repeats",
+                    f"summary::{foms.SummaryFoms.N_SUCCESS.value}",
                     foms.FomType.MEASURE,
                 ),
             ),

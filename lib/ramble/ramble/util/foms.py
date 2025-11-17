@@ -58,3 +58,9 @@ class FomType(Enum):
     def to_dict(self):
         """Converts the FomType enum member to a dictionary representation."""
         return {"name": self.name, "better_direction": self.better_direction().name}
+
+
+class SummaryFoms(Enum):
+    SUMMARY = "Experiment Summary"
+    N_TOTAL = "n_total_repeats"
+    N_SUCCESS = "n_success_repeats"

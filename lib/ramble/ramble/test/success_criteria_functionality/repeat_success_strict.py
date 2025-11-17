@@ -12,6 +12,7 @@ import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.util.foms import SummaryFoms
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -61,8 +62,8 @@ ramble:
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             assert "FAILED" not in data
-            assert "summary::n_total_repeats = 2 repeats" in data
-            assert "summary::n_successful_repeats = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
 
         # Write mock output to fail one of the experiments
         result_path = os.path.join(
@@ -77,8 +78,8 @@ ramble:
             data = f.read()
             assert "SUCCESS" in data
             assert "FAILED" in data
-            assert "summary::n_total_repeats = 2 repeats" in data
-            assert "summary::n_successful_repeats = 1 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 1 repeats" in data
 
         # Write mock output to fail the second experiment
         result_path = os.path.join(
@@ -92,5 +93,5 @@ ramble:
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             data = f.read()
             assert "SUCCESS" not in data
-            assert "summary::n_total_repeats" not in data
-            assert "summary::n_successful_repeats" not in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value}" not in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value}" not in data

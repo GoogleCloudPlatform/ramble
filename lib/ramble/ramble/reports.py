@@ -19,7 +19,7 @@ import ramble.repository
 import ramble.util.path
 from ramble.keywords import keywords
 from ramble.util.file_util import create_symlink
-from ramble.util.foms import BetterDirection, FomType
+from ramble.util.foms import BetterDirection, FomType, SummaryFoms
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
@@ -247,11 +247,13 @@ def generate_result_index(experiments: list, all_vars=False, where_query=None):
             for fom in context["foms"]:
                 if fom["origin"] == exp["application_name"]:
                     # If it's a repeat summary, add summary FOMs and stat names
-                    if fom["name"] == "Experiment Summary":
+                    if fom["name"] == SummaryFoms.SUMMARY.value:
                         summary_shortname = fom["origin_type"].split("::")[1]
-                        if "Experiment Summary" not in app_dict[exp["workload_name"]]:
-                            app_dict[exp["workload_name"]]["Experiment Summary"] = set()
-                        app_dict[exp["workload_name"]]["Experiment Summary"].add(summary_shortname)
+                        if SummaryFoms.SUMMARY.value not in app_dict[exp["workload_name"]]:
+                            app_dict[exp["workload_name"]][SummaryFoms.SUMMARY.value] = set()
+                        app_dict[exp["workload_name"]][SummaryFoms.SUMMARY.value].add(
+                            summary_shortname
+                        )
                     else:
                         if fom["origin_type"].startswith("summary::"):
                             summary_shortname = fom["origin_type"].split("::")[1]
@@ -293,8 +295,8 @@ def get_all_foms(result_index):
             for app_name, app_dict in obj_type_dict.items():
                 for wl_name, wl_dict in app_dict.items():
                     all_foms.update(wl_dict["FOMs"])
-                    if "Experiment Summary" in wl_dict:
-                        all_foms.update(wl_dict["Experiment Summary"])
+                    if SummaryFoms.SUMMARY.value in wl_dict:
+                        all_foms.update(wl_dict[SummaryFoms.SUMMARY.value])
         else:
             for obj_name, obj_dict in obj_type_dict.items():
                 all_foms.update(obj_dict["FOMs"])
@@ -813,7 +815,7 @@ class FomPlot(PlotGenerator):
             series_results = results.query(
                 f'fom_name == "{fom}" and (fom_origin_type == "application" or '
                 'fom_origin_type == "modifier" or fom_origin_type == "summary::mean" or '
-                'fom_origin_type == "summary::n_total_repeats")'
+                f'fom_origin_type == "summary::{SummaryFoms.N_TOTAL.value}")'
             ).copy()
 
             scale_var = "experiment_namespace"
