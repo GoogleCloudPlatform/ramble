@@ -6,10 +6,13 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import concurrent.futures
 import fnmatch
 import math
 import os
+import sys
 from enum import Enum
+from functools import partial
 
 import ramble.context
 import ramble.error
@@ -359,7 +362,6 @@ class ExperimentSet:
         )
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
-        app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
         app_inst.define_variable(
             self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
         )
@@ -416,6 +418,47 @@ class ExperimentSet:
         )
         app_inst.set_success_list(context.success_criteria)
         return app_inst.build_used_variables(self._workspace)
+
+    def _process_render_object(
+        self,
+        render_item,
+        workload_template_name,
+        experiment_template_name,
+        final_context,
+        excluded_experiments,
+    ):
+        """Helper to render a base and its repeated experiments, for parallel execution."""
+        experiment_vars, repeats = render_item
+        processed_experiments = []
+        # Expand and prepare base and repeated experiments
+        # TODO: Exploit the relationship between base and repeated experiments,
+        # to save up redundant works.
+        # For instance, caching may be enabled for expanders across these experiments.
+        for n in range(0, repeats.n_repeats + 1):
+            cur_repeats = ramble.repeats.Repeats()
+            if repeats.is_repeat_base:
+                if n == 0:
+                    cur_repeats.set_repeats(True, repeats.n_repeats)
+                else:
+                    cur_repeats.set_repeat_index(n)
+
+            app_inst = self._prepare_experiment(
+                workload_template_name,
+                experiment_template_name,
+                experiment_vars.copy(),
+                final_context,
+                cur_repeats,
+            )
+
+            final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
+            final_exp_namespace = app_inst.expander.expand_var_name(
+                self.keywords.experiment_namespace
+            )
+
+            # Skip explicitly excluded experiments
+            if final_exp_name not in excluded_experiments:
+                processed_experiments.append((app_inst, final_exp_namespace, n == 0))
+        return processed_experiments
 
     def _ingest_experiments(self, die_on_validate_error=True):
         """Ingest experiments based on the current context.
@@ -535,101 +578,96 @@ class ExperimentSet:
         render_group.used_variables = used_variables.copy()
 
         workload_names = set()
-
         rendered_experiments = set()
-        for experiment_vars, repeats in renderer.render_objects(
-            render_group, exclude_where=exclude_where
-        ):
-            # Expand and prepare base and repeated experiments
-            # TODO: Exploit the relationship between base and repeated experiments,
-            # to save up redundant works.
-            # For instance, caching may be enabled for expanders across these experiments.
-            for n in range(0, repeats.n_repeats + 1):
-                cur_repeats = ramble.repeats.Repeats()
-                if repeats.is_repeat_base:
-                    if n == 0:
-                        cur_repeats.set_repeats(True, repeats.n_repeats)
-                    else:
-                        cur_repeats.set_repeat_index(n)
 
-                app_inst = self._prepare_experiment(
-                    workload_template_name,
-                    experiment_template_name,
-                    experiment_vars,
-                    final_context,
-                    cur_repeats,
-                )
+        render_list = renderer.render_objects(render_group, exclude_where=exclude_where)
 
-                final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
-                final_exp_namespace = app_inst.expander.expand_var_name(
-                    self.keywords.experiment_namespace
-                )
+        all_processed_experiments = []
 
-                # Skip explicitly excluded experiments
-                if final_exp_name not in excluded_experiments:
-                    logger.debug(f"   Final name: {final_exp_namespace}")
+        worker_func = partial(
+            self._process_render_object,
+            workload_template_name=workload_template_name,
+            experiment_template_name=experiment_template_name,
+            final_context=final_context,
+            excluded_experiments=excluded_experiments,
+        )
 
-                    if final_exp_namespace in rendered_experiments:
-                        left_vars = self.experiments[final_exp_namespace].variables
-                        right_vars = experiment_vars
-                        lkeys = set(left_vars.keys())
-                        rkeys = set(right_vars.keys())
+        free_threading = hasattr(sys, "_is_gil_enabled") and (not sys._is_gil_enabled())
+        if free_threading:
+            # From experimentation, using more workers incurs overhead that discounts the benefit.
+            # The tests were done against a workspace with plenty of parallelism to exploit,
+            # and on a M4 laptop with 10 p-cores. For now, start with at most 2 workers.
+            max_workers = min(2, os.process_cpu_count())
+        else:
+            max_workers = 1
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+            results = list(executor.map(worker_func, render_list))
 
-                        # Determine variables that are only in one of the two experiments
-                        left_unique_vars = lkeys - rkeys
-                        right_unique_vars = rkeys - lkeys
-                        common_vars = lkeys & rkeys
+        for processed_experiments in results:
+            all_processed_experiments.extend(processed_experiments)
 
-                        logger.warn(
-                            f"Two experiments are defined with the name {final_exp_namespace}"
-                        )
+        # The results are now processed serially to update the experiment set state
+        for app_inst, final_exp_namespace, is_base_experiment in all_processed_experiments:
+            logger.debug(f"   Final name: {final_exp_namespace}")
 
-                        # Print warnings about experiment differences
-                        if left_unique_vars:
-                            logger.warn("Variables unique to previously defined experiment:")
-                            for var in left_unique_vars:
-                                logger.warn(f"  - {var}")
+            if final_exp_namespace in rendered_experiments:
+                left_vars = self.experiments[final_exp_namespace].variables
+                right_vars = app_inst.variables
+                lkeys = set(left_vars.keys())
+                rkeys = set(right_vars.keys())
 
-                        if right_unique_vars:
-                            logger.warn("Variables unique to newly defined experiment:")
-                            for var in right_unique_vars:
-                                logger.warn(f"  - {var}")
+                # Determine variables that are only in one of the two experiments
+                left_unique_vars = lkeys - rkeys
+                right_unique_vars = rkeys - lkeys
+                common_vars = lkeys & rkeys
 
-                        print_header = True
-                        for var in common_vars:
-                            if left_vars[var] != right_vars[var]:
-                                if print_header:
-                                    logger.warn(
-                                        "Variable differences between experiment definitions:"
-                                    )
-                                    print_header = False
+                logger.warn(f"Two experiments are defined with the name {final_exp_namespace}")
 
-                                diff = {"previous": left_vars[var], "new": right_vars[var]}
-                                logger.warn(f"  - {var}: {diff}")
+                # Print warnings about experiment differences
+                if left_unique_vars:
+                    logger.warn("Variables unique to previously defined experiment:")
+                    for var in left_unique_vars:
+                        logger.warn(f"  - {var}")
 
-                        logger.die(f"Experiment {final_exp_namespace} is not unique.")
+                if right_unique_vars:
+                    logger.warn("Variables unique to newly defined experiment:")
+                    for var in right_unique_vars:
+                        logger.warn(f"  - {var}")
 
-                    # Only need to validate the base experiment
-                    if n == 0:
-                        try:
-                            app_inst.validate_experiment(
-                                warn_validation=True, die_on_validate_error=die_on_validate_error
-                            )
-                        except ramble.keywords.RambleKeywordError as e:
-                            if die_on_validate_error:
-                                raise RambleVariableDefinitionError(
-                                    f"In experiment {final_exp_namespace}: {e}"
-                                ) from None
-                            pass
+                print_header = True
+                for var in common_vars:
+                    if left_vars[var] != right_vars[var]:
+                        if print_header:
+                            logger.warn("Variable differences between experiment definitions:")
+                            print_header = False
 
-                    workload_names.add(app_inst.expander.workload_name)
+                        diff = {"previous": left_vars[var], "new": right_vars[var]}
+                        logger.warn(f"  - {var}: {diff}")
 
-                    app_inst.set_success_list(final_context.success_criteria)
-                    rendered_experiments.add(final_exp_namespace)
-                    self.experiments[final_exp_namespace] = app_inst
-                    self.experiment_order.append(final_exp_namespace)
+                logger.die(f"Experiment {final_exp_namespace} is not unique.")
 
-                self.define_scoped_tables(workload_names, experiment_template_name)
+            # Only need to validate the base experiment
+            if is_base_experiment:
+                try:
+                    app_inst.validate_experiment(
+                        warn_validation=True, die_on_validate_error=die_on_validate_error
+                    )
+                except ramble.keywords.RambleKeywordError as e:
+                    if die_on_validate_error:
+                        raise RambleVariableDefinitionError(
+                            f"In experiment {final_exp_namespace}: {e}"
+                        ) from None
+                    pass
+
+            workload_names.add(app_inst.expander.workload_name)
+
+            app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
+            app_inst.set_success_list(final_context.success_criteria)
+            rendered_experiments.add(final_exp_namespace)
+            self.experiments[final_exp_namespace] = app_inst
+            self.experiment_order.append(final_exp_namespace)
+
+        self.define_scoped_tables(workload_names, experiment_template_name)
 
     def define_scoped_tables(self, workload_names, experiment_template_name):
         # Generate focused tables for results
