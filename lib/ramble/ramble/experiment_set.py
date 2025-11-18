@@ -522,11 +522,9 @@ class ExperimentSet:
         tracking_group.used_variables = set()
 
         used_variables = set()
-        for tracking_vars, repeats in renderer.render_objects(
+        for tracking_vars, _ in renderer.render_objects(
             tracking_group, exclude_where=exclude_where, ignore_used=False, fatal=False
         ):
-            if repeats.repeat_index:
-                continue
             exp_used_variables = self._get_used_variables(
                 workload_template_name,
                 experiment_template_name,
@@ -542,78 +540,96 @@ class ExperimentSet:
         for experiment_vars, repeats in renderer.render_objects(
             render_group, exclude_where=exclude_where
         ):
-            app_inst = self._prepare_experiment(
-                workload_template_name,
-                experiment_template_name,
-                experiment_vars,
-                final_context,
-                repeats,
-            )
+            # Expand and prepare base and repeated experiments
+            # TODO: Exploit the relationship between base and repeated experiments,
+            # to save up redundant works.
+            # For instance, caching may be enabled for expanders across these experiments.
+            for n in range(0, repeats.n_repeats + 1):
+                cur_repeats = ramble.repeats.Repeats()
+                if repeats.is_repeat_base:
+                    if n == 0:
+                        cur_repeats.set_repeats(True, repeats.n_repeats)
+                    else:
+                        cur_repeats.set_repeat_index(n)
 
-            final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
-            final_exp_namespace = app_inst.expander.expand_var_name(
-                self.keywords.experiment_namespace
-            )
+                app_inst = self._prepare_experiment(
+                    workload_template_name,
+                    experiment_template_name,
+                    experiment_vars,
+                    final_context,
+                    cur_repeats,
+                )
 
-            # Skip explicitly excluded experiments
-            if final_exp_name not in excluded_experiments:
-                logger.debug(f"   Final name: {final_exp_namespace}")
+                final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
+                final_exp_namespace = app_inst.expander.expand_var_name(
+                    self.keywords.experiment_namespace
+                )
 
-                if final_exp_namespace in rendered_experiments:
-                    left_vars = self.experiments[final_exp_namespace].variables
-                    right_vars = experiment_vars
-                    lkeys = set(left_vars.keys())
-                    rkeys = set(right_vars.keys())
+                # Skip explicitly excluded experiments
+                if final_exp_name not in excluded_experiments:
+                    logger.debug(f"   Final name: {final_exp_namespace}")
 
-                    # Determine variables that are only in one of the two experiments
-                    left_unique_vars = lkeys - rkeys
-                    right_unique_vars = rkeys - lkeys
-                    common_vars = lkeys & rkeys
+                    if final_exp_namespace in rendered_experiments:
+                        left_vars = self.experiments[final_exp_namespace].variables
+                        right_vars = experiment_vars
+                        lkeys = set(left_vars.keys())
+                        rkeys = set(right_vars.keys())
 
-                    logger.warn(f"Two experiments are defined with the name {final_exp_namespace}")
+                        # Determine variables that are only in one of the two experiments
+                        left_unique_vars = lkeys - rkeys
+                        right_unique_vars = rkeys - lkeys
+                        common_vars = lkeys & rkeys
 
-                    # Print warnings about experiment differences
-                    if left_unique_vars:
-                        logger.warn("Variables unique to previously defined experiment:")
-                        for var in left_unique_vars:
-                            logger.warn(f"  - {var}")
+                        logger.warn(
+                            f"Two experiments are defined with the name {final_exp_namespace}"
+                        )
 
-                    if right_unique_vars:
-                        logger.warn("Variables unique to newly defined experiment:")
-                        for var in right_unique_vars:
-                            logger.warn(f"  - {var}")
+                        # Print warnings about experiment differences
+                        if left_unique_vars:
+                            logger.warn("Variables unique to previously defined experiment:")
+                            for var in left_unique_vars:
+                                logger.warn(f"  - {var}")
 
-                    print_header = True
-                    for var in common_vars:
-                        if left_vars[var] != right_vars[var]:
-                            if print_header:
-                                logger.warn("Variable differences between experiment definitions:")
-                                print_header = False
+                        if right_unique_vars:
+                            logger.warn("Variables unique to newly defined experiment:")
+                            for var in right_unique_vars:
+                                logger.warn(f"  - {var}")
 
-                            diff = {"previous": left_vars[var], "new": right_vars[var]}
-                            logger.warn(f"  - {var}: {diff}")
+                        print_header = True
+                        for var in common_vars:
+                            if left_vars[var] != right_vars[var]:
+                                if print_header:
+                                    logger.warn(
+                                        "Variable differences between experiment definitions:"
+                                    )
+                                    print_header = False
 
-                    logger.die(f"Experiment {final_exp_namespace} is not unique.")
+                                diff = {"previous": left_vars[var], "new": right_vars[var]}
+                                logger.warn(f"  - {var}: {diff}")
 
-                try:
-                    app_inst.validate_experiment(
-                        warn_validation=True, die_on_validate_error=die_on_validate_error
-                    )
-                except ramble.keywords.RambleKeywordError as e:
-                    if die_on_validate_error:
-                        raise RambleVariableDefinitionError(
-                            f"In experiment {final_exp_namespace}: {e}"
-                        ) from None
-                    pass
+                        logger.die(f"Experiment {final_exp_namespace} is not unique.")
 
-                workload_names.add(app_inst.expander.workload_name)
+                    # Only need to validate the base experiment
+                    if n == 0:
+                        try:
+                            app_inst.validate_experiment(
+                                warn_validation=True, die_on_validate_error=die_on_validate_error
+                            )
+                        except ramble.keywords.RambleKeywordError as e:
+                            if die_on_validate_error:
+                                raise RambleVariableDefinitionError(
+                                    f"In experiment {final_exp_namespace}: {e}"
+                                ) from None
+                            pass
 
-                app_inst.set_success_list(final_context.success_criteria)
-                rendered_experiments.add(final_exp_namespace)
-                self.experiments[final_exp_namespace] = app_inst
-                self.experiment_order.append(final_exp_namespace)
+                    workload_names.add(app_inst.expander.workload_name)
 
-            self.define_scoped_tables(workload_names, experiment_template_name)
+                    app_inst.set_success_list(final_context.success_criteria)
+                    rendered_experiments.add(final_exp_namespace)
+                    self.experiments[final_exp_namespace] = app_inst
+                    self.experiment_order.append(final_exp_namespace)
+
+                self.define_scoped_tables(workload_names, experiment_template_name)
 
     def define_scoped_tables(self, workload_names, experiment_template_name):
         # Generate focused tables for results

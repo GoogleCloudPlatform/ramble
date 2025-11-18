@@ -465,19 +465,14 @@ class Renderer:
                     evaluated = where_expander.expand_var(where)
                     if evaluated == "True":
                         keep_object = False
+                        break
 
             if keep_object:
-                # If n_repeats is set, yield 1 base and n duplicate copies of each object
-                # repeats = (is_repeat_base, [T:n_repeats|F:repeat index or 0 if not a repeat])
-                for n in range(0, n_repeats + 1):
-                    repeats = ramble.repeats.Repeats()
-
-                    if n_repeats > 0 and n == 0:  # this is a repeat base
-                        repeats.set_repeats(True, n_repeats)
-                    elif n_repeats > 0 and n > 0:  # this is a repeat with index n
-                        repeats.set_repeat_index(n)
-                    # maybe yield a tuple of vars and repeat info
-                    yield object_variables.copy(), repeats
+                # The repeated experiments will be optionally expanded by the caller.
+                repeats = ramble.repeats.Repeats()
+                if n_repeats > 0:
+                    repeats.set_repeats(True, n_repeats)
+                yield object_variables.copy(), repeats
 
 
 class RambleRendererError(ramble.error.RambleError):
