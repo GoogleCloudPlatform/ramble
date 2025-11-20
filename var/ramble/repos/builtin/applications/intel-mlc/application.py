@@ -91,6 +91,7 @@ class IntelMlc(ExecutableApplication):
         "thread_distribution",
         default="spread",
         values=["spread", "compact"],
+        strict=True,
         description="Thread distribution method when generating cpu_list",
         workload_group="all_workloads",
     )
@@ -132,15 +133,6 @@ class IntelMlc(ExecutableApplication):
             "node, but is configured with n_nodes = {n_nodes}"
         ),
         fail_on_invalid=False,
-    )
-
-    register_validator(
-        name="validate_thread_distribution",
-        predicate='"{thread_distribution}" in ["spread", "compact"]',
-        message=(
-            "Unsupported thread distribution method {thread_distribution} requested. "
-            "Options are 'spread' and 'compact'"
-        ),
     )
 
     figure_of_merit(
