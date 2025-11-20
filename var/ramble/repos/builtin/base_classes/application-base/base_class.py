@@ -17,7 +17,7 @@ import stat
 import string
 import time
 from html import escape
-from typing import List
+from typing import Dict, List
 
 import llnl.util.filesystem as fs
 import llnl.util.tty.color as color
@@ -617,6 +617,35 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.expander.replacement_paths = (
                 experiment_set._workspace.workspace_paths()
             )
+
+    def non_reserved_variables(
+        self, workspace, remove_keys: set = None
+    ) -> Dict[str, str]:
+        """Replicate this instances variables, and remove any reserved variables from the dict.
+        Additionally, remove any variables in the remove_keys set.
+
+        Args:
+            remove_keys (set): Set of keys to remove from variable definitions
+
+        Returns:
+            (dict): A dictionary of variable, value pairs from this experiment.
+        """
+        if remove_keys is None:
+            remove_keys = {"env_name", "workspace_tables"}
+        cleaned_variables = self.variables.copy()
+        for key in self.keywords.all_reserved_keys():
+            cleaned_variables.pop(key, None)
+
+        for key in remove_keys:
+            cleaned_variables.pop(key, None)
+
+        for template_name, _ in workspace.all_templates():
+            cleaned_variables.pop(key, None)
+
+        for _, tpl_config in self._object_templates(workspace):
+            cleaned_variables.pop(key, None)
+
+        return cleaned_variables
 
     def define_missing_variables(self):
         """Iterate over missing variable definitions, and add them until there
