@@ -19,6 +19,24 @@ class Context:
     (such as application, workload, or experiment) and logic to merge in
     additional contexts by order of precedence."""
 
+    output_mapping = {
+        "variables": namespace.variables,
+        "variants": namespace.variants,
+        "env_variables": namespace.env_var,
+        "internals": namespace.internals,
+        "chained_experiments": namespace.chained_experiments,
+        "modifiers": namespace.modifiers,
+        "template": namespace.template,  # TODO: Make sure this is good
+        "exclude": namespace.exclude,
+        "zips": namespace.zips,
+        "tables": namespace.tables,
+        "tags": namespace.tags,
+        "matrices": namespace.matrices,
+        "n_repeats": namespace.n_repeats,
+        "formatted_executables": namespace.formatted_executables,
+        "success_criteria": namespace.success,
+    }
+
     def __init__(self):
         """Constructor for a Context
 
@@ -98,6 +116,28 @@ class Context:
             self.success_criteria.extend(in_context.success_criteria)
         if in_context.tables:
             self.tables.extend(in_context.tables)
+
+    def to_workspace_config(self, application_name, workload_name):
+        experiment_config = {}
+
+        for attr_name, namespace_name in self.output_mapping.items():
+            attr_val = getattr(self, attr_name, None)
+            if attr_val:
+                experiment_config[namespace_name] = attr_val
+
+        workspace_config = {
+            "ramble": {
+                "applications": {
+                    application_name: {
+                        "workloads": {
+                            workload_name: {"experiments": {self.context_name: experiment_config}}
+                        }
+                    }
+                }
+            }
+        }
+
+        return workspace_config
 
 
 def create_context_from_dict(context_name, in_dict):
