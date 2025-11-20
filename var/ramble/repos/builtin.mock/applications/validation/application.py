@@ -15,12 +15,55 @@ class Validation(ExecutableApplication):
     executable("foo", "bar")
 
     workload("test_validation", executable="foo")
+    workload("test_validation_workload_var", executable="foo")
+    workload(
+        "test_validation_workload_var_with_workload_defaults", executable="foo"
+    )
+    workload(
+        "test_validation_workload_var_with_workload_group", executable="foo"
+    )
 
     workload_variable(
         "validate_var",
         default="valid",
         description="A var",
         workload="test_validation",
+    )
+
+    workload_variable(
+        "multi_choice_var",
+        default="choice1",
+        description="A variable that can only be set to values from a predefined list",
+        values=["choice1", "choice2", "choice3"],
+        strict=True,
+        workload="test_validation_workload_var",
+    )
+
+    workload_variable(
+        "multi_choice_var2",
+        workload_defaults={
+            "test_validation": "choice1",
+            "test_validation_workload_var": "choice2",
+            "test_validation_workload_var_with_workload_defaults": "choice3",
+            "test_validation_workload_var_with_workload_group": "choice3",
+        },
+        description="A variable that can only be set to values from a predefined list",
+        values=["choice1", "choice2", "choice3"],
+        strict=True,
+    )
+
+    workload_group(
+        "target_workloads",
+        workloads=["test_validation_workload_var_with_workload_group"],
+    )
+
+    workload_variable(
+        "multi_choice_var3",
+        default="choice1",
+        description="A variable that can only be set to values from a predefined list",
+        values=["choice1", "choice2", "choice3"],
+        strict=True,
+        workload_group="target_workloads",
     )
 
     register_validator(
