@@ -36,6 +36,14 @@ def setup_parser(subparser):
     index_parser = sp.add_parser(
         "index", help=results_index.__doc__, description=results_index.__doc__
     )
+    index_parser.add_argument(
+        "-v",
+        "--all-vars",
+        dest="all_vars",
+        action="store_true",
+        help="print all variable names",
+        required=False,
+    )
     index_parser.add_argument("-f", "--file", help="path of results file")
 
     report_parser = sp.add_parser(
@@ -231,10 +239,15 @@ def _print_attr_dict(attr_dict: dict, n_indent=0):
 def results_index(args):
     """List attributes in results including FOMs and template variables"""
     results_dict = _load_results(args)
-    result_index = ramble.reports.generate_result_index(results_dict)
+    filtered_experiments = ramble.reports.filter_exp_results(results_dict["experiments"])
+    result_index = ramble.reports.generate_result_index(
+        filtered_experiments, all_vars=args.all_vars
+    )
     for obj_name, obj_dict in result_index.items():
         if obj_dict:
             color.cprint(rucolor.title_color(f'{obj_name.replace("_", " ").title()}:'))
+            if obj_name == "All Variables" and not args.all_vars:
+                continue
             _print_attr_dict(obj_dict, n_indent=4)
 
 
@@ -250,8 +263,8 @@ def results_report(args):
     if args.workspace:
         ws_name = str(args.workspace)
 
-    results_df = ramble.reports.prepare_data(results_dict, args.where)
-    ramble.reports.make_report(results_df, ws_name, args)
+    filtered_experiments = ramble.reports.filter_exp_results(results_dict["experiments"])
+    ramble.reports.make_report(filtered_experiments, ws_name, args)
 
 
 def results(parser, args):

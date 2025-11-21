@@ -58,7 +58,7 @@ from ramble.language.shared_language import (
     register_phase,
 )
 from ramble.util import constants, conversions
-from ramble.util.foms import FomType
+from ramble.util.foms import FomType, SummaryFoms
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
@@ -2807,8 +2807,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     "value": self.repeats.n_repeats,
                     "units": "repeats",
                     "origin": summary_origin,
-                    "origin_type": "summary::n_total_repeats",
-                    "name": "Experiment Summary",
+                    "origin_type": f"summary::{SummaryFoms.N_TOTAL.value}",
+                    "name": SummaryFoms.SUMMARY.value,
                     "fom_type": FomType.MEASURE.to_dict(),
                 }
                 summary_foms.append(n_total_dict)
@@ -2819,8 +2819,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     "value": n_success,
                     "units": "repeats",
                     "origin": summary_origin,
-                    "origin_type": "summary::n_successful_repeats",
-                    "name": "Experiment Summary",
+                    "origin_type": f"summary::{SummaryFoms.N_SUCCESS.value}",
+                    "name": SummaryFoms.SUMMARY.value,
                     "fom_type": FomType.MEASURE.to_dict(),
                 }
                 summary_foms.append(n_success_dict)

@@ -14,6 +14,7 @@ import pytest
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import search_files_for_string
+from ramble.util.foms import SummaryFoms
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -193,7 +194,7 @@ ramble:
         )
         with open(result_file) as f:
             data = f.read()
-            assert "summary::n_total_repeats = 1 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 1 repeats" in data
             assert "summary::mean = 11.111 s" in data
             assert "= NA" not in data
 
@@ -238,8 +239,8 @@ ramble:
         result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
-            assert "summary::n_total_repeats = 3 repeats" in data
-            assert "summary::n_successful_repeats = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 3 repeats" in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
             assert "summary::min = 1.0 minutes" in data
             # Assert that the last experiment is not included in the stats
             assert "summary::max = 2.0 minutes" in data
