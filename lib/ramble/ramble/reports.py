@@ -292,13 +292,13 @@ def get_all_foms(result_index):
     all_foms = set()
     for obj_type, obj_type_dict in result_index.items():
         if obj_type == "applications":
-            for app_name, app_dict in obj_type_dict.items():
-                for wl_name, wl_dict in app_dict.items():
+            for app_dict in obj_type_dict.values():
+                for wl_dict in app_dict.values():
                     all_foms.update(wl_dict["FOMs"])
                     if SummaryFoms.SUMMARY.value in wl_dict:
                         all_foms.update(wl_dict[SummaryFoms.SUMMARY.value])
         else:
-            for obj_name, obj_dict in obj_type_dict.items():
+            for obj_dict in obj_type_dict.values():
                 all_foms.update(obj_dict["FOMs"])
 
     return all_foms
@@ -337,7 +337,7 @@ def extract_data(
                         ReportVars.CONTEXT_NAME.value: context["name"],
                     }
 
-                    for name, val in _EXP_BASIC_VARS_MAPPING.items():
+                    for name in _EXP_BASIC_VARS_MAPPING:
                         if name in exp:
                             exp_data[_EXP_BASIC_VARS_MAPPING[name]] = exp[name]
 
