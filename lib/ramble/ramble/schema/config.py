@@ -184,6 +184,8 @@ properties["config"]["repeat_success_strict"] = {"type": "boolean", "default": T
 
 properties["config"]["enable_workspace_prompt"] = {"type": "boolean", "default": False}
 
+properties["config"]["overwrite_inventories"] = {"type": "boolean", "default": False}
+
 properties["config"]["stage_method"] = {
     "type": "string",
     "enum": ["cp", "rsync", "symbolic_link", "hard_link"],

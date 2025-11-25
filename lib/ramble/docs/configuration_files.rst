@@ -244,6 +244,23 @@ through and not cause an error. This is useful for things like `${ENV_VAR}`
 that are recognized as a variable. When passthrough is disabled, any variables
 that fail to expand will raise a syntax error, which can aid in debugging.
 
+.. _overwrite-inventories-config-option:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Overwrite Experiment Inventories
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+An optional flag can be set in ``config`` or with ``--overwrite-inventories``
+on the command line to force workspace pipelines to overwrite existing
+experiment inventories and hashes. This will disable the hash checking / error
+semantics, and replace them with reconstruction of the hash regardless of it's
+previous contents. Its format is as follows:
+
+.. code-block:: yaml
+
+    config:
+      overwrite_inventories: True
+
 .. _experiment-repeats-config-option:
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

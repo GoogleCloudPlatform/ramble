@@ -471,6 +471,11 @@ def make_argument_parser(**kwargs):
         action="store_true",
         help="use the builtin.mock repository instead of builtin",
     )
+    parser.add_argument(
+        "--overwrite-inventories",
+        action="store_true",
+        help="enables all workspace actions to overwrite experiment inventories",
+    )
 
     for obj in ramble.repository.ObjectTypes:
         objname = obj.name.replace("_", "-")
@@ -577,7 +582,6 @@ def setup_main_options(args):
         spack.util.debug.register_interrupt_handler()
         ramble.config.set("config:debug", True, scope="command_line")
         spack.util.environment.tracing_enabled = True
-
     if args.timestamp:
         tty.set_timestamp(True)
 
@@ -598,6 +602,9 @@ def setup_main_options(args):
 
     if args.disable_progress_bar:
         ramble.config.set("config:disable_progress_bar", True, scope="command_line")
+
+    if args.overwrite_inventories:
+        ramble.config.set("config:overwrite_inventories", True, scope="command_line")
 
     objects_to_mock = set()
     if args.mock:

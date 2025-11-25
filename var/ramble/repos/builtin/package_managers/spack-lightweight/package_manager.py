@@ -424,18 +424,6 @@ class SpackLightweight(PackageManagerBase):
         self.runner.set_env(env_path, require_exists=False)
         self.runner.activate()
 
-        try:
-            pkgman_version = self.get_version(workspace=workspace)
-        except RunnerError:
-            pkgman_version = "unknown"
-
-        self.app_inst.hash_inventory["package_manager"].append(
-            {
-                "name": self.name,
-                "version": pkgman_version,
-                "digest": ramble.util.hashing.hash_string(pkgman_version),
-            }
-        )
         self.app_inst.hash_inventory["software"].append(
             {
                 "name": self.runner.env_path.replace(
