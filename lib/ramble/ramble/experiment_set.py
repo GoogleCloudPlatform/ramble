@@ -53,6 +53,7 @@ class ExperimentSet:
         self.chained_order = []
         self._workspace = workspace
         self._context = {}
+        self._filtered_experiments_cache = {}
 
         for context in self._contexts:
             self._context[context] = ramble.context.Context()
@@ -755,8 +756,7 @@ class ExperimentSet:
 
     def num_filtered_experiments(self, filters):
         """Return the number of filtered experiments in this set"""
-
-        return sum(1 for _ in self.filtered_experiments(filters))
+        return len(self.filtered_experiments(filters))
 
     def filtered_experiments(self, filters):
         """Return a filtered set of all experiments based on a logical expression
@@ -771,7 +771,15 @@ class ExperimentSet:
             exp: The name of the experiment, if expression results in True
             inst: An application instance representing the experiment
         """
+        include_where = tuple(sorted(filters.include_where)) if filters.include_where else ()
+        exclude_where = tuple(sorted(filters.exclude_where)) if filters.exclude_where else ()
+        tags = tuple(sorted(filters.tags)) if filters.tags else ()
+        cache_key = (include_where, exclude_where, tags)
 
+        if cache_key in self._filtered_experiments_cache:
+            return self._filtered_experiments_cache[cache_key]
+
+        filtered_list = []
         for exp, inst, idx in self.all_experiments():
             active = True
 
@@ -779,18 +787,27 @@ class ExperimentSet:
                 for expression in filters.include_where:
                     if not inst.expander.evaluate_predicate(expression):
                         active = False
+                        break
+            if not active:
+                continue
 
             if filters.exclude_where:
                 for expression in filters.exclude_where:
                     if inst.expander.evaluate_predicate(expression):
                         active = False
+                        break
+            if not active:
+                continue
 
             if filters.tags:
                 if not inst.has_tags(filters.tags):
                     active = False
 
             if active and inst.is_actionable():
-                yield exp, inst, idx
+                filtered_list.append((exp, inst, idx))
+
+        self._filtered_experiments_cache[cache_key] = filtered_list
+        return filtered_list
 
     def add_chained_experiment(self, name, instance):
         if name in self.chained_experiments.keys():
