@@ -126,7 +126,7 @@ class Gromacs(ExecutableApplication):
 
     input_file(
         "JCP_benchmarks",
-        url="https://zenodo.org/record/3893789/files/GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP.tar.gz?download=1",
+        url="https://zenodo.org/record/3893789/files/GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP.tar.gz",
         sha256="82449291f44f4d5b7e5c192d688b57b7c2a2e267fe8b12e7a15b5d68f96c7b20",
         description="GROMACS_heterogeneous_parallelization_benchmark_info_and_systems_JCP",
     )
