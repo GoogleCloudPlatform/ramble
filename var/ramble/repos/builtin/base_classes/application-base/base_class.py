@@ -2098,7 +2098,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 obj.experiment_variants(app_inst=self).as_set()
             )
 
-        return list(sorted(variant_definitions))
+        return sorted(variant_definitions)
 
     def _purge_inventory(self):
         self.hash_inventory = {
