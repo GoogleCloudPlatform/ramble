@@ -112,7 +112,7 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
             An iterator of expanded strings
         """
         expander = self.app_inst.expander
-        for tpl in set(templates):
+        for tpl in sorted(set(templates)):
             try:
                 rendered = expander.expand_var(tpl, allow_passthrough=False)
                 if rendered:
