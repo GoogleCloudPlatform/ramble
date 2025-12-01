@@ -18,6 +18,7 @@ import warnings
 from contextlib import contextmanager
 from typing import Dict, FrozenSet, List, Optional, Union
 
+import ramble.config
 import ramble.error
 import ramble.keywords
 from ramble.util.logger import logger
