@@ -15,6 +15,7 @@ from typing import Dict, List
 import llnl.util.filesystem as fs
 
 import ramble.config
+import ramble.expander
 import ramble.repository
 import ramble.util.path
 from ramble.keywords import keywords
