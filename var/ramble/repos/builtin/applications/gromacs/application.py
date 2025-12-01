@@ -42,6 +42,11 @@ class Gromacs(ExecutableApplication):
     )
 
     executable(
+        name="print-binary-info",
+        template="{gmx} --version",
+        use_mpi=False,
+    )
+    executable(
         "pre-process",
         "{grompp} "
         + "-f {input_path}/{type}.mdp "
@@ -138,48 +143,53 @@ class Gromacs(ExecutableApplication):
         description="A cubic box with 33 million water molecules (~100 million atoms). This deck is provided by Dr. Carsten Kutzner.",
     )
 
+    execs_with_gen = ["print-binary-info", "pre-process", "execute-gen"]
+    execs_no_gen = ["print-binary-info", "execute"]
+
     workload(
         "water_gmx50",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="water_gmx50_bare",
     )
     workload(
         "water_bare",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="water_bare_hbonds",
     )
-    workload("lignocellulose", executables=["execute"], input="lignocellulose")
-    workload("hecbiosim", executables=["execute"], input="HECBioSim")
-    workload("benchpep", executables=["execute"], input="BenchPEP")
-    workload("benchpep_h", executables=["execute"], input="BenchPEP_h")
-    workload("benchmem", executables=["execute"], input="BenchMEM")
-    workload("benchrib", executables=["execute"], input="BenchRIB")
+    workload(
+        "lignocellulose", executables=execs_no_gen, input="lignocellulose"
+    )
+    workload("hecbiosim", executables=execs_no_gen, input="HECBioSim")
+    workload("benchpep", executables=execs_no_gen, input="BenchPEP")
+    workload("benchpep_h", executables=execs_no_gen, input="BenchPEP_h")
+    workload("benchmem", executables=execs_no_gen, input="BenchMEM")
+    workload("benchrib", executables=execs_no_gen, input="BenchRIB")
     workload(
         "stmv_rf",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "stmv_pme",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "rnase_cubic",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "ion_channel",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
     workload(
         "adh_dodec",
-        executables=["pre-process", "execute-gen"],
+        executables=execs_with_gen,
         input="JCP_benchmarks",
     )
-    workload("water_33m", executables=["execute"], input="water_33m")
+    workload("water_33m", executables=execs_no_gen, input="water_33m")
 
     workload_group(
         "all_workloads",
@@ -421,3 +431,26 @@ class Gromacs(ExecutableApplication):
         units="hours/ns",
         fom_type=FomType.INFO,
     )
+
+    # FOMs around the binary information
+    info_foms = (
+        "Precision",
+        "MPI library",
+        "OpenMP support",
+        "GPU support",
+        "SIMD instructions",
+        "CPU FFT library",
+        "GPU FFT library",
+        "Multi-GPU FFT",
+        "Hwloc support",
+        "BLAS library",
+        "LAPACK library",
+    )
+    for fom in info_foms:
+        figure_of_merit(
+            name=fom,
+            fom_regex=rf"\s*{fom}:\s*(?P<fom_value>.*)",
+            group_name="fom_value",
+            units="",
+            fom_type=FomType.INFO,
+        )

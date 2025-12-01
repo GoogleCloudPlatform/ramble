@@ -66,4 +66,5 @@ ramble:
 
             with open(exp_script) as f:
                 data = f.read()
+                assert "gmx_mpi --version" in data
                 assert f"mpirun -n {n_ranks}" in data
