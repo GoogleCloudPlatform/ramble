@@ -9,10 +9,9 @@
 import copy
 import os
 
-import pandas
-
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
+from ramble.util.module_utils import import_pandas
 
 
 class ResultsColumn:
@@ -248,11 +247,12 @@ class ResultsTable:
 
     def _to_dataframe(self):
         """Construct a pandasdata frame from this table's data"""
-        self._df = pandas.DataFrame(self._data)
+        pd = import_pandas()
+        self._df = pd.DataFrame(self._data)
 
         for column in self._df.columns:
             try:
-                self._df[column] = pandas.to_numeric(self._df[column])
+                self._df[column] = pd.to_numeric(self._df[column])
             except ValueError:
                 pass
 

@@ -22,15 +22,15 @@ from ramble.keywords import keywords
 from ramble.util.file_util import create_symlink
 from ramble.util.foms import BetterDirection, FomType, SummaryFoms
 from ramble.util.logger import logger
+from ramble.util.module_utils import import_pandas
 
 import spack.util.spack_yaml as syaml
 
 try:
     import matplotlib.pyplot as plt
-    import pandas as pd
     from matplotlib.backends.backend_pdf import PdfPages
 except ModuleNotFoundError:
-    logger.die("matplotlib or pandas was not found. Ensure requirements.txt are installed.")
+    logger.die("matplotlib was not found. Ensure requirements.txt are installed.")
 
 
 class ReportVars(Enum):
@@ -83,6 +83,7 @@ for obj in ramble.repository.ObjectTypes:
 
 def to_numeric_if_possible(series):
     """Try to convert a Pandas series to numeric, or return the series unchanged."""
+    pd = import_pandas()
     try:
         return pd.to_numeric(series)
     except (ValueError, TypeError):
@@ -314,9 +315,7 @@ def get_all_vars(result_index):
     return all_vars
 
 
-def extract_data(
-    experiments: List[dict], foms: List[str], variables: List[str], where_query=None
-) -> pd.DataFrame:
+def extract_data(experiments: List[dict], foms: List[str], variables: List[str], where_query=None):
     """Extracts data from the experiments dicts and returns it as a Pandas DataFrame.
 
     Args:
@@ -371,6 +370,7 @@ def extract_data(
 
                     extracted_data.append(exp_data)
 
+    pd = import_pandas()
     extracted_df = pd.DataFrame.from_dict(extracted_data)
 
     # Apply where to down select
@@ -419,6 +419,7 @@ class PlotFactory:
 
 class PlotGenerator:
     def __init__(self, spec, normalize, report_dir_path, exp_results, logx, logy, split_by):
+        pd = import_pandas()
         self.normalize = normalize
         self.spec = spec
         self.report_dir_path = report_dir_path
@@ -619,6 +620,7 @@ class ScalingPlotGenerator(PlotGenerator):
     def generate_plot_data(self, pdf_report):
         """Creates a dataframe for plotting line charts with scaling var on x axis,
         and performance variable on y axis."""
+        pd = import_pandas()
         self.validate_spec(self.spec, self.result_index)
 
         perf_measure, scale_var, *additional_vars = self.spec
@@ -854,14 +856,13 @@ class FomPlot(PlotGenerator):
 
     # TODO: dry bar plot drawing
     def draw(self, perf_measure, scale_var, series, unit, pdf_report):
+        pd = import_pandas()
 
         self.output_df[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
             self.output_df[ReportVars.FOM_VALUE.value]
         )
 
-        from pandas.api.types import is_numeric_dtype
-
-        if not is_numeric_dtype(self.output_df[ReportVars.FOM_VALUE.value]):
+        if not pd.api.types.is_numeric_dtype(self.output_df[ReportVars.FOM_VALUE.value]):
             logger.warn(f"Skipping drawing of non numeric FOM: {perf_measure}")
             return
 

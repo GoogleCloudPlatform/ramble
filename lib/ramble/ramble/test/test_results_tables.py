@@ -134,18 +134,23 @@ class TestResultsTable(unittest.TestCase):
         self.assertEqual(self.table._data["col2"], ["val2"])
 
     @patch("ramble.results_table.create_symlink")
-    @patch("ramble.results_table.pandas.DataFrame")
-    def test_to_csv(self, mock_df, mock_symlink):
+    @patch("ramble.results_table.import_pandas")
+    def test_to_csv(self, mock_import_pandas, mock_symlink):
         self.table._data = {"col1": ["a", "b"], "col2": [1, 2]}
         self.table._num_rows = 2
 
-        mock_df_instance = mock_df.return_value
+        mock_pd_module = MagicMock()
+        mock_import_pandas.return_value = mock_pd_module
+        mock_df_constructor = MagicMock()
+        mock_pd_module.DataFrame = mock_df_constructor
+
+        mock_df_instance = mock_df_constructor.return_value
         mock_df_instance.groupby.return_value.max.return_value = mock_df_instance
         mock_df_instance.sort_values.return_value = mock_df_instance
 
         self.table.to_csv("/tmp", "timestamp")
 
-        mock_df.assert_called_with(self.table._data)
+        mock_df_constructor.assert_called_with(self.table._data)
         mock_df_instance.to_csv.assert_called_with("/tmp/test_table.timestamp.csv", index=False)
         mock_symlink.assert_called_with(
             "/tmp/test_table.timestamp.csv", "/tmp/test_table.latest.csv"
