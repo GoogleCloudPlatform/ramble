@@ -11,6 +11,9 @@ import math
 import sys
 from enum import Enum
 
+from ramble.schema.fom import fom_schema_v1
+from ramble.schema.experiment import experiment_schema_v1
+
 import ramble.config
 from ramble.config import ConfigError
 from ramble.util.logger import logger
@@ -18,6 +21,15 @@ from ramble.util.logger import logger
 default_node_type_val = "Not Specified"
 
 uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly"])
+
+
+def validate_data(data, schema):
+    """Validate data against a JSON schema."""
+    try:
+        validate(instance=data, schema=schema)
+    except jsonschema.exceptions.ValidationError as err:
+        logger.error(f"Schema validation error: {err}")
+        raise
 
 
 class Uploader:
@@ -107,7 +119,7 @@ class Experiment:
         # large un-needed uploads
         data_copy["CONTEXTS"] = []
 
-        j["foms"] = json.dumps(None)
+        del j["foms"]
         j["data"] = json.dumps(data_copy, default=vars)
         return j
 
@@ -230,7 +242,8 @@ def _prepare_data(results, uri):
     foms_to_insert = []
 
     for experiment in results:
-        exps_to_insert.append(experiment.to_json())
+        json_experiment = experiment.to_json()
+        exps_to_insert.append(json_experiment)
 
         for fom in experiment.foms:
             fom_data = fom
@@ -239,94 +252,3 @@ def _prepare_data(results, uri):
             foms_to_insert.append(fom_data)
 
     return exp_table_id, exps_to_insert, fom_table_id, foms_to_insert
-
-
-class BigQueryUploader(Uploader):
-    """Class to handle upload of FOMs to BigQuery"""
-
-    """
-    Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements
-    """
-
-    def chunked_upload(self, table_id, data):
-        from google.cloud import bigquery
-
-        client = bigquery.Client()
-        error = None
-        approx_max_request = 1000000.0  # 1MB
-
-        data_len = len(data)
-        approx_request_size = sys.getsizeof(json.dumps(data))
-        approx_num_batches = math.ceil(approx_request_size / approx_max_request)
-        rows_per_batch = math.floor(data_len / approx_num_batches)
-        if rows_per_batch <= 1:
-            rows_per_batch = 1
-
-        logger.debug(f"Size: {sys.getsizeof(json.dumps(data))}B")
-        logger.debug(f"Length in rows: {data_len}")
-        logger.debug(f"Num Batches: {approx_num_batches}")
-        logger.debug(f"Rows per Batch: {rows_per_batch}")
-
-        for i in range(0, data_len, rows_per_batch):
-            end = i + rows_per_batch
-            if end > data_len:
-                end = data_len
-            logger.debug(f"Uploading rows {i} to {end}")
-            error = client.insert_rows_json(table_id, data[i:end])
-            if error:
-                return error
-        return error
-
-    def insert_data(self, uri: str, results) -> None:
-
-        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
-
-        logger.debug("Experiments to insert:")
-        logger.debug(exps_to_insert)
-
-        logger.msg("Upload experiments...")
-        errors1 = self.chunked_upload(exp_table_id, exps_to_insert)
-        errors2 = None
-
-        if errors1 == []:
-            logger.msg("Upload FOMs...")
-            errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
-
-        for errors, name in zip((errors1, errors2), ("exp", "fom")):
-            if errors == []:
-                logger.msg(f"New rows have been added in {name}")
-            else:
-                logger.die(f"Encountered errors while inserting rows: {errors}")
-
-    def perform_upload(self, uri, results):
-        super().perform_upload(uri, results)
-
-        # import spack.util.spack_json as sjson
-        # json_str = sjson.dump(results)
-
-        self.insert_data(uri, results)
-
-    # def get_max_current_id(uri, table):
-    # TODO: Generating an id based on the max in use id is dangerous, and
-    # technically gives a race condition in parallel, and should be done in
-    # a more graceful and scalable way..  like hashing the experiment? or
-    # generating a known unique id for it
-    # query = "SELECT MAX(id) FROM `{uri}.{table}` LIMIT 1".format(uri=uri, table=table)
-    # query_job = client.query(query)
-    # results = query_job.result()  # Waits for job to complete.
-    # return results[0]
-
-
-class PrintOnlyUploader(Uploader):
-    """An uploader that only prints out formatted data without actually uploading."""
-
-    def perform_upload(self, uri, results):
-        super().perform_upload(uri, results)
-        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
-        logger.info("NOTE: The PrintOnly uploader only logs, but does not upload any data.")
-        logger.info(f"{len(exps_to_insert)} experiment(s) would be uploaded to {exp_table_id}:")
-        for exp in exps_to_insert:
-            logger.info(f"  {exp}")
-        logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
-        for fom in foms_to_insert:
-            logger.info(f"  {fom}")
