@@ -252,3 +252,148 @@ def _prepare_data(results, uri):
             foms_to_insert.append(fom_data)
 
     return exp_table_id, exps_to_insert, fom_table_id, foms_to_insert
+
+
+class BigQueryUploader(Uploader):
+    """Class to handle upload of FOMs to BigQuery"""
+
+    """
+    Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements
+    """
+
+    schema = [
+        {"table": "experiments", "schema": experiment_schema_v1},
+        {"table": "foms", "schema": fom_schema_v1},
+    ]
+
+    def _schema_to_bigquery(self, schema):
+        from google.cloud import bigquery
+
+        type_map = {
+            "string": "STRING",
+            "number": "FLOAT",
+            "integer": "INTEGER",
+            "boolean": "BOOLEAN",
+            "array": "RECORD",
+            "object": "RECORD",
+        }
+
+        bq_schema = []
+        for name, props in schema["properties"].items():
+            bq_type = type_map[props["type"]]
+            mode = "NULLABLE"
+            if name in schema.get("required", []):
+                mode = "REQUIRED"
+            
+            fields = []
+            if "items" in props:
+                fields = self._schema_to_bigquery(props["items"])
+
+            bq_schema.append(bigquery.SchemaField(name, bq_type, mode=mode, fields=fields))
+
+        return bq_schema
+
+    def create_tables(self, uri):
+        from google.cloud import bigquery
+        from google.cloud.exceptions import NotFound
+
+        client = bigquery.Client()
+
+        for table_def in self.schema:
+            table_id = f"{uri}.{table_def['table']}"
+            try:
+                client.get_table(table_id)
+                logger.info(f"Table {table_id} already exists.")
+            except NotFound:
+                logger.info(f"Creating table {table_id}")
+                bq_schema = self._schema_to_bigquery(table_def["schema"])
+                table = bigquery.Table(table_id, schema=bq_schema)
+                table = client.create_table(table)
+                logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+
+    def chunked_upload(self, table_id, data):
+        from google.cloud import bigquery
+
+        client = bigquery.Client()
+        error = None
+        approx_max_request = 1000000.0  # 1MB
+
+        data_len = len(data)
+        approx_request_size = sys.getsizeof(json.dumps(data))
+        approx_num_batches = math.ceil(approx_request_size / approx_max_request)
+        rows_per_batch = math.floor(data_len / approx_num_batches)
+        if rows_per_batch <= 1:
+            rows_per_batch = 1
+
+        logger.debug(f"Size: {sys.getsizeof(json.dumps(data))}B")
+        logger.debug(f"Length in rows: {data_len}")
+        logger.debug(f"Num Batches: {approx_num_batches}")
+        logger.debug(f"Rows per Batch: {rows_per_batch}")
+
+        for i in range(0, data_len, rows_per_batch):
+            end = i + rows_per_batch
+            if end > data_len:
+                end = data_len
+            logger.debug(f"Uploading rows {i} to {end}")
+            for row in data[i:end]:
+                table_name = table_id.split(".")[-1]
+                table_schema = [t["schema"] for t in self.schema if t["table"] == table_name][0]
+                validate_data(row, table_schema)
+            error = client.insert_rows_json(table_id, data[i:end])
+            if error:
+                return error
+        return error
+
+    def insert_data(self, uri: str, results) -> None:
+
+        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
+
+        logger.debug("Experiments to insert:")
+        logger.debug(exps_to_insert)
+
+        logger.msg("Upload experiments...")
+        errors1 = self.chunked_upload(exp_table_id, exps_to_insert)
+        errors2 = None
+
+        if errors1 == []:
+            logger.msg("Upload FOMs...")
+            errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
+
+        for errors, name in zip((errors1, errors2), ("exp", "fom")):
+            if errors == []:
+                logger.msg(f"New rows have been added in {name}")
+            else:
+                logger.die(f"Encountered errors while inserting rows: {errors}")
+
+    def perform_upload(self, uri, results):
+        super().perform_upload(uri, results)
+
+        # import spack.util.spack_json as sjson
+        # json_str = sjson.dump(results)
+
+        self.insert_data(uri, results)
+
+    # def get_max_current_id(uri, table):
+    # TODO: Generating an id based on the max in use id is dangerous, and
+    # technically gives a race condition in parallel, and should be done in
+    # a more graceful and scalable way..  like hashing the experiment? or
+    # generating a known unique id for it
+    # query = "SELECT MAX(id) FROM `{uri}.{table}` LIMIT 1".format(uri=uri, table=table)
+    # query_job = client.query(query)
+    # results = query_job.result()  # Waits for job to complete.
+    # return results[0]
+
+
+class PrintOnlyUploader(Uploader):
+    """An uploader that only prints out formatted data without actually uploading."""
+
+    def perform_upload(self, uri, results):
+        super().perform_upload(uri, results)
+        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
+        logger.info("NOTE: The PrintOnly uploader only logs, but does not upload any data.")
+        logger.info(f"{len(exps_to_insert)} experiment(s) would be uploaded to {exp_table_id}:")
+        for exp in exps_to_insert:
+            logger.info(f"  {exp}")
+        logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
+        for fom in foms_to_insert:
+            logger.info(f"  {fom}")

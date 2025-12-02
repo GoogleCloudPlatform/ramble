@@ -22,7 +22,15 @@ def zeppelin_create_db_setup_parser(subparser):
 
 def zeppelin_create_db(args):
     """create the zeppelin database"""
-    pass
+    import ramble.config
+    import ramble.uploader
+    from ramble.config import ConfigError
+
+    uri = ramble.config.get("config:upload:uri")
+    if not uri:
+        raise ConfigError("No upload URI (config:upload:uri) in config.")
+    uploader = ramble.uploader.BigQueryUploader()
+    uploader.create_tables(uri)
 
 
 #: Dictionary mapping subcommand names and aliases to functions
