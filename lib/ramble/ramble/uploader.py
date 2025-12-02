@@ -11,6 +11,7 @@ import math
 import sys
 from enum import Enum
 
+from ramble.schema.db import db_schema_version
 from ramble.schema.metadata import metadata_schema, metadata_schema_version
 from ramble.schema.fom import fom_schema, fom_schema_version
 from ramble.schema.experiment import experiment_schema, experiment_schema_version
@@ -262,9 +263,13 @@ class BigQueryUploader(Uploader):
     """
 
     schema = [
-        {"table": "experiments", "schema": experiment_schema[experiment_schema_version]},
-        {"table": "foms", "schema": fom_schema[fom_schema_version]},
-        {"table": "metadata", "schema": metadata_schema[metadata_schema_version]},
+        {
+            "table": "experiments",
+            "schema": experiment_schema,
+            "version": experiment_schema_version,
+        },
+        {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
+        {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
     ]
 
     def _schema_to_bigquery(self, schema):
@@ -280,7 +285,7 @@ class BigQueryUploader(Uploader):
         }
 
         bq_schema = []
-        for name, props in schema["properties"].items():
+        for name, props in schema.get("properties", {}).items():
             bq_type = type_map[props["type"]]
             mode = "NULLABLE"
             if name in schema.get("required", []):
@@ -300,6 +305,21 @@ class BigQueryUploader(Uploader):
 
         client = bigquery.Client()
 
+        # Check schema version
+        for table_def in self.schema:
+            try:
+                query = f"SELECT value FROM `{uri}.metadata` WHERE key = '{table_def['table']}_schema_version'"
+                query_job = client.query(query)
+                results = query_job.result()
+                if results.total_rows > 0:
+                    upstream_version = list(results)[0].value
+                    if upstream_version != str(table_def["version"]):
+                        logger.warn(
+                            f"Upstream DB schema version for table {table_def['table']} ('{upstream_version}') does not match current version ('{table_def['version']}')"
+                        )
+            except NotFound:
+                pass  # metadata table doesn't exist, so we don't need to check the version
+
         for table_def in self.schema:
             table_id = f"{uri}.{table_def['table']}"
             try:
@@ -307,7 +327,7 @@ class BigQueryUploader(Uploader):
                 logger.info(f"Table {table_id} already exists.")
             except NotFound:
                 logger.info(f"Creating table {table_id}")
-                bq_schema = self._schema_to_bigquery(table_def["schema"])
+                bq_schema = self._schema_to_bigquery(table_def["schema"][table_def["version"]])
                 table = bigquery.Table(table_id, schema=bq_schema)
                 table = client.create_table(table)
                 logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
@@ -320,6 +340,11 @@ class BigQueryUploader(Uploader):
         metadata_table_id = f"{uri}.metadata"
         metadata_to_insert = [
             {
+                "key": "db_schema_version",
+                "value": db_schema_version,
+                "timestamp": str(datetime.now()),
+            },
+            {
                 "key": "experiment_schema_version",
                 "value": str(experiment_schema_version),
                 "timestamp": str(datetime.now()),
@@ -327,6 +352,11 @@ class BigQueryUploader(Uploader):
             {
                 "key": "fom_schema_version",
                 "value": str(fom_schema_version),
+                "timestamp": str(datetime.now()),
+            },
+            {
+                "key": "metadata_schema_version",
+                "value": str(metadata_schema_version),
                 "timestamp": str(datetime.now()),
             },
         ]
