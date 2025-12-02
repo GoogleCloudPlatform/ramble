@@ -11,9 +11,9 @@ import math
 import sys
 from enum import Enum
 
-from ramble.schema.fom import fom_schema_v1
-from ramble.schema.experiment import experiment_schema_v1
-
+from ramble.schema.metadata import metadata_schema, metadata_schema_version
+from ramble.schema.fom import fom_schema, fom_schema_version
+from ramble.schema.experiment import experiment_schema, experiment_schema_version
 import ramble.config
 from ramble.config import ConfigError
 from ramble.util.logger import logger
@@ -262,8 +262,9 @@ class BigQueryUploader(Uploader):
     """
 
     schema = [
-        {"table": "experiments", "schema": experiment_schema_v1},
-        {"table": "foms", "schema": fom_schema_v1},
+        {"table": "experiments", "schema": experiment_schema[experiment_schema_version]},
+        {"table": "foms", "schema": fom_schema[fom_schema_version]},
+        {"table": "metadata", "schema": metadata_schema[metadata_schema_version]},
     ]
 
     def _schema_to_bigquery(self, schema):
@@ -284,7 +285,7 @@ class BigQueryUploader(Uploader):
             mode = "NULLABLE"
             if name in schema.get("required", []):
                 mode = "REQUIRED"
-            
+
             fields = []
             if "items" in props:
                 fields = self._schema_to_bigquery(props["items"])
@@ -310,6 +311,26 @@ class BigQueryUploader(Uploader):
                 table = bigquery.Table(table_id, schema=bq_schema)
                 table = client.create_table(table)
                 logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+
+        self.upload_metadata(uri)
+
+    def upload_metadata(self, uri):
+        from datetime import datetime
+
+        metadata_table_id = f"{uri}.metadata"
+        metadata_to_insert = [
+            {
+                "key": "experiment_schema_version",
+                "value": str(experiment_schema_version),
+                "timestamp": str(datetime.now()),
+            },
+            {
+                "key": "fom_schema_version",
+                "value": str(fom_schema_version),
+                "timestamp": str(datetime.now()),
+            },
+        ]
+        self.chunked_upload(metadata_table_id, metadata_to_insert)
 
     def chunked_upload(self, table_id, data):
         from google.cloud import bigquery
