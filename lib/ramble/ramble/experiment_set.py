@@ -25,6 +25,7 @@ from ramble.namespace import namespace
 from ramble.util.logger import logger
 
 import spack.util.naming
+from spack.util import cpus
 
 
 class ExperimentSet:
@@ -598,7 +599,7 @@ class ExperimentSet:
             # From experimentation, using more workers incurs overhead that discounts the benefit.
             # The tests were done against a workspace with plenty of parallelism to exploit,
             # and on a M4 laptop with 10 p-cores. For now, start with at most 2 workers.
-            max_workers = min(2, os.process_cpu_count())
+            max_workers = min(2, cpus.cpus_available())
         else:
             max_workers = 1
         with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
