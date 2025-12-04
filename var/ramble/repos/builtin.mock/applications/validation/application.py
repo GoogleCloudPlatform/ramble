@@ -31,11 +31,19 @@ class Validation(ExecutableApplication):
     )
 
     workload_variable(
+        "loose_multi_choice_var",
+        default="choice-1",
+        description="A variable that can be set to a value outside the values list",
+        values=["choice1", "choice2", "choice3"],
+        strict=False,
+        workload="test_validation_workload_var",
+    )
+
+    workload_variable(
         "multi_choice_var",
         default="choice1",
         description="A variable that can only be set to values from a predefined list",
         values=["choice1", "choice2", "choice3"],
-        strict=True,
         workload="test_validation_workload_var",
     )
 
@@ -49,7 +57,6 @@ class Validation(ExecutableApplication):
         },
         description="A variable that can only be set to values from a predefined list",
         values=["choice1", "choice2", "choice3"],
-        strict=True,
     )
 
     workload_group(
@@ -62,7 +69,6 @@ class Validation(ExecutableApplication):
         default="choice1",
         description="A variable that can only be set to values from a predefined list",
         values=["choice1", "choice2", "choice3"],
-        strict=True,
         workload_group="target_workloads",
     )
 

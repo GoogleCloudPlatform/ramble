@@ -226,7 +226,7 @@ def workload_variable(
     default=None,
     description="",
     values=None,
-    strict: bool = False,
+    strict: bool = True,
     workload=None,
     workloads=None,
     workload_group=None,
@@ -250,7 +250,7 @@ def workload_variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
-        strict (bool): If True and values is not None, the variable's value
+        strict (bool): If True (the default) and values is not None, the variable's value
                        will be validated against the values list.
         workload (str): Single workload this variable is used in
         workloads (list): List of modes this variable is used in

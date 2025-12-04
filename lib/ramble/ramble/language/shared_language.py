@@ -803,7 +803,7 @@ def variable(
     default,
     description: str,
     values: Optional[list] = None,
-    strict: bool = False,
+    strict: bool = True,
     expandable: bool = True,
     track_used: bool = False,
     when=None,
@@ -818,7 +818,7 @@ def variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
-        strict (bool): If True and values is not None, the variable's value
+        strict (bool): If True (the default) and values is not None, the variable's value
                        will be validated against the values list.
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,

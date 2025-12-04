@@ -91,7 +91,6 @@ class IntelMlc(ExecutableApplication):
         "thread_distribution",
         default="spread",
         values=["spread", "compact"],
-        strict=True,
         description="Thread distribution method when generating cpu_list",
         workload_group="all_workloads",
     )

@@ -41,11 +41,18 @@ class Info(PackageManagerBase):
     )
 
     variable(
+        "loose_obj_multi_choice_var",
+        default="-1",
+        description="A variable that does not validate its value",
+        values=["1", "2", "3"],
+        strict=False,
+    )
+
+    variable(
         "obj_multi_choice_var",
         default="1",
         description="A variable with a prescribed set of values",
         values=["1", "2", "3"],
-        strict=True,
     )
 
     environment_variable(
