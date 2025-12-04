@@ -1585,15 +1585,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 "{mpi_command}",
                                 exec_vars,
                             ).strip()
-                            if (
-                                not raw_mpi_cmd
-                                and int(
-                                    self.expander.expand_var_name(
-                                        self.keywords.n_nodes
-                                    )
-                                )
-                                > 1
-                            ):
+                            n_nodes = self.expander.expand_var_name(
+                                self.keywords.n_nodes
+                            )
+                            n_nodes = 1 if not n_nodes else int(n_nodes)
+                            if not raw_mpi_cmd and n_nodes > 1:
                                 logger.warn(
                                     f"Command {cmd_conf.name} requires a non-empty `mpi_command` "
                                     "variable in a multi-node experiment"
@@ -3526,6 +3522,48 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def set_required_variables(self):
         """Set required variables from all objects"""
+
+        def define_mpi_vars():
+            required_vars_defined = set()
+
+            required_vars = {
+                self.keywords.n_ranks: "int({processes_per_node}*{n_nodes})",
+                self.keywords.processes_per_node: "int({n_ranks}/{n_nodes})",
+                self.keywords.n_nodes: "int({n_ranks}/{processes_per_node})",
+            }
+
+            for required_var in required_vars:
+                if required_var in self.variables:
+                    required_vars_defined.add(required_var)
+
+            if len(required_vars_defined) < 2:
+                required_keys = "Two or more of the following are required to be defined.\n"
+                for var in required_vars.keys():
+                    required_keys += f"  - {var}\n"
+
+                defined_keys = f"Experiment {self.expander.experiment_namespace} only has:\n"
+                for var in required_vars_defined:
+                    defined_keys += f"  - {var}\n"
+                raise ramble.error.ObjectValidationError(
+                    "Invalid number of required variables defined.\n"
+                    + required_keys
+                    + defined_keys
+                )
+
+            for required_var in required_vars_defined:
+                del required_vars[required_var]
+
+            for var_name, formula in required_vars.items():
+                value = self.expander.expand_var(
+                    formula, allow_passthrough=False
+                )
+                self.define_variable(var_name, value)
+
+        define_mpi_vars()
+
+        if self.keywords.n_threads not in self.variables:
+            self.define_variable(self.keywords.n_threads, 1)
+
         for _, obj in self._objects():
             logger.debug(f"Setting required variables for {obj.name}")
             self.keywords.update_keys(obj.required_variables)
