@@ -497,3 +497,39 @@ def test_stage_files_directive_invalid_method():
     app_inst = TestApp("/not/a/path")
     with pytest.raises(DirectiveError):
         app_inst.stage_files(src="src", dst="dst", method="invalid")
+
+
+@pytest.mark.parametrize("app_class", app_types)
+def test_non_reserved_variables(app_class):
+    app_inst = app_class("/not/a/path")
+    app_inst.variables = {
+        "user_var1": "value1",
+        "workspace_name": "reserved_value",
+        "user_var2": "value2",
+        "n_nodes": "reserved_value2",
+    }
+
+    # Mock the workspace object
+    class MockWorkspace:
+        def all_templates(self):
+            return [("template1", "path1")]
+
+    workspace = MockWorkspace()
+
+    # Mock _object_templates
+    app_inst._object_templates = lambda ws: [("template2", {"var_name": "tpl_var_name"})]
+
+    # Test without remove_keys
+    non_reserved = app_inst.non_reserved_variables(workspace)
+    assert "user_var1" in non_reserved
+    assert "user_var2" in non_reserved
+    assert "workspace_name" not in non_reserved
+    assert "template1" not in non_reserved
+    assert "tpl_var_name" not in non_reserved
+    assert len(non_reserved) == 3
+
+    # Test with remove_keys
+    non_reserved = app_inst.non_reserved_variables(workspace, remove_keys={"user_var1"})
+    assert "user_var1" not in non_reserved
+    assert "user_var2" in non_reserved
+    assert len(non_reserved) == 2
