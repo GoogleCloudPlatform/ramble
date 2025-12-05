@@ -803,6 +803,7 @@ def variable(
     default,
     description: str,
     values: Optional[list] = None,
+    strict: bool = True,
     expandable: bool = True,
     track_used: bool = False,
     when=None,
@@ -817,6 +818,8 @@ def variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
+        strict (bool): If True (the default) and values is not None, the variable's value
+                       will be validated against the values list.
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
@@ -848,6 +851,9 @@ def variable(
                 **kwargs,
             )
         )
+
+        if strict and values is not None:
+            ramble.language.language_helpers.add_variable_validator(obj, name, values, when_list)
 
         if environment_variable_name is not None:
             if when_set not in obj.object_environment_variables:

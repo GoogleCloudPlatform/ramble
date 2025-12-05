@@ -134,15 +134,6 @@ class IntelMlc(ExecutableApplication):
         fail_on_invalid=False,
     )
 
-    register_validator(
-        name="validate_thread_distribution",
-        predicate='"{thread_distribution}" in ["spread", "compact"]',
-        message=(
-            "Unsupported thread distribution method {thread_distribution} requested. "
-            "Options are 'spread' and 'compact'"
-        ),
-    )
-
     figure_of_merit(
         "All Read Bandwidth",
         fom_regex=r"ALL Reads\s*:\s+(?P<bw>[0-9\.]+)",

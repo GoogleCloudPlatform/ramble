@@ -33,6 +33,8 @@ def test_object_validation(workspace_name):
         "processes_per_node=1",
         "-v",
         "batch_submit={execute_experiment}",
+        "--wf",
+        "test_validation",
         global_args=global_args,
     )
     ws._re_read()
@@ -50,6 +52,8 @@ def test_object_validation(workspace_name):
         "n_nodes=2",
         "-v",
         "processes_per_node=1",
+        "--wf",
+        "test_validation",
         "--overwrite",
         global_args=global_args,
     )
@@ -69,6 +73,8 @@ def test_object_validation(workspace_name):
         "n_nodes=2",
         "-v",
         "processes_per_node=1",
+        "--wf",
+        "test_validation",
         "--overwrite",
         global_args=global_args,
     )
@@ -77,3 +83,139 @@ def test_object_validation(workspace_name):
     out = workspace("setup", global_args=global_args)
     assert "Warning: Validator 'validate_var_check'" in out
     assert "The validate_var is recommended to start with 'valid', but got 'invalid'" in out
+
+
+def test_variable_validation_workload(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    ws = ramble.workspace.create(workspace_name)
+
+    workspace(
+        "manage",
+        "experiments",
+        "validation",
+        "-v",
+        "n_nodes=2",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "-v",
+        "multi_choice_var=invalid",
+        "--wf",
+        "test_validation_workload_var",
+        global_args=global_args,
+    )
+    ws._re_read()
+    with pytest.raises(
+        ramble.error.ObjectValidationError,
+        match=r"variable 'multi_choice_var' \('invalid'\) is not one of the allowed values",
+    ):
+        workspace("setup", global_args=global_args)
+
+    workspace(
+        "manage",
+        "experiments",
+        "validation",
+        "-v",
+        "n_nodes=2",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "-v",
+        "multi_choice_var=choice2",
+        "--wf",
+        "test_validation_workload_var",
+        "--overwrite",
+        global_args=global_args,
+    )
+    ws._re_read()
+    # No error when a valid value is given
+    workspace("setup", global_args=global_args)
+
+
+def test_variable_validation_workload_defaults(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    ws = ramble.workspace.create(workspace_name)
+    workspace(
+        "manage",
+        "experiments",
+        "validation",
+        "-v",
+        "n_nodes=2",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "-v",
+        "multi_choice_var2=choice0",
+        "--wf",
+        "test_validation_workload_var_with_workload_defaults",
+        global_args=global_args,
+    )
+    ws._re_read()
+    with pytest.raises(
+        ramble.error.ObjectValidationError,
+        match=r"variable 'multi_choice_var2' \('choice0'\) is not one of the allowed values",
+    ):
+        workspace("setup", global_args=global_args)
+
+
+def test_variable_validation_workload_group(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    ws = ramble.workspace.create(workspace_name)
+    workspace(
+        "manage",
+        "experiments",
+        "validation",
+        "-v",
+        "n_nodes=2",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "-v",
+        "multi_choice_var3=choice0",
+        "--wf",
+        "test_validation_workload_var_with_workload_group",
+        global_args=global_args,
+    )
+    ws._re_read()
+    with pytest.raises(
+        ramble.error.ObjectValidationError,
+        match=r"variable 'multi_choice_var3' \('choice0'\) is not one of the allowed values",
+    ):
+        workspace("setup", global_args=global_args)
+
+
+def test_object_variable_validation(workspace_name, mutable_mock_pkg_mans_repo):
+    global_args = ["-w", workspace_name]
+
+    ws = ramble.workspace.create(workspace_name)
+    workspace(
+        "manage",
+        "experiments",
+        "validation",
+        "-v",
+        "n_nodes=2",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "-v",
+        "obj_multi_choice_var=a",
+        "--wf",
+        "test_validation",
+        "-p",
+        "info",
+        global_args=global_args,
+    )
+    ws._re_read()
+    with pytest.raises(
+        ramble.error.ObjectValidationError,
+        match=r"variable 'obj_multi_choice_var' \('a'\) is not one of the allowed values",
+    ):
+        workspace("setup", global_args=global_args)

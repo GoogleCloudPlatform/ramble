@@ -240,6 +240,30 @@ def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict
     return list(expanded_patterns.keys())
 
 
+def add_variable_validator(obj, var_name, var_values, when_list, wl_name=None):
+    """Adds a validator to an object to ensure a variable's value is in a list of values."""
+    validator_name = f"validate_values_for_{var_name}_obj_{obj.name}"
+
+    predicate = f"'{{{var_name}}}' in {var_values!r}"
+    message = (
+        f"Value of variable '{var_name}' ('{{{var_name}}}') is not one of the allowed values: "
+        f"{var_values}"
+    )
+    new_when_list = when_list.copy()
+    if wl_name is not None:
+        new_when_list.extend([f"workload_name={wl_name}"])
+    when_set = frozenset(new_when_list)
+
+    if when_set not in obj.validators:
+        obj.validators[when_set] = {}
+
+    obj.validators[when_set][validator_name] = {
+        "predicate": predicate,
+        "message": message,
+        "fail_on_invalid": True,
+    }
+
+
 def build_when_list(
     when_arg: Union[str, List[str]], obj: Any, directive_id: str, directive_name: str
 ) -> List[str]:

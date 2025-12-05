@@ -47,7 +47,7 @@ class NcclEnv(BasicModifier):
         "nccl_socket_family",
         default="",
         description="Allows users to force IPv4 or IPv6 interfaces",
-        values=["AF_INET", "AF_INET6"],
+        values=["", "AF_INET", "AF_INET6"],
         modes=["standard"],
     )
 
@@ -68,7 +68,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_cross_nic",
         default="",
-        values=[0, 1, 2],
+        values=["", 0, 1, 2],
         description="Controls whether NCCL should allow rings/trees to use different NICs.",
         modes=["standard"],
     )
@@ -104,7 +104,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_addr_family",
         default="",
-        values=["AF_INET", "AF_INET6"],
+        values=["", "AF_INET", "AF_INET6"],
         description="Defines the IP address family associated to the InfiniBand GID.",
         modes=["standard"],
     )
@@ -140,7 +140,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_return_async_events",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="IB Events are reported to the user as warnings. If enabled NCCL will also stop IB communications upon fatal IB async events.",
         modes=["standard"],
     )
@@ -148,7 +148,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_oob_net_enable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enables the use of NCCL net for out-of-band communications.",
         modes=["standard"],
     )
@@ -212,7 +212,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ignore_cpu_affinity",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Causes NCCL to ignore the job's CPU affinity, and use the GPU affinity only.",
         modes=["standard"],
     )
@@ -227,7 +227,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_debug",
         default="",
-        values=["VERSION", "WARN", "INFO", "TRACE"],
+        values=["", "VERSION", "WARN", "INFO", "TRACE"],
         description="Controls the debug information that is displayed from NCCL",
         modes=["standard"],
     )
@@ -249,7 +249,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_collnet_enable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enable the use of the CollNet plugin",
         modes=["standard"],
     )
@@ -278,7 +278,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_set_thread_name",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Give more meaningful names to NCCL CPU threads to ease debugging and analysis.",
         modes=["standard"],
     )
@@ -286,7 +286,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_p2p_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Disables the peer to peer transport, which uses CUDA direct access between GPUs, using NVLink or PCI.",
         modes=["standard"],
     )
@@ -294,7 +294,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_p2p_level",
         default="",
-        values=["LOC", "NVL", "PIX", "PXB", "PHB", "SYS"],
+        values=["", "LOC", "NVL", "PIX", "PXB", "PHB", "SYS"],
         description="Allows fine control when using the peer to peer transport between GPUs.",
         modes=["standard"],
     )
@@ -302,7 +302,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_p2p_direct_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Forbids NCCL to directly access user buffers through P2P between GPUs.",
         modes=["standard"],
     )
@@ -310,7 +310,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_shm_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Disables the Shared Memory transports.",
         modes=["standard"],
     )
@@ -346,7 +346,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_checks_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Used to disable argument checks on each collective call",
         modes=["standard"],
     )
@@ -354,7 +354,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_check_pointers",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enables checking of the CUDA memory pointers on each collective call.",
         modes=["standard"],
     )
@@ -362,7 +362,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_launch_mode",
         default="",
-        values=["PARALLEL", "GROUP"],
+        values=["", "PARALLEL", "GROUP"],
         description="(Deprecated) Controls how NCCL launches CUDA kernels.",
         modes=["standard"],
     )
@@ -370,7 +370,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Prevents the IB/RoCE transport from being used by NCCL. Forces IP sockets.",
         modes=["standard"],
     )
@@ -392,7 +392,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_split_data_on_qps",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Controls how queue pairs are used when more than one are created.",
         modes=["standard"],
     )
@@ -400,7 +400,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_cuda_support",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Force or disable the use of GPU Direct RDMA. 0 disables GPU Direct RDMA, 1 forces GPU Direct RDMA.",
         modes=["standard"],
     )
@@ -408,7 +408,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_pci_relaxed_ordering",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enables the use of Relaxed Ordering for IB Verbs.",
         modes=["standard"],
     )
@@ -416,7 +416,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_adaptive_routing",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enables the use of Adaptive Routing for IB Verbs.",
         modes=["standard"],
     )
@@ -431,7 +431,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_cumem_enable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="NCCL uses CUDA cuMem* functions to allocate memory",
         modes=["standard"],
     )
@@ -439,7 +439,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_cumem_host_enable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="NCCL uses CUDA cuMem* functions to allocate host memory",
         modes=["standard"],
     )
@@ -447,7 +447,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_net_gdr_level",
         default="",
-        values=["LOC", "PIX", "PXB", "PHB", "SYS"],
+        values=["", "LOC", "PIX", "PXB", "PHB", "SYS"],
         description="Allows fine control over when to use GPU Direct RDMA between a NIC and a GPU.",
         modes=["standard"],
     )
@@ -455,7 +455,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_net_gdr_read",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enables GPU Direct RDMA when sending data as long as the distance is wtihin the GDR Level distance.",
         modes=["standard"],
     )
@@ -463,7 +463,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_net_shared_buffers",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Allows the use of shared buffers for inter-node point-to-point communication.",
         modes=["standard"],
     )
@@ -471,7 +471,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_net_shared_comms",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Reuse the same connections in the context of PXN.",
         modes=["standard"],
     )
@@ -501,6 +501,7 @@ class NcclEnv(BasicModifier):
         "nccl_algo",
         default="",
         values=[
+            "",
             "Tree",
             "Ring",
             "Collnet",
@@ -515,7 +516,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_proto",
         default="",
-        values=["LL", "LL128", "Simple"],
+        values=["", "LL", "LL128", "Simple"],
         description="(Use is Discouraged) Defines which protocol NCCL will use.",
         modes=["standard"],
     )

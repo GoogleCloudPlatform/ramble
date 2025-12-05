@@ -226,6 +226,7 @@ def workload_variable(
     default=None,
     description="",
     values=None,
+    strict: bool = True,
     workload=None,
     workloads=None,
     workload_group=None,
@@ -249,6 +250,8 @@ def workload_variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
+        strict (bool): If True (the default) and values is not None, the variable's value
+                       will be validated against the values list.
         workload (str): Single workload this variable is used in
         workloads (list): List of modes this variable is used in
         workload_group (str): Name of workload group this variable is used in.
@@ -285,6 +288,8 @@ def workload_variable(
         else:
             env_var = None
 
+        validation = strict and values
+
         # If a workload map is passed, handle that.
         if workload_defaults:
             if any([workload, workloads, workload_group, default]):
@@ -306,6 +311,10 @@ def workload_variable(
                 for when_set, app_workloads in app.workloads.items():
                     if wl_name in app_workloads:
                         app.workloads[when_set][wl_name].add_variable(workload_var.copy())
+                        if validation:
+                            ramble.language.language_helpers.add_variable_validator(
+                                app, name, values, when_list, wl_name=wl_name
+                            )
                         if env_var is not None:
                             app.workloads[when_set][wl_name].add_environment_variable(
                                 env_var.copy()
@@ -328,6 +337,10 @@ def workload_variable(
             for wl_name in all_workloads:
                 if wl_name in app_workloads:
                     app.workloads[when_set][wl_name].add_variable(workload_var.copy())
+                    if validation:
+                        ramble.language.language_helpers.add_variable_validator(
+                            app, name, values, when_list, wl_name=wl_name
+                        )
                     if env_var:
                         app.workloads[when_set][wl_name].add_environment_variable(env_var.copy())
 
@@ -349,6 +362,10 @@ def workload_variable(
                     if wl_name in app_workloads:
                         # Apply the variable
                         app.workloads[when_set][wl_name].add_variable(workload_var.copy())
+                        if validation:
+                            ramble.language.language_helpers.add_variable_validator(
+                                app, name, values, when_list, wl_name=wl_name
+                            )
                         if env_var:
                             app.workloads[when_set][wl_name].add_environment_variable(
                                 env_var.copy()

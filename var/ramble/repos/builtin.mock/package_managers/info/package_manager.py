@@ -40,6 +40,21 @@ class Info(PackageManagerBase):
         when=["variant_name=a_variant_val"],
     )
 
+    variable(
+        "loose_obj_multi_choice_var",
+        default="-1",
+        description="A variable that does not validate its value",
+        values=["1", "2", "3"],
+        strict=False,
+    )
+
+    variable(
+        "obj_multi_choice_var",
+        default="1",
+        description="A variable with a prescribed set of values",
+        values=["1", "2", "3"],
+    )
+
     environment_variable(
         "ENV_VAR_NAME",
         value="ENVVARVAL",
@@ -93,7 +108,7 @@ class Info(PackageManagerBase):
 
     register_builtin("builtin_name", required=True)
 
-    def builtin_name():
+    def builtin_name(self):
         return 'echo "builtin"'
 
     register_phase(
