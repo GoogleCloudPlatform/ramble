@@ -456,6 +456,7 @@ class Expander:
         self._math_str_stack = []
 
         self._application_name = None
+        self._application_version = None
         self._workload_name = None
         self._experiment_name = None
 
@@ -499,6 +500,13 @@ class Expander:
             self._application_name = self.expand_var_name(self._keywords.application_name)
 
         return self._application_name
+
+    @property
+    def application_version(self):
+        if not self._application_version:
+            self._application_version = self.expand_var_name(self._keywords.application_version)
+
+        return self._application_version
 
     @property
     def workload_name(self):
@@ -797,11 +805,19 @@ class Expander:
                 reqs = list(reqs)
 
             for req in reqs:
-                exp_req = self.expand_var(
-                    req, extra_vars=extra_vars, merge_used_stage=merge_used_stage
-                )
+                if "@" in req:
+                    variant_name, _ = req.split("@")
+                    version = variant_set.version(variant_name)
+                    if hasattr(version, "satisfies"):
+                        satisfied = satisfied and version.satisfies(req)
+                    else:
+                        satisfied = False
+                else:
+                    exp_req = self.expand_var(
+                        req, extra_vars=extra_vars, merge_used_stage=merge_used_stage
+                    )
 
-                satisfied = satisfied and exp_req in variant_definitions
+                    satisfied = satisfied and exp_req in variant_definitions
         return satisfied
 
     @staticmethod

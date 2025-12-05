@@ -22,7 +22,7 @@ reserved_variants = {
     "workflow_manager",
 }
 
-variant_types = Enum("variant_types", ["default", "experiment"])
+variant_types = Enum("variant_types", ["default", "experiment", "version"])
 
 
 class VariantSet:
@@ -33,6 +33,7 @@ class VariantSet:
         self.default_variants = {}
         self.multi_value_variants = {}
         self.experiment_variants = {}
+        self.version_variants = {}
         self._set_cache = None
 
     def __str__(self):
@@ -61,6 +62,9 @@ class VariantSet:
         for variant in self.experiment_variants.values():
             to_print.append(variant)
 
+        for variant in self.version_variants.values():
+            to_print.append(variant)
+
         if verbose:
             out_str = "\n".join(v.as_str(verbose=True) for v in to_print)
         else:
@@ -83,12 +87,16 @@ class VariantSet:
             for variant in var_list:
                 new_set.multi_value_variants[name].add(variant.copy())
 
+        for name, variant in self.version_variants.items():
+            new_set.version_variants[name] = variant.copy()
+
         return new_set
 
     def merge_variants(self, in_set):
         self.merge_default_variants(in_set)
         self.merge_experiment_variants(in_set)
         self.merge_multi_value_variants(in_set)
+        self.merge_version_variants(in_set)
 
     def merge_default_variants(self, in_set):
         """Merge another variant set's default variants into this variant set.
@@ -127,6 +135,18 @@ class VariantSet:
                 self.multi_value_variants[name] = set()
             for variant in variant_list:
                 self.multi_value_variants[name].add(variant)
+
+    def merge_version_variants(self, in_set):
+        """Merge another variant set's version variants into this variant set.
+
+        Args:
+            in_set: VariantSet to merge into self
+        """
+
+        self._set_cache = None
+        for name, variant in in_set.version_variants.items():
+            if name not in self.version_variants:
+                self.version_variants[name] = variant.copy()
 
     def default_variant(
         self,
@@ -194,6 +214,27 @@ class VariantSet:
 
         self.multi_value_variants[name].add(Variant(name, default=value))
 
+    def version_variant(self, name: str, value: Any):
+        """Define a new version variant within this set.
+
+        Version variants are variants defined within the software section of a workspace's
+        configuration file.
+
+        Args:
+            name: Name of variant
+            default: Default value of the variant
+            description: Description of the variant, and what it's used for
+            values: Set of valid values for the variant
+        """
+
+        self._define_variant(
+            name,
+            variant_type=variant_types.version,
+            default=value,
+            description=None,
+            values=None,
+        )
+
     def _define_variant(
         self,
         name: str,
@@ -223,6 +264,9 @@ class VariantSet:
         elif variant_type == variant_types.default:
             variant_dict = self.default_variants
 
+        elif variant_type == variant_types.version:
+            variant_dict = self.version_variants
+
         else:
             raise RambleVariantError(
                 f"Cannot define variant {name} with unknown variant type of {variant_type}"
@@ -247,6 +291,20 @@ class VariantSet:
 
         if name in self.default_variants:
             return self.default_variants[name].default
+
+        return None
+
+    def version(self, name: str):
+        """Extract the version of the named variant
+
+        Args:
+            name: Name of the variant to determine version of
+
+        Returns:
+            ramble.definitions.versions.ObjectVersion: Version of the variant
+        """
+        if name in self.version_variants:
+            return self.version_variants[name].default
 
         return None
 
@@ -308,6 +366,11 @@ class VariantSet:
         for variant_list in self.multi_value_variants.values():
             for variant in variant_list:
                 out_set.add(variant.as_definition())
+
+        # Version variants are included as strings in the set for completeness, but should be
+        # checked using the stored ObjectVersion class instead of a string comparison.
+        for variant in self.version_variants.values():
+            out_set.add(variant.as_definition())
 
         self._set_cache = out_set
         return self._expanded_set(expander)
