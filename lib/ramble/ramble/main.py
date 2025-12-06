@@ -971,6 +971,9 @@ def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):
     args.workspace_dir = main_args.workspace_dir
     args.workspace = main_args.workspace
     args.no_workspace = main_args.no_workspace
+    args.sorted_profile = main_args.sorted_profile
+    args.lines = main_args.lines
+    args.profile_restrictions = main_args.profile_restrictions
 
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
