@@ -8,7 +8,6 @@
 
 import concurrent.futures
 import fnmatch
-import math
 import os
 import sys
 from enum import Enum
@@ -193,81 +192,6 @@ class ExperimentSet:
             return f"{wl_ns}.{exp_ns}"
         return None
 
-    def _compute_mpi_vars(self, expander, variables):
-        """Compute required MPI variables
-
-        Perform computation of required MPI variables, including:
-        - n_ranks
-        - n_nodes
-        - processes_per_node
-        - n_threads
-        """
-        n_ranks = (
-            variables[self.keywords.n_ranks] if self.keywords.n_ranks in variables.keys() else None
-        )
-        ppn = (
-            variables[self.keywords.processes_per_node]
-            if self.keywords.processes_per_node in variables.keys()
-            else None
-        )
-        n_nodes = (
-            variables[self.keywords.n_nodes] if self.keywords.n_nodes in variables.keys() else None
-        )
-        n_threads = (
-            variables[self.keywords.n_threads]
-            if self.keywords.n_threads in variables.keys()
-            else None
-        )
-
-        def _expand(var):
-            try:
-                return int(var)
-            except ValueError:
-                return int(expander.expand_var(var))
-
-        if n_ranks:
-            n_ranks = _expand(n_ranks)
-            if n_ranks <= 0:
-                logger.error("n_ranks must be positive")
-
-        if ppn:
-            ppn = _expand(ppn)
-            if ppn <= 0:
-                logger.error("processes_per_node must be positive")
-
-        if n_nodes:
-            n_nodes = _expand(n_nodes)
-            if n_nodes <= 0:
-                logger.error("n_nodes must be positive")
-
-        if n_threads:
-            n_threads = _expand(n_threads)
-
-        if n_ranks and ppn:
-            test_n_nodes = math.ceil(n_ranks / ppn)
-
-            if n_nodes and n_nodes < test_n_nodes:
-                logger.error(
-                    f"n_nodes in {self.experiment_namespace} is {n_nodes} "
-                    f"and should be {test_n_nodes}"
-                )
-            elif not n_nodes:
-                logger.debug(f"Defining n_nodes in {self.experiment_namespace}")
-                variables[self.keywords.n_nodes] = test_n_nodes
-        elif n_ranks and n_nodes:
-            ppn = math.ceil(int(n_ranks) / int(n_nodes))
-            logger.debug(f"Defining processes_per_node in {self.experiment_namespace}")
-            variables[self.keywords.processes_per_node] = ppn
-        elif ppn and n_nodes:
-            n_ranks = ppn * n_nodes
-            logger.debug(f"Defining n_ranks in {self.experiment_namespace}")
-            variables[self.keywords.n_ranks] = n_ranks
-        elif not n_nodes:
-            variables[self.keywords.n_nodes] = 1
-
-        if not n_threads:
-            variables[self.keywords.n_threads] = 1
-
     def _setup_experiment_minimal(
         self,
         workload_template_name,
@@ -276,7 +200,6 @@ class ExperimentSet:
     ):
         """Perform minimal setup for an experiment instance."""
         expander = ramble.expander.Expander(variables, self)
-        self._compute_mpi_vars(expander, variables)
 
         final_app_name = expander.expand_var_name(
             self.keywords.application_name, allow_passthrough=False
@@ -291,9 +214,9 @@ class ExperimentSet:
         app_inst = ramble.repository.get(final_app_name)
         app_inst.set_variables_and_variants(variables, context.variants, self)
 
-        app_inst.set_required_variables()
         app_inst.set_active_workload()
         app_inst.set_modifiers(context.modifiers)
+        app_inst.set_required_variables()
         app_inst.set_internals(context.internals)
         app_inst.set_chained_experiments(context.chained_experiments)
         app_inst.set_env_variable_sets(context.env_variables)
@@ -548,7 +471,6 @@ class ExperimentSet:
                     exclude_group, ignore_used=False
                 ):
                     expander = ramble.expander.Expander(exclude_exp_vars, self)
-                    self._compute_mpi_vars(expander, exclude_exp_vars)
                     exclude_exp_name = expander.expand_var(
                         experiment_template_name, allow_passthrough=False
                     )

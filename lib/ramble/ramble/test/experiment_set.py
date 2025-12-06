@@ -822,7 +822,7 @@ def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var)
         assert "is reserved by ramble" in captured
 
 
-def test_missing_required_keyword_errors(mutable_mock_workspace_path, capsys):
+def test_missing_required_keyword_errors(mutable_mock_workspace_path):
     workspace("create", "test")
 
     assert "test" in workspace("list")
@@ -854,10 +854,10 @@ def test_missing_required_keyword_errors(mutable_mock_workspace_path, capsys):
 
         exp_set.set_application_context(application_context)
         exp_set.set_workload_context(workload_context)
-        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+
+        match_str = r"Invalid number of required variables defined"
+        with pytest.raises(ramble.error.ObjectValidationError, match=match_str):
             exp_set.set_experiment_context(experiment_context)
-        captured = capsys.readouterr()
-        assert 'Required key "n_ranks" is not defined' in captured.err
 
 
 def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_path):
