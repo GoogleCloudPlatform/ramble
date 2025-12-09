@@ -1535,6 +1535,50 @@ def test_vector_experiment_with_where_excludes(mutable_mock_workspace_path):
         assert "basic.test_wl.series1_10" in exp_set.experiments.keys()
 
 
+def test_vector_experiment_with_late_where_excludes(workspace_name):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "app_var1": "1",
+            "app_var2": "2",
+            "n_ranks": "{processes_per_node}*{n_nodes}",
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+        workload_context.variables = {"wl_var1": "1", "wl_var2": "2", "processes_per_node": "2"}
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "series1_{n_ranks}"
+        experiment_context.variables = {
+            "exp_var1": "1",
+            "exp_var2": "2",
+            "n_nodes": ["1", "2", "3", "4", "5"],
+        }
+        experiment_context.exclude = {"where": ["{my_base_var} == 0.0"]}
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+        exp_set.build_experiment_chains()
+
+        assert len(exp_set.experiments) == 0
+        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_6" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_8" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+
+
 def test_vector_experiment_with_multi_where_excludes(mutable_mock_workspace_path):
     workspace("create", "test")
 
