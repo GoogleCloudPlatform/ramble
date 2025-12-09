@@ -382,7 +382,15 @@ class ExperimentSet:
 
             # Skip explicitly excluded experiments
             if final_exp_name not in excluded_experiments:
-                processed_experiments.append((app_inst, final_exp_namespace, n == 0))
+                active = True
+                if namespace.where in final_context.exclude:
+                    for expression in final_context.exclude[namespace.where]:
+                        if app_inst.expander.evaluate_predicate(expression):
+                            active = False
+                            break
+
+                if active:
+                    processed_experiments.append((app_inst, final_exp_namespace, n == 0))
         return processed_experiments
 
     def _ingest_experiments(self, die_on_validate_error=True):
