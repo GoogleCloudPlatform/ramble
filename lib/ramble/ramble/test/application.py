@@ -132,9 +132,12 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
     src_inst = mutable_mock_apps_repo.get(app_name)
 
     defined_variables = {
-        "workload_name": wl_name,
+        "n_nodes": "1",
+        "n_ranks": "{processes_per_node}*{n_nodes}",
+        "processes_per_node": "1",
         "test_var1": "test_val1",
         "test_var2": "test_val2",
+        "workload_name": wl_name,
     }
 
     defined_env_vars = [
@@ -532,7 +535,12 @@ ramble:
 
 def test_class_attributes(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get("basic")
-    basic_inst.variables = {"workload_name": "test_wl"}
+    basic_inst.variables = {
+        "n_nodes": "1",
+        "n_ranks": "{processes_per_node}*{n_nodes}",
+        "processes_per_node": "1",
+        "workload_name": "test_wl",
+    }
     basic_clone = basic_inst.clone()
 
     instances = [basic_inst, basic_clone]
