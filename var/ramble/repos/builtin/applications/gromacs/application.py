@@ -59,7 +59,7 @@ class Gromacs(ExecutableApplication):
     executable(
         "execute-gen",
         "{mdrun} {notunepme} -dlb {dlb} "
-        + "{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} "
+        + "{verbose} -resetstep {resetstep} -nsteps {nsteps} "
         + "-s exp_input.tpr {additional_args}",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -67,7 +67,7 @@ class Gromacs(ExecutableApplication):
     executable(
         "execute",
         "{mdrun} {notunepme} -dlb {dlb} "
-        + "{verbose} -resetstep {resetstep} -noconfout -nsteps {nsteps} "
+        + "{verbose} -resetstep {resetstep} -nsteps {nsteps} "
         + "-s {input_path} {additional_args}",
         use_mpi=True,
         output_capture=OUTPUT_CAPTURE.ALL,
@@ -213,7 +213,7 @@ class Gromacs(ExecutableApplication):
 
     workload_variable(
         "additional_args",
-        default="",
+        default="-noconfout",
         description="Additiaonl Exec Args",
         workload_group="all_workloads",
     )
