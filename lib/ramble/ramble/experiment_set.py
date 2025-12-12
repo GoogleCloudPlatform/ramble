@@ -264,6 +264,14 @@ class ExperimentSet:
             (Application): Instance of an application class for this experiment
         """
 
+        experiment_suffix = ""
+        # After generating the base experiment, append the index to repeat experiments
+        if repeats.repeat_index:
+            experiment_suffix = f".{repeats.repeat_index}"
+            variables[self.keywords.repeat_index] = repeats.repeat_index
+        else:
+            variables[self.keywords.repeat_index] = 0
+
         app_inst = self._setup_experiment_minimal(workload_template_name, variables, context)
 
         final_wl_name = app_inst.expander.expand_var_name(
@@ -274,9 +282,13 @@ class ExperimentSet:
         app_inst.repeats = repeats
 
         # Setup experiment name after modifiers are defined
-        final_exp_name = app_inst.expander.expand_var(exp_template_name, allow_passthrough=False)
+        final_exp_name = app_inst.expander.expand_var(
+            exp_template_name + experiment_suffix, allow_passthrough=False
+        )
 
-        app_inst.define_variable(self.keywords.experiment_template_name, exp_template_name)
+        app_inst.define_variable(
+            self.keywords.experiment_template_name, exp_template_name + experiment_suffix
+        )
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
         app_inst.define_variable(
@@ -345,53 +357,31 @@ class ExperimentSet:
     ):
         """Helper to render a base and its repeated experiments, for parallel execution."""
         experiment_vars, repeats = render_item
-
-        base_app_inst = self._prepare_experiment(
-            workload_template_name,
-            experiment_template_name,
-            experiment_vars.copy(),
-            final_context,
-            repeats,
-        )
-
-        if repeats.n_repeats > 0:
-            base_app_inst.repeats.set_repeats(True, repeats.n_repeats)
-        else:
-            base_app_inst.repeats.set_repeats(False, 0)
-
         processed_experiments = []
         # Expand and prepare base and repeated experiments
+        # TODO: Exploit the relationship between base and repeated experiments,
+        # to save up redundant works.
+        # For instance, caching may be enabled for expanders across these experiments.
         for n in range(0, repeats.n_repeats + 1):
-            app_inst = base_app_inst.clone()
-            app_inst.set_modifiers(final_context.modifiers)
-            app_inst.set_chained_experiments(final_context.chained_experiments)
-            app_inst.set_template(final_context.is_template)
-            app_inst.set_env_variable_sets(final_context.env_variables)
-            app_inst.set_tags(final_context.tags)
+            cur_repeats = ramble.repeats.Repeats()
             if repeats.is_repeat_base:
                 if n == 0:
-                    app_inst.repeats.set_repeats(True, repeats.n_repeats)
+                    cur_repeats.set_repeats(True, repeats.n_repeats)
                 else:
-                    app_inst.repeats.set_repeat_index(n)
-                    app_inst.define_variable(
-                        self.keywords.experiment_name,
-                        base_app_inst.variables[self.keywords.experiment_name] + f".{n}",
-                    )
-                    app_inst.define_variable(
-                        self.keywords.experiment_namespace,
-                        base_app_inst.variables[self.keywords.experiment_namespace] + f".{n}",
-                    )
+                    cur_repeats.set_repeat_index(n)
+
+            app_inst = self._prepare_experiment(
+                workload_template_name,
+                experiment_template_name,
+                experiment_vars.copy(),
+                final_context,
+                cur_repeats,
+            )
+
             final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
             final_exp_namespace = app_inst.expander.expand_var_name(
                 self.keywords.experiment_namespace
             )
-
-            try:
-                app_inst.validate_experiment(warn_validation=True, die_on_validate_error=True)
-            except ramble.keywords.RambleKeywordError as e:
-                raise RambleVariableDefinitionError(
-                    f"In experiment {final_exp_namespace}: {e}"
-                ) from None
 
             # Skip explicitly excluded experiments
             if final_exp_name not in excluded_experiments:
