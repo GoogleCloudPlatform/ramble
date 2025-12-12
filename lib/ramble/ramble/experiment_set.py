@@ -12,7 +12,6 @@ import os
 import sys
 from enum import Enum
 from functools import partial
-from typing import Set
 
 import ramble.context
 import ramble.error
@@ -147,9 +146,7 @@ class ExperimentSet:
 
         self._set_context(self._contexts.workload, workload_context)
 
-    def set_experiment_context(
-        self, experiment_context, die_on_validate_error=True, chained=False
-    ) -> list:
+    def set_experiment_context(self, experiment_context, die_on_validate_error=True):
         """Set up current experiment context"""
 
         try:
@@ -159,9 +156,7 @@ class ExperimentSet:
             raise RambleVariableDefinitionError(f"In experiment {namespace}: {e}") from None
 
         self._set_context(self._contexts.experiment, experiment_context)
-        return self._ingest_experiments(
-            die_on_validate_error=die_on_validate_error, chained=chained
-        )
+        self._ingest_experiments(die_on_validate_error=die_on_validate_error)
 
     @property
     def application_namespace(self):
@@ -218,6 +213,7 @@ class ExperimentSet:
         # Setup the application instance
         app_inst = ramble.repository.get(final_app_name)
         app_inst.set_variables_and_variants(variables, context.variants, self)
+
         app_inst.set_active_workload()
         app_inst.set_modifiers(context.modifiers)
         app_inst.set_required_variables()
@@ -264,6 +260,14 @@ class ExperimentSet:
             (Application): Instance of an application class for this experiment
         """
 
+        experiment_suffix = ""
+        # After generating the base experiment, append the index to repeat experiments
+        if repeats.repeat_index:
+            experiment_suffix = f".{repeats.repeat_index}"
+            variables[self.keywords.repeat_index] = repeats.repeat_index
+        else:
+            variables[self.keywords.repeat_index] = 0
+
         app_inst = self._setup_experiment_minimal(workload_template_name, variables, context)
 
         final_wl_name = app_inst.expander.expand_var_name(
@@ -274,9 +278,13 @@ class ExperimentSet:
         app_inst.repeats = repeats
 
         # Setup experiment name after modifiers are defined
-        final_exp_name = app_inst.expander.expand_var(exp_template_name, allow_passthrough=False)
+        final_exp_name = app_inst.expander.expand_var(
+            exp_template_name + experiment_suffix, allow_passthrough=False
+        )
 
-        app_inst.define_variable(self.keywords.experiment_template_name, exp_template_name)
+        app_inst.define_variable(
+            self.keywords.experiment_template_name, exp_template_name + experiment_suffix
+        )
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
         app_inst.define_variable(
@@ -307,6 +315,7 @@ class ExperimentSet:
             app_inst.define_variable(name, value)
 
         app_inst.define_variables_for_template_path(self._workspace)
+        app_inst.read_status()
 
         experiment_namespace = app_inst.expander.experiment_namespace
         app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
@@ -345,53 +354,31 @@ class ExperimentSet:
     ):
         """Helper to render a base and its repeated experiments, for parallel execution."""
         experiment_vars, repeats = render_item
-
-        base_app_inst = self._prepare_experiment(
-            workload_template_name,
-            experiment_template_name,
-            experiment_vars.copy(),
-            final_context,
-            repeats,
-        )
-
-        if repeats.n_repeats > 0:
-            base_app_inst.repeats.set_repeats(True, repeats.n_repeats)
-        else:
-            base_app_inst.repeats.set_repeats(False, 0)
-
         processed_experiments = []
         # Expand and prepare base and repeated experiments
+        # TODO: Exploit the relationship between base and repeated experiments,
+        # to save up redundant works.
+        # For instance, caching may be enabled for expanders across these experiments.
         for n in range(0, repeats.n_repeats + 1):
-            app_inst = base_app_inst.clone()
-            app_inst.set_modifiers(final_context.modifiers)
-            app_inst.set_chained_experiments(final_context.chained_experiments)
-            app_inst.set_template(final_context.is_template)
-            app_inst.set_env_variable_sets(final_context.env_variables)
-            app_inst.set_tags(final_context.tags)
+            cur_repeats = ramble.repeats.Repeats()
             if repeats.is_repeat_base:
                 if n == 0:
-                    app_inst.repeats.set_repeats(True, repeats.n_repeats)
+                    cur_repeats.set_repeats(True, repeats.n_repeats)
                 else:
-                    app_inst.repeats.set_repeat_index(n)
-                    app_inst.define_variable(
-                        self.keywords.experiment_name,
-                        base_app_inst.variables[self.keywords.experiment_name] + f".{n}",
-                    )
-                    app_inst.define_variable(
-                        self.keywords.experiment_namespace,
-                        base_app_inst.variables[self.keywords.experiment_namespace] + f".{n}",
-                    )
+                    cur_repeats.set_repeat_index(n)
+
+            app_inst = self._prepare_experiment(
+                workload_template_name,
+                experiment_template_name,
+                experiment_vars.copy(),
+                final_context,
+                cur_repeats,
+            )
+
             final_exp_name = app_inst.expander.expand_var_name(self.keywords.experiment_name)
             final_exp_namespace = app_inst.expander.expand_var_name(
                 self.keywords.experiment_namespace
             )
-
-            try:
-                app_inst.validate_experiment(warn_validation=True, die_on_validate_error=True)
-            except ramble.keywords.RambleKeywordError as e:
-                raise RambleVariableDefinitionError(
-                    f"In experiment {final_exp_namespace}: {e}"
-                ) from None
 
             # Skip explicitly excluded experiments
             if final_exp_name not in excluded_experiments:
@@ -403,60 +390,20 @@ class ExperimentSet:
                             break
 
                 if active:
-                    app_inst.read_status()
                     processed_experiments.append((app_inst, final_exp_namespace, n == 0))
         return processed_experiments
 
-    def render_chained_experiments(self, app_name, workload_name, experiment_context) -> list:
-        """Render a set of experiments into the chained experiment set.
-
-        This method will render a new set of experiments for a given app (input
-        with app_name) and workload (input with workload_name, but could be
-        an indirect variable reference). It takes a context object for the
-        experiment, and will process any vectors and matrices to create
-        multiple experiments.
-
-        These are added to this experiment set's chained_experiments list,
-        rather than the base experiments list. Upon completion, all rendered
-        experiment instances are returned in a list, to allow further
-        processing. For example, if one wants to render chained experiments
-        from the child experiment.
-
-        Args:
-            app_name (str): Name of application to render experiments for
-            workload_name (str): Name, or template, of workload(s) to render
-                                 experiments for
-            experiment_context (ramble.context.Context): Context object for the
-                                                         set of experiments to render
-
-        Returns:
-            (list): List of application instances from the rendered set of experiments
-        """
-        app_context = ramble.context.Context()
-        app_context.context_name = app_name
-
-        wl_context = ramble.context.Context()
-        wl_context.context_name = workload_name
-        self.set_application_context(app_context)
-        self.set_workload_context(wl_context)
-        return self.set_experiment_context(experiment_context, chained=True)
-
-    def _ingest_experiments(self, die_on_validate_error=True, chained=False) -> list:
+    def _ingest_experiments(self, die_on_validate_error=True):
         """Ingest experiments based on the current context.
 
         Merge all contexts, and render individual experiments. Track these
         experiments within this experiment set.
 
         Args:
-            die_on_validated_error (bool): Whether rendering should kill
-                                           execution when validation errors are
-                                           encountered or not
-            chained (bool): Whether the rendered experiments should be added to
-                            the chained experiments list, or the base
-                            experiments list.
+            None
 
         Returns:
-            (list): List of application instances that are rendered
+            None
         """
 
         no_var_contexts = [
@@ -549,7 +496,7 @@ class ExperimentSet:
         tracking_group.n_repeats = final_context.n_repeats
         tracking_group.used_variables = set()
 
-        used_variables: Set[str] = set()
+        used_variables = set()
         for tracking_vars, _ in renderer.render_objects(
             tracking_group, exclude_where=exclude_where, ignore_used=False, fatal=False
         ):
@@ -564,7 +511,6 @@ class ExperimentSet:
 
         workload_names = set()
         rendered_experiments = set()
-        rendered_instances = []
 
         render_list = renderer.render_objects(render_group, exclude_where=exclude_where)
 
@@ -647,21 +593,13 @@ class ExperimentSet:
 
             workload_names.add(app_inst.expander.workload_name)
 
-            app_inst.define_variable(
-                self.keywords.experiment_index,
-                len(self.experiments) + len(self.chained_experiments) + 1,
-            )
+            app_inst.define_variable(self.keywords.experiment_index, len(self.experiments) + 1)
             app_inst.set_success_list(final_context.success_criteria)
             rendered_experiments.add(final_exp_namespace)
-            rendered_instances.append(app_inst)
-            if not chained:
-                self.experiments[final_exp_namespace] = app_inst
-                self.experiment_order.append(final_exp_namespace)
-            else:
-                self.add_chained_experiment(app_inst.expander.experiment_name, app_inst)
+            self.experiments[final_exp_namespace] = app_inst
+            self.experiment_order.append(final_exp_namespace)
 
         self.define_scoped_tables(workload_names, experiment_template_name)
-        return rendered_instances
 
     def define_scoped_tables(self, workload_names, experiment_template_name):
         # Generate focused tables for results
