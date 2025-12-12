@@ -651,19 +651,53 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
 
-        while True:
-            missing_vars = {}
-            for _, obj in self._objects():
-                for var, val in obj.selected_variables.items():
-                    # Check for its presence in missing_vars, for the "first-defined-wins" semantic
-                    if var not in self.variables and var not in missing_vars:
-                        missing_vars[var] = val.default
+        # Process the application variables that are missing
+        for var, val in self.selected_variables.items():
+            if var not in self.variables:
+                self.define_variable(var, val.default)
 
-            if not missing_vars:
+        # Extract a merged set of when_keys from objects that are not
+        # applications.
+        object_when_map = {}
+        for _, obj in self._objects(
+            exclude_types=[ramble.repository.ObjectTypes.applications]
+        ):
+            object_when_map[obj] = []
+
+            for when_key, var_list in obj.object_variables.items():
+                keep = False
+                for var in var_list:
+                    if var.name not in self.variables:
+                        keep = True
+
+                if keep:
+                    object_when_map[obj].append(when_key)
+
+            if not object_when_map[obj]:
+                object_when_map.pop(obj, None)
+
+        while True:
+            to_define = {}
+            # Process any missing variables from other objects
+            for obj, when_keys in object_when_map.items():
+                to_remove = set()
+                for when_key in when_keys:
+                    if obj.satisfy_when(when_key):
+                        to_remove.add(when_key)
+                        for var in obj.object_variables[when_key]:
+                            if var.name not in self.variables:
+                                to_define[var.name] = var.default
+
+                # Remove any satisfied when_keys, as we won't need to check
+                # them (since their variables have already been defined).
+                for when_key in to_remove:
+                    when_keys.remove(when_key)
+
+            if not to_define:
                 break
 
-            for var, default_val in missing_vars.items():
-                self.define_variable(var, default_val)
+            for var, val in to_define.items():
+                self.define_variable(var, val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
