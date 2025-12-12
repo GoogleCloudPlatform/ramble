@@ -247,6 +247,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         new_clone.set_template(False)
         new_clone.repeats.set_repeats(False, 0)
         new_clone.set_chained_experiments(None)
+        new_clone.set_required_variables()
 
         return new_clone
 
@@ -3274,6 +3275,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def get_status(self):
         """Get the status of this experiment"""
+        if self.keywords.experiment_status not in self.variables:
+            self.read_status()
+
         return self.variables[self.keywords.experiment_status]
 
     def get_ramble_status(self):
