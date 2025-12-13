@@ -640,10 +640,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             cleaned_variables.pop(key, None)
 
         for template_name, _ in workspace.all_templates():
-            cleaned_variables.pop(key, None)
+            cleaned_variables.pop(template_name, None)
 
         for _, tpl_config in self._object_templates(workspace):
-            cleaned_variables.pop(key, None)
+            cleaned_variables.pop(tpl_config["var_name"], None)
 
         return cleaned_variables
 
