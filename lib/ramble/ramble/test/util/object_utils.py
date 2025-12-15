@@ -32,7 +32,9 @@ from ramble.util import object_utils
         (["non-existent"], True, []),
     ],
 )
-def test_filter_by_name(mutable_mock_apps_repo, patterns, search_description, expected):
+def test_filter_by_name(
+    mutable_mock_apps_repo, mutable_mock_base_apps_repo, patterns, search_description, expected
+):
     assert (
         object_utils.filter_by_name(
             patterns, search_description, ramble.repository.ObjectTypes.applications
