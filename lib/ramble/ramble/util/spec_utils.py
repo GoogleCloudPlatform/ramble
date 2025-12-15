@@ -76,7 +76,7 @@ class SoftwareSpec:
         base_indent = " " * n_indent
         indentation = " " * (n_indent + 4)
         self_dict = self.to_dict()
-        color_name = ramble.util.colors.section_title(self.name)
+        color_name = ramble.util.colors.section_title(self.name.replace("@", "@@"))
         output = f"{base_indent}{color_name}:\n"
         for key, val in self_dict.items():
             color_key = ramble.util.colors.nested_1(key)
@@ -85,7 +85,7 @@ class SoftwareSpec:
         if self.when:
             output += ramble.util.colors.nested_2(f"\n{indentation}When:\n")
             for condition in self.when:
-                output += f"{indentation}    {condition}\n"
+                output += f"{indentation}    {condition}\n".replace("@", "@@")
         return output
 
     def __str__(self):

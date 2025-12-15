@@ -214,10 +214,10 @@ class ExperimentSet:
         # to ensure variables and variants can be defined correctly.
         variables[self.keywords.workload_template_name] = workload_template_name
         variables[self.keywords.application_name] = final_app_name
-
         # Setup the application instance
-        app_inst = ramble.repository.get(final_app_name)
+        app_inst = ramble.repository.get(final_app_name.partition("@")[0])
         app_inst.set_variables_and_variants(variables, context.variants, self)
+        app_inst.validate_version()
         app_inst.set_active_workload()
         app_inst.set_modifiers(context.modifiers)
         app_inst.set_required_variables()

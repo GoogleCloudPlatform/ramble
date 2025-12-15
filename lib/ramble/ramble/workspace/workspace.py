@@ -401,7 +401,7 @@ def _get_all_obj_var_names(obj, obj_type):
     else:
         obj_name = obj
     try:
-        obj_inst = ramble.repository.get(obj_name, object_type=obj_type)
+        obj_inst = ramble.repository.get(obj_name.partition("@")[0], object_type=obj_type)
     except ramble.repository.UnknownObjectError:
         return set()
     vars = list(itertools.chain.from_iterable(obj_inst.object_variables.values()))
@@ -846,18 +846,6 @@ ramble:
         self._previous_active = None  # previously active environment
         self.specs = []
 
-    def all_specs(self):
-        import ramble.spec
-
-        specs = []
-        for app, workloads, *_ in self.all_applications():
-            for workload, *_ in self.all_workloads(workloads):
-                app_spec = ramble.spec.Spec(app)
-                app_spec.workloads[workload] = True
-                specs.append(app_spec)
-
-        return specs
-
     @property
     def all_experiments_path(self):
         return os.path.join(self.root, WORKSPACE_ALL_EXPERIMENTS_FILE)
@@ -899,6 +887,10 @@ ramble:
         app_dict = ramble.config.config.get_config(namespace.application)
 
         for application, contents in app_dict.items():
+            app_name, _, maybe_version = application.partition("@")
+            if maybe_version:
+                contents[namespace.version] = maybe_version
+
             application_context = ramble.context.create_context_from_dict(application, contents)
 
             yield contents, application_context
@@ -1241,7 +1233,8 @@ ramble:
         workspace_vars = self.get_workspace_vars()
         apps_dict = self.get_applications().copy()
 
-        app_inst = ramble.repository.get(application)
+        app_inst = ramble.repository.get(application.partition("@")[0])
+        app_inst.validate_version()
 
         var_def_dict = {}
         def_regex = re.compile(r"\s*=\s*")

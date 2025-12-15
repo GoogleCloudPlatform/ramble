@@ -49,7 +49,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
             "test_workload",
         ]
         if package_manager == "user-managed":
-            app_inst = ramble.repository.get(application)
+            app_inst = ramble.repository.get(application.partition("@")[0])
             for pkg in app_inst.required_packages.keys():
                 args.append("-v")
                 args.append(f"{pkg}_path='/not/real/path'")
@@ -128,7 +128,8 @@ def test_known_workflow_managers(
         if workflow_manager != "None":
             ws._re_read()
             wm_inst = ramble.repository.get(
-                workflow_manager, object_type=ramble.repository.ObjectTypes.workflow_managers
+                workflow_manager.partition("@")[0],
+                object_type=ramble.repository.ObjectTypes.workflow_managers,
             )
             for var in wm_inst.object_variables[frozenset()]:
                 config("remove", f"variables:{var.name}", global_args=["-w", workspace_name])

@@ -156,6 +156,7 @@ config_defaults = {
         "workspace_dirs": "$ramble/var/ramble/workspaces",
         "upload": {"push_failed": True},
         "report_dirs": "~/.ramble/reports",
+        "enable_strict_versions": True,
     }
 }
 

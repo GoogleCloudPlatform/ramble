@@ -23,7 +23,9 @@ workspace = RambleCommand("workspace")
 
 
 def _get_package_manager(pm_name: str = "spack"):
-    return ramble.repository.get(pm_name, ramble.repository.ObjectTypes.package_managers).copy()
+    return ramble.repository.get(
+        pm_name.partition("@")[0], ramble.repository.ObjectTypes.package_managers
+    ).copy()
 
 
 def test_basic_software_environment(request, mutable_mock_workspace_path):

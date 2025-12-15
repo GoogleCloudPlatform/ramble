@@ -432,7 +432,9 @@ class SoftwareEnvironment:
 
         indentation = " " * indent
         color = rucolor.level_func(color_level)
-        out_str = color(f"{indentation}{self._environment_type} environment: {self.name}\n")
+        out_str = color(
+            f"{indentation}{self._environment_type} environment: {self.name.replace('@', '@@')}\n"
+        )
 
         if self._packages:
             indentation = " " * (indent + SUB_INDENT)
@@ -440,9 +442,9 @@ class SoftwareEnvironment:
 
         for pkg in self._packages:
             if verbosity >= 1:
-                out_str += f'{indentation}- {pkg.name} = {pkg.spec_str().replace("@", "@@")}\n'
+                out_str += f"{indentation}- {pkg.name} = {pkg.spec_str()}\n".replace("@", "@@")
             else:
-                out_str += f"{indentation}- {pkg.name}\n"
+                out_str += f"{indentation}- {pkg.name}\n".replace("@", "@@")
         return out_str
 
     def __str__(self):

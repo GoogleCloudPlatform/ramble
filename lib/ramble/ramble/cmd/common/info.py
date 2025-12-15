@@ -32,6 +32,7 @@ obj_attribute_map = {
     "required_packages": None,
     "object_variants": None,
     "compilers": None,
+    "known_versions": None,
     "software_specs": None,
     "archive_patterns": None,
     "success_criteria": None,
@@ -417,7 +418,7 @@ def print_info(args):
 
     object_type = ramble.repository.ObjectTypes[args.type]
     obj_name = args.object
-    obj = ramble.repository.get(obj_name, object_type=object_type)
+    obj = ramble.repository.get(obj_name.partition("@")[0], object_type=object_type)
 
     print_object_header(object_type, obj)
 

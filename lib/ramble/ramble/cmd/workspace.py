@@ -883,10 +883,12 @@ def workspace_info(args):
 
                     if print_header:
                         color.cprint(
-                            rucolor.nested_1("  Application: ") + application_context.context_name
+                            rucolor.nested_1("  Application: ")
+                            + application_context.context_name.replace("@", "@@")
                         )
                         color.cprint(
-                            rucolor.nested_2("    Workload: ") + workload_context.context_name
+                            rucolor.nested_2("    Workload: ")
+                            + workload_context.context_name.replace("@", "@@")
                         )
                         print_header = False
 
@@ -913,7 +915,8 @@ def workspace_info(args):
                         )
                     else:
                         color.cprint(
-                            rucolor.nested_3(f"      Experiment {experiment_index}: ") + exp_name
+                            rucolor.nested_3(f"      Experiment {experiment_index}: ")
+                            + exp_name.replace("@", "@@")
                         )
 
                     if args.tags:

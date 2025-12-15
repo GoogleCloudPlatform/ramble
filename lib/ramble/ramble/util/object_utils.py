@@ -49,7 +49,7 @@ def _match(obj_name, pattern, search_description, obj_type):
         return True
     if not search_description:
         return False
-    obj = ramble.repository.get(obj_name, object_type=obj_type)
+    obj = ramble.repository.get(obj_name.partition("@")[0], object_type=obj_type)
     if obj.__doc__:
         return pattern.match(obj.__doc__)
     return False

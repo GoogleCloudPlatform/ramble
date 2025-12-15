@@ -10,6 +10,8 @@ import os
 from html import escape
 from typing import List
 
+import ramble.config
+from ramble.error import ObjectValidationError
 from ramble.repository import ObjectTypes
 from ramble.util import format
 from ramble.util.logger import logger
@@ -87,6 +89,48 @@ class ObjectMixin:
         app_inst = self._get_app_inst()
         experiment_variants = self.experiment_variants()
         return app_inst.expander.satisfies(when_key, experiment_variants)
+
+    def validate_version(self):
+        """Checks if the current version is registered in the application definition. Can be
+        disabled using config:enable_strict_versions:false.
+        """
+
+        global_strict = ramble.config.get("config:enable_strict_versions")
+        obj_strict = True
+        if hasattr(self, "enable_strict_versions"):
+            obj_strict = self.enable_strict_versions
+
+        if not global_strict or not obj_strict:
+            return
+
+        current_ver = self.object_variants.version(
+            f"{self.origin_type}_version"
+        )
+
+        if current_ver:
+            for known_version in self.known_versions.values():
+                if current_ver.get_version() == known_version.get_version():
+                    return
+            raise ObjectValidationError(
+                f"The current version {current_ver.get_version()} is not defined in the "
+                f"{self.origin_type}.py. You must select from defined versions. Set "
+                "config:enable_strict_versions:false to disable strict version checking."
+            )
+
+    def set_version(self, version):
+        """Set the version of this object.
+
+        args:
+            version (ramble.definitions.versions.ObjectVersion): Version to set
+        """
+        self.object_variants.version_variant(
+            f"{self.origin_type}_version", version
+        )
+        app_inst = self._get_app_inst()
+        if app_inst and hasattr(app_inst, "define_variable"):
+            app_inst.define_variable(
+                f"{self.origin_type}_version", str(version)
+            )
 
     def experiment_variants(
         self, include_modifier=None, allow_caching=True, app_inst=None

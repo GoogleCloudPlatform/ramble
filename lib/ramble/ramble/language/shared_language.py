@@ -14,6 +14,7 @@ import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
 import ramble.variants
+from ramble.definitions.versions import ObjectVersion
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.spec_utils import SoftwareSpec
@@ -998,6 +999,61 @@ def variant(
         obj.class_variants[name] = args_dict
 
     return _define_variant
+
+
+@shared_directive("known_versions")
+def version(
+    number: str,
+    description: str = "",
+    preferred: bool = False,
+    **kwargs,
+):
+    """Define a new version in the input object
+
+    Args:
+        number: Version number (Python packaging version format)
+        description: Description of this version
+        preferred: Mark this version as preferred. Only one version can be preferred.
+    """
+
+    def _define_version(obj):
+        new_version = ObjectVersion(
+            version_number=number,
+            description=description,
+            origin_type=obj.origin_type,
+            preferred=preferred
+        )
+
+        # Ensure only one version is marked as preferred
+        if new_version.preferred:
+            if not hasattr(obj, "preferred_version"):
+                obj.preferred_version = new_version
+            elif obj.preferred_version.version == new_version.version:
+                # Ignore identical preferred versions, which happens when app is subclassed
+                pass
+            else:
+                raise ramble.language.language_base.DirectiveError(
+                    f"Object {obj.name} already has a preferred version "
+                    f"({obj.preferred_version.version}). Only one version can be marked preferred."
+                )
+        obj.known_versions[number] = new_version
+
+    return _define_version
+
+
+@shared_directive(dicts=())
+def strict_versions(strict: bool = True, **kwargs):
+    """Directive to specify if the object has strict versioning.
+    If true, only known versions can be used in experiments.
+
+    Args:
+        strict (bool): Whether strict versioning is enabled.
+    """
+
+    def _execute_strict_versions(obj):
+        obj.enable_strict_versions = strict
+
+    return _execute_strict_versions
 
 
 @shared_directive("required_vars")
