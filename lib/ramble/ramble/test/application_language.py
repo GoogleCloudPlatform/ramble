@@ -507,6 +507,8 @@ def test_non_reserved_variables(app_class):
         "workspace_name": "reserved_value",
         "user_var2": "value2",
         "n_nodes": "reserved_value2",
+        "template1": "path1",
+        "tpl_var_name": "template_value",
     }
 
     # Mock the workspace object
