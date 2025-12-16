@@ -127,7 +127,8 @@ class OrderedLineLoader(RoundTripLoader):
         # so this assumes we are talking about a Spack config override key if
         # it ends with a ':' and does not contain a '@' (which can appear
         # in config values that refer to Spack specs)
-        if value and value.endswith(':') and '@' not in value:
+        # and is not quoted (identified by a non-empty node.style)
+        if value and value.endswith(':') and '@' not in value and not node.style:
             value = syaml_str(value[:-1])
             value.override = True
         else:
