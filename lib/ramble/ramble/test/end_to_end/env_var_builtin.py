@@ -42,7 +42,7 @@ ramble:
                 n_nodes: 1
               env_vars:
                 set:
-                  MY_VAR: 'TEST'
+                  MY_VAR: 'TEST:'
         test_wl2:
           experiments:
             simple_test:
@@ -50,7 +50,7 @@ ramble:
                 n_nodes: 1
               env_vars:
                 set:
-                  MY_VAR: 'TEST'
+                  MY_VAR: 'TEST:'
         test_wl3:
           experiments:
             simple_test:
@@ -58,7 +58,7 @@ ramble:
                 n_nodes: 1
               env_vars:
                 set:
-                  MY_VAR: 'TEST'
+                  MY_VAR: 'TEST:'
   software:
     packages: {}
     environments: {}
@@ -82,7 +82,7 @@ ramble:
         exp3_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl3", "simple_test")
         exp3_script = os.path.join(exp3_dir, "execute_experiment")
 
-        export_regex = re.compile(r"export MY_VAR=TEST")
+        export_regex = re.compile(r"export MY_VAR=TEST:")
         cmd1_regex = re.compile("bar >>")
         cmd2_regex = re.compile("baz >>")
         cmd3_regex = re.compile("foo >>")
