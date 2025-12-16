@@ -225,7 +225,7 @@ class Wrfv4(ExecutableApplication):
     with when("+wrf_tiles"):
         workload_variable(
             "num_tiles",
-            environment_variable_name="NUM_WRF_TILES",
+            environment_variable_name="WRF_NUM_TILES",
             default="1",
             description="Number of tiles to use in WRF domain",
             workload_group="all_workloads",
