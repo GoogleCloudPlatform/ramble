@@ -2490,236 +2490,222 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             context_string = context_format.format(**context_val)
             return context_string
 
-        if not self.result.read_cache(workspace, self):
-            criteria_list = self.success_list
-            if not criteria_list:
-                criteria_list = ramble.success_criteria.ScopedCriteriaList()
-            criteria_list.reset()
+        # Exit early if read from cache works.
+        if self.result.read_cache(workspace, self):
+            self.result.finalize(workspace)
+            return
 
-            files, f_defs, inmem_defs = self._analysis_dicts(criteria_list)
+        criteria_list = self.success_list
+        if not criteria_list:
+            criteria_list = ramble.success_criteria.ScopedCriteriaList()
+        criteria_list.reset()
 
-            exp_lock = self.experiment_lock
+        files, f_defs, inmem_defs = self._analysis_dicts(criteria_list)
 
-            fom_values = {}
-            # Iterate over files. We already know they exist
-            with lk.ReadTransaction(exp_lock):
-                for file, file_conf in files.items():
+        exp_lock = self.experiment_lock
 
-                    # Start with no active contexts in a file.
-                    active_contexts = {}
-                    logger.debug(f"Reading log file: {file}")
+        fom_values = {}
+        # Iterate over files. We already know they exist
+        with lk.ReadTransaction(exp_lock):
+            for file, file_conf in files.items():
 
-                    if not os.path.exists(file):
-                        logger.debug(
-                            f"Skipping analysis of non-existent file: {file}"
-                        )
-                        continue
+                # Start with no active contexts in a file.
+                active_contexts = {}
+                logger.debug(f"Reading log file: {file}")
 
-                    per_file_crit_objs = [
-                        criteria_list.find_criteria(c)
-                        for c in file_conf["success_criteria"]
-                    ]
+                if not os.path.exists(file):
+                    logger.debug(
+                        f"Skipping analysis of non-existent file: {file}"
+                    )
+                    continue
 
-                    with open(file) as f:
-                        for line in f.readlines():
-                            new_per_file_crit_objs = []
-                            for crit_obj in per_file_crit_objs:
-                                if crit_obj.passed(line, self):
-                                    crit_obj.mark_found()
-                                elif crit_obj.anti_matched(line):
-                                    crit_obj.mark_anti_found()
-                                else:
-                                    new_per_file_crit_objs.append(crit_obj)
-                            per_file_crit_objs = new_per_file_crit_objs
+                per_file_crit_objs = [
+                    criteria_list.find_criteria(c)
+                    for c in file_conf["success_criteria"]
+                ]
 
-                            # Iterate over contexts and add matched contexts to active_contexts
-                            for context, foms in file_conf["contexts"].items():
-                                if not context == _NULL_CONTEXT:
-                                    context_conf = f_defs[context][
-                                        "definition"
-                                    ]
-                                    context_match = context_conf[
-                                        "regex"
-                                    ].match(line)
+                with open(file) as f:
+                    for line in f.readlines():
+                        new_per_file_crit_objs = []
+                        for crit_obj in per_file_crit_objs:
+                            if crit_obj.passed(line, self):
+                                crit_obj.mark_found()
+                            elif crit_obj.anti_matched(line):
+                                crit_obj.mark_anti_found()
+                            else:
+                                new_per_file_crit_objs.append(crit_obj)
+                        per_file_crit_objs = new_per_file_crit_objs
 
-                                    if context_match:
-                                        context_name = format_context(
-                                            context_match,
-                                            context_conf["format"],
+                        # Iterate over contexts and add matched contexts to active_contexts
+                        for context, foms in file_conf["contexts"].items():
+                            if not context == _NULL_CONTEXT:
+                                context_conf = f_defs[context]["definition"]
+                                context_match = context_conf["regex"].match(
+                                    line
+                                )
+
+                                if context_match:
+                                    context_name = format_context(
+                                        context_match,
+                                        context_conf["format"],
+                                    )
+                                    logger.debug("Line was: %s" % line)
+                                    logger.debug(
+                                        f" Context match {context} -- {context_name}"
+                                    )
+
+                                    active_contexts[context] = context_name
+
+                                    if context_name not in fom_values:
+                                        fom_values[context_name] = {}
+
+                            for fom in foms:
+                                fom_conf = f_defs[context]["foms"][fom]
+                                fom_match = fom_conf["regex"].match(line)
+
+                                if fom_match:
+                                    fom_vars = {}
+                                    for (
+                                        k,
+                                        v,
+                                    ) in fom_match.groupdict().items():
+                                        fom_vars[k] = v
+                                    if (
+                                        fom_conf["fom_name_expanded"]
+                                        is not None
+                                    ):
+                                        fom_name = fom_conf[
+                                            "fom_name_expanded"
+                                        ]
+                                    else:
+                                        fom_name = self.expander.expand_var(
+                                            fom, extra_vars=fom_vars
                                         )
-                                        logger.debug("Line was: %s" % line)
+
+                                    if (
+                                        fom_conf["group"]
+                                        in fom_conf["regex"].groupindex
+                                    ):
                                         logger.debug(
-                                            f" Context match {context} -- {context_name}"
+                                            " --- Matched fom %s" % fom_name
                                         )
-
-                                        active_contexts[context] = context_name
-
-                                        if context_name not in fom_values:
-                                            fom_values[context_name] = {}
-
-                                for fom in foms:
-                                    fom_conf = f_defs[context]["foms"][fom]
-                                    fom_match = fom_conf["regex"].match(line)
-
-                                    if fom_match:
-                                        fom_vars = {}
-                                        for (
-                                            k,
-                                            v,
-                                        ) in fom_match.groupdict().items():
-                                            fom_vars[k] = v
-                                        if (
-                                            fom_conf["fom_name_expanded"]
-                                            is not None
-                                        ):
-                                            fom_name = fom_conf[
-                                                "fom_name_expanded"
-                                            ]
-                                        else:
-                                            fom_name = (
-                                                self.expander.expand_var(
-                                                    fom, extra_vars=fom_vars
+                                        fom_contexts = []
+                                        # if a FOM has contexts, check if each is active
+                                        if fom_conf["contexts"]:
+                                            for _ in fom_conf["contexts"]:
+                                                context_name = (
+                                                    active_contexts[context]
+                                                    if context
+                                                    in active_contexts
+                                                    else _NULL_CONTEXT
                                                 )
-                                            )
-
-                                        if (
-                                            fom_conf["group"]
-                                            in fom_conf["regex"].groupindex
-                                        ):
-                                            logger.debug(
-                                                " --- Matched fom %s"
-                                                % fom_name
-                                            )
-                                            fom_contexts = []
-                                            # if a FOM has contexts, check if each is active
-                                            if fom_conf["contexts"]:
-                                                for _ in fom_conf["contexts"]:
-                                                    context_name = (
-                                                        active_contexts[
-                                                            context
-                                                        ]
-                                                        if context
-                                                        in active_contexts
-                                                        else _NULL_CONTEXT
-                                                    )
-                                                    fom_contexts.append(
-                                                        context_name
-                                                    )
-                                            else:
                                                 fom_contexts.append(
-                                                    _NULL_CONTEXT
+                                                    context_name
                                                 )
+                                        else:
+                                            fom_contexts.append(_NULL_CONTEXT)
 
-                                            for fom_context in fom_contexts:
-                                                if (
-                                                    fom_context
-                                                    not in fom_values
-                                                ):
-                                                    fom_values[fom_context] = (
-                                                        {}
-                                                    )
-                                                fom_val = fom_match.group(
-                                                    fom_conf["group"]
-                                                )
-                                                if (
-                                                    fom_conf["units_expanded"]
-                                                    is not None
-                                                ):
-                                                    fom_unit = fom_conf[
-                                                        "units"
-                                                    ]
-                                                else:
-                                                    fom_unit = self.expander.expand_var(
+                                        for fom_context in fom_contexts:
+                                            if fom_context not in fom_values:
+                                                fom_values[fom_context] = {}
+                                            fom_val = fom_match.group(
+                                                fom_conf["group"]
+                                            )
+                                            if (
+                                                fom_conf["units_expanded"]
+                                                is not None
+                                            ):
+                                                fom_unit = fom_conf["units"]
+                                            else:
+                                                fom_unit = (
+                                                    self.expander.expand_var(
                                                         fom_conf["units"],
                                                         extra_vars=fom_vars,
                                                     )
-                                                fom_values[fom_context][
-                                                    fom_name
-                                                ] = {
-                                                    "value": fom_val,
-                                                    "units": fom_unit,
-                                                    "origin": fom_conf[
-                                                        "origin"
-                                                    ],
-                                                    "origin_type": fom_conf[
-                                                        "origin_type"
-                                                    ],
-                                                    "fom_type": fom_conf[
-                                                        "fom_type"
-                                                    ],
-                                                }
-            self._extract_inmem_foms(inmem_defs, fom_values)
+                                                )
+                                            fom_values[fom_context][
+                                                fom_name
+                                            ] = {
+                                                "value": fom_val,
+                                                "units": fom_unit,
+                                                "origin": fom_conf["origin"],
+                                                "origin_type": fom_conf[
+                                                    "origin_type"
+                                                ],
+                                                "fom_type": fom_conf[
+                                                    "fom_type"
+                                                ],
+                                            }
+        self._extract_inmem_foms(inmem_defs, fom_values)
 
-            # Test all non-file based success criteria
-            for criteria_obj, _ in criteria_list.all_criteria():
-                if criteria_obj.file is None:
-                    if criteria_obj.passed(
-                        app_inst=self, fom_values=fom_values
-                    ):
-                        criteria_obj.mark_found()
+        # Test all non-file based success criteria
+        for criteria_obj, _ in criteria_list.all_criteria():
+            if criteria_obj.file is None:
+                if criteria_obj.passed(app_inst=self, fom_values=fom_values):
+                    criteria_obj.mark_found()
 
-            # If an app has no FOMs defined, don't fail it for that
-            success = (not f_defs and not inmem_defs) or False
-            for fom in fom_values.values():
-                for value in fom.values():
-                    if (
-                        "origin_type" in value
-                        and value["origin_type"] == "application"
-                    ):
-                        success = True
-            success = success and criteria_list.passed()
-
-            status = self.get_status()
-            if status == ExperimentStatus.SUCCESS and not success:
-                status = ExperimentStatus.FAILED
-            elif success:
-                status = ExperimentStatus.SUCCESS
-
-            # When workflow_manager is present, only use app_status when workflow is completed or
-            # unresolved.
-            if self.workflow_manager is not None:
-                wm_status = self.workflow_manager.get_status(workspace)
-                if not (
-                    wm_status is None
-                    or wm_status
-                    in [ExperimentStatus.COMPLETE, ExperimentStatus.UNRESOLVED]
+        # If an app has no FOMs defined, don't fail it for that
+        success = (not f_defs and not inmem_defs) or False
+        for fom in fom_values.values():
+            for value in fom.values():
+                if (
+                    "origin_type" in value
+                    and value["origin_type"] == "application"
                 ):
-                    status = wm_status
+                    success = True
+        success = success and criteria_list.passed()
 
-            self.set_status(status)
+        status = self.get_status()
+        if status == ExperimentStatus.SUCCESS and not success:
+            status = ExperimentStatus.FAILED
+        elif success:
+            status = ExperimentStatus.SUCCESS
 
-            self.result.finalize(workspace)
+        # When workflow_manager is present, only use app_status when workflow is completed or
+        # unresolved.
+        if self.workflow_manager is not None:
+            wm_status = self.workflow_manager.get_status(workspace)
+            if not (
+                wm_status is None
+                or wm_status
+                in [ExperimentStatus.COMPLETE, ExperimentStatus.UNRESOLVED]
+            ):
+                status = wm_status
 
-            for criteria_obj, criteria_scope in criteria_list.all_criteria():
-                if criteria_obj.owner is not None:
-                    criteria_name = f"{criteria_obj.owner.scoped_name}::{criteria_obj.name}"
-                else:
-                    criteria_name = (
-                        f"config::{criteria_scope}::{criteria_obj.name}"
-                    )
-                if criteria_obj.ok():
-                    self.result.success_criteria[criteria_name] = "PASSED"
-                else:
-                    self.result.success_criteria[criteria_name] = "FAILED"
+        self.set_status(status)
 
-            for context, fom_map in fom_values.items():
-                context_map = {
-                    "name": context,
-                    "foms": [],
-                    "display_name": _get_context_display_name(context),
-                }
+        self.result.finalize(workspace)
 
-                for fom_name, fom in fom_map.items():
-                    fom_copy = fom.copy()
-                    fom_copy["name"] = fom_name
-                    context_map["foms"].append(fom_copy)
+        for criteria_obj, criteria_scope in criteria_list.all_criteria():
+            if criteria_obj.owner is not None:
+                criteria_name = (
+                    f"{criteria_obj.owner.scoped_name}::{criteria_obj.name}"
+                )
+            else:
+                criteria_name = (
+                    f"config::{criteria_scope}::{criteria_obj.name}"
+                )
+            if criteria_obj.ok():
+                self.result.success_criteria[criteria_name] = "PASSED"
+            else:
+                self.result.success_criteria[criteria_name] = "FAILED"
 
-                if context == _NULL_CONTEXT:
-                    self.result.contexts.insert(0, context_map)
-                else:
-                    self.result.contexts.append(context_map)
-        else:
-            self.result.finalize(workspace)
+        for context, fom_map in fom_values.items():
+            context_map = {
+                "name": context,
+                "foms": [],
+                "display_name": _get_context_display_name(context),
+            }
+
+            for fom_name, fom in fom_map.items():
+                fom_copy = fom.copy()
+                fom_copy["name"] = fom_name
+                context_map["foms"].append(fom_copy)
+
+            if context == _NULL_CONTEXT:
+                self.result.contexts.insert(0, context_map)
+            else:
+                self.result.contexts.append(context_map)
 
     register_phase(
         "append_results_to_workspace",
