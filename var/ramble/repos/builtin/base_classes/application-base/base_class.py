@@ -54,6 +54,7 @@ from ramble.experiment_result import ExperimentResult, ExperimentStatus
 from ramble.language.application_language import ApplicationMeta
 from ramble.language.shared_language import (
     SharedMeta,
+    archive_pattern,
     register_builtin,
     register_phase,
 )
@@ -146,6 +147,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     license_names: List[str] = []
 
+    archive_pattern("{experiment_run_dir}/" + ExperimentResult.cache_file_name)
+
     def __init__(self, file_path):
         super().__init__()
 
@@ -198,6 +201,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._file_path = file_path
 
         self.license_names = self.license_names + [self.name]
+
+        self.hash_inventory = {
+            "attributes": [],
+            "inputs": [],
+            "software": [],
+            "templates": [],
+            "package_manager": [],
+            "modifier_artifacts": [],
+        }
+        self.experiment_hash = None
 
         self.application_class = "ApplicationBase"
 
@@ -1240,6 +1253,38 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             # Define any missing modifier variables
             self.define_missing_variables()
+
+    @property
+    def inventory_file(self):
+        experiment_run_dir = self.expander.experiment_run_dir
+        return os.path.join(experiment_run_dir, self._inventory_file_name)
+
+    def object_hashes(self):
+        for obj_type, obj in self._objects():
+            yield obj_type, obj, ramble.util.hashing.hash_file(obj._file_path)
+
+    def object_inventory(self, workspace):
+        object_definitions = []
+        added_objects = {}
+        for obj_type, obj, obj_hash in self.object_hashes():
+            if obj_type not in added_objects:
+                added_objects[obj_type] = set()
+
+            if obj.name not in added_objects[obj_type]:
+                obj_inventory = {
+                    "name": obj.name,
+                    "type": obj_type.name,
+                    "digest": obj_hash,
+                }
+
+                if hasattr(obj, "get_version"):
+                    obj_inventory["external_version"] = obj.get_version(
+                        workspace=workspace
+                    )
+
+                object_definitions.append(obj_inventory)
+                added_objects[obj_type].add(obj.name)
+        return object_definitions
 
     def validate_experiment(
         self, warn_validation=True, die_on_validate_error=True
@@ -2491,7 +2536,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             logger.warn(
                 f"Experiment has status {self.get_status()}. Skipping analysis..\n"
             )
-            self.result.finalize()
+            self.result.finalize(workspace)
             return
 
         def format_context(context_match, context_format):
@@ -2504,6 +2549,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             context_string = context_format.format(**context_val)
             return context_string
+
+        # Exit early if read from cache works.
+        if self.result.read_cache(workspace, self):
+            self.result.finalize(workspace)
+            return
 
         criteria_list = self.success_list
         if not criteria_list:
@@ -2556,7 +2606,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                                 if context_match:
                                     context_name = format_context(
-                                        context_match, context_conf["format"]
+                                        context_match,
+                                        context_conf["format"],
                                     )
                                     logger.debug("Line was: %s" % line)
                                     logger.debug(
@@ -2574,7 +2625,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                                 if fom_match:
                                     fom_vars = {}
-                                    for k, v in fom_match.groupdict().items():
+                                    for (
+                                        k,
+                                        v,
+                                    ) in fom_match.groupdict().items():
                                         fom_vars[k] = v
                                     if (
                                         fom_conf["fom_name_expanded"]
@@ -2680,7 +2734,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.set_status(status)
 
-        self.result.finalize()
+        self.result.finalize(workspace)
 
         for criteria_obj, criteria_scope in criteria_list.all_criteria():
             if criteria_obj.owner is not None:
@@ -2822,7 +2876,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         else:
             self.set_status(status=ExperimentStatus.FAILED)
 
-        self.result.finalize()
+        self.result.finalize(workspace)
 
         logger.debug(
             f"Calculating statistics for {self.repeats.n_repeats} repeats of {base_exp_name}"
@@ -3319,6 +3373,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             with lk.ReadTransaction(exp_lock):
                 with open(status_path, "w+") as f:
                     spack.util.spack_json.dump(status_data, f)
+
+    register_phase(
+        "write_results_cache",
+        pipeline="analyze",
+        run_after=["write_status", "append_results_to_workspace"],
+    )
+
+    def _write_results_cache(self, workspace, app_inst=None):
+        if hasattr(self, "result") and self.result is not None:
+            with lk.WriteTransaction(self.experiment_lock):
+                self.result.write_cache(self)
 
     register_phase("deploy_artifacts", pipeline="pushdeployment")
 
