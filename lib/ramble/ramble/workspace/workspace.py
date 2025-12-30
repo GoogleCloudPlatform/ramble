@@ -10,6 +10,7 @@ import contextlib
 import copy
 import datetime
 import fnmatch
+import getpass
 import itertools
 import os
 import re
@@ -113,6 +114,16 @@ workspace_execution_template = "execute_experiment" + workspace_template_extensi
 
 #: Name of lockfile within a workspace
 lockfile_name = "ramble.lock"
+
+
+def get_user():
+    """Get the user name, or 'unknown' if it cannot be found."""
+    config_user = ramble.config.get("config:user")
+    if config_user:
+        return config_user
+    else:
+        return getpass.getuser()
+
 
 
 def valid_workspace_name(name):
@@ -819,15 +830,6 @@ ramble:
             return self.metadata[namespace.metadata][key]
         else:
             return None
-
-    def update_metadata(self, key, value):
-        """Set the metadata key value
-
-        Args:
-            key (str): Key of metadata to set
-            value (Any): Value to set in the metadata object
-        """
-        self.metadata[namespace.metadata][key] = value
 
     def clear(self):
         self.config_sections = {}
@@ -1577,6 +1579,7 @@ ramble:
                 res["workspace_hash"] = "Unknown.."
 
         res["workspace_name"] = self.name
+        res["ramble_version"] = ramble.util.version.get_version()
         res[namespace.experiment] = []
 
         return res

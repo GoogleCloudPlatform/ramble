@@ -4,7 +4,7 @@ fom_schema = {
         "type": "object",
         "properties": {
             "name": {"type": "string"},
-            "value": {"type": ["number", "string"]},
+            "value": {"type": "string"},
             "unit": {"type": "string"},
             "origin": {"type": "string"},
             "origin_type": {"type": "string"},

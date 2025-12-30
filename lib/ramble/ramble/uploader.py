@@ -16,8 +16,11 @@ from ramble.schema.metadata import metadata_schema, metadata_schema_version
 from ramble.schema.fom import fom_schema, fom_schema_version
 from ramble.schema.experiment import experiment_schema, experiment_schema_version
 import ramble.config
+import ramble.util.version
 from ramble.config import ConfigError
 from ramble.util.logger import logger
+
+import jsonschema
 
 default_node_type_val = "Not Specified"
 
@@ -27,7 +30,7 @@ uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly"])
 def validate_data(data, schema):
     """Validate data against a JSON schema."""
     try:
-        validate(instance=data, schema=schema)
+        jsonschema.validate(instance=data, schema=schema)
     except jsonschema.exceptions.ValidationError as err:
         logger.error(f"Schema validation error: {err}")
         raise
@@ -286,6 +289,8 @@ class BigQueryUploader(Uploader):
 
         bq_schema = []
         for name, props in schema.get("properties", {}).items():
+            print(props)
+            print(props["type"])
             bq_type = type_map[props["type"]]
             mode = "NULLABLE"
             if name in schema.get("required", []):
@@ -304,6 +309,12 @@ class BigQueryUploader(Uploader):
         from google.cloud.exceptions import NotFound
 
         client = bigquery.Client()
+
+        try:
+            client.get_dataset(uri)
+        except NotFound:
+            logger.info(f"Dataset {uri} is not found, creating it.")
+            client.create_dataset(uri)
 
         # Check schema version
         for table_def in self.schema:
@@ -337,6 +348,7 @@ class BigQueryUploader(Uploader):
     def upload_metadata(self, uri):
         from datetime import datetime
 
+        logger.info("Uploading metadata at table creation time")
         metadata_table_id = f"{uri}.metadata"
         metadata_to_insert = [
             {
@@ -357,6 +369,16 @@ class BigQueryUploader(Uploader):
             {
                 "key": "metadata_schema_version",
                 "value": str(metadata_schema_version),
+                "timestamp": str(datetime.now()),
+            },
+            {
+                "key": "ramble_version",
+                "value": ramble.util.version.get_version(),
+                "timestamp": str(datetime.now()),
+            },
+            {
+                "key": "user",
+                "value": get_user(),
                 "timestamp": str(datetime.now()),
             },
         ]
