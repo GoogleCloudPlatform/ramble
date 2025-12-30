@@ -10,7 +10,6 @@ import contextlib
 import copy
 import datetime
 import fnmatch
-import getpass
 import itertools
 import os
 import re
@@ -114,15 +113,6 @@ workspace_execution_template = "execute_experiment" + workspace_template_extensi
 
 #: Name of lockfile within a workspace
 lockfile_name = "ramble.lock"
-
-
-def get_user():
-    """Get the user name, or 'unknown' if it cannot be found."""
-    config_user = ramble.config.get("config:user")
-    if config_user:
-        return config_user
-    else:
-        return getpass.getuser()
 
 
 def valid_workspace_name(name):
