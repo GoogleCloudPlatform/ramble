@@ -11,16 +11,16 @@ import math
 import sys
 from enum import Enum
 
-from ramble.schema.db import db_schema_version
-from ramble.schema.metadata import metadata_schema, metadata_schema_version
-from ramble.schema.fom import fom_schema, fom_schema_version
-from ramble.schema.experiment import experiment_schema, experiment_schema_version
+import jsonschema
+
 import ramble.config
 import ramble.util.version
 from ramble.config import ConfigError
+from ramble.schema.db import db_schema_version
+from ramble.schema.experiment import experiment_schema, experiment_schema_version
+from ramble.schema.fom import fom_schema, fom_schema_version
+from ramble.schema.metadata import metadata_schema, metadata_schema_version
 from ramble.util.logger import logger
-
-import jsonschema
 
 default_node_type_val = "Not Specified"
 
@@ -319,14 +319,19 @@ class BigQueryUploader(Uploader):
         # Check schema version
         for table_def in self.schema:
             try:
-                query = f"SELECT value FROM `{uri}.metadata` WHERE key = '{table_def['table']}_schema_version'"
+                query = (
+                    f"SELECT value FROM `{uri}.metadata` WHERE key = "
+                    f"'{table_def['table']}_schema_version'"
+                )
                 query_job = client.query(query)
                 results = query_job.result()
                 if results.total_rows > 0:
                     upstream_version = list(results)[0].value
                     if upstream_version != str(table_def["version"]):
                         logger.warn(
-                            f"Upstream DB schema version for table {table_def['table']} ('{upstream_version}') does not match current version ('{table_def['version']}')"
+                            f"Upstream DB schema version for table {table_def['table']} "
+                            f"('{upstream_version}') does not match current version "
+                            f"('{table_def['version']}')"
                         )
             except NotFound:
                 pass  # metadata table doesn't exist, so we don't need to check the version

@@ -82,9 +82,9 @@ def test_create_tables_dataset_exists(mock_bigquery_client):
 
     # Configure mock for client.query().result().total_rows and list(results)[0].value
     mock_row = MagicMock()
-    mock_row.value = "1.0" # Example schema version
+    mock_row.value = "1.0"  # Example schema version
 
-    mock_results_iterable = [mock_row] # This is the data that the iterator will yield
+    mock_results_iterable = [mock_row]  # This is the data that the iterator will yield
 
     mock_results = MagicMock()
     mock_results.total_rows = 1
@@ -124,7 +124,7 @@ def test_create_tables_dataset_does_not_exist(mock_bigquery_client):
     mock_query_job.result.return_value = mock_results
     mock_client.query.return_value = mock_query_job
 
-    mock_client.get_table.side_effect = NotFound("testing") # Tables will be created
+    mock_client.get_table.side_effect = NotFound("testing")  # Tables will be created
     mock_bigquery_client.return_value = mock_client
     uploader = BigQueryUploader()
     uploader.upload_metadata = MagicMock()

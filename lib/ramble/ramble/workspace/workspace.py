@@ -125,7 +125,6 @@ def get_user():
         return getpass.getuser()
 
 
-
 def valid_workspace_name(name):
     return re.match(valid_workspace_name_re, name)
 
@@ -830,6 +829,14 @@ ramble:
             return self.metadata[namespace.metadata][key]
         else:
             return None
+
+    def update_metadata(self, key, value):
+        """Set the metadata key value
+        Args:
+            key (str): Key of metadata to set
+            value (Any): Value to set in the metadata object
+        """
+        self.metadata[namespace.metadata][key] = value
 
     def clear(self):
         self.config_sections = {}

@@ -12,7 +12,16 @@ fom_schema = {
             "experiment_id": {"type": "integer"},
             "experiment_name": {"type": "string"},
         },
-        "required": ["name", "value", "unit", "origin", "origin_type", "context", "experiment_id", "experiment_name"],
+        "required": [
+            "name",
+            "value",
+            "unit",
+            "origin",
+            "origin_type",
+            "context",
+            "experiment_id",
+            "experiment_name",
+        ],
         "additionalProperties": False,
     }
 }
