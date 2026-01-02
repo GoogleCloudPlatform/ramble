@@ -235,7 +235,8 @@ def repo_add(args):
 
         # If that succeeds, finally add it to the configuration.
         if not repo:
-            # This case should ideally not be reached if allow_partial is False and BadRepoError is re-raised
+            # This case should ideally not be reached if allow_partial is False
+            # and BadRepoError is re-raised
             raise ramble.repository.BadRepoError(
                 f"The given path {path} is not a valid repo for type {obj_type.name}"
             )
