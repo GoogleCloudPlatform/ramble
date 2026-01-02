@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 import os
+import shutil
 
 import pytest
 
@@ -78,6 +79,39 @@ def test_add_behavior(mutable_config, tmpdir):
     assert "mockrepo" in output
 
     # Complains if the given path contains no valid repo for all object types
-    os.rmdir(os.path.join(tmpdir, "applications"))
+    shutil.rmtree(os.path.join(tmpdir, "applications"))
     with pytest.raises(BadRepoError, match="not a valid repo for any object types"):
         repo("add", "--scope=site", str(tmpdir))
+
+
+def test_remove_from_any_scope(mutable_config, tmpdir):
+    """Tests that 'repo rm' without a scope removes from the correct scope."""
+    repo_path = str(tmpdir.join("test_repo"))
+    repo_name = "test_repo_namespace"
+
+    # Create a new repository
+    repo("create", repo_path, repo_name)
+
+    # Add the new repository to the 'site' scope
+    repo("add", "-t", "applications", "--scope=site", repo_path)
+
+    apps_repos_in_site = mutable_config.get("repos", scope="site")
+    assert repo_path in apps_repos_in_site, "Repo should be in site config after add."
+
+    # Check that it's in the list (merged scopes)
+    output = repo("list", output=str)
+    assert repo_name in output
+    print(output)
+
+    # Then remove it without specifying a scope
+    repo("remove", "--scope=site", repo_path)
+
+    # Check it's not in the site scope list anymore
+    output = repo("list", "--scope=site", output=str)
+    assert repo_name not in output
+    print(output)
+
+    apps_repos_in_site_after_remove = mutable_config.get("repos", scope="site")
+    assert (
+        repo_path not in apps_repos_in_site_after_remove
+    ), "Repo should be removed from site config."

@@ -243,6 +243,8 @@ Ramble uses `pytest` for its unit tests. The tests can be run using a wrapper co
     ramble unit-test -k gromacs
     ```
 
+Prefer using `-k` if we know which tests we added.
+
 *   **Getting Help:**
     *   For help with the `ramble unit-test` command itself: `ramble unit-test --help`
     *   For a full list of all available `pytest` options: `ramble unit-test --pytest-help`

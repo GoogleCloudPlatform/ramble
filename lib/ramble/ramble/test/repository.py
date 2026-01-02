@@ -113,22 +113,3 @@ def test_list_object_files(
         assert expected[i][2] == actual[i][2]
 
 
-#
-#
-# def test_repo_anonymous_app(mutable_mock_apps_repo):
-#     with pytest.raises(ramble.repository.UnknownObjectError):
-#         mutable_mock_apps_repo.get('+variant')
-#
-#
-# @pytest.mark.maybeslow
-# def test_repo_last_mtime():
-#     latest_mtime = max(os.path.getmtime(p.module.__file__)
-#                        for p in ramble.repository.path.all_applications())
-#     assert ramble.repository.path.last_mtime() == latest_mtime
-#
-#
-# def test_repo_invisibles(mutable_mock_apps_repo, extra_repo):
-#     with open(os.path.join(extra_repo.root, 'applications', '.invisible'),
-#                            'w'):
-#         pass
-#     extra_repo.all_application_names()
