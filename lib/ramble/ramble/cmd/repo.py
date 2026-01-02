@@ -186,50 +186,65 @@ def repo_remove(args):
     else:
         obj_types = [ramble.repository.ObjectTypes[args.type]]
 
-    repo_removed = [False] * len(obj_types)
+    if args.scope:
+        scopes_to_check = [args.scope]
+    else:
+        # Highest precedence first
+        scopes_to_check = reversed([s.name for s in ramble.config.config.file_scopes])
 
-    for obj_idx, obj_type in enumerate(obj_types):
-        type_def = ramble.repository.type_definitions[obj_type]
-
-        repos = ramble.config.get(type_def["config_section"], scope=args.scope)
-        namespace_or_path = args.namespace_or_path
-
-        obj_complete = False
-        # If the argument is a path, remove that repository from config.
-        canon_path = ramble.util.path.canonicalize_path(namespace_or_path)
-        for repo_path in repos:
-            repo_canon_path = ramble.util.path.canonicalize_path(repo_path)
-            if canon_path == repo_canon_path:
-                repos.remove(repo_path)
-                ramble.config.set(type_def["config_section"], repos, args.scope)
-                logger.msg(f"Removed {obj_type.name} repository {repo_path}")
-                obj_complete = True
-                repo_removed[obj_idx] = True
-                break
-
-        if obj_complete:
-            continue
-
-        # If it is a namespace, remove corresponding repo
-        for path in repos:
-            try:
-                repo = ramble.repository.Repo(path, obj_type)
-                if repo.namespace == namespace_or_path:
-                    repos.remove(path)
-                    ramble.config.set(type_def["config_section"], repos, args.scope)
-                    logger.msg(
-                        f"Removed {obj_type.name} repository {repo.root} "
-                        f"with namespace '{repo.namespace}'."
-                    )
-                    repo_removed[obj_idx] = True
-                    obj_complete = True
-                    break
-            except ramble.repository.RepoError:
+    repo_removed = False
+    for scope in scopes_to_check:
+        for obj_type in obj_types:
+            type_def = ramble.repository.type_definitions[obj_type]
+            repos = ramble.config.get(type_def["config_section"], scope=scope)
+            if not repos:
                 continue
 
-    if not any(repo_removed):
+            namespace_or_path = args.namespace_or_path
+
+            canon_path = ramble.util.path.canonicalize_path(namespace_or_path)
+            normalized_path_to_remove = os.path.normcase(os.path.normpath(canon_path))
+
+            path_found_and_removed = False
+            for repo_path in repos:
+                repo_canon_path = ramble.util.path.canonicalize_path(repo_path)
+                normalized_repo_path = os.path.normcase(os.path.normpath(repo_canon_path))
+                if normalized_path_to_remove == normalized_repo_path:
+                    repos.remove(repo_path)
+                    ramble.config.set(type_def["config_section"], repos, scope)
+                    logger.msg(
+                        f"Removed {obj_type.name} repository {repo_path} from scope '{scope}'."
+                    )
+                    repo_removed = True
+                    path_found_and_removed = True
+                    break  # move to next obj_type
+
+            if path_found_and_removed:
+                continue
+
+            for path in list(repos):
+                try:
+                    repo = ramble.repository.Repo(path, obj_type)
+                    if repo.namespace == namespace_or_path:
+                        repos.remove(path)
+                        ramble.config.set(type_def["config_section"], repos, scope)
+                        logger.msg(
+                            f"Removed {obj_type.name} repository {repo.root} "
+                            f"with namespace '{repo.namespace}' from scope '{scope}'."
+                        )
+                        repo_removed = True
+                        break
+                except ramble.repository.RepoError:
+                    continue
+
+        if repo_removed and not args.scope:
+            break
+
+    if not repo_removed:
         all_types = [str(obj_type.name) for obj_type in obj_types]
-        logger.die(f"No repository for {all_types} with path or namespace: {namespace_or_path}")
+        logger.die(
+            f"No repository for {all_types} with path or namespace: {args.namespace_or_path}"
+        )
 
 
 def repo_list(args):
