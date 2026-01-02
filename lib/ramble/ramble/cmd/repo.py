@@ -126,6 +126,7 @@ def repo_add(args):
     path = args.path
     # real_path is absolute and handles substitution.
     canon_path = ramble.util.path.canonicalize_path(path)
+
     # check if the path exists
     if not os.path.exists(canon_path):
         logger.die(f"No such file or directory: {path}")
@@ -135,74 +136,118 @@ def repo_add(args):
         logger.die(f"Not a Ramble repository: {path}")
 
     if args.type == "any":
-        obj_types = ramble.repository.ObjectTypes
-        # When types are not explicitly specified, allow
-        # some (but not all) object types to be missing
-        # from the given repo.
-        first_repo = None
-        for obj_type in obj_types:
-            try:
-                first_repo = ramble.repository.Repo(canon_path, obj_type)
+        # For 'any' type, first determine the namespace from repo.yaml
+        # without trying to instantiate a full Repo object, which might fail
+        # for partial repos.
+        repo_config_name = None
+        repo_config_file = None
+        for config_name_candidate in ramble.repository.type_definitions[
+            ramble.repository.default_type
+        ]["accepted_configs"]:
+            config_file_candidate = os.path.join(canon_path, config_name_candidate)
+            if os.path.exists(config_file_candidate):
+                repo_config_name = config_name_candidate
+                repo_config_file = config_file_candidate
                 break
-            except ramble.repository.BadRepoError:
-                continue
 
-        if not first_repo:
+        if not repo_config_file:
+            raise ramble.repository.BadRepoError(f"No valid config file found in '{path}'")
+
+        if not os.path.isfile(repo_config_file):
+            raise ramble.repository.BadRepoError(f"No {repo_config_name} found in '{path}'")
+
+        try:
+            with open(repo_config_file) as f:
+                yaml_data = ramble.repository.yaml.safe_load(f)
+                if (
+                    not yaml_data
+                    or "repo" not in yaml_data
+                    or not isinstance(yaml_data["repo"], dict)
+                ):
+                    logger.die(f"Invalid {repo_config_name} in repository {path}")
+                repo_namespace = yaml_data["repo"].get("namespace")
+                if not repo_namespace:
+                    logger.die(f"Namespace not defined in {repo_config_name} in repository {path}")
+                if not ramble.repository.re.match(r"[a-zA-Z][a-zA-Z0-9_.]+", repo_namespace):
+                    logger.die(
+                        f"Invalid namespace '{repo_namespace}' in repo '{path}'. "
+                        "Namespaces must be valid python identifiers separated by '.'"
+                    )
+        except Exception as e:
             raise ramble.repository.BadRepoError(
-                f"The given path {path} is not a valid repo for any object types"
+                f"Error reading or parsing {repo_config_name} in '{path}': {e}"
             )
 
-        # Now that we know it is a valid repo for at least one object type,
-        # add it for all of them.
-        for obj_type in obj_types:
+        # Now that we have a valid namespace, check for at least one object type directory
+        at_least_one_object_type_found = False
+        for obj_type in ramble.repository.ObjectTypes:
+            objects_dir_name = yaml_data["repo"].get("subdirectory")
+            if objects_dir_name is None:
+                objects_dir_name = ramble.repository.type_definitions[obj_type]["dir_name"]
+
+            objects_full_path = os.path.join(canon_path, objects_dir_name)
+
+            if os.path.isdir(objects_full_path):
+                at_least_one_object_type_found = True
+                break
+
+        if not at_least_one_object_type_found:
+            raise ramble.repository.BadRepoError(
+                f"The given path {path} is not a valid repo for any object types "
+                f"as no object type directory (e.g., 'applications/') was found."
+            )
+
+        # Now add the canonical path for all object types
+        for obj_type in ramble.repository.ObjectTypes:
             type_def = ramble.repository.type_definitions[obj_type]
             repos = ramble.config.get(type_def["config_section"], scope=args.scope) or []
-            if canon_path in [ramble.util.path.canonicalize_path(r) for r in repos]:
+
+            # Check if canonical path is already present in the list of repos for this type
+            is_present = False
+            for r_path in repos:
+                if ramble.util.path.canonicalize_path(r_path) == canon_path:
+                    is_present = True
+                    break
+
+            if is_present:
                 logger.warn(
                     f"{obj_type.name} repository is already registered with Ramble: {path}"
                 )
             else:
                 repos.insert(0, canon_path)
                 ramble.config.set(type_def["config_section"], repos, args.scope)
-                logger.msg(f"Added {obj_type.name} repo with namespace '{first_repo.namespace}'.")
-    else:
-        obj_types = [ramble.repository.ObjectTypes[args.type]]
-        allow_partial = False
-        added = False
-        for obj_type in obj_types:
-            type_def = ramble.repository.type_definitions[obj_type]
+                logger.msg(f"Added {obj_type.name} repo with namespace '{repo_namespace}'.")
+    else:  # This is the original logic for a specific type
+        obj_type = ramble.repository.ObjectTypes[args.type]
+        type_def = ramble.repository.type_definitions[obj_type]
+        allow_partial = False  # For specific type, we don't allow partial
 
-            # Make sure it's actually a ramble repository by constructing it.
-            try:
-                repo = ramble.repository.Repo(canon_path, obj_type)
-            except ramble.repository.BadRepoError as e:
-                if not allow_partial:
-                    # Wrap the error to give a clearer message
-                    raise ramble.repository.BadRepoError(
-                        f"Failed to find valid repo with type {obj_type}"
-                    ) from e
-                repo = None
+        # Make sure it's actually a ramble repository by constructing it.
+        try:
+            repo = ramble.repository.Repo(canon_path, obj_type)
+        except ramble.repository.BadRepoError as e:
+            # Wrap the error to give a clearer message
+            if not allow_partial:
+                raise ramble.repository.BadRepoError(
+                    f"Failed to find valid repo with type {obj_type}"
+                ) from e
+            repo = None  # Should not happen in this branch due to allow_partial=False
 
-            # If that succeeds, finally add it to the configuration.
-            if not repo:
-                continue
-            repos = ramble.config.get(type_def["config_section"], scope=args.scope)
-            if not repos:
-                repos = []
-
-            if repo.root in repos or path in repos:
-                logger.warn(
-                    f"{obj_type.name} repository is already registered with Ramble: {path}"
-                )
-            else:
-                repos.insert(0, canon_path)
-                ramble.config.set(type_def["config_section"], repos, args.scope)
-                logger.msg(f"Added {obj_type.name} repo with namespace '{repo.namespace}'.")
-            added = True
-        if not added:
+        # If that succeeds, finally add it to the configuration.
+        if not repo:
+            # This case should ideally not be reached if allow_partial is False and BadRepoError is re-raised
             raise ramble.repository.BadRepoError(
-                f"The given path {path} is not a valid repo for any object types"
+                f"The given path {path} is not a valid repo for type {obj_type.name}"
             )
+
+        repos = ramble.config.get(type_def["config_section"], scope=args.scope) or []
+
+        if repo.root in repos or path in repos:
+            logger.warn(f"{obj_type.name} repository is already registered with Ramble: {path}")
+        else:
+            repos.insert(0, canon_path)
+            ramble.config.set(type_def["config_section"], repos, args.scope)
+            logger.msg(f"Added {obj_type.name} repo with namespace '{repo.namespace}'.")
 
 
 def repo_remove(args):
