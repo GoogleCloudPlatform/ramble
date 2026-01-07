@@ -395,3 +395,16 @@ def test_info_directives(
             else:
                 for val in verbose_values:
                     assert val in section_content
+
+
+def test_info_object_name_formats(mutable_mock_apps_repo):
+    output = info("basic")
+    assert "basic" in output
+    output = info("basic-inherited")
+    assert "basic-inherited" in output
+    output = info("basic_inherited")
+    assert "basic-inherited" in output
+    output = info("basic_underscores")
+    assert "basic_underscores" in output
+    output = info("basic-underscores")
+    assert "basic_underscores" in output
