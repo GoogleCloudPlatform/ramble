@@ -1213,7 +1213,15 @@ class Repo:
     def dirname_for_object_name(self, obj_name):
         """Get the directory name for a particular object.  This is the
         directory that contains its object.py file."""
-        return os.path.join(self.objects_path, obj_name)
+        path_priorities = [
+            os.path.join(self.objects_path, obj_name),  # Default
+            os.path.join(self.objects_path, obj_name.replace("_", "-")),  # Hyphens
+            os.path.join(self.objects_path, obj_name.replace("-", "_")),  # Underscores
+        ]
+        for path in path_priorities:
+            if os.path.isdir(path):
+                return path
+        return path_priorities[0]
 
     def filename_for_object_name(self, obj_name):
         """Get the filename for the module we should load for a particular
