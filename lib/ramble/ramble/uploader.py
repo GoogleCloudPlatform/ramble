@@ -411,10 +411,15 @@ class BigQueryUploader(Uploader):
             if end > data_len:
                 end = data_len
             logger.debug(f"Uploading rows {i} to {end}")
-            for row in data[i:end]:
-                table_name = table_id.split(".")[-1]
-                table_schema = [t["schema"] for t in self.schema if t["table"] == table_name][0]
-                validate_data(row, table_schema)
+            table_name = table_id.split(".")[-1]
+            table_def = next((t for t in self.schema if t["table"] == table_name), None)
+            if table_def and table_def["schema"].get(table_def["version"]):
+                schema_for_validation = table_def["schema"][table_def["version"]]
+                for row in data[i:end]:
+                    validate_data(row, schema_for_validation)
+            else:
+                logger.warn(f"Could not find a valid schema for table '{table_name}'. Skipping validation for this chunk.")
+
             error = client.insert_rows_json(table_id, data[i:end])
             if error:
                 return error
