@@ -19,7 +19,7 @@ class ScopedCriteriaList:
     based on which portion of a workspace they are defined in.
 
     Possible scopes are:
-     - application_definition
+     - object_definitions
      - application
      - workload
      - experiment
@@ -28,16 +28,12 @@ class ScopedCriteriaList:
     """
 
     _valid_scopes = [
-        "application_definition",
-        "workflow_manager_definition",
-        "modifier_definition",
+        "object_definitions",
         "experiment",
     ]
     _flush_scopes = {
         "experiment": ["experiment"],
-        "workflow_manager_definition": ["workflow_manager_definition"],
-        "modifier_definition": ["modifier_definition"],
-        "application_definition": ["application_definition"],
+        "object_definitions": ["object_definitions"],
     }
 
     def __init__(self):

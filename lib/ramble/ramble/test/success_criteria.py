@@ -65,7 +65,7 @@ def test_criteria_list(tmpdir):
     criteria_list = ramble.success_criteria.ScopedCriteriaList()
 
     criteria_list.add_criteria(
-        "application_definition",
+        "object_definitions",
         "test-success",
         "string",
         r".*Success string.*",
@@ -79,7 +79,7 @@ def test_criteria_list(tmpdir):
     assert criteria_list.passed()
 
     criteria_list.add_criteria(
-        scope="application_definition",
+        scope="object_definitions",
         name="test-anti",
         mode="string",
         file=log_path,
