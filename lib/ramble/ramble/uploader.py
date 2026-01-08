@@ -289,8 +289,6 @@ class BigQueryUploader(Uploader):
 
         bq_schema = []
         for name, props in schema.get("properties", {}).items():
-            print(props)
-            print(props["type"])
             bq_type = type_map[props["type"]]
             mode = "NULLABLE"
             if name in schema.get("required", []):

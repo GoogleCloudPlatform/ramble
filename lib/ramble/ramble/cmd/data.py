@@ -6,8 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-description = "manage zeppelin databases"
-section = "zeppelin"
+description = "manage data and databases"
+section = "data"
 level = "short"
 
 subcommands = [
@@ -15,13 +15,13 @@ subcommands = [
 ]
 
 
-def zeppelin_create_db_setup_parser(subparser):
-    """create the zeppelin database"""
+def data_create_db_setup_parser(subparser):
+    """create the data database"""
     pass
 
 
-def zeppelin_create_db(args):
-    """create the zeppelin database"""
+def data_create_db(args):
+    """create the data database"""
     import ramble.config
     import ramble.uploader
     from ramble.config import ConfigError
@@ -44,7 +44,7 @@ def sanitize_arg_name(base_name):
 
 
 def setup_parser(subparser):
-    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="zeppelin_command")
+    sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="data_command")
 
     for name in subcommands:
         if isinstance(name, (list, tuple)):
@@ -53,14 +53,14 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("zeppelin_%s" % name)
+        function_name = sanitize_arg_name("data_%s" % name)
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("zeppelin_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name("data_%s_setup_parser" % name)
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(
@@ -72,7 +72,7 @@ def setup_parser(subparser):
         setup_parser_cmd(subsubparser)
 
 
-def zeppelin(parser, args, unknown_args=None):
-    """Look for a function called zeppelin_<name> and call it."""
-    action = subcommand_functions[args.zeppelin_command]
+def data(parser, args, unknown_args=None):
+    """Look for a function called data_<name> and call it."""
+    action = subcommand_functions[args.data_command]
     action(args)
