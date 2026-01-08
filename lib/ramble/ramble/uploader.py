@@ -353,36 +353,37 @@ class BigQueryUploader(Uploader):
 
         logger.info("Uploading metadata at table creation time")
         metadata_table_id = f"{uri}.metadata"
+        now_timestamp = str(datetime.now())
         metadata_to_insert = [
             {
                 "key": "db_schema_version",
                 "value": db_schema_version,
-                "timestamp": str(datetime.now()),
+                "timestamp": now_timestamp,
             },
             {
                 "key": "experiment_schema_version",
                 "value": str(experiment_schema_version),
-                "timestamp": str(datetime.now()),
+                "timestamp": now_timestamp,
             },
             {
                 "key": "fom_schema_version",
                 "value": str(fom_schema_version),
-                "timestamp": str(datetime.now()),
+                "timestamp": now_timestamp,
             },
             {
                 "key": "metadata_schema_version",
                 "value": str(metadata_schema_version),
-                "timestamp": str(datetime.now()),
+                "timestamp": now_timestamp,
             },
             {
                 "key": "ramble_version",
                 "value": ramble.util.version.get_version(),
-                "timestamp": str(datetime.now()),
+                "timestamp": now_timestamp,
             },
             {
                 "key": "user",
                 "value": get_user(),
-                "timestamp": str(datetime.now()),
+                "timestamp": now_timestamp,
             },
         ]
         self.chunked_upload(metadata_table_id, metadata_to_insert)
@@ -418,7 +419,10 @@ class BigQueryUploader(Uploader):
                 for row in data[i:end]:
                     validate_data(row, schema_for_validation)
             else:
-                logger.warn(f"Could not find a valid schema for table '{table_name}'. Skipping validation for this chunk.")
+                logger.warn(
+                    f"Could not find a valid schema for table '{table_name}'. "
+                    f"Skipping validation for this chunk."
+                )
 
             error = client.insert_rows_json(table_id, data[i:end])
             if error:
