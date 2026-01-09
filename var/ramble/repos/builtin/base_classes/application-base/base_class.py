@@ -3055,73 +3055,51 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         file_fom_defs = {}
         inmem_fom_defs = {}
 
-        # Add the application defined criteria
-        criteria_list.flush_scope("application_definition")
+        # Add the object defined criteria
+        criteria_list.flush_scope("object_definitions")
 
-        success_lists = [
-            ("application_definition", self, self.success_criteria),
-        ]
+        for _, obj_inst in self._objects():
+            if obj_inst.success_criteria:
+                for criteria, conf in obj_inst.success_criteria.items():
+                    if not self.expander.satisfies(
+                        conf["when"],
+                        variant_set=obj_inst.experiment_variants(),
+                    ):
+                        continue
 
-        logger.debug(
-            f" Number of modifiers are: {len(self._modifier_instances)}"
-        )
-        if self._modifier_instances:
-            criteria_list.flush_scope("modifier_definition")
-        for mod in self._modifier_instances:
-            success_lists.append(
-                ("modifier_definition", mod, mod.success_criteria)
-            )
-
-        if self.workflow_manager is not None:
-            criteria_list.flush_scope("workflow_manager_definition")
-            success_lists.append(
-                (
-                    "workflow_manager_definition",
-                    self.workflow_manager,
-                    self.workflow_manager.success_criteria,
-                )
-            )
-
-        for success_scope, obj, success_list in success_lists:
-            for criteria, conf in success_list.items():
-                if not self.expander.satisfies(
-                    conf["when"], variant_set=self.experiment_variants()
-                ):
-                    continue
-
-                if conf["mode"] == "string":
-                    match = (
-                        self.expander.expand_var(conf["match"])
-                        if conf["match"] is not None
-                        else None
-                    )
-                    anti_match = (
-                        self.expander.expand_var(conf["anti_match"])
-                        if conf["anti_match"] is not None
-                        else None
-                    )
-                    criteria_list.add_criteria(
-                        success_scope,
-                        criteria,
-                        mode=conf["mode"],
-                        match=match,
-                        file=conf["file"],
-                        anti_match=anti_match,
-                        owning_object=obj,
-                    )
-                elif conf["mode"] == "fom_comparison":
-                    criteria_list.add_criteria(
-                        success_scope,
-                        criteria,
-                        conf["mode"],
-                        fom_name=conf["fom_name"],
-                        fom_context=conf["fom_context"],
-                        formula=conf["formula"],
-                        owning_object=obj,
-                    )
+                    if conf["mode"] == "string":
+                        match = (
+                            self.expander.expand_var(conf["match"])
+                            if conf["match"] is not None
+                            else None
+                        )
+                        anti_match = (
+                            self.expander.expand_var(conf["anti_match"])
+                            if conf["anti_match"] is not None
+                            else None
+                        )
+                        criteria_list.add_criteria(
+                            "object_definitions",
+                            criteria,
+                            mode=conf["mode"],
+                            match=match,
+                            file=conf["file"],
+                            anti_match=anti_match,
+                            owning_object=obj_inst,
+                        )
+                    elif conf["mode"] == "fom_comparison":
+                        criteria_list.add_criteria(
+                            "object_definitions",
+                            criteria,
+                            conf["mode"],
+                            fom_name=conf["fom_name"],
+                            fom_context=conf["fom_context"],
+                            formula=conf["formula"],
+                            owning_object=obj_inst,
+                        )
 
         criteria_list.add_criteria(
-            scope="application_definition",
+            scope="object_definitions",
             name="_application_function",
             mode="application_function",
             owning_object=self,
