@@ -18,7 +18,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_gromacs_size_expansion(make_workspace):
+def test_gromacs_size_expansion(make_workspace_from_config):
     test_config = """
 ramble:
   variants:
@@ -55,7 +55,7 @@ ramble:
         - intel-mpi
 """
 
-    ws, ws_name = make_workspace(test_config)
+    ws, ws_name = make_workspace_from_config(test_config)
 
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
 

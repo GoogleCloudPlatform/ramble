@@ -715,7 +715,7 @@ def mock_file_auto_create(monkeypatch):
 
 
 @pytest.fixture
-def make_workspace(workspace_name, mutable_config, mutable_mock_workspace_path):
+def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_workspace_path):
     """Fixture to create a workspace with a specific configuration."""
 
     def _create(config_str=None, name=None, activate=False):
