@@ -714,6 +714,28 @@ def mock_file_auto_create(monkeypatch):
     monkeypatch.setattr(builtins, "open", open_or_create_inmem)
 
 
+@pytest.fixture
+def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_workspace_path):
+    """Fixture to create a workspace with a specific configuration."""
+
+    def _create(config_str=None, name=None, activate=False):
+        ws_name = name or workspace_name
+        ws = ramble.workspace.create(ws_name)
+        ws.write()
+
+        if config_str:
+            config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+            with open(config_path, "w+") as f:
+                f.write(config_str)
+            ws._re_read()
+
+        if activate:
+            ramble.workspace.activate(ws)
+        return ws, ws_name
+
+    return _create
+
+
 def pytest_generate_tests(metafunc):
     import re
 
