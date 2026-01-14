@@ -1,3 +1,10 @@
 codecov:
   branch: develop
-  target: 90%
+coverage:
+  status:
+    project:
+      default:
+        target: 90%
+    patch:
+      default:
+        target: 90%
