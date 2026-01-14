@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
 
@@ -20,7 +19,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_missing_required_dry_run(mutable_config, mutable_mock_workspace_path, workspace_name):
+def test_missing_required_dry_run(make_workspace_from_config):
     """Tests tty.die at end of ramble.application_types.spack._create_software_env"""
     test_config = """
 ramble:
@@ -58,17 +57,10 @@ ramble:
         - wrfv3
 """
 
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-        with open(config_path, "w+") as f:
-            f.write(test_config)
-        ws._re_read()
-
-        with pytest.raises(RambleCommandError):
-            workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-        setup_log = os.path.join(ws.log_dir, "setup.latest.out")
-        with open(setup_log) as f:
-            assert "Software spec wrf is not defined in environment wrfv3" in f.read()
+    with pytest.raises(RambleCommandError):
+        workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    setup_log = os.path.join(ws.log_dir, "setup.latest.out")
+    with open(setup_log) as f:
+        assert "Software spec wrf is not defined in environment wrfv3" in f.read()
