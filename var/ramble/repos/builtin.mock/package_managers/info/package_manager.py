@@ -109,7 +109,7 @@ class Info(PackageManagerBase):
     register_builtin("builtin_name", required=True)
 
     def builtin_name(self):
-        return 'echo "builtin"'
+        return ['echo "builtin"']
 
     register_phase(
         "after_make_experiments",
