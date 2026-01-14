@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def _setup_workspace(ws_name):
+def _setup_workspace(make_workspace_from_config):
     test_config = """
 ramble:
   variables:
@@ -44,27 +44,19 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws = ramble.workspace.create(ws_name)
-    ws.write()
-
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
     exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
     with open(exp_out, "w+") as f:
         f.write("test-user.c.googlers.com\n")
-    return ws
+    return ws, ws_name
 
 
-def test_analyze_fom_output(workspace_name):
-    ws = _setup_workspace(workspace_name)
+def test_analyze_fom_output(make_workspace_from_config):
+    ws, ws_name = _setup_workspace(make_workspace_from_config)
 
-    workspace("analyze", "-p", global_args=["-w", workspace_name])
+    workspace("analyze", "-p", global_args=["-w", ws_name])
     result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
 
     with open(result_file) as f:
@@ -73,8 +65,8 @@ def test_analyze_fom_output(workspace_name):
         assert "possible hostname = test-user.c.googlers.com" in content
 
 
-def test_analyze_print(monkeypatch, workspace_name):
-    _setup_workspace(workspace_name)
+def test_analyze_print(monkeypatch, make_workspace_from_config):
+    _, ws_name = _setup_workspace(make_workspace_from_config)
 
     msg_list = []
 
@@ -84,11 +76,11 @@ def test_analyze_print(monkeypatch, workspace_name):
     # Assert whether the print is present or not
     monkeypatch.setattr(tty, "msg", _msg)
 
-    workspace("analyze", global_args=["-w", workspace_name])
+    workspace("analyze", global_args=["-w", ws_name])
     assert not any(m.startswith("Results from the analysis pipeline") for m in msg_list)
 
     msg_list = []
-    workspace("analyze", "-p", global_args=["-w", workspace_name])
+    workspace("analyze", "-p", global_args=["-w", ws_name])
     assert any(m.startswith("Results from the analysis pipeline") for m in msg_list)
 
 

@@ -20,7 +20,7 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.maybeslow
-def test_configvar_dry_run(mutable_config, mutable_mock_workspace_path, workspace_name):
+def test_configvar_dry_run(make_workspace_from_config):
     test_scopes = ["site", "system", "user"]
 
     var_name1 = "test1"
@@ -80,30 +80,23 @@ ramble:
     for i, scope in enumerate(test_scopes):
         config("--scope", scope, "add", f"env_vars:set:{var_name2}{i}:{var_val}")
 
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
-        ws._re_read()
+    software_dir = "openfoam"
+    software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
+    assert os.path.exists(software_base_dir)
 
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    software_path = os.path.join(software_base_dir, "spack", software_dir)
+    assert os.path.exists(software_path)
 
-        software_dir = "openfoam"
-        software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
-        assert os.path.exists(software_base_dir)
+    for i, exp in enumerate(expected_experiments):
+        exp_dir = os.path.join(ws.root, "experiments", "openfoam", "motorbike", exp)
+        assert os.path.isdir(exp_dir)
+        assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
 
-        software_path = os.path.join(software_base_dir, "spack", software_dir)
-        assert os.path.exists(software_path)
-
-        for i, exp in enumerate(expected_experiments):
-            exp_dir = os.path.join(ws.root, "experiments", "openfoam", "motorbike", exp)
-            assert os.path.isdir(exp_dir)
-            assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
-
-            with open(os.path.join(exp_dir, "execute_experiment")) as f:
-                data = f.read()
-                # Test the license exists
-                assert f"export {var_name2}{i}={var_val}" in data
+        with open(os.path.join(exp_dir, "execute_experiment")) as f:
+            data = f.read()
+            # Test the license exists
+            assert f"export {var_name2}{i}={var_val}" in data
