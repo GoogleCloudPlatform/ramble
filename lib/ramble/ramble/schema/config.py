@@ -178,6 +178,10 @@ properties["config"]["disable_progress_bar"] = {"type": "boolean", "default": Fa
 
 properties["config"]["disable_logger"] = {"type": "boolean", "default": False}
 
+properties["config"]["aggregate_warnings"] = {"type": "boolean", "default": False}
+
+properties["config"]["suppress_warnings"] = {"type": "boolean", "default": False}
+
 properties["config"]["n_repeats"] = {"type": "string", "default": "0"}
 
 properties["config"]["repeat_success_strict"] = {"type": "boolean", "default": True}

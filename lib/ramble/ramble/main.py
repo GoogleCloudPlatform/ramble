@@ -399,6 +399,19 @@ def make_argument_parser(**kwargs):
         help="disable the ramble logger. All output will be printed to stdout.",
     )
     parser.add_argument(
+        "-A",
+        "--aggregate-warnings",
+        action="store_true",
+        help="aggregate warnings from the ramble logger to the end of "
+        + "execution. May lose context information",
+    )
+    parser.add_argument(
+        "-S",
+        "--suppress-warnings",
+        action="store_true",
+        help="suppress warnings from the ramble logger.",
+    )
+    parser.add_argument(
         "-P",
         "--disable-progress-bar",
         action="store_true",
@@ -599,6 +612,12 @@ def setup_main_options(args):
         ramble.config.set("config:disable_logger", True, scope="command_line")
 
     logger.enabled = not ramble.config.get("config:disable_logger", False)
+
+    if args.aggregate_warnings:
+        ramble.config.set("config:aggregate_warnings", True, scope="command_line")
+
+    if args.suppress_warnings:
+        ramble.config.set("config:suppress_warnings", True, scope="command_line")
 
     if args.disable_progress_bar:
         ramble.config.set("config:disable_progress_bar", True, scope="command_line")
@@ -953,13 +972,15 @@ def _main(argv=None):
     # like `ConstraintAction` and `ConfigSetAction` happen at parse time.
     bootstrap_context = llnl.util.lang.nullcontext()
 
-    # TODO (dwj): Do we need this?
-    # if args.bootstrap:
-    #   # import spack.bootstrap as bootstrap  # avoid circular imports
-    #   # bootstrap_context = bootstrap.ensure_bootstrap_configuration()
-
     with bootstrap_context:
-        return finish_parse_and_run(parser, cmd_name, args, workspace_format_error)
+        suppress_warnings = ramble.config.get("config:suppress_warnings")
+        aggregate_warnings = suppress_warnings or ramble.config.get("config:aggregate_warnings")
+        logger.aggregate_warnings(on=aggregate_warnings)
+        err = finish_parse_and_run(parser, cmd_name, args, workspace_format_error)
+
+        if not suppress_warnings:
+            logger.all_warnings()
+        return err
 
 
 def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):

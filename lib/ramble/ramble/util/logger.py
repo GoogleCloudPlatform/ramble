@@ -33,6 +33,13 @@ class Logger:
         """
         self.log_stack = []
         self.enabled = True
+        self._aggregated_warnings = False
+        self.file_warnings = {}
+        self.global_warnings = []
+
+    def aggregate_warnings(self, on=True):
+        """Control whether warnings are aggregated or not"""
+        self._aggregated_warnings = on
 
     def add_log(self, path):
         """Add a log to the current log stack
@@ -179,12 +186,46 @@ class Logger:
         Pass all args and kwargs to tty.warn (which will concatenate and
         print). Perform this action for the active log only.
         """
-        st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
-        if "stream" in st_kwargs:
-            with self.configure_colors(**st_kwargs):
-                tty.warn(*args, **st_kwargs)
 
-        tty.warn(*args, **kwargs)
+        st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
+        if self._aggregated_warnings:
+            if "stream" in st_kwargs:
+                file_name = st_kwargs["stream"].name
+                if file_name not in self.file_warnings:
+                    self.file_warnings[file_name] = []
+                self.file_warnings[file_name].append((args, kwargs))
+            else:
+                self.global_warnings.append((args, kwargs))
+
+        else:
+            if "stream" in st_kwargs:
+                with self.configure_colors(**st_kwargs):
+                    tty.warn(*args, **st_kwargs)
+
+            tty.warn(*args, **kwargs)
+
+    def all_warnings(self):
+        """Print all warnings that have been encountered
+
+        This is intended to be called once, and will print all warnings that
+        were encountered over the course of the execution.
+        """
+
+        if self._aggregated_warnings:
+            if self.file_warnings:
+                for file_name, warnings in self.file_warnings.items():
+                    suffix = "s" if len(warnings) > 1 else ""
+                    tty.info("")
+                    tty.info(f"File {file_name} encountered {len(warnings)} warning{suffix}.")
+                    for args, kwargs in warnings:
+                        tty.warn(*args, **kwargs)
+
+            if self.global_warnings:
+                suffix = "s" if len(self.global_warnings) > 1 else ""
+                tty.info("")
+                tty.info(f"Encountered {len(self.global_warnings)} global warning{suffix}.")
+                for args, kwargs in self.global_warnings:
+                    tty.warn(*args, **kwargs)
 
     def debug(self, *args, **kwargs):
         """Print a debug message to the active log
