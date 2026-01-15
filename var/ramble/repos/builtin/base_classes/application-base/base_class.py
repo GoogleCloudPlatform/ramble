@@ -1746,6 +1746,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 else:  # All Builtins
                     func = exec_node.attribute
                     func_cmds = func()
+                    if isinstance(func_cmds, str):
+                        func_cmds = [func_cmds]
                     for cmd in func_cmds:
                         expanded = self.expander.expand_var(cmd, exec_vars)
                         self._command_list.append(expanded)

@@ -309,7 +309,7 @@ class Slurm(WorkflowManagerBase):
     )
 
     def capture_sbatch_script_end_time(self):
-        return ["date +%s > {experiment_run_dir}/.slurm_script_end_time"]
+        return "date +%s > {experiment_run_dir}/.slurm_script_end_time"
 
     # Capture slurm configs before the workload runs, just so that the configs
     # match closer when the job is submitted.
@@ -318,9 +318,7 @@ class Slurm(WorkflowManagerBase):
     )
 
     def capture_slurm_config(self):
-        return [
-            "scontrol show config > {experiment_run_dir}/.slurm_config",
-        ]
+        return "scontrol show config > {experiment_run_dir}/.slurm_config"
 
     for fom in ["TopologyParam", "TopologyPlugin"]:
         figure_of_merit(
