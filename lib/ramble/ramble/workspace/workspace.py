@@ -822,7 +822,6 @@ ramble:
 
     def update_metadata(self, key, value):
         """Set the metadata key value
-
         Args:
             key (str): Key of metadata to set
             value (Any): Value to set in the metadata object
@@ -1577,6 +1576,7 @@ ramble:
                 res["workspace_hash"] = "Unknown.."
 
         res["workspace_name"] = self.name
+        res["ramble_version"] = ramble.util.version.get_version()
         res[namespace.experiment] = []
 
         return res

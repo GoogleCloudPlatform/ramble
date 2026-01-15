@@ -11,13 +11,29 @@ import math
 import sys
 from enum import Enum
 
+import jsonschema
+
 import ramble.config
+import ramble.util.version
 from ramble.config import ConfigError
+from ramble.schema.db import db_schema_version
+from ramble.schema.experiment import experiment_schema, experiment_schema_version
+from ramble.schema.fom import fom_schema, fom_schema_version
+from ramble.schema.metadata import metadata_schema, metadata_schema_version
 from ramble.util.logger import logger
 
 default_node_type_val = "Not Specified"
 
 uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly"])
+
+
+def validate_data(data, schema):
+    """Validate data against a JSON schema."""
+    try:
+        jsonschema.validate(instance=data, schema=schema)
+    except jsonschema.exceptions.ValidationError as err:
+        logger.error(f"Schema validation error: {err}")
+        raise
 
 
 class Uploader:
@@ -107,7 +123,7 @@ class Experiment:
         # large un-needed uploads
         data_copy["CONTEXTS"] = []
 
-        j["foms"] = json.dumps(None)
+        del j["foms"]
         j["data"] = json.dumps(data_copy, default=vars)
         return j
 
@@ -230,7 +246,8 @@ def _prepare_data(results, uri):
     foms_to_insert = []
 
     for experiment in results:
-        exps_to_insert.append(experiment.to_json())
+        json_experiment = experiment.to_json()
+        exps_to_insert.append(json_experiment)
 
         for fom in experiment.foms:
             fom_data = fom
@@ -247,6 +264,129 @@ class BigQueryUploader(Uploader):
     """
     Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements
     """
+
+    schema = [
+        {
+            "table": "experiments",
+            "schema": experiment_schema,
+            "version": experiment_schema_version,
+        },
+        {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
+        {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
+    ]
+
+    def _schema_to_bigquery(self, schema):
+        from google.cloud import bigquery
+
+        type_map = {
+            "string": "STRING",
+            "number": "FLOAT",
+            "integer": "INTEGER",
+            "boolean": "BOOLEAN",
+            "array": "RECORD",
+            "object": "RECORD",
+        }
+
+        bq_schema = []
+        for name, props in schema.get("properties", {}).items():
+            bq_type = type_map[props["type"]]
+            mode = "NULLABLE"
+            if name in schema.get("required", []):
+                mode = "REQUIRED"
+
+            fields = []
+            if "items" in props:
+                fields = self._schema_to_bigquery(props["items"])
+
+            bq_schema.append(bigquery.SchemaField(name, bq_type, mode=mode, fields=fields))
+
+        return bq_schema
+
+    def create_tables(self, uri):
+        from google.cloud import bigquery
+        from google.cloud.exceptions import NotFound
+
+        client = bigquery.Client()
+
+        try:
+            client.get_dataset(uri)
+        except NotFound:
+            logger.info(f"Dataset {uri} is not found, creating it.")
+            client.create_dataset(uri)
+
+        # Check schema version
+        for table_def in self.schema:
+            try:
+                query = (
+                    f"SELECT value FROM `{uri}.metadata` WHERE key = "
+                    f"'{table_def['table']}_schema_version'"
+                )
+                query_job = client.query(query)
+                results = query_job.result()
+                if results.total_rows > 0:
+                    upstream_version = list(results)[0].value
+                    if upstream_version != str(table_def["version"]):
+                        logger.warn(
+                            f"Upstream DB schema version for table {table_def['table']} "
+                            f"('{upstream_version}') does not match current version "
+                            f"('{table_def['version']}')"
+                        )
+            except NotFound:
+                pass  # metadata table doesn't exist, so we don't need to check the version
+
+        for table_def in self.schema:
+            table_id = f"{uri}.{table_def['table']}"
+            try:
+                client.get_table(table_id)
+                logger.info(f"Table {table_id} already exists.")
+            except NotFound:
+                logger.info(f"Creating table {table_id}")
+                bq_schema = self._schema_to_bigquery(table_def["schema"][table_def["version"]])
+                table = bigquery.Table(table_id, schema=bq_schema)
+                table = client.create_table(table)
+                logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+
+        self.upload_metadata(uri)
+
+    def upload_metadata(self, uri):
+        from datetime import datetime
+
+        logger.info("Uploading metadata at table creation time")
+        metadata_table_id = f"{uri}.metadata"
+        now_timestamp = str(datetime.now())
+        metadata_to_insert = [
+            {
+                "key": "db_schema_version",
+                "value": db_schema_version,
+                "timestamp": now_timestamp,
+            },
+            {
+                "key": "experiment_schema_version",
+                "value": str(experiment_schema_version),
+                "timestamp": now_timestamp,
+            },
+            {
+                "key": "fom_schema_version",
+                "value": str(fom_schema_version),
+                "timestamp": now_timestamp,
+            },
+            {
+                "key": "metadata_schema_version",
+                "value": str(metadata_schema_version),
+                "timestamp": now_timestamp,
+            },
+            {
+                "key": "ramble_version",
+                "value": ramble.util.version.get_version(),
+                "timestamp": now_timestamp,
+            },
+            {
+                "key": "user",
+                "value": get_user(),
+                "timestamp": now_timestamp,
+            },
+        ]
+        self.chunked_upload(metadata_table_id, metadata_to_insert)
 
     def chunked_upload(self, table_id, data):
         from google.cloud import bigquery
@@ -272,6 +412,18 @@ class BigQueryUploader(Uploader):
             if end > data_len:
                 end = data_len
             logger.debug(f"Uploading rows {i} to {end}")
+            table_name = table_id.split(".")[-1]
+            table_def = next((t for t in self.schema if t["table"] == table_name), None)
+            if table_def and table_def["schema"].get(table_def["version"]):
+                schema_for_validation = table_def["schema"][table_def["version"]]
+                for row in data[i:end]:
+                    validate_data(row, schema_for_validation)
+            else:
+                logger.warn(
+                    f"Could not find a valid schema for table '{table_name}'. "
+                    f"Skipping validation for this chunk."
+                )
+
             error = client.insert_rows_json(table_id, data[i:end])
             if error:
                 return error

@@ -37,3 +37,5 @@ config:
       flags: ''
     env_view:
       link_type: symlink
+  aliases:
+    zeppelin: data
