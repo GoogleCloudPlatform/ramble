@@ -1579,18 +1579,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             (list) List of environment variable sets from all objects
         """
         obj_env_var_sets = self._env_variable_sets.copy()
-
-        env_var_objs = []
-        if self.package_manager is not None:
-            env_var_objs.append(self.package_manager)
-        if self.workflow_manager is not None:
-            env_var_objs.append(self.workflow_manager)
-        for mod_inst in self._modifier_instances:
-            env_var_objs.append(mod_inst)
-
-        for env_var_obj in env_var_objs:
+        for _, obj in self._objects(
+            exclude_types=[ramble.repository.ObjectTypes.applications]
+        ):
             obj_env_vars = {}
-            for env_var in env_var_obj.selected_environment_variables.values():
+            for env_var in obj.selected_environment_variables.values():
                 obj_env_vars[env_var.name] = env_var.value
 
             if obj_env_vars:
@@ -3609,10 +3602,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if ramble.repository.ObjectTypes.applications not in exclude_types:
             yield (ramble.repository.ObjectTypes.applications, self)
 
-        if ramble.repository.ObjectTypes.modifiers not in exclude_types:
-            for mod_inst in self._modifier_instances:
-                yield (ramble.repository.ObjectTypes.modifiers, mod_inst)
-
         if ramble.repository.ObjectTypes.package_managers not in exclude_types:
             if self.package_manager is not None:
                 yield (
@@ -3629,6 +3618,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     ramble.repository.ObjectTypes.workflow_managers,
                     self.workflow_manager,
                 )
+
+        if ramble.repository.ObjectTypes.modifiers not in exclude_types:
+            for mod_inst in self._modifier_instances:
+                yield (ramble.repository.ObjectTypes.modifiers, mod_inst)
 
     def set_required_variables(self):
         """Set required variables from all objects"""
