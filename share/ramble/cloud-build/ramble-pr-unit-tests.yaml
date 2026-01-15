@@ -6,8 +6,41 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+tags:
+  # This is used for filtering builds related to a specific PR
+  - '$TRIGGER_NAME-$_PR_NUMBER'
+steps: 
+  # Cancel older builds
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - |
+        # Only attempt cancellation for PR builds
+        if [ -z "$_PR_NUMBER" ]; then
+          echo "Skipping build cancellation."
+          exit 0
+        fi
 
-steps:
+        target_tag="${TRIGGER_NAME}-${_PR_NUMBER}"
+
+        echo "Current Build ID: $BUILD_ID"
+        echo "Filtering for tag: $$target_tag in project: $PROJECT_ID"
+
+        builds_to_cancel=$(gcloud builds list \
+          --project="$PROJECT_ID" \
+          --filter="tags='$$target_tag' AND (status=WORKING OR status=QUEUED) AND id!=$BUILD_ID" \
+          --format="value(id)")
+
+        if [ -z "$$builds_to_cancel" ]; then
+          echo "No older builds found to cancel."
+          exit 0
+        fi
+
+        for build in $$builds_to_cancel; do
+          echo "Cancelling obsolete build: $$build"
+          gcloud builds cancel $$build --project="$PROJECT_ID" || echo "Failed to cancel $$build"
+        done
   - name: gcr.io/cloud-builders/git
     args:
       - fetch
