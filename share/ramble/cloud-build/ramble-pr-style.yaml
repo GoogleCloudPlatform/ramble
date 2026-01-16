@@ -6,8 +6,21 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-
+tags:
+  # This is used for filtering builds related to a specific PR
+  - '$TRIGGER_NAME-$_PR_NUMBER'
 steps:
+  # Cancel older builds
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'share/ramble/cloud-build/cancel-older-builds.sh'
+    env:
+      - 'PR_NUMBER=$_PR_NUMBER'
+      - 'TRIGGER_NAME=$TRIGGER_NAME'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'PROJECT_ID=$PROJECT_ID'
   - name: gcr.io/cloud-builders/git
     args:
       - fetch

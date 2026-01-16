@@ -15,32 +15,12 @@ steps:
     entrypoint: 'bash'
     args:
       - '-c'
-      - |
-        # Only attempt cancellation for PR builds
-        if [ -z "$_PR_NUMBER" ]; then
-          echo "Skipping build cancellation."
-          exit 0
-        fi
-
-        target_tag="${TRIGGER_NAME}-${_PR_NUMBER}"
-
-        echo "Current Build ID: $BUILD_ID"
-        echo "Filtering for tag: $$target_tag in project: $PROJECT_ID"
-
-        builds_to_cancel=$(gcloud builds list \
-          --project="$PROJECT_ID" \
-          --filter="tags='$$target_tag' AND (status=WORKING OR status=QUEUED) AND id!=$BUILD_ID" \
-          --format="value(id)")
-
-        if [ -z "$$builds_to_cancel" ]; then
-          echo "No older builds found to cancel."
-          exit 0
-        fi
-
-        for build in $$builds_to_cancel; do
-          echo "Cancelling obsolete build: $$build"
-          gcloud builds cancel $$build --project="$PROJECT_ID" || echo "Failed to cancel $$build"
-        done
+      - 'share/ramble/cloud-build/cancel-older-builds.sh'
+    env:
+      - 'PR_NUMBER=$_PR_NUMBER'
+      - 'TRIGGER_NAME=$TRIGGER_NAME'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'PROJECT_ID=$PROJECT_ID'
   - name: gcr.io/cloud-builders/git
     args:
       - fetch
