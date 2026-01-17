@@ -12,3 +12,4 @@ pandas
 matplotlib
 setuptools
 scipy
+types-PyYAML

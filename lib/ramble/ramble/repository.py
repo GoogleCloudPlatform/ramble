@@ -420,6 +420,8 @@ class FastObjectChecker(Mapping):
         # Create a dictionary that will store the mapping between a
         # object name and its stat info
         cache = {}
+        if not os.path.isdir(self.objects_path):
+            return cache
         for obj_name in os.listdir(self.objects_path):
             # Skip non-directories in the object root.
             obj_dir = os.path.join(self.objects_path, obj_name)
@@ -999,7 +1001,7 @@ class Repo:
         self.objects_path = os.path.join(self.root, objects_dir)
         check(
             os.path.isdir(self.objects_path),
-            f"No directory '{objects_dir}' found in '{root}'",
+            f"Objects directory '{self.objects_path}' not found or is not a directory.",
         )
 
         # Set up 'full_namespace' to include the super-namespace
