@@ -9,11 +9,12 @@ import os
 import shutil
 
 import pytest
-import yaml
 
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
 from ramble.repository import BadRepoError
+
+import spack.util.spack_yaml as syaml
 
 repo = RambleCommand("repo")
 
@@ -172,7 +173,7 @@ def test_add_repo_missing_config_file(mutable_config, tmpdir):
     # Create a dummy repo.yaml and then remove it to simulate the missing file
     repo_config_file = os.path.join(str(repo_path), "repo.yaml")
     with open(repo_config_file, "w") as f:
-        yaml.dump({"repo": {"namespace": "test_namespace"}}, f)
+        syaml.dump({"repo": {"namespace": "test_namespace"}}, f)
     os.remove(repo_config_file)
 
     with pytest.raises(BadRepoError) as e:  # Catch BadRepoError directly

@@ -175,8 +175,8 @@ def repo_add(args):
                     )
         except Exception as e:
             raise ramble.repository.BadRepoError(
-                f"Error reading or parsing {repo_config_name} in '{path}': {e}"
-            )
+                f"Error reading or parsing {repo_config_name} in '{path}'"
+            ) from e
 
         # Now that we have a valid namespace, check for at least one object type directory
         at_least_one_object_type_found = False
