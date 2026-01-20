@@ -150,6 +150,11 @@ def working_env():
 #
 # Test-specific fixtures
 #
+
+
+#
+# Mock repository paths
+#
 @pytest.fixture(scope="function")
 def mock_apps_repo_path():
     obj_type = ramble.repository.ObjectTypes.applications
@@ -171,6 +176,30 @@ def mock_pkg_mans_repo_path():
 @pytest.fixture(scope="function")
 def mock_wms_repo_path():
     obj_type = ramble.repository.ObjectTypes.workflow_managers
+    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture(scope="function")
+def mock_base_apps_repo_path():
+    obj_type = ramble.repository.ObjectTypes.base_applications
+    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture(scope="function")
+def mock_base_mods_repo_path():
+    obj_type = ramble.repository.ObjectTypes.base_modifiers
+    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture(scope="function")
+def mock_base_pkg_mans_repo_path():
+    obj_type = ramble.repository.ObjectTypes.base_package_managers
+    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+
+@pytest.fixture(scope="function")
+def mock_base_wms_repo_path():
+    obj_type = ramble.repository.ObjectTypes.base_workflow_managers
     yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
 
 
@@ -196,6 +225,9 @@ def _get_obj_repo_path(obj_type, extra_repo_path):
     yield ramble.repository.RepoPath(*repos, object_type=obj_type)
 
 
+#
+# Mutable repository paths
+#
 @pytest.fixture(scope="function")
 def mutable_apps_repo_path(pytestconfig):
     obj_type = ramble.repository.ObjectTypes.applications
@@ -225,6 +257,37 @@ def mutable_wms_repo_path(pytestconfig):
 
 
 @pytest.fixture(scope="function")
+def mutable_base_apps_repo_path(pytestconfig):
+    obj_type = ramble.repository.ObjectTypes.base_applications
+    extra_repo_path = pytestconfig.getoption("--repo-path")
+    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+
+
+@pytest.fixture(scope="function")
+def mutable_base_mods_repo_path(pytestconfig):
+    obj_type = ramble.repository.ObjectTypes.base_modifiers
+    extra_repo_path = pytestconfig.getoption("--repo-path")
+    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+
+
+@pytest.fixture(scope="function")
+def mutable_base_pkg_mans_repo_path(pytestconfig):
+    obj_type = ramble.repository.ObjectTypes.base_package_managers
+    extra_repo_path = pytestconfig.getoption("--repo-path")
+    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+
+
+@pytest.fixture(scope="function")
+def mutable_base_wms_repo_path(pytestconfig):
+    obj_type = ramble.repository.ObjectTypes.base_workflow_managers
+    extra_repo_path = pytestconfig.getoption("--repo-path")
+    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+
+
+#
+# Mock object types
+#
+@pytest.fixture(scope="function")
 def mock_applications(mock_apps_repo_path):
     """Use the 'builtin.mock' repository for applications instead of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.applications
@@ -236,7 +299,7 @@ def mock_applications(mock_apps_repo_path):
 
 @pytest.fixture(scope="function")
 def mock_modifiers(mock_mods_repo_path):
-    """Use the 'builtin.mock' repository for modifiersinstead of 'builtin'"""
+    """Use the 'builtin.mock' repository for modifiers instead of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.modifiers
     with ramble.repository.use_repositories(
         mock_mods_repo_path, object_type=obj_type
@@ -256,12 +319,55 @@ def mock_package_managers(mock_pkg_mans_repo_path):
 
 @pytest.fixture(scope="function")
 def mock_workflow_managers(mock_wms_repo_path):
-    """Use the 'builtin.mock' repository for package managers of 'builtin'"""
+    """Use the 'builtin.mock' repository for workflow managers of 'builtin'"""
     obj_type = ramble.repository.ObjectTypes.workflow_managers
     with ramble.repository.use_repositories(mock_wms_repo_path, object_type=obj_type) as mock_repo:
         yield mock_repo
 
 
+@pytest.fixture(scope="function")
+def mock_base_applications(mock_base_apps_repo_path):
+    """Use the 'builtin.mock' repository for base applications instead of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.base_applications
+    with ramble.repository.use_repositories(
+        mock_base_apps_repo_path, object_type=obj_type
+    ) as mock_base_apps_repo:
+        yield mock_base_apps_repo
+
+
+@pytest.fixture(scope="function")
+def mock_base_modifiers(mock_base_mods_repo_path):
+    """Use the 'builtin.mock' repository for base modifiers instead of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.base_modifiers
+    with ramble.repository.use_repositories(
+        mock_base_mods_repo_path, object_type=obj_type
+    ) as mock_base_mods_repo:
+        yield mock_base_mods_repo
+
+
+@pytest.fixture(scope="function")
+def mock_base_package_managers(mock_base_pkg_mans_repo_path):
+    """Use the 'builtin.mock' repository for base package managers of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.base_package_managers
+    with ramble.repository.use_repositories(
+        mock_base_pkg_mans_repo_path, object_type=obj_type
+    ) as mock_base_pkg_mans_repo:
+        yield mock_base_pkg_mans_repo
+
+
+@pytest.fixture(scope="function")
+def mock_base_workflow_managers(mock_base_wms_repo_path):
+    """Use the 'builtin.mock' repository for base workflow managers of 'builtin'"""
+    obj_type = ramble.repository.ObjectTypes.base_workflow_managers
+    with ramble.repository.use_repositories(
+        mock_base_wms_repo_path, object_type=obj_type
+    ) as mock_base_wms_repo:
+        yield mock_base_wms_repo
+
+
+#
+# Mutable object types
+#
 @pytest.fixture(scope="function")
 def mutable_applications(mutable_apps_repo_path):
     obj_type = ramble.repository.ObjectTypes.applications
@@ -299,6 +405,45 @@ def mutable_workflow_managers(mutable_wms_repo_path):
 
 
 @pytest.fixture(scope="function")
+def mutable_base_applications(mutable_base_apps_repo_path):
+    obj_type = ramble.repository.ObjectTypes.base_applications
+    with ramble.repository.use_repositories(
+        mutable_base_apps_repo_path, object_type=obj_type
+    ) as base_apps_repo:
+        yield base_apps_repo
+
+
+@pytest.fixture(scope="function")
+def mutable_base_modifiers(mutable_base_mods_repo_path):
+    obj_type = ramble.repository.ObjectTypes.base_modifiers
+    with ramble.repository.use_repositories(
+        mutable_base_mods_repo_path, object_type=obj_type
+    ) as base_mods_repo:
+        yield base_mods_repo
+
+
+@pytest.fixture(scope="function")
+def mutable_base_package_managers(mutable_base_pkg_mans_repo_path):
+    obj_type = ramble.repository.ObjectTypes.base_package_managers
+    with ramble.repository.use_repositories(
+        mutable_base_pkg_mans_repo_path, object_type=obj_type
+    ) as base_pkg_mans_repo:
+        yield base_pkg_mans_repo
+
+
+@pytest.fixture(scope="function")
+def mutable_base_workflow_managers(mutable_base_wms_repo_path):
+    obj_type = ramble.repository.ObjectTypes.base_workflow_managers
+    with ramble.repository.use_repositories(
+        mutable_base_wms_repo_path, object_type=obj_type
+    ) as base_wms_repo:
+        yield base_wms_repo
+
+
+#
+# Mutable repositories
+#
+@pytest.fixture(scope="function")
 def mutable_mock_apps_repo(mock_apps_repo_path):
     """Function-scoped mock applications, for tests that need to modify them."""
     obj_type = ramble.repository.ObjectTypes.applications
@@ -329,6 +474,42 @@ def mutable_mock_pkg_mans_repo(mock_pkg_mans_repo_path):
 def mutable_mock_wms_repo(mock_wms_repo_path):
     """Function-scoped mock package managers, for tests that need to modify them."""
     obj_type = ramble.repository.ObjectTypes.workflow_managers
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
+        yield mock_repo_path
+
+
+@pytest.fixture(scope="function")
+def mutable_mock_base_apps_repo(mock_base_apps_repo_path):
+    """Function-scoped mock base applications, for tests that need to modify them."""
+    obj_type = ramble.repository.ObjectTypes.base_applications
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
+        yield mock_repo_path
+
+
+@pytest.fixture(scope="function")
+def mutable_mock_base_mods_repo(mock_base_mods_repo_path):
+    """Function-scoped mock base modifiers, for tests that need to modify them."""
+    obj_type = ramble.repository.ObjectTypes.base_modifiers
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
+        yield mock_repo_path
+
+
+@pytest.fixture(scope="function")
+def mutable_mock_base_pkg_mans_repo(mock_base_pkg_mans_repo_path):
+    """Function-scoped mock base package managers, for tests that need to modify them."""
+    obj_type = ramble.repository.ObjectTypes.base_package_managers
+    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
+        yield mock_repo_path
+
+
+@pytest.fixture(scope="function")
+def mutable_mock_base_wms_repo(mock_base_wms_repo_path):
+    """Function-scoped mock base workflow managers, for tests that need to modify them."""
+    obj_type = ramble.repository.ObjectTypes.base_workflow_managers
     mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
     with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
         yield mock_repo_path
