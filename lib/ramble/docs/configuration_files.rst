@@ -413,6 +413,7 @@ The format of the internals config section is as follows:
           use_mpi: [True/False] # Default: False
           redirect: 'where_to_redirect_output' # Default '{log_file}'
           output_capture: 'operator_to_use_for_redirection' # Default >>
+          force: [True/False] # Default: False
       executables:
       - list of
       - executables
@@ -423,11 +424,12 @@ The format of the internals config section is as follows:
         order: 'before' / 'after' # Default: 'after'
         [relative_to: <relative_executable_name>]
 
-Currently this section has two sub-sections.
+Currently this section has three sub-sections.
 
 The ``custom_executables`` sub-section can be used to define new executables
-that an experiment should use. It can also be used to override the definition
-of an internally defined executable within an experiment.
+that an experiment can use. It can also be used to override the definition
+of an internally defined executable within an experiment, when the ``force``
+property is set to ``True``.
 
 The ``executables`` sub-section can be used to control the order executables
 will be used in the experiment. This is also the mechanism to inject custom

@@ -11,6 +11,7 @@ import re
 
 import pytest
 
+import ramble.error
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
@@ -133,3 +134,61 @@ ramble:
 
         assert custom_found and cmd_found and export_found
         assert all(inject_order_found)
+
+
+def test_executable_already_defined(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    hostname:
+      workloads:
+        local:
+          experiments:
+            test:
+              internals:
+                custom_executables:
+                  local:
+                    template:
+                    - 'hostname-not-overridden'
+"""
+    _, ws_name = make_workspace_from_config(test_config)
+    with pytest.raises(
+        ramble.error.ExecutableNameError, match='an executable "local" is already defined'
+    ):
+        workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+
+def test_executable_override_with_force(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    hostname:
+      workloads:
+        local:
+          experiments:
+            test:
+              internals:
+                custom_executables:
+                  local:
+                    template:
+                    - 'hostname-overridden'
+                    force: true
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    experiment_root = ws.experiment_dir
+    exp_dir = os.path.join(experiment_root, "hostname", "local", "test")
+    exp_script = os.path.join(exp_dir, "execute_experiment")
+
+    with open(exp_script) as f:
+        content = f.read()
+        assert "hostname-overridden >>" in content
+        # The old executable should not be included
+        assert "hostname >>" not in content
