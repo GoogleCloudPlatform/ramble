@@ -28,6 +28,7 @@ custom_executables_def = {
             "use_mpi": False,
             "redirect": "{log_file}",
             "variables": {},
+            "force": False,
             "output_capture": OUTPUT_CAPTURE.DEFAULT,
         },
         "properties": union_dicts(
@@ -35,6 +36,7 @@ custom_executables_def = {
                 "template": ramble.schema.types.array_or_scalar_of_strings_or_nums,
                 "use_mpi": {"type": "boolean"},
                 "redirect": ramble.schema.types.string_or_num,
+                "force": {"type": "boolean"},
             },
             ramble.schema.variables.properties,
         ),

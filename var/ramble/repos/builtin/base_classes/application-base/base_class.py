@@ -1402,7 +1402,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if (
                     name in filtered_executabls
                     or name in self.custom_executables
-                ):
+                ) and not conf.get("force", False):
                     experiment_namespace = self.expander.expand_var_name(
                         "experiment_namespace"
                     )
@@ -1426,10 +1426,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             ExecutableGraph: Graph of executables for workload
         """
         self._define_custom_executables()
-        exec_order = self.get_workload(workload_name).executables
         # Use yaml defined executable order, if defined
         if namespace.executables in self.internals:
             exec_order = self.internals[namespace.executables]
+        else:
+            exec_order = self.get_workload(workload_name).executables
 
         builtin_objects = []
         all_builtins = []
