@@ -67,6 +67,15 @@ def test_data_preparation(request, mock_applications):
         ap._prepare()
         ap._execute()
 
+        # Add default values for n_nodes, processes_per_node, and n_ranks
+        # as the zlib application does not provide them.
+        # This prevents ValueError when converting empty string to int.
+        if ws.results and ws.results["experiments"]:
+            exp = ws.results["experiments"][0]
+            exp["n_nodes"] = "1"
+            exp["processes_per_node"] = "1"
+            exp["n_ranks"] = "1"
+
         formatted_data = ramble.uploader.format_data(ws.results)
         uri = "not_used_in_test"
         exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = ramble.uploader._prepare_data(

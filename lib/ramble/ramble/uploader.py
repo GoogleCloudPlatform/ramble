@@ -72,10 +72,10 @@ class Experiment:
         self.workspace_hash = workspace_hash
         self.workload_name = data["workload_name"]
         self.bulk_hash = None  # proxy for workspace or "uploaded with"
-        self.n_nodes = data["n_nodes"]
-        self.processes_per_node = data["processes_per_node"]
-        self.n_ranks = data["n_ranks"]
-        self.n_threads = data["n_threads"]
+        self.n_nodes = int(data["n_nodes"])
+        self.processes_per_node = int(data["processes_per_node"])
+        self.n_ranks = int(data["n_ranks"])
+        self.n_threads = int(data["n_threads"])
         self.node_type = default_node_type_val
         self.status = data["RAMBLE_STATUS"]
         self.user = get_user()
