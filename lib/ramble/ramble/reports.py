@@ -463,15 +463,15 @@ class PlotGenerator:
         """When using summary statistics from repeats, adds columns fom_value_min and fom_value_max
         to the selected data.
         """
-        min_data.loc[:, scale_var] = to_numeric_if_possible(min_data[scale_var])
+        min_data[scale_var] = to_numeric_if_possible(min_data[scale_var])
         min_data = min_data.set_index(scale_var)
-        max_data.loc[:, scale_var] = to_numeric_if_possible(max_data[scale_var])
+        max_data[scale_var] = to_numeric_if_possible(max_data[scale_var])
         max_data = max_data.set_index(scale_var)
 
-        selected_data.loc[:, ReportVars.FOM_VALUE_MIN.value] = to_numeric_if_possible(
+        selected_data[ReportVars.FOM_VALUE_MIN.value] = to_numeric_if_possible(
             min_data[ReportVars.FOM_VALUE.value]
         )
-        selected_data.loc[:, ReportVars.FOM_VALUE_MAX.value] = to_numeric_if_possible(
+        selected_data[ReportVars.FOM_VALUE_MAX.value] = to_numeric_if_possible(
             max_data[ReportVars.FOM_VALUE.value]
         )
 
@@ -652,10 +652,10 @@ class ScalingPlotGenerator(PlotGenerator):
                 'or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")'
             ).copy()
 
-            series_results.loc[:, ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+            series_results[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
                 series_results[ReportVars.FOM_VALUE.value]
             )
-            series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+            series_results[scale_var] = to_numeric_if_possible(series_results[scale_var])
             series_results = series_results.set_index(scale_var)
 
             self.validate_data(series_results)
@@ -823,11 +823,11 @@ class FomPlot(PlotGenerator):
 
             scale_var = "experiment_namespace"
 
-            series_results.loc[:, ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+            series_results[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
                 series_results[ReportVars.FOM_VALUE.value]
             )
 
-            series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+            series_results[scale_var] = to_numeric_if_possible(series_results[scale_var])
 
             series_results = series_results.set_index(scale_var)
 
