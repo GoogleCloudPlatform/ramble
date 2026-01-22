@@ -57,6 +57,12 @@ def test_data_preparation(request, mock_applications):
             wl_name,
             "-p",
             "spack",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
             global_args=global_args,
         )
         workspace("concretize", global_args=global_args)
