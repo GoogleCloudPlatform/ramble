@@ -999,10 +999,6 @@ class Repo:
         )
 
         self.objects_path = os.path.join(self.root, objects_dir)
-        check(
-            os.path.isdir(self.objects_path),
-            f"Objects directory '{self.objects_path}' not found or is not a directory.",
-        )
 
         # Set up 'full_namespace' to include the super-namespace
         self.full_namespace = f"{self.base_namespace}.{self.namespace}"
