@@ -57,6 +57,12 @@ def test_data_preparation(request, mock_applications):
             wl_name,
             "-p",
             "spack",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
             global_args=global_args,
         )
         workspace("concretize", global_args=global_args)
@@ -66,15 +72,6 @@ def test_data_preparation(request, mock_applications):
         ap = ramble.pipeline.AnalyzePipeline(ws, filters)
         ap._prepare()
         ap._execute()
-
-        # Add default values for n_nodes, processes_per_node, and n_ranks
-        # as the zlib application does not provide them.
-        # This prevents ValueError when converting empty string to int.
-        if ws.results and ws.results["experiments"]:
-            exp = ws.results["experiments"][0]
-            exp["n_nodes"] = "1"
-            exp["processes_per_node"] = "1"
-            exp["n_ranks"] = "1"
 
         formatted_data = ramble.uploader.format_data(ws.results)
         uri = "not_used_in_test"
