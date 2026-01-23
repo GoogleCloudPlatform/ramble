@@ -178,7 +178,7 @@ The current default configuration is as follows:
           flags: ''
         env_create:
           flags: ''
-        global
+        global:
           flags: ''
         env_view:
           link_type: 'symlink'
