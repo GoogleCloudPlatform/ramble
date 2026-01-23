@@ -664,10 +664,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
 
+        default_variables = {}
         # Process the application variables that are missing
         for var, val in self.selected_variables.items():
             if var not in self.variables:
-                self.define_variable(var, val.default)
+                default_variables[var] = val.default
 
         # Extract a merged set of when_keys from objects that are not
         # applications.
@@ -691,6 +692,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         while True:
             to_define = {}
+            changed_definitions = False
             # Process any missing variables from other objects
             for obj, when_keys in object_when_map.items():
                 to_remove = set()
@@ -700,17 +702,21 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         for var in obj.object_variables[when_key]:
                             if var.name not in self.variables:
                                 to_define[var.name] = var.default
+                                changed_definitions = True
 
                 # Remove any satisfied when_keys, as we won't need to check
                 # them (since their variables have already been defined).
                 for when_key in to_remove:
                     when_keys.remove(when_key)
 
-            if not to_define:
+            if not changed_definitions:
                 break
 
             for var, val in to_define.items():
-                self.define_variable(var, val)
+                default_variables[var] = val
+
+        for var, val in default_variables.items():
+            self.define_variable(var, val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
