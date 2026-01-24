@@ -178,7 +178,7 @@ The current default configuration is as follows:
           flags: ''
         env_create:
           flags: ''
-        global
+        global:
           flags: ''
         env_view:
           link_type: 'symlink'
@@ -275,10 +275,10 @@ the set of repeats. Its format is as follows:
 
     config:
       n_repeats: 'int'
-      repeats_success_strict: [True/False]
+      repeat_success_strict: [True/False]
 
 By default, a set of repeats is successful if all individual repeats are successful.
-When ``repeats_success_strict`` is set to false, the set will be considered successful
+When ``repeat_success_strict`` is set to false, the set will be considered successful
 if any repeat succeeds, and statistics will be calculated over the successful experiments
 only.
 

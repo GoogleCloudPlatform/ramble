@@ -113,6 +113,7 @@ supported_math_operators = {
     ast.BitAnd: operator.and_,
     ast.BitOr: operator.or_,
     ast.BitXor: operator.xor,
+    ast.Invert: operator.invert,
     ast.LShift: operator.lshift,
     ast.RShift: operator.rshift,
 }

@@ -133,6 +133,8 @@ def build_variant_set():
         ("0b10 & 0b01", "0", set(), 1),
         ("0b10 | 0b01", "3", set(), 1),
         ("0b10 ^ 0b01", "3", set(), 1),
+        ("~0", "-1", set(), 1),
+        ("~2", "-3", set(), 1),
         ("0b10 << 1", "4", set(), 1),
         ("0b10 >> 1", "1", set(), 1),
         # Can be a handy way to select experiments to run
@@ -212,6 +214,8 @@ def test_expansions(input, output, no_expand_vars, passes):
         ("2 or 1", 2, set(), 1),
         ("randrange(2, 3, 1)", 2, set(), 1),
         ("randint(3, 3)", 3, set(), 1),
+        ("~0", -1, set(), 1),
+        ("~2", -3, set(), 1),
     ],
 )
 def test_typed_expansions(input, output, no_expand_vars, passes):

@@ -545,7 +545,7 @@ level.
     ramble:
       config:
         n_repeats: int
-        repeats_success_strict: [True/False]
+        repeat_success_strict: [True/False]
       applications:
         hostname:
           n_repeats: int
