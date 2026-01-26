@@ -192,6 +192,15 @@ which is implemented as a class method which returns two lists of
 ``CommandExecutable`` objects, which are injected before and after each
 executable.
 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Modifiers can define requirements that must be met when using a package manager.
+The ``package_manager_requirement`` directive
+(:py:meth:`ramble.language.modifier_language.package_manager_requirement`) can
+be used to ensure certain package manager commands return expected output.
+
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Variable Modification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
