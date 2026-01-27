@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.error
 import ramble.workspace
 from ramble.main import RambleCommand
 
