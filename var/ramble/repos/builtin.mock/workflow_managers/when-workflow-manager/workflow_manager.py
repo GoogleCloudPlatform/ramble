@@ -65,6 +65,20 @@ class WhenWorkflowManager(WorkflowManagerBase):
         when=["+wf_man_required_key"],
     )
 
+    variant(
+        "set_precedence_var",
+        default=False,
+        values=[True, False],
+        description="Variant to control the value of object_precedence_var",
+    )
+
+    with when("+set_precedence_var"):
+        workflow_manager_variable(
+            "object_precedence_var",
+            default="object_precedence_var from workflow_manager",
+            description="Variable to exercise object precedence",
+        )
+
     def get_status(self, workspace):
         """Return status of a given job"""
         return None

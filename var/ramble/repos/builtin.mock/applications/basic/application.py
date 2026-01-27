@@ -75,6 +75,13 @@ class Basic(ExecutableApplication):
         },
     )
 
+    workload_variable(
+        "object_precedence_var",
+        default="object_precedence_var from application",
+        description="Variable to exercise object precedence",
+        workloads=["*"],
+    )
+
     environment_variable(
         "TEST_ENV", value="1", description="test var", workload="test_wl"
     )

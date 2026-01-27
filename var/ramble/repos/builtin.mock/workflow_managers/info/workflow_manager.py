@@ -92,7 +92,7 @@ class Info(WorkflowManagerBase):
 
     register_builtin("builtin_name", required=True)
 
-    def builtin_name():
+    def builtin_name(self):
         return ['echo "builtin"']
 
     register_phase(
