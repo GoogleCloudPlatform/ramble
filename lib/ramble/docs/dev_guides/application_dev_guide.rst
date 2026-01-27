@@ -210,6 +210,16 @@ workload in an ``application.py`` allows it to be used within a
 :ref:`workspace-config` and will be shown when executing ``ramble info <app>``
 on the named application.
 
+^^^^^^^^^^^^^^^
+Workload Groups
+^^^^^^^^^^^^^^^
+
+Workload groups allow for grouping multiple workloads together under a single
+name. This can be used to apply variables or environment variables to all
+workloads in the group. The ``workload_group`` directive 
+(:py:meth:`ramble.language.application_language.workload_group`) is used to
+define a workload group.
+
 ^^^^^^^^^^^^^^^^^^
 Workload Variables
 ^^^^^^^^^^^^^^^^^^
@@ -220,8 +230,25 @@ definition of the workload (such as executable commands). Each workload can
 have an arbitrary number of workload variables, defined by
 :py:meth:`ramble.language.application_language.workload_variable`.
 
-Each variable has a default value, which can be override within a
+Each variable has a default value, which can be overridden within a
 :ref:`workspace-config`.
+
+^^^^^^^^^^^^^^^^^^^^^^
+Environment Variables
+^^^^^^^^^^^^^^^^^^^^^^
+
+Applications can define environment variables that should be set, appended, or
+prepended during an experiment. The ``environment_variable`` directive
+(:py:meth:`ramble.language.shared_language.environment_variable`) is used for
+this purpose.
+
+^^^^^^^^^^^^^^^^^^
+Required Variables
+^^^^^^^^^^^^^^^^^^
+
+If an application requires certain variables to be defined in the workspace
+configuration, it can mark them as required using the ``required_variable``
+directive (:py:meth:`ramble.language.shared_language.required_variable`).
 
 ^^^^^^^^^^^^^^^^
 Success Criteria
@@ -266,6 +293,23 @@ additional information, Ramble has the ability to define a figure of merit
 context. Each context represents a grouping of figures of merit that are
 collected together. A figure of merit context can be defined using
 :py:meth:`ramble.language.shared_language.figure_of_merit_context`.
+
+^^^^^^^^^^^^^^^^^^^^
+Cleaning up Files
+^^^^^^^^^^^^^^^^^^^^
+
+Applications can define cleanup operations to remove files matching a regex
+before or after execution. The ``cleanup`` directive
+(:py:meth:`ramble.language.application_language.cleanup`) is used to define
+these operations.
+
+^^^^^^^^^^^^^^^^^^^^
+Staging Files
+^^^^^^^^^^^^^^^^^^^^
+
+The ``stage_files`` directive
+(:py:meth:`ramble.language.application_language.stage_files`) can be used to
+copy or link files and directories into the experiment directory.
 
 ^^^^^^^^^^^^^^^^^^
 File path handling
@@ -317,6 +361,47 @@ more detail later, but an example of this specific variant would be:
 In this case, the variable ``gpu_flag`` will be defined, and will have
 a value of ``-g`` or an empty string, depending on the value of the
 ``gpu`` variant.
+
+
+^^^^^^^^^^^^^^^^^^^^
+License Names
+^^^^^^^^^^^^^^^^^^^^
+
+The ``license_name`` directive
+(:py:meth:`ramble.language.application_language.license_name`) can be used to
+declaratively set the name of a license required by the application.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Configs
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Applications can provide configurations to the package manager using the
+``package_manager_config`` directive
+(:py:meth:`ramble.language.shared_language.package_manager_config`).
+
+^^^^^^^^^^^^^^^^^^^^
+Target Shells
+^^^^^^^^^^^^^^^^^^^^
+
+The ``target_shells`` directive
+(:py:meth:`ramble.language.shared_language.target_shells`) can be used to
+specify which shells are supported by the application.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Formatted Executables
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``formatted_executable`` directive
+(:py:meth:`ramble.language.shared_language.formatted_executable`) allows
+defining variables that represent a formatted merging of multiple executables.
+
+^^^^^^^^^^^^^^^^^^^^
+Validators
+^^^^^^^^^^^^^^^^^^^^
+
+Validators can be registered to ensure certain conditions are met during
+experiment setup. The ``register_validator`` directive
+(:py:meth:`ramble.language.shared_language.register_validator`) is used for this.
 
 
 .. _application-dev-conditional-logic:

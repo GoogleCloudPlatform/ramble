@@ -29,6 +29,11 @@ Configuration Sections:
 Currently, Ramble supports the following configuration sections:
 
 * :ref:`applications <application-config>`
+* :ref:`base_application_repos <repos-config>`
+* :ref:`base_class_repos <repos-config>`
+* :ref:`base_modifier_repos <repos-config>`
+* :ref:`base_package_manager_repos <repos-config>`
+* :ref:`base_workflow_manager_repos <repos-config>`
 * :ref:`config <config-yaml>`
 * :ref:`env_vars <env-vars-config>`
 * :ref:`formatted_executables <formatted-execs-config>`
@@ -37,12 +42,15 @@ Currently, Ramble supports the following configuration sections:
 * :ref:`mirrors <mirrors-config>`
 * :ref:`modifier_repos <modifier-repos-config>`
 * :ref:`modifiers <modifiers-config>`
+* :ref:`package_manager_repos <repos-config>`
 * :ref:`repos <repos-config>`
 * :ref:`software <software-config>`
 * :ref:`success_criteria <success-criteria-config>`
 * :ref:`tables <tables-config>`
 * :ref:`variables <variables-config>`
 * :ref:`variants <variants-config>`
+* :ref:`workflow_manager_repos <repos-config>`
+* :ref:`zips <zips-config>`
 
 Each of these config sections has a defined schema contained in
 ``lib/ramble/ramble/schemas``.
@@ -168,7 +176,7 @@ The current default configuration is as follows:
 .. code-block:: yaml
 
     config:
-      shell: ''
+      shell: 'bash'
       spack:
         install:
           flags: '--reuse'
@@ -218,7 +226,8 @@ Upload
 Ramble aims to support the upload of experiment outcomes (including FOMs), to
 SQL-like datastores. To do this we can specify an ``upload:type`` as defined by
 :mod:`ramble.uploader.uploader_types`, and a ``upload:uri`` to specify the
-destination.
+destination. Supported types include ``BigQuery`` and ``PrintOnly`` (which
+only logs the data without performing an actual upload).
 
 As part of the upload it tries to attribute the data to a user. This can be
 specified via ``config:user``, or if blank ramble will try deduce it based on
@@ -284,6 +293,22 @@ only.
 
 More information on using repeats within a workspace can be found in the
 :ref:`workspace configuration file<workspace-config>`.
+
+.. _general-config-options:
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+General Config Options
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Several general configuration options can be set within the ``config`` section:
+
+* ``report_dirs``: Defines the directory where Ramble will store generated reports.
+  Default is ``~/.ramble/reports``.
+* ``stage_method``: Defines the method used to stage files. Valid options are
+  ``cp``, ``rsync``, ``symbolic_link``, and ``hard_link``. Default is ``cp``.
+* ``resolve_variables_in_subprocesses``: A boolean flag that controls if environment
+  variables should be resolved in subprocesses. Default is ``False``.
+* ``shell``: Defines the shell to use for generated scripts. Default is ``bash``.
 
 .. _env-vars-config:
 
@@ -362,7 +387,7 @@ The default values for the attributes are:
 .. code-block:: yaml
 
   formatted_executables:
-    command_name:
+    command:
       indentation: 0
       prefix: ''
       join_separator: '\n'
@@ -547,7 +572,19 @@ Repos Section:
 --------------
 
 The repos config section is used to control which repositories should
-be searched for when looking for application definitions. Its format is as follows:
+be searched for when looking for application definitions. Other sections
+controlling different types of object repositories follow the same format.
+These include:
+
+* ``base_application_repos``
+* ``base_class_repos``
+* ``base_modifier_repos``
+* ``base_package_manager_repos``
+* ``base_workflow_manager_repos``
+* ``package_manager_repos``
+* ``workflow_manager_repos``
+
+The format for these sections is as follows:
 
 .. code-block:: yaml
 
@@ -825,3 +862,23 @@ variant could be lazily expanded based on an experiment's variable definitions).
 
 The default value for ``package_manager`` is ``null`` which disables the use of
 a package manager.
+
+.. _zips-config:
+
+-------------
+Zips Section:
+-------------
+
+The zips config section is used to define explicit groupings of variables that
+are related and should be iterated over together when generating experiments.
+Its format is as follows:
+
+.. code-block:: yaml
+
+    zips:
+      <zip_name>:
+      - <var1>
+      - <var2>
+
+For more information on using zips, see the :ref:`explicit variable zips
+documentation<ramble-explicit-zips>`.
