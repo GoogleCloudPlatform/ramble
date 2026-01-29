@@ -55,6 +55,10 @@ def _re_search(regex, s):
     return re.search(regex, s) is not None
 
 
+def _str_replace(s, *args, **kwargs):
+    return str(s).replace(*args, **kwargs)
+
+
 # TODO: These conditional defines should be removed when support for
 # older Python versions are dropped.
 if sys.version_info >= (3, 8):
@@ -134,6 +138,7 @@ supported_scalar_function_pointers = {
     "simplify_str": spack.util.naming.simplify_name,
     "join_str": _join_str,
     "re_search": _re_search,
+    "replace": _str_replace,
 }
 
 # Format Spec Regex:
@@ -972,8 +977,6 @@ class Expander:
         elif node.func.id in supported_list_function_pointers.keys():
             func = supported_list_function_pointers[node.func.id]
             return list(func(*args, **kwargs))
-        elif node.func.id == "replace":
-            return str(args[0]).replace(*args[1:], **kwargs)
         elif node.func.id in supported_scalar_function_with_self_arg_pointers.keys():
             func = supported_scalar_function_with_self_arg_pointers[node.func.id]
             return func(self, *args, **kwargs)

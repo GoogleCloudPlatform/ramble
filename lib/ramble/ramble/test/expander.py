@@ -154,6 +154,8 @@ def build_variant_set():
         ("str_lstrip('AAAbbb', 'A')", "bbb", set(), 1),
         ("str_join('.', str_split('a b c 1'))", "a.b.c.1", set(), 1),
         ("str_no_such_method('a')", "str_no_such_method('a')", set(), 1),
+        ("replace('abc', 'a', 'd')", "dbc", set(), 1),
+        ("replace('{application_name}', 'f', 'F')", "Foo", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
