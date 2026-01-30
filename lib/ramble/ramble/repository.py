@@ -842,7 +842,15 @@ class RepoPath:
 
     def last_mtime(self):
         """Time a object file in this repo was last updated."""
-        return max(repo.last_mtime() for repo in self.repos)
+        # Filter out repos that don't have any mtime values before calling max
+        mtimes = []
+        for repo in self.repos:
+            try:
+                mtimes.append(repo.last_mtime())
+            except ValueError:
+                # This repo has no objects, so just skip it.
+                pass
+        return max(mtimes) if mtimes else 0
 
     def repo_for_obj(self, spec):
         """Given a spec, get the repository for its object."""

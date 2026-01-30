@@ -595,7 +595,7 @@ class Workspace:
 #   - log_dir (Will be replaced with the logs directory)
 #   - experiment_name (Will be replaced with the name of the experiment)
 #   - workload_run_dir (Will be replaced with the directory of the workload
-#   - application_name (Will be repalced with the name of the application)
+#   - application_name (Will be replaced with the name of the application)
 #   - n_nodes (Will be replaced with the required number of nodes)
 #   Any experiment parameters will be available as variables as well.
 

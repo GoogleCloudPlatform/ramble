@@ -8,16 +8,16 @@
 
 .. _tutorials:
 
-=========
-Tutorials
-=========
+==============
+User Tutorials
+==============
 
 Below is a list of available tutorials for getting started with Ramble and its
 various features.
 
 .. toctree::
     :maxdepth: 1
-    :caption: Tutorials
+    :caption: User Tutorials
 
     tutorials/1_hello_world
     tutorials/2_running_a_simple_gromacs_experiment
@@ -33,3 +33,5 @@ various features.
     tutorials/mirrors
     tutorials/EESSI_package_manager
     tutorials/Workspace_config_command
+
+
