@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import ast
+import collections
 import itertools
 import math
 import operator
@@ -687,10 +688,11 @@ class Expander:
         logger.debug(f"BEGINNING OF EXPAND_VAR STACK ON {var}")
         logger.debug(f" REPLACE VAR (1): {replace_escaped_braces}")
         logger.debug(f" REPLACE VAR (2): {self._replace_escaped_braces}")
-        expansions = self._variables
+
         if extra_vars:
-            expansions = self._variables.copy()
-            expansions.update(extra_vars)
+            expansions = collections.ChainMap(extra_vars, self._variables)
+        else:
+            expansions = self._variables
 
         try:
             value = self._partial_expand(
