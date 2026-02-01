@@ -18,13 +18,13 @@ Ramble works on Linux, macOS, and many supercomputers.
 
 Ramble is primarily controlled through the `ramble` command. Key aspects of the CLI include:
 
-*   You should always examing the command line interface before you execute any ramble commands, as the arguments might change over time.
+*   You should always examine the command line interface before you execute any ramble commands, as the arguments might change over time.
 *   **Getting Help:** Users can get help on any command by using `ramble help` or `ramble help --all` for more detailed information on all commands. Help is also available for subcommands (e.g., `ramble workspace --help`).
 *   **Discovering Commands and Depth:** To discover the full command hierarchy and determine its maximum depth, start with `ramble help --all`. For any command that shows `...` in its help text (indicating it has subcommands), run that command with `--help` or `-h` to explore its subcommands (e.g., `ramble workspace --help`). This process can be repeated recursively until no more subcommands are found. The longest chain of commands reveals the maximum depth of the CLI.
 *   **Key Commands:**
     *   `ramble workspace create`: To set up a new experiment workspace.
     *   `ramble workspace config`: To manage workspace configurations.
-    *   `ramble run`: To execute the experiments defined in the workspace.
+    *   `ramble on`: To execute the experiments defined in the workspace.
     *   `ramble list`: To list available applications, modifiers, etc.
     *   `ramble config`: To manage Ramble's configuration settings.
     *   `ramble repo`: To manage Ramble repositories.
@@ -44,7 +44,7 @@ Ramble uses YAML files for configuration, drawing inspiration from Spack's confi
 
 Ramble supports various sections within its configuration files. These can exist in the workspace `ramble.yaml`, in separate files within `$workspace/configs/`, or in other configuration scopes (user, site, system). Key sections include:
 
-*   `applications`: Defines the experiments to be generated, including application, workload, and experiment scopes, variables, matrices, etc.. See the [Application Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#application-section).
+*   `applications`: Defines the experiments to be generated, including application, workload, and experiment scopes, variables, matrices, etc. See the [Application Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#application-section).
 *   `config`: Controls internal Ramble behavior, shell settings, Spack command flags, and upload configurations. See the [Config Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#config-section).
 *   `env_vars`: Manages environment variable modifications (set, append, prepend, unset) for experiments. See the [Environment Variables Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#environment-variables-section).
 *   `software`: Defines software packages and environments, specifying package manager specs (e.g., Spack specs), compilers, and dependencies. See the [Software Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#software-section).
@@ -118,6 +118,7 @@ This section provides a practical guide for creating a new Ramble application de
         ramble list --type base_applications
         ramble list --type base_modifiers
         ramble list --type base_package_managers
+        ramble list --type base_workflow_managers
         ```
 
 3.  **Key Concepts and Patterns**:
@@ -243,7 +244,7 @@ Ramble uses `pytest` for its unit tests. The tests can be run using a wrapper co
     ramble unit-test -k gromacs
     ```
 
-Prefer using `-k` if we know which tests we added.
+Using `-k` is particularly useful for running only newly added tests.
 
 *   **Getting Help:**
     *   For help with the `ramble unit-test` command itself: `ramble unit-test --help`
