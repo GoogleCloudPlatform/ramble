@@ -21,7 +21,6 @@ import ramble.cmd
 import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.expander
-import ramble.experiment_set
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
@@ -779,6 +778,35 @@ def workspace_info(args):
     # Build experiment set
     experiment_set = ws.build_experiment_set()
 
+    experiments_by_context = {}
+
+    filters = ramble.filters.Filters(
+        phase_filters=[],
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags,
+    )
+
+    filtered_experiments = experiment_set.filtered_experiments(filters)
+
+    # Index the filtered experiments
+    for _, app_inst, _ in filtered_experiments:
+        app_name = app_inst.expander.expand_var_name("application_name")
+        workload_name = app_inst.expander.expand_var_name("workload_name")
+
+        # Use the unexpanded experiment template name to match with the experiment_context name
+        exp_template_name = app_inst.variables[app_inst.keywords.experiment_template_name]
+
+        # If this is a repeat, the variable includes the suffix but not the template name
+        if app_inst.repeats and app_inst.repeats.repeat_index:
+            suffix = f".{app_inst.repeats.repeat_index}"
+            if exp_template_name.endswith(suffix):
+                exp_template_name = exp_template_name[: -len(suffix)]
+
+        experiments_by_context.setdefault(app_name, {}).setdefault(workload_name, {}).setdefault(
+            exp_template_name, []
+        ).append(app_inst)
+
     if args.tags:
         color.cprint("")
         all_tags = experiment_set.all_experiment_tags()
@@ -786,31 +814,27 @@ def workspace_info(args):
         color.cprint(colified(all_tags, indent=4))
 
     # Print experiment information
-    # We built a "print_experiment_set" to access the scopes of variables for each
-    # experiment, rather than having merged scopes as we do in the base experiment_set.
-    # The base experiment_set is used to list *all* experiments.
     all_pipelines = {}
     color.cprint("")
+
     color.cprint(rucolor.section_title("Experiments:"))
+
+    # Iterate over the workspace structure to preserve order
     for workloads, application_context in ws.all_applications():
+        app_name = application_context.context_name
         for experiments, workload_context in ws.all_workloads(workloads):
+            workload_name = workload_context.context_name
             for _, experiment_context in ws.all_experiments(experiments):
-                print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
-                print_experiment_set.set_application_context(application_context)
-                print_experiment_set.set_workload_context(workload_context)
-                print_experiment_set.set_experiment_context(experiment_context)
-                print_experiment_set.build_experiment_chains()
+                exp_template_name = experiment_context.context_name
 
-                # Reindex the experiments in the print set to match the overall set
-                for exp_name, print_app_inst, _ in print_experiment_set.all_experiments():
-                    app_inst = experiment_set.get_experiment(exp_name)
-                    experiment_index = app_inst.expander.expand_var_name(
-                        app_inst.keywords.experiment_index
-                    )
+                matching_experiments = (
+                    experiments_by_context.get(app_name, {})
+                    .get(workload_name, {})
+                    .get(exp_template_name, [])
+                )
 
-                    print_app_inst.define_variable(
-                        print_app_inst.keywords.experiment_index, experiment_index
-                    )
+                if not matching_experiments:
+                    continue
 
                 print_header = True
                 # Define variable printing groups.
@@ -825,16 +849,9 @@ def workspace_info(args):
                 header_base = rucolor.nested_4("Variables from")
                 config_vars = ramble.config.config.get("config:variables")
 
-                # Construct filters here...
-                filters = ramble.filters.Filters(
-                    phase_filters=[],
-                    include_where_filters=args.where,
-                    exclude_where_filters=args.exclude_where,
-                    tags=args.filter_tags,
-                )
+                for app_inst in matching_experiments:
+                    exp_name = app_inst.expander.expand_var_name("experiment_namespace")
 
-                for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
-                    app_inst = experiment_set.get_experiment(exp_name)
                     if app_inst.package_manager is not None:
                         software_environments.render_environment(
                             app_inst.expander.expand_var("{env_name}"),

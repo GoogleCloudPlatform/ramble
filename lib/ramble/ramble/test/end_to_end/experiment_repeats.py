@@ -246,3 +246,30 @@ ramble:
             assert "summary::max = 2.0 minutes" in data
             assert "summary::mean = 1.5 minutes" in data
             assert "mode:\n      value = Sleep" in data
+
+
+def test_info_repeats(make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 5
+    n_nodes: 2
+  applications:
+    sleep:
+      workloads:
+        sleep:
+          experiments:
+            test_experiment:
+              n_repeats: 3
+"""
+    ws1, workspace_name = make_workspace_from_config(test_config)
+    output = workspace(
+        "info",
+        global_args=["-w", workspace_name],
+    )
+    assert "Repeat Base Experiment 1: sleep.sleep.test_experiment" in output
+    assert "Experiment 2: sleep.sleep.test_experiment.1" in output
+    assert "Experiment 3: sleep.sleep.test_experiment.2" in output
+    assert "Experiment 4: sleep.sleep.test_experiment.3" in output
