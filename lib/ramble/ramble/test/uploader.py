@@ -15,6 +15,8 @@ import ramble.config
 import ramble.pipeline
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.pkg_man.builtin import spack_lightweight
+from ramble.test.mock_spack_runner import MockSpackRunner
 from ramble.uploader import BigQueryUploader, ConfigError, upload_results
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -42,7 +44,6 @@ def test_upload_results_errs(upload_uri, upload_type, results, expected_err_msg)
 @pytest.mark.maybeslow
 def test_data_preparation(request, mock_applications):
     ws_name = request.node.name
-
     global_args = ["-w", ws_name]
 
     app_name = "zlib"
@@ -65,19 +66,21 @@ def test_data_preparation(request, mock_applications):
             "processes_per_node=1",
             global_args=global_args,
         )
-        workspace("concretize", global_args=global_args)
-        workspace("setup", global_args=global_args)
 
-        filters = ramble.filters.Filters()
-        ap = ramble.pipeline.AnalyzePipeline(ws, filters)
-        ap._prepare()
-        ap._execute()
+        with patch.object(spack_lightweight, "SpackRunner", return_value=MockSpackRunner()):
+            workspace("concretize", global_args=global_args)
+            workspace("setup", global_args=global_args)
 
-        formatted_data = ramble.uploader.format_data(ws.results)
-        uri = "not_used_in_test"
-        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = ramble.uploader._prepare_data(
-            formatted_data, uri
-        )
+            filters = ramble.filters.Filters()
+            ap = ramble.pipeline.AnalyzePipeline(ws, filters)
+            ap._prepare()
+            ap._execute()
+
+            formatted_data = ramble.uploader.format_data(ws.results)
+            uri = "not_used_in_test"
+            exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = (
+                ramble.uploader._prepare_data(formatted_data, uri)
+            )
 
 
 @patch("google.cloud.bigquery.Client")
