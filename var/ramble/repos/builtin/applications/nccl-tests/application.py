@@ -170,13 +170,13 @@ class NcclTests(ExecutableApplication):
 
     figure_of_merit(
         "Avg. Bus Bandwidth",
-        fom_regex=r"\s*Avg bus bandwidth\s+:\s+(?P<bw>[0-9]+\.?[0-9]+)",
+        fom_regex=r".*Avg bus bandwidth\s+:\s+(?P<bw>[0-9]+\.?[0-9]+)",
         group_name="bw",
         units="GB/s",
     )
     figure_of_merit(
         "Out of bounds values",
-        fom_regex=r"\s*Out of bounds values\s*:\s+(?P<count>[0-9]+)",
+        fom_regex=r".*Out of bounds values\s*:\s+(?P<count>[0-9]+)",
         group_name="count",
         units="",
     )
