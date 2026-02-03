@@ -233,8 +233,6 @@ def format_data(data_in):
                         }
                     )
 
-            if "SOFTWARE" in exp.keys():
-                for software_name, software_list in exp["SOFTWARE"].items():
             if "SOFTWARE" in exp:
                 for software_list in exp["SOFTWARE"].values():
                     for software in software_list:
@@ -275,12 +273,12 @@ def _prepare_data(results, uri):
             foms_to_insert.append(fom_data)
 
         for software in experiment.software:
-            software_data = software
-        for software in experiment.software:
             software_data = software.copy()
             software_data["experiment_id"] = experiment.get_hash()
             software_data["experiment_name"] = experiment.name
             software_to_insert.append(software_data)
+
+    return (
         exp_table_id,
         exps_to_insert,
         fom_table_id,
@@ -547,7 +545,8 @@ class PrintOnlyUploader(Uploader):
         for fom in foms_to_insert:
             logger.info(f"  {fom}")
         logger.info(
-            f"{len(software_to_insert)} software package(s) would be uploaded to {software_table_id}:"
+            f"{len(software_to_insert)} "
+            f"software package(s) would be uploaded to {software_table_id}:"
         )
         for software in software_to_insert:
             logger.info(f"  {software}")
