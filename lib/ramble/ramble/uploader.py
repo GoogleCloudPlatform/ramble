@@ -235,6 +235,8 @@ def format_data(data_in):
 
             if "SOFTWARE" in exp.keys():
                 for software_name, software_list in exp["SOFTWARE"].items():
+            if "SOFTWARE" in exp:
+                for software_list in exp["SOFTWARE"].values():
                     for software in software_list:
                         e.software.append(
                             {
@@ -246,8 +248,6 @@ def format_data(data_in):
                                 "variants": software["variants"],
                             }
                         )
-
-            # Explicitly try to pull out node type, if the run provided enough data
             determine_node_type(e, exp["CONTEXTS"])
 
     return results
