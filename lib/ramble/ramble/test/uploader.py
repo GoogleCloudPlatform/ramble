@@ -78,9 +78,14 @@ def test_data_preparation(request, mock_applications):
 
             formatted_data = ramble.uploader.format_data(ws.results)
             uri = "not_used_in_test"
-            exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = (
-                ramble.uploader._prepare_data(formatted_data, uri)
-            )
+            (
+                exp_table_id,
+                exps_to_insert,
+                fom_table_id,
+                foms_to_insert,
+                software_table_id,
+                software_to_insert,
+            ) = ramble.uploader._prepare_data(formatted_data, uri)
 
 
 @patch("google.cloud.bigquery.Client")

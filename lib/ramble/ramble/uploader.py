@@ -20,6 +20,7 @@ from ramble.schema.db import db_schema_version
 from ramble.schema.experiment import experiment_schema, experiment_schema_version
 from ramble.schema.fom import fom_schema, fom_schema_version
 from ramble.schema.metadata import metadata_schema, metadata_schema_version
+from ramble.schema.software_db import software_db_schema, software_db_schema_version
 from ramble.util.logger import logger
 
 default_node_type_val = "Not Specified"
@@ -64,8 +65,9 @@ class Experiment:
 
     def __init__(self, name, workspace_hash, data, timestamp):
         self.name = name
-        self.foms = []
         self.id = None  # This is essentially the hash
+        self.foms = []
+        self.software = []
         self.data = data
         self.application_name = data["application_name"]
         self.workspace_name = data["RAMBLE_VARIABLES"]["workspace_name"]
@@ -124,6 +126,7 @@ class Experiment:
         data_copy["CONTEXTS"] = []
 
         del j["foms"]
+        del j["software"]
         j["data"] = json.dumps(data_copy, default=vars)
         return j
 
@@ -230,6 +233,20 @@ def format_data(data_in):
                         }
                     )
 
+            if "SOFTWARE" in exp.keys():
+                for software_name, software_list in exp["SOFTWARE"].items():
+                    for software in software_list:
+                        e.software.append(
+                            {
+                                "name": software["name"],
+                                "version": software["version"],
+                                "compiler": software["compiler"],
+                                "compiler_version": software["compiler_version"],
+                                "target": software["target"],
+                                "variants": software["variants"],
+                            }
+                        )
+
             # Explicitly try to pull out node type, if the run provided enough data
             determine_node_type(e, exp["CONTEXTS"])
 
@@ -241,9 +258,11 @@ def _prepare_data(results, uri):
     # tooling
     exp_table_id = f"{uri}.experiments"
     fom_table_id = f"{uri}.foms"
+    software_table_id = f"{uri}.software"
 
     exps_to_insert = []
     foms_to_insert = []
+    software_to_insert = []
 
     for experiment in results:
         json_experiment = experiment.to_json()
@@ -255,7 +274,20 @@ def _prepare_data(results, uri):
             fom_data["experiment_name"] = experiment.name
             foms_to_insert.append(fom_data)
 
-    return exp_table_id, exps_to_insert, fom_table_id, foms_to_insert
+        for software in experiment.software:
+            software_data = software
+            software_data["experiment_id"] = experiment.get_hash()
+            software_data["experiment_name"] = experiment.name
+            software_to_insert.append(software_data)
+
+    return (
+        exp_table_id,
+        exps_to_insert,
+        fom_table_id,
+        foms_to_insert,
+        software_table_id,
+        software_to_insert,
+    )
 
 
 class BigQueryUploader(Uploader):
@@ -273,6 +305,11 @@ class BigQueryUploader(Uploader):
         },
         {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
         {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
+        {
+            "table": "software",
+            "schema": software_db_schema,
+            "version": software_db_schema_version,
+        },
     ]
 
     def _schema_to_bigquery(self, schema):
@@ -376,6 +413,11 @@ class BigQueryUploader(Uploader):
                 "timestamp": now_timestamp,
             },
             {
+                "key": "software_db_schema_version",
+                "value": str(software_db_schema_version),
+                "timestamp": now_timestamp,
+            },
+            {
                 "key": "ramble_version",
                 "value": ramble.util.version.get_version(),
                 "timestamp": now_timestamp,
@@ -392,7 +434,7 @@ class BigQueryUploader(Uploader):
         from google.cloud import bigquery
 
         client = bigquery.Client()
-        error = None
+        error = []
         approx_max_request = 1000000.0  # 1MB
 
         data_len = len(data)
@@ -426,12 +468,21 @@ class BigQueryUploader(Uploader):
 
             error = client.insert_rows_json(table_id, data[i:end])
             if error:
+                logger.warn("Issue  during uploader insert")
+                logger.warn(error)
                 return error
         return error
 
     def insert_data(self, uri: str, results) -> None:
 
-        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
+        (
+            exp_table_id,
+            exps_to_insert,
+            fom_table_id,
+            foms_to_insert,
+            software_table_id,
+            software_to_insert,
+        ) = _prepare_data(results, uri)
 
         logger.debug("Experiments to insert:")
         logger.debug(exps_to_insert)
@@ -444,7 +495,13 @@ class BigQueryUploader(Uploader):
             logger.msg("Upload FOMs...")
             errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
 
-        for errors, name in zip((errors1, errors2), ("exp", "fom")):
+        if errors2 == []:
+            logger.msg("Upload Software...")
+            errors3 = self.chunked_upload(software_table_id, software_to_insert)
+        else:
+            errors3 = None
+
+        for errors, name in zip((errors1, errors2, errors3), ("exp", "fom", "software")):
             if errors == []:
                 logger.msg(f"New rows have been added in {name}")
             else:
@@ -474,7 +531,14 @@ class PrintOnlyUploader(Uploader):
 
     def perform_upload(self, uri, results):
         super().perform_upload(uri, results)
-        exp_table_id, exps_to_insert, fom_table_id, foms_to_insert = _prepare_data(results, uri)
+        (
+            exp_table_id,
+            exps_to_insert,
+            fom_table_id,
+            foms_to_insert,
+            software_table_id,
+            software_to_insert,
+        ) = _prepare_data(results, uri)
         logger.info("NOTE: The PrintOnly uploader only logs, but does not upload any data.")
         logger.info(f"{len(exps_to_insert)} experiment(s) would be uploaded to {exp_table_id}:")
         for exp in exps_to_insert:
@@ -482,3 +546,8 @@ class PrintOnlyUploader(Uploader):
         logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
         for fom in foms_to_insert:
             logger.info(f"  {fom}")
+        logger.info(
+            f"{len(software_to_insert)} software package(s) would be uploaded to {software_table_id}:"
+        )
+        for software in software_to_insert:
+            logger.info(f"  {software}")
