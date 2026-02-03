@@ -95,6 +95,8 @@ steps:
     - 'COMMIT_SHA=$_COMMIT_SHA'
     - 'CODECOV_TOKEN=$_CODECOV_TOKEN'
     - 'PUSH_CODECOV=$_PUSH_CODECOV'
+    - 'BASE_BRANCH=$_BASE_BRANCH'
+    - 'PR_NUMBER=$_PR_NUMBER'
 substitutions:
   _SPACK_REF: v0.21.2
   _PYTHON_VER: 3.11.6

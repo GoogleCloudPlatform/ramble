@@ -81,7 +81,25 @@ if [[ "$PUSH_CODECOV" ]]; then
   if [[ -z "$COMMIT_SHA" ]]; then
     export COMMIT_SHA=`git -C $(dirname $0) log -n 1 --format="%H"`
   fi
+
+  DEFAULT_BASE_BRANCH="develop"
+  TARGET_BRANCH=${BASE_BRANCH:-$DEFAULT_BASE_BRANCH}
+
+  echo "Comparing against base branch: origin/$TARGET_BRANCH"
+
+  # Calculate merge base against origin/$TARGET_BRANCH
+  MERGE_BASE_SHA=$(git merge-base HEAD "origin/$TARGET_BRANCH" || echo "")
+  
   echo "Processing codecov upload for commit $COMMIT_SHA"
+
+  if [[ -n "$MERGE_BASE_SHA" ]]; then
+    echo "Picking PR base: $MERGE_BASE_SHA"
+    if [[ -n "$PR_NUMBER" ]]; then
+      codecovcli pr-base-picking --base-sha $MERGE_BASE_SHA --pr $PR_NUMBER --slug "GoogleCloudPlatform/ramble"
+    else
+      echo "Skipping pr-base-picking: PR_NUMBER not set"
+    fi
+  fi
 
   codecovcli upload-process -C $COMMIT_SHA
 fi
