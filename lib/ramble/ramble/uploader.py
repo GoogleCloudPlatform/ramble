@@ -276,11 +276,11 @@ def _prepare_data(results, uri):
 
         for software in experiment.software:
             software_data = software
+        for software in experiment.software:
+            software_data = software.copy()
             software_data["experiment_id"] = experiment.get_hash()
             software_data["experiment_name"] = experiment.name
             software_to_insert.append(software_data)
-
-    return (
         exp_table_id,
         exps_to_insert,
         fom_table_id,
