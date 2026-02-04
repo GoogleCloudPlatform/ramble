@@ -944,19 +944,34 @@ def environment_variable(
                         )
 
             if workload_group is not None:
-                workload_group_list = obj.workload_groups[workload_group]
+                workload_group_inst = obj.workload_groups[workload_group]
 
                 if workload_group not in obj.workload_group_env_vars:
                     obj.workload_group_env_vars[workload_group] = []
 
                 obj.workload_group_env_vars[workload_group].append(workload_env_var.copy())
 
+                # TODO: See if there's a way to clean this up. We can't evaluate 'when' here due to
+                # lack of expander, so this merges the 'when' of wl group with the 'when' of vars
+                # and env vars to be evaluated later. It adds each var or env var to all workloads
+                # that match the name, but the merged 'when' ensures they're only activated for the
+                # correct workload group conditions.
+                wl_group_when_map = collections.defaultdict(list)
+                for wl_group_when_set, wl_group_workloads in workload_group_inst.workloads.items():
+                    for wl_name in wl_group_workloads:
+                        wl_group_when_map[wl_name].append(wl_group_when_set)
+
                 for when_set, app_workloads in obj.workloads.items():
-                    for wl_name in workload_group_list:
-                        if wl_name in app_workloads:
-                            obj.workloads[when_set][wl_name].add_environment_variable(
-                                workload_env_var.copy()
-                            )
+                    for app_wl_name in app_workloads.keys():
+                        if app_wl_name in wl_group_when_map:
+                            # Add each variation of merged 'when' set for each workload
+                            for wl_group_when_set in wl_group_when_map[app_wl_name]:
+                                workload_env_var_copy = workload_env_var.copy()
+                                workload_env_var_copy.when.extend(wl_group_when_set)
+
+                                obj.workloads[when_set][app_wl_name].add_environment_variable(
+                                    workload_env_var_copy
+                                )
         else:
             when_set = frozenset(when_list)
             if when_set not in obj.object_environment_variables:
@@ -1021,7 +1036,7 @@ def version(
             version_number=number,
             description=description,
             origin_type=obj.origin_type,
-            preferred=preferred
+            preferred=preferred,
         )
 
         # Ensure only one version is marked as preferred

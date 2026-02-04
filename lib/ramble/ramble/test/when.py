@@ -1155,6 +1155,117 @@ def test_workload_errors_when_overlapping_conditions(workspace_name):
             assert "test_wl is defined for overlapping `when` conditions" in captured
 
 
+@pytest.mark.parametrize(
+    "active_variant,active_workload,disabled_variant,disabled_workload",
+    [
+        ("group1", "test_wl2", "group2", "test_wl3"),
+        ("group2", "test_wl3", "group1", "test_wl2"),
+    ],
+)
+def test_workload_group_when(
+    workspace_name, active_variant, active_workload, disabled_variant, disabled_workload
+):
+    global_args = ["-w", workspace_name]
+
+    expected_commands = {
+        "group1_test_wl": [
+            "echo 'Test'",
+            "export APP_ENV_VAR2=TEST_WL2_ENV_VAR",
+        ],
+        "group1_test_wl2": [
+            "echo 'Var2'",
+            "export APP_ENV_VAR2=TEST_WL2_ENV_VAR",
+        ],
+        "group2_test_wl": [
+            "echo 'Test'",
+            "export APP_ENV_VAR3=TEST_WL3_ENV_VAR",
+        ],
+        "group2_test_wl3": [
+            "echo 'Var3'",
+            "export APP_ENV_VAR3=TEST_WL3_ENV_VAR",
+        ],
+    }
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:workload_group_options:{active_variant}", global_args=global_args)
+
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            f"{active_workload}",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        base_wl_exec_file = os.path.join(
+            ws.experiment_dir, "when-directives", "test_wl", "generated", "execute_experiment"
+        )
+
+        active_wl_exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            f"{active_workload}",
+            "generated",
+            "execute_experiment",
+        )
+
+        disabled_wl_exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            f"{disabled_workload}",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(base_wl_exec_file) as f:
+            base_script = f.read()
+
+            for cmd in expected_commands[f"{active_variant}_test_wl"]:
+                assert cmd in base_script
+
+            assert expected_commands[f"{disabled_variant}_test_wl"][1] not in base_script
+
+            for cmd in expected_commands[f"{disabled_variant}_{disabled_workload}"]:
+                assert cmd not in base_script
+
+        with open(active_wl_exec_file) as f:
+            active_script = f.read()
+
+            for cmd in expected_commands[f"{active_variant}_{active_workload}"]:
+                assert cmd in active_script
+
+            for cmd in expected_commands[f"{disabled_variant}_{disabled_workload}"]:
+                assert cmd not in active_script
+
+        assert not os.path.exists(disabled_wl_exec_file)
+
+
 @pytest.mark.parametrize("obj", ["app", "mod", "wf_man", "pkg_man"])
 def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mock_pkg_mans_repo):
     global_args = ["-w", workspace_name]

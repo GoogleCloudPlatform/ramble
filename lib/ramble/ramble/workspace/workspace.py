@@ -1754,7 +1754,7 @@ ramble:
                         if exp["VARIANTS"]:
                             f.write("  Experiment variants:\n")
                             for variant in exp["VARIANTS"]:
-                                f.write(f"  - {variant}\n")
+                                f.write(f"  - {variant}\n".replace("@", "@@"))
 
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")

@@ -10,6 +10,8 @@ from typing import Dict, FrozenSet, List, Optional
 
 import ramble.util.colors as rucolor
 from ramble.definitions.variables import EnvironmentVariable, Variable
+from ramble.util.format import sort_when
+from ramble.util.logger import logger
 
 
 class Workload:
@@ -25,6 +27,7 @@ class Workload:
         executables: List[str],
         inputs: Optional[List[str]] = None,
         tags: Optional[List[str]] = None,
+        when: Optional[List[str]] = None,
     ):
         """Constructor for a workload
 
@@ -38,10 +41,13 @@ class Workload:
             inputs = []
         if tags is None:
             tags = []
+        if when is None:
+            when = []
 
         self.name = name
         self.variables: Dict[FrozenSet[str], List[Variable]] = {}
         self.environment_variables: Dict[FrozenSet[str], List[EnvironmentVariable]] = {}
+        self.when = when
 
         attr_names = ["executables", "inputs", "tags"]
         attr_vals = [executables, inputs, tags]
@@ -69,7 +75,12 @@ class Workload:
         Returns:
             (str): Representation of this workload
         """
-        attrs = [("Executables", "executables"), ("Inputs", "inputs"), ("Tags", "tags")]
+        attrs = [
+            ("Executables", "executables"),
+            ("Inputs", "inputs"),
+            ("Tags", "tags"),
+            ("When", "when"),
+        ]
 
         indentation = " " * n_indent
 
@@ -78,15 +89,21 @@ class Workload:
         for attr in attrs:
             out_str += rucolor.nested_1(f"{indentation}    {attr[0]}: ")
             attr_val = getattr(self, attr[1], [])
-            out_str += f"{attr_val}\n"
+            # TODO: Remove this after adding 'when' to the loop in 'ramble info' that prints
+            # workloads. Better to group workloads under 'when' than print 'when' for each workload
+            if attr[0] == "When" and isinstance(attr_val, list):
+                out_str += f"{' AND '.join(attr_val)}\n".replace("@", "@@")
+            else:
+                out_str += f"{attr_val}\n".replace("@", "@@")
 
         if self.variables:
             out_str += rucolor.nested_1(f"{indentation}    Variables:\n")
             for when_set, var_list in self.variables.items():
                 if when_set:
-                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
-                    for variant in when_set:
-                        out_str += f"{indentation}            {variant}\n"
+                    out_str += rucolor.nested_2(f"{indentation}        When: ")
+                    out_str += f"{' AND '.join(sorted(when_set, key=sort_when))}\n".replace(
+                        "@", "@@"
+                    )
                 else:
                     out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
 
@@ -100,9 +117,10 @@ class Workload:
             out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
             for when_set, env_var_list in self.environment_variables.items():
                 if when_set:
-                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
-                    for variant in when_set:
-                        out_str += f"{indentation}            {variant}\n"
+                    out_str += rucolor.nested_2(f"{indentation}        When: ")
+                    out_str += f"{' AND '.join(sorted(when_set, key=sort_when))}\n".replace(
+                        "@", "@@"
+                    )
                 else:
                     out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
 
@@ -234,3 +252,73 @@ class Workload:
             for env_var in env_var_list:
                 named_env_vars.append(env_var)
         return named_env_vars
+
+
+class WorkloadGroup:
+    """Class representing a single workload group"""
+
+    name: str
+    workloads: Dict[FrozenSet[str], List[str]]
+
+    def __init__(self, name: str, workloads: List[str], when_list: List[str]):
+        """Constructor for a workload group. A workload group can have different lists of workloads
+        for different 'when' conditions.
+
+        Args:
+            name: Name of this workload group
+            workloads: List of workloads
+            when_list: List of when conditions for this list of workloads
+        """
+        self.name = name
+        self.workloads = {frozenset(when_list): workloads}
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of this workload group
+
+        Args:
+            n_indent: Number of spaces to indent string with
+
+        Returns:
+            (str): Representation of this workload
+
+        """
+        indentation = " " * n_indent
+        out_str = rucolor.section_title(f"{indentation}{self.name}\n")
+        for when_set, workload_list in self.workloads.items():
+            if when_set:
+                out_str += rucolor.nested_1(f"{indentation}    When: ")
+                out_str += f"{' AND '.join(sorted(when_set, key=sort_when))}\n".replace("@", "@@")
+            else:
+                out_str += rucolor.nested_1(f"{indentation}    Unconditional\n")
+
+            for workload in workload_list:
+                out_str += rucolor.nested_2(f"{indentation}        {workload}\n")
+
+        return out_str
+
+    def add_workloads(self, workloads: List[str], when_list: List[str], mode: str):
+        """Add workloads to this workload group using a different set of 'when'
+        condition
+
+        Args:
+            workloads: List of workloads
+            when_list: List of 'when' conditions for this list of workloads
+            mode: Append or overwrite workloads in this set of 'when' conditions
+        """
+        when_set = frozenset(when_list)
+
+        if mode == "append":
+            self.workloads.setdefault(when_set, []).extend(workloads)
+        else:
+            if when_set in self.workloads and self.workloads[when_set] != workloads:
+                logger.debug(
+                    f"Workload group {self.name} has been defined twice with the same "
+                    "`when` conditions. Overwriting by default. Use mode `append` to extend "
+                    "workload group instead."
+                )
+            self.workloads[when_set] = workloads

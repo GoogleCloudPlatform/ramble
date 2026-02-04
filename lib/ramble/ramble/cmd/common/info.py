@@ -213,7 +213,10 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
                 try:
                     color.cprint(to_print)
                 except color.ColorParseError:
-                    escaped_sub_val = sub_val.replace("@", "@@")
+                    if hasattr(sub_val, "__iter__"):
+                        escaped_sub_val = [item.replace("@", "@@") for item in sub_val]
+                    else:
+                        escaped_sub_val = sub_val.replace("@", "@@")
                     color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
             color.cprint("")
         elif isinstance(vals, set):

@@ -589,7 +589,7 @@ def test_workload_groups_inherited(mutable_mock_apps_repo):
     assert "empty" in wlgi_inst.workload_groups
     assert "test_wlg" in wlgi_inst.workload_groups
 
-    assert "test_wl" in wlgi_inst.workload_groups["test_wlg"]
+    assert "test_wl" in wlgi_inst.workload_groups["test_wlg"].name
 
     # Ensure a new workload can obtain the parent level vars via groups
     possible_vars = wlgi_inst.workloads[_FS]["test_wl3"].find_variable("test_var")

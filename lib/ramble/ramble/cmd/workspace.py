@@ -930,7 +930,7 @@ def workspace_info(args):
                                 obj.experiment_variants().as_set(expander=app_inst.expander)
                             )
                         for variant in variant_set:
-                            color.cprint(f"          - {variant}")
+                            color.cprint(f"          - {variant}".replace("@", "@@"))
 
                     if args.executables:
                         color.cprint(rucolor.nested_4("        Executables: "))
