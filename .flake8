@@ -30,12 +30,3 @@ exclude =
   var
   docs/tutorial/examples
 
-format = ramble
-
-[flake8:local-plugins]
-report =
-# TODO :I'm guessing we'd rather this is renamed to Ramble?
-# .. It's tempting to keep it as Spack unless it diverges
-  ramble = flake8_formatter:SpackFormatter
-paths =
-  ./share/ramble/qa/
