@@ -1,4 +1,4 @@
-ARG BASE_IMG=rocklinux
+ARG BASE_IMG=rockylinux
 ARG BASE_VER=8
 FROM ${BASE_IMG}:${BASE_VER} as builder
 
