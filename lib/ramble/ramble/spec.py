@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import io
-from collections.abc import Mapping
+from typing import Mapping
 
 import llnl.util.tty.color as clr
 
