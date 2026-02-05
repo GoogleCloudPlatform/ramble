@@ -36,8 +36,6 @@ class Spec:
         self.name = None
         self.namespace = None
 
-        self.workloads = {}
-
         if isinstance(spec_like, str):
             namespace, _, spec_name = spec_like.rpartition(".")
             if not namespace:
@@ -64,7 +62,6 @@ class Spec:
         Commonly used attributes of the Spec for format strings include::
 
             name
-            workloads
 
         Args:
             format_string (str): string containing the format to be expanded
