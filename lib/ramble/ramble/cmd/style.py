@@ -406,7 +406,6 @@ def run_flake8(flake8_cmd, file_list, args):
             shutil.copy(f, primary_dest_dir)
             qa_dir = os.path.join(primary_dest_dir, "share", "ramble", "qa")
             os.makedirs(qa_dir, exist_ok=True)
-            shutil.copy("share/ramble/qa/flake8_formatter.py", qa_dir)
 
             with working_dir(primary_dest_dir):
                 output += flake8_cmd(
