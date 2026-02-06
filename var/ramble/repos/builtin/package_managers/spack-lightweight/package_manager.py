@@ -60,10 +60,17 @@ class SpackLightweight(PackageManagerBase):
             self._runner = SpackRunner()
         return self._runner
 
+    variant(
+        "spack_install_compilers",
+        default=True,
+        description="Whether spack should install compilers or not",
+    )
+
     register_phase(
         "software_install_requested_compilers",
         pipeline="setup",
         run_after=["software_create_env"],
+        when="+spack_install_compilers",
     )
 
     def _software_install_requested_compilers(self, workspace, app_inst=None):
