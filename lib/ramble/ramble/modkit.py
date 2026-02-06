@@ -18,13 +18,11 @@ from ramble.language.modifier_language import *
 from ramble.language.shared_language import *
 from ramble.spec import Spec
 from ramble.util.command_runner import (
-    CommandRunner,
-    NoPathRunnerError,
     RunnerError,
     ValidationFailedError,
 )
 from ramble.util.conflicts import MODIFIER_CONFLICT
-from ramble.util.file_util import get_file_path
+
 from ramble.util.logger import logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
 

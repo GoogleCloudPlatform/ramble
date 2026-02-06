@@ -16,15 +16,13 @@ from llnl.util.filesystem import *
 
 import ramble.language.package_manager_language
 import ramble.repository
-from ramble.error import PackageManagerError
+
 from ramble.language.package_manager_language import *
 from ramble.language.shared_language import *
 from ramble.software_environments import ExternalEnvironment
 from ramble.software_info import SoftwareInfo
 from ramble.spec import Spec
 from ramble.util.command_runner import (
-    CommandRunner,
-    NoPathRunnerError,
     RunnerError,
     ValidationFailedError,
 )

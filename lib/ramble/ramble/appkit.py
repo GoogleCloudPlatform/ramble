@@ -21,12 +21,10 @@ from ramble.language.shared_language import *
 from ramble.repository import get_base_class
 from ramble.spec import Spec
 from ramble.util.command_runner import (
-    CommandRunner,
-    NoPathRunnerError,
     RunnerError,
     ValidationFailedError,
 )
-from ramble.util.file_util import get_file_path
+
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.output_capture import OUTPUT_CAPTURE
