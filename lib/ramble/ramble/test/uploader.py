@@ -87,6 +87,16 @@ def test_data_preparation(request, mock_applications):
                 software_to_insert,
             ) = ramble.uploader._prepare_data(formatted_data, uri)
 
+            assert len(software_to_insert) == 1
+            software = software_to_insert[0]
+            assert software["name"] == "zlib"
+            assert software["version"] == "1.2.11"
+            assert software["compiler"] == "gcc"
+            assert software["compiler_version"] == "9.3.0"
+            assert software["target"] == "x86_64"
+            assert software["variants"] == "none"
+            assert software["experiment_name"] == "zlib.ensure_installed.generated"
+
 
 @patch("google.cloud.bigquery.Client")
 def test_create_tables_dataset_exists(mock_bigquery_client):
