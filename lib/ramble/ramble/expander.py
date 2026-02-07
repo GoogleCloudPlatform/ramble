@@ -1075,7 +1075,6 @@ class Expander:
                     raise RambleSyntaxError(
                         f"{namespace} does not exist in: " + f'"{var_name} in {namespace}"'
                     )
-                    self.__raise_syntax_error(node)
                 return val
         # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
         elif isinstance(node.left, ast.Constant) or _is_str_node(node.left):
