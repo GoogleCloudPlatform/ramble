@@ -30,6 +30,8 @@ steps:
       - 'build'
       - '-f'
       - 'share/ramble/cloud-build/Dockerfile-apt'
+      - '--cache-from'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG_APT}-${_BASE_VER_APT}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest'
       - '--build-arg'
       - 'SPACK_REF=${_SPACK_REF}'
       - '--build-arg'
@@ -42,6 +44,8 @@ steps:
       - 'build'
       - '-f'
       - 'share/ramble/cloud-build/Dockerfile-yum'
+      - '--cache-from'
+      - 'us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG_YUM}-${_BASE_VER_YUM}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest'
       - '--build-arg'
       - 'SPACK_REF=${_SPACK_REF}'
       - '--build-arg'
@@ -53,6 +57,10 @@ steps:
 substitutions:
   _SPACK_REF: v1.1.1
   _PYTHON_VER: 3.11.14
+  _BASE_IMG_APT: debian
+  _BASE_VER_APT: '12.5'
+  _BASE_IMG_YUM: rockylinux
+  _BASE_VER_YUM: '8'
 
 timeout: 3600s
 options:
