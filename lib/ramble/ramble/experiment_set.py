@@ -540,9 +540,11 @@ class ExperimentSet:
         tracking_group.used_variables = set()
 
         used_variables: Set[str] = set()
-        for tracking_vars, _ in renderer.render_objects(
+        tracking_gen = renderer.render_objects(
             tracking_group, exclude_where=exclude_where, ignore_used=False, fatal=False
-        ):
+        )
+        try:
+            tracking_vars, _ = next(tracking_gen)
             exp_used_variables = self._get_used_variables(
                 workload_template_name,
                 experiment_template_name,
@@ -550,6 +552,22 @@ class ExperimentSet:
                 final_context,
             )
             used_variables = used_variables.union(exp_used_variables)
+        except StopIteration:
+            pass
+
+        if exclude_where:
+            temp_vars = final_context.variables.copy()
+            if "tracking_vars" in locals():
+                temp_vars.update(tracking_vars)
+
+            temp_expander = ramble.expander.Expander(temp_vars, self)
+            for where in exclude_where:
+                try:
+                    temp_expander.expand_var(where)
+                except ramble.error.RambleError:
+                    pass
+            used_variables.update(temp_expander._used_variables)
+
         render_group.used_variables = used_variables.copy()
 
         workload_names = set()
