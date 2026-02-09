@@ -292,6 +292,7 @@ class Renderer:
                     cur_zip["vars"][var_name] = object_variables[var_name]
                     del object_variables[var_name]
 
+        matrix_generator = None
         if matrices:
             """Matrix syntax is:
             matrix:
@@ -349,6 +350,7 @@ class Renderer:
                         matrix_size = matrix_size * zip_len
                         vectors.append(idx_vector)
                         variable_names.append(var)
+                        consumed_zips.add(var)
                     else:
                         err_context = object_variables[render_group.context]
                         logger.die(
@@ -369,26 +371,51 @@ class Renderer:
                 matrix_vectors.append(vectors)
                 matrix_variables.append(variable_names)
 
-            # Create the empty initial dictionairies
-            matrix_objects = []
-            for _ in range(matrix_size):
-                matrix_objects.append({})
-
             # Generate all of the obj var dicts
-            for names, vectors in zip(matrix_variables, matrix_vectors):
-                for obj_idx, entry in enumerate(itertools.product(*vectors)):
-                    for name_idx, name in enumerate(names):
-                        if name in defined_zips.keys():
-                            # Replace the zip name with the constituent variables
-                            for zip_var in defined_zips[name]["vars"]:
-                                matrix_objects[obj_idx][zip_var] = defined_zips[name]["vars"][
-                                    zip_var
-                                ][entry[name_idx]]
+            matrix_product_iters = [itertools.product(*vectors) for vectors in matrix_vectors]
 
-                            # Consume the defined zip
-                            consumed_zips.add(name)
-                        else:
-                            matrix_objects[obj_idx][name] = entry[name_idx]
+            # Prepare fast mapping data
+            matrix_col_maps = []
+            for names in matrix_variables:
+                col_map = []
+                for name_idx, name in enumerate(names):
+                    if name in defined_zips:
+                        # It's a zip
+                        zip_info = defined_zips[name]
+                        col_map.append(
+                            {
+                                "type": "zip",
+                                "vars": zip_info["vars"],  # dict of var -> list of values
+                            }
+                        )
+                    else:
+                        col_map.append({"type": "var", "name": name})
+                matrix_col_maps.append(col_map)
+
+            def _matrix_generator_func():
+                for entry_tuple in zip(*matrix_product_iters):
+                    obj = {}
+                    for mat_idx, entry in enumerate(entry_tuple):
+                        col_map = matrix_col_maps[mat_idx]
+                        for name_idx, val in enumerate(entry):
+                            # entry is a tuple of indices or values?
+                            # Wait, vectors contained:
+                            # if var in object_variables:
+                            #    vectors.append(object_variables[var]) -> values
+                            # if var in defined_zips: vectors.append(idx_vector) -> indices
+
+                            info = col_map[name_idx]
+                            if info["type"] == "zip":
+                                # val is an index
+                                idx = val
+                                for zip_var, zip_vals in info["vars"].items():
+                                    obj[zip_var] = zip_vals[idx]
+                            else:
+                                # val is the value
+                                obj[info["name"]] = val
+                    yield obj
+
+            matrix_generator = _matrix_generator_func()
 
         # Remove all consumed zips and return all remaining zipped variables
         # back to real vector definitions
@@ -429,6 +456,9 @@ class Renderer:
                     err_str += f"\tVariable {var} has length {len(val)}\n"
                 logger.die(err_str)
 
+            # Materialize matrix objects if we have vector vars
+            matrix_objects = list(matrix_generator) if matrix_generator else None
+
             # Iterate over the vector length, and set the value in the
             # object dict to the index value.
             for i in range(0, max_vector_size):
@@ -439,30 +469,34 @@ class Renderer:
 
                 if matrix_objects:
                     for matrix_object in matrix_objects:
-                        for var, val in matrix_object.items():
-                            obj_vars[var] = val
-
-                        new_objects.append(obj_vars.copy())
+                        # Combine vector vars with matrix object
+                        # Matrix object overrides vector vars if collision
+                        # (though collision shouldn't happen)
+                        combined = obj_vars.copy()
+                        combined.update(matrix_object)
+                        new_objects.append(combined)
                 else:
                     new_objects.append(obj_vars.copy())
 
-        elif matrix_objects:
-            new_objects = matrix_objects
+        elif matrix_generator:
+            # If no vector vars, use generator directly
+            new_objects = matrix_generator
         else:
             # Ensure at least one object is rendered, if everything was a scalar
-            new_objects.append({})
+            new_objects = [{}]
 
         where_expander = ramble.expander.Expander(object_variables, None)
 
         for obj in new_objects:
             logger.debug(f"Rendering {render_group.object}:")
-            for var, val in obj.items():
-                object_variables[var] = val
+
+            # Avoid mutating object_variables
+            # Use extra_vars for evaluation
 
             keep_object = True
             if exclude_where:
                 for where in exclude_where:
-                    evaluated = where_expander.expand_var(where)
+                    evaluated = where_expander.expand_var(where, extra_vars=obj)
                     if evaluated == "True":
                         keep_object = False
                         break
@@ -472,7 +506,11 @@ class Renderer:
                 repeats = ramble.repeats.Repeats()
                 if n_repeats > 0:
                     repeats.set_repeats(True, n_repeats)
-                yield object_variables.copy(), repeats
+
+                # Merge object_variables and obj
+                # object_variables contains the base variables
+                # obj contains the specific variables for this iteration
+                yield {**object_variables, **obj}, repeats
 
 
 class RambleRendererError(ramble.error.RambleError):
