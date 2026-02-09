@@ -4,7 +4,7 @@ FROM ${BASE_IMG}:${BASE_VER} AS builder
 
 ARG SPACK_REF=releases/latest
 ARG PYTHON_VER=3.11.14
-COPY share/ramble/cloud-build/container_test.sh /container_test.sh
+
 RUN apt-get update && apt-get install -yq build-essential make git python3 python3-venv python3-pip wget mercurial which subversion curl gcc tar bzip2 && rm -rf /var/lib/apt/lists/*
 RUN cd /opt && \
     git clone https://github.com/spack/spack && \
@@ -14,13 +14,13 @@ RUN cd /opt && \
     spack install --deprecated py-pip ^python@${PYTHON_VER} && \
     spack clean -a
 RUN echo ". /opt/spack/share/spack/setup-env.sh\n spack load py-pip ^python@${PYTHON_VER}\n export SPACK_PYTHON=`which python3`" > /etc/profile.d/ramble.sh
+COPY requirements.txt requirements-dev.txt /opt/
 RUN cd /opt &&  \
     . spack/share/spack/setup-env.sh && \
     spack load py-pip ^python@${PYTHON_VER} && \
-    wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements.txt && \
-    wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements-dev.txt && \
-    chmod a+x /container_test.sh && \
-    python -m pip install -r /opt/requirements-dev.txt
+    python -m pip install --no-cache-dir -r /opt/requirements-dev.txt
+COPY share/ramble/cloud-build/container_test.sh /container_test.sh
+RUN chmod a+x /container_test.sh
 FROM ${BASE_IMG}:${BASE_VER}
 
 COPY --from=builder / /
