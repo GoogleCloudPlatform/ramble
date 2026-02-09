@@ -34,6 +34,7 @@ from .workspace import (
     get_filepath,
     get_workspace_path,
     is_workspace_dir,
+    license_inc_name,
     licenses_file,
     licenses_file_name,
     metadata_file_name,
@@ -42,6 +43,7 @@ from .workspace import (
     ramble_workspace_var,
     read,
     root,
+    template_extension,
     template_path,
     workspace_config_path,
     workspace_log_path,
@@ -51,6 +53,8 @@ from .workspace import (
 
 __all__ = [
     "Workspace",
+    "template_extension",
+    "license_inc_name",
     "RambleWorkspaceError",
     "RambleConflictingDefinitionError",
     "RambleActiveWorkspaceError",

@@ -13,7 +13,6 @@ import pytest
 import ramble.workspace
 from ramble.error import ApplicationError
 from ramble.main import RambleCommand
-from ramble.util import constants
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
@@ -156,7 +155,7 @@ ramble:
 
 def test_template_wrong_extension(mutable_mock_apps_repo, workspace_name):
     template_src_name = "template_wrong_extension.sh"
-    ext = constants.TEMPLATE_EXTENSION
+    ext = ramble.workspace.template_extension
     test_config = f"""
 ramble:
   variables:

@@ -12,7 +12,7 @@ import shutil
 
 import pytest
 
-from ramble.workspace import workspace
+from ramble.workspace import template_extension, workspace
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
@@ -86,7 +86,7 @@ def test_template_path():
     expected_path = os.path.join(
         ws_root,
         workspace.workspace_config_path,
-        template_name + workspace.workspace_template_extension,
+        template_name + template_extension,
     )
 
     assert path == expected_path

@@ -22,7 +22,6 @@ from ramble.error import RambleCommandError
 from ramble.main import RambleCommand, main
 from ramble.namespace import namespace
 from ramble.test.dry_run_helpers import search_files_for_string
-from ramble.util import constants
 
 import spack.util.spack_yaml as syaml
 
@@ -1577,7 +1576,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            constants.LICENSE_INC_NAME,
+            ramble.workspace.license_inc_name,
         )
     )
 
@@ -1642,7 +1641,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            constants.LICENSE_INC_NAME,
+            ramble.workspace.license_inc_name,
         )
     )
 

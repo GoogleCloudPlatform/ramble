@@ -30,7 +30,6 @@ import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
-from ramble.util import constants
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
 
@@ -378,7 +377,7 @@ class ArchivePipeline(Pipeline):
 
         excluded_secrets = set()
         if not self.include_secrets:
-            excluded_secrets.add(constants.LICENSE_INC_NAME)
+            excluded_secrets.add(ramble.workspace.license_inc_name)
 
         fs.mkdirp(archive_shared)
         for root, _, files in os.walk(self.workspace.shared_dir):

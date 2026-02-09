@@ -39,7 +39,7 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util import constants, object_utils
+from ramble.util import object_utils
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
@@ -89,11 +89,15 @@ workspace_deployments_path = "deployments"
 #: regex for validating workspace names
 valid_workspace_name_re = r"^\w[\w-]*$"
 
+# File that includes licensing information for sourcing
+license_inc_name = "license.inc"
+
 #: Config schema for application files
 applications_schema = ramble.schema.applications.schema
 
 #: Extension for template files
-workspace_template_extension = constants.TEMPLATE_EXTENSION
+# Only files that end with this extension are considered valid templates by Ramble
+template_extension = ".tpl"
 
 #: Directory name for auxiliary software files
 auxiliary_software_dir_name = "auxiliary_software_files"
@@ -109,7 +113,7 @@ metadata_file_name = "workspace_metadata.yaml"
 
 workspace_all_experiments_file = "all_experiments"
 
-workspace_execution_template = "execute_experiment" + workspace_template_extension
+workspace_execution_template = "execute_experiment" + template_extension
 
 #: Name of lockfile within a workspace
 lockfile_name = "ramble.lock"
@@ -275,7 +279,7 @@ def all_config_files(path):
 def template_path(ws_path, requested_template_name):
     """Returns the path to a workspace's template file"""
     config_path = os.path.join(ws_path, workspace_config_path)
-    template_file = requested_template_name + workspace_template_extension
+    template_file = requested_template_name + template_extension
     template_path = os.path.join(config_path, template_file)
     return template_path
 
@@ -287,7 +291,7 @@ def all_template_paths(path):
     config_path = os.path.join(path, workspace_config_path)
     for root, _, files in os.walk(config_path):
         for f in files:
-            if f.endswith(workspace_template_extension):
+            if f.endswith(template_extension):
                 templates.append(os.path.join(root, f))
 
     return templates
@@ -542,7 +546,7 @@ class Workspace:
                     self._read_config(config_section, f)
 
             read_default_script = self.read_default_template
-            ext_len = len(workspace_template_extension)
+            ext_len = len(template_extension)
             if os.path.exists(self.config_dir):
                 for root, _, files in os.walk(self.config_dir):
                     processed_root = root.replace(self.config_dir, "")
@@ -551,7 +555,7 @@ class Workspace:
                     if len(processed_root) > 1:
                         processed_root += os.sep
                     for filename in files:
-                        if filename.endswith(workspace_template_extension):
+                        if filename.endswith(template_extension):
                             read_default_script = False
                             template_name = processed_root + filename[0:-ext_len]
                             template_path = os.path.join(root, filename)
@@ -2154,7 +2158,7 @@ ramble:
 
     def template_path(self, name):
         if name in self._templates.keys():
-            return os.path.join(self.config_dir, name + workspace_template_extension)
+            return os.path.join(self.config_dir, name + template_extension)
         return None
 
     def all_templates(self):
