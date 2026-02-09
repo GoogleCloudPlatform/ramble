@@ -19,6 +19,9 @@ class MockPackageInfo:
     def to_version_text(self):
         return f"{self.data.get('name', 'unknown')} @{self.data.get('version', 'unknown')}"
 
+    def __getitem__(self, key):
+        return self.data[key]
+
 
 class MockSpackRunner:
     def __init__(self):
@@ -57,7 +60,18 @@ class MockSpackRunner:
         self.concretized = True
 
     def package_provenance(self):
-        return [MockPackageInfo({"name": "zlib", "version": "1.2.11"})]
+        return [
+            MockPackageInfo(
+                {
+                    "name": "zlib",
+                    "version": "1.2.11",
+                    "compiler": "gcc",
+                    "compiler_version": "9.3.0",
+                    "target": "x86_64",
+                    "variants": "none",
+                }
+            )
+        ]
 
     def get_version(self):
         return "0.0.0"
