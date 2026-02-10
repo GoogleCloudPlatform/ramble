@@ -89,7 +89,6 @@ __all__ = [
     "root",
     "RAMBLE_WORKSPACE_VAR",
     "namespace",
-    "namespace",
     "WORKSPACE_CONFIG_PATH",
     "WORKSPACE_LOG_PATH",
     "WORKSPACE_SHARED_PATH",
