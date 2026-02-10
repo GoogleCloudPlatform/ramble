@@ -86,7 +86,7 @@ WORKSPACE_SHARED_LICENSE_PATH = "licenses"
 WORKSPACE_DEPLOYMENTS_PATH = "deployments"
 
 #: regex for validating workspace names
-valid_workspace_name_re = r"^\w[\w-]*$"
+VALID_WORKSPACE_NAME_RE = re.compile(r"^\w[\w-]*$")
 
 # File that includes licensing information for sourcing
 LICENSE_INC_NAME = "license.inc"
@@ -123,7 +123,7 @@ _active_workspace = None
 
 
 def valid_workspace_name(name):
-    return re.match(valid_workspace_name_re, name)
+    return re.match(VALID_WORKSPACE_NAME_RE, name)
 
 
 def validate_workspace_name(name):
