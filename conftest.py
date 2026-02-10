@@ -905,7 +905,7 @@ def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_work
         ws.write()
 
         if config_str:
-            config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+            config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
             with open(config_path, "w+") as f:
                 f.write(config_str)
             ws._re_read()

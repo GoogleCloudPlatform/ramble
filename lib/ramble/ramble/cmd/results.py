@@ -191,7 +191,7 @@ def _load_results(args):
         1. via ``ramble results report -f FILENAME``
         2. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` or
         ``ramble results report --workspace WRKSPC``(arguments)
-        3. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+        3. via a path in the ramble.workspace.RAMBLE_WORKSPACE_VAR environment variable.
     """
     results_dict = {}
 

@@ -55,7 +55,7 @@ def test_success_modifier(
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config("modifiers", modifier, config_path, "basic", "test_wl")
         ws._re_read()
@@ -105,7 +105,7 @@ ramble:
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)

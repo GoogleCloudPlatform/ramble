@@ -23,7 +23,7 @@ def test_anti_match_criteria(mutable_config, mutable_mock_workspace_path, mock_a
     with ramble.workspace.create(ws_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config(
             "success_criteria",
