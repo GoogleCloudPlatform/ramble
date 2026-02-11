@@ -27,6 +27,8 @@ class QuantumEspresso(ExecutableApplication):
         "pseudopotential",
     )
 
+    version("7.1", "Version 7.1 of Quantum-Espresso", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc13", pkg_spec="gcc@13.1.0")
 
@@ -35,8 +37,8 @@ class QuantumEspresso(ExecutableApplication):
             pkg_spec="intel-oneapi-mpi@2021.8.0",
         )
         software_spec(
-            "quantum-espresso",
-            pkg_spec="quantum-espresso@7.1",
+            "quantum-espresso-{application_version}",
+            pkg_spec="quantum-espresso@{application_version}",
             compiler="gcc13",
         )
 

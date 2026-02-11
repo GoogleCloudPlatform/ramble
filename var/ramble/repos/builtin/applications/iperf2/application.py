@@ -23,10 +23,12 @@ class Iperf2(ExecutableApplication):
 
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
+    version("2.0.12", "Version 2.0.12 of iperf2", preferred=True)
+
     with when("package_manager_family=spack"):
         software_spec(
-            "iperf2",
-            pkg_spec="iperf2@2.0.12",
+            "iperf2-{application_version}",
+            pkg_spec="iperf2@{application_version}",
             compiler="gcc9",
         )
 

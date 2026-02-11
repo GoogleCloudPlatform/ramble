@@ -21,13 +21,15 @@ class Su2(ExecutableApplication):
 
     maintainers("linsword13")
 
+    version("8.2.0", "Version 8.2.0 of SU2", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
         # See https://github.com/spack/spack/pull/50601 for building with intel mpi.
         software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.0")
         software_spec(
-            "su2",
-            pkg_spec="su2@8.2.0 +mpi +openmp",
+            "su2-{application_version}",
+            pkg_spec="su2@{application_version} +mpi +openmp",
             compiler="gcc12",
         )
         required_package("su2")

@@ -1530,8 +1530,9 @@ ramble:
                         packages_dict[spec_name] = syaml.syaml_dict()
 
                     # Check for usage of compilers
-                    if info.compiler in compiler_packages:
-                        compiler_packages[info.compiler] = True
+                    expanded_compiler = app_inst.expander.expand_var(info.compiler)
+                    if expanded_compiler in compiler_packages:
+                        compiler_packages[expanded_compiler] = True
 
                     packages_dict[spec_name].update(info.to_dict(apply_prefix=force_prefix))
 

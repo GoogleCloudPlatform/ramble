@@ -21,6 +21,8 @@ class Ngspice(ExecutableApplication):
 
     tags("circuit-simulation", "mini-app")
 
+    version("44", "Version 44 of NgSpice", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc14", pkg_spec="gcc@14.3.0")
 
@@ -30,8 +32,8 @@ class Ngspice(ExecutableApplication):
         )
 
         software_spec(
-            "ngspice",
-            pkg_spec="ngspice@44 build=bin",
+            "ngspice-{application_version}",
+            pkg_spec="ngspice@{application_version} build=bin",
             compiler="gcc14",
         )
 

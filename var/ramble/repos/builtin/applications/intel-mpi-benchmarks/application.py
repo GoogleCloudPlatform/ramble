@@ -30,12 +30,14 @@ class IntelMpiBenchmarks(ExecutableApplication):
 
     tags("mpi-benchmark", "micro-benchmark", "communication-benchmark")
 
+    version("2019.6", "Version 2019.6 of Intel MPI Benchmarks", preferred=True)
+
     with when("package_manager_family"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
         software_spec(
-            "intel-mpi-benchmarks",
-            pkg_spec="intel-mpi-benchmarks@2019.6",
+            "intel-mpi-benchmarks-{application_version}",
+            pkg_spec="intel-mpi-benchmarks@{application_version}",
             compiler="gcc9",
         )
 

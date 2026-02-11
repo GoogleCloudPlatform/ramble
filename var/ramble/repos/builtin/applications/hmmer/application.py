@@ -29,14 +29,16 @@ class Hmmer(ExecutableApplication):
 
     tags("bioinformatics", "molecular-simulation", "hidden-markov-models")
 
+    version("3.3.2", "Version 3.3.2 of Hmmer", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
         software_spec("impi_2018", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hmmer",
-            pkg_spec="hmmer@3.3.2",
+            "hmmer-{application_version}",
+            pkg_spec="hmmer@{application_version}",
             compiler="gcc9",
         )
 

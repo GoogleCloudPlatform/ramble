@@ -21,6 +21,8 @@ class Minixyce(ExecutableApplication):
 
     tags("circuit-simulation", "mini-app")
 
+    version("1.0", description="Version 1.0 of miniXyce", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
@@ -31,8 +33,8 @@ class Minixyce(ExecutableApplication):
         )
 
         software_spec(
-            "minixyce",
-            pkg_spec="minixyce@1.0 +mpi",
+            "minixyce-{application_version}",
+            pkg_spec="minixyce@{application_version} +mpi",
             compiler="gcc12",
         )
 

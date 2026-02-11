@@ -82,7 +82,7 @@ def test_workspace_multispec_concretize(workspace_name):
     workspace(
         "manage",
         "experiments",
-        "gromacs",
+        "gromacs@2024.1",
         "-p",
         "eessi",
         "-e",

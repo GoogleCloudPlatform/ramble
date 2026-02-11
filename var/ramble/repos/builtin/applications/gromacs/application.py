@@ -21,7 +21,11 @@ class Gromacs(ExecutableApplication):
 
     tags("molecular-dynamics", "hpc-benchmark")
 
+    version("2020.5", description="Version 2020.5 of Gromacs", preferred=True)
+    version("2024.1", description="Version 2024.1 of Gromacs", preferred=False)
+
     with when("package_manager_family=spack"):
+
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
         software_spec(
@@ -31,14 +35,14 @@ class Gromacs(ExecutableApplication):
 
         with default_args(compiler="gcc9"):
             software_spec(
-                "gromacs",
-                pkg_spec="gromacs@2020.5",
+                "gromacs-{application_version}",
+                pkg_spec="gromacs@{application_version}",
             )
 
     software_spec(
-        "gromacs",
+        "gromacs-2024.1",
         pkg_spec="GROMACS/2024.1-foss-2023b",
-        when=["package_manager_family=eessi"],
+        when=["package_manager_family=eessi", "application_version=2024.1"],
     )
 
     executable(

@@ -76,12 +76,14 @@ class Lammps(ExecutableApplication):
         workload_group="all_workloads",
     )
 
+    version("20220623.4", "Version 20220623.4 of LAMMPS", preferred=True)
+
     with when("package_manager_family=spack"):
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "lammps",
-            pkg_spec="lammps@20220623.4 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
+            "lammps-{application_version}",
+            pkg_spec="lammps@{application_version} +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
             compiler="gcc9",
         )
 
