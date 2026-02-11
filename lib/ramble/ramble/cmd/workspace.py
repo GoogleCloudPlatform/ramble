@@ -792,26 +792,30 @@ def workspace_info(args):
     all_pipelines = {}
     color.cprint("")
     color.cprint(rucolor.section_title("Experiments:"))
+
+    # Build an index of experiments to avoid re-rendering them in the loops below
+    from collections import defaultdict
+
+    experiment_index_map = defaultdict(list)
+    for exp_name, app_inst, _ in experiment_set.all_experiments():
+        key = (
+            app_inst.variables[app_inst.keywords.application_name],
+            app_inst.variables[app_inst.keywords.workload_template_name],
+            app_inst.variables[app_inst.keywords.experiment_template_name],
+        )
+        experiment_index_map[key].append(exp_name)
+
+    # Construct filters here...
+    filters = ramble.filters.Filters(
+        phase_filters=[],
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags,
+    )
+
     for workloads, application_context in ws.all_applications():
         for experiments, workload_context in ws.all_workloads(workloads):
             for _, experiment_context in ws.all_experiments(experiments):
-                print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
-                print_experiment_set.set_application_context(application_context)
-                print_experiment_set.set_workload_context(workload_context)
-                print_experiment_set.set_experiment_context(experiment_context)
-                print_experiment_set.build_experiment_chains()
-
-                # Reindex the experiments in the print set to match the overall set
-                for exp_name, print_app_inst, _ in print_experiment_set.all_experiments():
-                    app_inst = experiment_set.get_experiment(exp_name)
-                    experiment_index = app_inst.expander.expand_var_name(
-                        app_inst.keywords.experiment_index
-                    )
-
-                    print_app_inst.define_variable(
-                        print_app_inst.keywords.experiment_index, experiment_index
-                    )
-
                 print_header = True
                 # Define variable printing groups.
                 var_indent = "        "
@@ -825,16 +829,42 @@ def workspace_info(args):
                 header_base = rucolor.nested_4("Variables from")
                 config_vars = ramble.config.config.get("config:variables")
 
-                # Construct filters here...
-                filters = ramble.filters.Filters(
-                    phase_filters=[],
-                    include_where_filters=args.where,
-                    exclude_where_filters=args.exclude_where,
-                    tags=args.filter_tags,
+                # Retrieve experiments from index
+                key = (
+                    application_context.context_name,
+                    workload_context.context_name,
+                    experiment_context.context_name,
                 )
+                matching_experiments = experiment_index_map.get(key, [])
 
-                for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
+                for exp_name in matching_experiments:
                     app_inst = experiment_set.get_experiment(exp_name)
+
+                    # Apply filters manually since we are iterating a raw list
+                    active = True
+                    if filters.include_where:
+                        for expression in filters.include_where:
+                            if not app_inst.expander.evaluate_predicate(expression):
+                                active = False
+                                break
+                    if not active:
+                        continue
+
+                    if filters.exclude_where:
+                        for expression in filters.exclude_where:
+                            if app_inst.expander.evaluate_predicate(expression):
+                                active = False
+                                break
+                    if not active:
+                        continue
+
+                    if filters.tags:
+                        if not app_inst.has_tags(filters.tags):
+                            active = False
+
+                    if not active:
+                        continue
+
                     if app_inst.package_manager is not None:
                         software_environments.render_environment(
                             app_inst.expander.expand_var("{env_name}"),
