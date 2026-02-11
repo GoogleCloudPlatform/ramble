@@ -11,6 +11,7 @@ import itertools
 import os
 import sys
 import tempfile
+from collections import defaultdict
 from typing import Callable, Dict
 
 import llnl.util.tty as tty
@@ -794,8 +795,6 @@ def workspace_info(args):
     color.cprint(rucolor.section_title("Experiments:"))
 
     # Build an index of experiments to avoid re-rendering them in the loops below
-    from collections import defaultdict
-
     experiment_index_map = defaultdict(list)
     for exp_name, app_inst, _ in experiment_set.all_experiments():
         key = (

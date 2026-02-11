@@ -496,7 +496,7 @@ class Renderer:
             keep_object = True
             if exclude_where:
                 for where in exclude_where:
-                    evaluated = where_expander.expand_var(where, extra_vars=obj)
+                    evaluated = where_expander.expand_var(where)
                     if evaluated == "True":
                         keep_object = False
                         break
