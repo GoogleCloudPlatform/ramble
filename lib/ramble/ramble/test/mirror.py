@@ -153,7 +153,7 @@ ramble:
 
         with ramble.workspace.create(ws_name) as workspace:
             workspace.write()
-            config_path = os.path.join(workspace.config_dir, ramble.workspace.config_file_name)
+            config_path = os.path.join(workspace.config_dir, ramble.workspace.CONFIG_FILE_NAME)
             with open(config_path, "w+") as f:
                 f.write(test_config)
             workspace._re_read()

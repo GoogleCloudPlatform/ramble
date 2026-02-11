@@ -22,7 +22,6 @@ from ramble.error import RambleCommandError
 from ramble.main import RambleCommand, main
 from ramble.namespace import namespace
 from ramble.test.dry_run_helpers import search_files_for_string
-from ramble.util import constants
 
 import spack.util.spack_yaml as syaml
 
@@ -217,8 +216,8 @@ def test_workspace_deactivate(workspace_name):
     ramble.workspace.deactivate()
 
     # Test deactivation fails when no workspace is active
-    if ramble.workspace.ramble_workspace_var in os.environ:
-        del os.environ[ramble.workspace.ramble_workspace_var]
+    if ramble.workspace.RAMBLE_WORKSPACE_VAR in os.environ:
+        del os.environ[ramble.workspace.RAMBLE_WORKSPACE_VAR]
     output = workspace("deactivate", "--sh", fail_on_error=False)
     assert "No workspace is currently active." in output
 
@@ -297,7 +296,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -357,7 +356,7 @@ config:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    ramble_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    ramble_config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     config_scope_path = os.path.join(ws1.config_dir, "config.yaml")
 
     with open(ramble_config_path, "w+") as f:
@@ -411,7 +410,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -465,7 +464,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -673,7 +672,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -750,7 +749,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -807,7 +806,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1073,7 +1072,7 @@ ramble # Missing colon!
         ws = ramble.workspace.create(workspace_name)
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         with open(config_path, "w") as f:
             f.write(bad_config)
 
@@ -1111,7 +1110,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1176,7 +1175,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1228,7 +1227,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1279,7 +1278,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1320,7 +1319,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1360,7 +1359,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1401,7 +1400,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1446,7 +1445,7 @@ ramble:
 
     def write_config(ws_path, config):
         with ramble.workspace.Workspace(ws_path) as ws:
-            config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+            config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
             with open(config_path, "w+") as f:
                 f.write(config)
             ws._re_read()
@@ -1510,7 +1509,7 @@ licenses:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     lic_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
     with open(config_path, "w+") as f:
@@ -1577,7 +1576,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            constants.LICENSE_INC_NAME,
+            ramble.workspace.LICENSE_INC_NAME,
         )
     )
 
@@ -1613,7 +1612,7 @@ licenses:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     lic_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
     with open(config_path, "w+") as f:
@@ -1642,7 +1641,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            constants.LICENSE_INC_NAME,
+            ramble.workspace.LICENSE_INC_NAME,
         )
     )
 
@@ -1671,7 +1670,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1744,7 +1743,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1823,7 +1822,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1904,7 +1903,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1952,7 +1951,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1976,7 +1975,7 @@ def test_workspace_include(workspace_name):
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_file = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_file = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     inc_file = os.path.join(ws1.config_dir, "test_include.yaml")
 
     test_include = """
@@ -2051,7 +2050,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     template_path = os.path.join(ws1.config_dir, f"{tpl_name}.tpl")
 
     with open(config_path, "w+") as f:
@@ -2112,7 +2111,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -2173,7 +2172,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -2251,7 +2250,7 @@ software:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     app_config_path = os.path.join(ws1.config_dir, "applications.yaml")
     software_config_path = os.path.join(ws1.config_dir, "software.yaml")
 

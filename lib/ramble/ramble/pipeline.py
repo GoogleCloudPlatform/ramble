@@ -30,7 +30,6 @@ import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
-from ramble.util import constants
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
 
@@ -367,18 +366,18 @@ class ArchivePipeline(Pipeline):
 
         # Copy current configs
         archive_configs = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_config_path
+            self.workspace.latest_archive_path, ramble.workspace.WORKSPACE_CONFIG_PATH
         )
         _copy_tree(self.workspace.config_dir, archive_configs)
 
         # Copy shared files
         archive_shared = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_shared_path
+            self.workspace.latest_archive_path, ramble.workspace.WORKSPACE_SHARED_PATH
         )
 
         excluded_secrets = set()
         if not self.include_secrets:
-            excluded_secrets.add(constants.LICENSE_INC_NAME)
+            excluded_secrets.add(ramble.workspace.LICENSE_INC_NAME)
 
         fs.mkdirp(archive_shared)
         for root, _, files in os.walk(self.workspace.shared_dir):
@@ -392,7 +391,7 @@ class ArchivePipeline(Pipeline):
 
         # Copy logs, but omit all symlinks (i.e. "latest")
         archive_logs = os.path.join(
-            self.workspace.latest_archive_path, ramble.workspace.workspace_log_path
+            self.workspace.latest_archive_path, ramble.workspace.WORKSPACE_LOG_PATH
         )
         fs.mkdirp(archive_logs)
         for root, _, files in os.walk(self.workspace.log_dir):
@@ -699,13 +698,13 @@ class PushDeploymentPipeline(Pipeline):
 
     def _execute(self):
         configs_dir = os.path.join(
-            self.workspace.named_deployment, ramble.workspace.workspace_config_path
+            self.workspace.named_deployment, ramble.workspace.WORKSPACE_CONFIG_PATH
         )
         fs.mkdirp(configs_dir)
 
         _copy_tree(self.workspace.config_dir, configs_dir)
 
-        aux_software_dir = os.path.join(configs_dir, ramble.workspace.auxiliary_software_dir_name)
+        aux_software_dir = os.path.join(configs_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME)
         fs.mkdirp(aux_software_dir)
 
         super()._execute()

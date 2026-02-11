@@ -80,10 +80,10 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         aux_software_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
@@ -218,7 +218,7 @@ ramble:
 """
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()

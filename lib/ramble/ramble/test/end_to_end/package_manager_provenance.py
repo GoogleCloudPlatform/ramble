@@ -39,7 +39,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
 
     from llnl.util.filesystem import mkdirp
 
-    aux_dir = os.path.join(ws.config_dir, ramble.workspace.auxiliary_software_dir_name)
+    aux_dir = os.path.join(ws.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME)
     mkdirp(aux_dir)
 
     with open(os.path.join(aux_dir, "config.yaml"), "w") as f:

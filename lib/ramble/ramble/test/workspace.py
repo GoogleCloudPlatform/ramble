@@ -12,7 +12,7 @@ import shutil
 
 import pytest
 
-from ramble.workspace import workspace
+from ramble.workspace import TEMPLATE_EXTENSION, workspace
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
@@ -50,7 +50,7 @@ def test_all_config_files():
         ws = workspace.create(ws_name)
         ws.write()
 
-        config_dir = os.path.join(ws_root, workspace.workspace_config_path)
+        config_dir = os.path.join(ws_root, workspace.WORKSPACE_CONFIG_PATH)
 
         # Create another yaml file
         extra_yaml_path = os.path.join(config_dir, "extra.yaml")
@@ -64,7 +64,7 @@ def test_all_config_files():
 
         config_files = workspace.all_config_files(ws_root)
 
-        ramble_yaml_path = os.path.join(config_dir, workspace.config_file_name)
+        ramble_yaml_path = os.path.join(config_dir, workspace.CONFIG_FILE_NAME)
 
         assert len(config_files) == 2
         assert ramble_yaml_path in config_files
@@ -85,8 +85,8 @@ def test_template_path():
 
     expected_path = os.path.join(
         ws_root,
-        workspace.workspace_config_path,
-        template_name + workspace.workspace_template_extension,
+        workspace.WORKSPACE_CONFIG_PATH,
+        template_name + TEMPLATE_EXTENSION,
     )
 
     assert path == expected_path

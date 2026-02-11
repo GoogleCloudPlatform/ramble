@@ -58,13 +58,13 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions
+from ramble.util import conversions
 from ramble.util.foms import FomType, SummaryFoms
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
 from ramble.util.shell_utils import source_str
-from ramble.workspace import namespace
+from ramble.workspace import LICENSE_INC_NAME, TEMPLATE_EXTENSION, namespace
 
 import spack.util.compression
 import spack.util.executable
@@ -2066,9 +2066,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.license_path = os.path.join(
             workspace.shared_license_dir, self.name
         )
-        self.license_file = os.path.join(
-            self.license_path, constants.LICENSE_INC_NAME
-        )
+        self.license_file = os.path.join(self.license_path, LICENSE_INC_NAME)
 
         fs.mkdirp(self.license_path)
 
@@ -3459,7 +3457,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         # Append logic to source file which contains the exports
                         shell = ramble.config.get("config:shell")
                         license_set.add(
-                            f"{source_str(shell)} {{license_input_dir}}/{constants.LICENSE_INC_NAME}"
+                            f"{source_str(shell)} {{license_input_dir}}/{LICENSE_INC_NAME}"
                         )
 
         command.extend(license_set)
@@ -3505,7 +3503,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         run_dir = self.expander.experiment_run_dir
         replacements = workspace.workspace_paths()
         expander = self.expander
-        tpl_ext = constants.TEMPLATE_EXTENSION
+        tpl_ext = TEMPLATE_EXTENSION
 
         def _expand_path(path):
             return ramble.util.path.substitute_path_variables(

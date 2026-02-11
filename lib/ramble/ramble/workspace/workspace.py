@@ -39,7 +39,7 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util import constants, object_utils
+from ramble.util import object_utils
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
@@ -49,74 +49,81 @@ import spack.util.spack_yaml as syaml
 import spack.util.url as url_util
 import spack.util.web as web_util
 
-#: Environment variable used to indicate the active workspace
-ramble_workspace_var = "RAMBLE_WORKSPACE"
+# Workspace-related constants
 
-#: Currently activated workspace
-_active_workspace = None
+#: Environment variable used to indicate the active workspace
+RAMBLE_WORKSPACE_VAR = "RAMBLE_WORKSPACE"
 
 #: Subdirectory where workspace configs are stored
-workspace_config_path = "configs"
+WORKSPACE_CONFIG_PATH = "configs"
 
 #: Name of subdirectory within workspace where tables are stored
-workspace_tables_path = "tables"
+WORKSPACE_TABLES_PATH = "tables"
 
 #: Name of subdirectory within workspaces where logs are stored
-workspace_log_path = "logs"
+WORKSPACE_LOG_PATH = "logs"
 
 #: Name of subdirectory within workspaces where experiments are stored
-workspace_experiment_path = "experiments"
+WORKSPACE_EXPERIMENT_PATH = "experiments"
 
 #: Name of subdirectory within workspaces where input files are stored
-workspace_input_path = "inputs"
+WORKSPACE_INPUT_PATH = "inputs"
 
 #: Name of subdirectory within workspaces where software environment
 #: are stored
-workspace_software_path = "software"
+WORKSPACE_SOFTWARE_PATH = "software"
 
 #: Name of the subdirectory where workspace archives are stored
-workspace_archive_path = "archive"
+WORKSPACE_ARCHIVE_PATH = "archive"
 
-#: Name of the subdirectory where shared/sourale files are stored
-workspace_shared_path = "shared"
+#: Name of the subdirectory where shared files are stored
+WORKSPACE_SHARED_PATH = "shared"
 
-#: Name of the subdirectory where shared/sourale files are stored
-workspace_shared_license_path = "licenses"
+#: Name of the subdirectory where shared license files are stored
+WORKSPACE_SHARED_LICENSE_PATH = "licenses"
 
 #: Name of the subdirectory where deployments are stored
-workspace_deployments_path = "deployments"
+WORKSPACE_DEPLOYMENTS_PATH = "deployments"
 
 #: regex for validating workspace names
-valid_workspace_name_re = r"^\w[\w-]*$"
+VALID_WORKSPACE_NAME_RE = re.compile(r"^\w[\w-]*$")
+
+# File that includes licensing information for sourcing
+LICENSE_INC_NAME = "license.inc"
+
+#: Extension for template files
+# Only files that end with this extension are considered valid templates by Ramble
+TEMPLATE_EXTENSION = ".tpl"
+
+#: Directory name for auxiliary software files
+AUXILIARY_SOFTWARE_DIR_NAME = "auxiliary_software_files"
+
+CONFIG_SECTION = namespace.workspace
+CONFIG_FILE_NAME = "ramble.yaml"
+LICENSES_FILE_NAME = "licenses.yaml"
+
+METADATA_FILE_NAME = "workspace_metadata.yaml"
+
+WORKSPACE_ALL_EXPERIMENTS_FILE = "all_experiments"
+
+WORKSPACE_EXECUTION_TEMPLATE = "execute_experiment" + TEMPLATE_EXTENSION
+
+#: Name of lockfile within a workspace
+LOCKFILE_NAME = "ramble.lock"
 
 #: Config schema for application files
 applications_schema = ramble.schema.applications.schema
 
-#: Extension for template files
-workspace_template_extension = constants.TEMPLATE_EXTENSION
-
-#: Directory name for auxiliary software files
-auxiliary_software_dir_name = "auxiliary_software_files"
-
 #: Config file information for workspaces.
 #: Keys are filenames, values are dictionaries describing the config files.
 config_schema = ramble.schema.workspace.schema
-config_section = namespace.workspace
-config_file_name = "ramble.yaml"
-licenses_file_name = "licenses.yaml"
 
-metadata_file_name = "workspace_metadata.yaml"
-
-workspace_all_experiments_file = "all_experiments"
-
-workspace_execution_template = "execute_experiment" + workspace_template_extension
-
-#: Name of lockfile within a workspace
-lockfile_name = "ramble.lock"
+#: Currently activated workspace
+_active_workspace = None
 
 
 def valid_workspace_name(name):
-    return re.match(valid_workspace_name_re, name)
+    return re.match(VALID_WORKSPACE_NAME_RE, name)
 
 
 def validate_workspace_name(name):
@@ -196,7 +203,7 @@ def all_workspace_names():
     names = []
     for candidate in candidates:
         configured = True
-        yaml_path = os.path.join(_root(candidate), workspace_config_path, config_file_name)
+        yaml_path = os.path.join(_root(candidate), WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
         if not os.path.exists(yaml_path):
             configured = False
         if valid_workspace_name(candidate) and configured:
@@ -246,25 +253,25 @@ def active(name):
 
 def get_filepath(path, file_name):
     if is_workspace_dir(path):
-        return os.path.join(path, workspace_config_path, file_name)
+        return os.path.join(path, WORKSPACE_CONFIG_PATH, file_name)
     return None
 
 
 def config_file(path):
     """Returns the path to a workspace's ramble.yaml"""
-    return get_filepath(path, config_file_name)
+    return get_filepath(path, CONFIG_FILE_NAME)
 
 
 def licenses_file(path):
     """Returns the path to a workspace's licenses.yaml"""
-    return get_filepath(path, licenses_file_name)
+    return get_filepath(path, LICENSES_FILE_NAME)
 
 
 def all_config_files(path):
     """Returns path to all yaml files in workspace config directory"""
     config_files = []
 
-    config_path = os.path.join(path, workspace_config_path)
+    config_path = os.path.join(path, WORKSPACE_CONFIG_PATH)
     for f in os.listdir(config_path):
         if f.endswith(".yaml"):
             config_files.append(os.path.join(config_path, f))
@@ -274,8 +281,8 @@ def all_config_files(path):
 
 def template_path(ws_path, requested_template_name):
     """Returns the path to a workspace's template file"""
-    config_path = os.path.join(ws_path, workspace_config_path)
-    template_file = requested_template_name + workspace_template_extension
+    config_path = os.path.join(ws_path, WORKSPACE_CONFIG_PATH)
+    template_file = requested_template_name + TEMPLATE_EXTENSION
     template_path = os.path.join(config_path, template_file)
     return template_path
 
@@ -284,10 +291,10 @@ def all_template_paths(path):
     """Returns (abs) path to available template files in the workspace"""
     templates = []
 
-    config_path = os.path.join(path, workspace_config_path)
+    config_path = os.path.join(path, WORKSPACE_CONFIG_PATH)
     for root, _, files in os.walk(config_path):
         for f in files:
-            if f.endswith(workspace_template_extension):
+            if f.endswith(TEMPLATE_EXTENSION):
                 templates.append(os.path.join(root, f))
 
     return templates
@@ -298,7 +305,7 @@ def is_workspace_dir(path):
     ret_val = os.path.isdir(path)
     if ret_val:
         ret_val = ret_val and os.path.exists(
-            os.path.join(path, workspace_config_path, config_file_name)
+            os.path.join(path, WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
         )
     return ret_val
 
@@ -536,13 +543,13 @@ class Workspace:
 
             read_default = not os.path.exists(self.config_file_path)
             if read_default:
-                self._read_config(config_section, self._default_config_yaml())
+                self._read_config(CONFIG_SECTION, self._default_config_yaml())
             else:
                 with open(self.config_file_path) as f:
-                    self._read_config(config_section, f)
+                    self._read_config(CONFIG_SECTION, f)
 
             read_default_script = self.read_default_template
-            ext_len = len(workspace_template_extension)
+            ext_len = len(TEMPLATE_EXTENSION)
             if os.path.exists(self.config_dir):
                 for root, _, files in os.walk(self.config_dir):
                     processed_root = root.replace(self.config_dir, "")
@@ -551,7 +558,7 @@ class Workspace:
                     if len(processed_root) > 1:
                         processed_root += os.sep
                     for filename in files:
-                        if filename.endswith(workspace_template_extension):
+                        if filename.endswith(TEMPLATE_EXTENSION):
                             read_default_script = False
                             template_name = processed_root + filename[0:-ext_len]
                             template_path = os.path.join(root, filename)
@@ -572,7 +579,7 @@ class Workspace:
                             self._read_auxiliary_software_file(filename, f.read())
 
             if read_default_script:
-                template_name = workspace_execution_template[0:-ext_len]
+                template_name = WORKSPACE_EXECUTION_TEMPLATE[0:-ext_len]
                 self._read_template(template_name, self._template_execute_script())
 
             self._read_metadata()
@@ -694,7 +701,7 @@ ramble:
         If a metadata file exists in the workspace root, read it in, and
         populate this workspace's metadata object with its contents.
         """
-        metadata_file_path = os.path.join(self.root, metadata_file_name)
+        metadata_file_path = os.path.join(self.root, METADATA_FILE_NAME)
 
         if os.path.exists(metadata_file_path):
             with open(metadata_file_path) as f:
@@ -709,7 +716,7 @@ ramble:
         Create, and populate the metadata file in the root of the workspace.
         This file can be used to house cross-pipeline information.
         """
-        metadata_file_path = os.path.join(self.root, metadata_file_name)
+        metadata_file_path = os.path.join(self.root, METADATA_FILE_NAME)
 
         with open(metadata_file_path, "w+") as f:
             syaml.dump(self.metadata, stream=f)
@@ -780,7 +787,7 @@ ramble:
             fs.mkdirp(self.shared_dir)
             fs.mkdirp(self.shared_license_dir)
 
-            self._write_config(config_section)
+            self._write_config(CONFIG_SECTION)
 
             self._write_templates()
 
@@ -848,7 +855,7 @@ ramble:
 
     @property
     def all_experiments_path(self):
-        return os.path.join(self.root, workspace_all_experiments_file)
+        return os.path.join(self.root, WORKSPACE_ALL_EXPERIMENTS_FILE)
 
     def build_experiment_set(self, die_on_validate_error=True):
         """Create an experiment set representing this workspace"""
@@ -1810,8 +1817,8 @@ ramble:
         parsed_url = url_util.parse(mirror_root)
         self.mirror_path = url_util.local_file_path(parsed_url)
         self.mirror_existed = web_util.url_exists(self.mirror_path)
-        self.input_mirror_path = os.path.join(self.mirror_path, workspace_input_path)
-        self.software_mirror_path = os.path.join(self.mirror_path, workspace_software_path)
+        self.input_mirror_path = os.path.join(self.mirror_path, WORKSPACE_INPUT_PATH)
+        self.software_mirror_path = os.path.join(self.mirror_path, WORKSPACE_SOFTWARE_PATH)
         mirror_dirs = [self.mirror_path, self.input_mirror_path, self.software_mirror_path]
         for subdir in mirror_dirs:
             if not os.path.isdir(subdir):
@@ -1925,7 +1932,7 @@ ramble:
         changed = changed or _remove_scoped_variables("workspace", workspace_used_variables)
 
         if changed:
-            self._write_config(config_section)
+            self._write_config(CONFIG_SECTION)
         else:
             logger.all_msg("No variables were changed.")
 
@@ -2085,57 +2092,57 @@ ramble:
     @property
     def experiment_dir(self):
         """Path to the experiment directory"""
-        return os.path.join(self.root, workspace_experiment_path)
+        return os.path.join(self.root, WORKSPACE_EXPERIMENT_PATH)
 
     @property
     def input_dir(self):
         """Path to the input directory"""
-        return os.path.join(self.root, workspace_input_path)
+        return os.path.join(self.root, WORKSPACE_INPUT_PATH)
 
     @property
     def software_dir(self):
         """Path to the software directory"""
-        return os.path.join(self.root, workspace_software_path)
+        return os.path.join(self.root, WORKSPACE_SOFTWARE_PATH)
 
     @property
     def tables_dir(self):
         """Path to the tables directory"""
-        return os.path.join(self.root, workspace_tables_path)
+        return os.path.join(self.root, WORKSPACE_TABLES_PATH)
 
     @property
     def log_dir(self):
         """Path to the logs directory"""
-        return os.path.join(self.root, workspace_log_path)
+        return os.path.join(self.root, WORKSPACE_LOG_PATH)
 
     @property
     def config_dir(self):
         """Path to the configuration file directory"""
-        return os.path.join(self.root, workspace_config_path)
+        return os.path.join(self.root, WORKSPACE_CONFIG_PATH)
 
     @property
     def auxiliary_software_dir(self):
         """Path to the auxiliary software files directory"""
-        return os.path.join(self.config_dir, auxiliary_software_dir_name)
+        return os.path.join(self.config_dir, AUXILIARY_SOFTWARE_DIR_NAME)
 
     @property
     def config_file_path(self):
         """Path to the configuration file directory"""
-        return os.path.join(self.config_dir, config_file_name)
+        return os.path.join(self.config_dir, CONFIG_FILE_NAME)
 
     @property
     def archive_dir(self):
         """Path to the archive directory"""
-        return os.path.join(self.root, workspace_archive_path)
+        return os.path.join(self.root, WORKSPACE_ARCHIVE_PATH)
 
     @property
     def shared_dir(self):
         """Path to the shared directory"""
-        return os.path.join(self.root, workspace_shared_path)
+        return os.path.join(self.root, WORKSPACE_SHARED_PATH)
 
     @property
     def deployments_dir(self):
         """Path to the deployments directory"""
-        return os.path.join(self.root, workspace_deployments_path)
+        return os.path.join(self.root, WORKSPACE_DEPLOYMENTS_PATH)
 
     @property
     def named_deployment(self):
@@ -2150,11 +2157,11 @@ ramble:
     @property
     def shared_license_dir(self):
         """Path to the shared license directory"""
-        return os.path.join(self.shared_dir, workspace_shared_license_path)
+        return os.path.join(self.shared_dir, WORKSPACE_SHARED_LICENSE_PATH)
 
     def template_path(self, name):
         if name in self._templates.keys():
-            return os.path.join(self.config_dir, name + workspace_template_extension)
+            return os.path.join(self.config_dir, name + TEMPLATE_EXTENSION)
         return None
 
     def all_templates(self):
@@ -2171,15 +2178,15 @@ ramble:
         workspace_path_replacements = {
             "workspace_root": root,
             namespace.workspace: root,
-            "workspace_configs": os.path.join(root, workspace_config_path),
-            "workspace_software": os.path.join(root, workspace_software_path),
-            "workspace_tables": os.path.join(root, workspace_tables_path),
-            "workspace_logs": os.path.join(root, workspace_log_path),
-            "workspace_inputs": os.path.join(root, workspace_input_path),
-            "workspace_experiments": os.path.join(root, workspace_experiment_path),
-            "workspace_shared": os.path.join(root, workspace_shared_path),
-            "workspace_archives": os.path.join(root, workspace_archive_path),
-            "workspace_deployments": os.path.join(root, workspace_deployments_path),
+            "workspace_configs": os.path.join(root, WORKSPACE_CONFIG_PATH),
+            "workspace_software": os.path.join(root, WORKSPACE_SOFTWARE_PATH),
+            "workspace_tables": os.path.join(root, WORKSPACE_TABLES_PATH),
+            "workspace_logs": os.path.join(root, WORKSPACE_LOG_PATH),
+            "workspace_inputs": os.path.join(root, WORKSPACE_INPUT_PATH),
+            "workspace_experiments": os.path.join(root, WORKSPACE_EXPERIMENT_PATH),
+            "workspace_shared": os.path.join(root, WORKSPACE_SHARED_PATH),
+            "workspace_archives": os.path.join(root, WORKSPACE_ARCHIVE_PATH),
+            "workspace_deployments": os.path.join(root, WORKSPACE_DEPLOYMENTS_PATH),
         }
 
         return workspace_path_replacements
@@ -2377,7 +2384,7 @@ ramble:
                     del base_section[namespace.modifiers]
 
                 if not dry_run:
-                    self._write_config(config_section)
+                    self._write_config(CONFIG_SECTION)
 
         return removed
 
@@ -2432,7 +2439,7 @@ ramble:
             added += 1
 
         if not dry_run:
-            self._write_config(config_section)
+            self._write_config(CONFIG_SECTION)
         return added
 
     def add_include(self, new_include):
@@ -2449,7 +2456,7 @@ ramble:
             namespace.include
         ]
         includes.append(new_include)
-        self._write_config(config_section)
+        self._write_config(CONFIG_SECTION)
 
     def remove_include(self, index=None, pattern=None):
         """Remove one or more includes from this workspace.
@@ -2491,7 +2498,7 @@ ramble:
                     changed = True
 
         if changed:
-            self._write_config(config_section)
+            self._write_config(CONFIG_SECTION)
 
     def included_config_scopes(self):
         """List of included configuration scopes from the environment.
@@ -2731,16 +2738,16 @@ def no_active_workspace():
     effect when there is no active workspace."""
     ws = active_workspace()
     env_var = None
-    if ramble_workspace_var in os.environ.keys():
-        env_var = os.environ[ramble_workspace_var]
-        del os.environ[ramble_workspace_var]
+    if RAMBLE_WORKSPACE_VAR in os.environ.keys():
+        env_var = os.environ[RAMBLE_WORKSPACE_VAR]
+        del os.environ[RAMBLE_WORKSPACE_VAR]
 
     try:
         deactivate()
         yield
     finally:
         if ws:
-            os.environ[ramble_workspace_var] = env_var
+            os.environ[RAMBLE_WORKSPACE_VAR] = env_var
             activate(ws)
 
 

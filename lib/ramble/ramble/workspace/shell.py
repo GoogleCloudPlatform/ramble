@@ -19,7 +19,7 @@ def activate_header(ws, shell, prompt=None):
     cmds = ""
     if shell == "csh":
         # TODO: figure out how to make color work for csh
-        cmds += f"setenv {ramble.workspace.ramble_workspace_var} {ws.root};\n"
+        cmds += f"setenv {ramble.workspace.RAMBLE_WORKSPACE_VAR} {ws.root};\n"
         if prompt:
             cmds += "if (! $?RAMBLE_OLD_PROMPT ) "
             cmds += 'setenv RAMBLE_OLD_PROMPT "${prompt}";\n'
@@ -28,7 +28,7 @@ def activate_header(ws, shell, prompt=None):
         if "color" in os.getenv("TERM", "") and prompt:
             prompt = colorize("@G{%s} " % prompt, color=True)
 
-        cmds += f"set -gx {ramble.workspace.ramble_workspace_var} {ws.root};\n"
+        cmds += f"set -gx {ramble.workspace.RAMBLE_WORKSPACE_VAR} {ws.root};\n"
         #
         # NOTE: We're not changing the fish_prompt function (which is fish's
         # solution to the PS1 variable) here. This is a bit fiddly, and easy to
@@ -36,13 +36,13 @@ def activate_header(ws, shell, prompt=None):
         #
     elif shell == "bat":
         # TODO: Color
-        cmds += f'set "{ramble.workspace.ramble_workspace_var}={ws.root}"\n'
+        cmds += f'set "{ramble.workspace.RAMBLE_WORKSPACE_VAR}={ws.root}"\n'
         # TODO: prompt
     else:
         if "color" in os.getenv("TERM", "") and prompt:
             prompt = colorize("@G{%s}" % prompt, color=True)
 
-        cmds += f"export {ramble.workspace.ramble_workspace_var}={ws.root};\n"
+        cmds += f"export {ramble.workspace.RAMBLE_WORKSPACE_VAR}={ws.root};\n"
         if prompt:
             cmds += "if [ -z ${RAMBLE_OLD_PS1+x} ]; then\n"
             cmds += "    if [ -z ${PS1+x} ]; then\n"
@@ -58,25 +58,25 @@ def activate_header(ws, shell, prompt=None):
 def deactivate_header(shell):
     cmds = ""
     if shell == "csh":
-        cmds += "unsetenv %s;\n" % (ramble.workspace.ramble_workspace_var)
+        cmds += "unsetenv %s;\n" % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
         cmds += "if ( $?RAMBLE_OLD_PROMPT ) "
         cmds += '    eval \'set prompt="$RAMBLE_OLD_PROMPT" &&'
         cmds += "        unsetenv RAMBLE_OLD_PROMPT';\n"
     elif shell == "fish":
-        cmds += "set -e %s;\n" % (ramble.workspace.ramble_workspace_var)
+        cmds += "set -e %s;\n" % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
         #
         # NOTE: Not changing fish_prompt (above) => no need to restore it here.
         #
     elif shell == "bat":
         # TODO: Color
-        cmds += 'set "%s="\n' % (ramble.workspace.ramble_workspace_var)
+        cmds += 'set "%s="\n' % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
         # TODO: despacktivate
         # TODO: prompt
     else:
-        cmds += "if [ ! -z ${%s+x} ]; then\n" % (ramble.workspace.ramble_workspace_var)
+        cmds += "if [ ! -z ${%s+x} ]; then\n" % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
         cmds += "unset {}; export {};\n".format(
-            ramble.workspace.ramble_workspace_var,
-            ramble.workspace.ramble_workspace_var,
+            ramble.workspace.RAMBLE_WORKSPACE_VAR,
+            ramble.workspace.RAMBLE_WORKSPACE_VAR,
         )
         cmds += "fi;\n"
         cmds += "if [ ! -z ${RAMBLE_OLD_PS1+x} ]; then\n"
