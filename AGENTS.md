@@ -227,7 +227,7 @@ This workflow details how to create a workspace, configure it for a single exper
 
 ## Running Unit Tests
 
-Ramble uses `pytest` for its unit tests. The tests can be run using a wrapper command, `ramble unit-test`.
+Ramble uses `pytest` for its unit tests. Tests **must** be run using the `ramble unit-test` wrapper command, not by invoking `pytest` directly, as the wrapper handles necessary test environment setup.
 
 *   **Running all tests:**
     ```bash
