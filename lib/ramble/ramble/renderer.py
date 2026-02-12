@@ -378,7 +378,7 @@ class Renderer:
             matrix_col_maps = []
             for names in matrix_variables:
                 col_map = []
-                for name_idx, name in enumerate(names):
+                for name in names:
                     if name in defined_zips:
                         # It's a zip
                         zip_info = defined_zips[name]

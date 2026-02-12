@@ -22,7 +22,6 @@ import ramble.cmd
 import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.expander
-import ramble.experiment_set
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
