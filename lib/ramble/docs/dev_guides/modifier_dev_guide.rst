@@ -232,11 +232,12 @@ preparation steps can be copied into the experiment directory to verify the
 ``ramble workspace analyze`` pipeline works, without having to execute the
 experiment itself.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Variants and Conditional Logic
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Versions, Variants, and Conditional Logic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Ramble modifiers support variants, just as applications do (see
+Ramble modifiers support versions and variants, just as applications do (see
+:ref:`application-dev-version-directive` and
 :ref:`application-dev-variant-directive`).
 
 Variants can be used to control the behavior of many of the

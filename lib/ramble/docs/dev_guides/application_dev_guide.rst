@@ -320,6 +320,47 @@ that should be used when referencing file paths in application definitions. This
 helps with Ramble to properly mock out these paths during unit testing, where the
 files may not exist under the dry-run setting.
 
+.. _application-dev-version-directive:
+
+^^^^^^^^^^^^^^^^^^^^
+Application Versions
+^^^^^^^^^^^^^^^^^^^^
+
+Ramble allows objects to be defined with multiple versions, and then to use 
+:ref:`conditional logic<application-dev-conditional-logic>` to set other directives
+based on the version. The ``version`` directive (:py:meth:`ramble.language.shared_language.version`)
+is used to set a version, and ``when`` conditions can be described using the following syntax:
+
+* ``application_version@<version_number>`` Apply to only a specific version.
+* ``application_version@:<version_number>`` Apply to a range up to the specified version.
+* ``application_version@<version_number>:`` Apply to a range from the specified version.
+* ``application_version@<start_number>:<end_number>`` Apply to a range of versions.
+
+Version numbers must conform to `Python packaging.version`_ format. In some cases, it may be
+necessary to adjust the format of version numbers to conform with the requirement. For example,
+``iozone`` uses underscores instead of periods in its versioning on Spack, so it is defined in
+Ramble as follows:
+
+.. code-block:: python
+
+    version("3.506", "Version 3_506 of Iozone", preferred=True)
+
+    with when("package_manager_family=spack"):
+        software_spec(
+            "iozone-{application_version}",
+            pkg_spec="iozone@{application_version}".replace(".", "_"),
+            compiler="gcc15",
+        )
+    
+.. _Python packaging.version: https://packaging.python.org/en/latest/specifications/version-specifiers/>`
+
+Versions can be set for any object by substituting ``application_version`` for
+``<object_name>_version``.
+
+By default, users must select from versions defined in the ``application.py``. Strict version
+checking can be disabled for the entire application using the ``strict_versions`` directive
+(:py:meth:`ramble.language.shared_language.strict_versions`) or by setting the configuration
+``config:enable_strict_versions:false`` in the ``ramble.yaml`` file.
 
 .. _application-dev-variant-directive:
 
