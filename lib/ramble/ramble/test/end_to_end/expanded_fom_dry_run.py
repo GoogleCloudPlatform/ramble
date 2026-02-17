@@ -76,7 +76,7 @@ ramble:
         output = workspace("analyze", global_args=["-w", workspace_name])
         print(output)
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
         with open(text_results_files[0]) as f:
             data = f.read()
             assert "Status = SUCCESS" in data

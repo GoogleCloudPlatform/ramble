@@ -109,9 +109,9 @@ def check_info_basic(output):
 
 def check_results(ws):
     fn = ws.dump_results(output_formats=["text", "json", "yaml"])
-    assert os.path.exists(os.path.join(ws.root, fn + ".txt"))
-    assert os.path.exists(os.path.join(ws.root, fn + ".json"))
-    assert os.path.exists(os.path.join(ws.root, fn + ".yaml"))
+    assert os.path.exists(os.path.join(ws.results_dir, fn + ".txt"))
+    assert os.path.exists(os.path.join(ws.results_dir, fn + ".json"))
+    assert os.path.exists(os.path.join(ws.results_dir, fn + ".yaml"))
 
 
 def test_workspace_create_links(mutable_mock_workspace_path, tmpdir):

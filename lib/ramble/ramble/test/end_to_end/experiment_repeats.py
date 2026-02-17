@@ -157,9 +157,9 @@ ramble:
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        json_results_files = glob.glob(os.path.join(ws1.root, "results*.json"))
-        yaml_results_files = glob.glob(os.path.join(ws1.root, "results*.yaml"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
+        json_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.json"))
+        yaml_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.yaml"))
 
         # Match both the file and the symlink
         assert len(text_results_files) == 2
@@ -180,7 +180,7 @@ ramble:
 
         # When --summary-only, only the base experiments are included
         workspace("analyze", "-s", global_args=["-w", workspace_name])
-        result_file = glob.glob(os.path.join(ws1.root, "results.latest.txt"))[0]
+        result_file = glob.glob(os.path.join(ws1.results_dir, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
             assert "gromacs.water_bare.pme_single_rank" in data
@@ -236,7 +236,7 @@ ramble:
                     f.write(f"Sleep for {60 * r} seconds\n")
 
         workspace("analyze", "-s", global_args=["-w", workspace_name])
-        result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
+        result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
             assert f"summary::{SummaryFoms.N_TOTAL.value} = 3 repeats" in data

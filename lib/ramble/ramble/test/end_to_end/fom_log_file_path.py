@@ -46,7 +46,7 @@ def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, wor
 
     workspace("analyze", global_args=global_args)
 
-    with open(os.path.join(ws.root, "results.latest.txt")) as f:
+    with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
         data = f.read()
 
         assert "FAILED" not in data

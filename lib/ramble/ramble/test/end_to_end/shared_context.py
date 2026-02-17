@@ -76,7 +76,7 @@ ramble:
 
         workspace("analyze", "-f", "text", "json", global_args=["-w", workspace_name])
 
-        results_files = glob.glob(os.path.join(ws.root, "results.latest.txt"))
+        results_files = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))
 
         with open(results_files[0]) as f:
             data = f.read()

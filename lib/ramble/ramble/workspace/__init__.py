@@ -18,6 +18,7 @@ from .workspace import (
     TEMPLATE_EXTENSION,
     WORKSPACE_CONFIG_PATH,
     WORKSPACE_LOG_PATH,
+    WORKSPACE_RESULTS_PATH,
     WORKSPACE_SHARED_PATH,
     WORKSPACE_SOFTWARE_PATH,
     RambleActiveWorkspaceError,
@@ -91,5 +92,6 @@ __all__ = [
     "namespace",
     "WORKSPACE_CONFIG_PATH",
     "WORKSPACE_LOG_PATH",
+    "WORKSPACE_RESULTS_PATH",
     "WORKSPACE_SHARED_PATH",
 ]

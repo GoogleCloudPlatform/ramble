@@ -403,7 +403,10 @@ class ArchivePipeline(Pipeline):
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
 
-        for pattern in itertools.chain(self.archive_patterns, ["results.*"]):
+        for pattern in itertools.chain(
+            self.archive_patterns,
+            [os.path.join(ramble.workspace.WORKSPACE_RESULTS_PATH, "results.*")],
+        ):
             # Escape workspace root incase it contains glob characters.
             pattern_path = glob.escape(self.workspace.root) + os.sep + pattern
             for file in glob.glob(pattern_path):

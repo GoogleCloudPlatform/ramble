@@ -65,7 +65,7 @@ ramble:
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
         for _ in ["txt", "json", "yaml"]:
-            with open(os.path.join(ws.root, "results.latest.txt")) as f:
+            with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
                 data = f.read()
                 assert "Success criteria summary:" in data
                 assert "application::basic::_application_function = PASSED" in data

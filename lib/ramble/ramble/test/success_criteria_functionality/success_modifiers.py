@@ -72,7 +72,7 @@ def test_success_modifier(
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert result in data
 
@@ -122,7 +122,7 @@ ramble:
         f.write("0.35 seconds\nExperiment status: SUCCESS\n")
 
     workspace("analyze", global_args=["-w", workspace_name])
-    result_file = os.path.join(ws.root, "results.latest.txt")
+    result_file = os.path.join(ws.results_dir, "results.latest.txt")
 
     with open(result_file) as f:
         content = f.read()

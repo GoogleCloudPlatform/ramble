@@ -103,7 +103,7 @@ def test_setup_analyze(test_case_path, workspace_name):
         _copy_tree(src_child_dir, dest_exp_dir_path)
     ws_cmd("analyze", global_args=global_args)
     # Check the analyze output matches with the expected
-    actual_analyze = os.path.join(ws.root, "results.latest.txt")
+    actual_analyze = os.path.join(ws.results_dir, "results.latest.txt")
     assert os.path.isfile(actual_analyze)
     expected_analyze = test_case_path / "expected_analyze.out"
     assert expected_analyze.is_file()
