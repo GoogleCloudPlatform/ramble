@@ -59,7 +59,7 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "FAILED" not in data
             assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
@@ -74,7 +74,7 @@ ramble:
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "SUCCESS" in data
             assert "FAILED" in data
@@ -90,7 +90,7 @@ ramble:
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "SUCCESS" not in data
             assert f"summary::{SummaryFoms.N_TOTAL.value}" not in data

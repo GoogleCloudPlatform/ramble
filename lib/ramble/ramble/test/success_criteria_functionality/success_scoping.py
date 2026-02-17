@@ -66,7 +66,7 @@ ramble:
             "analyze", "--where", "{experiment_index} == 1", global_args=["-w", workspace_name]
         )
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "Status = SUCCESS" in data
 
@@ -74,6 +74,6 @@ ramble:
             "analyze", "--where", "{experiment_index} == 2", global_args=["-w", workspace_name]
         )
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "Status = FAILED" in data

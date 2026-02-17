@@ -271,7 +271,9 @@ compilers:
             f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
-        symlink_results_file = os.path.join(ws1.root, "results.latest.txt")
+        if not os.path.exists(ws1.results_dir):
+            os.makedirs(ws1.results_dir)
+        symlink_results_file = os.path.join(ws1.results_dir, "results.latest.txt")
         # Temporarily store some temp data in the "latest" result and check it
         # gets updated
         with open(tmp_results_file, "w+") as f:
@@ -280,9 +282,9 @@ compilers:
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        json_results_files = glob.glob(os.path.join(ws1.root, "results*.json"))
-        yaml_results_files = glob.glob(os.path.join(ws1.root, "results*.yaml"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
+        json_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.json"))
+        yaml_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.yaml"))
 
         # Match both the file and the symlink
         assert len(text_results_files) == 2
@@ -499,7 +501,9 @@ licenses:
             f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
-        symlink_results_file = os.path.join(ws1.root, "results.latest.txt")
+        if not os.path.exists(ws1.results_dir):
+            os.makedirs(ws1.results_dir)
+        symlink_results_file = os.path.join(ws1.results_dir, "results.latest.txt")
         # Temporarily store some temp data in the "latest" result and check it
         # gets updated
         with open(tmp_results_file, "w+") as f:
@@ -508,9 +512,9 @@ licenses:
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        json_results_files = glob.glob(os.path.join(ws1.root, "results*.json"))
-        yaml_results_files = glob.glob(os.path.join(ws1.root, "results*.yaml"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
+        json_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.json"))
+        yaml_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.yaml"))
 
         # Match both the file and the symlink
         assert len(text_results_files) == 2

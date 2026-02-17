@@ -1658,6 +1658,15 @@ ramble:
             fs.mkdirp(self.tables_dir)
             self.results_tables.output_tables(self.tables_dir, self.date_string())
 
+    def _create_result_symlinks(self, out_file, latest_base, file_extension, symlinks_updated):
+        latest_file = os.path.join(self.results_dir, latest_base + file_extension)
+        symlinks_updated.append(latest_file)
+        self.symlink_result(out_file, latest_file)
+
+        # Allow one simlink to the latest result in the top level for backwards compat
+        latest_file_parent = os.path.join(self.root, latest_base + file_extension)
+        self.symlink_result(out_file, latest_file_parent)
+
     def dump_results(self, output_formats=None, print_results=False, summary_only=False):
         """
         Write out result file in desired format
@@ -1691,7 +1700,6 @@ ramble:
 
             file_extension = ".txt"
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
-            latest_file = os.path.join(self.results_dir, latest_base + file_extension)
 
             results_written.append(out_file)
 
@@ -1759,14 +1767,7 @@ ramble:
                 else:
                     logger.msg("No results to write")
 
-            symlinks_updated.append(latest_file)
-
-            self.symlink_result(out_file, latest_file)
-
-            # Allow one simlink to the latest result in the top level for backwards compat
-            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
-            self.symlink_result(out_file, latest_file_parent)
-
+            self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
 
         # Convert SoftwareInfo classes to dicts
         for exp in results[namespace.experiment]:
@@ -1776,21 +1777,14 @@ ramble:
         if "json" in output_formats:
             file_extension = ".json"
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
-            latest_file = os.path.join(self.results_dir, latest_base + file_extension)
             results_written.append(out_file)
             with open(out_file, "w+") as f:
                 sjson.dump(results, f)
-            symlinks_updated.append(latest_file)
-            self.symlink_result(out_file, latest_file)
-
-            # Allow one simlink to the latest result in the top level for backwards compat
-            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
-            self.symlink_result(out_file, latest_file_parent)
+            self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
 
         if "yaml" in output_formats:
             file_extension = ".yaml"
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
-            latest_file = os.path.join(self.results_dir, latest_base + file_extension)
             results_written.append(out_file)
 
             from ruamel.yaml import RoundTripDumper
@@ -1808,12 +1802,7 @@ ramble:
             with open(out_file, "w+") as f:
                 syaml.dump(results, stream=f, Dumper=RambleSafeDumper)
 
-            symlinks_updated.append(latest_file)
-            self.symlink_result(out_file, latest_file)
-
-            # Allow one simlink to the latest result in the top level for backwards compat
-            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
-            self.symlink_result(out_file, latest_file_parent)
+            self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
 
         if not results_written:
             logger.die("Results were not written.")

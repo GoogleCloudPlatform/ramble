@@ -74,7 +74,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
 
         workspace("analyze", global_args=global_args)
 
-        results_file = os.path.join(ws.root, "results.latest.txt")
+        results_file = os.path.join(ws.results_dir, "results.latest.txt")
         assert os.path.isfile(results_file)
 
         with open(results_file) as f:
@@ -85,7 +85,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
 
         workspace("analyze", "-f", "json", global_args=global_args)
 
-        results_file = os.path.join(ws.root, "results.latest.json")
+        results_file = os.path.join(ws.results_dir, "results.latest.json")
         assert os.path.isfile(results_file)
 
         with open(results_file) as f:
@@ -132,7 +132,7 @@ def test_usermanged_package_manager_provenance_zlib(mock_applications, workspace
     workspace("setup", global_args=global_args)
     workspace("analyze", global_args=global_args)
 
-    results_file = os.path.join(ws.root, "results.latest.txt")
+    results_file = os.path.join(ws.results_dir, "results.latest.txt")
 
     assert os.path.isfile(results_file)
 

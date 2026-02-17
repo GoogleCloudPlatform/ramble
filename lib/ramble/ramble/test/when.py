@@ -93,7 +93,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -155,7 +155,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -218,7 +218,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -275,7 +275,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         ws._re_read()
         workspace("setup", global_args=global_args)
@@ -339,7 +339,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives-inherited", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         ws._re_read()
         workspace("setup", global_args=global_args)
@@ -768,7 +768,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -1560,7 +1560,7 @@ def test_obj_required_key_when(
 
         workspace("analyze", "-f", "json", global_args=global_args)
 
-        results_file = os.path.join(ws.root, "results.latest.json")
+        results_file = os.path.join(ws.results_dir, "results.latest.json")
 
         assert os.path.exists(results_file)
 

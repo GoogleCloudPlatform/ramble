@@ -55,7 +55,7 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "FAILED" in data
             assert "0.9 s" in data

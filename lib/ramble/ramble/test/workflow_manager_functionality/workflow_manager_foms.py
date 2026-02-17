@@ -48,6 +48,6 @@ ramble:
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
         workspace("analyze", "-p", global_args=["-D", ws.root])
-        result_file = os.path.join(ws.root, "results.latest.txt")
+        result_file = os.path.join(ws.results_dir, "results.latest.txt")
         with open(result_file) as f:
             assert "job-status = RUNNING" in f.read()
