@@ -116,6 +116,7 @@ class variables, as in:
 
   class Spack(PackageManagerBase):
     package_manager_variable(...)
+    package_manager_family(...)
     register_builtin(...)
     register_phase(...)
 
@@ -127,6 +128,15 @@ When aspects of a package manager are able to be parameterized, it can be
 useful for a package manager to define a variable which users can modify to
 control the package manager's behavior. The ``package_manager_variable``
 directive can be used to define these variables.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Families
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Package managers can be grouped into families. This allows other objects to
+conditionally apply logic based on the family of the package manager being
+used. The ``package_manager_family`` directive is used to add a package manager
+to one or more families.
 
 ^^^^^^^^
 Builtins

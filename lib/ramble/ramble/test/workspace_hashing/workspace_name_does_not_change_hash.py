@@ -53,7 +53,7 @@ ramble:
     with ramble.workspace.create(workspace1_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -63,19 +63,19 @@ ramble:
         with ramble.workspace.create(workspace2_name) as ws2:
             ws2.write()
 
-            config_path = os.path.join(ws2.config_dir, ramble.workspace.config_file_name)
+            config_path = os.path.join(ws2.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
             with open(config_path, "w+") as f:
                 f.write(test_config)
             ws2._re_read()
             workspace("setup", "--dry-run", global_args=["-w", workspace2_name])
 
-            metadata_path = os.path.join(ws1.root, ramble.workspace.metadata_file_name)
+            metadata_path = os.path.join(ws1.root, ramble.workspace.METADATA_FILE_NAME)
             with open(metadata_path) as f:
                 data = syaml.load(f)
                 ws1_hash = data[namespace.metadata]["workspace_digest"]
 
-            metadata_path = os.path.join(ws2.root, ramble.workspace.metadata_file_name)
+            metadata_path = os.path.join(ws2.root, ramble.workspace.METADATA_FILE_NAME)
             with open(metadata_path) as f:
                 data = syaml.load(f)
                 ws2_hash = data[namespace.metadata]["workspace_digest"]

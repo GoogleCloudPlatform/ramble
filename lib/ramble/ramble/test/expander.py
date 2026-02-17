@@ -37,6 +37,7 @@ def exp_dict():
         "max_len": 9,
         "test_dict": {"test_key1": "test_val1", "test_key2": "test_val2"},
         "experiment_index": 5,
+        "var4": "a-b",
     }
 
 
@@ -133,6 +134,8 @@ def build_variant_set():
         ("0b10 & 0b01", "0", set(), 1),
         ("0b10 | 0b01", "3", set(), 1),
         ("0b10 ^ 0b01", "3", set(), 1),
+        ("~0", "-1", set(), 1),
+        ("~2", "-3", set(), 1),
         ("0b10 << 1", "4", set(), 1),
         ("0b10 >> 1", "1", set(), 1),
         # Can be a handy way to select experiments to run
@@ -152,6 +155,9 @@ def build_variant_set():
         ("str_lstrip('AAAbbb', 'A')", "bbb", set(), 1),
         ("str_join('.', str_split('a b c 1'))", "a.b.c.1", set(), 1),
         ("str_no_such_method('a')", "str_no_such_method('a')", set(), 1),
+        ("replace('abc', 'a', 'd')", "dbc", set(), 1),
+        ("replace('{application_name}', 'f', 'F')", "Foo", set(), 1),
+        ("str_upper({var4})", "A-B", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
@@ -212,6 +218,8 @@ def test_expansions(input, output, no_expand_vars, passes):
         ("2 or 1", 2, set(), 1),
         ("randrange(2, 3, 1)", 2, set(), 1),
         ("randint(3, 3)", 3, set(), 1),
+        ("~0", -1, set(), 1),
+        ("~2", -3, set(), 1),
     ],
 )
 def test_typed_expansions(input, output, no_expand_vars, passes):

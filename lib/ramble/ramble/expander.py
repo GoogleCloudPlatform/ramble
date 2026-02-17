@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import ast
+import collections
 import itertools
 import math
 import operator
@@ -53,6 +54,10 @@ def _join_str(seq, sep=","):
 
 def _re_search(regex, s):
     return re.search(regex, s) is not None
+
+
+def _str_replace(s, *args, **kwargs):
+    return str(s).replace(*args, **kwargs)
 
 
 # TODO: These conditional defines should be removed when support for
@@ -113,6 +118,7 @@ supported_math_operators = {
     ast.BitAnd: operator.and_,
     ast.BitOr: operator.or_,
     ast.BitXor: operator.xor,
+    ast.Invert: operator.invert,
     ast.LShift: operator.lshift,
     ast.RShift: operator.rshift,
 }
@@ -133,6 +139,7 @@ supported_scalar_function_pointers = {
     "simplify_str": spack.util.naming.simplify_name,
     "join_str": _join_str,
     "re_search": _re_search,
+    "replace": _str_replace,
 }
 
 # Format Spec Regex:
@@ -442,6 +449,8 @@ class Expander:
         self._experiment_set = experiment_set
         self.replacement_paths = {}
 
+        self._math_str_stack = []
+
         self._application_name = None
         self._workload_name = None
         self._experiment_name = None
@@ -681,10 +690,11 @@ class Expander:
         logger.debug(f"BEGINNING OF EXPAND_VAR STACK ON {var}")
         logger.debug(f" REPLACE VAR (1): {replace_escaped_braces}")
         logger.debug(f" REPLACE VAR (2): {self._replace_escaped_braces}")
-        expansions = self._variables
+
         if extra_vars:
-            expansions = self._variables.copy()
-            expansions.update(extra_vars)
+            expansions = collections.ChainMap(extra_vars, self._variables)
+        else:
+            expansions = self._variables
 
         try:
             value = self._partial_expand(
@@ -854,25 +864,29 @@ class Expander:
             unmodified (if unsuccessful)
 
         """
-        with warnings.catch_warnings(record=True) as wal:
-            try:
-                math_ast = _ast_parse(in_str)
-                out_str = self.eval_math(math_ast.body)
-                return out_str
-            except MathEvaluationError as e:
-                logger.debug(f'   Math input is: "{in_str}"')
-                logger.debug(e)
-            except RambleSyntaxError as e:
-                raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
-            except SyntaxError as e:
-                logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
-                logger.debug(e)
+        self._math_str_stack.append(in_str)
+        try:
+            with warnings.catch_warnings(record=True) as wal:
+                try:
+                    math_ast = _ast_parse(in_str)
+                    out_str = self.eval_math(math_ast.body)
+                    return out_str
+                except MathEvaluationError as e:
+                    logger.debug(f'   Math input is: "{in_str}"')
+                    logger.debug(e)
+                except RambleSyntaxError as e:
+                    raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
+                except SyntaxError as e:
+                    logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
+                    logger.debug(e)
 
-            for warn in wal:
-                if r"invalid escape sequence '\{'" not in str(warn.message):
-                    logger.warn(str(warn.message))
+                for warn in wal:
+                    if r"invalid escape sequence '\{'" not in str(warn.message):
+                        logger.warn(str(warn.message))
 
-        return in_str
+            return in_str
+        finally:
+            self._math_str_stack.pop()
 
     def eval_math(self, node):
         """Evaluate math from parsing the AST
@@ -971,8 +985,6 @@ class Expander:
         elif node.func.id in supported_list_function_pointers.keys():
             func = supported_list_function_pointers[node.func.id]
             return list(func(*args, **kwargs))
-        elif node.func.id == "replace":
-            return str(args[0]).replace(*args[1:], **kwargs)
         elif node.func.id in supported_scalar_function_with_self_arg_pointers.keys():
             func = supported_scalar_function_with_self_arg_pointers[node.func.id]
             return func(self, *args, **kwargs)
@@ -1069,7 +1081,6 @@ class Expander:
                     raise RambleSyntaxError(
                         f"{namespace} does not exist in: " + f'"{var_name} in {namespace}"'
                     )
-                    self.__raise_syntax_error(node)
                 return val
         # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
         elif isinstance(node.left, ast.Constant) or _is_str_node(node.left):
@@ -1101,6 +1112,34 @@ class Expander:
             right_eval = self.eval_math(node.right)
             op = supported_math_operators[type(node.op)]
             if isinstance(left_eval, str) or isinstance(right_eval, str):
+                # Determine the end of the left node and the start of the right node,
+                # to preserve strings in between.
+                # This is to avoid expanding "gromacs +debug" into "gromacs+debug".
+                op_str = None
+                if self._math_str_stack:
+                    source = self._math_str_stack[-1]
+                    l_node, r_node = node.left, node.right
+
+                    l_end_lineno = getattr(l_node, "end_lineno", None)
+                    l_end_col_offset = getattr(l_node, "end_col_offset", None)
+
+                    # The `end_lineno` and `end_col_offset` may not be available in older (<3.8)
+                    # versions of Python.
+                    if l_end_lineno is None and hasattr(l_node, "lineno"):
+                        if isinstance(l_node, ast.Name):
+                            l_end_lineno = l_node.lineno
+                            l_end_col_offset = l_node.col_offset + len(l_node.id)
+                        elif _is_num_node(l_node):
+                            l_end_lineno = l_node.lineno
+                            l_end_col_offset = l_node.col_offset + len(str(l_node.n))
+
+                    if l_end_lineno is not None and hasattr(r_node, "lineno"):
+                        if l_end_lineno == r_node.lineno:
+                            lines = source.splitlines(keepends=True)
+                            line = lines[l_end_lineno - 1]
+                            op_str = line[l_end_col_offset : r_node.col_offset]
+                    if op_str is not None:
+                        return f"{left_eval}{op_str}{right_eval}"
                 self.__dbg_syntax_error("Unsupported operand type in binary operator", node)
             return op(left_eval, right_eval)
         except TypeError:

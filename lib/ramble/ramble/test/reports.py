@@ -301,8 +301,6 @@ def test_scaling_plots(mutable_mock_workspace_path, tmpdir_factory, values):
     # Update index to match
     ideal_df = ideal_df.set_index("n_nodes")
 
-    ideal_df[["fom_units"]] = ideal_df[["fom_units"]].astype(object)
-
     logx = False
     logy = False
     split_by = "workload_namespace"

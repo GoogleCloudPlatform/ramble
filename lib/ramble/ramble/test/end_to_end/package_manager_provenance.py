@@ -7,11 +7,14 @@
 # except according to those terms.
 
 import os
+from unittest.mock import patch
 
 import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.pkg_man.builtin import spack_lightweight
+from ramble.test.mock_spack_runner import MockSpackRunner
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
@@ -36,64 +39,65 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
 
     from llnl.util.filesystem import mkdirp
 
-    aux_dir = os.path.join(ws.config_dir, ramble.workspace.auxiliary_software_dir_name)
+    aux_dir = os.path.join(ws.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME)
     mkdirp(aux_dir)
 
     with open(os.path.join(aux_dir, "config.yaml"), "w") as f:
         f.write(spack_config)
 
-    workspace("concretize", global_args=global_args)
+    with patch.object(spack_lightweight, "SpackRunner", return_value=MockSpackRunner()):
+        workspace("concretize", global_args=global_args)
 
-    workspace("setup", global_args=global_args)
+        workspace("setup", global_args=global_args)
 
-    spack_yaml = os.path.join(ws.software_dir, pm, "zlib", "spack.yaml")
-    spack_lock = os.path.join(ws.software_dir, pm, "zlib", "spack.lock")
+        spack_yaml = os.path.join(ws.software_dir, pm, "zlib", "spack.yaml")
+        spack_lock = os.path.join(ws.software_dir, pm, "zlib", "spack.lock")
 
-    assert os.path.isfile(spack_yaml)
+        assert os.path.isfile(spack_yaml)
 
-    with open(spack_yaml) as f:
-        data = f.read()
-        assert "- zlib" in data
+        with open(spack_yaml) as f:
+            data = f.read()
+            assert "- zlib" in data
 
-    assert os.path.isfile(spack_lock)
+        assert os.path.isfile(spack_lock)
 
-    with open(spack_lock) as f:
-        data = f.read()
-        assert '"spec":"zlib"' in data
+        with open(spack_lock) as f:
+            data = f.read()
+            assert '"spec":"zlib"' in data
 
-    out_log = os.path.join(
-        ws.experiment_dir, "zlib", "ensure_installed", "generated", "generated.out"
-    )
+        out_log = os.path.join(
+            ws.experiment_dir, "zlib", "ensure_installed", "generated", "generated.out"
+        )
 
-    with open(out_log, "w+") as f:
-        f.write("libz.so.2\n")
+        with open(out_log, "w+") as f:
+            f.write("libz.so.2\n")
 
-    workspace("analyze", global_args=global_args)
+        workspace("analyze", global_args=global_args)
 
-    results_file = os.path.join(ws.root, "results.latest.txt")
-    assert os.path.isfile(results_file)
+        results_file = os.path.join(ws.root, "results.latest.txt")
+        assert os.path.isfile(results_file)
 
-    with open(results_file) as f:
-        data = f.read()
-        assert "Software definitions" in data
-        assert "spack packages:" in data
-        assert "zlib @" in data
+        with open(results_file) as f:
+            data = f.read()
+            assert "Software definitions" in data
+            assert "spack packages:" in data
+            assert "zlib @" in data
 
-    workspace("analyze", "-f", "json", global_args=global_args)
+        workspace("analyze", "-f", "json", global_args=global_args)
 
-    results_file = os.path.join(ws.root, "results.latest.json")
-    assert os.path.isfile(results_file)
+        results_file = os.path.join(ws.root, "results.latest.json")
+        assert os.path.isfile(results_file)
 
-    with open(results_file) as f:
-        import json
+        with open(results_file) as f:
+            import json
 
-        data = json.load(f)
-        for d in data["experiments"]:
-            pkg_list = d["SOFTWARE"]["spack"]
-            names = [pkg["name"] for pkg in pkg_list]
-            assert "SOFTWARE" in d
-            assert "spack" in d["SOFTWARE"]
-            assert "zlib" in names
+            data = json.load(f)
+            for d in data["experiments"]:
+                pkg_list = d["SOFTWARE"]["spack"]
+                names = [pkg["name"] for pkg in pkg_list]
+                assert "SOFTWARE" in d
+                assert "spack" in d["SOFTWARE"]
+                assert "zlib" in names
 
 
 def test_usermanged_package_manager_provenance_zlib(mock_applications, workspace_name):

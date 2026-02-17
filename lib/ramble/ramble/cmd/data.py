@@ -16,12 +16,12 @@ subcommands = [
 
 
 def data_create_db_setup_parser(subparser):
-    """create the data database"""
+    """create the database"""
     pass
 
 
 def data_create_db(args):
-    """create the data database"""
+    """create the database"""
     import ramble.config
     import ramble.uploader
     from ramble.config import ConfigError

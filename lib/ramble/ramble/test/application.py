@@ -81,7 +81,7 @@ def test_basic_app(mutable_mock_apps_repo):
     example_input = basic_inst.workloads[_FS]["test_wl"].find_input("input")
     assert example_input is not None
 
-    assert len(basic_inst.workloads[_FS]["test_wl"].variables[_FS]) == 6
+    assert len(basic_inst.workloads[_FS]["test_wl"].variables[_FS]) == 7
     possible_vars = basic_inst.workloads[_FS]["test_wl"].find_variable("my_var")
     assert len(possible_vars) == 1
     assert possible_vars[0].default == "1.0"
@@ -501,7 +501,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)

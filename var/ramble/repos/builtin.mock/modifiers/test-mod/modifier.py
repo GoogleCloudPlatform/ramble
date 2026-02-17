@@ -48,6 +48,13 @@ class TestMod(BasicModifier):
         modes=["test"],
     )
 
+    modifier_variable(
+        "modeless_variable",
+        default="is defined",
+        environment_variable_name="MODELESS_ENV_VAR",
+        description="Test a modifier variable without a mode",
+    )
+
     variable_modification(
         "test_var_mod",
         "test-mod-append",

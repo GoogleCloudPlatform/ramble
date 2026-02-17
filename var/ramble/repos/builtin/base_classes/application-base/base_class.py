@@ -58,13 +58,13 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import constants, conversions
+from ramble.util import conversions
 from ramble.util.foms import FomType, SummaryFoms
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
 from ramble.util.shell_utils import source_str
-from ramble.workspace import namespace
+from ramble.workspace import LICENSE_INC_NAME, TEMPLATE_EXTENSION, namespace
 
 import spack.util.compression
 import spack.util.executable
@@ -664,10 +664,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
 
+        default_variables = {}
         # Process the application variables that are missing
         for var, val in self.selected_variables.items():
             if var not in self.variables:
-                self.define_variable(var, val.default)
+                default_variables[var] = val.default
 
         # Extract a merged set of when_keys from objects that are not
         # applications.
@@ -691,6 +692,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         while True:
             to_define = {}
+            changed_definitions = False
             # Process any missing variables from other objects
             for obj, when_keys in object_when_map.items():
                 to_remove = set()
@@ -700,17 +702,21 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         for var in obj.object_variables[when_key]:
                             if var.name not in self.variables:
                                 to_define[var.name] = var.default
+                                changed_definitions = True
 
                 # Remove any satisfied when_keys, as we won't need to check
                 # them (since their variables have already been defined).
                 for when_key in to_remove:
                     when_keys.remove(when_key)
 
-            if not to_define:
+            if not changed_definitions:
                 break
 
             for var, val in to_define.items():
-                self.define_variable(var, val)
+                default_variables[var] = val
+
+        for var, val in default_variables.items():
+            self.define_variable(var, val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
@@ -1402,7 +1408,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if (
                     name in filtered_executabls
                     or name in self.custom_executables
-                ):
+                ) and not conf.get("force", False):
                     experiment_namespace = self.expander.expand_var_name(
                         "experiment_namespace"
                     )
@@ -1426,10 +1432,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             ExecutableGraph: Graph of executables for workload
         """
         self._define_custom_executables()
-        exec_order = self.get_workload(workload_name).executables
         # Use yaml defined executable order, if defined
         if namespace.executables in self.internals:
             exec_order = self.internals[namespace.executables]
+        else:
+            exec_order = self.get_workload(workload_name).executables
 
         builtin_objects = []
         all_builtins = []
@@ -2059,9 +2066,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.license_path = os.path.join(
             workspace.shared_license_dir, self.name
         )
-        self.license_file = os.path.join(
-            self.license_path, constants.LICENSE_INC_NAME
-        )
+        self.license_file = os.path.join(self.license_path, LICENSE_INC_NAME)
 
         fs.mkdirp(self.license_path)
 
@@ -3452,7 +3457,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         # Append logic to source file which contains the exports
                         shell = ramble.config.get("config:shell")
                         license_set.add(
-                            f"{source_str(shell)} {{license_input_dir}}/{constants.LICENSE_INC_NAME}"
+                            f"{source_str(shell)} {{license_input_dir}}/{LICENSE_INC_NAME}"
                         )
 
         command.extend(license_set)
@@ -3498,7 +3503,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         run_dir = self.expander.experiment_run_dir
         replacements = workspace.workspace_paths()
         expander = self.expander
-        tpl_ext = constants.TEMPLATE_EXTENSION
+        tpl_ext = TEMPLATE_EXTENSION
 
         def _expand_path(path):
             return ramble.util.path.substitute_path_variables(

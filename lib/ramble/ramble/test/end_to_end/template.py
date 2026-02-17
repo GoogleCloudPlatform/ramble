@@ -13,7 +13,6 @@ import pytest
 import ramble.workspace
 from ramble.error import ApplicationError
 from ramble.main import RambleCommand
-from ramble.util import constants
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
@@ -41,7 +40,7 @@ ramble:
 """
     ws = ramble.workspace.create(workspace_name)
     ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     with open(config_path, "w+") as f:
         f.write(test_config)
     ws._re_read()
@@ -97,7 +96,7 @@ ramble:
 """
     ws = ramble.workspace.create(workspace_name)
     ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     with open(config_path, "w+") as f:
         f.write(test_config)
     ws._re_read()
@@ -139,7 +138,7 @@ ramble:
 """
     ws = ramble.workspace.create(workspace_name)
     ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     with open(config_path, "w+") as f:
         f.write(test_config)
     ws._re_read()
@@ -156,7 +155,7 @@ ramble:
 
 def test_template_wrong_extension(mutable_mock_apps_repo, workspace_name):
     template_src_name = "template_wrong_extension.sh"
-    ext = constants.TEMPLATE_EXTENSION
+    ext = ramble.workspace.TEMPLATE_EXTENSION
     test_config = f"""
 ramble:
   variables:
@@ -174,7 +173,7 @@ ramble:
 """
     ws = ramble.workspace.create(workspace_name)
     ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     with open(config_path, "w+") as f:
         f.write(test_config)
     ws._re_read()

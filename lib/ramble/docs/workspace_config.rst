@@ -184,6 +184,7 @@ Supported functions are:
 * ``randint`` (from `random.randint`)
 * ``join_str(iterable, sep=",")`` (concatenate iterable into ``sep``-separated string)
 * ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
+* ``replace(str, old, new)`` (returns a copy of ``str`` with all occurrences of ``old`` replaced by ``new``)
 * ``maybe(var_name, default="")`` (returns the expanded ``var_name`` if it is defined, otherwise returns ``default``)
 
 Besides the above listed, any functions from the ``math`` module can be used in Ramble by referencing ``math_<function_name>``.
@@ -545,7 +546,7 @@ level.
     ramble:
       config:
         n_repeats: int
-        repeats_success_strict: [True/False]
+        repeat_success_strict: [True/False]
       applications:
         hostname:
           n_repeats: int
@@ -964,9 +965,20 @@ Generated Variables
 
 Ramble automatically generates definitions for the following variables:
 
+* ``workspace_name`` - Set to the name of the workspace
 * ``application_name`` - Set to the name of the application
+* ``application_namespace`` - Set to the namespace of the application
+* ``simplified_application_namespace`` - Set to a simplified version of the application namespace
 * ``workload_name`` - Set to the name of the workload within the application
+* ``workload_namespace`` - Set to the namespace of the workload
+* ``simplified_workload_namespace`` - Set to a simplified version of the workload namespace
 * ``experiment_name`` - Set to the name of the experiment
+* ``experiment_namespace`` - Set to the namespace of the experiment
+* ``simplified_experiment_namespace`` - Set to a simplified version of the experiment namespace
+* ``experiment_hash`` - Set to the hash of the experiment
+* ``experiment_status`` - Set to the status of the experiment (e.g., SUCCESS, FAILED)
+* ``RAMBLE_STATUS`` - Set to the status of the experiment
+* ``experiments_file`` - Path to the experiments file
 * ``env_name`` - By default defined as ``{application_name}``. Can be
   overridden to control the software environment to use.
 * ``application_run_dir`` - Absolute path to
@@ -981,6 +993,7 @@ Ramble automatically generates definitions for the following variables:
   ``$workspace_root/inputs/{application_name}/{workload_name}``
 * ``experiment_index`` - Index, in set, of experiment. If part of a chain,
   shares a value with its root.
+* ``repeat_index`` - Index of the current repeat for an experiment.
 * ``env_path`` - Absolute path to
   ``$workspace_root/software/{package_manager_name}/{env_name}.{workload_name}``
   if no package manager is used, ``{package_manager_name}`` is replaced with
@@ -988,6 +1001,8 @@ Ramble automatically generates definitions for the following variables:
 * ``log_dir`` - Absolute path to ``$workspace_root/logs``
 * ``log_file`` - Absolute path to
   ``{experiment_run_dir}/{experiment_name}.out``
+* ``err_file`` - Absolute path to
+  ``{experiment_run_dir}/{experiment_name}.err``
 * ``<input_name>`` - Applications that have input files have variables defined
   that contain the absolute path to:
   ``$workspace_root/inputs/{application_name}/{workload_name}/<input_name>``
@@ -1002,6 +1017,8 @@ Ramble automatically generates definitions for the following variables:
   to the ``configs`` directory. For example:
   ``$workspace_root/configs/templates/foo.tpl`` would create a variable named
   ``templates/foo``.
+* ``workload_template_name`` - Set to the name of the workload template
+* ``experiment_template_name`` - Set to the name of the experiment template
 * ``unformatted_command`` - A multi-line string with the command for running
   the experiment. Unformatted so it can be formatted for various experiments.
 * ``unformatted_command_without_logs`` - The same as ``unformatted_command`` but
@@ -1296,6 +1313,12 @@ A few common examples include:
 - **slurm**: A comprehensive manager for submitting jobs to the Slurm Workload
   Manager. It handles `sbatch` script generation, job status queries with
   `squeue` and `sacct`, and cancellation with `scancel`.
+- **slurm-intel-mpi**: A specialized Slurm manager for use with Intel MPI.
+- **slurm-pyxis**: A Slurm manager that supports running jobs within containers
+  using Pyxis and Enroot.
+- **gke-mpi**: A workflow manager for running MPI jobs on Google Kubernetes
+  Engine (GKE).
+- **google-batch**: A workflow manager for submitting jobs to Google Cloud Batch.
 
 Configuration and Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

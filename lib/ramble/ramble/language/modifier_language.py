@@ -288,8 +288,10 @@ def modifier_variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
-        mode (str): Single mode this variable is used in
-        modes (list): List of modes this variable is used in
+        mode (str): Single mode this variable is used in, if no mode/modes are
+                    specified, will apply to all modes.
+        modes (list): List of modes this variable is used in, if no mode/modes are
+                      specified, will apply to all modes.
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
@@ -307,8 +309,15 @@ def modifier_variable(
             when, mod, name, "modifier_variable"
         )
 
+        if not all_modes:
+            all_modes = [None]
+
         for mode_name in all_modes:
-            mode_variant = f"{mod.name}_mode={mode_name}"
+            if mode_name:
+                mode_variant = f"{mod.name}_mode={mode_name}"
+                variant_when_list = base_when_list + [mode_variant]
+            else:
+                variant_when_list = base_when_list
 
             ramble.language.shared_language.variable(
                 name,
@@ -317,7 +326,7 @@ def modifier_variable(
                 values=values,
                 expandable=expandable,
                 track_used=track_used,
-                when=base_when_list + [mode_variant],
+                when=variant_when_list,
                 error_context="modifier_variable",
                 **kwargs,
             )(mod)

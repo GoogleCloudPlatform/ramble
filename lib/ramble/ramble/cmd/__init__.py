@@ -186,7 +186,7 @@ def find_workspace(args):
 
     Check for a workspace in this order:
         1. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` (arguments)
-        2. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+        2. via a path in the ramble.workspace.RAMBLE_WORKSPACE_VAR environment variable.
 
     If a workspace is found, read it in.  If not, return None.
 
@@ -210,13 +210,13 @@ def find_workspace(args):
 
         # if no argument, look for the environment variable
         if not ws:
-            ws = os.environ.get(ramble.workspace.ramble_workspace_var)
+            ws = os.environ.get(ramble.workspace.RAMBLE_WORKSPACE_VAR)
 
             # nothing was set; there's no active environment
             if not ws:
                 return None
             elif not ramble.workspace.is_workspace_dir(ws):
-                env_var = ramble.workspace.ramble_workspace_var
+                env_var = ramble.workspace.RAMBLE_WORKSPACE_VAR
                 raise ramble.workspace.RambleActiveWorkspaceError(
                     f"The environment variable {env_var} refers to an invalid ramble workspace."
                 )
@@ -234,7 +234,7 @@ def find_workspace_path(args):
 
     Check for a workspace in this order:
         1. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` (arguments)
-        2. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+        2. via a path in the ramble.workspace.RAMBLE_WORKSPACE_VAR environment variable.
 
     If a workspace is found, return it's path.  If not, return None.
 
@@ -258,7 +258,7 @@ def find_workspace_path(args):
 
         # if no argument, look for the environment variable
         if not ws:
-            ws = os.environ.get(ramble.workspace.ramble_workspace_var)
+            ws = os.environ.get(ramble.workspace.RAMBLE_WORKSPACE_VAR)
 
             # nothing was set; there's no active environment
             if not ws:

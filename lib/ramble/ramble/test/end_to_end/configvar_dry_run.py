@@ -85,7 +85,7 @@ ramble:
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
     software_dir = "openfoam"
-    software_base_dir = os.path.join(ws.root, ramble.workspace.workspace_software_path)
+    software_base_dir = os.path.join(ws.root, ramble.workspace.WORKSPACE_SOFTWARE_PATH)
     assert os.path.exists(software_base_dir)
 
     software_path = os.path.join(software_base_dir, "spack", software_dir)

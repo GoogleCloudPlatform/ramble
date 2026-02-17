@@ -136,14 +136,14 @@ compilers:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         license_path = os.path.join(ws1.config_dir, "licenses.yaml")
         compilers_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name, "compilers.yaml"
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME, "compilers.yaml"
         )
 
         aux_software_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
@@ -178,7 +178,7 @@ compilers:
 
         # Test software directories
         software_dirs = ["wrfv4", "wrfv4-portable"]
-        software_base_dir = os.path.join(ws1.root, ramble.workspace.workspace_software_path)
+        software_base_dir = os.path.join(ws1.root, ramble.workspace.WORKSPACE_SOFTWARE_PATH)
         assert os.path.exists(software_base_dir)
         for software_dir in software_dirs:
             software_path = os.path.join(software_base_dir, "spack", software_dir)
