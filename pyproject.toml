@@ -1,3 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ramble"
+version = "0.6.0"
+description = "A multi-platform experimentation framework written in python."
+readme = "README.md"
+requires-python = ">=3.6"
+license = "Apache-2.0 OR MIT"
+license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools]
+package-dir = { "" = "." }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lib*", "etc*", "var*", "bin*", "share*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"*" = ["*"]
+
 [tool.black]
 line-length = 99
 # Older versions of black (like the ones compatible with py3.7)
@@ -142,3 +174,4 @@ extend-select = ["B", "C4", "F401"]
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]
 "var/ramble/repos/**/*.py" = ["F403", "F405"]
+
