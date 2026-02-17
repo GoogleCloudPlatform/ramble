@@ -57,7 +57,7 @@ def test_analyze_fom_output(make_workspace_from_config):
     ws, ws_name = _setup_workspace(make_workspace_from_config)
 
     workspace("analyze", "-p", global_args=["-w", ws_name])
-    result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
+    result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
 
     with open(result_file) as f:
         content = f.read()
@@ -103,7 +103,7 @@ def test_analyze_success_with_no_fom_defined(mock_applications, workspace_name):
     ws._re_read()
     workspace("setup", "--dry-run", global_args=global_args)
     workspace("analyze", global_args=["-w", workspace_name])
-    result_file = os.path.join(ws.root, "results.latest.txt")
+    result_file = os.path.join(ws.results_dir, "results.latest.txt")
     with open(result_file) as f:
         content = f.read()
         assert "Status = SUCCESS" in content
@@ -130,7 +130,7 @@ def test_analyze_fail_with_no_fom_detected(mock_applications, workspace_name):
     ws._re_read()
     workspace("setup", "--dry-run", global_args=global_args)
     workspace("analyze", global_args=["-w", workspace_name])
-    result_file = os.path.join(ws.root, "results.latest.txt")
+    result_file = os.path.join(ws.results_dir, "results.latest.txt")
     with open(result_file) as f:
         content = f.read()
         assert "Status = FAILED" in content

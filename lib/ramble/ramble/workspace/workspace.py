@@ -60,6 +60,9 @@ WORKSPACE_CONFIG_PATH = "configs"
 #: Name of subdirectory within workspace where tables are stored
 WORKSPACE_TABLES_PATH = "tables"
 
+#: Name of subdirectory within workspace where results are stored
+WORKSPACE_RESULTS_PATH = "results"
+
 #: Name of subdirectory within workspaces where logs are stored
 WORKSPACE_LOG_PATH = "logs"
 
@@ -1565,7 +1568,8 @@ ramble:
         return
 
     def write_json_results(self):
-        out_file = os.path.join(self.root, "results.json")
+        fs.mkdirp(self.results_dir)
+        out_file = os.path.join(self.results_dir, "results.json")
         with open(out_file, "w+") as f:
             sjson.dump(self.results, f)
         return out_file
@@ -1685,8 +1689,12 @@ ramble:
         if "text" in output_formats:
 
             file_extension = ".txt"
-            out_file = os.path.join(self.root, filename_base + file_extension)
-            latest_file = os.path.join(self.root, latest_base + file_extension)
+            fs.mkdirp(self.results_dir)
+            out_file = os.path.join(self.results_dir, filename_base + file_extension)
+            latest_file = os.path.join(self.results_dir, latest_base + file_extension)
+
+            # Allow one simlink to the latest result in the top level for backwards compat
+            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
 
             results_written.append(out_file)
 
@@ -1756,6 +1764,7 @@ ramble:
 
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)
+            self.symlink_result(out_file, latest_file_parent)
 
         # Convert SoftwareInfo classes to dicts
         for exp in results[namespace.experiment]:
@@ -1764,8 +1773,9 @@ ramble:
 
         if "json" in output_formats:
             file_extension = ".json"
-            out_file = os.path.join(self.root, filename_base + file_extension)
-            latest_file = os.path.join(self.root, latest_base + file_extension)
+            fs.mkdirp(self.results_dir)
+            out_file = os.path.join(self.results_dir, filename_base + file_extension)
+            latest_file = os.path.join(self.results_dir, latest_base + file_extension)
             results_written.append(out_file)
             with open(out_file, "w+") as f:
                 sjson.dump(results, f)
@@ -1774,8 +1784,9 @@ ramble:
 
         if "yaml" in output_formats:
             file_extension = ".yaml"
-            out_file = os.path.join(self.root, filename_base + file_extension)
-            latest_file = os.path.join(self.root, latest_base + file_extension)
+            fs.mkdirp(self.results_dir)
+            out_file = os.path.join(self.results_dir, filename_base + file_extension)
+            latest_file = os.path.join(self.results_dir, latest_base + file_extension)
             results_written.append(out_file)
 
             from ruamel.yaml import RoundTripDumper
@@ -2106,8 +2117,13 @@ ramble:
 
     @property
     def tables_dir(self):
-        """Path to the tables directory"""
+        """Directory where workspace tables are stored"""
         return os.path.join(self.root, WORKSPACE_TABLES_PATH)
+
+    @property
+    def results_dir(self):
+        """Directory where workspace results are stored"""
+        return os.path.join(self.root, WORKSPACE_RESULTS_PATH)
 
     @property
     def log_dir(self):
@@ -2181,6 +2197,7 @@ ramble:
             "workspace_configs": os.path.join(root, WORKSPACE_CONFIG_PATH),
             "workspace_software": os.path.join(root, WORKSPACE_SOFTWARE_PATH),
             "workspace_tables": os.path.join(root, WORKSPACE_TABLES_PATH),
+            "workspace_results": os.path.join(root, WORKSPACE_RESULTS_PATH),
             "workspace_logs": os.path.join(root, WORKSPACE_LOG_PATH),
             "workspace_inputs": os.path.join(root, WORKSPACE_INPUT_PATH),
             "workspace_experiments": os.path.join(root, WORKSPACE_EXPERIMENT_PATH),
