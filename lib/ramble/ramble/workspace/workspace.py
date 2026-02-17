@@ -1675,6 +1675,7 @@ ramble:
             self.results = {}
 
         results = _filter_results(self.results, summary_only=summary_only)
+        fs.mkdirp(self.results_dir)
 
         results_written = []
         symlinks_updated = []
@@ -1689,12 +1690,8 @@ ramble:
         if "text" in output_formats:
 
             file_extension = ".txt"
-            fs.mkdirp(self.results_dir)
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
             latest_file = os.path.join(self.results_dir, latest_base + file_extension)
-
-            # Allow one simlink to the latest result in the top level for backwards compat
-            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
 
             results_written.append(out_file)
 
@@ -1763,8 +1760,13 @@ ramble:
                     logger.msg("No results to write")
 
             symlinks_updated.append(latest_file)
+
             self.symlink_result(out_file, latest_file)
+
+            # Allow one simlink to the latest result in the top level for backwards compat
+            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
             self.symlink_result(out_file, latest_file_parent)
+
 
         # Convert SoftwareInfo classes to dicts
         for exp in results[namespace.experiment]:
@@ -1773,7 +1775,6 @@ ramble:
 
         if "json" in output_formats:
             file_extension = ".json"
-            fs.mkdirp(self.results_dir)
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
             latest_file = os.path.join(self.results_dir, latest_base + file_extension)
             results_written.append(out_file)
@@ -1782,9 +1783,12 @@ ramble:
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)
 
+            # Allow one simlink to the latest result in the top level for backwards compat
+            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
+            self.symlink_result(out_file, latest_file_parent)
+
         if "yaml" in output_formats:
             file_extension = ".yaml"
-            fs.mkdirp(self.results_dir)
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
             latest_file = os.path.join(self.results_dir, latest_base + file_extension)
             results_written.append(out_file)
@@ -1806,6 +1810,10 @@ ramble:
 
             symlinks_updated.append(latest_file)
             self.symlink_result(out_file, latest_file)
+
+            # Allow one simlink to the latest result in the top level for backwards compat
+            latest_file_parent = os.path.join(self.root, latest_base + file_extension)
+            self.symlink_result(out_file, latest_file_parent)
 
         if not results_written:
             logger.die("Results were not written.")
