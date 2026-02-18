@@ -64,7 +64,7 @@ def pytest_configure(config):
         return
     path = pathlib.Path(repo_path)
     # Define testpaths
-    testpaths = [p for p in path.rglob("test") if p.is_dir()]
+    testpaths = [str(p) for p in path.rglob("test") if p.is_dir()]
     testpaths.append("setup_analyze.py")
     config.args = testpaths
 
