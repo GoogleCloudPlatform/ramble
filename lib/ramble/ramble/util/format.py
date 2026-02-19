@@ -25,7 +25,7 @@ def format_doc(doc_str, **kwargs):
     return results.getvalue()
 
 
-def sort_when(when: str):
+def when_order(when: str):
     """Sort 'when' conditions consistently when unpacking from sets or lists"""
 
     if not when:

@@ -9,7 +9,7 @@
 import copy
 from typing import Dict, List, Optional
 
-import ramble.util.colors
+import ramble.util.colors as rucolor
 
 
 def specs_conflict(new, existing, prefix="", skip_conflicting_when=False):
@@ -76,16 +76,14 @@ class SoftwareSpec:
         base_indent = " " * n_indent
         indentation = " " * (n_indent + 4)
         self_dict = self.to_dict()
-        color_name = ramble.util.colors.section_title(self.name.replace("@", "@@"))
+        color_name = rucolor.section_title(self.name)
         output = f"{base_indent}{color_name}:\n"
         for key, val in self_dict.items():
-            color_key = ramble.util.colors.nested_1(key)
-            escaped_val = val.replace("@", "@@")
-            output += f"{indentation}{color_key}: {escaped_val}\n"
+            output += f"{indentation}{rucolor.nested_1(key)}: {rucolor.plaintext(val)}\n"
         if self.when:
-            output += ramble.util.colors.nested_2(f"\n{indentation}When:\n")
+            output += rucolor.nested_2(f"\n{indentation}When:\n")
             for condition in self.when:
-                output += f"{indentation}    {condition}\n".replace("@", "@@")
+                output += f"{indentation}    {rucolor.plaintext(condition)}\n"
         return output
 
     def __str__(self):

@@ -58,7 +58,7 @@ class PackageManagerRequirement:
                 if attr_val:
                     out_str += (
                         f"{indentation}    {rucolor.nested_1(print_attr)}: "
-                        f'{str(attr_val).replace("@", "@@")}\n'
+                        f"{rucolor.plaintext(str(attr_val))}\n"
                     )
         else:
             out_str = f"{indentation}{self.when}"

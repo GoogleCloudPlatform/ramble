@@ -883,12 +883,10 @@ def workspace_info(args):
 
                     if print_header:
                         color.cprint(
-                            rucolor.nested_1("  Application: ")
-                            + application_context.context_name.replace("@", "@@")
+                            rucolor.nested_1("  Application: ") + application_context.escaped_name
                         )
                         color.cprint(
-                            rucolor.nested_2("    Workload: ")
-                            + workload_context.context_name.replace("@", "@@")
+                            rucolor.nested_2("    Workload: ") + workload_context.escaped_name
                         )
                         print_header = False
 
@@ -906,17 +904,17 @@ def workspace_info(args):
                     if app_inst.is_template:
                         color.cprint(
                             rucolor.nested_3(f"      Template Experiment {experiment_index}: ")
-                            + exp_name
+                            + rucolor.plaintext(exp_name)
                         )
                     elif app_inst.repeats.is_repeat_base:
                         color.cprint(
                             rucolor.nested_3(f"      Repeat Base Experiment {experiment_index}: ")
-                            + exp_name
+                            + rucolor.plaintext(exp_name)
                         )
                     else:
                         color.cprint(
                             rucolor.nested_3(f"      Experiment {experiment_index}: ")
-                            + exp_name.replace("@", "@@")
+                            + rucolor.plaintext(exp_name)
                         )
 
                     if args.tags:
@@ -930,7 +928,7 @@ def workspace_info(args):
                                 obj.experiment_variants().as_set(expander=app_inst.expander)
                             )
                         for variant in variant_set:
-                            color.cprint(f"          - {variant}".replace("@", "@@"))
+                            color.cprint(f"          - {rucolor.plaintext(variant)}")
 
                     if args.executables:
                         color.cprint(rucolor.nested_4("        Executables: "))

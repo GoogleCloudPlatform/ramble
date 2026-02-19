@@ -30,17 +30,17 @@ class Wrf(ExecutableApplication):
     with when("package_manager_family=spack"):
         with when("application_version@4.0:"):
 
-            define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+            define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
             software_spec(
                 "intel-mpi",
-                pkg_spec="intel-oneapi-mpi@2021.13.1",
+                pkg_spec="intel-oneapi-mpi@2021.17.2",
             )
 
             software_spec(
                 "wrfv4-{application_version}",
                 pkg_spec="wrf@{application_version} build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf",
-                compiler="gcc9",
+                compiler="gcc14",
             )
 
             required_package("wrf")

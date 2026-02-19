@@ -90,7 +90,7 @@ class ObjectVersion:
 
     def evaluate_conflicts(self, variant):
         """Error if this version conflicts with a variant that is used"""
-        # This is a placeholder; actual conflict logic will be implemented later.
+        # TODO(dapomeroy): Implement logic to allow conflicts to be defined
         pass
 
     def satisfies(self, variant):
@@ -108,14 +108,16 @@ class ObjectVersion:
 
         satisfied = False
         if value:
-            if ":" not in value:
+            sep_index = value.find(":")
+            if sep_index == -1:
                 spec_set = SpecifierSet(f"~={value}", prereleases=True)
-            elif value.startswith(":"):
-                spec_set = SpecifierSet(f"<={value.split(':')[1]}", prereleases=True)
-            elif value.endswith(":"):
-                spec_set = SpecifierSet(f">={value.split(':')[0]}", prereleases=True)
+            elif sep_index == 0:
+                spec_set = SpecifierSet(f"<={value.lstrip(':')}", prereleases=True)
+            elif sep_index == len(value) - 1:
+                spec_set = SpecifierSet(f">={value.rstrip(':')}", prereleases=True)
             else:
-                start, end = value.split(":")
+                start = value[:sep_index]
+                end = value[sep_index + 1 :]
                 spec_set = SpecifierSet(f">={start},<={end}", prereleases=True)
 
             satisfied = spec_set.contains(self.version)

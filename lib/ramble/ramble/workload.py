@@ -10,7 +10,7 @@ from typing import Dict, FrozenSet, List, Optional
 
 import ramble.util.colors as rucolor
 from ramble.definitions.variables import EnvironmentVariable, Variable
-from ramble.util.format import sort_when
+from ramble.util.format import when_order
 from ramble.util.logger import logger
 
 
@@ -92,17 +92,17 @@ class Workload:
             # TODO: Remove this after adding 'when' to the loop in 'ramble info' that prints
             # workloads. Better to group workloads under 'when' than print 'when' for each workload
             if attr[0] == "When" and isinstance(attr_val, list):
-                out_str += f"{' AND '.join(attr_val)}\n".replace("@", "@@")
+                out_str += rucolor.plaintext(f"{' AND '.join(attr_val)}\n")
             else:
-                out_str += f"{attr_val}\n".replace("@", "@@")
+                out_str += rucolor.plaintext(f"{attr_val}\n")
 
         if self.variables:
             out_str += rucolor.nested_1(f"{indentation}    Variables:\n")
             for when_set, var_list in self.variables.items():
                 if when_set:
                     out_str += rucolor.nested_2(f"{indentation}        When: ")
-                    out_str += f"{' AND '.join(sorted(when_set, key=sort_when))}\n".replace(
-                        "@", "@@"
+                    out_str += rucolor.plaintext(
+                        f"{' AND '.join(sorted(when_set, key=when_order))}\n"
                     )
                 else:
                     out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
@@ -118,8 +118,8 @@ class Workload:
             for when_set, env_var_list in self.environment_variables.items():
                 if when_set:
                     out_str += rucolor.nested_2(f"{indentation}        When: ")
-                    out_str += f"{' AND '.join(sorted(when_set, key=sort_when))}\n".replace(
-                        "@", "@@"
+                    out_str += rucolor.plaintext(
+                        f"{' AND '.join(sorted(when_set, key=when_order))}\n"
                     )
                 else:
                     out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
@@ -292,7 +292,7 @@ class WorkloadGroup:
         for when_set, workload_list in self.workloads.items():
             if when_set:
                 out_str += rucolor.nested_1(f"{indentation}    When: ")
-                out_str += f"{' AND '.join(sorted(when_set, key=sort_when))}\n".replace("@", "@@")
+                out_str += rucolor.plaintext(f"{' AND '.join(sorted(when_set, key=when_order))}\n")
             else:
                 out_str += rucolor.nested_1(f"{indentation}    Unconditional\n")
 

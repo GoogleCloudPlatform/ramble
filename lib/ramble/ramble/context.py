@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.util.colors as rucolor
 import ramble.util.matrices
 from ramble.namespace import namespace
 
@@ -60,6 +61,10 @@ class Context:
         self.tables = []
         self.is_template = False
         self.n_repeats = 0
+
+    @property
+    def escaped_name(self):
+        return rucolor.escape_str(self.context_name)
 
     def merge_context(self, in_context):
         """Merges another Context into this Context."""

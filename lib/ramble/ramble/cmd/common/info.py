@@ -14,7 +14,7 @@ from llnl.util.tty.colify import colified
 
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
-import ramble.util.colors
+import ramble.util.colors as rucolor
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 
@@ -136,10 +136,10 @@ def print_object_header(obj_type, obj):
     """Print an object header"""
     singular = ramble.repository.type_definitions[obj_type]["singular"]
     parts = [part[0].upper() + part[1:] for part in singular.split()]
-    type_name = ramble.util.colors.section_title(" ".join(parts))
+    type_name = rucolor.section_title(" ".join(parts))
     color.cprint(f"{type_name}: {obj.name}\n")
 
-    color.cprint(ramble.util.colors.section_title("Description:"))
+    color.cprint(rucolor.section_title("Description:"))
     if obj.__doc__:
         doc_str = ""
         for part in obj.__doc__.split("\n"):
@@ -201,35 +201,35 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
         if pattern and not fnmatch.fnmatch(name, pattern):
             continue
         if isinstance(vals, dict):
-            color_name = ramble.util.colors.section_title(name)
+            color_name = rucolor.section_title(name)
             color.cprint(f"{color_name}:")
             for sub_name, sub_val in vals.items():
                 # Avoid showing duplicate names for variables
                 if isinstance(sub_val, Variable) and sub_name == sub_val.name:
                     to_print = f"{indentation}{sub_val}"
                 else:
-                    color_sub_name = ramble.util.colors.nested_1(sub_name)
+                    color_sub_name = rucolor.nested_1(sub_name)
                     to_print = f"{indentation}{color_sub_name}: {sub_val}"
                 try:
                     color.cprint(to_print)
                 except color.ColorParseError:
                     if not isinstance(sub_val, str) and hasattr(sub_val, "__iter__"):
-                        escaped_sub_val = [str(item).replace("@", "@@") for item in sub_val]
+                        escaped_sub_val = [rucolor.plaintext(str(item)) for item in sub_val]
                     else:
-                        escaped_sub_val = str(sub_val).replace("@", "@@")
+                        escaped_sub_val = rucolor.plaintext(str(sub_val))
                     color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
             color.cprint("")
         elif isinstance(vals, set):
-            color_name = ramble.util.colors.section_title(name)
+            color_name = rucolor.section_title(name)
             color.cprint(f"{color_name}:")
             for sub_name in vals:
                 # Avoid showing duplicate names for variables
-                color_sub_name = ramble.util.colors.nested_1(sub_name)
+                color_sub_name = rucolor.nested_1(sub_name)
                 to_print = f"{indentation}{color_sub_name}"
                 try:
                     color.cprint(to_print)
                 except color.ColorParseError:
-                    escaped_sub_name = ramble.util.colors.nested_1(sub_name.replace("@", "@@"))
+                    escaped_sub_name = rucolor.nested_1(sub_name)
                     color.cprint(f"{indentation}{escaped_sub_name}")
             color.cprint("")
         elif isinstance(vals, list):
@@ -260,10 +260,10 @@ def _print_phases(obj, attr, verbose=False, pattern="*", format=supported_format
     print_attribute_header(attr, verbose)
 
     if not verbose:
-        color_func = ramble.util.colors.level_func(1)
+        color_func = rucolor.level_func(1)
         base_indent = 4
     else:
-        color_func = ramble.util.colors.level_func(0)
+        color_func = rucolor.level_func(0)
         base_indent = 0
 
     indentation = " " * base_indent
@@ -398,7 +398,7 @@ def print_attribute_header(attr, verbose=False):
         color.cprint(f"{banner_char} {attr} {banner_char}")
         color.cprint(banner)
     else:
-        attr_name = ramble.util.colors.section_title(attr)
+        attr_name = rucolor.section_title(attr)
         color.cprint(f"{attr_name}:")
 
 
@@ -421,7 +421,7 @@ def print_info(args):
 
     object_type = ramble.repository.ObjectTypes[args.type]
     obj_name = args.object
-    obj = ramble.repository.get(obj_name.partition("@")[0], object_type=object_type)
+    obj = ramble.repository.get(obj_name, object_type=object_type)
 
     print_object_header(object_type, obj)
 

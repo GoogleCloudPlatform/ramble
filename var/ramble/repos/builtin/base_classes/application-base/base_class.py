@@ -868,7 +868,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             expansion_var = self.expander.expansion_str(var)
             expanded = self.expander.expand_var(expansion_var)
             color.cprint(
-                f"{indent}  {var} = {val} ==> {expanded}".replace("@", "@@")
+                rucolor.plaintext(f"{indent}  {var} = {val} ==> {expanded}")
             )
 
     def build_used_variables(self, workspace):

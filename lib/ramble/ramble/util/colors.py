@@ -15,6 +15,10 @@ level4_color = "@*m"
 plain_format = "@."
 
 
+def escape_str(s):
+    return s.replace("@@", "@").replace("@", "@@")
+
+
 def level_func(level):
     if level < 0:
         return str
@@ -31,27 +35,27 @@ def level_func(level):
 
 
 def config_title(s):
-    return config_color + s + plain_format
+    return config_color + escape_str(s) + plain_format
 
 
 def section_title(s):
-    return header_color + s + plain_format
+    return header_color + escape_str(s) + plain_format
 
 
 def nested_1(s):
-    return level1_color + s + plain_format
+    return level1_color + escape_str(s) + plain_format
 
 
 def nested_2(s):
-    return level2_color + s + plain_format
+    return level2_color + escape_str(s) + plain_format
 
 
 def nested_3(s):
-    return level3_color + s + plain_format
+    return level3_color + escape_str(s) + plain_format
 
 
 def nested_4(s):
-    return level4_color + s + plain_format
+    return level4_color + escape_str(s) + plain_format
 
 
 def title_color(title: str, n_indent: int = 0):
@@ -68,3 +72,8 @@ def title_color(title: str, n_indent: int = 0):
         out_str = nested_4(f"{title}")
 
     return out_str
+
+
+def plaintext(s):
+    """Escapes `@` characters to print plaintext with cprint"""
+    return escape_str(s)

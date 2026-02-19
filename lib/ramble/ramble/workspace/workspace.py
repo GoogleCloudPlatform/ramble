@@ -32,6 +32,7 @@ import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
 import ramble.software_environments
+import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.install_cache
 import ramble.util.lock as lk
@@ -401,7 +402,7 @@ def _get_all_obj_var_names(obj, obj_type):
     else:
         obj_name = obj
     try:
-        obj_inst = ramble.repository.get(obj_name.partition("@")[0], object_type=obj_type)
+        obj_inst = ramble.repository.get(obj_name, object_type=obj_type)
     except ramble.repository.UnknownObjectError:
         return set()
     vars = list(itertools.chain.from_iterable(obj_inst.object_variables.values()))
@@ -1233,7 +1234,7 @@ ramble:
         workspace_vars = self.get_workspace_vars()
         apps_dict = self.get_applications().copy()
 
-        app_inst = ramble.repository.get(application.partition("@")[0])
+        app_inst = ramble.repository.get(application)
         app_inst.validate_version()
 
         var_def_dict = {}
@@ -1755,7 +1756,7 @@ ramble:
                         if exp["VARIANTS"]:
                             f.write("  Experiment variants:\n")
                             for variant in exp["VARIANTS"]:
-                                f.write(f"  - {variant}\n".replace("@", "@@"))
+                                f.write(f"  - {rucolor.plaintext(variant)}\n")
 
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")

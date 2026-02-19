@@ -51,10 +51,7 @@ def rows_for_ncols(elts, ncols):
 @formatter
 def version_json(obj_names, out, object_type):
     """Print all objects with their latest versions."""
-    objs = [
-        ramble.repository.get(name.partition("@")[0], object_type=object_type)
-        for name in obj_names
-    ]
+    objs = [ramble.repository.get(name, object_type=object_type) for name in obj_names]
 
     out.write("[\n")
 
@@ -86,10 +83,7 @@ def html(obj_names, out, object_type):
     obj_def = ramble.repository.type_definitions[object_type]
 
     # Read in all objects
-    objs = [
-        ramble.repository.get(name.partition("@")[0], object_type=object_type)
-        for name in obj_names
-    ]
+    objs = [ramble.repository.get(name, object_type=object_type) for name in obj_names]
 
     # Start at 2 because the title of the page from Sphinx is id1.
     span_id = 2
