@@ -132,6 +132,14 @@ class SpackLightweight(PackageManagerBase):
 
         logger.msg("Creating Spack environment")
 
+        # Ignore externally active spack environment
+        if "SPACK_ENV" in os.environ and not os.path.isdir(
+            os.environ["SPACK_ENV"]
+        ):
+            _spack_vars = ["SPACK_ENV", "SPACK_ENV_VIEW"]
+            for var in _spack_vars:
+                os.environ.pop(var, None)
+
         # See if we cached this already, and if so return
         env_path = app_inst.expander.env_path
         if not env_path:
