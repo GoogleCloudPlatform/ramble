@@ -246,3 +246,35 @@ ramble:
             assert "summary::max = 2.0 minutes" in data
             assert "summary::mean = 1.5 minutes" in data
             assert "mode:\n      value = Sleep" in data
+
+
+def test_repeat_info(mutable_config, mutable_mock_workspace_path, workspace_name):
+    test_config = """
+ramble:
+  variables:
+    n_nodes: 1
+    processes_per_node: 1
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+  applications:
+    sleep:
+      workloads:
+        sleep:
+          experiments:
+            sleep_test:
+              n_repeats: 3
+"""
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+        with open(config_path, "w+") as f:
+            f.write(test_config)
+        ws._re_read()
+
+        output = workspace("info", global_args=["-w", workspace_name])
+
+        assert "Experiment 1:" in output
+        assert "Experiment 2:" in output
+        assert "Experiment 3:" in output
+        assert "Experiment 4:" in output

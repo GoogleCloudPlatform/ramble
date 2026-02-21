@@ -266,11 +266,13 @@ class ExperimentSet:
 
         experiment_suffix = ""
         # After generating the base experiment, append the index to repeat experiments
+        variables[self.keywords.is_repeat_parent] = repeats.is_repeat_base
+        variables[self.keywords.is_repeat_child] = False
+        variables[self.keywords.repeat_index] = 0
         if repeats.repeat_index:
             experiment_suffix = f".{repeats.repeat_index}"
+            variables[self.keywords.is_repeat_child] = True
             variables[self.keywords.repeat_index] = repeats.repeat_index
-        else:
-            variables[self.keywords.repeat_index] = 0
 
         app_inst = self._setup_experiment_minimal(workload_template_name, variables, context)
 
