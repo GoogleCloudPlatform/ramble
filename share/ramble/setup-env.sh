@@ -122,7 +122,10 @@ _ramble_shell_wrapper() {
                             command ramble workspace activate "$@"
                         else
                             # Actual call to activate: source the output.
-                            eval $(command ramble $_rmb_flags workspace activate --sh "$@")
+                            _activate_cmd=$(command ramble $_rmb_flags workspace activate --sh "$@")
+                            _rs=$?
+                            eval "$_activate_cmd" || return $?
+                            return $_rs
                         fi
                         ;;
                     deactivate)
@@ -143,7 +146,10 @@ _ramble_shell_wrapper() {
                             command ramble workspace deactivate -h
                         else
                             # No args: source the output of the command.
-                            eval $(command ramble $_rmb_flags workspace deactivate --sh)
+                            _deactivate_cmd=$(command ramble $_rmb_flags workspace deactivate --sh)
+                            _rs=$?
+                            eval "$_deactivate_cmd" || return $?
+                            return $_rs
                         fi
                         ;;
                     create)
@@ -156,18 +162,22 @@ _ramble_shell_wrapper() {
                             # into stdout (`ramble workspace activate <ws>`.)
                             # And the eval routes that command back to the wrapper to
                             # inject shell args, etc.
-                            _activate_cmd="$(command ramble $_rmb_flags workspace create "$@")"
-                            if [ $? -eq 0 ]; then
+                            _create_activate_cmd="$(command ramble $_rmb_flags workspace create "$@")"
+                            _rs=$?
+                            if [ $_rs -eq 0 ]; then
                                 unset RAMBLE_WORKSPACES
-                                eval $_activate_cmd
-                                _workspace="$(echo $_activate_cmd | awk '{print $NF}')"
+                                eval "$_create_activate_cmd" || return $?
+                                _workspace="$(echo $_create_activate_cmd | awk '{print $NF}')"
                                 echo "==> Created and activated workspace in $_workspace"
                             fi
+                            return $_rs
                         else
                             command ramble $_rmb_flags workspace create "$@"
-                            if [ $? -eq 0 ]; then
+                            _rs=$?
+                            if [ $_rs -eq 0 ]; then
                                 unset RAMBLE_WORKSPACES
                             fi
+                            return $_rs
                         fi
                         ;;
                     *)
