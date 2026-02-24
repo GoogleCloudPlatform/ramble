@@ -586,6 +586,8 @@ class Workspace:
                 self._read_template(template_name, self._template_execute_script())
 
             self._read_metadata()
+            if hasattr(self, "results") and self.results:
+                self.results["metadata"] = self.metadata
 
     @classmethod
     def _template_execute_script(self):
@@ -1587,6 +1589,7 @@ ramble:
                 res["workspace_hash"] = "Unknown.."
 
         res["workspace_name"] = self.name
+        res["metadata"] = self.metadata
         res["ramble_version"] = ramble.util.version.get_version()
         res[namespace.experiment] = []
 
