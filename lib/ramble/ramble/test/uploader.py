@@ -139,6 +139,7 @@ def test_create_tables_dataset_exists(mock_bigquery_client):
     mock_client.create_dataset.assert_not_called()
     assert mock_client.get_table.call_count == len(uploader.schema)
     mock_client.create_table.assert_not_called()
+    uploader.upload_metadata.assert_not_called()
 
 
 @patch("google.cloud.bigquery.Client")
@@ -169,6 +170,7 @@ def test_create_tables_dataset_does_not_exist(mock_bigquery_client):
     mock_client.get_dataset.assert_called_with(uri)
     mock_client.create_dataset.assert_called_with(uri)
     assert mock_client.create_table.call_count == len(uploader.schema)
+    uploader.upload_metadata.assert_called_with(uri)
 
 
 @pytest.fixture

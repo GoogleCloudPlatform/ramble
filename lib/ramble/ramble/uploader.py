@@ -421,6 +421,7 @@ class BigQueryUploader(Uploader):
             except NotFound:
                 pass  # metadata table doesn't exist, so we don't need to check the version
 
+        tables_created = False
         for table_def in self.schema:
             table_id = f"{uri}.{table_def['table']}"
             try:
@@ -432,8 +433,10 @@ class BigQueryUploader(Uploader):
                 table = bigquery.Table(table_id, schema=bq_schema)
                 table = client.create_table(table)
                 logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+                tables_created = True
 
-        self.upload_metadata(uri)
+        if tables_created:
+            self.upload_metadata(uri)
 
     def upload_metadata(self, uri):
         from datetime import datetime
