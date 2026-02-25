@@ -18,6 +18,10 @@ import ramble.util.version
 from ramble.config import ConfigError
 from ramble.schema.db import db_schema_version
 from ramble.schema.experiment import experiment_schema, experiment_schema_version
+from ramble.schema.experiments_metadata import (
+    experiments_metadata_schema,
+    experiments_metadata_schema_version,
+)
 from ramble.schema.fom import fom_schema, fom_schema_version
 from ramble.schema.metadata import metadata_schema, metadata_schema_version
 from ramble.schema.software_db import software_db_schema, software_db_schema_version
@@ -46,6 +50,12 @@ class Uploader:
         if not data:
             raise ValueError(f"{self.__class__} requires %{data} argument.")
         pass
+
+
+class ExperimentList(list):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.metadata = {}
 
 
 def get_user():
@@ -201,7 +211,10 @@ def format_data(data_in):
     """
     logger.debug("Format Data in")
     logger.debug(data_in)
-    results = []
+    results = ExperimentList()
+
+    if "metadata" in data_in:
+        results.metadata = data_in["metadata"]
 
     # TODO: what is the nice way to deal with the distinction between
     # numberic/float and string FOM values
@@ -256,10 +269,12 @@ def _prepare_data(results, uri):
     # tooling
     exp_table_id = f"{uri}.experiments"
     fom_table_id = f"{uri}.foms"
+    metadata_table_id = f"{uri}.experiments_metadata"
     software_table_id = f"{uri}.software"
 
     exps_to_insert = []
     foms_to_insert = []
+    metadata_to_insert = []
     software_to_insert = []
 
     for experiment in results:
@@ -278,11 +293,43 @@ def _prepare_data(results, uri):
             software_data["experiment_name"] = experiment.name
             software_to_insert.append(software_data)
 
+    current_metadata = []
+    if hasattr(results, "metadata"):
+        current_metadata = results.metadata
+
+    # Handle dictionary and list format of metadata
+    if isinstance(current_metadata, dict):
+        # Flatten dictionary to a list of dicts
+        aux_metadata = []
+        for key, value in current_metadata.items():
+            if isinstance(value, dict):
+                for sub_key, sub_value in value.items():
+                    # Check if we should use dot notation or just the sub_key
+                    # For now, just using the sub_key as it's cleaner for the 'metadata' case
+                    aux_metadata.append({"key": sub_key, "value": sub_value})
+            else:
+                aux_metadata.append({"key": key, "value": value})
+        current_metadata = aux_metadata
+
+    for result in results:
+        for metadatum in current_metadata:
+            md_item = metadatum.copy()
+            # Stringify all values
+            for k, v in md_item.items():
+                md_item[k] = str(v)
+
+            md_item["experiment_id"] = result.get_hash()
+            if hasattr(result, "timestamp"):
+                md_item["timestamp"] = result.timestamp
+            metadata_to_insert.append(md_item)
+
     return (
         exp_table_id,
         exps_to_insert,
         fom_table_id,
         foms_to_insert,
+        metadata_table_id,
+        metadata_to_insert,
         software_table_id,
         software_to_insert,
     )
@@ -303,6 +350,11 @@ class BigQueryUploader(Uploader):
         },
         {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
         {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
+        {
+            "table": "experiments_metadata",
+            "schema": experiments_metadata_schema,
+            "version": experiments_metadata_schema_version,
+        },
         {
             "table": "software",
             "schema": software_db_schema,
@@ -369,6 +421,7 @@ class BigQueryUploader(Uploader):
             except NotFound:
                 pass  # metadata table doesn't exist, so we don't need to check the version
 
+        tables_created = False
         for table_def in self.schema:
             table_id = f"{uri}.{table_def['table']}"
             try:
@@ -380,8 +433,10 @@ class BigQueryUploader(Uploader):
                 table = bigquery.Table(table_id, schema=bq_schema)
                 table = client.create_table(table)
                 logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+                tables_created = True
 
-        self.upload_metadata(uri)
+        if tables_created:
+            self.upload_metadata(uri)
 
     def upload_metadata(self, uri):
         from datetime import datetime
@@ -478,6 +533,8 @@ class BigQueryUploader(Uploader):
             exps_to_insert,
             fom_table_id,
             foms_to_insert,
+            metadata_table_id,
+            metadata_to_insert,
             software_table_id,
             software_to_insert,
         ) = _prepare_data(results, uri)
@@ -494,12 +551,21 @@ class BigQueryUploader(Uploader):
             errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
 
         if errors2 == []:
-            logger.msg("Upload Software...")
-            errors3 = self.chunked_upload(software_table_id, software_to_insert)
+            logger.msg("Upload Experiment Metadata...")
+            errors3 = self.chunked_upload(metadata_table_id, metadata_to_insert)
         else:
             errors3 = None
 
-        for errors, name in zip((errors1, errors2, errors3), ("exp", "fom", "software")):
+        if errors3 == []:
+            logger.msg("Upload Software...")
+            errors4 = self.chunked_upload(software_table_id, software_to_insert)
+        else:
+            errors4 = None
+
+        for errors, name in zip(
+            (errors1, errors2, errors3, errors4),
+            ("exp", "fom", "experiment_metadata", "software"),
+        ):
             if errors == []:
                 logger.msg(f"New rows have been added in {name}")
             else:
@@ -534,6 +600,8 @@ class PrintOnlyUploader(Uploader):
             exps_to_insert,
             fom_table_id,
             foms_to_insert,
+            metadata_table_id,
+            metadata_to_insert,
             software_table_id,
             software_to_insert,
         ) = _prepare_data(results, uri)
@@ -544,6 +612,12 @@ class PrintOnlyUploader(Uploader):
         logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
         for fom in foms_to_insert:
             logger.info(f"  {fom}")
+        logger.info(
+            f"{len(metadata_to_insert)} experiment metadata item(s) "
+            f"would be uploaded to {metadata_table_id}:"
+        )
+        for metadata_item in metadata_to_insert:
+            logger.info(f"  {metadata_item}")
         logger.info(
             f"{len(software_to_insert)} "
             f"software package(s) would be uploaded to {software_table_id}:"

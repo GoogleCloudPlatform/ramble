@@ -17,7 +17,13 @@ import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.pkg_man.builtin import spack_lightweight
 from ramble.test.mock_spack_runner import MockSpackRunner
-from ramble.uploader import BigQueryUploader, ConfigError, upload_results
+from ramble.uploader import (
+    BigQueryUploader,
+    ConfigError,
+    _prepare_data,
+    format_data,
+    upload_results,
+)
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
@@ -83,6 +89,8 @@ def test_data_preparation(request, mock_applications):
                 exps_to_insert,
                 fom_table_id,
                 foms_to_insert,
+                metadata_table_id,
+                metadata_to_insert,
                 software_table_id,
                 software_to_insert,
             ) = ramble.uploader._prepare_data(formatted_data, uri)
@@ -131,6 +139,7 @@ def test_create_tables_dataset_exists(mock_bigquery_client):
     mock_client.create_dataset.assert_not_called()
     assert mock_client.get_table.call_count == len(uploader.schema)
     mock_client.create_table.assert_not_called()
+    uploader.upload_metadata.assert_not_called()
 
 
 @patch("google.cloud.bigquery.Client")
@@ -161,3 +170,70 @@ def test_create_tables_dataset_does_not_exist(mock_bigquery_client):
     mock_client.get_dataset.assert_called_with(uri)
     mock_client.create_dataset.assert_called_with(uri)
     assert mock_client.create_table.call_count == len(uploader.schema)
+    uploader.upload_metadata.assert_called_with(uri)
+
+
+@pytest.fixture
+def mock_results_with_metadata():
+    results = {
+        "experiments": [
+            {
+                "name": "exp1",
+                "RAMBLE_STATUS": "SUCCESS",
+                "RAMBLE_VARIABLES": {"workspace_name": "test_ws"},
+                "application_name": "app1",
+                "workload_name": "workload1",
+                "n_nodes": 1,
+                "processes_per_node": 1,
+                "n_ranks": 1,
+                "n_threads": 1,
+                "CONTEXTS": [],
+                "SOFTWARE": {},
+            }
+        ],
+        "workspace_hash": "hash123",
+        "metadata": {"metadata": {"key1": "value1", "key2": 123}},
+    }
+    return results
+
+
+@pytest.mark.usefixtures("mutable_config")
+def test_experiment_metadata_preparation(mock_results_with_metadata, mutable_config):
+    uri = "test_dataset"
+
+    # Mock Config to avoid errors and set up upload
+    upload_config = {"uri": uri, "type": "PrintOnly", "push_failed": False}
+    with ramble.config.override("config:upload", upload_config):
+        formatted_data = format_data(mock_results_with_metadata)
+
+        assert hasattr(formatted_data, "metadata")
+        assert formatted_data.metadata == mock_results_with_metadata["metadata"]
+
+        (
+            exp_table_id,
+            exps_to_insert,
+            fom_table_id,
+            foms_to_insert,
+            metadata_table_id,
+            metadata_to_insert,
+            software_table_id,
+            software_to_insert,
+        ) = _prepare_data(formatted_data, uri)
+
+        assert len(metadata_to_insert) == 2  # 2 metadata items * 1 experiment
+
+        # Check actual values
+        keys = {item["key"] for item in metadata_to_insert}
+        assert "key1" in keys
+        assert "key2" in keys
+
+        for item in metadata_to_insert:
+            if item["key"] == "key1":
+                assert item["value"] == "value1"
+            elif item["key"] == "key2":
+                assert item["value"] == "123"  # Should be stringified
+
+            assert "experiment_name" not in item
+            assert "experiment_id" in item
+            assert "timestamp" in item
+            assert isinstance(item["timestamp"], str)
