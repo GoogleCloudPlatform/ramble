@@ -86,9 +86,10 @@ def pytest_runtest_makereport(item, call):
 
 
 def pytest_sessionfinish(session, exitstatus):
-    perf_file = os.path.join(ramble.paths.ramble_root, "perf_test_metrics.json")
-    with open(perf_file, "w") as f:
-        json.dump(session.perf_metrics, f, indent=2)
+    if session.perf_metrics:
+        perf_file = os.path.join(ramble.paths.ramble_root, "perf_test_metrics.json")
+        with open(perf_file, "w") as f:
+            json.dump(session.perf_metrics, f, indent=2)
 
 
 def pytest_configure(config):
