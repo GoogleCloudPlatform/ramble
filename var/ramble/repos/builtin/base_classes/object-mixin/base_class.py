@@ -8,9 +8,10 @@
 import functools
 import os
 from html import escape
-from typing import List
+from typing import List, Optional
 
 import ramble.config
+from ramble.definitions.versions import ObjectVersion
 from ramble.error import ObjectValidationError
 from ramble.repository import ObjectTypes
 from ramble.util import format
@@ -117,20 +118,52 @@ class ObjectMixin:
                 "config:enable_strict_versions:false to disable strict version checking."
             )
 
-    def set_version(self, version):
+    def set_version(
+        self,
+        version_number: Optional[str] = "",
+        version: Optional[ObjectVersion] = None,
+        description: str = "",
+    ):
         """Set the version of this object.
 
         args:
+            version_number: Optional. Version number to be converted to ObjectVersion
             version (ramble.definitions.versions.ObjectVersion): Version to set
+            description: Description of this version
         """
-        self.object_variants.version_variant(
-            f"{self.origin_type}_version", version
-        )
-        app_inst = self._get_app_inst()
-        if app_inst and hasattr(app_inst, "define_variable"):
-            app_inst.define_variable(
-                f"{self.origin_type}_version", str(version)
+        version_inst = None
+
+        if version:
+            version_inst = version
+        else:
+            version_inst = ObjectVersion(
+                version_number=version_number,
+                description=description,
+                origin_type=self.origin_type,
+                version_to_pep440=self.version_to_pep440,
+                pep440_to_version=self.pep440_to_version,
             )
+
+        self.object_variants.version_variant(
+            f"{self.origin_type}_version", version_inst
+        )
+        if hasattr(self, "define_variable"):
+            self.define_variable(
+                f"{self.origin_type}_version", str(version_inst)
+            )
+
+    @staticmethod
+    def version_to_pep440(version_str):
+        """Converts object version number to PEP 440 compliant version number.
+        This enables Ramble to use python.packaging for version comparison logic.
+        See https://peps.python.org/pep-0440/ for valid formats.
+        """
+        return version_str
+
+    @staticmethod
+    def pep440_to_version(version_str):
+        """Converts PEP 440 compliant version number to object version number"""
+        return version_str
 
     def experiment_variants(
         self, include_modifier=None, allow_caching=True, app_inst=None

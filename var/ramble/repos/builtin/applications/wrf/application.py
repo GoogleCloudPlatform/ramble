@@ -29,11 +29,10 @@ class Wrf(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         with when("application_version@4.0:"):
-
             define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
             software_spec(
-                "intel-mpi",
+                "intel-mpi-2021p17",
                 pkg_spec="intel-oneapi-mpi@2021.17.2",
             )
 
@@ -48,7 +47,11 @@ class Wrf(ExecutableApplication):
         with when("application_version@:3.9.1.1"):
             define_compiler("gcc8", pkg_spec="gcc@8.2.0")
 
-            software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+            software_spec(
+                "intel-mpi-2021p13",
+                pkg_spec="intel-oneapi-mpi@2021.13.1",
+                compiler="gcc8",
+            )
 
             software_spec(
                 "wrfv3-{application_version}",
@@ -428,8 +431,6 @@ class Wrf(ExecutableApplication):
         file="{experiment_run_dir}/rsl.out.0000",
     )
 
-    # with when("application_version@4.0:"):
-
     def _analyze_experiments(self, workspace, app_inst=None):
         experiment_dir = self.expander.expand_var_name("experiment_run_dir")
 
@@ -481,56 +482,3 @@ class Wrf(ExecutableApplication):
                 f.write("Number of times: %s\n" % (count))
 
         super()._analyze_experiments(workspace)
-
-    # with when("application_version@:3.9"):
-
-    #     def _analyze_experiments(self, workspace, app_inst=None):
-    #         import glob
-
-    #         # Generate stats file
-
-    #         file_list = glob.glob(
-    #             os.path.join(
-    #                 self.expander.expand_var_name("experiment_run_dir"),
-    #                 "rsl.out.*",
-    #             )
-    #         )
-
-    #         if file_list:
-    #             timing_regex = re.compile(
-    #                 r"Timing for main.*:\s+(?P<main_time>[0-9]+\.[0-9]*).*"
-    #             )
-    #             avg_time = 0.0
-    #             min_time = float("inf")
-    #             max_time = float("-inf")
-    #             sum_time = 0.0
-    #             count = 0
-    #             for out_file in file_list:
-    #                 with open(out_file) as f:
-    #                     for line in f.readlines():
-    #                         m = timing_regex.match(line)
-    #                         if m:
-    #                             time = float(m.group("main_time"))
-    #                             count += 1
-    #                             sum_time += time
-    #                             min_time = min(min_time, time)
-    #                             max_time = max(max_time, time)
-
-    #             avg_time = sum_time / max(count, 1)
-
-    #             stats_path = os.path.join(
-    #                 self.expander.expand_var_name("experiment_run_dir"),
-    #                 "stats.out",
-    #             )
-    #             with open(stats_path, "w+") as f:
-    #                 f.write("Average time: %s s\n" % (avg_time))
-    #                 f.write("Cumulative time: %s s\n" % (sum_time))
-    #                 f.write("Min time: %s s\n" % (min_time))
-    #                 f.write("Max time: %s s\n" % (max_time))
-    #                 f.write(
-    #                     "Avg time / Max time: %s s\n"
-    #                     % (avg_time / max(max_time, float(1.0)))
-    #                 )
-    #                 f.write("Number of times: %s\n" % (count))
-
-    #         super()._analyze_experiments(workspace)

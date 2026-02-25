@@ -47,15 +47,6 @@ class TestObjectVersion:
         assert obj_ver.origin_type == obj_ver_copy.origin_type
         assert obj_ver.preferred == obj_ver_copy.preferred
 
-    def test_apply(self):
-        """Test that the apply method works correctly."""
-        obj_ver_1 = ObjectVersion(version_number="1.2.3")
-        obj_ver_2 = ObjectVersion(version_number="4.5.6", preferred=True)
-        obj_ver_3 = ObjectVersion(version_number="7.8.9")
-
-        assert obj_ver_1.apply(obj_ver_2) is obj_ver_2
-        assert obj_ver_1.apply(obj_ver_3) is obj_ver_1
-
     def test_str(self):
         """Test that the __str__ method works correctly."""
         obj_ver = ObjectVersion(version_number="1.2.3")
@@ -81,5 +72,5 @@ class TestObjectVersion:
     )
     def test_satisfies(self, version, variant, expected):
         """Test that the satisfies method works correctly."""
-        obj_ver = ObjectVersion(version)
+        obj_ver = ObjectVersion(version_number=version)
         assert obj_ver.satisfies(variant) is expected

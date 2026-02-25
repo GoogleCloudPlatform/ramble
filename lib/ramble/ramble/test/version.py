@@ -31,19 +31,19 @@ workspace = RambleCommand("workspace")
 def test_only_one_preferred_version_allowed():
     app_inst = ExecutableApplication("/not/a/path")
 
-    app_inst.preferred_version = ObjectVersion("1.0", preferred=True)
+    app_inst.preferred_version = ObjectVersion(version_number="1.0", preferred=True)
 
     with pytest.raises(DirectiveError, match="Only one version can be marked preferred."):
-        app_inst.version("1.1", description="Version 1.1", preferred=True)
+        app_inst.version("1.1", preferred=True)
 
 
 @pytest.mark.parametrize(
     "version,expected_zlib",
     [
-        ("2.0a1", ["zlib-greater"]),
-        ("1.0", ["zlib-exact", "zlib-greater", "zlib-range"]),
-        ("0.9", ["zlib-range", "zlib-less"]),
-        ("0.8", ["zlib-less"]),
+        ("2.0a1", {"zlib-greater"}),
+        ("1.0", {"zlib-exact", "zlib-greater", "zlib-range"}),
+        ("0.9", {"zlib-range", "zlib-less"}),
+        ("0.8", {"zlib-less"}),
     ],
 )
 def test_application_version_variant_when(workspace_name, version, expected_zlib):
@@ -75,7 +75,6 @@ def test_application_version_variant_when(workspace_name, version, expected_zlib
         )
 
         workspace("concretize", global_args=global_args)
-        # workspace("setup", "--dry-run", global_args=global_args)
 
         with open(ws.config_file_path) as f:
             data = f.read()
@@ -197,3 +196,88 @@ def test_versions_inherited_from_base_app(workspace_name):
             data = f.read()
             assert "versions@0.8" in data
             assert "versions@1.0" in data
+
+
+def test_non_pep440_version_number(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "versions-nonstandard@1_01",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "versions-nonstandard@1_01" in data
+            assert "zlib@1.2.14" in data
+
+        output = workspace("info", "-v", global_args=global_args)
+
+        assert "Rendered package: versions-nonstandard-1_01" in output
+        assert "Spec: versions-nonstandard@1_01" in output
+        assert "versions-nonstandard-1_01 = versions-nonstandard@1_01" in output
+        assert "zlib-exact = zlib@1.2.14" in output
+
+
+@pytest.mark.parametrize(
+    "version,expected_zlib",
+    [
+        ("1_01", {"zlib-exact", "zlib-range", "zlib-less"}),
+        ("1_02", {"zlib-greater", "zlib-range"}),
+        ("2_0a1", {"zlib-greater"}),
+        ("0.8", {"zlib-less"}),
+    ],
+)
+def test_non_pep440_application_version_variant_when(workspace_name, version, expected_zlib):
+    global_args = ["-w", workspace_name]
+
+    zlib_versions = {
+        ("zlib-exact", "zlib@1.2.14"),
+        ("zlib-greater", "zlib@1.2.13"),
+        ("zlib-range", "zlib@1.2.12"),
+        ("zlib-less", "zlib@1.2.11"),
+    }
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            f"versions-nonstandard@{version}",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+
+            for zlib_name, zlib_version in zlib_versions:
+                if zlib_name in expected_zlib:
+                    assert zlib_version in data
+                else:
+                    assert zlib_version not in data

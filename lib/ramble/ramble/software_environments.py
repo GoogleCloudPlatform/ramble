@@ -214,11 +214,11 @@ class RenderedPackage(SoftwarePackage):
 
         indentation = " " * (indent + SUB_INDENT)
         out_str = super().info(indent, verbosity, color_level, only_used)
-        out_str += f"{indentation}Spec: {self.spec}\n"
+        out_str += rucolor.plaintext(f"{indentation}Spec: {self.spec}\n")
         if self.compiler:
-            out_str += f"{indentation}Compiler: {self.compiler}\n"
+            out_str += rucolor.plaintext(f"{indentation}Compiler: {self.compiler}\n")
         if self.compiler_spec:
-            out_str += f"{indentation}Compiler Spec: {self.compiler_spec}\n"
+            out_str += rucolor.plaintext(f"{indentation}Compiler Spec: {self.compiler_spec}\n")
         return out_str
 
     def __eq__(self, other):
@@ -324,7 +324,6 @@ class TemplatePackage(SoftwarePackage):
         raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix, pm_allow_unprefixed)
         raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix, pm_allow_unprefixed)
         raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix, pm_allow_unprefixed)
-
         spec = (
             expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec is not None else None
         )
@@ -333,7 +332,6 @@ class TemplatePackage(SoftwarePackage):
                 raise RambleSoftwareEnvironmentError(f"Package {name} is missing a valid spec")
             else:
                 return None
-
         compiler = (
             expander.expand_var(raw_compiler, merge_used_stage=False)
             if raw_compiler is not None
@@ -346,7 +344,6 @@ class TemplatePackage(SoftwarePackage):
         )
 
         new_pkg = RenderedPackage(name, pkg_info, package_manager, spec, compiler, compiler_spec)
-
         if new_pkg.name in self._rendered_packages[pm_name]:
             if new_pkg != self._rendered_packages[pm_name][name]:
                 new_info = new_pkg.info(only_used=False, color_level=-1).replace("@", "")
@@ -440,9 +437,9 @@ class SoftwareEnvironment:
 
         for pkg in self._packages:
             if verbosity >= 1:
-                out_str += f"{indentation}- {pkg.name} = {pkg.spec_str()}\n"
+                out_str += rucolor.plaintext(f"{indentation}- {pkg.name} = {pkg.spec_str()}\n")
             else:
-                out_str += f"{indentation}- {pkg.name}\n"
+                out_str += rucolor.plaintext(f"{indentation}- {pkg.name}\n")
         return out_str
 
     def __str__(self):

@@ -42,7 +42,6 @@ import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
 import ramble.variants
-from ramble.definitions.versions import ObjectVersion
 from ramble.error import (
     ApplicationError,
     ChainCycleDetectedError,
@@ -401,12 +400,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.package_manager.set_application(self)
 
                 if maybe_pkgman_ver:
-                    pkgman_version = ObjectVersion(
+                    self.package_manager.set_version(
                         version_number=maybe_pkgman_ver,
                         description=f"{pkgman_name} {maybe_pkgman_ver}",
-                        origin_type="package_manager",
                     )
-                    self.package_manager.set_version(pkgman_version)
             except ramble.repository.UnknownObjectError:
                 logger.die(
                     f"{pkgman_name} is not a valid package manager. "
@@ -450,12 +447,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             ).copy()
             self.workflow_manager.set_application(self)
             if maybe_workflow_ver:
-                workflow_version = ObjectVersion(
+                self.workflow_manager.set_version(
                     version_number=maybe_workflow_ver,
                     description=f"{workflow_name} {maybe_workflow_ver}",
-                    origin_type="workflow_manager",
                 )
-                self.workflow_manager.set_version(workflow_version)
         except ramble.repository.UnknownObjectError:
             logger.die(
                 f"{workflow_name} is not a valid workflow manager. "
@@ -610,21 +605,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.variables, self.experiment_set
         )
 
-        # Define application version variant
-        version_to_set = None
+        # Set application version or use preferred version if none specified
         _, _, maybe_version = self.expander.application_name.partition("@")
 
         if maybe_version:
-            version_to_set = ObjectVersion(
+            super().set_version(
                 version_number=maybe_version,
                 description=self.expander.application_name,
-                origin_type="application",
             )
         elif hasattr(self, "preferred_version"):
-            version_to_set = self.preferred_version.copy()
-
-        if version_to_set:
-            super().set_version(version_to_set)
+            super().set_version(
+                version=self.preferred_version,
+                description=self.expander.application_name,
+            )
 
         # Define experiment variants
         for name, value in variants.items():
@@ -1276,12 +1269,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 mod_inst.set_usage_mode(None)
 
             if maybe_mod_ver:
-                mod_version = ObjectVersion(
+                mod_inst.set_version(
                     version_number=maybe_mod_ver,
                     description=f"{mod_name} {maybe_mod_ver}",
-                    origin_type="modifier",
                 )
-                mod_inst.set_version(mod_version)
 
             if not mod_inst.disabled:
                 mod_inst.inherit_from_application(self)

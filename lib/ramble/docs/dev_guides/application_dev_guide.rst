@@ -327,40 +327,57 @@ Application Versions
 ^^^^^^^^^^^^^^^^^^^^
 
 Ramble allows objects to be defined with multiple versions, and then to use 
-:ref:`conditional logic<application-dev-conditional-logic>` to set other directives
-based on the version. The ``version`` directive (:py:meth:`ramble.language.shared_language.version`)
-is used to set a version, and ``when`` conditions can be described using the following syntax:
+:ref:`conditional logic<application-dev-conditional-logic>` to set other
+directives based on the version. The ``version`` directive 
+(:py:meth:`ramble.language.shared_language.version`) is used to set a version,
+ and ``when`` conditions can be described using the following syntax:
 
 * ``application_version@<version_number>`` Apply to only a specific version.
-* ``application_version@:<version_number>`` Apply to a range up to the specified version.
-* ``application_version@<version_number>:`` Apply to a range from the specified version.
-* ``application_version@<start_number>:<end_number>`` Apply to a range of versions.
+* ``application_version@:<version_number>`` Apply to a range up to and including
+  the specified version.
+* ``application_version@<version_number>:`` Apply to a range including the
+  specified version and above.
+* ``application_version@<start_number>:<end_number>`` Apply to a range of
+  versions, inclusive of specified versions.
 
-Version numbers must conform to `Python packaging.version`_ format. In some cases, it may be
-necessary to adjust the format of version numbers to conform with the requirement. For example,
-``iozone`` uses underscores instead of periods in its versioning on Spack, so it is defined in
-Ramble as follows:
+Ramble relies on `Python packaging.version`_ to calculate whether a version
+satisfies ``when`` criteria. In some cases, it may be necessary to adjust the
+format of version numbers to conform with `PEP 440 version specifiers`_. For
+example, ``iozone`` uses underscores instead of periods in its versioning on
+Spack. To make this compatible, static methods must be defined to convert to and
+from PEP 440 format for the purpose of version comparisons:
 
 .. code-block:: python
 
-    version("3.506", "Version 3_506 of Iozone", preferred=True)
+    version("3_506", "Version 3_506 of Iozone", preferred=True)
+
+    @staticmethod
+    def version_to_pep440(version):
+        return version.replace("_", ".")
+
+    @staticmethod
+    def pep440_to_version(version):
+        return version.replace(".", "_")
 
     with when("package_manager_family=spack"):
         software_spec(
             "iozone-{application_version}",
-            pkg_spec="iozone@{application_version}".replace(".", "_"),
+            pkg_spec="iozone@{application_version}",
             compiler="gcc15",
         )
     
-.. _Python packaging.version: https://packaging.python.org/en/latest/specifications/version-specifiers/>`
+.. _Python packaging.version: https://packaging.python.org/en/latest/specifications/version-specifiers/
+.. _PEP 440 version specifiers: https://peps.python.org/pep-0440/
 
 Versions can be set for any object by substituting ``application_version`` for
 ``<object_name>_version``.
 
-By default, users must select from versions defined in the ``application.py``. Strict version
-checking can be disabled for the entire application using the ``strict_versions`` directive
-(:py:meth:`ramble.language.shared_language.strict_versions`) or by setting the configuration
-``config:enable_strict_versions:false`` in the ``ramble.yaml`` file.
+By default, users must select from versions defined in the ``application.py``.
+Strict version checking can be disabled for the entire application using the
+``strict_versions`` directive
+(:py:meth:`ramble.language.shared_language.strict_versions`) or by setting the
+configuration ``config:enable_strict_versions:false`` in the ``ramble.yaml``
+file.
 
 .. _application-dev-variant-directive:
 
@@ -463,17 +480,17 @@ package manager variant:
 .. code-block:: python
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.5.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
         software_spec(
             "impi",
-            pkg_spec="intel-oneapi-mpi@2021.13.1",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
         )
 
-        with default_args(compiler="gcc9"):
+        with default_args(compiler="gcc14"):
             software_spec(
                 "gromacs",
-                pkg_spec="gromacs@2020.5",
+                pkg_spec="gromacs@2025.3",
             )
 
     software_spec(

@@ -1037,6 +1037,8 @@ def version(
             description=description,
             origin_type=obj.origin_type,
             preferred=preferred,
+            version_to_pep440=obj.version_to_pep440,
+            pep440_to_version=obj.pep440_to_version,
         )
 
         # Ensure only one version is marked as preferred

@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from typing import Optional
+from typing import Callable, Optional
 
 from packaging.specifiers import SpecifierSet
 from packaging.version import InvalidVersion, Version
@@ -16,6 +16,9 @@ from ramble.language.language_base import DirectiveError
 
 
 class ObjectVersion:
+    def default_conversion(self, version_str):
+        return version_str
+
     def __init__(
         self,
         version_number: str = "",
@@ -23,22 +26,35 @@ class ObjectVersion:
         description: str = "",
         origin_type: str = "",
         preferred: bool = False,
+        version_to_pep440: Optional[Callable[[str], str]] = None,
+        pep440_to_version: Optional[Callable[[str], str]] = None,
     ):
+        self.version_to_pep440 = (
+            version_to_pep440 if version_to_pep440 is not None else self.default_conversion
+        )
+        self.pep440_to_version = (
+            pep440_to_version if pep440_to_version is not None else self.default_conversion
+        )
+
         if version:
             self.version = version
         elif version_number:
+            pep440_version = self.version_to_pep440(version_number)
             try:
-                self.version = Version(version_number)
+                self.version = Version(pep440_version)
             except InvalidVersion:
                 raise DirectiveError(
-                    f"Version number '{version_number}' must conform to Python packaging version "
-                    "specifier format. Please refer to "
-                    "https://packaging.pypa.io/en/latest/version.html for valid formats."
+                    f"Version number '{version_number}' (converted: {pep440_version}) must be "
+                    "converted to a valid PEP 440 version specifier format to use Ramble's "
+                    "versioning functionality. If this object uses version numbering that differs "
+                    "from PEP 440, please define the `version_to_pep440()` method. See "
+                    "https://peps.python.org/pep-0440/ for valid formats."
                 )
         else:
             raise DirectiveError(
                 "An ObjectVersion requires either a Version object or a version number"
             )
+        self.version_number = version_number
         self.description = description
         self.origin_type = origin_type
         self.preferred = preferred
@@ -46,19 +62,14 @@ class ObjectVersion:
     def copy(self):
         """Construct a copy of self and return it"""
         return ObjectVersion(
-            version_number=str(self.version),
+            version_number=self.get_version_num(),
+            version=Version(str(self.version)),
             description=self.description,
             origin_type=self.origin_type,
             preferred=self.preferred,
+            version_to_pep440=self.version_to_pep440,
+            pep440_to_version=self.pep440_to_version,
         )
-
-    def apply(self, ver_to_apply):
-        # Apply a version on top of the current version
-        # This method's logic will depend on how version layering is implemented.
-        # For now, it simply returns the ver_to_apply if it's preferred.
-        if ver_to_apply.preferred:
-            return ver_to_apply
-        return self
 
     def __str__(self):
         return self.get_version_num()
@@ -74,7 +85,7 @@ class ObjectVersion:
             (str): Representation of this version
         """
         indentation = " " * n_indent
-        out_str = rucolor.section_title(f"{indentation}{str(self.version).replace('@', '@@')}\n")
+        out_str = rucolor.section_title(f"{indentation}{self.version}") + "\n"
         out_str += rucolor.nested_1(f"{indentation}    Description: ") + f"{self.description}\n"
         out_str += rucolor.nested_1(f"{indentation}    Preferred: ") + f"{self.preferred}\n"
 
@@ -86,7 +97,10 @@ class ObjectVersion:
 
     def get_version_num(self):
         """Returns the version number of this version"""
-        return str(self.version)
+        if not self.version_number:
+            self.version_number = self.pep440_to_version(str(self.version))
+
+        return self.version_number
 
     def evaluate_conflicts(self, variant):
         """Error if this version conflicts with a variant that is used"""
@@ -110,15 +124,22 @@ class ObjectVersion:
         if value:
             sep_index = value.find(":")
             if sep_index == -1:
-                spec_set = SpecifierSet(f"~={value}", prereleases=True)
+                spec_set = SpecifierSet(f"=={self.version_to_pep440(value)}", prereleases=True)
             elif sep_index == 0:
-                spec_set = SpecifierSet(f"<={value.lstrip(':')}", prereleases=True)
+                spec_set = SpecifierSet(
+                    f"<={self.version_to_pep440(value.lstrip(':'))}", prereleases=True
+                )
             elif sep_index == len(value) - 1:
-                spec_set = SpecifierSet(f">={value.rstrip(':')}", prereleases=True)
+                spec_set = SpecifierSet(
+                    f">={self.version_to_pep440(value.rstrip(':'))}", prereleases=True
+                )
             else:
                 start = value[:sep_index]
                 end = value[sep_index + 1 :]
-                spec_set = SpecifierSet(f">={start},<={end}", prereleases=True)
+                spec_set = SpecifierSet(
+                    (f">={self.version_to_pep440(start)}," f"<={self.version_to_pep440(end)}"),
+                    prereleases=True,
+                )
 
             satisfied = spec_set.contains(self.version)
 

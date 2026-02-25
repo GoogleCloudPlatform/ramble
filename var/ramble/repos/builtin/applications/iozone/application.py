@@ -18,14 +18,24 @@ class Iozone(ExecutableApplication):
 
     tags("storage-benchmark", "io-benchmark", "filesystem")
 
-    version("3.506", "Version 3_506 of Iozone", preferred=True)
+    version("3_506", "Version 3_506 of Iozone", preferred=True)
+    version("3_491", "Version 3_491 of Iozone", preferred=False)
+    version("3_465", "Version 3_465 of Iozone", preferred=False)
+
+    @staticmethod
+    def version_to_pep440(version):
+        return version.replace("_", ".")
+
+    @staticmethod
+    def pep440_to_version(version):
+        return version.replace(".", "_")
 
     with when("package_manager_family=spack"):
         # gcc >= 10 compilation errors were addressed in https://github.com/spack/spack-packages/pull/2073.
         define_compiler("gcc15", pkg_spec="gcc@15.2.0")
         software_spec(
             "iozone-{application_version}",
-            pkg_spec="iozone@{application_version}".replace(".", "_"),
+            pkg_spec="iozone@{application_version}",
             compiler="gcc15",
         )
         required_package("iozone")
