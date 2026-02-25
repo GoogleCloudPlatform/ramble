@@ -20,7 +20,8 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-@pytest.mark.maybeslow
+@pytest.mark.perf
+@pytest.mark.long
 def test_many_experiments(workspace_name):
     ws = ramble.workspace.create(workspace_name)
     ws.write()
