@@ -38,6 +38,7 @@ def exp_dict():
         "test_dict": {"test_key1": "test_val1", "test_key2": "test_val2"},
         "experiment_index": 5,
         "var4": "a-b",
+        "test::var": "value",
     }
 
 
@@ -158,6 +159,7 @@ def build_variant_set():
         ("replace('abc', 'a', 'd')", "dbc", set(), 1),
         ("replace('{application_name}', 'f', 'F')", "Foo", set(), 1),
         ("str_upper({var4})", "A-B", set(), 1),
+        ("{test::var}", "value", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
