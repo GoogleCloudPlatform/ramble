@@ -56,6 +56,12 @@ def pytest_addoption(parser):
         default=None,
         help="runs only tests under the given Ramble object repo path",
     )
+    group.addoption(
+        "--perf",
+        action="store_true",
+        default=False,
+        help="runs perf tests",
+    )
 
 
 def pytest_configure(config):
@@ -70,6 +76,17 @@ def pytest_configure(config):
 
 
 def pytest_collection_modifyitems(config, items):
+    if config.getoption("--perf"):
+        skip_non_perf = pytest.mark.skip(reason="skipped non-perf test [remove --perf to run]")
+        for item in items:
+            if "perf" not in item.keywords:
+                item.add_marker(skip_non_perf)
+    else:
+        skip_perf = pytest.mark.skip(reason="skipped perf test [use --perf to run]")
+        for item in items:
+            if "perf" in item.keywords:
+                item.add_marker(skip_perf)
+
     if not config.getoption("--fast"):
         # --fast not given, run all the tests
         return
