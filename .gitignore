@@ -5,3 +5,6 @@ var/ramble/workspaces
 
 # bash autocomplete with user-defined aliases
 share/ramble/custom-ramble-completion.bash
+
+# artifacts from tests
+perf_test_metrics.json
