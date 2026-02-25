@@ -143,7 +143,7 @@ supported_scalar_function_pointers = {
 }
 
 # Format Spec Regex:
-format_spec_regex = re.compile(r"(?P<kw>.*):(?P<format_spec>\S+)$")
+format_spec_regex = re.compile(r"(?P<kw>[^:]+(?:::[^:]+)*):(?P<format_spec>[^:]+)$")
 
 # Functions that need to be supplied with the expander
 supported_scalar_function_with_self_arg_pointers = {
@@ -281,7 +281,11 @@ class ExpansionNode:
                     return
 
                 keyword = replaced_contents[1:-1]
-                format_match = format_spec_regex.search(keyword)
+                format_match = None
+
+                # Only search for format specs if the keyword is not already a variable
+                if keyword not in expansion_dict:
+                    format_match = format_spec_regex.search(keyword)
                 required_passthrough = False
 
                 if format_match:

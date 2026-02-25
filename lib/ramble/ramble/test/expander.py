@@ -160,6 +160,7 @@ def build_variant_set():
         ("replace('{application_name}', 'f', 'F')", "Foo", set(), 1),
         ("str_upper({var4})", "A-B", set(), 1),
         ("{test::var}", "value", set(), 1),
+        ("{n_ranks:05d}", "00004", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
