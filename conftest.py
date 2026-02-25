@@ -9,6 +9,7 @@
 import builtins
 import collections
 import io
+import json
 import os
 import os.path
 import pathlib
@@ -62,6 +63,33 @@ def pytest_addoption(parser):
         default=False,
         help="runs perf tests",
     )
+
+
+def pytest_sessionstart(session):
+    session.perf_metrics = []
+
+
+# Extract execution time of perf tests
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    res = outcome.get_result()
+
+    if res.when == "call" and "perf" in item.keywords:
+        metric = {
+            "test_name": item.name,
+            "test_id": item.nodeid,
+            "duration": res.duration,
+            "outcome": res.outcome,
+        }
+        item.session.perf_metrics.append(metric)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    if session.perf_metrics:
+        perf_file = os.path.join(ramble.paths.ramble_root, "perf_test_metrics.json")
+        with open(perf_file, "w") as f:
+            json.dump(session.perf_metrics, f, indent=2)
 
 
 def pytest_configure(config):
