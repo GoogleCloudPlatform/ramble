@@ -30,6 +30,46 @@ import spack.util.naming
 _ast_cache: Dict[str, str] = {}
 
 
+def _get_source_segment(source, node):
+    """Retrieve the source segment for an AST node, with compatibility for Python < 3.8"""
+    if hasattr(ast, "get_source_segment"):
+        return ast.get_source_segment(source, node)
+
+    # Fallback for Python < 3.8 which lacks end_lineno/end_col_offset
+    # This is a best-effort implementation for single-line segments (most literals)
+    try:
+        if not hasattr(node, "lineno") or not hasattr(node, "col_offset"):
+            return None
+
+        lines = source.splitlines(keepends=True)
+        line = lines[node.lineno - 1]
+        segment = line[node.col_offset :]
+
+        # For numeric literals, we can try to find the end by matching the pattern
+        if isinstance(node, (ast.Num, getattr(ast, "Constant", type(None)))):
+            # Match integers (including hex, octal, binary and underscores)
+            # and floats.
+            match = re.match(r"[0-9a-zA-Z._]+", segment)
+            if match:
+                return match.group(0)
+
+        # For strings, we need to handle quotes
+        if isinstance(node, (ast.Str, getattr(ast, "Constant", type(None)))):
+            if segment.startswith(("'", '"')):
+                quote = segment[0]
+                if segment.startswith(f"{quote}{quote}{quote}"):
+                    quote = f"{quote}{quote}{quote}"
+                # Find the matching end quote, being careful about escapes
+                # This is a bit complex, but for many cases re works
+                end_match = re.search(rf"{quote}.*?(?<!\\){quote}", segment)
+                if end_match:
+                    return end_match.group(0)
+
+        return None
+    except (IndexError, AttributeError):
+        return None
+
+
 def _ast_parse(in_str):
     """Parse a string into an AST, with caching."""
     if in_str in _ast_cache:
@@ -889,7 +929,19 @@ class Expander:
             with warnings.catch_warnings(record=True) as wal:
                 try:
                     math_ast = _ast_parse(in_str)
-                    out_str = self.eval_math(math_ast.body)
+                    body = math_ast.body
+                    out_str = self.eval_math(body)
+
+                    # If the AST is just a literal, check if it is formatted specially.
+                    # This preserves formatting like underscores in version numbers (e.g. 1_01)
+                    # and keeps hex formatting (e.g. 0x10) for numbers.
+                    if isinstance(body, (ast.Constant, ast.Num)) and isinstance(
+                        out_str, (int, float)
+                    ):
+                        source = _get_source_segment(in_str, body)
+                        if source and str(out_str) != source:
+                            return source
+
                     return out_str
                 except MathEvaluationError as e:
                     logger.debug(f'   Math input is: "{in_str}"')
@@ -1159,6 +1211,8 @@ class Expander:
                             line = lines[l_end_lineno - 1]
                             op_str = line[l_end_col_offset : r_node.col_offset]
                     if op_str is not None:
+                        left_eval = _get_source_segment(source, l_node) or left_eval
+                        right_eval = _get_source_segment(source, r_node) or right_eval
                         return f"{left_eval}{op_str}{right_eval}"
                 self.__dbg_syntax_error("Unsupported operand type in binary operator", node)
             return op(left_eval, right_eval)
