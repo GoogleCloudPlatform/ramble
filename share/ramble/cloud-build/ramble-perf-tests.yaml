@@ -1,0 +1,106 @@
+# Copyright 2022-2026 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+steps:
+  # Cancel older builds (only for PR builds)
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'share/ramble/cloud-build/cancel-older-builds.sh'
+    env:
+      - 'PR_NUMBER=$_PR_NUMBER'
+      - 'TRIGGER_NAME=$TRIGGER_NAME'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'PROJECT_ID=$PROJECT_ID'
+  - name: gcr.io/cloud-builders/git
+    args:
+      - fetch
+      - '--unshallow'
+    id: ramble-clone
+  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest
+    args:
+      - '-c'
+      - |
+        cd /workspace
+
+        git branch develop origin/develop
+
+        . /opt/spack/share/spack/setup-env.sh
+
+        spack load py-pip ^python
+
+        pip install -r /workspace/requirements-dev.txt
+
+        export SPACK_PYTHON=`which python3`
+
+        . /workspace/share/ramble/setup-env.sh
+
+        echo "Spack version is $(spack --version)"
+        echo "Python version is $(python3 --version)"
+
+        echo "Running Perf Tests..."
+        ramble unit-test --perf
+        test_err=$$?
+
+        if [ $$test_err -eq 0 ]; then
+          echo "Perf tests passed."
+
+          if [ -f "$$RAMBLE_ROOT/perf_test_metrics.json" ]; then
+            echo "Generated Metrics:"
+            cat "$$RAMBLE_ROOT/perf_test_metrics.json"
+            echo ""
+          fi
+
+          if [ -z "$_PR_NUMBER" ] && [ "$_UPLOAD_TO_BQ" == "true" ]; then
+            echo "Uploading metrics to BigQuery..."
+            # This dependency should already exist, but just in case.
+            pip install google-cloud-bigquery
+            
+            python3 share/ramble/qa/upload_perf_metrics.py \
+              --metrics-file "$$RAMBLE_ROOT/perf_test_metrics.json" \
+              --project-id "$_PROJECT_ID" \
+              --dataset-id "$_DATASET_ID" \
+              --table-id "$_TABLE_ID" \
+              --commit-sha "$COMMIT_SHA"
+            
+            upload_err=$$?
+            if [ $$upload_err -ne 0 ]; then
+              echo "Failed to upload metrics."
+              exit $$upload_err
+            fi
+          else
+            echo "Skipping metric upload."
+          fi
+        else
+          echo "Perf tests failed."
+          exit $$test_err
+        fi
+
+    id: ramble-perf-tests
+    entrypoint: /bin/bash
+    env:
+    - 'COMMIT_SHA=$COMMIT_SHA'
+    - 'PR_NUMBER=$_PR_NUMBER'
+
+substitutions:
+  _SPACK_REF: 'v1.0.0'
+  _PYTHON_VER: '3.13.5'
+  _BASE_IMG: 'rockylinux'
+  _BASE_VER: '8'
+  _PROJECT_ID: 'ramble-eng'
+  _DATASET_ID: 'ramble_metrics'
+  _TABLE_ID: 'perf_test_durations'
+  _PR_NUMBER: ''
+  # This is only set to true when pushing to develop branch
+  _UPLOAD_TO_BQ: 'false'
+
+timeout: 3600s
+options:
+  # TODO: Maybe use a higher SKU for more consistent performance?
+  machineType: N1_HIGHCPU_8
