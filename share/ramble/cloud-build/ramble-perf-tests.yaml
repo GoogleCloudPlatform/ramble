@@ -37,7 +37,7 @@ steps:
 
         pip install -r /workspace/requirements-dev.txt
 
-        export SPACK_PYTHON=`which python3`
+        export SPACK_PYTHON=$(which python3)
 
         . /workspace/share/ramble/setup-env.sh
 
@@ -59,9 +59,6 @@ steps:
 
           if [ -z "$_PR_NUMBER" ] && [ "$_UPLOAD_TO_BQ" == "true" ]; then
             echo "Uploading metrics to BigQuery..."
-            # This dependency should already exist, but just in case.
-            pip install google-cloud-bigquery
-            
             python3 share/ramble/qa/upload_perf_metrics.py \
               --metrics-file "$$RAMBLE_ROOT/perf_test_metrics.json" \
               --project-id "$_PROJECT_ID" \

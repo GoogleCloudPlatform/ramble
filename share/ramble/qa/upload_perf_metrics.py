@@ -69,7 +69,7 @@ def upload_metrics(metrics_file, project_id, dataset_id, table_id, commit_sha=No
 
 def main():
     parser = argparse.ArgumentParser(description="Upload Ramble perf metrics to BigQuery")
-    parser.add_argument("--metrics-file", default="perf_test_metrics.json", help="Path to metrics JSON file")
+    parser.add_argument("--metrics-file", required=True, help="Path to metrics JSON file")
     parser.add_argument("--project-id", required=True, help="GCP Project ID")
     parser.add_argument("--dataset-id", required=True, help="BigQuery Dataset ID")
     parser.add_argument("--table-id", required=True, help="BigQuery Table ID")
