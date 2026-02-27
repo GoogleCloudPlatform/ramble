@@ -503,6 +503,7 @@ class Expander:
         self._math_str_stack = []
 
         self._application_name = None
+        self._application_spec = None
         self._application_version = None
         self._workload_name = None
         self._experiment_name = None
@@ -549,6 +550,13 @@ class Expander:
         return self._application_name
 
     @property
+    def application_spec(self):
+        if not self._application_spec:
+            self._application_spec = self.expand_var_name(self._keywords.application_spec)
+
+        return self._application_spec
+
+    @property
     def application_version(self):
         if not self._application_version:
             self._application_version = self.expand_var_name(self._keywords.application_version)
@@ -572,14 +580,14 @@ class Expander:
     @property
     def application_namespace(self):
         if not self._application_namespace:
-            self._application_namespace = self.application_name
+            self._application_namespace = self.application_spec
 
         return self._application_namespace
 
     @property
     def workload_namespace(self):
         if not self._workload_namespace:
-            self._workload_namespace = f"{self.application_name}.{self.workload_name}"
+            self._workload_namespace = f"{self.application_spec}.{self.workload_name}"
 
         return self._workload_namespace
 
@@ -587,7 +595,7 @@ class Expander:
     def experiment_namespace(self):
         if not self._experiment_namespace:
             self._experiment_namespace = "{}.{}.{}".format(
-                self.application_name,
+                self.application_spec,
                 self.workload_name,
                 self.experiment_name,
             )

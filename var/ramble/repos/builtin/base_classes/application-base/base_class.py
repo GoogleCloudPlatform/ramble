@@ -606,17 +606,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         )
 
         # Set application version or use preferred version if none specified
-        _, _, maybe_version = self.expander.application_name.partition("@")
+        _, _, maybe_version = self.expander.application_spec.partition("@")
 
         if maybe_version:
             super().set_version(
                 version_number=maybe_version,
-                description=self.expander.application_name,
+                description=self.expander.application_spec,
             )
         elif hasattr(self, "preferred_version"):
             super().set_version(
                 version=self.preferred_version,
-                description=self.expander.application_name,
+                description=self.expander.application_spec,
             )
 
         # Define experiment variants

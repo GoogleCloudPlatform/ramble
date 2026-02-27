@@ -892,7 +892,7 @@ ramble:
             if maybe_version:
                 contents[namespace.version] = maybe_version
 
-            application_context = ramble.context.create_context_from_dict(application, contents)
+            application_context = ramble.context.create_context_from_dict(app_name, contents)
 
             yield contents, application_context
 
@@ -905,9 +905,11 @@ ramble:
                 logger.msg(f"No applications in config file {app_conf}")
             app_dict = config[namespace.application]
             for application, contents in app_dict.items():
-                application_context = ramble.context.create_context_from_dict(
-                    application, contents
-                )
+                app_name, _, maybe_version = application.partition("@")
+                if maybe_version:
+                    contents[namespace.version] = maybe_version
+
+                application_context = ramble.context.create_context_from_dict(app_name, contents)
 
                 yield contents, application_context
 

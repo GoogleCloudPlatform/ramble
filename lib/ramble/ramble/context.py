@@ -125,7 +125,7 @@ class Context:
         if in_context.tables:
             self.tables.extend(in_context.tables)
 
-    def to_workspace_config(self, application_name, workload_name):
+    def to_workspace_config(self, application_spec, workload_name):
         experiment_config = {}
 
         for attr_name, namespace_name in self.output_mapping.items():
@@ -136,7 +136,7 @@ class Context:
         workspace_config = {
             "ramble": {
                 "applications": {
-                    application_name: {
+                    application_spec: {
                         "workloads": {
                             workload_name: {"experiments": {self.context_name: experiment_config}}
                         }
