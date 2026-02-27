@@ -6,9 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import re
 from enum import Enum
 
 import ramble.error
+from ramble.repository import type_definitions
 from ramble.util.logger import logger
 
 key_type = Enum("key_type", ["reserved", "optional", "required"])
@@ -158,6 +160,11 @@ class Keywords:
         if extra_keys is None:
             extra_keys = {}
         self.update_keys(extra_keys)
+        self.reserved_patterns = set()
+        for type_definition in type_definitions.values():
+            object_type = type_definition["singular"]
+            self.reserved_patterns.add(re.compile(rf"{object_type}::\S+::version"))
+            self.reserved_patterns.add(re.compile(rf"{object_type}_version"))
 
     def copy(self):
         new_inst = type(self)()
@@ -177,9 +184,12 @@ class Keywords:
 
     def is_reserved(self, key):
         """Check if a key is reserved"""
-        if not self.is_valid(key):
-            return False
-        return self.keys[key]["type"] == key_type.reserved
+        if self.is_valid(key):
+            return self.keys[key]["type"] == key_type.reserved
+        for reserved_pattern in self.reserved_patterns:
+            if reserved_pattern.match(key):
+                return True
+        return False
 
     def is_optional(self, key):
         """Check if a key is optional"""
