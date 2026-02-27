@@ -30,6 +30,10 @@ class ObjectMixin:
 
     _verbosity = "short"
 
+    def __init__(self):
+        if not hasattr(self, "selected_version"):
+            self.selected_version = None
+
     def __str__(self):
         return self.name
 
@@ -131,12 +135,10 @@ class ObjectMixin:
             version (ramble.definitions.versions.ObjectVersion): Version to set
             description: Description of this version
         """
-        version_inst = None
-
         if version:
-            version_inst = version
+            self.selected_version = version
         else:
-            version_inst = ObjectVersion(
+            self.selected_version = ObjectVersion(
                 version_number=version_number,
                 description=description,
                 origin_type=self.origin_type,
@@ -145,12 +147,8 @@ class ObjectMixin:
             )
 
         self.object_variants.version_variant(
-            f"{self.origin_type}_version", version_inst
+            f"{self.origin_type}_version", self.selected_version
         )
-        if hasattr(self, "define_variable"):
-            self.define_variable(
-                f"{self.origin_type}_version", str(version_inst)
-            )
 
     @staticmethod
     def version_to_pep440(version_str):
