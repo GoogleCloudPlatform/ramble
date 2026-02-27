@@ -10,6 +10,7 @@ import os
 
 import pytest
 
+import ramble.variants
 import ramble.workspace
 from ramble.appkit import ExecutableApplication
 from ramble.definitions.versions import ObjectVersion
@@ -339,3 +340,141 @@ def test_version_variable_expansion_info(workspace_name):
         exp2_path = os.path.join(ws.experiment_dir, "versions@2.0a1", "test_wl", "generated")
         assert os.path.exists(exp1_path)
         assert os.path.exists(exp2_path)
+
+
+def test_repeat_modifier_versions_error(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    ramble.workspace.create(workspace_name)
+    workspace(
+        "manage",
+        "experiments",
+        "versions@0.9",
+        "--wf",
+        "test_wl",
+        "-v",
+        "n_ranks=1",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "processes_per_node=1",
+        global_args=global_args,
+    )
+
+    workspace(
+        "manage",
+        "modifiers",
+        "--add",
+        "--scope",
+        "workspace",
+        "--name",
+        "versions-mod@1.0",
+        "--on-executable",
+        "foo",
+        global_args=global_args,
+    )
+
+    workspace(
+        "manage",
+        "modifiers",
+        "--add",
+        "--scope",
+        "workspace",
+        "--name",
+        "versions-mod@2.0",
+        "--on-executable",
+        "bar",
+        global_args=global_args,
+    )
+
+    err_str = (
+        "Two modifier definitions conflict by having the same name and different version numbers."
+    )
+    with pytest.raises(ramble.error.ConflictingModifiersError, match=err_str):
+        workspace("info", global_args=global_args)
+
+
+def test_multi_modifier_versions(workspace_name):
+    global_args = ["-w", workspace_name, "--overwrite-inventories"]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "versions@0.9",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "--scope",
+            "workspace",
+            "--name",
+            "versions-mod@1.0",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "--scope",
+            "workspace",
+            "--name",
+            "info@2.0",
+            global_args=global_args,
+        )
+
+        exec_tpl = os.path.join(ws.config_dir, "execute_experiment.tpl")
+        with open(exec_tpl, "a+") as f:
+            f.write("versions-mod version: {modifier::versions-mod::version}\n")
+            f.write("info version: {modifier::info::version}\n")
+
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_script = os.path.join(
+            ws.experiment_dir, "versions@0.9", "test_wl", "generated", "execute_experiment"
+        )
+
+        with open(exec_script) as f:
+            data = f.read()
+            assert "versions-mod version: 1.0" in data
+            assert "info version: 2.0" in data
+
+
+def test_define_version_variables_errors(workspace_name):
+    global_args = ["-w", workspace_name, "--overwrite-inventories"]
+
+    ramble.workspace.create(workspace_name)
+    workspace(
+        "manage",
+        "experiments",
+        "versions@0.9",
+        "--wf",
+        "test_wl",
+        "-v",
+        "n_ranks=1",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "application::versions::version=foo",
+        global_args=global_args,
+    )
+
+    err_str = (
+        'Keyword "application::versions::version" has been defined, but is reserved by ramble'
+    )
+    with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError, match=err_str):
+        workspace("info", global_args=global_args)
