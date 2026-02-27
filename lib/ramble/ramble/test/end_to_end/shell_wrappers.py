@@ -17,7 +17,12 @@ import ramble.paths
 pytestmark = pytest.mark.maybeslow
 
 # TODO: add tests for other supported shells
-_SHELLS_TO_TEST = ["bash"]
+_SHELLS_TO_TEST = ["bash", "fish"]
+
+_SETUP_ENV_FILE = {
+    "bash": "setup-env.sh",
+    "fish": "setup-env.fish",
+}
 
 
 @pytest.mark.parametrize("shell", _SHELLS_TO_TEST)
@@ -26,7 +31,7 @@ def test_shell_wrapper_workspace_activate_missing(shell, tmpdir):
     if not shutil.which(shell):
         pytest.skip(f"{shell} not found")
 
-    setup_env = os.path.join(ramble.paths.prefix, "share", "ramble", "setup-env.sh")
+    setup_env = os.path.join(ramble.paths.prefix, "share", "ramble", _SETUP_ENV_FILE[shell])
     test_script_path = str(tmpdir.join("test_missing.sh"))
 
     with open(test_script_path, "w") as f:
