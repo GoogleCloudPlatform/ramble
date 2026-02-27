@@ -90,9 +90,9 @@ substitutions:
   _PYTHON_VER: '3.13.5'
   _BASE_IMG: 'rockylinux'
   _BASE_VER: '8'
-  _PROJECT_ID: 'ramble-eng'
-  _DATASET_ID: 'ramble_metrics'
-  _TABLE_ID: 'perf_test_durations'
+  _PROJECT_ID: ''
+  _DATASET_ID: ''
+  _TABLE_ID: ''
   _PR_NUMBER: ''
   # This is only set to true when pushing to develop branch
   _UPLOAD_TO_BQ: 'false'
