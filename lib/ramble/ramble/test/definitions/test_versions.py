@@ -9,6 +9,7 @@
 import pytest
 
 from ramble.definitions.versions import ObjectVersion
+from ramble.language import language_base
 
 
 class TestObjectVersion:
@@ -29,7 +30,7 @@ class TestObjectVersion:
 
     def test_init_invalid_version(self):
         """Test that the ObjectVersion constructor raises an error for invalid versions."""
-        with pytest.raises(Exception):
+        with pytest.raises(language_base.DirectiveError):
             ObjectVersion(version_number="invalid_version")
 
     def test_copy(self):
