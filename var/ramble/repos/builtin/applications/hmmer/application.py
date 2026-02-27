@@ -37,8 +37,8 @@ class Hmmer(ExecutableApplication):
         software_spec("impi_2018", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hmmer-{application_version}",
-            pkg_spec="hmmer@{application_version}",
+            "hmmer-{application::hmmer::version}",
+            pkg_spec="hmmer@{application::hmmer::version}",
             compiler="gcc9",
         )
 

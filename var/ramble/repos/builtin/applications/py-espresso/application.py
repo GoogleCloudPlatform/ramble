@@ -23,8 +23,8 @@ class PyEspresso(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         software_spec(
-            "py-espresso-{application_version}",
-            pkg_spec="py-espresso@{application_version}",
+            "py-espresso-{application::py-espresso::version}",
+            pkg_spec="py-espresso@{application::py-espresso::version}",
         )
 
     software_spec(

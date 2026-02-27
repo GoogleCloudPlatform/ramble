@@ -36,8 +36,8 @@ class IntelMpiBenchmarks(ExecutableApplication):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
         software_spec(
-            "intel-mpi-benchmarks-{application_version}",
-            pkg_spec="intel-mpi-benchmarks@{application_version}",
+            "intel-mpi-benchmarks-{application::intel-mpi-benchmarks::version}",
+            pkg_spec="intel-mpi-benchmarks@{application::intel-mpi-benchmarks::version}",
             compiler="gcc9",
         )
 

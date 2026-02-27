@@ -25,8 +25,8 @@ class Openfoam(OpenfoamBase):
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "openfoam-{application_version}",
-            pkg_spec="openfoam@{application_version}",
+            "openfoam-{application::openfoam::version}",
+            pkg_spec="openfoam@{application::openfoam::version}",
             compiler="gcc9",
         )
 

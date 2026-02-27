@@ -37,8 +37,8 @@ class QuantumEspresso(ExecutableApplication):
             pkg_spec="intel-oneapi-mpi@2021.8.0",
         )
         software_spec(
-            "quantum-espresso-{application_version}",
-            pkg_spec="quantum-espresso@{application_version}",
+            "quantum-espresso-{application::quantum-espresso::version}",
+            pkg_spec="quantum-espresso@{application::quantum-espresso::version}",
             compiler="gcc13",
         )
 

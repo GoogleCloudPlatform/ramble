@@ -25,8 +25,8 @@ class Hpl(HplBase):
         software_spec("impi_2018", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hpl-{application_version}",
-            pkg_spec="hpl@{application_version} +openmp",
+            "hpl-{application::hpl::version}",
+            pkg_spec="hpl@{application::hpl::version} +openmp",
             compiler="gcc9",
         )
 

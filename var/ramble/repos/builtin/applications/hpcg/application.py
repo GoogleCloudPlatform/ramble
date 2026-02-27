@@ -34,8 +34,8 @@ class Hpcg(BaseHpcg):
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hpcg-{application_version}",
-            pkg_spec="hpcg@{application_version} +openmp",
+            "hpcg-{application::hpcg::version}",
+            pkg_spec="hpcg@{application::hpcg::version} +openmp",
             compiler="gcc9",
         )
 

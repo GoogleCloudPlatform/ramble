@@ -29,8 +29,8 @@ class Babelstream(ExecutableApplication):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
         software_spec(
-            "babelstream-{application_version}",
-            pkg_spec="babelstream@{application_version} +omp",
+            "babelstream-{application::babelstream::version}",
+            pkg_spec="babelstream@{application::babelstream::version} +omp",
             compiler="gcc12",
         )
     stage_files(

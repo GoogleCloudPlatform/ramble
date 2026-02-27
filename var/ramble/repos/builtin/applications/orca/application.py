@@ -25,7 +25,8 @@ class Orca(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         software_spec(
-            "orca-{application_version}", pkg_spec="orca@{application_version}"
+            "orca-{application::orca::version}",
+            pkg_spec="orca@{application::orca::version}",
         )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 

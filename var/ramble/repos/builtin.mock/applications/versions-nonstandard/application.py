@@ -41,8 +41,8 @@ class VersionsNonstandard(VersionsBase):
     with default_args(when=["package_manager_family=spack"]):
 
         software_spec(
-            "versions-nonstandard-{application_version}",
-            pkg_spec="versions-nonstandard@{application_version}",
+            "versions-nonstandard-{application::versions-nonstandard::version}",
+            pkg_spec="versions-nonstandard@{application::versions-nonstandard::version}",
         )
 
         required_package("versions-nonstandard")

@@ -37,8 +37,8 @@ class Hpcc(ExecutableApplication):
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hpcc-{application_version}",
-            pkg_spec="hpcc@{application_version}",
+            "hpcc-{application::hpcc::version}",
+            pkg_spec="hpcc@{application::hpcc::version}",
             compiler="gcc9",
         )
 

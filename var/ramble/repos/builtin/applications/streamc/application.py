@@ -27,8 +27,8 @@ class Streamc(ExecutableApplication):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
         software_spec(
-            "streamc-{application_version}",
-            pkg_spec='stream@{application_version} +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
+            "streamc-{application::streamc::version}",
+            pkg_spec='stream@{application::streamc::version} +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
             compiler="gcc12",
         )
 

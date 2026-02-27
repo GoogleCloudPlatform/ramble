@@ -20,21 +20,21 @@ class IntelHpl(HplBase):
     tags("intel-optimized")
 
     version(
-        "2021.11.0",
-        "Version 2021.11.0 of intel-oneapi-mpi with HPL",
+        "2024.2.0",
+        "Version 2024.2.0 of intel-oneapi-mkl with HPL",
         preferred=True,
     )
 
     with when("package_manager_family=spack"):
         define_compiler("gcc13p2", pkg_spec="gcc@13.2.0")
         software_spec(
-            "imkl_2024p2",
-            pkg_spec="intel-oneapi-mkl@2024.2.0 threads=openmp",
+            "imkl_{application::intel-hpl::version}",
+            pkg_spec="intel-oneapi-mkl@{application::intel-hpl::version} threads=openmp",
             compiler="gcc13p2",
         )
         software_spec(
-            "impi-{application_version}",
-            pkg_spec="intel-oneapi-mpi@{application_version}",
+            "impi-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.13.1",
         )
 
         required_package("intel-oneapi-mkl")

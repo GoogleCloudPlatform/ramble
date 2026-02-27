@@ -33,8 +33,8 @@ class Cloverleaf(ExecutableApplication):
             compiler="gcc12",
         )
         software_spec(
-            "cloverleaf-{application_version}",
-            pkg_spec="cloverleaf@{application_version} build=ref",
+            "cloverleaf-{application::cloverleaf::version}",
+            pkg_spec="cloverleaf@{application::cloverleaf::version} build=ref",
             compiler="gcc12",
         )
 

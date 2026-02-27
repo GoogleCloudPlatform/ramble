@@ -34,8 +34,8 @@ class Iozone(ExecutableApplication):
         # gcc >= 10 compilation errors were addressed in https://github.com/spack/spack-packages/pull/2073.
         define_compiler("gcc15", pkg_spec="gcc@15.2.0")
         software_spec(
-            "iozone-{application_version}",
-            pkg_spec="iozone@{application_version}",
+            "iozone-{application::iozone::version}",
+            pkg_spec="iozone@{application::iozone::version}",
             compiler="gcc15",
         )
         required_package("iozone")

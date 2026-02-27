@@ -2234,6 +2234,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "RAMBLE_STATUS",
         ]
 
+        for _, obj in self._objects():
+            remove_variables.append(f"{obj.origin_type}_version")
+            remove_variables.append(f"{obj.origin_type}::{obj.name}::version")
+
         # Remove some variables that don't affect the experiment, and change
         # frequently (or are actually output variables)
         for var in remove_variables:
