@@ -361,16 +361,16 @@ from PEP 440 format for the purpose of version comparisons:
 
     with when("package_manager_family=spack"):
         software_spec(
-            "iozone-{application_version}",
-            pkg_spec="iozone@{application_version}",
+            "iozone-{application::iozone::version}",
+            pkg_spec="iozone@{application::iozone::version}",
             compiler="gcc15",
         )
     
 .. _Python packaging.version: https://packaging.python.org/en/latest/specifications/version-specifiers/
 .. _PEP 440 version specifiers: https://peps.python.org/pep-0440/
 
-Versions can be set for any object by substituting ``application_version`` for
-``<object_name>_version``.
+Versions can be set for any object by substituting ``application::iozone::version`` with
+``<object_type>::<object_name>::version``.
 
 By default, users must select from versions defined in the ``application.py``.
 Strict version checking can be disabled for the entire application using the

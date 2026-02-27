@@ -1090,6 +1090,8 @@ Ramble automatically generates definitions for the following variables:
 * ``workspace_shared`` - Path to the workspace shared directory
 * ``workspace_archives`` - Path to the workspace archives directory
 * ``workspace_deployments`` - Path to the workspace deployments directory
+* ``<object_type>_version`` - Version of the object (i.e. ``application_version``)
+* ``<object_type>::<object_name>::version`` - Version of the object (i.e. ``application::wrf::version``)
 
 
 Package Manager Specific Generated Variables
