@@ -89,13 +89,15 @@ def workload(
         if when_set not in app.workloads:
             app.workloads[when_set] = {}
 
-        app.workloads[when_set][name] = ramble.workload.Workload(name, all_execs, all_inputs, tags)
+        app.workloads[when_set][name] = ramble.workload.Workload(
+            name, all_execs, all_inputs, tags, when_list
+        )
 
     return _execute_workload
 
 
 @application_directive("workload_groups")
-def workload_group(name, workloads=None, mode=None, **kwargs):
+def workload_group(name, workloads=None, mode=None, when=None, **kwargs):
     """Adds a workload group to this application
 
     Defines a new workload group that can be used within the context of its
@@ -109,10 +111,18 @@ def workload_group(name, workloads=None, mode=None, **kwargs):
         workloads = []
 
     def _execute_workload_groups(app):
-        if mode == "append":
-            app.workload_groups[name].update(set(workloads))
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, app, name, "workload_group"
+        )
+
+        if name not in app.workload_groups:
+            app.workload_groups[name] = ramble.workload.WorkloadGroup(
+                name=name, workloads=workloads, when_list=when_list
+            )
         else:
-            app.workload_groups[name] = set(workloads)
+            app.workload_groups[name].add_workloads(
+                workloads=workloads, when_list=when_list, mode=mode
+            )
 
         # Apply any existing variables in the group to the workload
         for workload in workloads:
@@ -345,7 +355,7 @@ def workload_variable(
                         app.workloads[when_set][wl_name].add_environment_variable(env_var.copy())
 
         if workload_group is not None:
-            workload_group_list = app.workload_groups[workload_group]
+            workload_group_inst = app.workload_groups[workload_group]
 
             if workload_group not in app.workload_group_vars:
                 app.workload_group_vars[workload_group] = []
@@ -358,18 +368,29 @@ def workload_variable(
                 app.workload_group_env_vars[workload_group].append(env_var.copy())
 
             for when_set, app_workloads in app.workloads.items():
-                for wl_name in workload_group_list:
-                    if wl_name in app_workloads:
-                        # Apply the variable
-                        app.workloads[when_set][wl_name].add_variable(workload_var.copy())
-                        if validation:
-                            ramble.language.language_helpers.add_variable_validator(
-                                app, name, values, when_list, wl_name=wl_name
-                            )
-                        if env_var:
-                            app.workloads[when_set][wl_name].add_environment_variable(
-                                env_var.copy()
-                            )
+                for (
+                    wl_group_when_list,
+                    workload_group_list,
+                ) in workload_group_inst.workloads.items():
+                    for wl_name in workload_group_list:
+                        if wl_name in app_workloads:
+                            # Apply the variable
+                            # Add wl group 'when' to variable to defer satisfies evaluation
+                            workload_var_copy = workload_var.copy()
+                            workload_var_copy.when += wl_group_when_list
+
+                            app.workloads[when_set][wl_name].add_variable(workload_var_copy)
+                            if validation:
+                                ramble.language.language_helpers.add_variable_validator(
+                                    app, name, values, when_list, wl_name=wl_name
+                                )
+                            if env_var:
+                                env_var_copy = env_var.copy()
+                                env_var_copy.when += wl_group_when_list
+
+                                app.workloads[when_set][wl_name].add_environment_variable(
+                                    env_var_copy
+                                )
 
         if not all_workloads and workload_group is None:
             raise DirectiveError("A workload or workload group is required")

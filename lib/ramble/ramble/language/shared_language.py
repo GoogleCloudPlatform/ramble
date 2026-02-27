@@ -14,6 +14,7 @@ import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
 import ramble.variants
+from ramble.definitions.versions import ObjectVersion
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.spec_utils import SoftwareSpec
@@ -943,19 +944,34 @@ def environment_variable(
                         )
 
             if workload_group is not None:
-                workload_group_list = obj.workload_groups[workload_group]
+                workload_group_inst = obj.workload_groups[workload_group]
 
                 if workload_group not in obj.workload_group_env_vars:
                     obj.workload_group_env_vars[workload_group] = []
 
                 obj.workload_group_env_vars[workload_group].append(workload_env_var.copy())
 
+                # TODO: See if there's a way to clean this up. We can't evaluate 'when' here due to
+                # lack of expander, so this merges the 'when' of wl group with the 'when' of vars
+                # and env vars to be evaluated later. It adds each var or env var to all workloads
+                # that match the name, but the merged 'when' ensures they're only activated for the
+                # correct workload group conditions.
+                wl_group_when_map = collections.defaultdict(list)
+                for wl_group_when_set, wl_group_workloads in workload_group_inst.workloads.items():
+                    for wl_name in wl_group_workloads:
+                        wl_group_when_map[wl_name].append(wl_group_when_set)
+
                 for when_set, app_workloads in obj.workloads.items():
-                    for wl_name in workload_group_list:
-                        if wl_name in app_workloads:
-                            obj.workloads[when_set][wl_name].add_environment_variable(
-                                workload_env_var.copy()
-                            )
+                    for app_wl_name in app_workloads.keys():
+                        if app_wl_name in wl_group_when_map:
+                            # Add each variation of merged 'when' set for each workload
+                            for wl_group_when_set in wl_group_when_map[app_wl_name]:
+                                workload_env_var_copy = workload_env_var.copy()
+                                workload_env_var_copy.when.extend(wl_group_when_set)
+
+                                obj.workloads[when_set][app_wl_name].add_environment_variable(
+                                    workload_env_var_copy
+                                )
         else:
             when_set = frozenset(when_list)
             if when_set not in obj.object_environment_variables:
@@ -998,6 +1014,63 @@ def variant(
         obj.class_variants[name] = args_dict
 
     return _define_variant
+
+
+@shared_directive("known_versions")
+def version(
+    number: str,
+    description: str = "",
+    preferred: bool = False,
+    **kwargs,
+):
+    """Define a new version in the input object
+
+    Args:
+        number: Version number (Python packaging version format)
+        description: Description of this version
+        preferred: Mark this version as preferred. Only one version can be preferred.
+    """
+
+    def _define_version(obj):
+        new_version = ObjectVersion(
+            version_number=number,
+            description=description,
+            origin_type=obj.origin_type,
+            preferred=preferred,
+            version_to_pep440=obj.version_to_pep440,
+            pep440_to_version=obj.pep440_to_version,
+        )
+
+        # Ensure only one version is marked as preferred
+        if new_version.preferred:
+            if not hasattr(obj, "preferred_version"):
+                obj.preferred_version = new_version
+            elif obj.preferred_version.version == new_version.version:
+                # Ignore identical preferred versions, which happens when app is subclassed
+                pass
+            else:
+                raise ramble.language.language_base.DirectiveError(
+                    f"Object {obj.name} already has a preferred version "
+                    f"({obj.preferred_version.version}). Only one version can be marked preferred."
+                )
+        obj.known_versions[number] = new_version
+
+    return _define_version
+
+
+@shared_directive(dicts=())
+def strict_versions(strict: bool = True, **kwargs):
+    """Directive to specify if the object has strict versioning.
+    If true, only known versions can be used in experiments.
+
+    Args:
+        strict (bool): Whether strict versioning is enabled.
+    """
+
+    def _execute_strict_versions(obj):
+        obj.enable_strict_versions = strict
+
+    return _execute_strict_versions
 
 
 @shared_directive("required_vars")

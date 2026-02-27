@@ -8,8 +8,11 @@
 import functools
 import os
 from html import escape
-from typing import List
+from typing import List, Optional
 
+import ramble.config
+from ramble.definitions.versions import ObjectVersion
+from ramble.error import ObjectValidationError
 from ramble.repository import ObjectTypes
 from ramble.util import format
 from ramble.util.logger import logger
@@ -87,6 +90,80 @@ class ObjectMixin:
         app_inst = self._get_app_inst()
         experiment_variants = self.experiment_variants()
         return app_inst.expander.satisfies(when_key, experiment_variants)
+
+    def validate_version(self):
+        """Checks if the current version is registered in the application definition. Can be
+        disabled using config:enable_strict_versions:false.
+        """
+
+        global_strict = ramble.config.get("config:enable_strict_versions")
+        obj_strict = True
+        if hasattr(self, "enable_strict_versions"):
+            obj_strict = self.enable_strict_versions
+
+        if not global_strict or not obj_strict:
+            return
+
+        current_ver = self.object_variants.version(
+            f"{self.origin_type}_version"
+        )
+
+        if current_ver:
+            for known_version in self.known_versions.values():
+                if current_ver.get_version() == known_version.get_version():
+                    return
+            raise ObjectValidationError(
+                f"The current version {current_ver.get_version()} is not defined in the "
+                f"{self.origin_type}.py. You must select from defined versions. Set "
+                "config:enable_strict_versions:false to disable strict version checking."
+            )
+
+    def set_version(
+        self,
+        version_number: Optional[str] = "",
+        version: Optional[ObjectVersion] = None,
+        description: str = "",
+    ):
+        """Set the version of this object.
+
+        args:
+            version_number: Optional. Version number to be converted to ObjectVersion
+            version (ramble.definitions.versions.ObjectVersion): Version to set
+            description: Description of this version
+        """
+        version_inst = None
+
+        if version:
+            version_inst = version
+        else:
+            version_inst = ObjectVersion(
+                version_number=version_number,
+                description=description,
+                origin_type=self.origin_type,
+                version_to_pep440=self.version_to_pep440,
+                pep440_to_version=self.pep440_to_version,
+            )
+
+        self.object_variants.version_variant(
+            f"{self.origin_type}_version", version_inst
+        )
+        if hasattr(self, "define_variable"):
+            self.define_variable(
+                f"{self.origin_type}_version", str(version_inst)
+            )
+
+    @staticmethod
+    def version_to_pep440(version_str):
+        """Converts object version number to PEP 440 compliant version number.
+        This enables Ramble to use python.packaging for version comparison logic.
+        See https://peps.python.org/pep-0440/ for valid formats.
+        """
+        return version_str
+
+    @staticmethod
+    def pep440_to_version(version_str):
+        """Converts PEP 440 compliant version number to object version number"""
+        return version_str
 
     def experiment_variants(
         self, include_modifier=None, allow_caching=True, app_inst=None

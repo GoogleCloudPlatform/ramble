@@ -36,6 +36,9 @@ responsible for configuring, executing, analyzing, and archiving.
 .. code-block:: yaml
 
     ramble:
+      variants:
+          workflow_manager: user-managed
+          package_manager: user-managed
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -73,6 +76,9 @@ string, and can take variables for expansion.
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: user-managed
+        package_manager: user-managed
       applications:
         hostname:
           workloads:
@@ -109,6 +115,9 @@ individual experiments take precedence.
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -130,7 +139,6 @@ individual experiments take precedence.
 In this example, ``n_ranks`` will take a value of ``1`` within the ``test_exp``
 experiment. This experiment will also include definitions for
 ``processes_per_node``, ``n_nodes``, and ``n_threads``.
-
 
 .. _ramble-supported-functions:
 
@@ -227,6 +235,9 @@ math and variable expansion syntax as defined above).
 .. code-block:: yaml
 
     ramble:
+      variants:
+          workflow_manager: slurm
+          package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -259,6 +270,9 @@ to create a list. With this functionality, the example above could be re-written
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -293,6 +307,9 @@ consumes.
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -323,6 +340,9 @@ Multiple matrices are allowed to be defined:
    :linenos:
 
     ramble:
+      variants:
+          workflow_manager: slurm
+          package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -377,6 +397,9 @@ Below is an example showing how to define explicit zips:
    :linenos:
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -407,8 +430,41 @@ Below is an example showing how to define explicit zips:
 Which would result in eight experiments, crossing the ``n_nodes`` variable with
 the zip of ``partition`` and ``processes_per_node``.
 
-.. _ramble-experiment-variants:
+.. _ramble-application-versions:
 
+^^^^^^^^^^^^^^^
+Object Versions
+^^^^^^^^^^^^^^^
+
+Ramble objects (Applications, Modifiers, etc.) support versioning using the ``@`` syntax. This 
+allows you to select a specific definition for an object:
+
+.. code-block:: yaml
+
+  applications:
+    wrf@4.2:
+      workloads: ...
+
+By default, you must choose from known versions registered in the 
+:ref:`application.py file <application-list>`. A list of known versions can be viewed using the
+``ramble info`` command. If no version is specified, the preferred version will be used. Strict
+version checking can be disabled by setting the configuration
+``config:enable_strict_versions:false`` in the ``ramble.yaml`` file.
+
+Versions can also be parameterized as a variable:
+
+.. code-block:: yaml
+
+  applications:
+    wrf@{wrf_version}:
+      workloads:
+        CONUS_12km:
+          experiments:
+            test_exp:
+              variables:
+                wrf_version: ['4.2', '3.9.1.1']
+
+.. _ramble-experiment-variants:
 
 ^^^^^^^^^^^^^^^
 Variant Control
@@ -969,6 +1025,7 @@ Ramble automatically generates definitions for the following variables:
 * ``application_name`` - Set to the name of the application
 * ``application_namespace`` - Set to the namespace of the application
 * ``simplified_application_namespace`` - Set to a simplified version of the application namespace
+* ``application_version`` - Set to the version of the application, if applicable
 * ``workload_name`` - Set to the name of the workload within the application
 * ``workload_namespace`` - Set to the namespace of the workload
 * ``simplified_workload_namespace`` - Set to a simplified version of the workload namespace

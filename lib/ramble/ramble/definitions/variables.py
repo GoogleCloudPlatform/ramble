@@ -76,7 +76,7 @@ class Variable:
                 if attr_val:
                     out_str += (
                         f"{indentation}    {rucolor.title_color(name, n_indent=n_indent + 4)}: "
-                        f'{str(attr_val).replace("@", "@@")}\n'
+                        f"{rucolor.plaintext(str(attr_val))}\n"
                     )
         else:
             out_str = f"{indentation}{self.name}"
@@ -151,7 +151,7 @@ class VariableModification:
                     attr_val = f"'{attr_val}'"
                 out_str += (
                     f"{indentation}    {rucolor.title_color(name, n_indent=n_indent + 4)}: "
-                    f'{str(attr_val).replace("@", "@@")}\n'
+                    f"{rucolor.plaintext(str(attr_val))}\n"
                 )
         return out_str
 
@@ -217,7 +217,7 @@ class EnvironmentVariable:
                 if attr_val:
                     out_str += (
                         f"{indentation}    {rucolor.title_color(name, n_indent=n_indent + 4)}: "
-                        f'{str(attr_val).replace("@", "@@")}\n'
+                        f"{rucolor.plaintext(str(attr_val))}\n"
                     )
         else:
             out_str = f"{indentation}{self.name}"

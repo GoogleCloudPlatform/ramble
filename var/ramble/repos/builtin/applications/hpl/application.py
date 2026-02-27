@@ -17,14 +17,16 @@ class Hpl(HplBase):
 
     maintainers("douglasjacobsen")
 
+    version("2.3", "Version 2.3 of HPL", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
         software_spec("impi_2018", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hpl",
-            pkg_spec="hpl@2.3 +openmp",
+            "hpl-{application_version}",
+            pkg_spec="hpl@{application_version} +openmp",
             compiler="gcc9",
         )
 

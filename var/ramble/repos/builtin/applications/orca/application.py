@@ -21,8 +21,12 @@ class Orca(ExecutableApplication):
 
     tags("quantum-chemistry", "electronic-structure")
 
+    version("5.0.4", "Version 5.0.4 of ORCA", preferred=True)
+
     with when("package_manager_family=spack"):
-        software_spec("orca", pkg_spec="orca@5.0.4")
+        software_spec(
+            "orca-{application_version}", pkg_spec="orca@{application_version}"
+        )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(

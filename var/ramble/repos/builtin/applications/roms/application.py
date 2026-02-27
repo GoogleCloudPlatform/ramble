@@ -25,8 +25,12 @@ class Roms(ExecutableApplication):
     maintainers("rbfgo")
     tags("weather", "ocean-modeling", "climate-modeling")
 
+    version("4.1", "Version 4.1 of ROMS", preferred=True)
+
     with when("package_manager_family=spack"):
-        software_spec("roms", pkg_spec="roms@4.1")
+        software_spec(
+            "roms-{application_version}", pkg_spec="roms@{application_version}"
+        )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(

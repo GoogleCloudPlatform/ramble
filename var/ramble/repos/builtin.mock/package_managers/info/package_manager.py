@@ -19,6 +19,9 @@ class Info(PackageManagerBase):
 
     tags("tag1", "tag2")
 
+    version("1.0", description="Version 1.0 of info", preferred=True)
+    version("2.0", description="Version 2.0 of info", preferred=False)
+
     variant(
         "variant_name",
         default="variant_default",
@@ -80,31 +83,33 @@ class Info(PackageManagerBase):
         units="s",
     )
 
-    define_compiler("gcc12", pkg_spec="gcc@12.2.0")
+    with when("application_version@1.0:"):
 
-    software_spec(
-        "info-app",
-        pkg_spec="info-app@5.0",
-        compiler="gcc12",
-    )
+        define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
-    package_manager_config(
-        "config_name",
-        "config:true",
-        when="package_manager=info",
-    )
+        software_spec(
+            "info-app",
+            pkg_spec="info-app@5.0",
+            compiler="gcc12",
+        )
 
-    required_package(
-        "info-app-dep",
-        when=["package_manager=info", "+turn_on_required_directives"],
-    )
+        package_manager_config(
+            "config_name",
+            "config:true",
+            when="package_manager=info",
+        )
 
-    success_criteria(
-        "success_criteria_name",
-        mode="string",
-        match=r"fom: test",
-        file="log.file",
-    )
+        required_package(
+            "info-app-dep",
+            when=["package_manager=info", "+turn_on_required_directives"],
+        )
+
+        success_criteria(
+            "success_criteria_name",
+            mode="string",
+            match=r"fom: test",
+            file="log.file",
+        )
 
     register_builtin("builtin_name", required=True)
 

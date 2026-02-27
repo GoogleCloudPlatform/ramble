@@ -23,3 +23,23 @@ def format_doc(doc_str, **kwargs):
     for line in lines:
         results.write((" " * indent) + line + "\n")
     return results.getvalue()
+
+
+def when_order(when: str):
+    """Sort 'when' conditions consistently when unpacking from sets or lists"""
+
+    if not when:
+        return (3, when)  # Handle empty strings
+
+    first_char = when[0]
+
+    if first_char.isalpha():
+        priority = 0
+    elif first_char == "+":
+        priority = 1
+    elif first_char == "~":
+        priority = 2
+    else:
+        priority = 3  # For any other characters
+
+    return (priority, when)

@@ -128,7 +128,8 @@ def test_known_workflow_managers(
         if workflow_manager != "None":
             ws._re_read()
             wm_inst = ramble.repository.get(
-                workflow_manager, object_type=ramble.repository.ObjectTypes.workflow_managers
+                workflow_manager,
+                object_type=ramble.repository.ObjectTypes.workflow_managers,
             )
             for var in wm_inst.object_variables[frozenset()]:
                 config("remove", f"variables:{var.name}", global_args=["-w", workspace_name])

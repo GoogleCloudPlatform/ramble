@@ -23,6 +23,8 @@ class Namd(ExecutableApplication):
 
     tags("molecular-dynamics", "hpc-benchmark", "charmpp")
 
+    version("2.14", description="Version 2.14 of NAMD", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
@@ -38,8 +40,8 @@ class Namd(ExecutableApplication):
         )
 
         software_spec(
-            "namd",
-            pkg_spec="namd@2.14 interface=tcl",
+            "namd-{application_version}",
+            pkg_spec="namd@{application_version} interface=tcl",
             compiler="gcc12",
         )
 

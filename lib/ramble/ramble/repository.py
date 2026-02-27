@@ -355,7 +355,7 @@ def autospec(function):
     @functools.wraps(function)
     def converter(self, spec_like, *args, **kwargs):
         if not isinstance(spec_like, ramble.spec.Spec):
-            spec_like = ramble.spec.Spec(spec_like)
+            spec_like = ramble.spec.Spec(spec_like.partition("@")[0])
         return function(self, spec_like, *args, **kwargs)
 
     return converter

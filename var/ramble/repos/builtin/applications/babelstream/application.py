@@ -23,12 +23,14 @@ class Babelstream(ExecutableApplication):
 
     maintainers("rfbgo", "kaanolgu", "douglasjacobsen", "tomdeakin")
 
+    version("5.0", "Version 5.0 of babelstream", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
         software_spec(
-            "babelstream",
-            pkg_spec="babelstream@5.0 +omp",
+            "babelstream-{application_version}",
+            pkg_spec="babelstream@{application_version} +omp",
             compiler="gcc12",
         )
     stage_files(

@@ -19,17 +19,19 @@ class PyEspresso(ExecutableApplication):
 
     tags("molecular-dynamics", "python")
 
+    version("4.2.2", "Version 4.2.2 of py-espresso", preferred=True)
+
     with when("package_manager_family=spack"):
         software_spec(
-            "py-espresso",
-            pkg_spec="py-espresso@4.2.2",
+            "py-espresso-{application_version}",
+            pkg_spec="py-espresso@{application_version}",
         )
 
-    with when("package_manager_family=eessi"):
-        software_spec(
-            "py-espresso",
-            pkg_spec="ESPResSo/4.2.2-foss-2023b",
-        )
+    software_spec(
+        "py-espresso",
+        pkg_spec="ESPResSo/4.2.2-foss-2023b",
+        when=["package_manager_family=eessi", "application_version=4.2.2"],
+    )
 
     executable("execute", template=["pypresso {input_file}"], use_mpi=True)
 

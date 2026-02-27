@@ -29,6 +29,7 @@ default_keys = {
     "application_run_dir": {"type": key_type.reserved, "level": output_level.variable},
     "application_input_dir": {"type": key_type.reserved, "level": output_level.variable},
     "application_namespace": {"type": key_type.reserved, "level": output_level.key},
+    "application_version": {"type": key_type.reserved, "level": output_level.key},
     "simplified_application_namespace": {"type": key_type.reserved, "level": output_level.key},
     "workload_name": {"type": key_type.reserved, "level": output_level.key},
     "workload_run_dir": {"type": key_type.reserved, "level": output_level.variable},
@@ -113,6 +114,7 @@ class Keywords:
     application_run_dir: str
     application_input_dir: str
     application_namespace: str
+    application_version: str
     simplified_application_namespace: str
     workload_name: str
     workload_run_dir: str

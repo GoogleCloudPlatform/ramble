@@ -22,6 +22,8 @@ class Cloverleaf(ExecutableApplication):
 
     tags("cfd", "euler", "mini-app")
 
+    version("1.1", "Version 1.1 of CLOVERLEAF", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
@@ -31,8 +33,8 @@ class Cloverleaf(ExecutableApplication):
             compiler="gcc12",
         )
         software_spec(
-            "cloverleaf",
-            pkg_spec="cloverleaf@1.1 build=ref",
+            "cloverleaf-{application_version}",
+            pkg_spec="cloverleaf@{application_version} build=ref",
             compiler="gcc12",
         )
 

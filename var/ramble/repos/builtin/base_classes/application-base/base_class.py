@@ -241,6 +241,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         new_clone = type(self)(self._file_path)
         self.generated_experiments.append(new_clone)
 
+        if self.known_versions:
+            new_clone.known_versions = self.known_versions.copy()
         clone_variables = {} if not self.variables else self.variables
         clone_variants = {} if not self.variants else self.variants
         new_clone.set_variables_and_variants(
@@ -381,19 +383,27 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
 
     def _set_package_manager(self):
-        pkgman_name = conversions.canonical_none(
+        pkgman = conversions.canonical_none(
             self.experiment_variants(allow_caching=False).value(
                 namespace.package_manager
             )
         )
 
-        if pkgman_name is not None:
+        if pkgman is not None:
+            pkgman_name, _, maybe_pkgman_ver = pkgman.partition("@")
+
             try:
                 pkgman_type = ramble.repository.ObjectTypes.package_managers
                 self.package_manager = ramble.repository.get(
                     pkgman_name, pkgman_type
                 ).copy()
                 self.package_manager.set_application(self)
+
+                if maybe_pkgman_ver:
+                    self.package_manager.set_version(
+                        version_number=maybe_pkgman_ver,
+                        description=f"{pkgman_name} {maybe_pkgman_ver}",
+                    )
             except ramble.repository.UnknownObjectError:
                 logger.die(
                     f"{pkgman_name} is not a valid package manager. "
@@ -417,22 +427,30 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     )
 
     def _set_workflow_manager(self):
-        workflow_name = conversions.canonical_none(
+        workflow = conversions.canonical_none(
             self.experiment_variants(allow_caching=False).value(
                 namespace.workflow_manager
             )
         )
 
+        workflow_name = ""
         # Map None to the default of user-managed
-        if workflow_name is None:
-            workflow_name = "user-managed"
+        if workflow is None:
+            workflow = "user-managed"
 
         try:
+            workflow_name, _, maybe_workflow_ver = workflow.partition("@")
+
             wfman_type = ramble.repository.ObjectTypes.workflow_managers
             self.workflow_manager = ramble.repository.get(
                 workflow_name, wfman_type
             ).copy()
             self.workflow_manager.set_application(self)
+            if maybe_workflow_ver:
+                self.workflow_manager.set_version(
+                    version_number=maybe_workflow_ver,
+                    description=f"{workflow_name} {maybe_workflow_ver}",
+                )
         except ramble.repository.UnknownObjectError:
             logger.die(
                 f"{workflow_name} is not a valid workflow manager. "
@@ -586,6 +604,20 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.expander = ramble.expander.Expander(
             self.variables, self.experiment_set
         )
+
+        # Set application version or use preferred version if none specified
+        _, _, maybe_version = self.expander.application_name.partition("@")
+
+        if maybe_version:
+            super().set_version(
+                version_number=maybe_version,
+                description=self.expander.application_name,
+            )
+        elif hasattr(self, "preferred_version"):
+            super().set_version(
+                version=self.preferred_version,
+                description=self.expander.application_name,
+            )
 
         # Define experiment variants
         for name, value in variants.items():
@@ -829,7 +861,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             expansion_var = self.expander.expansion_str(var)
             expanded = self.expander.expand_var(expansion_var)
             color.cprint(
-                f"{indent}  {var} = {val} ==> {expanded}".replace("@", "@@")
+                rucolor.plaintext(f"{indent}  {var} = {val} ==> {expanded}")
             )
 
     def build_used_variables(self, workspace):
@@ -1221,7 +1253,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         mod_type = ramble.repository.ObjectTypes.modifiers
 
         for mod in self.modifiers:
-            mod_inst = ramble.repository.get(mod["name"], mod_type).copy()
+            mod_name, _, maybe_mod_ver = mod["name"].partition("@")
+
+            mod_inst = ramble.repository.get(mod_name, mod_type).copy()
 
             if "on_executable" in mod:
                 mod_inst.set_on_executables(mod["on_executable"])
@@ -1233,6 +1267,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 mod_inst.set_usage_mode(mode_name)
             else:
                 mod_inst.set_usage_mode(None)
+
+            if maybe_mod_ver:
+                mod_inst.set_version(
+                    version_number=maybe_mod_ver,
+                    description=f"{mod_name} {maybe_mod_ver}",
+                )
 
             if not mod_inst.disabled:
                 mod_inst.inherit_from_application(self)

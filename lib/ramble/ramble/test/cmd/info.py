@@ -129,6 +129,7 @@ def _get_shared_outputs():
         # (section title, sample content, sample verbose content)
         ("maintainers", "maintainername", ""),
         ("tags", ["tag1", "tag2"], ""),
+        ("known_versions", ["1.0", "2.0"], ["Version 1.0 of info", "Version 2.0 of info"]),
         ("figure_of_merit_contexts", "fom_context", ["fom context regex.*", "{test}"]),
         (
             "figures_of_merit",
@@ -139,7 +140,7 @@ def _get_shared_outputs():
         (
             "required_packages",
             "info-app-dep",
-            ["package_manager=info", "+turn_on_required_directives"],
+            ["application_version@1.0:", "package_manager=info", "+turn_on_required_directives"],
         ),
         ("compilers", "gcc12", ["gcc@12.2.0"]),
         ("software_specs", "info-app", ["info-app@5.0", "gcc12"]),

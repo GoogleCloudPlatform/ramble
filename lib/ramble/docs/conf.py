@@ -220,6 +220,7 @@ nitpick_ignore = [
     ("py:class", "llnl.util.argparsewriter.ArgparseWriter"),
     ("py:class", "llnl.util.lock.Lock"),
     ("py:class", "llnl.util.lock.LockTransaction"),
+    ("py:class", "packaging.version.Version"),
     ("py:class", "pandas.core.frame.DataFrame"),
     ("py:class", "spack.environment.Environment"),
     ("py:class", "spack.error.SpackError"),

@@ -149,14 +149,13 @@ In order to get information about the available applications defined within
 
    $ ramble list
 
-
 This command uses filtering to search the defined applications, e.g.:
 
 .. code-block:: console
 
-   $ ramble list wrf
+   $ ramble list hpl
 
-will list both ``wrfv3`` and ``wrfv4``.
+will list ``hpl``, ``intel-hpl``, and other versions of ``hpl``.
 
 Available applications can be filtered using tags, e.g.:
 
@@ -164,7 +163,8 @@ Available applications can be filtered using tags, e.g.:
 
     $ ramble list -t weather
 
-will also list both ``wrfv3`` and ``wrfrv4``. The available tags can be seen with:
+will list ``wrf``, ``ufs-weather-model``, and other applications tagged with
+``weather``. The available tags can be seen with:
 
 .. code-block:: console
 
@@ -184,12 +184,12 @@ For example:
 
 .. code-block:: console
 
-    $ ramble info wrfv3
+    $ ramble info hpl
 
-Will show that ``wrfv3`` has two workloads
+Will show that ``hpl`` has two workloads
 
-* ``CONUS_12km``
-* ``CONUS_2p5km``
+* ``standard``
+* ``calculator``
 
 that experiments can be generated from. The ``ramble info`` command can also be
 used to see what variables each workload has, and potentially some suggested

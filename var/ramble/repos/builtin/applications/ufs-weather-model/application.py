@@ -21,6 +21,8 @@ class UfsWeatherModel(ExecutableApplication):
 
     tags("weather", "nwp", "climate-modeling")
 
+    version("2.0.0", "Version 2.0.0 of ufs-weather-model", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
@@ -42,8 +44,8 @@ class UfsWeatherModel(ExecutableApplication):
         )
 
         software_spec(
-            "ufs-weather-model",
-            pkg_spec="ufs-weather-model@2.0.0 +openmp",
+            "ufs-weather-model-{application_version}",
+            pkg_spec="ufs-weather-model@{application_version} +openmp",
             compiler="gcc9",
         )
 

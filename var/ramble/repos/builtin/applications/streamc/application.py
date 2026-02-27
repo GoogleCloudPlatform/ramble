@@ -21,12 +21,14 @@ class Streamc(ExecutableApplication):
 
     tags("memory-benchmark", "micro-benchmark")
 
+    version("5.10", "Version 5.10 of STREAMC", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
         software_spec(
-            "streamc",
-            pkg_spec='stream@5.10 +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
+            "streamc-{application_version}",
+            pkg_spec='stream@{application_version} +openmp cflags="-O3 -DSTREAM_ARRAY_SIZE=80000000 -DNTIMES=20"',
             compiler="gcc12",
         )
 

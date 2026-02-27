@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.util.colors as rucolor
 import ramble.util.matrices
 from ramble.namespace import namespace
 
@@ -45,6 +46,7 @@ class Context:
         self.env_variables = []
         self.variables = syaml.syaml_dict()
         self.variants = syaml.syaml_dict()
+        self.version = None
         self.internals = {}
         self.templates = None
         self.formatted_executables = {}
@@ -60,6 +62,10 @@ class Context:
         self.is_template = False
         self.n_repeats = 0
 
+    @property
+    def escaped_name(self):
+        return rucolor.escape_str(self.context_name)
+
     def merge_context(self, in_context):
         """Merges another Context into this Context."""
 
@@ -73,6 +79,8 @@ class Context:
             self.variables.update(in_context.variables)
         if in_context.variants:
             self.variants.update(in_context.variants)
+        if in_context.version:
+            self.version = in_context.version
         if in_context.env_variables:
             self.env_variables.append(in_context.env_variables)
         if in_context.internals:
@@ -183,6 +191,9 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.variants in in_dict:
         new_context.variants = in_dict[namespace.variants]
+
+    if namespace.version in in_dict:
+        new_context.version = in_dict[namespace.version]
 
     if namespace.internals in in_dict:
         new_context.internals = in_dict[namespace.internals]

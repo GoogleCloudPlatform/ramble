@@ -26,9 +26,15 @@ class Fio(ExecutableApplication):
 
     tags("io-benchmark", "storage-benchmark")
 
+    version("3.37", "Version 3.37 of fio", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc13", pkg_spec="gcc@13.1.0")
-        software_spec("fio", pkg_spec="fio@3.37 +libaio", compiler="gcc13")
+        software_spec(
+            "fio-{application_version}",
+            pkg_spec="fio@{application_version} +libaio",
+            compiler="gcc13",
+        )
 
     executable(
         "run",

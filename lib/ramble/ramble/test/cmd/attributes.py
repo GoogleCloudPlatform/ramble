@@ -111,6 +111,8 @@ def untagged_mods():
     ],
 )
 def test_mock_attributes_list(
+    mutable_mock_base_apps_repo,
+    mock_base_applications,
     mutable_mock_apps_repo,
     mock_applications,
     mutable_mock_mods_repo,

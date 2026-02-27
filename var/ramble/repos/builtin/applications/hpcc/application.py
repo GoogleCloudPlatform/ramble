@@ -29,14 +29,16 @@ class Hpcc(ExecutableApplication):
 
     tags("hpc-benchmark", "dgemm")
 
+    version("1.5.0", "Version 1.5.0 of HPCC", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "hpcc",
-            pkg_spec="hpcc@1.5.0",
+            "hpcc-{application_version}",
+            pkg_spec="hpcc@{application_version}",
             compiler="gcc9",
         )
 

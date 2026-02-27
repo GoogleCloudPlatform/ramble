@@ -32,6 +32,7 @@ import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
 import ramble.software_environments
+import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.install_cache
 import ramble.util.lock as lk
@@ -846,18 +847,6 @@ ramble:
         self._previous_active = None  # previously active environment
         self.specs = []
 
-    def all_specs(self):
-        import ramble.spec
-
-        specs = []
-        for app, workloads, *_ in self.all_applications():
-            for workload, *_ in self.all_workloads(workloads):
-                app_spec = ramble.spec.Spec(app)
-                app_spec.workloads[workload] = True
-                specs.append(app_spec)
-
-        return specs
-
     @property
     def all_experiments_path(self):
         return os.path.join(self.root, WORKSPACE_ALL_EXPERIMENTS_FILE)
@@ -899,6 +888,10 @@ ramble:
         app_dict = ramble.config.config.get_config(namespace.application)
 
         for application, contents in app_dict.items():
+            app_name, _, maybe_version = application.partition("@")
+            if maybe_version:
+                contents[namespace.version] = maybe_version
+
             application_context = ramble.context.create_context_from_dict(application, contents)
 
             yield contents, application_context
@@ -1242,6 +1235,7 @@ ramble:
         apps_dict = self.get_applications().copy()
 
         app_inst = ramble.repository.get(application)
+        app_inst.validate_version()
 
         var_def_dict = {}
         def_regex = re.compile(r"\s*=\s*")
@@ -1537,8 +1531,9 @@ ramble:
                         packages_dict[spec_name] = syaml.syaml_dict()
 
                     # Check for usage of compilers
-                    if info.compiler in compiler_packages:
-                        compiler_packages[info.compiler] = True
+                    expanded_compiler = app_inst.expander.expand_var(info.compiler)
+                    if expanded_compiler in compiler_packages:
+                        compiler_packages[expanded_compiler] = True
 
                     packages_dict[spec_name].update(info.to_dict(apply_prefix=force_prefix))
 
@@ -1761,7 +1756,7 @@ ramble:
                         if exp["VARIANTS"]:
                             f.write("  Experiment variants:\n")
                             for variant in exp["VARIANTS"]:
-                                f.write(f"  - {variant}\n")
+                                f.write(f"  - {rucolor.plaintext(variant)}\n")
 
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")
