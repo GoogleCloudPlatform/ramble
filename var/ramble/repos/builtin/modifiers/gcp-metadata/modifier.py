@@ -114,12 +114,12 @@ class GcpMetadata(BasicModifier):
                 if include_hostname and "pdsh" in prefix:
                     prefix = prefix.replace(" -N ", " ")
 
-                if not prefix.endswith(" '"):
+                if prefix and not prefix.endswith(" '"):
                     prefix += " '"
 
                 suffix = self.expander.expand_var("{metadata_parallel_suffix}")
 
-                if not suffix.startswith("'"):
+                if suffix and not suffix.startswith("'"):
                     if suffix:
                         suffix = "' " + suffix
                     else:
