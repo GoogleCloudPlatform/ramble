@@ -17,11 +17,12 @@ import ramble.paths
 pytestmark = pytest.mark.maybeslow
 
 # TODO: add tests for other supported shells
-_SHELLS_TO_TEST = ["bash", "fish"]
+_SHELLS_TO_TEST = ["bash", "fish", "tcsh"]
 
 _SETUP_ENV_FILE = {
     "bash": "setup-env.sh",
     "fish": "setup-env.fish",
+    "tcsh": "setup-env.csh",
 }
 
 
@@ -37,7 +38,7 @@ def test_shell_wrapper_workspace_activate_missing(shell, tmpdir):
     with open(test_script_path, "w") as f:
         f.write(
             f"""
-. "{setup_env}"
+source "{setup_env}"
 ramble workspace activate non_existent_workspace
 """
         )
