@@ -142,8 +142,8 @@ unset _rmb_arg _rmb_env_arg
 
 # The `endif` may swallow the subshell's exit status, so doing the eval at the very end.
 if ( $?_rmb_rs ) then
-    set _rmb_rs_eval="unset _rmb_rs _rmb_rs_eval _rmb_rs_save; (exit $_rmb_rs)"
+    set _rmb_rs_eval="unset _rmb_rs _rmb_rs_eval; (exit $_rmb_rs)"
 else
-    set _rmb_rs_eval="unset _rmb_rs_eval _rmb_rs_save; (exit 0)"
+    set _rmb_rs_eval="unset _rmb_rs_eval; (exit 0)"
 endif
 eval "$_rmb_rs_eval"
