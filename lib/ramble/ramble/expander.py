@@ -29,6 +29,13 @@ import spack.util.naming
 
 _ast_cache: Dict[str, str] = {}
 
+# Define a dummy type so that it doesn't match any real types
+# These type defs are used to handle compatibility among Python versions
+_DUMMY_TYPE = type("_DUMMY_TYPE", (), {})
+_AST_CONSTANT = getattr(ast, "Constant", _DUMMY_TYPE)
+_AST_NUM = getattr(ast, "Num", _DUMMY_TYPE)
+_AST_STR = getattr(ast, "Str", _DUMMY_TYPE)
+
 
 def _get_source_segment(source, node):
     """Retrieve the source segment for an AST node, with compatibility for Python < 3.8"""
@@ -46,7 +53,7 @@ def _get_source_segment(source, node):
         segment = line[node.col_offset :]
 
         # For numeric literals, we can try to find the end by matching the pattern
-        if isinstance(node, (ast.Num, getattr(ast, "Constant", type(None)))):
+        if isinstance(node, (_AST_NUM, _AST_CONSTANT)):
             # Match integers (including hex, octal, binary and underscores)
             # and floats.
             match = re.match(r"[0-9a-zA-Z._]+", segment)
@@ -54,7 +61,7 @@ def _get_source_segment(source, node):
                 return match.group(0)
 
         # For strings, we need to handle quotes
-        if isinstance(node, (ast.Str, getattr(ast, "Constant", type(None)))):
+        if isinstance(node, (_AST_STR, _AST_CONSTANT)):
             if segment.startswith(("'", '"')):
                 quote = segment[0]
                 if segment.startswith(f"{quote}{quote}{quote}"):
@@ -113,10 +120,10 @@ if sys.version_info >= (3, 8):
 else:
 
     def _is_str_node(node):
-        return isinstance(node, ast.Str)
+        return isinstance(node, _AST_STR)
 
     def _is_num_node(node):
-        return isinstance(node, ast.Num)
+        return isinstance(node, _AST_NUM)
 
 
 if sys.version_info >= (3, 9):
@@ -935,7 +942,7 @@ class Expander:
                     # If the AST is just a literal, check if it is formatted specially.
                     # This preserves formatting like underscores in version numbers (e.g. 1_01)
                     # and keeps hex formatting (e.g. 0x10) for numbers.
-                    if isinstance(body, (ast.Constant, ast.Num)) and isinstance(
+                    if isinstance(body, (_AST_CONSTANT, _AST_NUM)) and isinstance(
                         out_str, (int, float)
                     ):
                         source = _get_source_segment(in_str, body)
