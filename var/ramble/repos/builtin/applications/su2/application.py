@@ -28,8 +28,8 @@ class Su2(ExecutableApplication):
         # See https://github.com/spack/spack/pull/50601 for building with intel mpi.
         software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.0")
         software_spec(
-            "su2-{application_version}",
-            pkg_spec="su2@{application_version} +mpi +openmp",
+            "su2-{application::su2::version}",
+            pkg_spec="su2@{application::su2::version} +mpi +openmp",
             compiler="gcc12",
         )
         required_package("su2")

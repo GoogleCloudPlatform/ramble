@@ -1937,3 +1937,68 @@ def test_validation_in_render_repeat_experiments(workspace_name):
         match_str = r"Invalid number of required variables defined"
         with pytest.raises(ramble.error.ObjectValidationError, match=match_str):
             exp_set.set_experiment_context(experiment_context)
+
+
+def test_modifiers_no_version_set_correctly(workspace_name, mock_modifiers):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "app_var1": "1",
+            "app_var2": "2",
+            "processes_per_node": "1",
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+        application_context.modifiers = [
+            {
+                "name": "test-mod-no-version",
+                "mode": "app-scope",
+                "on_executable": ["builtin::env_vars"],
+            }
+        ]
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+        workload_context.variables = {
+            "wl_var1": "1",
+            "wl_var2": "2",
+        }
+        workload_context.modifiers = [
+            {
+                "name": "test-mod-no-version",
+                "mode": "wl-scope",
+                "on_executable": ["builtin::env_vars"],
+            }
+        ]
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "test1"
+        experiment_context.variables = {"n_ranks": "2"}
+        experiment_context.modifiers = [
+            {
+                "name": "test-mod-no-version",
+                "mode": "exp-scope",
+                "on_executable": ["builtin::env_vars"],
+            }
+        ]
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+
+        assert "basic.test_wl.test1" in exp_set.experiments
+        app_inst = exp_set.experiments["basic.test_wl.test1"]
+        assert app_inst.modifiers is not None
+
+        expected_modifier_modes = {"app-scope", "wl-scope", "exp-scope"}
+        for mod_def in app_inst.modifiers:
+            assert mod_def["mode"] in expected_modifier_modes
+            expected_modifier_modes.remove(mod_def["mode"])
+        assert len(expected_modifier_modes) == 0

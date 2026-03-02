@@ -26,7 +26,8 @@ class Hp2p(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         software_spec(
-            "hp2p-{application_version}", pkg_spec="hp2p@{application_version}"
+            "hp2p-{application::hp2p::version}",
+            pkg_spec="hp2p@{application::hp2p::version}",
         )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 

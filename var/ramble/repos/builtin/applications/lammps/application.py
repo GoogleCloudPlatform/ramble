@@ -82,8 +82,8 @@ class Lammps(ExecutableApplication):
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "lammps-{application_version}",
-            pkg_spec="lammps@{application_version} +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
+            "lammps-{application::lammps::version}",
+            pkg_spec="lammps@{application::lammps::version} +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
             compiler="gcc9",
         )
 

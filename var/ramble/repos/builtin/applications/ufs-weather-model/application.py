@@ -44,8 +44,8 @@ class UfsWeatherModel(ExecutableApplication):
         )
 
         software_spec(
-            "ufs-weather-model-{application_version}",
-            pkg_spec="ufs-weather-model@{application_version} +openmp",
+            "ufs-weather-model-{application::ufs-weather-model::version}",
+            pkg_spec="ufs-weather-model@{application::ufs-weather-model::version} +openmp",
             compiler="gcc9",
         )
 

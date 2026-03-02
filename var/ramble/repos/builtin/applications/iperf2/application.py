@@ -27,8 +27,8 @@ class Iperf2(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         software_spec(
-            "iperf2-{application_version}",
-            pkg_spec="iperf2@{application_version}",
+            "iperf2-{application::iperf2::version}",
+            pkg_spec="iperf2@{application::iperf2::version}",
             compiler="gcc9",
         )
 

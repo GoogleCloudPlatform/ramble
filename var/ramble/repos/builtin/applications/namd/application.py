@@ -40,8 +40,8 @@ class Namd(ExecutableApplication):
         )
 
         software_spec(
-            "namd-{application_version}",
-            pkg_spec="namd@{application_version} interface=tcl",
+            "namd-{application::namd::version}",
+            pkg_spec="namd@{application::namd::version} interface=tcl",
             compiler="gcc12",
         )
 

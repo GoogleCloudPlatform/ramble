@@ -200,17 +200,20 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                 self_idx = mod_idx
                 continue
 
+            # Don't check conflicts if they are different modifiers
+            if mod_inst.name != self.name:
+                continue
+
             if conflict_value == MODIFIER_CONFLICT.name_only:
-                if mod_inst.name == self.name:
-                    comp_str = mod_inst.config_str(index=mod_idx, indent=4)
-                    self_str = self.config_str(index=self_idx, indent=4)
-                    raise ConflictingModifiersError(
-                        f"Two modifier definitions conflict by having the same name.\n"
-                        f"Modifier 1:\n"
-                        f"{comp_str}"
-                        f"Modifier 2:\n"
-                        f"{self_str}"
-                    )
+                comp_str = mod_inst.config_str(index=mod_idx, indent=4)
+                self_str = self.config_str(index=self_idx, indent=4)
+                raise ConflictingModifiersError(
+                    f"Two modifier definitions conflict by having the same name.\n"
+                    f"Modifier 1:\n"
+                    f"{comp_str}"
+                    f"Modifier 2:\n"
+                    f"{self_str}"
+                )
 
             elif conflict_value == MODIFIER_CONFLICT.name_mode:
                 if (
@@ -283,11 +286,28 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
                             f"{self_str}"
                         )
 
+            if self.selected_version != mod_inst.selected_version:
+                comp_str = mod_inst.config_str(
+                    index=mod_idx, include_version=True, indent=4
+                )
+                self_str = self.config_str(
+                    index=self_idx, include_version=True, indent=4
+                )
+                raise ConflictingModifiersError(
+                    "Two modifier definitions conflict by having the same name "
+                    "and different version numbers.\n"
+                    f"Modifier 1:\n"
+                    f"{comp_str}"
+                    f"Modifier 2:\n"
+                    f"{self_str}"
+                )
+
     def config_str(
         self,
         index=None,
         include_mode=False,
         include_executables=False,
+        include_version=False,
         indent=0,
     ):
         """Construct a string representation of this modifier's configuration
@@ -296,6 +316,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             index (int): Index of this modifier to include if provided
             include_mode (bool): Whether to include the mode of the modifier in the configuration or not
             include_executables (bool): Whether to include the on_executables attribute or not
+            include_version (bool): Whether to include the version attribute or not
             indent (int): Number of spaces to prefix the config with
 
         Returns:
@@ -303,6 +324,8 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         """
         indentation = " " * indent
         out_str = f"{indentation}Name: {self.name}\n"
+        if include_version:
+            out_str += f"{indentation}Version: {str(self.selected_version)}\n"
         if index is not None:
             out_str += f"{indentation}Index: {index}\n"
         if include_mode:

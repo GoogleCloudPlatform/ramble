@@ -47,8 +47,8 @@ class Gromacs(ExecutableApplication):
 
         with default_args(compiler="gcc9"):
             software_spec(
-                "gromacs-{application_version}",
-                pkg_spec="gromacs@{application_version}",
+                "gromacs-{application::gromacs::version}",
+                pkg_spec="gromacs@{application::gromacs::version}",
             )
 
     software_spec(

@@ -702,13 +702,32 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if var not in self.variables:
                 default_variables[var] = val.default
 
+        # TODO: Remove the {origin_type}_version variable when we can
+        self.define_variable(
+            f"{self.origin_type}_version", str(self.selected_version)
+        )
+        self.define_variable(
+            f"{self.origin_type}::{self.name}::version",
+            str(self.selected_version),
+        )
+
         # Extract a merged set of when_keys from objects that are not
         # applications.
+        # Also, define object version variables
         object_when_map = {}
         for _, obj in self._objects(
             exclude_types=[ramble.repository.ObjectTypes.applications]
         ):
             object_when_map[obj] = []
+
+            # TODO: Remove the {origin_type}_version variable when we can
+            self.define_variable(
+                f"{obj.origin_type}_version", str(obj.selected_version)
+            )
+            self.define_variable(
+                f"{obj.origin_type}::{obj.name}::version",
+                str(obj.selected_version),
+            )
 
             for when_key, var_list in obj.object_variables.items():
                 keep = False
@@ -1297,8 +1316,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.expander.add_no_expand_var(var)
                 mod_inst.expander.add_no_expand_var(var)
 
-            # Define any missing modifier variables
-            self.define_missing_variables()
+        # Define any missing modifier variables
+        self.define_missing_variables()
 
     @property
     def inventory_file(self):
@@ -2214,6 +2233,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "experiment_status",
             "RAMBLE_STATUS",
         ]
+
+        for _, obj in self._objects():
+            remove_variables.append(f"{obj.origin_type}_version")
+            remove_variables.append(f"{obj.origin_type}::{obj.name}::version")
 
         # Remove some variables that don't affect the experiment, and change
         # frequently (or are actually output variables)

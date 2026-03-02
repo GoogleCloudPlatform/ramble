@@ -2404,8 +2404,8 @@ ramble:
 
     def add_modifier(
         self,
+        name_pattern: str,
         scope: Optional[str] = None,
-        name_pattern: Optional[str] = None,
         mode: Optional[str] = None,
         on_executable: Optional[str] = None,
         dry_run: bool = False,
@@ -2436,7 +2436,9 @@ ramble:
             base_section[namespace.modifiers] = syaml.syaml_list()
 
         mod_type = ramble.repository.ObjectTypes.modifiers
-        mod_names = object_utils.filter_by_name([name_pattern], False, mod_type)
+        if isinstance(name_pattern, str):
+            spec_parts = name_pattern.partition("@")
+        mod_names = object_utils.filter_by_name([spec_parts[0]], False, mod_type)
 
         if len(mod_names) < 1:
             logger.error(f"No modifiers found matching name pattern of {name_pattern}")
@@ -2445,6 +2447,8 @@ ramble:
         for mod_name in mod_names:
             mod_def = syaml.syaml_dict()
             mod_def["name"] = mod_name
+            if spec_parts[2]:
+                mod_def["name"] += f"@{spec_parts[2]}"
             if mode is not None:
                 mod_def["mode"] = mode
             if on_exec_list is not None:

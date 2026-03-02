@@ -74,6 +74,9 @@ class ObjectVersion:
     def __str__(self):
         return self.get_version_num()
 
+    def __eq__(self, other):
+        return str(self) == str(other)
+
     def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of this version
 

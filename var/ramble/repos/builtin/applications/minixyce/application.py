@@ -33,8 +33,8 @@ class Minixyce(ExecutableApplication):
         )
 
         software_spec(
-            "minixyce-{application_version}",
-            pkg_spec="minixyce@{application_version} +mpi",
+            "minixyce-{application::minixyce::version}",
+            pkg_spec="minixyce@{application::minixyce::version} +mpi",
             compiler="gcc12",
         )
 

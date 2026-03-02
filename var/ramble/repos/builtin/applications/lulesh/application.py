@@ -29,8 +29,8 @@ class Lulesh(ExecutableApplication):
         software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
 
         software_spec(
-            "lulesh-{application_version}",
-            pkg_spec="lulesh@{application_version} +openmp",
+            "lulesh-{application::lulesh::version}",
+            pkg_spec="lulesh@{application::lulesh::version} +openmp",
             compiler="gcc13",
         )
 

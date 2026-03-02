@@ -32,8 +32,8 @@ class Ngspice(ExecutableApplication):
         )
 
         software_spec(
-            "ngspice-{application_version}",
-            pkg_spec="ngspice@{application_version} build=bin",
+            "ngspice-{application::ngspice::version}",
+            pkg_spec="ngspice@{application::ngspice::version} build=bin",
             compiler="gcc14",
         )
 

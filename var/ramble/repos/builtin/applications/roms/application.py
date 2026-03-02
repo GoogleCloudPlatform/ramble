@@ -29,7 +29,8 @@ class Roms(ExecutableApplication):
 
     with when("package_manager_family=spack"):
         software_spec(
-            "roms-{application_version}", pkg_spec="roms@{application_version}"
+            "roms-{application::roms::version}",
+            pkg_spec="roms@{application::roms::version}",
         )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
