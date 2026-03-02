@@ -30,7 +30,7 @@ echo "  job_status: $status" | tee -a $saved
 
 # To avoid nodelist truncation, use a big number. `xargs` handles the extra space correctly.
 paste -d ":" \
-  <(echo "job_nodes job_start job_end job_elapsed_time job_exit_code" | xargs -n1) \
-  <(sacct -j "${job_id}" -o 'nodelist%4096,start,end,elapsed,exitcode' -X -n | xargs -n1) \
+  <(echo "job_nodes job_start job_end job_elapsed_time job_elapsed_seconds job_exit_code" | xargs -n1) \
+  <(sacct -j "${job_id}" -o 'nodelist%4096,start,end,elapsed,elapsedraw,exitcode' -X -n | xargs -n1) \
   | sed "s/^/  /" \
   | tee -a $saved
