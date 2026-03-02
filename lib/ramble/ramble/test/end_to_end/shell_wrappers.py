@@ -61,19 +61,17 @@ def test_shell_wrapper_workspace_lifecycle(shell, tmpdir):
     test_script_path = str(tmpdir.join(f"test_lifecycle.{shell}"))
     ws_name = f"test_ws_lifecycle_{shell}"
 
-    script_content = ""
-    if shell == "bash":
-        script_content = f"""
+    script_templates = {
+        "bash": f"""
 source "{setup_env}"
 ramble workspace create {ws_name} || exit 1
 ramble workspace activate {ws_name} || exit 2
 ramble workspace deactivate || exit 3
 ramble workspace create -a {ws_name} && exit 4
 exit 0
-"""
-    elif shell == "tcsh":
-        # The set prompt is needed as tcsh doesn't tolerate undefined variables.
-        script_content = f"""
+""",
+        "tcsh": f"""
+# The set prompt is needed as tcsh doesn't tolerate undefined variables.
 set prompt=""
 source "{setup_env}"
 ramble workspace create {ws_name}
@@ -85,16 +83,17 @@ if ( $status != 0 ) exit 3
 ramble workspace create -a {ws_name}
 if ( $status == 0 ) exit 4
 exit 0
-"""
-    elif shell == "fish":
-        script_content = f"""
+""",
+        "fish": f"""
 source "{setup_env}"
 ramble workspace create {ws_name}; or exit 1
 ramble workspace activate {ws_name}; or exit 2
 ramble workspace deactivate; or exit 3
 ramble workspace create -a {ws_name}; and exit 4
 exit 0
-"""
+""",
+    }
+    script_content = script_templates[shell]
 
     with open(test_script_path, "w") as f:
         f.write(script_content)
