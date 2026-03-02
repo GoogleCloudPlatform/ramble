@@ -84,7 +84,7 @@ class ExperimentSet:
         # Set some base variables from the workspace definition.
         self.set_base_var(self.keywords.log_dir, workspace.log_dir)
         self.set_base_var(
-            self.keywords.env_name, Expander.expansion_str(self.keywords.application_name)
+            self.keywords.env_name, Expander.expansion_str(self.keywords.application_spec)
         )
 
     def read_config_vars(self, workspace):
@@ -165,16 +165,21 @@ class ExperimentSet:
 
     @property
     def application_namespace(self):
-        """Property to return application namespace (application name)"""
-        if self._context[self._contexts.application].context_name:
-            return self._context[self._contexts.application].context_name
+        """Property to return application namespace (application spec)"""
+        if self._context[self._contexts.application]:
+            app_context = self._context[self._contexts.application]
+
+            if app_context.version:
+                return f"{app_context.context_name}@{app_context.version}"
+
+            return app_context.context_name
         return None
 
     @property
     def workload_namespace(self):
         """Property to return workload namespace
 
-        Workload namespaces are of the form: application_name.workload_name
+        Workload namespaces are of the form: application_spec.workload_name
         """
         app_ns = self.application_namespace
         wl_ns = self._context[self._contexts.workload].context_name
@@ -188,7 +193,7 @@ class ExperimentSet:
     def experiment_namespace(self):
         """Property to return experiment namespace
 
-        Experiment namespaces are of the form: application_name.workload_name.experiment_name
+        Experiment namespaces are of the form: application_spec.workload_name.experiment_name
         """
         wl_ns = self.workload_namespace
         exp_ns = self._context[self._contexts.experiment].context_name
@@ -206,16 +211,17 @@ class ExperimentSet:
         """Perform minimal setup for an experiment instance."""
         expander = ramble.expander.Expander(variables, self)
 
-        final_app_name = expander.expand_var_name(
-            self.keywords.application_name, allow_passthrough=False
+        final_app_spec = expander.expand_var_name(
+            self.keywords.application_spec, allow_passthrough=False
         )
 
         # Define some standard variables before the application is created
         # to ensure variables and variants can be defined correctly.
         variables[self.keywords.workload_template_name] = workload_template_name
-        variables[self.keywords.application_name] = final_app_name
+
         # Setup the application instance
-        app_inst = ramble.repository.get(final_app_name)
+        app_inst = ramble.repository.get(final_app_spec)
+        variables[self.keywords.application_name] = app_inst.name
         app_inst.set_variables_and_variants(variables, context.variants, self)
         app_inst.validate_version()
         app_inst.set_active_workload()
@@ -227,7 +233,6 @@ class ExperimentSet:
         app_inst.set_template(context.is_template)
         app_inst.set_tags(context.tags)
         app_inst.set_formatted_executables(context.formatted_executables)
-
         if app_inst.package_manager is not None:
             app_inst.package_manager.define_missing_packages(self._workspace)
             app_inst.define_variable(
@@ -468,16 +473,17 @@ class ExperimentSet:
                     final_context.variables[var_name] = self._context[context].context_name
 
         # Set namespaces
+        final_context.variables[self.keywords.application_spec] = self.application_namespace
         final_context.variables[self.keywords.application_namespace] = self.application_namespace
         final_context.variables[self.keywords.workload_namespace] = self.workload_namespace
         final_context.variables[self.keywords.experiment_namespace] = self.experiment_namespace
 
         # Set required variables for directories.
         final_context.variables[self.keywords.application_run_dir] = os.path.join(
-            self._workspace.experiment_dir, Expander.expansion_str(self.keywords.application_name)
+            self._workspace.experiment_dir, Expander.expansion_str(self.keywords.application_spec)
         )
         final_context.variables[self.keywords.application_input_dir] = os.path.join(
-            self._workspace.input_dir, Expander.expansion_str(self.keywords.application_name)
+            self._workspace.input_dir, Expander.expansion_str(self.keywords.application_spec)
         )
 
         final_context.variables[self.keywords.workload_run_dir] = os.path.join(
@@ -491,7 +497,7 @@ class ExperimentSet:
 
         final_context.variables[self.keywords.license_input_dir] = os.path.join(
             self._workspace.shared_license_dir,
-            Expander.expansion_str(self.keywords.application_name),
+            Expander.expansion_str(self.keywords.application_spec),
         )
 
         final_context.variables[self.keywords.experiment_run_dir] = os.path.join(

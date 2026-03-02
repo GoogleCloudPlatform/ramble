@@ -222,8 +222,10 @@ This workflow details how to create a workspace, configure it for a single exper
 *   Point users to the **Command Reference** for CLI usage questions.
 *   For configuration questions, guide users to the **Configuration Files** and **Workspace Configuration File** sections of the Ramble documentation.
 *   Use the examples in the GitHub repository to understand common configuration patterns.
-*   Encourage users to provide their Ramble configuration files and any error messages for debugging.
-*   When making Python code changes, consult `bin/ramble` to determine the officially supported Python versions.
+* Encourage users to provide their Ramble configuration files and any error messages for debugging.
+* When making Python code changes, consult `bin/ramble` to determine the officially supported Python versions.
+* Ensure all Python code is compatible with the full range of supported versions. Avoid using APIs that have been deprecated or removed in newer Python versions. When necessary, use feature detection (`hasattr`) or version checks (`sys.version_info`) to maintain broad compatibility.
+
 
 ## Running Unit Tests
 

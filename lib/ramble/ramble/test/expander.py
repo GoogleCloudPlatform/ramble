@@ -15,6 +15,7 @@ import ramble.variants
 def exp_dict():
     return {
         "application_name": "foo",
+        "application_spec": "foo@1.2",
         "workload_name": "bar",
         "experiment_name": "baz",
         "application_input_dir": "/workspace/inputs/foo",
@@ -265,9 +266,10 @@ def test_expansion_namespaces():
 
     expander = ramble.expander.Expander(expansion_vars, None)
 
-    assert expander.application_namespace == "foo"
-    assert expander.workload_namespace == "foo.bar"
-    assert expander.experiment_namespace == "foo.bar.baz"
+    assert expander.application_name == "foo"
+    assert expander.application_namespace == "foo@1.2"
+    assert expander.workload_namespace == "foo@1.2.bar"
+    assert expander.experiment_namespace == "foo@1.2.bar.baz"
 
 
 @pytest.mark.parametrize(

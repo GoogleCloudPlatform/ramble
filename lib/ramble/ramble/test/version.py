@@ -6,6 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 import pytest
 
 import ramble.workspace
@@ -280,3 +282,60 @@ def test_non_pep440_application_version_variant_when(workspace_name, version, ex
                     assert zlib_version in data
                 else:
                     assert zlib_version not in data
+
+
+def test_version_variable_expansion_info(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "versions@{version}",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-v",
+            "version=['1.0', '2.0a1']",
+            "-v",
+            "custom_var='val_{version}'",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        output = workspace("info", global_args=global_args)
+
+        assert "versions@1.0.test_wl.generated" in output
+        assert "versions@2.0a1.test_wl.generated" in output
+
+        # Verify expansion in the ramble.yaml file
+        with open(ws.config_file_path) as f:
+            config_content = f.read()
+            assert "versions@{version}" in config_content
+            assert "val_{version}" in config_content
+
+        # Verify application_version logic works for expanded experiments
+        # versions@1.0 should have zlib@1.2.14, versions@2.0a1 should not.
+        output_v = workspace("info", "-vv", global_args=global_args)
+        assert "versions@1.0.test_wl.generated" in output_v
+        assert "versions@2.0a1.test_wl.generated" in output_v
+        assert "custom_var = 'val_{version}' ==> val_1.0" in output_v
+        assert "custom_var = 'val_{version}' ==> val_2.0a1" in output_v
+        assert "zlib-exact = zlib@1.2.14" in output_v
+        assert "zlib-greater = zlib@1.2.13" in output_v
+
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        # Verify paths for both experiments
+        exp1_path = os.path.join(ws.experiment_dir, "versions@1.0", "test_wl", "generated")
+        exp2_path = os.path.join(ws.experiment_dir, "versions@2.0a1", "test_wl", "generated")
+        assert os.path.exists(exp1_path)
+        assert os.path.exists(exp2_path)
