@@ -42,14 +42,14 @@ class ObjectVersion:
             pep440_version = self.version_to_pep440(version_number)
             try:
                 self.version = Version(pep440_version)
-            except InvalidVersion:
+            except InvalidVersion as err:
                 raise DirectiveError(
                     f"Version number '{version_number}' (converted: {pep440_version}) must be "
                     "converted to a valid PEP 440 version specifier format to use Ramble's "
                     "versioning functionality. If this object uses version numbering that differs "
                     "from PEP 440, please define the `version_to_pep440()` method. See "
                     "https://peps.python.org/pep-0440/ for valid formats."
-                )
+                ) from err
         else:
             raise DirectiveError(
                 "An ObjectVersion requires either a Version object or a version number"

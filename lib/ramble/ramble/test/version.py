@@ -8,7 +8,6 @@
 
 import pytest
 
-import ramble.variants
 import ramble.workspace
 from ramble.appkit import ExecutableApplication
 from ramble.definitions.versions import ObjectVersion
