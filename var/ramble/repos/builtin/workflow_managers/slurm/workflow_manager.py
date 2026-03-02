@@ -301,6 +301,15 @@ class Slurm(WorkflowManagerBase):
             fom_type=FomType.INFO,
         )
 
+    figure_of_merit(
+        "job-elapsed-seconds",
+        fom_regex=r"\s*job_elapsed_seconds:\s*(?P<val>\d+)",
+        group_name="val",
+        units="s",
+        log_file="{experiment_run_dir}/.slurm_job_info",
+        fom_type=FomType.TIME,
+    )
+
     # Capture sbatch script end time, in epoch seconds
     register_builtin(
         "capture_sbatch_script_end_time",
