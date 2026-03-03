@@ -31,18 +31,18 @@ def test_workspace_concretize_additive(workspace_name):
     with open(ws.config_file_path) as f:
         content = f.read()
         assert "gromacs" in content
-        assert "gcc9" in content
-        assert "wrfv4" not in content
+        assert "gcc14" in content
+        assert "wrf" not in content
         assert "intel-oneapi-vtune" not in content
 
-    workspace("generate-config", "wrfv4", "-p", "spack", global_args=global_args)
+    workspace("generate-config", "wrf", "-p", "spack", global_args=global_args)
     workspace("concretize", "-q", global_args=global_args)
 
     with open(ws.config_file_path) as f:
         content = f.read()
         assert "gromacs" in content
-        assert "gcc9" in content
-        assert "wrfv4" in content
+        assert "gcc14" in content
+        assert "wrf" in content
         assert "intel-oneapi-vtune" not in content
 
     modifiers_path = os.path.join(ws.config_dir, "modifiers.yaml")
@@ -58,8 +58,8 @@ def test_workspace_concretize_additive(workspace_name):
     with open(ws.config_file_path) as f:
         content = f.read()
         assert "gromacs" in content
-        assert "gcc9" in content
-        assert "wrfv4" in content
+        assert "gcc14" in content
+        assert "wrf" in content
         assert "intel-oneapi-vtune" in content
 
 
