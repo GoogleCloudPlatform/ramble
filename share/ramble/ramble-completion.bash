@@ -667,7 +667,7 @@ _ramble_workspace_setup() {
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase"
 }
 
 _ramble_workspace_push_to_cache() {

@@ -1667,7 +1667,9 @@ ramble:
         latest_file_parent = os.path.join(self.root, latest_base + file_extension)
         self.symlink_result(out_file, latest_file_parent)
 
-    def dump_results(self, output_formats=None, print_results=False, summary_only=False):
+    def dump_results(
+        self, output_formats=None, print_results=False, summary_only=False, fom_origin_types=None
+    ):
         """
         Write out result file in desired format
 
@@ -1683,7 +1685,9 @@ ramble:
         if not self.results:
             self.results = {}
 
-        results = _filter_results(self.results, summary_only=summary_only)
+        results = _filter_results(
+            self.results, summary_only=summary_only, fom_origin_types=fom_origin_types
+        )
         fs.mkdirp(self.results_dir)
 
         results_written = []
@@ -2769,13 +2773,31 @@ def no_active_workspace():
             activate(ws)
 
 
-def _filter_results(results, summary_only):
-    if not summary_only or namespace.experiment not in results:
+def _filter_results(results, summary_only, fom_origin_types=None):
+    if (not summary_only and not fom_origin_types) or namespace.experiment not in results:
         return results
     results = copy.deepcopy(results)
-    results[namespace.experiment] = [
-        r for r in results[namespace.experiment] if r["N_REPEATS"] > 0
-    ]
+
+    filtered_experiments = []
+    for r in results[namespace.experiment]:
+        if summary_only and r["N_REPEATS"] == 0:
+            continue
+
+        if fom_origin_types:
+            filtered_contexts = []
+            for context in r.get("CONTEXTS", []):
+                filtered_foms = []
+                for fom in context.get("foms", []):
+                    if fom.get("origin_type") in fom_origin_types:
+                        filtered_foms.append(fom)
+                if filtered_foms:
+                    context["foms"] = filtered_foms
+                    filtered_contexts.append(context)
+            r["CONTEXTS"] = filtered_contexts
+
+        filtered_experiments.append(r)
+
+    results[namespace.experiment] = filtered_experiments
     return results
 
 

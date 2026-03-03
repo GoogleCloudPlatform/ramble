@@ -250,6 +250,7 @@ class AnalyzePipeline(Pipeline):
         upload=False,
         print_results=False,
         summary_only=False,
+        fom_origin_types=None,
     ):
         super().__init__(workspace, filters)
         self.action_string = "Analyzing"
@@ -257,6 +258,7 @@ class AnalyzePipeline(Pipeline):
         self.upload_results = upload
         self.print_results = print_results
         self.summary_only = summary_only
+        self.fom_origin_types = fom_origin_types
 
     def _prepare(self):
 
@@ -303,6 +305,7 @@ class AnalyzePipeline(Pipeline):
             output_formats=self.output_formats,
             print_results=self.print_results,
             summary_only=self.summary_only,
+            fom_origin_types=self.fom_origin_types,
         )
 
         self.workspace.dump_tables(self.experiment_set, self.filters)

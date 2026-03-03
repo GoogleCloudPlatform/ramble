@@ -134,3 +134,74 @@ def test_analyze_fail_with_no_fom_detected(mock_applications, workspace_name):
     with open(result_file) as f:
         content = f.read()
         assert "Status = FAILED" in content
+
+
+def test_analyze_fom_origin_types_filter(mock_applications, make_workspace_from_config):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '1'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test:
+              variables:
+                n_nodes: '1'
+  software:
+    packages: {}
+    environments: {}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    workspace_flags = ["-w", ws_name]
+
+    workspace("setup", "--dry-run", global_args=workspace_flags)
+
+    exp_dir = os.path.join(ws.root, "experiments", "basic", "test_wl", "test")
+    with open(os.path.join(exp_dir, "test.out"), "w+") as f:
+        f.write("12.3 seconds\n")
+
+    output = workspace("analyze", "-p", global_args=workspace_flags)
+    assert "default (null) context figures of merit" in output
+    assert "test_fom = 12.3" in output
+
+    # Ensure application FOMs are displayed
+    output_filtered = workspace(
+        "analyze", "--fom-origin-types", "application", "-p", global_args=workspace_flags
+    )
+    assert "default (null) context figures of merit" in output
+    assert "test_fom = 12.3" in output
+
+    # Use a non-existent origin type to filter out all FOMs
+    output_filtered = workspace(
+        "analyze", "--fom-origin-types", "foo", "-p", global_args=workspace_flags
+    )
+    # Ensure context without FOMs is not displayed
+    assert "default (null) context figures of merit" not in output_filtered
+    assert "test_fom = 12.3" not in output_filtered
+
+    # Test option handling
+    output_filtered = workspace(
+        "analyze",
+        "--fom-origin-types",
+        "application",
+        "--fom-origin-types",
+        "foo",
+        "-p",
+        global_args=workspace_flags,
+    )
+
+    assert "default (null) context figures of merit" in output_filtered
+    assert "test_fom = 12.3" in output_filtered
+
+    output_filtered = workspace(
+        "analyze", "--fom-origin-types", "application", "foo", "-p", global_args=workspace_flags
+    )
+
+    assert "default (null) context figures of merit" in output_filtered
+    assert "test_fom = 12.3" in output_filtered
