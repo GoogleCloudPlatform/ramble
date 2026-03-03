@@ -24,18 +24,18 @@ specify the application you want to mirror, and any application workloads
 (with sha256 sums) that you want to have mirrored.
 
 For the purpose of this demonstration, let's assume that you're using
-a named workspace, and the application you want to mirror is ``wrfv4``.
-We will call the workspace ``wrfv4_mirror_test``.
+a named workspace, and the application you want to mirror is ``wrf``.
+We will call the workspace ``wrf_mirror_test``.
 
 .. code-block:: console
 
-    $ ramble workspace create wrfv4_mirror_test
+    $ ramble workspace create wrf_mirror_test
 
-    ==> Created workspace in wrfv4_mirror_test
+    ==> Created workspace in wrf_mirror_test
     ==> You can activate this workspace with:
-    ==>   ramble workspace activate wrfv4_mirror_test
+    ==>   ramble workspace activate wrf_mirror_test
 
-    $ ramble workspace activate wrfv4_mirror_test
+    $ ramble workspace activate wrf_mirror_test
 
     $ ramble workspace edit -c
 
@@ -56,7 +56,7 @@ Write the following configuration into the file, save, and exit:
         batch_submit: '{execute_experiment}'
         processes_per_node: 1
       applications:
-        wrfv4:
+        wrf@4.2:
           variables:
             app_workloads: [CONUS_2p5km, CONUS_12km]
           workloads:
@@ -86,7 +86,7 @@ will look something like this:
         batch_submit: '{execute_experiment}'
         processes_per_node: 1
       applications:
-        wrfv4:
+        wrf@4.2:
           variables:
             app_workloads: [CONUS_2p5km, CONUS_12km]
           workloads:
@@ -98,39 +98,39 @@ will look something like this:
                     processes_per_node: 30
       software:
         packages:
-          gcc9:
-            pkg_spec: gcc@9.5.0
+          gcc14:
+            pkg_spec: gcc@14.2.0
           intel-mpi:
-            pkg_spec: intel-oneapi-mpi@2021.11.0
-            compiler: gcc9
-          wrfv4:
-            pkg_spec: wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem
-              ~pnetcdf
-            compiler: gcc9
+            pkg_spec: intel-oneapi-mpi@2021.17.2
+            compiler: gcc14
+          wrfv4-{application::wrf::version}:
+            pkg_spec: wrf@{application::wrf::version} build_type=dm+sm compile_type=em_real
+              nesting=basic ~chem ~pnetcdf
+            compiler: gcc14
         environments:
-          wrfv4:
+          wrf@4.2:
             packages:
             - intel-mpi
-            - wrfv4
+            - wrfv4-{application::wrf::version}
 
 Edit the file again (using ``ramble workspace edit -c``) if you need to
 change compiler or mpi versions. Since we will be using this workspace only
 for mirror creation, you don't need to be particular about the compiler version,
 so use whatever compiler is already installed on your local system.
 
-Then run the command ``ramble workspace mirror -d $HOME/wrfv4_mirror``. Warning,
+Then run the command ``ramble workspace mirror -d $HOME/wrf_mirror``. Warning,
 it may take a long time to run, due to the time required to download input and
 source files, which gives an example of why you would want to create
 this mirror in the first place.
 
 .. code-block:: console
 
-    $ ramble workspace mirror -d $HOME/wrfv4_mirror
+    $ ramble workspace mirror -d $HOME/wrf_mirror
 
     ==>     Executing phase mirror_inputs
     ==>     Executing phase software_create_env
-    ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
-     -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
+    ==> Concretized intel-oneapi-mpi@2021.17.2%gcc@<gcc-version>
+     -   <hash>   intel-oneapi-mpi@2021.17.2%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==> Concretized wrf@4.2%gcc@<version> <wrf options>
@@ -139,35 +139,35 @@ this mirror in the first place.
     ==>     Executing phase mirror_software
     ==>     Executing phase mirror_inputs
     ==>     Executing phase software_create_env
-    ==> Created environment in <workspace_dirs path>/wrfv4_mirror_test/software/wrfv4.CONUS_12km
+    ==> Created environment in <workspace_dirs path>/wrf_mirror_test/software/wrf@4.2.CONUS_12km
     ==> You can activate this environment with:
-    ==>   spack env activate <workspace_dirs path>/wrfv4_mirror_test/software/wrfv4.CONUS_12km
+    ==>   spack env activate <workspace_dirs path>/wrf_mirror_test/software/wrf@4.2.CONUS_12km
     ==> Concretized wrf@4.2%gcc@<version> <wrf options>
      -   (long list of software prerequisites for wrf@4.2)
 
-    ==> Concretized intel-oneapi-mpi@2021.11.0%gcc@<gcc-version>
-     -   <hash>   intel-oneapi-mpi@2021.11.0%gcc@<version>_etc.
+    ==> Concretized intel-oneapi-mpi@2021.17.2%gcc@<gcc-version>
+     -   <hash>   intel-oneapi-mpi@2021.17.2%gcc@<version>_etc.
      -   <etc>        ^(short list of software prerequisistes for intel-mpi)
 
     ==>     Executing phase mirror_software
-    ==> Successfully updated spack software in $HOME/wrfv4_mirror
+    ==> Successfully updated spack software in $HOME/wrf_mirror
       Archive stats:
         44   already present
         44   added
         0    failed to fetch.
-    ==> Successfully updated inputs in $HOME/wrfv4_mirror
+    ==> Successfully updated inputs in $HOME/wrf_mirror
       Archive stats:
         1    already present
         1    added
         0    failed to fetch.
 
-The resulting structure of ``$HOME/wrfv4_mirror`` looks like
+The resulting structure of ``$HOME/wrf_mirror`` looks like
 
 .. code-block:: console
 
-    $ tree $HOME/wrfv4_mirror/
+    $ tree $HOME/wrf_mirror/
     
-    /home/sternt/wrfv4_mirror/
+    /home/user/wrf_mirror/
     ├── inputs
     │   ├── _input-cache
     │   │   └── archive
@@ -175,7 +175,7 @@ The resulting structure of ``$HOME/wrfv4_mirror`` looks like
     │   │       │   └── 6a0e87e3401efddc50539e71e5437fd7a5af9228b64cd4837e739737c3706fc3.tar.gz
     │   │       └── dc
     │   │           └── dcae9965d1873c1c1e34e21ad653179783302b9a13528ac10fab092b998578f6.tar.gz
-    │   └── wrfv4
+    │   └── wrf
     │       ├── v42_bench_conus12km.tar.gz
     │       └── v42_bench_conus2.5km.tar.gz
     └── software
@@ -518,9 +518,9 @@ For example, using the  mirror directories we created above,
 
 .. code-block:: console
 
-    $ ramble mirror add --scope=site ramble_mirror $HOME/wrfv4_mirror/inputs
+    $ ramble mirror add --scope=site ramble_mirror $HOME/wrf_mirror/inputs
 
-    $ spack mirror add spack_mirror $HOME/wrfv4_mirror/software
+    $ spack mirror add spack_mirror $HOME/wrf_mirror/software
 
 **NOTE**: The ``--scope`` argument controls at what level Ramble is configured to use this mirror. The default scope
 is ``user`` which places the config within the ``~/.ramble`` directory, and it only applies to the user that executed

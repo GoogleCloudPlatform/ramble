@@ -25,17 +25,17 @@ class Wrfv4(ExecutableApplication):
     tags("weather", "nwp", "climate-modeling")
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
         software_spec(
             "intel-mpi",
-            pkg_spec="intel-oneapi-mpi@2021.13.1",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
         )
 
         software_spec(
             "wrfv4",
             pkg_spec="wrf@4.2 build_type=dm+sm compile_type=em_real nesting=basic ~chem ~pnetcdf",
-            compiler="gcc9",
+            compiler="gcc14",
         )
 
         required_package("wrf")

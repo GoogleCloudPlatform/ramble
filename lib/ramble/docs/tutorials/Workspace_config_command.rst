@@ -98,9 +98,9 @@ In this file, write the following contents:
         pkg_spec: gromacs@{gromacs_version}
         compiler: '{compiler_name}'
       openmpi5:
-        pkg_spec: openmpi@5.0.1
-      intelmpi2113:
-        pkg_spec: intel-oneapi-mpi@2021.13.1
+        pkg_spec: openmpi@5.0.8
+      intel-mpi:
+        pkg_spec: intel-oneapi-mpi@2021.17.2
       wrf:
         pkg_spec: wrf@4.3.3
         compiler: '{compiler_name}'
@@ -211,7 +211,7 @@ environments) that are not used by an experiment, and additionally remove any
 variables that are not used by experiments as well.
 
 The result should be that packages (such as ``wrf``, ``gcc15``, and
-``intelmpi2113``) and environments (such as ``wrf``) are removed from the
+``intel-mpi``) and environments (such as ``wrf``) are removed from the
 software configuration section, while variables (such as ``test_variable``) are
 removed from the variables dictionaries.
 

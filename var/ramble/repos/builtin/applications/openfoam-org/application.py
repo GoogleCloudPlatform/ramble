@@ -20,14 +20,14 @@ class OpenfoamOrg(OpenfoamBase):
     version("10", "Version 10 of Openfoam-org", preferred=True)
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.17.2")
 
         software_spec(
             "openfoam-org-{application::openfoam-org::version}",
             pkg_spec="openfoam-org@{application::openfoam-org::version}",
-            compiler="gcc9",
+            compiler="gcc14",
         )
 
         required_package("openfoam-org")
