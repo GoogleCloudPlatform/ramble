@@ -513,77 +513,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self._env_variable_sets = env_variable_sets.copy()
 
-        new_env_vars = {
-            "set": {},
-            "append": [],
-            "prepend": [],
-        }
-        for env_var in self.selected_environment_variables.values():
-            action = env_var.method
-            value = env_var.value
-            # Pull out base group from the new_env_vars dict, based on the env_var's action.
-            new_group = new_env_vars[action]
-
-            if action == "append":
-                # If action is append, we need to pull out the append actions.
-                # Here, the value in the dict is a list (instead of a dict) to allow
-                # for different separators.
-                # We need to find the group (if it exists) with the correct separator,
-                # and add the new env-var to that group.
-                found = False
-                for group in new_group:
-                    if (
-                        "var-separator" in group
-                        and group["var-separator"] == env_var.separator
-                    ):
-                        found = True
-                        new_group = group["vars"]
-                        break
-
-                if not found:
-                    # Create a group, if it wasn't found previously, and
-                    # add to the append action's group.
-                    append_set = {
-                        "var-separator": env_var.separator,
-                        "vars": {},
-                    }
-                    new_group.append(append_set)
-                    new_group = append_set["vars"]
-            elif action == "prepend":
-                # If action is prepend, we need to pull out the prepend actions.
-                # Here, the value is again a list instead of a dict.
-                # However, we don't allow different separators
-                # when prepending. So, here we simply grab the first entry in the list.
-                if not new_group:
-                    prepend_set = {"paths": {}}
-                    new_group.append(prepend_set)
-
-                new_group = new_group[0]["paths"]
-            else:
-                # If action is set, just pull out the value
-                new_group = new_env_vars["set"]
-
-            add = True
-            # Find the env var set with a matching action, and
-            # decide of the env-var should be added or not.
-            for env_var_set in self._env_variable_sets:
-                if action in env_var_set:
-                    if env_var.name in env_var_set[action]:
-                        add = False
-
-            if add:
-                new_group[env_var.name] = value
-
-        # Remove any actions that don't have env-vars, to prevent them
-        # from being actioned later.
-        for action in ["set", "append", "prepend"]:
-            if not new_env_vars[action]:
-                del new_env_vars[action]
-
-        # Add the new env vars to the object's environment variable sets.
-        if new_env_vars:
-            self._env_variable_sets.append(new_env_vars)
-
     def set_variables_and_variants(self, variables, variants, experiment_set):
         """Set internal reference to variables and variants
 
@@ -1644,18 +1573,45 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Returns:
             (list) List of environment variable sets from all objects
         """
-        obj_env_var_sets = self._env_variable_sets.copy()
-        for _, obj in self._objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            obj_env_vars = {}
+
+        flattened_env_vars = {
+            "set": {},
+            "append": [],
+            "prepend": [],
+            "unset": set(),
+        }
+
+        for _, obj in self._objects():
             for env_var in obj.selected_environment_variables.values():
-                obj_env_vars[env_var.name] = env_var.value
+                action = env_var.method
 
-            if obj_env_vars:
-                obj_env_var_sets.append({"set": obj_env_vars})
+                if action == "set":
+                    flattened_env_vars[action][env_var.name] = env_var.value
+                elif action == "unset":
+                    flattened_env_vars[action].add(env_var.name)
+                else:
+                    sub_dict = {}
+                    if action == "append":
+                        sub_dict["var-separator"] = env_var.separator
+                        sub_dict["vars"] = {env_var.name: env_var.value}
+                    else:
+                        sub_dict["paths"] = {env_var.name: env_var.value}
+                    flattened_env_vars[action].append(sub_dict)
 
-        return obj_env_var_sets
+        # YAML defined env_vars override object defined env_vars
+        for env_var_set in self._env_variable_sets:
+            for action, conf in env_var_set.items():
+                if action == "set":
+                    flattened_env_vars[action].update(conf)
+                elif action == "unset":
+                    flattened_env_vars[action] = flattened_env_vars[
+                        action
+                    ].union(set(conf))
+                else:
+                    flattened_env_vars[action].extend(conf)
+
+        flattened_env_vars["unset"] = list(flattened_env_vars["unset"])
+        return [flattened_env_vars]
 
     def _define_commands(self, exec_graph=None, success_list=None):
         """Populate the internal list of commands based on executables
