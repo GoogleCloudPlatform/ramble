@@ -166,7 +166,12 @@ ramble:
     with open(os.path.join(exp_dir, "test.out"), "w+") as f:
         f.write("12.3 seconds\n")
 
-    output = workspace(
+    output = workspace("analyze", "-p", global_args=workspace_flags)
+    assert "default (null) context figures of merit" in output
+    assert "test_fom = 12.3" in output
+
+    # Ensure application FOMs are displayed
+    output_filtered = workspace(
         "analyze", "--fom-origin-types", "application", "-p", global_args=workspace_flags
     )
     assert "default (null) context figures of merit" in output
@@ -179,3 +184,24 @@ ramble:
     # Ensure context without FOMs is not displayed
     assert "default (null) context figures of merit" not in output_filtered
     assert "test_fom = 12.3" not in output_filtered
+
+    # Test option handling
+    output_filtered = workspace(
+        "analyze",
+        "--fom-origin-types",
+        "application",
+        "--fom-origin-types",
+        "foo",
+        "-p",
+        global_args=workspace_flags,
+    )
+
+    assert "default (null) context figures of merit" in output_filtered
+    assert "test_fom = 12.3" in output_filtered
+
+    output_filtered = workspace(
+        "analyze", "--fom-origin-types", "application", "foo", "-p", global_args=workspace_flags
+    )
+
+    assert "default (null) context figures of merit" in output_filtered
+    assert "test_fom = 12.3" in output_filtered

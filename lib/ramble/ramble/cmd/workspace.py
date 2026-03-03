@@ -545,7 +545,9 @@ def workspace_analyze_setup_parser(subparser):
         "--fom-origin-types",
         dest="fom_origin_types",
         nargs="+",
-        help="list of FOM origin types to include in analysis",
+        action="append",
+        help="FOM origin types to include in analysis output. "
+        + "Accepts space-delimited lists and can be specified multiple times.",
         required=False,
     )
 
@@ -582,6 +584,11 @@ def workspace_analyze(args):
         tags=args.filter_tags,
     )
 
+    if args.fom_origin_types:
+        fom_origin_types = [item for sublist in args.fom_origin_types for item in sublist]
+    else:
+        fom_origin_types = None
+
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     logger.debug("Analyzing workspace")
@@ -592,7 +599,7 @@ def workspace_analyze(args):
         upload=args.upload,
         print_results=args.print_results,
         summary_only=args.summary_only,
-        fom_origin_types=args.fom_origin_types,
+        fom_origin_types=fom_origin_types,
     )
 
     with ws.read_transaction():
