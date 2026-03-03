@@ -29,3 +29,10 @@ class TestMod2(BasicModifier):
         method="append",
         modes=["test"],
     )
+
+    modifier_variable(
+        "modeless_variable",
+        default="from_test_mod_2 defined",
+        environment_variable_name="MODELESS_ENV_VAR",
+        description="Test a modifier variable without a mode",
+    )
