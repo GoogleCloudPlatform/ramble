@@ -40,7 +40,6 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util import object_utils
 from ramble.util.conversions import list_str_to_list
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
@@ -2440,9 +2439,14 @@ ramble:
             base_section[namespace.modifiers] = syaml.syaml_list()
 
         mod_type = ramble.repository.ObjectTypes.modifiers
+        mod_objects = ramble.repository.all_object_names(object_type=mod_type)
         if isinstance(name_pattern, str):
             spec_parts = name_pattern.partition("@")
-        mod_names = object_utils.filter_by_name([spec_parts[0]], False, mod_type)
+        mod_names = [
+            name
+            for name in mod_objects
+            if fnmatch.fnmatchcase(name.lower(), spec_parts[0].lower())
+        ]
 
         if len(mod_names) < 1:
             logger.error(f"No modifiers found matching name pattern of {name_pattern}")
