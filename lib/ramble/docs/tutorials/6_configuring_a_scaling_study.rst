@@ -54,13 +54,13 @@ you want to execute. To begin with, select a workload from the output of:
 
 .. code-block:: console
 
-    $ ramble info --attrs workloads wrfv4
+    $ ramble info --attrs workloads wrf
 
 For the purposes of this tutorial, the ``CONUS_12km`` workload is recommended
 because it is less computationally expensive than the ``CONUS_2p5km`` workload.
 
 **NOTE**: To get more detailed information about the workload definitions, you
-can use ``ramble info --attrs workloads -v wrfv4``.
+can use ``ramble info --attrs workloads -v wrf``.
 
 Configure Experiment Definitions
 --------------------------------
@@ -85,7 +85,7 @@ experiments you want to execute. The contents might look like the following:
 
     ramble:
       applications:
-        wrfv4:
+        wrf@4.2:
           workloads:
             CONUS_12km:
               experiments:
@@ -105,7 +105,7 @@ configuration file might look like the following now:
 
     ramble:
       applications:
-        wrfv4:
+        wrf@4.2:
           workloads:
             CONUS_12km:
               experiments:
@@ -126,11 +126,13 @@ might look like the following:
 
 .. code-block:: console
 
-    ==> Warning: Required key "batch_submit" is not defined
-    ==> Warning: Required key "mpi_command" is not defined
-    ==> Warning: Required key "n_ranks" is not defined
-    ==> Warning: Required key "processes_per_node" is not defined
-    ==> Error: In experiment wrfv4.CONUS_12km.scaling_{n_nodes}: One or more required keys are not defined within an experiment.
+    ==> Error: Invalid number of required variables defined.
+    Two or more of the following are required to be defined.
+      - n_ranks
+      - processes_per_node
+      - n_nodes
+    Experiment wrf@4.2.CONUS_12km.scaling_1 only has:
+      - n_nodes
 
 To remedy this issue, you need to define some system level variables in the
 following section.
@@ -179,7 +181,7 @@ information:
         batch_submit: '{execute_experiment}'
         mpi_command: 'mpirun -n {n_ranks}'
       applications:
-        wrfv4:
+        wrf@4.2:
           workloads:
             CONUS_12km:
               experiments:
@@ -214,10 +216,10 @@ look like the following:
 
 At this point, you have fully described experiments that can be executed.
 However, your system might not have the correct compiler (and building a
-compiler could be costly). The ``gcc9`` package definition can be updated to
+compiler could be costly). The ``gcc14`` package definition can be updated to
 refer to a compiler you already have on your system. These can be viewed using
-the ``spack compiler list`` command. Edit the ``gcc9`` package definition as
-you see fit, and make sure the ``gcc9`` references under ``intel-mpi`` and
+the ``spack compiler list`` command. Edit the ``gcc14`` package definition as
+you see fit, and make sure the ``gcc14`` references under ``intel-mpi`` and
 ``wrfv4`` are updated appropriately as well.
 
 .. include:: shared/wrf_execute.rst

@@ -42,28 +42,26 @@ environments:
 .. code-block:: console
 
     Software Stack:
-      Packages:
-        gcc9:
-          Rendered Packages:
-            gcc9:
-              Spec: gcc@9.4.0 target=x86_64
-              Compiler spec: gcc@9.4.0
-        impi2021:
-          Rendered Packages:
-            impi2021:
-              Spec: intel-oneapi-mpi@2021.11.0 target=x86_64
-              Compiler: gcc9
-        gromacs:
-          Rendered Packages:
-            gromacs:
-              Spec: gromacs@2021.6
-              Compiler: gcc9
-      Environments:
-        gromacs:
-          Rendered Environments:
-            gromacs Packages:
-              - gromacs
-              - impi2021
+        Template package: gcc14 
+          spack packages:
+            Rendered package: gcc14 
+              Spec: gcc@14.2.0 target=x86_64
+              Compiler spec: gcc@14.2.0
+        Template package: intel-mpi 
+          spack packages:
+            Rendered package: intel-mpi 
+              Spec: intel-oneapi-mpi@2021.17.2 target=x86_64
+              Compiler: gcc14
+        Template package: gromacs-{application::gromacs::version} 
+          spack packages:
+            Rendered package: gromacs-2025.3 
+              Spec: gromacs@2025.3
+              Compiler: gcc14
+        Template environment: gromacs@2025.3
+          Base environment: gromacs@2025.3
+            Packages:
+            - gromacs-2025.3
+            - intel-mpi
 
 
 Currently, this command outputs every package and software environment
@@ -81,20 +79,20 @@ The relevant portion of the workspace configuration file is:
 
     software:
       packages:
-        gcc9:
-          pkg_spec: gcc@9.4.0 target=x86_64
-          compiler_spec: gcc@9.4.0
-        impi2021:
-          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
-          compiler: gcc9
-        gromacs:
-          pkg_spec: gromacs@2021.6
-          compiler: gcc9
+        gcc14:
+          pkg_spec: gcc@14.2.0 target=x86_64
+          compiler_spec: gcc@14.2.0
+        intel-mpi:
+          pkg_spec: intel-oneapi-mpi@2021.17.2 target=x86_64
+          compiler: gcc14
+        gromacs-{application::gromacs::version}:
+          pkg_spec: gromacs@{application::gromacs::version}
+          compiler: gcc14
       environments:
-        gromacs:
+        gromacs@2025.3:
           packages:
-          - gromacs
-          - impi2021
+          - gromacs-{application::gromacs::version}
+          - intel-mpi
 
 In this configuration, the ``packages`` block defines software packages that
 can be used to build experiment environments out of. The ``environments`` block
@@ -117,7 +115,7 @@ will assume the package manager is ``spack``. When changing the software
 definitions in a workspace, many options are available to you. For example, you
 could modify the compiler used for building GROMACS (as controlled by the
 ``compiler`` attribute under the ``gromacs`` package definition), or you could
-modify the MPI used for these experiments (as controlled by the ``impi2021``
+modify the MPI used for these experiments (as controlled by the ``intel-mpi``
 package used within the ``gromacs`` environment's package list).  However, we
 will explore changing aspects of GROMACS itself (such as its version or
 variants). 
@@ -141,7 +139,7 @@ package, you can use:
 This command will output all of the supported versions of GROMACS, along with
 the variants for GROMACS which can modify its behavior. While you can change
 any of these, we'll begin by only modifying the version of GROMACS from
-``2021.6`` to ``2021.7``.
+``2024.1`` to ``2024.2``.
 
 To make editing the workspace easier, use the following command (assuming you
 have an ``EDITOR`` environment variable set):
@@ -153,8 +151,8 @@ have an ``EDITOR`` environment variable set):
 This command opens the ``ramble.yaml`` file, along with any ``*.tpl`` files in
 the workspace's ``configs`` directory.
 
-Once the ``ramble.yaml`` file is opened, change the version ``2021.6`` to
-``2021.7`` in the ``gromacs`` package definition. Then save and exit the files.
+Once the ``ramble.yaml`` file is opened, change the version ``2024.1`` to
+``2024.2`` in the ``gromacs`` package definition. Then save and exit the files.
 These changes should now be reflected in the output of:
 
 .. code-block:: console
@@ -168,6 +166,22 @@ These changes should now be reflected in the output of:
 recompiled (unless you compiled it outside of Ramble) during the ``ramble
 workspace setup`` command. This will likely take longer than changing
 experiments and performing setup again.
+
+Versions in Ramble
+------------------
+
+Ramble has its own versioning system in application definitions, which allows
+for conditional statements based on versions and version ranges. We won't cover 
+this in detail here, but you can view the versions that are known to Ramble with
+the following command:
+
+.. code-block:: console
+
+    $ ramble info --attrs known_versions -v gromacs
+
+If a version of an application is not in Ramble, it can be added by modifying
+the ``application.py`` file. See the :ref:`developer guide<application-dev-version-directive>`
+for more details.
 
 Adding Package Variants
 -----------------------

@@ -95,14 +95,14 @@ Edit your workspace configuration file with:
 
     $ ramble workspace edit
 
-And add the example block within the ``wrfv4`` application block. The resulting
+And add the example block within the ``wrf@4.2`` application block. The resulting
 configuration file might look like the following:
 
 .. literalinclude:: ../../../../examples/tutorial_9_regex_criteria_config.yaml
    :language: YAML
 
 Placing the success criteria definition here applies it to all of the
-experiments defined within the ``wrfv4`` application.
+experiments defined within the ``wrf@4.2`` application.
 
 Figure of Merit Logic Based
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -141,7 +141,7 @@ different numbers of timesteps.
 
 It is important to note that the ``formula`` attribute of the success criteria
 definition can refer to other variables. As an example, one of the figures of
-merit output by the ``wrfv4`` application definition is
+merit output by the ``wrf@4.2`` application definition is
 ``Average Timestep Time``. If you had a single node value for this figure of
 merit and expected this to scale linerally you could define a success criteria
 as follows:

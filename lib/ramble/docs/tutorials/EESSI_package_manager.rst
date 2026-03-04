@@ -94,14 +94,14 @@ With this command, you should see output similar to the following:
   # software_specs #
   ##################
   intel-mpi:
-      pkg_spec: intel-oneapi-mpi@2021.13.1
+      pkg_spec: intel-oneapi-mpi@2021.17.2
 
       When:
           package_manager_family=spack
 
   gromacs:
-      pkg_spec: gromacs@2020.5
-      compiler: gcc9
+      pkg_spec: gromacs@2025.3
+      compiler: gcc14
 
       When:
           package_manager_family=spack
@@ -111,12 +111,13 @@ With this command, you should see output similar to the following:
 
       When:
           package_manager_family=eessi
+          application_version@2024.1
 
   #############
   # compilers #
   #############
-  gcc9:
-      pkg_spec: gcc@9.5.0
+  gcc14:
+      pkg_spec: gcc@14.2.0
 
       When:
           package_manager_family=spack

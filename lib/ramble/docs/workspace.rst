@@ -278,9 +278,9 @@ different version, one may type:
 
 .. code-block:: console
 
-    $ ramble workspace manage software --pkg gcc9 --package-spec gcc@9.4.0 --overwrite
+    $ ramble workspace manage software --pkg gcc14 --package-spec gcc@14.2.0 --overwrite
 
-This would update the software package definition names ``gcc9`` to have a new package spec.
+This would update the software package definition names ``gcc14`` to have a new package spec.
 
 Modifiers can be applied to various levels of a workspace configuration. To
 simplify the workflow around adding and removing modifiers from a set of

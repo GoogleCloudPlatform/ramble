@@ -64,8 +64,8 @@ Define New Executables
 ~~~~~~~~~~~~~~~~~~~~~~
 
 The definition of a new executable lives within an ``internals`` block. Below
-is an example of defining a new executable called ``start_time`` which time in
-seconds since 1970-01-01 00:00 UTC:
+is an example of defining a new executable called ``start_time`` which is time
+in seconds since the Unix epoch, 1970-01-01 00:00 UTC:
 
 .. code-block:: YAML
 
@@ -130,7 +130,7 @@ experiments, execute:
 
 .. code-block:: console
 
-    $ ramble info --attrs workloads -v -p "CONUS_12km" wrfv4
+    $ ramble info --attrs workloads -v -p "CONUS_12km" wrf
 
 This prints the information for the ``CONUS_12km`` workload in the wrfv4 application definition.
 ``Executables:`` definition lists the order of executables used for this
@@ -138,7 +138,7 @@ workload. As an example, you might see the following:
 
 .. code-block:: console
 
-    Executables: ['cleanup', 'copy', 'fix_12km', 'execute']
+    Executables: ['stage-files', 'stage-namelist', 'cleanup', 'define_nproc_y', 'define_nproc_x', 'fix_12km', 'execute', 'copy-logs', 'post-exec-clean']
 
 Some executables are provided through the ``builtin`` functionality. These are
 executable commands that are injected by default from the object definitions.
@@ -146,20 +146,38 @@ To be able to see these, you can execute:
 
 .. code-block:: console
 
-    $ ramble info --attrs builtins -v wrfv4
+    $ ramble info --attrs builtins -v wrf
 
 This command should print something like the following:
 
 .. code-block:: console
 
-  ############
-  # builtins #
-  ############
-  builtin::env_vars:
-      name: env_vars
-      required: True
-      injection_method: prepend
-      depends_on: []
+    ############
+    # builtins #
+    ############
+    builtin::pre_cleanup:
+        name: pre_cleanup
+        required: True
+        injection_method: prepend
+        depends_on: []
+        dependents: []
+        when: []
+
+    builtin::post_cleanup:
+        name: post_cleanup
+        required: True
+        injection_method: append
+        depends_on: []
+        dependents: []
+        when: []
+
+    builtin::env_vars:
+        name: env_vars
+        required: True
+        injection_method: prepend
+        depends_on: []
+        dependents: []
+        when: []
 
 Now, edit the workspace configuration file with:
 

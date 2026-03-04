@@ -20,7 +20,7 @@ class Lammps(ExecutableApplication):
 
     tags("molecular-dynamics", "hpc-benchmark")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
     workload_group("all_workloads", workloads=[])
     workload_group("standard_workloads", workloads=[])
@@ -79,12 +79,16 @@ class Lammps(ExecutableApplication):
     version("20220623.4", "Version 20220623.4 of LAMMPS", preferred=True)
 
     with when("package_manager_family=spack"):
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
             "lammps-{application::lammps::version}",
             pkg_spec="lammps@{application::lammps::version} +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
-            compiler="gcc9",
+            compiler="gcc14",
         )
 
         required_package("lammps")

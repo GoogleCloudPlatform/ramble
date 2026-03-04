@@ -24,14 +24,18 @@ class Lulesh(ExecutableApplication):
     version("2.0.3", "Version 2.0.3 of LULESH", preferred=True)
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc13", pkg_spec="gcc@13.1.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
             "lulesh-{application::lulesh::version}",
             pkg_spec="lulesh@{application::lulesh::version} +openmp",
-            compiler="gcc13",
+            compiler="gcc14",
         )
 
         required_package("lulesh")

@@ -26,7 +26,7 @@ ramble:
     - arch_name
     - eessi_arch_dir
   applications:
-    gromacs: # Application name
+    gromacs@2024.1: # Application name and version
       workloads:
         '{app_workloads}': # Workload name from application
           experiments:
@@ -45,9 +45,9 @@ ramble:
               - arch_conf
   software:
     packages:
-      gromacs:
+      gromacs-2024.1:
         pkg_spec: GROMACS/2024.1-foss-2023b
     environments:
-      gromacs:
+      gromacs@2024.1:
         packages:
-        - gromacs
+        - gromacs-2024.1

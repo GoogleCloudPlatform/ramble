@@ -29,14 +29,18 @@ class Hpcg(BaseHpcg):
     version("3.1", "Version 3.1 of HPCG", preferred=True)
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
             "hpcg-{application::hpcg::version}",
             pkg_spec="hpcg@{application::hpcg::version} +openmp",
-            compiler="gcc9",
+            compiler="gcc14",
         )
 
         required_package("hpcg")

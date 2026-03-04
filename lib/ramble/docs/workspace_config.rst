@@ -1121,7 +1121,7 @@ As an example:
       software:
         packages:
           grm:
-            pkg_spec: gromacs@2023.1
+            pkg_spec: gromacs@2025.3
         environments:
           grm_env:
             packages:
@@ -1206,17 +1206,17 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
                     env_name: ['gromacs-mpich', 'gromacs-ompi']
     software:
       packages:
-        gcc9:
-          pkg_spec: gcc@9.5.0 target=x86_64
+        gcc14:
+          pkg_spec: gcc@14.2.0 target=x86_64
         mpich:
           pkg_spec: mpich@4.0.2 target=x86_64
-          compiler: gcc9
+          compiler: gcc14
         ompi:
-          pkg_spec: openmpi@4.1.4 target=x86_64
-          compiler: gcc9
+          pkg_spec: openmpi@5.0.8 target=x86_64
+          compiler: gcc14
         gromacs:
-          pkg_spec: gromacs@2022.4
-          compiler: gcc9
+          pkg_spec: gromacs@2025.3
+          compiler: gcc14
       environments:
         gromacs-{mpi}:
           variables:
@@ -1271,18 +1271,18 @@ variable can be used to submit the same experiment to multiple batch systems.
                     n_nodes: '1'
     software:
       packages:
-        gcc9:
-          pkg_spec: gcc@9.5.0 target=x86_64
-        impi2021:
-          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
-          compiler: gcc9
+        gcc14:
+          pkg_spec: gcc@14.2.0 target=x86_64
+        intel-mpi:
+          pkg_spec: intel-oneapi-mpi@2021.17.2 target=x86_64
+          compiler: gcc14
         gromacs:
-          pkg_spec: gromacs@2022.4
-          compiler: gcc9
+          pkg_spec: gromacs@2025.3
+          compiler: gcc14
       environments:
         gromacs:
           packages:
-          - impi2021
+          - intel-mpi
           - gromacs
 
 The above example overrides the generated ``batch_submit`` variable to change

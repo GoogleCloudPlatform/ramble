@@ -26,7 +26,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
         workspace(
             "manage",
             "experiments",
-            "wrfv4",
+            "wrf",
             "-v",
             "n_ranks=1",
             "-v",
@@ -43,32 +43,32 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
             content = f.read()
             # Check that wrf has a package, and the package is in an environment
             assert "pkg_spec: wrf" in content
-            assert "- wrfv4" in content
+            assert "- wrfv4-{application::wrf::version}" in content
 
             # Check that intel-mpi was defined
-            assert "intel-mpi" in content
+            assert "pkg_spec: intel-oneapi-mpi" in content
 
             # Check that gcc was defined
-            assert "gcc@9.3.0" in content
+            assert "gcc@14.2.0" in content
 
             # Check that the (soon to be new) definition of gcc is not defined
-            assert "gcc@9.4.0" not in content
+            assert "gcc@14.3.0" not in content
 
         # Change the GCC package definition
         workspace(
             "manage",
             "software",
             "--pkg",
-            "gcc9",
+            "gcc14",
             "--overwrite",
             "--package-spec",
-            "gcc@9.4.0",
+            "gcc@14.3.0",
             global_args=["-w", workspace_name],
         )
 
         with open(config_path) as f:
             content = f.read()
-            assert "gcc@9.4.0" in content
+            assert "gcc@14.3.0" in content
 
         # Delete configs for wrf
         workspace(
@@ -76,9 +76,9 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
             "software",
             "--remove",
             "--env",
-            "wrfv4",
+            "wrf",
             "--pkg",
-            "wrfv4",
+            "wrfv4-{application::wrf::version}",
             global_args=["-w", workspace_name],
         )
         workspace(
@@ -90,7 +90,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
             global_args=["-w", workspace_name],
         )
         workspace(
-            "manage", "software", "--remove", "--pkg", "gcc9", global_args=["-w", workspace_name]
+            "manage", "software", "--remove", "--pkg", "gcc14", global_args=["-w", workspace_name]
         )
         workspace(
             "manage",
