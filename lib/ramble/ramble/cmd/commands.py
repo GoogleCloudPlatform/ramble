@@ -198,7 +198,7 @@ class BashCompletionWriter(ArgparseCompletionWriter):
 
 @formatter
 def subcommands(args, out):
-    parser = ramble.main.make_argument_parser()
+    parser = ramble.main.make_argument_parser(color=False)
     ramble.main.add_all_commands(parser)
     writer = SubcommandWriter(parser.prog, out, args.aliases)
     writer.write(parser)
@@ -234,7 +234,7 @@ def rst_index(out):
 @formatter
 def rst(args, out):
     # create a parser with all commands
-    parser = ramble.main.make_argument_parser()
+    parser = ramble.main.make_argument_parser(color=False)
     ramble.main.add_all_commands(parser)
 
     # extract cross-refs of the form `_cmd-ramble-<cmd>:` from rst files
@@ -269,7 +269,7 @@ def names(args, out):
 
 @formatter
 def bash(args, out):
-    parser = ramble.main.make_argument_parser()
+    parser = ramble.main.make_argument_parser(color=False)
     ramble.main.add_all_commands(parser)
 
     writer = BashCompletionWriter(parser.prog, out, args.aliases)
