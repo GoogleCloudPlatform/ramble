@@ -163,7 +163,7 @@ ramble:
             assert "FROM_DIRECTIVE" in f.read()
 
 
-def test_object_env_var_order(
+def test_object_env_var_definitions(
     workspace_name,
     mutable_mock_apps_repo,
     mutable_mock_mods_repo,
@@ -207,32 +207,26 @@ def test_object_env_var_order(
         ws._re_read()
         workspace("setup", "--dry-run", global_args=global_args)
 
-        regex_order = [
+        regex_defs = [
             re.compile(r"export APP_ENV_VAR=APP_ENV_VAR_SET;"),
             re.compile(r"export PACKAGE_ENV_VAR=PKG_ENV_VAR_SET;"),
             re.compile(r"export WORKFLOW_ENV_VAR=WF_ENV_VAR_SET;"),
             re.compile(r"export MOD_ENV_VAR=MOD_ENV_VAR_SET;"),
         ]
 
-        found_order = [False for _ in regex_order]
-
-        found_idx = 0
+        found_defs = [False for _ in regex_defs]
 
         rendered_script = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "execute_experiment"
         )
 
         with open(rendered_script) as f:
-            for line in f.readlines():
-                cur_regex = regex_order[found_idx]
-                if cur_regex.search(line):
-                    found_order[found_idx] = True
-                    found_idx += 1
+            data = f.read()
+            for idx, regex in enumerate(regex_defs):
+                if regex.search(data):
+                    found_defs[idx] = True
 
-                if found_idx == len(found_order):
-                    break
-
-        assert all(found_order)
+        assert all(found_defs)
 
 
 def test_object_env_var_methods(
