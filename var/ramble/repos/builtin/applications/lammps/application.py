@@ -79,7 +79,11 @@ class Lammps(ExecutableApplication):
     version("20220623.4", "Version 20220623.4 of LAMMPS", preferred=True)
 
     with when("package_manager_family=spack"):
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.17.2")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
             "lammps-{application::lammps::version}",

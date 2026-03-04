@@ -45,6 +45,7 @@ ramble:
         compiler: gcc14
       openmpi:
         pkg_spec: openmpi@5.0.8 +orterunprefix
+        compiler: gcc14
       wrfv4-{application::wrf::version}:
         pkg_spec: wrf@{application::wrf::version} build_type=dm+sm compile_type=em_real
           nesting=basic ~pnetcdf
