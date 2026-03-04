@@ -127,7 +127,6 @@ class Pipeline:
                 f.write(self.workspace.workspace_hash + "\n")
 
             self.workspace.update_metadata("workspace_digest", self.workspace.workspace_hash)
-            self.workspace._write_metadata()
 
     def _prepare(self):
         """Perform preparation for pipeline execution"""
@@ -205,12 +204,15 @@ class Pipeline:
 
     def _complete(self):
         """Hook for performing pipeline actions after execution is complete"""
+        self.workspace.update_metadata("ramble_version", ramble.util.version.get_version())
         if self.updated_experiment_hashes:
             try:
                 self._construct_workspace_hash()
             except FileNotFoundError as e:
                 tty.warn("Unable to construct workspace hash due to missing file")
                 tty.warn(e)
+
+        self.workspace._write_metadata()
 
     def run(self):
         """Run the full pipeline"""
