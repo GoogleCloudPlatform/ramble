@@ -678,8 +678,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if remove_keys is None:
             remove_keys = {"env_name", "workspace_tables"}
         cleaned_variables = self.variables.copy()
-        for key in self.keywords.all_reserved_keys():
-            cleaned_variables.pop(key, None)
+
+        for var in list(cleaned_variables):
+            if self.keywords.is_reserved(var):
+                cleaned_variables.pop(var)
 
         for key in remove_keys:
             cleaned_variables.pop(key, None)
