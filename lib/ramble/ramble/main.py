@@ -329,6 +329,11 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
 def make_argument_parser(**kwargs):
     """Create an basic argument parser without any subcommands added."""
+    if "color" in kwargs and sys.version_info < (3, 14):
+        # The color argument was only added since Python 3.14.
+        # See https://docs.python.org/3/library/argparse.html#color.
+        kwargs.pop("color")
+
     parser = RambleArgumentParser(
         formatter_class=RambleHelpFormatter,
         add_help=False,
