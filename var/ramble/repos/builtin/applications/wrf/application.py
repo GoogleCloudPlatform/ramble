@@ -28,14 +28,15 @@ class Wrf(ExecutableApplication):
     version("3.9.1.1", description="Version 3.9.1.1 of WRF", preferred=False)
 
     with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
+
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
+
         with when("application_version@4.0:"):
-            define_compiler("gcc14", pkg_spec="gcc@14.2.0")
-
-            software_spec(
-                "intel-mpi-2021p17",
-                pkg_spec="intel-oneapi-mpi@2021.17.2",
-            )
-
             software_spec(
                 "wrfv4-{application::wrf::version}",
                 pkg_spec="wrf@{application::wrf::version} build_type=dm+sm compile_type=em_real nesting=basic ~pnetcdf",
@@ -46,12 +47,6 @@ class Wrf(ExecutableApplication):
 
         with when("application_version@:3.9.1.1"):
             define_compiler("gcc8", pkg_spec="gcc@8.2.0")
-
-            software_spec(
-                "intel-mpi-2021p13",
-                pkg_spec="intel-oneapi-mpi@2021.13.1",
-                compiler="gcc8",
-            )
 
             software_spec(
                 "wrfv3-{application::wrf::version}",
