@@ -7,13 +7,18 @@
 # except according to those terms.
 """Perform tests of the Application class"""
 
+import unittest
 from typing import FrozenSet
+from unittest.mock import Mock
 
 import pytest
 
 import ramble.definitions.variables
+import ramble.paths
+import ramble.repository
 import ramble.workload
 import ramble.workspace
+from ramble.keywords import Keywords
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
@@ -625,3 +630,49 @@ def test_undefined_executable_dies(mutable_mock_apps_repo, capsys):
         executable_application_instance._get_executable_graph("wl_with_undefined_exec")
     captured = capsys.readouterr()
     assert "Executable undefined_exec is not defined." in captured.err
+
+
+class TestApplicationBase(unittest.TestCase):
+    def test_non_reserved_variables(self):
+        obj_type = ramble.repository.ObjectTypes.base_classes
+        repo = ramble.repository.Repo(ramble.paths.builtin_path, obj_type)
+
+        with ramble.repository.use_repositories(repo, object_type=obj_type):
+            ApplicationBase = ramble.repository.get_base_class("application-base")
+
+            # Instantiate the class, bypassing the __init__ method
+            app_base = ApplicationBase.__new__(ApplicationBase)
+
+            # Set the required attributes
+            app_base.keywords = Keywords()
+            app_base.variables = {
+                "regular_variable": "value1",
+                # A reserved variable
+                "workspace_name": "value2",
+                # A variable that matches a reserved pattern
+                "application::name::version": "value3",
+                # A variable that matches a reserved pattern
+                "modifier_version": "value4",
+            }
+            app_base.package_manager = None
+            app_base.workflow_manager = None
+
+            # This is needed by _get_object_templates
+            app_base._modifier_instances = []
+            app_base.expander = Mock()
+            app_base.expander.satisfies.return_value = True
+            app_base.templates = {}
+
+            # Mock the workspace
+            mock_workspace = Mock()
+            mock_workspace.all_templates.return_value = []
+
+            # Call the method to be tested
+            non_reserved = app_base.non_reserved_variables(mock_workspace)
+
+            # Assert the result
+            self.assertIn("regular_variable", non_reserved)
+            self.assertNotIn("workspace_name", non_reserved)
+            self.assertNotIn("application::name::version", non_reserved)
+            self.assertNotIn("modifier_version", non_reserved)
+            self.assertEqual(len(non_reserved), 1)
