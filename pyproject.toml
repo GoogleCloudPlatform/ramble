@@ -96,6 +96,9 @@ omit = [
     "lib/ramble/external/**",
     "lib/ramble/llnl/**",
     "share/**",
+    # Perf tests don't run in the coverage CI build, so exclude them here.
+    # They do run in a separate CI build though.
+    "**/lib/ramble/ramble/test/end_to_end/perf_tests/**",
 ]
 
 [tool.coverage.report]
