@@ -24,7 +24,7 @@ def test_workspace_concretize_additive(workspace_name):
     global_args = ["-w", workspace_name]
 
     workspace(
-        "generate-config", "gromacs", "-p", "spack", "--wf", "water_*", global_args=global_args
+        "generate-config", "gromacs", "-p", "spack", "--wf", "water_*", "-v", "n_ranks=''", "-v", "n_nodes=''", global_args=global_args
     )
     workspace("concretize", "-q", global_args=global_args)
 
@@ -35,7 +35,7 @@ def test_workspace_concretize_additive(workspace_name):
         assert "wrf" not in content
         assert "intel-oneapi-vtune" not in content
 
-    workspace("generate-config", "wrf", "-p", "spack", global_args=global_args)
+    workspace("generate-config", "wrf", "-p", "spack", "-v", "n_ranks=''", "-v", "n_nodes=''", global_args=global_args)
     workspace("concretize", "-q", global_args=global_args)
 
     with open(ws.config_file_path) as f:
@@ -77,6 +77,10 @@ def test_workspace_multispec_concretize(workspace_name):
         "spack_test",
         "--wf",
         "water_*",
+        "-v",
+        "n_ranks=''",
+        "-v",
+        "n_nodes=''",
         global_args=global_args,
     )
     workspace(
@@ -89,6 +93,10 @@ def test_workspace_multispec_concretize(workspace_name):
         "eessi_test",
         "--wf",
         "water_*",
+        "-v",
+        "n_ranks=''",
+        "-v",
+        "n_nodes=''",
         global_args=global_args,
     )
     workspace("concretize", "-q", global_args=global_args)

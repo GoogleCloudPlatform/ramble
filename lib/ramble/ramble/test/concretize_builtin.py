@@ -115,6 +115,10 @@ def test_concretize_allows_invalid_experiment(
             "water_bare",
             "-p",
             "spack",
+            "-v",
+            "n_ranks=''",
+            "-v",
+            "n_nodes=''",
             global_args=global_args,
         )
 

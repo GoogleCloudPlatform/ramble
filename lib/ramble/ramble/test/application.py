@@ -156,7 +156,7 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
 
     defined_internals = {
         "custom_executables": {
-            "test_exec": {"templates": ["test_exec"], "use_mpi": False, "redirect": "{log_file}"}
+            "test_exec": {"template": ["test_exec"], "use_mpi": False, "redirect": "{log_file}"}
         }
     }
 

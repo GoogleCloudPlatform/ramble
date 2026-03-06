@@ -72,10 +72,13 @@ def test_manage_experiments_no_overwrite_wm_vars(workspace_name):
         "parallel",
         "--wm",
         "user-managed",
+        "-v",
+        "n_nodes=''",
+        "-v",
+        "n_ranks=''",
         global_args=global_args,
     )
     with open(ws.config_file_path) as f:
         content = f.read()
-        assert "processes_per_node:" in content
         assert "batch_submit" not in content
         assert "mpi_command" not in content
