@@ -32,6 +32,7 @@ ramble:
     mpi_command: ''
     batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: '1'
+    n_ranks: '{n_nodes}*{processes_per_node}'
   applications:
     hostname:
       workloads:

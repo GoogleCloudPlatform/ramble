@@ -31,6 +31,7 @@ ramble:
     batch_submit: '{execute_experiment}'
     processes_per_node: '16'
     n_threads: '1'
+    n_ranks: '{processes_per_node}*{n_nodes}'
   formatted_executables:
     ws_exec_def:
       prefix: 'from_ws '

@@ -287,7 +287,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for when_set, workloads in self.workloads.items():
             if workload_name in workloads:
                 workload_found = True
-                if self.expander.satisfies(
+                if not self.expander:
+                    workload = workloads[workload_name]
+                elif self.expander.satisfies(
                     when_set, self.experiment_variants()
                 ):
                     if workload:
@@ -304,7 +306,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f"as a workload of application {self.name}."
             )
         if not workload:
-            logger.die(
+            raise ramble.expander.WorkloadNotDefinedError(
                 f"Workload {workload_name} is not defined "
                 "for the active `when` conditions."
             )
@@ -325,7 +327,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         workload_name is not provided, retrieves the active workload.
         """
         if not workload_name or (
-            self.expander.workload_name
+            self.expander
+            and self.expander.workload_name
             and self.expander.workload_name == workload_name
         ):
             if not self._active_workload:
@@ -3674,6 +3677,37 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for mod_inst in self._modifier_instances:
                 yield (ramble.repository.ObjectTypes.modifiers, mod_inst)
 
+    def require_mpi_variables(self):
+        self.keywords.update_keys(
+            {
+                self.keywords.n_ranks: {
+                    "type": ramble.keywords.key_type.required,
+                    "level": ramble.keywords.output_level.key,
+                },
+                self.keywords.processes_per_node: {
+                    "type": ramble.keywords.key_type.required,
+                    "level": ramble.keywords.output_level.key,
+                },
+                self.keywords.n_nodes: {
+                    "type": ramble.keywords.key_type.required,
+                    "level": ramble.keywords.output_level.key,
+                },
+            }
+        )
+
+    def is_mpi_required(self, workload_name):
+        for exec_node in self._get_executable_graph(workload_name).walk():
+            if isinstance(
+                exec_node.attribute,
+                ramble.util.executable.CommandExecutable,
+            ):
+                exec_cmd = exec_node.attribute
+                if exec_cmd.mpi and self.expander.expand_var(
+                    str(exec_cmd.mpi), typed=True
+                ):
+                    return True
+        return False
+
     def set_required_variables(self):
         """Set required variables from all objects"""
 
@@ -3713,7 +3747,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 self.define_variable(var_name, value)
 
-        define_mpi_vars()
+        if self.is_mpi_required(self.expander.workload_name):
+            define_mpi_vars()
 
         if self.keywords.n_threads not in self.variables:
             self.define_variable(self.keywords.n_threads, 1)

@@ -621,7 +621,7 @@ def test_n_ranks_correct_defaults(workspace_name):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {"wl_var1": "1", "wl_var2": "2", "processes_per_node": "2"}
         experiment_context = ramble.context.Context()
         experiment_context.context_name = "series1_{n_ranks}"
@@ -633,8 +633,8 @@ def test_n_ranks_correct_defaults(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments
-        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl2.series1_4" in exp_set.experiments
+        assert "basic.test_wl2.series1_6" in exp_set.experiments
 
 
 def test_n_nodes_correct_defaults(workspace_name):
@@ -656,7 +656,7 @@ def test_n_nodes_correct_defaults(workspace_name):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {"wl_var1": "1", "wl_var2": "2", "processes_per_node": "2"}
         experiment_context = ramble.context.Context()
         experiment_context.context_name = "series1_{n_ranks}_{n_nodes}"
@@ -671,8 +671,8 @@ def test_n_nodes_correct_defaults(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments
-        assert "basic.test_wl.series1_6_3" in exp_set.experiments
+        assert "basic.test_wl2.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl2.series1_6_3" in exp_set.experiments
 
 
 def test_processes_per_node_correct_defaults(workspace_name):
@@ -696,7 +696,7 @@ def test_processes_per_node_correct_defaults(workspace_name):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {
             "wl_var1": "1",
             "wl_var2": "2",
@@ -710,8 +710,8 @@ def test_processes_per_node_correct_defaults(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments
-        assert "basic.test_wl.series1_6_2" in exp_set.experiments
+        assert "basic.test_wl2.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl2.series1_6_2" in exp_set.experiments
 
 
 @pytest.mark.parametrize("var", ["env_path"])
@@ -836,7 +836,7 @@ def test_missing_required_keyword_errors(workspace_name):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {
             "wl_var1": "1",
             "wl_var2": "2",
@@ -1927,7 +1927,7 @@ def test_validation_in_render_repeat_experiments(workspace_name):
         exp_set.set_application_context(app_context)
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         exp_set.set_workload_context(workload_context)
 
         experiment_context = ramble.context.Context()

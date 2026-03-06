@@ -239,7 +239,7 @@ test inheritance 12.0
 
         with pytest.raises(
             RambleCommandError,
-            match=r"Command output:\n\n.*context 'test_context_when'.*is not found",
+            match=r"(?s)Command output:.*context 'test_context_when'.*is not found",
         ):
             workspace("analyze", global_args=global_args)
 
