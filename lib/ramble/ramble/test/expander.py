@@ -153,6 +153,7 @@ def build_variant_set():
         ("math_not_exist(1)", "math_not_exist(1)", set(), 1),
         ("str_upper('foo')", "FOO", set(), 1),
         ("str_lower('FOO')", "foo", set(), 1),
+        ("str_upper(foobar)", "FOOBAR", set(), 1),
         ("str_capitalize('foo')", "Foo", set(), 1),
         ("str_lstrip('AAAbbb', 'A')", "bbb", set(), 1),
         ("str_join('.', str_split('a b c 1'))", "a.b.c.1", set(), 1),
