@@ -3690,7 +3690,22 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 self.define_variable(var_name, value)
 
-        define_mpi_vars()
+        is_mpi_in_use = False
+        for exec_node in self._get_executable_graph(
+            self.expander.workload_name
+        ).walk():
+            if isinstance(
+                exec_node.attribute,
+                ramble.util.executable.CommandExecutable,
+            ):
+                exec_cmd = exec_node.attribute
+                if exec_cmd.mpi:
+                    if self.expander.expand_var(exec_cmd.mpi):
+                        is_mpi_in_use = True
+                        break
+
+        if is_mpi_in_use:
+            define_mpi_vars()
 
         if self.keywords.n_threads not in self.variables:
             self.define_variable(self.keywords.n_threads, 1)
