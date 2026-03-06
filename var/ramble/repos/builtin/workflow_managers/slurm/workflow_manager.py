@@ -290,7 +290,6 @@ class Slurm(WorkflowManagerBase):
         "nodes",
         "start",
         "end",
-        "elapsed_time",
         "exit_code",
     ]:
         figure_of_merit(
