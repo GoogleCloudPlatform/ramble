@@ -29,6 +29,8 @@ from ramble.util.foms import get_literal_from_regex
         (r"^[0-9]+$", ""),
         (r"^\s*$", ""),
         (r"hello\sworld", "hello"),
+        # Invalid regex
+        (r"hello(w", ""),
     ],
 )
 def test_get_literal_from_regex_functionality(regex_str, expected):
