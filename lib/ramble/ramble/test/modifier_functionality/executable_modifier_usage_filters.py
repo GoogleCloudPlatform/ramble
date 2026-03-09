@@ -93,7 +93,7 @@ def test_executable_modifier_usage_filters(
             pre_count = 0
             post_count = 0
 
-            for line in f.readlines():
+            for line in f:
                 pre_m = pre_regex.search(line)
                 if pre_m:
                     pre_count += 1

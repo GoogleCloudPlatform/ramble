@@ -243,7 +243,7 @@ ramble:
     ]
 
     with open(exp_script) as f:
-        for line in f.readlines():
+        for line in f:
             for idx, regex in enumerate(test_regexes):
                 if regex.search(line):
                     tests[idx] = True
@@ -324,7 +324,7 @@ ramble:
     ]
 
     with open(exp_script) as f:
-        for line in f.readlines():
+        for line in f:
             for idx, regex in enumerate(test_regexes):
                 if regex.search(line):
                     tests[idx] = True

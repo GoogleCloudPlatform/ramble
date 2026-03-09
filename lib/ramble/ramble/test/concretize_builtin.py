@@ -93,7 +93,7 @@ ramble:
 
         req_test = True
         with open(config_path) as f:
-            for line in f.readlines():
+            for line in f:
                 if re.match(r"^[^#]*required", line):
                     req_test = False
                     break

@@ -170,7 +170,7 @@ ramble:
         # Check prepend / append order is correct
         with open(script) as f:
 
-            for line in f.readlines():
+            for line in f:
                 if expected_order[0].match(line):
                     expected_order.pop(0)
 

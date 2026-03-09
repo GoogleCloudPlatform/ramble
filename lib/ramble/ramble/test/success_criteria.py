@@ -29,7 +29,7 @@ def remark_all(crit_list, file_path):
         c.reset()
 
     with open(file_path) as f:
-        for line in f.readlines():
+        for line in f:
             for c in crit_list:
                 if c.passed(line):
                     c.mark_found()

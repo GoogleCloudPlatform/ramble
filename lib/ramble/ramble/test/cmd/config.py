@@ -757,7 +757,7 @@ def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspa
     expected = ramble.workspace.Workspace._default_config_yaml()
     expected += """  config: {}
 """
-    for line in io.StringIO(expected).readlines():
+    for line in io.StringIO(expected):
         assert line in output
 
 

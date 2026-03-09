@@ -66,7 +66,7 @@ ramble:
         # Assert experiment 1 has exports before commands
         with open(exp1_script) as f:
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if export_regex.search(line):
                     export_found = True
             assert export_found

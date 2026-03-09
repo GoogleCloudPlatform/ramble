@@ -91,7 +91,7 @@ ramble:
         with open(exp1_script) as f:
             cmd_found = False
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if not export_found and export_regex.search(line):
                     assert not cmd_found
                     export_found = True
@@ -103,7 +103,7 @@ ramble:
         with open(exp2_script) as f:
             cmd_found = False
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if not cmd_found and cmd2_regex.search(line):
                     assert not export_found
                     cmd_found = True
@@ -115,7 +115,7 @@ ramble:
         with open(exp3_script) as f:
             cmd_found = False
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if not export_found and export_regex.search(line):
                     assert not cmd_found
                     export_found = True
@@ -267,7 +267,7 @@ def test_object_env_var_methods(
         )
 
         with open(rendered_script) as f:
-            for line in f.readlines():
+            for line in f:
                 for regex in env_var_regexes:
                     if regex.search(line):
                         found_vars.append(True)

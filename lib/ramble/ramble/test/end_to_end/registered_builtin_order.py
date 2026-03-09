@@ -84,7 +84,7 @@ def test_registered_builtin_order(workspace_name):
     )
 
     with open(rendered_script) as f:
-        for line in f.readlines():
+        for line in f:
             print(f"Line = '{line}'")
             cur_regex = regex_order[found_idx]
             if cur_regex.search(line):
