@@ -71,8 +71,23 @@ steps:
               echo "Failed to upload metrics."
               exit $$upload_err
             fi
+          elif [ -n "$_PR_NUMBER" ]; then
+            echo "Posting metrics to PR $_PR_NUMBER..."
+            python3 share/ramble/qa/post_perf_pr_comment.py \
+              --metrics-file "$$RAMBLE_ROOT/perf_test_metrics.json" \
+              --project-id "$_PROJECT_ID" \
+              --dataset-id "$_DATASET_ID" \
+              --table-id "$_TABLE_ID" \
+              --pr-number "$_PR_NUMBER" \
+              --repo "GoogleCloudPlatform/ramble"
+            
+            post_err=$$?
+            if [ $$post_err -ne 0 ]; then
+              echo "Failed to post PR comment."
+              exit $$post_err
+            fi
           else
-            echo "Skipping metric upload."
+            echo "Skipping metric upload and PR comment."
           fi
         else
           echo "Perf tests failed."
@@ -84,6 +99,7 @@ steps:
     env:
     - 'COMMIT_SHA=$COMMIT_SHA'
     - 'PR_NUMBER=$_PR_NUMBER'
+    secretEnv: ['GITHUB_PR_TOKEN']
 
 substitutions:
   _SPACK_REF: 'v1.0.0'
@@ -93,7 +109,6 @@ substitutions:
   _PROJECT_ID: ''
   _DATASET_ID: ''
   _TABLE_ID: ''
-  _PR_NUMBER: ''
   # This is only set to true when pushing to develop branch
   _UPLOAD_TO_BQ: 'false'
 
@@ -101,3 +116,8 @@ timeout: 3600s
 options:
   # TODO: Maybe use a higher SKU for more consistent performance?
   machineType: N1_HIGHCPU_8
+
+availableSecrets:
+  secretManager:
+  - versionName: projects/$PROJECT_ID/secrets/ramble-pr-pat/versions/latest
+    env: 'GITHUB_PR_TOKEN'
