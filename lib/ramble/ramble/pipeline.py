@@ -238,6 +238,20 @@ class Pipeline:
         self._complete()
         logger.remove_log()
 
+    def _copy_workspace_root_files(self, workspace, dest_dir):
+        root_files = [
+            ramble.workspace.Workspace.inventory_file_name,
+            ramble.workspace.Workspace.hash_file_name,
+            self.workspace.inventory_file_name,
+            self.workspace.hash_file_name,
+            ramble.workspace.METADATA_FILE_NAME,
+        ]
+        for filename in root_files:
+            src = os.path.join(workspace.root, filename)
+            if os.path.exists(src):
+                dest = os.path.join(dest_dir, filename)
+                shutil.copyfile(src, dest)
+
 
 class AnalyzePipeline(Pipeline):
     """Class for the analyze pipeline"""
@@ -360,14 +374,7 @@ class ArchivePipeline(Pipeline):
         archive_path = os.path.join(self.workspace.archive_dir, self.archive_name)
         fs.mkdirp(archive_path)
 
-        for filename in (
-            ramble.workspace.Workspace.inventory_file_name,
-            ramble.workspace.Workspace.hash_file_name,
-        ):
-            src = os.path.join(self.workspace.root, filename)
-            if os.path.exists(src):
-                dest = src.replace(self.workspace.root, archive_path)
-                shutil.copyfile(src, dest)
+        self._copy_workspace_root_files(self.workspace, archive_path)
 
         # Copy current configs
         archive_configs = os.path.join(
@@ -690,6 +697,7 @@ class PushDeploymentPipeline(Pipeline):
 
         self.action_string = "Pushing deployment of"
         self.create_tar = create_tar
+        self.force_inventory = True
 
         if upload_url:
             expanded_url = workspace_expander.expand_var(upload_url)
@@ -725,6 +733,10 @@ class PushDeploymentPipeline(Pipeline):
 
     def _complete(self):
         super()._complete()
+
+        # Copy inventory files into deployment
+        self._copy_workspace_root_files(self.workspace, self.workspace.named_deployment)
+
         # Create an index.json of the deployment
         deployment_index = {self.index_namespace: []}
         for file in self._deployment_files():
