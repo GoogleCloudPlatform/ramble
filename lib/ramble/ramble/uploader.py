@@ -29,7 +29,7 @@ from ramble.util.logger import logger
 
 default_node_type_val = "Not Specified"
 
-uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly"])
+uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly", "SQLite"])
 
 
 def validate_data(data, schema):
@@ -42,6 +42,26 @@ def validate_data(data, schema):
 
 
 class Uploader:
+    schema = [
+        {
+            "table": "experiments",
+            "schema": experiment_schema,
+            "version": experiment_schema_version,
+        },
+        {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
+        {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
+        {
+            "table": "experiments_metadata",
+            "schema": experiments_metadata_schema,
+            "version": experiments_metadata_schema_version,
+        },
+        {
+            "table": "software",
+            "schema": software_db_schema,
+            "version": software_db_schema_version,
+        },
+    ]
+
     # TODO: should the class store the base uri?
     def perform_upload(self, uri, data):
         # TODO: move content checking to __init__ ?
@@ -50,6 +70,55 @@ class Uploader:
         if not data:
             raise ValueError(f"{self.__class__} requires %{data} argument.")
         pass
+
+    def chunked_upload(self, table_id, data, uri=None):
+        """Abstract method for chunked uploads. Must be implemented by subclasses."""
+        raise NotImplementedError("Subclasses must implement chunked_upload()")
+
+    def insert_data(self, uri: str, results) -> None:
+        (
+            exp_table_id,
+            exps_to_insert,
+            fom_table_id,
+            foms_to_insert,
+            metadata_table_id,
+            metadata_to_insert,
+            software_table_id,
+            software_to_insert,
+        ) = _prepare_data(results, uri)
+
+        logger.debug("Experiments to insert:")
+        logger.debug(exps_to_insert)
+
+        logger.msg("Upload experiments...")
+        errors1 = self.chunked_upload(exp_table_id, exps_to_insert, uri=uri)
+
+        if not errors1:
+            logger.msg("Upload FOMs...")
+            errors2 = self.chunked_upload(fom_table_id, foms_to_insert, uri=uri)
+        else:
+            errors2 = None
+
+        if not errors2 and not errors1:
+            logger.msg("Upload Experiment Metadata...")
+            errors3 = self.chunked_upload(metadata_table_id, metadata_to_insert, uri=uri)
+        else:
+            errors3 = None
+
+        if not errors3 and not errors2 and not errors1:
+            logger.msg("Upload Software...")
+            errors4 = self.chunked_upload(software_table_id, software_to_insert, uri=uri)
+        else:
+            errors4 = None
+
+        for errors, name in zip(
+            (errors1, errors2, errors3, errors4),
+            ("exp", "fom", "experiment_metadata", "software"),
+        ):
+            if errors is not None and len(errors) == 0:
+                logger.msg(f"New rows have been added in {name}")
+            elif errors:
+                logger.die(f"Encountered errors while inserting rows: {errors}")
 
 
 class ExperimentList(list):
@@ -185,6 +254,8 @@ def upload_results(results):
     logger.all_msg(f"Uploading results to {uri} with {uploader_type} uploader")
     if uploader_type == uploader_types.BigQuery:
         uploader = BigQueryUploader()
+    elif uploader_type == uploader_types.SQLite:
+        uploader = SQLiteUploader()
     else:
         uploader = PrintOnlyUploader()
     uploader.perform_upload(uri, formatted_data)
@@ -335,32 +406,55 @@ def _prepare_data(results, uri):
     )
 
 
+def _get_metadata_to_insert():
+    from datetime import datetime
+
+    now_timestamp = str(datetime.now())
+    return [
+        {
+            "key": "db_schema_version",
+            "value": db_schema_version,
+            "timestamp": now_timestamp,
+        },
+        {
+            "key": "experiment_schema_version",
+            "value": str(experiment_schema_version),
+            "timestamp": now_timestamp,
+        },
+        {
+            "key": "fom_schema_version",
+            "value": str(fom_schema_version),
+            "timestamp": now_timestamp,
+        },
+        {
+            "key": "metadata_schema_version",
+            "value": str(metadata_schema_version),
+            "timestamp": now_timestamp,
+        },
+        {
+            "key": "software_db_schema_version",
+            "value": str(software_db_schema_version),
+            "timestamp": now_timestamp,
+        },
+        {
+            "key": "ramble_version",
+            "value": ramble.util.version.get_version(),
+            "timestamp": now_timestamp,
+        },
+        {
+            "key": "user",
+            "value": get_user(),
+            "timestamp": now_timestamp,
+        },
+    ]
+
+
 class BigQueryUploader(Uploader):
     """Class to handle upload of FOMs to BigQuery"""
 
     """
     Attempt to chunk the upload into acceptable size chunks, per BigQuery requirements
     """
-
-    schema = [
-        {
-            "table": "experiments",
-            "schema": experiment_schema,
-            "version": experiment_schema_version,
-        },
-        {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
-        {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
-        {
-            "table": "experiments_metadata",
-            "schema": experiments_metadata_schema,
-            "version": experiments_metadata_schema_version,
-        },
-        {
-            "table": "software",
-            "schema": software_db_schema,
-            "version": software_db_schema_version,
-        },
-    ]
 
     def _schema_to_bigquery(self, schema):
         from google.cloud import bigquery
@@ -439,51 +533,12 @@ class BigQueryUploader(Uploader):
             self.upload_metadata(uri)
 
     def upload_metadata(self, uri):
-        from datetime import datetime
-
         logger.info("Uploading metadata at table creation time")
         metadata_table_id = f"{uri}.metadata"
-        now_timestamp = str(datetime.now())
-        metadata_to_insert = [
-            {
-                "key": "db_schema_version",
-                "value": db_schema_version,
-                "timestamp": now_timestamp,
-            },
-            {
-                "key": "experiment_schema_version",
-                "value": str(experiment_schema_version),
-                "timestamp": now_timestamp,
-            },
-            {
-                "key": "fom_schema_version",
-                "value": str(fom_schema_version),
-                "timestamp": now_timestamp,
-            },
-            {
-                "key": "metadata_schema_version",
-                "value": str(metadata_schema_version),
-                "timestamp": now_timestamp,
-            },
-            {
-                "key": "software_db_schema_version",
-                "value": str(software_db_schema_version),
-                "timestamp": now_timestamp,
-            },
-            {
-                "key": "ramble_version",
-                "value": ramble.util.version.get_version(),
-                "timestamp": now_timestamp,
-            },
-            {
-                "key": "user",
-                "value": get_user(),
-                "timestamp": now_timestamp,
-            },
-        ]
-        self.chunked_upload(metadata_table_id, metadata_to_insert)
+        metadata_to_insert = _get_metadata_to_insert()
+        self.chunked_upload(metadata_table_id, metadata_to_insert, uri=uri)
 
-    def chunked_upload(self, table_id, data):
+    def chunked_upload(self, table_id, data, uri=None):
         from google.cloud import bigquery
 
         client = bigquery.Client()
@@ -525,51 +580,6 @@ class BigQueryUploader(Uploader):
                 logger.warn(error)
                 return error
         return error
-
-    def insert_data(self, uri: str, results) -> None:
-
-        (
-            exp_table_id,
-            exps_to_insert,
-            fom_table_id,
-            foms_to_insert,
-            metadata_table_id,
-            metadata_to_insert,
-            software_table_id,
-            software_to_insert,
-        ) = _prepare_data(results, uri)
-
-        logger.debug("Experiments to insert:")
-        logger.debug(exps_to_insert)
-
-        logger.msg("Upload experiments...")
-        errors1 = self.chunked_upload(exp_table_id, exps_to_insert)
-        errors2 = None
-
-        if errors1 == []:
-            logger.msg("Upload FOMs...")
-            errors2 = self.chunked_upload(fom_table_id, foms_to_insert)
-
-        if errors2 == []:
-            logger.msg("Upload Experiment Metadata...")
-            errors3 = self.chunked_upload(metadata_table_id, metadata_to_insert)
-        else:
-            errors3 = None
-
-        if errors3 == []:
-            logger.msg("Upload Software...")
-            errors4 = self.chunked_upload(software_table_id, software_to_insert)
-        else:
-            errors4 = None
-
-        for errors, name in zip(
-            (errors1, errors2, errors3, errors4),
-            ("exp", "fom", "experiment_metadata", "software"),
-        ):
-            if errors == []:
-                logger.msg(f"New rows have been added in {name}")
-            else:
-                logger.die(f"Encountered errors while inserting rows: {errors}")
 
     def perform_upload(self, uri, results):
         super().perform_upload(uri, results)
@@ -624,3 +634,151 @@ class PrintOnlyUploader(Uploader):
         )
         for software in software_to_insert:
             logger.info(f"  {software}")
+
+
+class SQLiteUploader(Uploader):
+    """Class to handle upload of FOMs to a local SQLite database"""
+
+    def _schema_to_sqlite(self, schema):
+        type_map = {
+            "string": "TEXT",
+            "number": "REAL",
+            "integer": "INTEGER",
+            "boolean": "INTEGER",  # SQLite uses 0/1 for booleans
+            "array": "TEXT",  # Store as JSON string
+            "object": "TEXT",  # Store as JSON string
+        }
+
+        sqlite_schema = []
+        for name, props in schema.get("properties", {}).items():
+            sqlite_type = type_map[props["type"]]
+            sqlite_schema.append(f"{name} {sqlite_type}")
+
+        return ", ".join(sqlite_schema)
+
+    def create_tables(self, uri):
+        import os
+        import sqlite3
+
+        # Verify URI is a valid path location, create directories if needed
+        db_dir = os.path.dirname(uri)
+        if db_dir and not os.path.exists(db_dir):
+            os.makedirs(db_dir)
+
+        conn = sqlite3.connect(uri)
+        cursor = conn.cursor()
+
+        # Check schema version
+        for table_def in self.schema:
+            try:
+                # Check if metadata table exists first
+                cursor.execute(
+                    "SELECT count(name) FROM sqlite_master WHERE type='table' AND name='metadata'"
+                )
+                if cursor.fetchone()[0] == 1:
+                    query = (
+                        f"SELECT value FROM metadata WHERE key = "
+                        f"'{table_def['table']}_schema_version'"
+                    )
+                    cursor.execute(query)
+                    result = cursor.fetchone()
+                    if result:
+                        upstream_version = result[0]
+                        if upstream_version != str(table_def["version"]):
+                            logger.warn(
+                                f"Upstream DB schema version for table {table_def['table']} "
+                                f"('{upstream_version}') does not match current version "
+                                f"('{table_def['version']}')"
+                            )
+            except sqlite3.Error as e:
+                logger.warn(f"Error checking schema version: {e}")
+
+        tables_created = False
+        for table_def in self.schema:
+            table_name = table_def["table"]
+            cursor.execute(
+                f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table_name}'"
+            )
+            if cursor.fetchone()[0] == 1:
+                logger.info(f"Table {table_name} already exists.")
+            else:
+                logger.info(f"Creating table {table_name}")
+                sqlite_schema = self._schema_to_sqlite(table_def["schema"][table_def["version"]])
+                cursor.execute(f"CREATE TABLE {table_name} ({sqlite_schema})")
+                tables_created = True
+
+        conn.commit()
+        conn.close()
+
+        if tables_created:
+            self.upload_metadata(uri)
+
+    def upload_metadata(self, uri):
+        logger.info("Uploading metadata at table creation time")
+        metadata_table_id = "metadata"
+        metadata_to_insert = _get_metadata_to_insert()
+        self.chunked_upload(metadata_table_id, metadata_to_insert, uri)
+
+    def chunked_upload(self, table_id, data, uri=None):
+        import sqlite3
+
+        if not data:
+            return []
+
+        error = []
+        table_name = table_id.split(".")[-1]
+        table_def = next((t for t in self.schema if t["table"] == table_name), None)
+
+        if table_def and table_def["schema"].get(table_def["version"]):
+            schema_for_validation = table_def["schema"][table_def["version"]]
+            for row in data:
+                validate_data(row, schema_for_validation)
+        else:
+            logger.warn(
+                f"Could not find a valid schema for table '{table_name}'. "
+                f"Skipping validation for this chunk."
+            )
+
+        # Prepare data for SQLite insertion (serialize dicts/lists to JSON strings)
+        sqlite_data = []
+        keys = list(data[0].keys())
+
+        for row in data:
+            sqlite_row = []
+            for key in keys:
+                val = row.get(key)
+                if isinstance(val, (dict, list)):
+                    sqlite_row.append(json.dumps(val))
+                elif isinstance(val, bool):
+                    sqlite_row.append(1 if val else 0)
+                else:
+                    sqlite_row.append(val)
+            sqlite_data.append(tuple(sqlite_row))
+
+        placeholders = ", ".join(["?"] * len(keys))
+        columns = ", ".join(keys)
+        insert_query = f"INSERT INTO {table_name} ({columns}) VALUES ({placeholders})"
+
+        try:
+            conn = sqlite3.connect(uri)
+            cursor = conn.cursor()
+            cursor.executemany(insert_query, sqlite_data)
+            conn.commit()
+            conn.close()
+        except sqlite3.Error as e:
+            logger.warn(f"Issue during uploader insert: {e}")
+            error.append(str(e))
+
+        return error
+
+    def perform_upload(self, uri, results):
+        import os
+
+        if not os.path.exists(uri):
+            logger.die(
+                f"SQLite database '{uri}' does not exist. "
+                "Please create it first by running: ramble data create-db"
+            )
+
+        super().perform_upload(uri, results)
+        self.insert_data(uri, results)

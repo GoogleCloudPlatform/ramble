@@ -29,8 +29,30 @@ def data_create_db(args):
     uri = ramble.config.get("config:upload:uri")
     if not uri:
         raise ConfigError("No upload URI (config:upload:uri) in config.")
-    uploader = ramble.uploader.BigQueryUploader()
-    uploader.create_tables(uri)
+
+    uploader_type_str = ramble.config.get("config:upload:type")
+
+    if uploader_type_str is None:
+        raise ConfigError("No upload type (config:upload:type) in config.")
+
+    if not hasattr(ramble.uploader.uploader_types, uploader_type_str):
+        raise ConfigError(f"Upload type {uploader_type_str} is not valid.")
+
+    uploader_type = getattr(ramble.uploader.uploader_types, uploader_type_str)
+
+    if uploader_type == ramble.uploader.uploader_types.BigQuery:
+        uploader = ramble.uploader.BigQueryUploader()
+    elif uploader_type == ramble.uploader.uploader_types.SQLite:
+        uploader = ramble.uploader.SQLiteUploader()
+    else:
+        # Note: PrintOnlyUploader shouldn't really be used here since it doesn't create tables
+        uploader = ramble.uploader.PrintOnlyUploader()
+
+    if hasattr(uploader, "create_tables"):
+        uploader.create_tables(uri)
+    else:
+        # Some uploaders might not have/need create_tables (like PrintOnly)
+        pass
 
 
 #: Dictionary mapping subcommand names and aliases to functions

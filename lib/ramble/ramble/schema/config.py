@@ -166,7 +166,11 @@ properties["config"]["upload"] = {
     "properties": {
         "uri": {"type": "string", "default": ""},
         "push_failed": {"type": "boolean", "default": True},
-        "type": {"type": "string", "default": "BigQuery", "enum": ["BigQuery", "PrintOnly"]},
+        "type": {
+            "type": "string",
+            "default": "BigQuery",
+            "enum": ["BigQuery", "PrintOnly", "SQLite"],
+        },
     },
 }
 
