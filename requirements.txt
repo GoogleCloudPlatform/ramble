@@ -13,3 +13,4 @@ matplotlib
 setuptools
 scipy
 types-PyYAML
+sqlite3

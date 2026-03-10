@@ -47,18 +47,31 @@ class Uploader:
             "table": "experiments",
             "schema": experiment_schema,
             "version": experiment_schema_version,
+            "metadata_key": "experiment_schema_version",
         },
-        {"table": "foms", "schema": fom_schema, "version": fom_schema_version},
-        {"table": "metadata", "schema": metadata_schema, "version": metadata_schema_version},
+        {
+            "table": "foms",
+            "schema": fom_schema,
+            "version": fom_schema_version,
+            "metadata_key": "fom_schema_version",
+        },
+        {
+            "table": "metadata",
+            "schema": metadata_schema,
+            "version": metadata_schema_version,
+            "metadata_key": "metadata_schema_version",
+        },
         {
             "table": "experiments_metadata",
             "schema": experiments_metadata_schema,
             "version": experiments_metadata_schema_version,
+            "metadata_key": "experiments_metadata_schema_version",
         },
         {
             "table": "software",
             "schema": software_db_schema,
             "version": software_db_schema_version,
+            "metadata_key": "software_db_schema_version",
         },
     ]
 
@@ -677,8 +690,7 @@ class SQLiteUploader(Uploader):
                 )
                 if cursor.fetchone()[0] == 1:
                     query = (
-                        f"SELECT value FROM metadata WHERE key = "
-                        f"'{table_def['table']}_schema_version'"
+                        f"SELECT value FROM metadata WHERE key = " f"'{table_def['metadata_key']}'"
                     )
                     cursor.execute(query)
                     result = cursor.fetchone()

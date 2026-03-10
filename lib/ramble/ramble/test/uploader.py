@@ -304,3 +304,62 @@ def test_sqlite_uploader_perform_upload_no_db(tmpdir, mock_results_with_metadata
         captured = capsys.readouterr()
         assert "does not exist" in captured.err
         assert "ramble data create-db" in captured.err
+
+
+def test_sqlite_uploader_create_tables_with_existing(tmpdir, mock_results_with_metadata, capsys):
+    import sqlite3
+
+    import ramble.util.logger
+
+    uri = str(tmpdir / "UNIT_TEST_DATABASE.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        # Create initially
+        uploader.create_tables(uri)
+
+        # Modify schema version dynamically to verify mismatch warning
+        conn = sqlite3.connect(uri)
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE metadata SET value='999.0' WHERE key='fom_schema_version'")
+        conn.commit()
+        conn.close()
+
+        # Call again to trigger existing table and schema mismatch logs
+        uploader.create_tables(uri)
+        captured = capsys.readouterr()
+
+        assert "already exists" in captured.out + captured.err
+        assert "does not match current version" in captured.out + captured.err
+
+
+def test_sqlite_uploader_chunked_upload_errors(tmpdir, mock_results_with_metadata, capsys):
+    uri = str(tmpdir / "test_ramble_upload_errors.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        uploader.create_tables(uri)
+
+        formatted_data = format_data(mock_results_with_metadata)
+        (
+            exp_table_id,
+            exps_to_insert,
+            fom_table_id,
+            foms_to_insert,
+            metadata_table_id,
+            metadata_to_insert,
+            software_table_id,
+            software_to_insert,
+        ) = ramble.uploader._prepare_data(formatted_data, uri)
+
+        # Trigger issue during upload insert by injecting bad data format that breaks SQLite schema
+        bad_exps_to_insert = exps_to_insert.copy()
+
+        # Test unknown schema missing
+        uploader.schema = []
+        uploader.chunked_upload(exp_table_id, bad_exps_to_insert, uri)
+        captured = capsys.readouterr()
+        assert "Could not find a valid schema" in captured.err
