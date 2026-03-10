@@ -59,7 +59,7 @@ from ramble.language.shared_language import (
     register_phase,
 )
 from ramble.util import conversions
-from ramble.util.foms import FomType, SummaryFoms
+from ramble.util.foms import FomType, SummaryFoms, get_literal_from_regex
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 from ramble.util.output_capture import output_mapper
@@ -2606,7 +2606,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 ]
 
                 with open(file) as f:
-                    for line in f.readlines():
+                    for line in f:
                         new_per_file_crit_objs = []
                         for crit_obj in per_file_crit_objs:
                             if crit_obj.passed(line, self):
@@ -2621,9 +2621,15 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         for context, foms in file_conf["contexts"].items():
                             if not context == _NULL_CONTEXT:
                                 context_conf = f_defs[context]["definition"]
-                                context_match = context_conf["regex"].match(
-                                    line
-                                )
+                                if (
+                                    context_conf.get("pre_filter", "")
+                                    not in line
+                                ):
+                                    context_match = None
+                                else:
+                                    context_match = context_conf[
+                                        "regex"
+                                    ].match(line)
 
                                 if context_match:
                                     context_name = format_context(
@@ -2642,7 +2648,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                             for fom in foms:
                                 fom_conf = f_defs[context]["foms"][fom]
-                                fom_match = fom_conf["regex"].match(line)
+                                if fom_conf.get("pre_filter", "") not in line:
+                                    fom_match = None
+                                else:
+                                    fom_match = fom_conf["regex"].match(line)
 
                                 if fom_match:
                                     fom_vars = {}
@@ -3203,6 +3212,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     )
                                     dest_def_dict[context]["definition"] = {
                                         "regex": re.compile(regex_str),
+                                        "pre_filter": get_literal_from_regex(
+                                            regex_str
+                                        ),
                                         "format": all_contexts[context][
                                             "output_format"
                                         ],
@@ -3236,6 +3248,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 except ramble.expander.RambleSyntaxError:
                                     return None
 
+                            expanded_regex = (
+                                ""
+                                if is_inmem
+                                else _expand_var(source_def["regex"])
+                            )
                             fom_def = {
                                 "origin": source.name,
                                 "origin_type": source.origin_type,
@@ -3249,9 +3266,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 "regex": (
                                     ""
                                     if is_inmem
-                                    else re.compile(
-                                        _expand_var(source_def["regex"])
-                                    )
+                                    else re.compile(expanded_regex)
+                                ),
+                                "pre_filter": (
+                                    ""
+                                    if is_inmem
+                                    else get_literal_from_regex(expanded_regex)
                                 ),
                                 "fom_type": source_def["fom_type"].to_dict(),
                                 "fom_map_key": source_def["fom_map_key"],
