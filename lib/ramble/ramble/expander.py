@@ -28,6 +28,10 @@ from ramble.util.path import substitute_config_variables
 import spack.util.naming
 
 _ast_cache: Dict[str, str] = {}
+# Regex for detecting math operators or keywords
+# We check for: + - * / % ^ & | ~ < > = ( ) [ ] { } , ' "
+# And keywords: and, or, in, is, not
+_math_regex = re.compile(r"[+\-*/%^&|~<>=()\[\]{},'\"]|\b(?:and|or|in|is|not)\b")
 
 # Define a dummy type so that it doesn't match any real types
 # These type defs are used to handle compatibility among Python versions
@@ -82,7 +86,11 @@ def _ast_parse(in_str):
     if in_str in _ast_cache:
         return _ast_cache[in_str]
 
-    math_ast = ast.parse(in_str, mode="eval")
+    try:
+        math_ast = ast.parse(in_str, mode="eval")
+    except SyntaxError:
+        math_ast = None
+
     _ast_cache[in_str] = math_ast
     return math_ast
 
@@ -939,11 +947,26 @@ class Expander:
             unmodified (if unsuccessful)
 
         """
+        # Fast path for things that are likely paths
+        if in_str.startswith("/") or in_str.startswith("./"):
+            return in_str
+
+        # Heuristic: if no math operators/keywords, it's probably a string. Skip parsing.
+        if not _math_regex.search(in_str):
+            # Exception: if it looks like a number or True/False/None, or a variable name,
+            # we should parse it.
+            # "Experiment 1" -> Space, no keywords, no operators -> Skip
+            if " " in in_str:
+                return in_str
+
         self._math_str_stack.append(in_str)
         try:
             with warnings.catch_warnings(record=True) as wal:
                 try:
                     math_ast = _ast_parse(in_str)
+                    if math_ast is None:
+                        return in_str
+
                     body = math_ast.body
                     out_str = self.eval_math(body)
 
