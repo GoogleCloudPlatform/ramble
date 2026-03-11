@@ -107,7 +107,7 @@ ramble:
             glob_env_var_found = False
             baz_env_var_not_found = True
 
-            for line in f.readlines():
+            for line in f:
                 # Executables
                 if test_cmd_regex.search(line):
                     test_cmd_found = True
@@ -156,7 +156,7 @@ ramble:
             glob_var_mod_found = False  # checks both variable modifier and modifier variable
             glob_env_var_mod_found = False
 
-            for line in f.readlines():
+            for line in f:
                 # Executables
                 if test_cmd_regex.search(line):
                     test_cmd_found = True

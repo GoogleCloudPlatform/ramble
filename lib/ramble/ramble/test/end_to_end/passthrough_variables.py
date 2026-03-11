@@ -68,7 +68,7 @@ ramble:
         # Assert undefined variable is found
         with open(exp1_script) as f:
             undefined_found = False
-            for line in f.readlines():
+            for line in f:
                 if undefined_regex.search(line):
                     undefined_found = True
             assert undefined_found

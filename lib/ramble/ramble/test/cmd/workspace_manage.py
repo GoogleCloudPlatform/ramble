@@ -53,7 +53,7 @@ def test_manage_variable_multiple_equals(workspace_name, tmpdir):
     results = [False for _ in tests]
 
     with open(ws.config_file_path) as f:
-        for line in f.readlines():
+        for line in f:
             for idx, test_str in enumerate(tests):
                 if test_str in line:
                     results[idx] = True

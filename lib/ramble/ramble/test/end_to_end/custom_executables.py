@@ -116,7 +116,7 @@ ramble:
         ]
         inject_idx = 0
 
-        for line in f.readlines():
+        for line in f:
             if not custom_found and custom_regex.search(line):
                 assert not cmd_found
                 assert not export_found
