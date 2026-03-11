@@ -1098,10 +1098,9 @@ def required_variable(
     """
 
     def _mark_required_var(obj):
-        when_list = []
         if mode or modes:
             if obj.origin_type and obj.origin_type == "modifier":
-                when_list = ramble.language.language_helpers.require_condition(
+                when_lists = ramble.language.language_helpers.merge_conditions(
                     obj, "required_variable", "mode", "modes", mode=mode, modes=modes, when=when
                 )
             else:
@@ -1110,9 +1109,11 @@ def required_variable(
                     f"{obj.name}. Mode arguments are only valid in a modifier definition."
                 )
         else:
-            when_list = ramble.language.language_helpers.build_when_list(
-                when, obj, var, "required_variable"
-            )
+            when_lists = [
+                ramble.language.language_helpers.build_when_list(
+                    when, obj, var, "required_variable"
+                )
+            ]
 
         if results_level not in ["key", "variable"]:
             raise ramble.language.language_base.DirectiveError(
@@ -1125,13 +1126,16 @@ def required_variable(
         if results_level == "key":
             output_level = ramble.keywords.output_level.key
 
-        obj.required_vars[var] = {
-            "type": ramble.keywords.key_type.required,
-            "level": output_level,
-            "description": description,
-            # Extra prop that's only used for filtering
-            "when": when_list,
-        }
+        if var not in obj.required_vars:
+            obj.required_vars[var] = {
+                "type": ramble.keywords.key_type.required,
+                "level": output_level,
+                "description": description,
+                "when": [],
+            }
+
+        for when_list in when_lists:
+            obj.required_vars[var]["when"].append(when_list)
 
     return _mark_required_var
 

@@ -106,26 +106,28 @@ def variable_modification(
                 f"  Valid methods are {str(supported_methods)}"
             )
 
-        when_list = ramble.language.language_helpers.require_condition(
+        when_lists = ramble.language.language_helpers.merge_conditions(
             mod, "variable_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
-        when_set = frozenset(when_list)
 
-        if when_set not in mod.variable_modifications:
-            mod.variable_modifications[when_set] = {}
+        for when_list in when_lists:
+            when_set = frozenset(when_list)
 
-        if name not in mod.variable_modifications[when_set]:
-            mod.variable_modifications[when_set][name] = []
+            if when_set not in mod.variable_modifications:
+                mod.variable_modifications[when_set] = {}
 
-        mod.variable_modifications[when_set][name].append(
-            VariableModification(
-                name=name,
-                modification=modification,
-                method=method,
-                separator=separator,
-                when=when_list,
+            if name not in mod.variable_modifications[when_set]:
+                mod.variable_modifications[when_set][name] = []
+
+            mod.variable_modifications[when_set][name].append(
+                VariableModification(
+                    name=name,
+                    modification=modification,
+                    method=method,
+                    separator=separator,
+                    when=when_list,
+                )
             )
-        )
 
     return _execute_variable_modification
 
@@ -242,28 +244,30 @@ def env_var_modification(
                 "requires a value for the modification argument."
             )
 
-        when_list = ramble.language.language_helpers.require_condition(
+        when_lists = ramble.language.language_helpers.merge_conditions(
             mod, "env_var_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
-        when_set = frozenset(when_list)
 
-        if when_set not in mod.env_var_modifications:
-            mod.env_var_modifications[when_set] = {}
+        for when_list in when_lists:
+            when_set = frozenset(when_list)
 
-        if name not in mod.env_var_modifications[when_set]:
-            mod.env_var_modifications[when_set][name] = EnvironmentVariableModifications(
-                name=name,
-                modification=modification,
-                method=method,
-                when=when_list,
-                **kwargs,
-            )
-        else:
-            mod.env_var_modifications[when_set][name].add_modification(
-                modification=modification,
-                method=method,
-                **kwargs,
-            )
+            if when_set not in mod.env_var_modifications:
+                mod.env_var_modifications[when_set] = {}
+
+            if name not in mod.env_var_modifications[when_set]:
+                mod.env_var_modifications[when_set][name] = EnvironmentVariableModifications(
+                    name=name,
+                    modification=modification,
+                    method=method,
+                    when=when_list,
+                    **kwargs,
+                )
+            else:
+                mod.env_var_modifications[when_set][name].add_modification(
+                    modification=modification,
+                    method=method,
+                    **kwargs,
+                )
 
     return _env_var_modification
 
@@ -300,25 +304,11 @@ def modifier_variable(
     """
 
     def _define_modifier_variable(mod):
-
-        all_modes = ramble.language.language_helpers.merge_definitions(
-            mode, modes, mod.modes, "mode", "modes", "modifier_variable"
+        when_lists = ramble.language.language_helpers.merge_conditions(
+            mod, "modifier_variable", "mode", "modes", mode=mode, modes=modes, when=when
         )
 
-        base_when_list = ramble.language.language_helpers.build_when_list(
-            when, mod, name, "modifier_variable"
-        )
-
-        if not all_modes:
-            all_modes = [None]
-
-        for mode_name in all_modes:
-            if mode_name:
-                mode_variant = f"{mod.name}_mode={mode_name}"
-                variant_when_list = base_when_list + [mode_variant]
-            else:
-                variant_when_list = base_when_list
-
+        for when_list in when_lists:
             ramble.language.shared_language.variable(
                 name,
                 default,
@@ -326,7 +316,7 @@ def modifier_variable(
                 values=values,
                 expandable=expandable,
                 track_used=track_used,
-                when=variant_when_list,
+                when=when_list,
                 error_context="modifier_variable",
                 **kwargs,
             )(mod)
@@ -383,23 +373,25 @@ def package_manager_requirement(
                 f"{validation_type} but no regex is given"
             )
 
-        when_list = ramble.language.language_helpers.require_condition(
+        when_lists = ramble.language.language_helpers.merge_conditions(
             mod, "package_manager_requirement", "mode", "modes", mode=mode, modes=modes, when=when
         )
-        when_set = frozenset(when_list)
 
-        if when_set not in mod.package_manager_requirements:
-            mod.package_manager_requirements[when_set] = []
+        for when_list in when_lists:
+            when_set = frozenset(when_list)
 
-        mod.package_manager_requirements[when_set].append(
-            ramble.definitions.requirements.PackageManagerRequirement(
-                command=command,
-                validation_type=validation_type,
-                regex=regex,
-                package_manager=package_manager,
-                when=when_list,
+            if when_set not in mod.package_manager_requirements:
+                mod.package_manager_requirements[when_set] = []
+
+            mod.package_manager_requirements[when_set].append(
+                ramble.definitions.requirements.PackageManagerRequirement(
+                    command=command,
+                    validation_type=validation_type,
+                    regex=regex,
+                    package_manager=package_manager,
+                    when=when_list,
+                )
             )
-        )
 
     return _new_package_manager_requirement
 

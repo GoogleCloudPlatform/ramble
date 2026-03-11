@@ -31,6 +31,8 @@ def test_modeless_modifier_variables(
             "n_nodes=1",
             "-v",
             "n_ranks=1",
+            "-v",
+            "modeless_required_var=val",
             global_args=global_args,
         )
 
@@ -48,7 +50,7 @@ def test_modeless_modifier_variables(
         template_path = os.path.join(ws.config_dir, "test.tpl")
 
         with open(template_path, "w+") as f:
-            f.write("{command}\n{modeless_variable}")
+            f.write("{command}\n{modeless_variable}\n{modeless_var_mod}")
 
         workspace("setup", "--dry-run", global_args=global_args)
 
@@ -59,3 +61,5 @@ def test_modeless_modifier_variables(
             assert "is defined" in data
             assert "MODELESS_ENV_VAR" in data
             assert "modeless_variable" not in data
+            assert "modeless-append" in data
+            assert "MODELESS_ENV_VAR_2=modeless_val" in data

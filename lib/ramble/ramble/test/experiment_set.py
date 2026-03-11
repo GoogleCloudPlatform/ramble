@@ -1093,6 +1093,7 @@ def test_modifiers_set_correctly(workspace_name, mock_modifiers):
             "app_var1": "1",
             "app_var2": "2",
             "processes_per_node": "1",
+            "modeless_required_var": "1",
             "mpi_command": "",
             "batch_submit": "",
         }
