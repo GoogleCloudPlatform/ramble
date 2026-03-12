@@ -32,6 +32,7 @@ _ast_cache: Dict[str, str] = {}
 # We check for: + - * / % ^ & | ~ < > = ( ) [ ] { } , ' "
 # And keywords: and, or, in, is, not
 _math_regex = re.compile(r"[+\-*/%^&|~<>=()\[\]{},'\"]|\b(?:and|or|in|is|not)\b")
+_MATH_CONSTANTS = frozenset(("True", "False", "None"))
 
 # Define a dummy type so that it doesn't match any real types
 # These type defs are used to handle compatibility among Python versions
@@ -953,20 +954,21 @@ class Expander:
 
         # Heuristic: if no math operators/keywords, it's probably a string. Skip parsing.
         if not _math_regex.search(in_str):
-            # Exception: if it looks like a number or True/False/None, or a variable name,
-            # we should parse it.
-            # "Experiment 1" -> Space, no keywords, no operators -> Skip
-            if " " in in_str:
+            # If it doesn't match the regex, it's only math-relevant if it's:
+            # 1. A number (like 123)
+            # 2. A constant (True, False, None)
+            # If it has a space, or is a valid identifier (excluding constants), it's not math.
+            if " " in in_str or (in_str.isidentifier() and in_str not in _MATH_CONSTANTS):
                 return in_str
+
+        math_ast = _ast_parse(in_str)
+        if math_ast is None:
+            return in_str
 
         self._math_str_stack.append(in_str)
         try:
             with warnings.catch_warnings(record=True) as wal:
                 try:
-                    math_ast = _ast_parse(in_str)
-                    if math_ast is None:
-                        return in_str
-
                     body = math_ast.body
                     out_str = self.eval_math(body)
 
