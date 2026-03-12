@@ -130,20 +130,18 @@ def require_definition(
     )
 
 
-def require_condition(
+def merge_conditions(
     obj,
     directive_name: str,
     single_arg_name: Optional[str] = None,
     multiple_arg_name: Optional[str] = None,
     **kwargs,
-):
-    """Require at least one condition for a type in a directive, and converts all conditions to
+) -> List[List[str]]:
+    """Merge conditions for a type in a directive, and converts all conditions to
     when conditions
 
     If single/multiple values are provided, this method will validate that they are
-    properly defined, and will merge them into a when list.
-
-    It will raise an error if at least one type is not defined, or if any are the incorrect type.
+    properly defined, and will merge them into a list of when conditions for each mode.
 
     Args:
         obj: Object instance
@@ -157,22 +155,15 @@ def require_condition(
         modes (list(str) | None): List of modifier modes to be applied as when conditions
 
     Returns:
-        List of all when conditions
+        List of lists of strings, where each inner list is a list of when conditions for a mode.
     """
     single_arg_val = kwargs.get(single_arg_name) if single_arg_name else None
     multiple_arg_val = kwargs.get(multiple_arg_name) if multiple_arg_name else None
-    when_arg_val = kwargs.get("when")
 
-    if not (single_arg_val or multiple_arg_val or when_arg_val):
-        raise DirectiveError(
-            f"Directive {directive_name} requires at least one of "
-            f"{single_arg_name} or {multiple_arg_name} or when to be defined."
-        )
+    base_when_list = build_when_list(kwargs.get("when"), obj, obj.name, directive_name)
 
-    if when_arg_val is not None:
-        when_list = build_when_list(kwargs["when"], obj, obj.name, directive_name)
-    else:
-        when_list = []
+    # Create a list of when conditions for each mode (or one modeless list if no mode)
+    variant_when_lists = []
 
     # If args are modifier modes, convert to when conditions
     if single_arg_name == "mode" or multiple_arg_name == "modes":
@@ -185,11 +176,21 @@ def require_condition(
             directive_name,
         )
 
-        if all_modes:
-            for mode_name in all_modes:
-                when_list.append(f"{obj.name}_mode={mode_name}")
+        if not all_modes:
+            all_modes = [None]
 
-    return when_list
+        for mode_name in all_modes:
+            if mode_name:
+                mode_variant = f"{obj.name}_mode={mode_name}"
+                variant_when_list = base_when_list + [mode_variant]
+            else:
+                variant_when_list = base_when_list
+
+            variant_when_lists.append(variant_when_list)
+    else:
+        variant_when_lists.append(base_when_list)
+
+    return variant_when_lists
 
 
 def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict]):
@@ -265,7 +266,10 @@ def add_variable_validator(obj, var_name, var_values, when_list, wl_name=None):
 
 
 def build_when_list(
-    when_arg: Union[str, List[str]], obj: Any, directive_id: str, directive_name: str
+    when_arg: Optional[Union[str, List[str]]],
+    obj: Any,
+    directive_id: str,
+    directive_name: str,
 ) -> List[str]:
     """Construct list of when conditions based on a directives input argument
     Also, validate that when is passed in with the right type.

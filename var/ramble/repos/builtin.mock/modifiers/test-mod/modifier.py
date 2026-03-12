@@ -55,11 +55,25 @@ class TestMod(BasicModifier):
         description="Test a modifier variable without a mode",
     )
 
+    env_var_modification(
+        "MODELESS_ENV_VAR_2",
+        "modeless_val",
+        method="set",
+    )
+
+    required_variable("modeless_required_var")
+
     variable_modification(
         "test_var_mod",
         "test-mod-append",
         method="append",
         modes=["test"],
+    )
+
+    variable_modification(
+        "modeless_var_mod",
+        "modeless-append",
+        method="append",
     )
 
     variable_modification(

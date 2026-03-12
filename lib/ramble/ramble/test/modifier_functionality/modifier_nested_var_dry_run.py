@@ -33,6 +33,8 @@ def test_nested_modifier_var(
             "n_nodes=1",
             "-v",
             "n_ranks=1",
+            "-v",
+            "modeless_required_var=1",
             "-p",
             "spack",
             global_args=global_args,

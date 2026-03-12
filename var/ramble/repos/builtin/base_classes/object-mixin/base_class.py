@@ -218,7 +218,7 @@ class ObjectMixin:
         return {
             var_name: {k: var_props[k] for k in var_props.keys() - {"when"}}
             for var_name, var_props in self.required_vars.items()
-            if self.satisfy_when(var_props["when"])
+            if any(self.satisfy_when(w) for w in var_props["when"])
         }
 
     @property

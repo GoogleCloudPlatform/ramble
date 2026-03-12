@@ -40,6 +40,7 @@ ramble:
     partition: 'part1'
     processes_per_node: '1'
     n_threads: '1'
+    modeless_required_var: '1'
   applications:
     shared-context:
       workloads:

@@ -51,6 +51,7 @@ def dry_run_config(
     ws_var_dict["processes_per_node"] = "16"
     ws_var_dict["n_ranks"] = "{processes_per_node}*{n_nodes}"
     ws_var_dict["n_threads"] = "1"
+    ws_var_dict["modeless_required_var"] = "1"
 
     app_dict = test_dict["applications"][app_name]
     app_dict["workloads"] = syaml.syaml_dict()

@@ -260,6 +260,7 @@ ramble:
     mpi_command: ''
     batch_submit: 'batch_submit {{execute_experiment}}'
     processes_per_node: 1
+    modeless_required_var: 1
   applications:
     when-variants:
       workloads:
