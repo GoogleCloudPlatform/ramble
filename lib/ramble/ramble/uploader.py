@@ -32,6 +32,13 @@ default_node_type_val = "Not Specified"
 uploader_types = Enum("uploader_types", ["BigQuery", "PrintOnly", "SQLite"])
 
 
+def get_utc_timestamp() -> str:
+    """Returns the current UTC datetime formatted as an ISO 8601 string without timezone offset."""
+    from datetime import datetime, timezone
+
+    return datetime.now(timezone.utc).replace(tzinfo=None).isoformat()
+
+
 def validate_data(data, schema):
     """Validate data against a JSON schema."""
     try:
@@ -303,9 +310,7 @@ def format_data(data_in):
     # TODO: what is the nice way to deal with the distinction between
     # numberic/float and string FOM values
 
-    from datetime import datetime
-
-    current_dateTime = datetime.now()
+    current_dateTime = get_utc_timestamp()
 
     for exp in data_in["experiments"]:
 
@@ -420,9 +425,7 @@ def _prepare_data(results, uri):
 
 
 def _get_metadata_to_insert():
-    from datetime import datetime
-
-    now_timestamp = str(datetime.now())
+    now_timestamp = get_utc_timestamp()
     return [
         {
             "key": "db_schema_version",
@@ -483,7 +486,10 @@ class BigQueryUploader(Uploader):
 
         bq_schema = []
         for name, props in schema.get("properties", {}).items():
-            bq_type = type_map[props["type"]]
+            if props.get("format") == "date-time":
+                bq_type = "DATETIME"
+            else:
+                bq_type = type_map[props["type"]]
             mode = "NULLABLE"
             if name in schema.get("required", []):
                 mode = "REQUIRED"
@@ -664,7 +670,10 @@ class SQLiteUploader(Uploader):
 
         sqlite_schema = []
         for name, props in schema.get("properties", {}).items():
-            sqlite_type = type_map[props["type"]]
+            if props.get("format") == "date-time":
+                sqlite_type = "DATETIME"
+            else:
+                sqlite_type = type_map[props["type"]]
             sqlite_schema.append(f"{name} {sqlite_type}")
 
         return ", ".join(sqlite_schema)
