@@ -6,9 +6,9 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-experiments_metadata_schema_version = 1.0
+experiments_metadata_schema_version = 0.1
 experiments_metadata_schema = {
-    1.0: {
+    0.1: {
         "type": "object",
         "properties": {
             "experiment_id": {"type": "integer"},

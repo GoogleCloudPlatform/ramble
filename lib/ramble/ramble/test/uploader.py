@@ -20,6 +20,7 @@ from ramble.test.mock_spack_runner import MockSpackRunner
 from ramble.uploader import (
     BigQueryUploader,
     ConfigError,
+    SQLiteUploader,
     _prepare_data,
     format_data,
     upload_results,
@@ -237,3 +238,128 @@ def test_experiment_metadata_preparation(mock_results_with_metadata, mutable_con
             assert "experiment_id" in item
             assert "timestamp" in item
             assert isinstance(item["timestamp"], str)
+
+
+def test_sqlite_uploader_create_tables_and_upload(tmpdir, mock_results_with_metadata):
+    import os
+    import sqlite3
+
+    uri = str(tmpdir / "test_ramble_upload.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        formatted_data = format_data(mock_results_with_metadata)
+
+        # Test create tables
+        uploader.create_tables(uri)
+        assert os.path.exists(uri)
+
+        conn = sqlite3.connect(uri)
+        cursor = conn.cursor()
+
+        # Verify tables exist
+        cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
+        tables = [row[0] for row in cursor.fetchall()]
+
+        expected_tables = ["experiments", "foms", "metadata", "experiments_metadata", "software"]
+        for table in expected_tables:
+            assert table in tables
+
+        # Verify metadata was uploaded upon table creation
+        cursor.execute("SELECT key FROM metadata")
+        metadata_keys = [row[0] for row in cursor.fetchall()]
+        assert "db_schema_version" in metadata_keys
+        assert "ramble_version" in metadata_keys
+
+        # Test uploading results
+        uploader.perform_upload(uri, formatted_data)
+
+        # Verify experiments were inserted
+        cursor.execute("SELECT * FROM experiments")
+        rows = cursor.fetchall()
+        assert len(rows) == 1
+
+        # Verify experiments_metadata was inserted
+        cursor.execute("SELECT * FROM experiments_metadata")
+        rows = cursor.fetchall()
+        assert len(rows) == 2  # mock_results_with_metadata has 2 keys
+
+        conn.close()
+
+
+def test_sqlite_uploader_perform_upload_no_db(tmpdir, mock_results_with_metadata, capsys):
+
+    uri = str(tmpdir / "does_not_exist.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        formatted_data = format_data(mock_results_with_metadata)
+
+        # Test uploading results to non-existent DB dies
+        with pytest.raises(SystemExit):
+            uploader.perform_upload(uri, formatted_data)
+
+        captured = capsys.readouterr()
+        assert "does not exist" in captured.err
+        assert "ramble data create-db" in captured.err
+
+
+def test_sqlite_uploader_create_tables_with_existing(tmpdir, mock_results_with_metadata, capsys):
+    import sqlite3
+
+    import ramble.util.logger
+
+    uri = str(tmpdir / "UNIT_TEST_DATABASE.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        # Create initially
+        uploader.create_tables(uri)
+
+        # Modify schema version dynamically to verify mismatch warning
+        conn = sqlite3.connect(uri)
+        cursor = conn.cursor()
+
+        cursor.execute("UPDATE metadata SET value='999.0' WHERE key='fom_schema_version'")
+        conn.commit()
+        conn.close()
+
+        # Call again to trigger existing table and schema mismatch logs
+        uploader.create_tables(uri)
+        captured = capsys.readouterr()
+
+        assert "already exists" in captured.out + captured.err
+        assert "does not match current version" in captured.out + captured.err
+
+
+def test_sqlite_uploader_chunked_upload_errors(tmpdir, mock_results_with_metadata, capsys):
+    uri = str(tmpdir / "test_ramble_upload_errors.db")
+    uploader = SQLiteUploader()
+    upload_config = {"uri": uri, "type": "SQLite", "push_failed": False}
+
+    with ramble.config.override("config:upload", upload_config):
+        uploader.create_tables(uri)
+
+        formatted_data = format_data(mock_results_with_metadata)
+        (
+            exp_table_id,
+            exps_to_insert,
+            fom_table_id,
+            foms_to_insert,
+            metadata_table_id,
+            metadata_to_insert,
+            software_table_id,
+            software_to_insert,
+        ) = ramble.uploader._prepare_data(formatted_data, uri)
+
+        # Trigger issue during upload insert by injecting bad data format that breaks SQLite schema
+        bad_exps_to_insert = exps_to_insert.copy()
+
+        # Test unknown schema missing
+        uploader.schema = []
+        uploader.chunked_upload(exp_table_id, bad_exps_to_insert, uri)
+        captured = capsys.readouterr()
+        assert "Could not find a valid schema" in captured.err
