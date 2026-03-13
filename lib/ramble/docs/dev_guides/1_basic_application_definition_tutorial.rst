@@ -21,6 +21,11 @@ use Ramble workspaces before starting this tutorial. You should at least be
 familiar with the content of the
 :ref:`Hello World Tutorial<hello_world_tutorial>`.
 
+This tutorial is intended to be a practical, hands-on guide to creating a
+simple application definition. For a more comprehensive reference on all
+available directives and advanced features, please see the
+:ref:`Application Definition Developers Guide<application-dev-guide>`.
+
 Installation
 ============
 
@@ -222,7 +227,15 @@ this, execute the following:
 
 .. code-block:: console
 
-    $ ramble workspace create -a -d tutorial-workspace
+    $ ramble workspace create -d tutorial-workspace
+
+**NOTE**: If you have an active workspace (e.g., if you used ``ramble workspace
+create -a`` in a previous session or this one), you must first deactivate it
+with ``ramble workspace deactivate`` or unset the ``RAMBLE_WORKSPACE``
+environment variable to avoid conflicts when creating a new workspace. Also,
+creating a workspace *without* the ``-a`` (activate) flag means you will need
+to use the ``-D <workspace_name>`` flag with subsequent ``ramble`` commands to
+specify which workspace to operate on.
 
 The following command can be used to add an experiment with the workload we defined earlier:
 
@@ -358,7 +371,7 @@ how the ``input_arguments`` applies to experiments.
 **NOTE**: When using the ``workload`` or ``workloads`` arguments on the
 ``workload_variable`` directive, the directive needs to show up after the
 workloads it is attached to within the python class. Usage of
-``workload_group``s can mitigate this restriction.
+``workload_group`` s can mitigate this restriction.
 
 
 Parallel Executables
@@ -548,8 +561,7 @@ To begin with, delete the tutorial workspace, and recreate it using:
 
   $ ramble workspace deactivate
   $ rm -rf tutorial-workspace
-  $ ramble workspace create -d tutorial-workspace -a
-
+      $ ramble workspace create -d tutorial-workspace -a
 Now, we can add an experiment to exercise the local workload using:
 
 .. code-block:: console
