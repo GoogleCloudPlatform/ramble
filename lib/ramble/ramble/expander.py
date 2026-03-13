@@ -8,6 +8,7 @@
 
 import ast
 import collections
+import functools
 import itertools
 import math
 import operator
@@ -927,7 +928,9 @@ class Expander:
                     expansion_vars,
                     allow_passthrough=allow_passthrough,
                     expansion_func=self._partial_expand,
-                    evaluation_func=self.perform_math_eval,
+                    evaluation_func=functools.partial(
+                        self.perform_math_eval, expansion_vars=expansion_vars
+                    ),
                     no_expand_vars=self._no_expand_vars,
                     used_vars=self._used_variable_stage,
                     replace_escaped_braces=replace_escaped_braces,
@@ -937,7 +940,7 @@ class Expander:
 
         return str(in_str)
 
-    def perform_math_eval(self, in_str):
+    def perform_math_eval(self, in_str, expansion_vars=None):
         """Attempt to evaluate in_str
 
         Args:
@@ -970,7 +973,7 @@ class Expander:
             with warnings.catch_warnings(record=True) as wal:
                 try:
                     body = math_ast.body
-                    out_str = self.eval_math(body)
+                    out_str = self.eval_math(body, expansion_vars=expansion_vars)
 
                     # If the AST is just a literal, check if it is formatted specially.
                     # This preserves formatting like underscores in version numbers (e.g. 1_01)
@@ -1000,7 +1003,7 @@ class Expander:
         finally:
             self._math_str_stack.pop()
 
-    def eval_math(self, node):
+    def eval_math(self, node, expansion_vars=None):
         """Evaluate math from parsing the AST
 
         Does not assume a specific type of operands.
@@ -1019,17 +1022,17 @@ class Expander:
             elif isinstance(node, ast.Attribute):
                 return self._ast_attr(node)
             elif isinstance(node, ast.Compare):
-                return self._eval_comparisons(node)
+                return self._eval_comparisons(node, expansion_vars=expansion_vars)
             elif isinstance(node, ast.BoolOp):
-                return self._eval_bool_op(node)
+                return self._eval_bool_op(node, expansion_vars=expansion_vars)
             elif isinstance(node, ast.BinOp):
-                return self._eval_binary_ops(node)
+                return self._eval_binary_ops(node, expansion_vars=expansion_vars)
             elif isinstance(node, ast.UnaryOp):
-                return self._eval_unary_ops(node)
+                return self._eval_unary_ops(node, expansion_vars=expansion_vars)
             elif isinstance(node, ast.Call):
-                return self._eval_function_call(node)
+                return self._eval_function_call(node, expansion_vars=expansion_vars)
             elif isinstance(node, ast.Subscript):
-                return self._eval_subscript_op(node)
+                return self._eval_subscript_op(node, expansion_vars=expansion_vars)
             else:
                 node_type = str(type(node))
                 raise MathEvaluationError(
@@ -1081,15 +1084,17 @@ class Expander:
         val = f"{base}.{node.attr}"
         return val
 
-    def _eval_function_call(self, node):
+    def _eval_function_call(self, node, expansion_vars=None):
         """Handle a subset of function call nodes in the ast"""
 
         args = []
         kwargs = {}
         for arg in node.args:
-            args.append(self.eval_math(arg))
+            args.append(self.eval_math(arg, expansion_vars=expansion_vars))
         for kw in node.keywords:
-            kwargs[self.eval_math(kw.arg)] = self.eval_math(kw.value)
+            kwargs[self.eval_math(kw.arg, expansion_vars=expansion_vars)] = self.eval_math(
+                kw.value, expansion_vars=expansion_vars
+            )
 
         if node.func.id in supported_scalar_function_pointers.keys():
             func = supported_scalar_function_pointers[node.func.id]
@@ -1120,15 +1125,15 @@ class Expander:
                 f"Undefined function {node.func.id} used.\n" "returning unexapanded string"
             )
 
-    def _eval_bool_op(self, node):
+    def _eval_bool_op(self, node, expansion_vars=None):
         """Handle a boolean operator node in the ast"""
         try:
             op = supported_math_operators[type(node.op)]
 
-            result = self.eval_math(node.values[0])
+            result = self.eval_math(node.values[0], expansion_vars=expansion_vars)
 
             for value in itertools.islice(node.values, 1, None):
-                result = op(result, self.eval_math(value))
+                result = op(result, self.eval_math(value, expansion_vars=expansion_vars))
 
             return result
 
@@ -1137,12 +1142,12 @@ class Expander:
         except KeyError:
             self.__dbg_syntax_error("Unsupported boolean operator", node)
 
-    def _eval_comparisons(self, node):
+    def _eval_comparisons(self, node, expansion_vars=None):
         """Handle a comparison node in the ast"""
 
         # Extract In or NotIn nodes, and call their helper
         if len(node.ops) == 1 and isinstance(node.ops[0], (ast.In, ast.NotIn)):
-            is_in = self._eval_comp_in(node)
+            is_in = self._eval_comp_in(node, expansion_vars=expansion_vars)
             if isinstance(node.ops[0], ast.NotIn):
                 return not is_in
             return is_in
@@ -1152,10 +1157,10 @@ class Expander:
 
         # Try to evaluate the comparison logic, if not return the node as is.
         try:
-            cur_left = self.eval_math(node.left)
+            cur_left = self.eval_math(node.left, expansion_vars=expansion_vars)
 
             op = supported_math_operators[type(node.ops[0])]
-            cur_right = self.eval_math(node.comparators[0])
+            cur_right = self.eval_math(node.comparators[0], expansion_vars=expansion_vars)
 
             result = op(cur_left, cur_right)
 
@@ -1163,7 +1168,7 @@ class Expander:
                 cur_left = cur_right
                 for comp, right in itertools.islice(zip(node.ops, node.comparators), 1, None):
                     op = supported_math_operators[type(comp)]
-                    cur_right = self.eval_math(right)
+                    cur_right = self.eval_math(right, expansion_vars=expansion_vars)
 
                     result = result and op(cur_left, cur_right)
 
@@ -1174,7 +1179,7 @@ class Expander:
         except KeyError:
             self.__dbg_syntax_error("Unsupported binary comparison operator", node)
 
-    def _eval_comp_in(self, node):
+    def _eval_comp_in(self, node, expansion_vars=None):
         """Handle in node in the ast
 
         Perform extraction of `<variable> in <experiment>` syntax.
@@ -1185,7 +1190,7 @@ class Expander:
         if isinstance(node.left, ast.Name):
             var_name = self._ast_name(node.left)
             if isinstance(node.comparators[0], ast.Attribute):
-                namespace = self.eval_math(node.comparators[0])
+                namespace = self.eval_math(node.comparators[0], expansion_vars=expansion_vars)
                 val = self._experiment_set.get_var_from_experiment(
                     namespace, self.expansion_str(var_name)
                 )
@@ -1196,32 +1201,32 @@ class Expander:
                 return val
         # TODO: Remove `or` logic after 3.6 & 3.7 series python are unsupported
         elif isinstance(node.left, ast.Constant) or _is_str_node(node.left):
-            lhs_value = self.eval_math(node.left)
+            lhs_value = self.eval_math(node.left, expansion_vars=expansion_vars)
 
             found = False
             for comp in node.comparators:
                 if isinstance(comp, (ast.List, ast.Set)):
                     for elt in comp.elts:
-                        rhs_value = self.eval_math(elt)
+                        rhs_value = self.eval_math(elt, expansion_vars=expansion_vars)
                         if lhs_value == rhs_value:
                             found = True
                 elif isinstance(comp, ast.Constant) or _is_str_node(comp):
                     # Attempt evaluating `"str" in "string"`
-                    rhs_value = self.eval_math(comp)
+                    rhs_value = self.eval_math(comp, expansion_vars=expansion_vars)
                     if isinstance(rhs_value, str) and lhs_value in rhs_value:
                         found = True
             return found
 
         self.__raise_syntax_error(node)
 
-    def _eval_binary_ops(self, node):
+    def _eval_binary_ops(self, node, expansion_vars=None):
         """Evaluate binary operators in the ast
 
         Extract the binary operator, and evaluate it.
         """
         try:
-            left_eval = self.eval_math(node.left)
-            right_eval = self.eval_math(node.right)
+            left_eval = self.eval_math(node.left, expansion_vars=expansion_vars)
+            right_eval = self.eval_math(node.right, expansion_vars=expansion_vars)
             op = supported_math_operators[type(node.op)]
             if isinstance(left_eval, str) or isinstance(right_eval, str):
                 # Determine the end of the left node and the start of the right node,
@@ -1261,13 +1266,13 @@ class Expander:
         except KeyError:
             self.__dbg_syntax_error("Unsupported binary operator", node)
 
-    def _eval_unary_ops(self, node):
+    def _eval_unary_ops(self, node, expansion_vars=None):
         """Evaluate unary operators in the ast
 
         Extract the unary operator, and evaluate it.
         """
         try:
-            operand = self.eval_math(node.operand)
+            operand = self.eval_math(node.operand, expansion_vars=expansion_vars)
             if isinstance(operand, str):
                 self.__dbg_syntax_error("Unsupported operand type in unary operator", node)
             op = supported_math_operators[type(node.op)]
@@ -1277,11 +1282,13 @@ class Expander:
         except KeyError:
             self.__dbg_syntax_error("Unsupported unary operator", node)
 
-    def _eval_subscript_op(self, node):
+    def _eval_subscript_op(self, node, expansion_vars=None):
         """Evaluate subscript operation in the ast"""
         try:
-            operand = self.eval_math(node.value)
+            operand = self.eval_math(node.value, expansion_vars=expansion_vars)
             slice_node = node.slice
+
+            active_vars = expansion_vars if expansion_vars is not None else self._variables
 
             if isinstance(operand, str):
                 if isinstance(slice_node, ast.Slice):
@@ -1290,20 +1297,21 @@ class Expander:
                         v_node = getattr(s_node, attr)
                         if v_node is None:
                             return default
-                        return self.eval_math(v_node)
+                        return self.eval_math(v_node, expansion_vars=expansion_vars)
 
                     lower = _get_with_default(slice_node, "lower", 0)
                     upper = _get_with_default(slice_node, "upper", len(operand))
                     step = _get_with_default(slice_node, "step", 1)
                     return operand[slice(lower, upper, step)]
-                elif operand in self._variables and isinstance(self._variables[operand], dict):
-                    op_dict = self.expand_var_name(operand, typed=True)
+                elif operand in active_vars and isinstance(active_vars[operand], dict):
+                    op_dict = self.expand_var_name(operand, extra_vars=active_vars, typed=True)
 
-                    key = None
                     if _is_index_node(slice_node):
-                        key = self.eval_math(slice_node.value)
+                        key = self.eval_math(slice_node.value, expansion_vars=active_vars)
                     elif isinstance(slice_node, ast.Constant) or _is_str_node(slice_node):
-                        key = self.eval_math(slice_node)
+                        key = self.eval_math(slice_node, expansion_vars=active_vars)
+                    else:
+                        key = None
 
                     if key is None:
                         msg = (

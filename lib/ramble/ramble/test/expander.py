@@ -293,3 +293,52 @@ def test_satisfies_works(input_list, output):
     satisfied = expander.satisfies(input_list, variant_set=variants)
 
     assert satisfied == output
+
+
+def test_variable_mutation():
+    """Test that variable changes are reflected in expansions"""
+    expansion_vars = {"my_dict": {"key": 1}}
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    in_str = "{my_dict['key']}"
+
+    res1 = expander.expand_var(in_str)
+    assert res1 == "1"
+
+    # sneaky mutation
+    expander._variables["my_dict"]["key"] = 2
+    res2 = expander.expand_var(in_str)
+    assert res2 == "2"
+
+
+def test_extra_vars_propagation():
+    """Test that extra_vars are propagated properly"""
+    expansion_vars = {
+        "my_dict": {"key": 1},
+        "my_val": 10,
+        "my_bool": 1,
+    }
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    in_str_dict = "{my_dict['key']}"
+    assert expander.expand_var(in_str_dict) == "1"
+    assert expander.expand_var(in_str_dict, extra_vars={"my_dict": {"key": 3}}) == "3"
+
+    in_str_bin = "{{my_val} * 2}"
+    assert expander.expand_var(in_str_bin) == "20"
+    assert expander.expand_var(in_str_bin, extra_vars={"my_val": 5}) == "10"
+
+    in_str_un = "{~{my_val}}"
+    assert expander.expand_var(in_str_un) == "-11"
+    assert expander.expand_var(in_str_un, extra_vars={"my_val": 1}) == "-2"
+
+    in_str_func = "{max({my_val}, 15)}"
+    assert expander.expand_var(in_str_func) == "15"
+    assert expander.expand_var(in_str_func, extra_vars={"my_val": 20}) == "20"
+
+    in_str_bool = "{{my_bool} and ({my_val} > 5)}"
+    assert expander.expand_var(in_str_bool) == "True"
+    assert expander.expand_var(in_str_bool, extra_vars={"my_val": 4}) == "False"
+    assert expander.expand_var(in_str_bool, extra_vars={"my_bool": 0}) == "0"
