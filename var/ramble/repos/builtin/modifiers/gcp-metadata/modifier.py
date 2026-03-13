@@ -120,10 +120,7 @@ class GcpMetadata(BasicModifier):
                 suffix = self.expander.expand_var("{metadata_parallel_suffix}")
 
                 if suffix and not suffix.startswith("'"):
-                    if suffix:
-                        suffix = "' " + suffix
-                    else:
-                        suffix = "' "
+                    suffix = "' " + suffix
 
             log_name = (
                 log_name if log_name is not None else end_point.split("/")[-1]
