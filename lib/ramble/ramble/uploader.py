@@ -8,6 +8,7 @@
 
 import json
 import math
+import os
 import sys
 from enum import Enum
 
@@ -679,7 +680,6 @@ class SQLiteUploader(Uploader):
         return ", ".join(sqlite_schema)
 
     def create_tables(self, uri):
-        import os
         import sqlite3
 
         # Verify URI is a valid path location, create directories if needed
@@ -688,48 +688,55 @@ class SQLiteUploader(Uploader):
             os.makedirs(db_dir)
 
         conn = sqlite3.connect(uri)
-        cursor = conn.cursor()
+        try:
+            cursor = conn.cursor()
 
-        # Check schema version
-        for table_def in self.schema:
-            try:
-                # Check if metadata table exists first
+            # Check schema version
+            for table_def in self.schema:
+                try:
+                    # Check if metadata table exists first
+                    cursor.execute(
+                        "SELECT count(name) FROM sqlite_master WHERE "
+                        "type='table' AND name='metadata'"
+                    )
+                    if cursor.fetchone()[0] == 1:
+                        query = (
+                            f"SELECT value FROM metadata WHERE key = "
+                            f"'{table_def['metadata_key']}'"
+                        )
+                        cursor.execute(query)
+                        result = cursor.fetchone()
+                        if result:
+                            upstream_version = result[0]
+                            if upstream_version != str(table_def["version"]):
+                                logger.warn(
+                                    f"Upstream DB schema version for table {table_def['table']} "
+                                    f"('{upstream_version}') does not match current version "
+                                    f"('{table_def['version']}')"
+                                )
+                except sqlite3.Error as e:
+                    logger.warn(f"Error checking schema version: {e}")
+
+            tables_created = False
+            for table_def in self.schema:
+                table_name = table_def["table"]
                 cursor.execute(
-                    "SELECT count(name) FROM sqlite_master WHERE type='table' AND name='metadata'"
+                    "SELECT count(name) FROM sqlite_master WHERE "
+                    f"type='table' AND name='{table_name}'"
                 )
                 if cursor.fetchone()[0] == 1:
-                    query = (
-                        f"SELECT value FROM metadata WHERE key = " f"'{table_def['metadata_key']}'"
+                    logger.info(f"Table {table_name} already exists.")
+                else:
+                    logger.info(f"Creating table {table_name}")
+                    sqlite_schema = self._schema_to_sqlite(
+                        table_def["schema"][table_def["version"]]
                     )
-                    cursor.execute(query)
-                    result = cursor.fetchone()
-                    if result:
-                        upstream_version = result[0]
-                        if upstream_version != str(table_def["version"]):
-                            logger.warn(
-                                f"Upstream DB schema version for table {table_def['table']} "
-                                f"('{upstream_version}') does not match current version "
-                                f"('{table_def['version']}')"
-                            )
-            except sqlite3.Error as e:
-                logger.warn(f"Error checking schema version: {e}")
+                    cursor.execute(f"CREATE TABLE {table_name} ({sqlite_schema})")
+                    tables_created = True
 
-        tables_created = False
-        for table_def in self.schema:
-            table_name = table_def["table"]
-            cursor.execute(
-                f"SELECT count(name) FROM sqlite_master WHERE type='table' AND name='{table_name}'"
-            )
-            if cursor.fetchone()[0] == 1:
-                logger.info(f"Table {table_name} already exists.")
-            else:
-                logger.info(f"Creating table {table_name}")
-                sqlite_schema = self._schema_to_sqlite(table_def["schema"][table_def["version"]])
-                cursor.execute(f"CREATE TABLE {table_name} ({sqlite_schema})")
-                tables_created = True
-
-        conn.commit()
-        conn.close()
+            conn.commit()
+        finally:
+            conn.close()
 
         if tables_created:
             self.upload_metadata(uri)
@@ -782,10 +789,12 @@ class SQLiteUploader(Uploader):
 
         try:
             conn = sqlite3.connect(uri)
-            cursor = conn.cursor()
-            cursor.executemany(insert_query, sqlite_data)
-            conn.commit()
-            conn.close()
+            try:
+                cursor = conn.cursor()
+                cursor.executemany(insert_query, sqlite_data)
+                conn.commit()
+            finally:
+                conn.close()
         except sqlite3.Error as e:
             logger.warn(f"Issue during uploader insert: {e}")
             error.append(str(e))
@@ -793,7 +802,6 @@ class SQLiteUploader(Uploader):
         return error
 
     def perform_upload(self, uri, results):
-        import os
 
         if not os.path.exists(uri):
             logger.die(
