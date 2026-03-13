@@ -33,9 +33,11 @@ To install Ramble, see the :doc:`../getting_started` guide.
 
 **NOTE**: This tutorial requires a package manager to be installed and
 configured to build HPL. For the purposes of this tutorial, we will focus on
-Spack, however there are several ways to make this work in Ramble that do not
-include Spack. For more information on Spack, or installation instructions see
-the Spack documentation.
+Spack. You will need a working Spack installation and configuration on your
+system for this tutorial. For more information on Spack installation or
+usage, please refer to the `official Spack documentation <https://spack.readthedocs.io/en/latest/>`_. Ramble
+will leverage your configured Spack instance during the workspace setup stage
+to build HPL.
 
 Ramble Repositories
 ===================
@@ -91,7 +93,7 @@ the beginning of our HPL application definition.
     from ramble.appkit import *
 
     class Hpl(ExecutableApplication):
-      name = 'hpl'
+        name = 'hpl'
 
 At this stage, our application should show up in the output of ``ramble list``
 and ``ramble info hpl`` should show limited information about this application.
@@ -108,8 +110,8 @@ software and its dependencies.
 
 .. code-block:: python
 
-    with when("package_manager_family=spack"):
-        software_spec("hpl@2.3")
+        with when("package_manager_family=spack"):
+            software_spec(name="hpl", pkg_spec="hpl@2.3")
 
 This tells Ramble to use Spack to install HPL version 2.3. The ``with when(...)``
 construct makes these directives conditional on the package manager being used.
@@ -130,11 +132,11 @@ us.
 
 .. code-block:: python
 
-    register_template(
-        "hpl.dat.in",
-        template_file="templates/HPL.dat.tpl",
-        destination="HPL.dat"
-    )
+        register_template(
+            "hpl.dat.in",
+            template_file="templates/HPL.dat.tpl",
+            destination="HPL.dat"
+        )
 
 Now, let's populate the template file
 ``tutorial-repo/applications/hpl/templates/HPL.dat.tpl``. We can refer to any
@@ -191,11 +193,11 @@ MPI launcher like `mpirun` or `srun`.
 
 .. code-block:: python
 
-    executable(
-        "hpl-execute",
-        "xhpl",
-        use_mpi=True,
-    )
+        executable(
+            "hpl-execute",
+            "xhpl",
+            use_mpi=True,
+        )
 
 Application Workloads
 ^^^^^^^^^^^^^^^^^^^^^
@@ -206,10 +208,10 @@ specification.
 
 .. code-block:: python
 
-    workload(
-        "default",
-        executables=["hpl-execute"],
-    )
+        workload(
+            "default",
+            executables=["hpl-execute"],
+        )
 
 Workload Variables
 ^^^^^^^^^^^^^^^^^^
@@ -221,10 +223,10 @@ set them.
 
 .. code-block:: python
 
-    workload_variable("Ns", default=1000, description="Problem size", workload="default")
-    workload_variable("NBs", default=256, description="Block size", workload="default")
-    workload_variable("Ps", default=1, description="Number of process rows", workload="default")
-    workload_variable("Qs", default=1, description="Number of process columns", workload="default")
+        workload_variable("Ns", default=1000, description="Problem size", workload="default")
+        workload_variable("NBs", default=256, description="Block size", workload="default")
+        workload_variable("Ps", default=1, description="Number of process rows", workload="default")
+        workload_variable("Qs", default=1, description="Number of process columns", workload="default")
 
 Analysis of experiments
 -----------------------
@@ -244,11 +246,11 @@ to exist within this context. The context can look like the following:
 
 .. code-block:: python
 
-    figure_of_merit_context(
-        "problem-name",
-        regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
-        output_format="N-NB-P-Q = {N}-{NB}-{P}-{Q}",
-    )
+        figure_of_merit_context(
+            "problem-name",
+            regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+            output_format="N-NB-P-Q = {N}-{NB}-{P}-{Q}",
+        )
 
 This creates a new figure of merit context named ``problem-name`` which figures
 of merit can be associated with. The context will have the ``N``, ``NB``,
@@ -258,14 +260,14 @@ HPL reports its performance in Gflops, we extract this value using the
 
 .. code-block:: python
 
-    figure_of_merit(
-        "gflops",
-        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
-        group_name="gflops",
-        units="Gflops",
-        contexts=["problem-name"],
-        fom_type=FomType.THROUGHPUT
-    )
+        figure_of_merit(
+            "gflops",
+            fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+            group_name="gflops",
+            units="Gflops",
+            contexts=["problem-name"],
+            fom_type=FomType.THROUGHPUT
+        )
 
 Here we have associated the figure of merit with the ``problem-name`` and also
 added the ``fom_type`` attribute to convey to users (and Ramble) that this is a
@@ -276,14 +278,14 @@ separate figure of merit:
 
 .. code-block:: python
 
-    figure_of_merit(
-        "Time",
-        fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
-        group_name="time",
-        units="s",
-        contexts=["problem-name"],
-        fom_type=FomType.TIME,
-    )
+        figure_of_merit(
+            "Time",
+            fom_regex=r".*?\s+(?P<N>[0-9]+)\s+(?P<NB>[0-9]+)\s+(?P<P>[0-9]+)\s+(?P<Q>[0-9]+)\s+(?P<time>[0-9]+\.[0-9]+)\s+(?P<gflops>\S+)",
+            group_name="time",
+            units="s",
+            contexts=["problem-name"],
+            fom_type=FomType.TIME,
+        )
 
 
 Putting it all together
@@ -299,7 +301,7 @@ Our complete application definition at this point is as follows:
         name = 'hpl'
 
         with when("package_manager_family=spack"):
-            software_spec("hpl@2.3")
+            software_spec(name="hpl", pkg_spec="hpl@2.3")
 
         register_template(
             "hpl.dat.in",
