@@ -136,7 +136,7 @@ class Uploader:
             (errors1, errors2, errors3, errors4),
             ("exp", "fom", "experiment_metadata", "software"),
         ):
-            if errors is not None and len(errors) == 0:
+            if errors is not None and not errors:
                 logger.msg(f"New rows have been added in {name}")
             elif errors:
                 logger.die(f"Encountered errors while inserting rows: {errors}")
@@ -268,7 +268,7 @@ def upload_results(results):
         formatted_data = format_data(results)
     except (KeyError, TypeError) as e:
         raise ConfigError("Error parsing file: Does not contain valid data to upload.") from e
-    if len(formatted_data) == 0:
+    if not formatted_data:
         logger.warn("No data to upload")
         return
 

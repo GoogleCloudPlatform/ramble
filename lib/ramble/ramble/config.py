@@ -307,7 +307,7 @@ class SingleFileScope(ConfigScope):
             for section_key, data in section_data.items():
                 self.sections[section_key] = {section_key: data}
 
-        return self.sections.get(section, None)
+        return self.sections.get(section)
 
     def _write_section(self, section):
         data_to_write = self._raw_data
@@ -1153,7 +1153,7 @@ def merge_yaml(dest, source):
     elif they_are(dict):
         # save dest keys to reinsert later -- this ensures that  source items
         # come *before* dest in OrderedDicts
-        dest_keys = [dk for dk in dest.keys() if dk not in source]
+        dest_keys = [dk for dk in dest if dk not in source]
 
         for sk, sv in source.items():
             # always remove the dest items. Python dicts do not overwrite

@@ -94,6 +94,6 @@ ramble:
 
         out_files = glob.glob(os.path.join(ws.log_dir, "**", "*.out"), recursive=True)
 
-        assert search_files_for_string(out_files, gcc8_str) is True
-        assert search_files_for_string(out_files, gcc9_str) is True
-        assert search_files_for_string(out_files, gcc10_str) is True
+        assert search_files_for_string(out_files, gcc8_str)
+        assert search_files_for_string(out_files, gcc9_str)
+        assert search_files_for_string(out_files, gcc10_str)

@@ -632,7 +632,7 @@ class LogsPipeline(Pipeline):
     def _execute(self):
         def print_archive_files(app_inst, pattern_title, patterns):
             print_header = True
-            if len(patterns) > 0:
+            if patterns:
                 for pattern in patterns:
                     exp_pattern = app_inst.expander.expand_var(pattern)
                     for file in glob.glob(exp_pattern):
@@ -823,7 +823,7 @@ _pipeline_map = {
 def pipeline_class(name):
     """Factory for determining a pipeline class from its name"""
 
-    if name not in _pipeline_map.keys():
+    if name not in _pipeline_map:
         logger.die(
             f"Pipeline {name} is not valid.\n" f"Valid pipelines are {_pipeline_map.keys()}"
         )

@@ -1040,7 +1040,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         + f"be one of {str(possible_orders)}\n"
                     )
 
-            if "command" not in cur_exp_def.keys():
+            if "command" not in cur_exp_def:
                 raise InvalidChainError(
                     "Invalid experiment chain defined:\n"
                     + f"    Primary experiment {parent_namespace}\n"
@@ -1368,7 +1368,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         when_satisfied = {
             when_set
-            for when_set in all_executables.keys()
+            for when_set in all_executables
             if self.expander.satisfies(
                 when_set, variant_set=self.experiment_variants()
             )
@@ -1621,7 +1621,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Populates self._command_list with a list of the executable commands that
         should be executed by this experiment.
         """
-        if len(self._command_list) > 0:
+        if self._command_list:
             return
 
         exec_graph = getattr(self, "_executable_graph", exec_graph)
@@ -1891,7 +1891,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if hasattr(obj, "template_render_vars"):
                 render_vars = obj.template_render_vars
                 self.variables.update(render_vars)
-                for name in render_vars.keys():
+                for name in render_vars:
                     self.keywords.update_keys({name: var_attr})
 
     def _inputs_and_fetchers(self, workload=None):
@@ -1909,7 +1909,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Batch 'when' evaluation to avoid repeat expander calls
         when_satisfied = {
             when_set
-            for when_set in self.inputs.keys()
+            for when_set in self.inputs
             if self.expander.satisfies(
                 when_set, variant_set=self.experiment_variants()
             )
@@ -2454,18 +2454,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # Copy all figure of merit files
             criteria_list = self.success_list
             analysis_files, _, _ = self._analysis_dicts(criteria_list)
-            for file in analysis_files.keys():
+            for file in analysis_files:
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
 
             # Copy all archive patterns
             archive_patterns = set(self.archive_patterns.keys())
             if self.package_manager:
-                for pattern in self.package_manager.archive_patterns.keys():
+                for pattern in self.package_manager.archive_patterns:
                     archive_patterns.add(pattern)
 
             for mod in self._modifier_instances:
-                for pattern in mod.archive_patterns.keys():
+                for pattern in mod.archive_patterns:
                     archive_patterns.add(pattern)
 
             for pattern in archive_patterns:
@@ -2857,8 +2857,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Create a list of all repeats by inserting repeat index
         for n in range(1, self.repeats.n_repeats + 1):
             if (
-                base_exp_name in self.experiment_set.chained_experiments.keys()
-                and base_exp_name not in self.experiment_set.experiments.keys()
+                base_exp_name in self.experiment_set.chained_experiments
+                and base_exp_name not in self.experiment_set.experiments
             ):
                 insert_idx = base_exp_name.find(".chain")
                 repeat_exp_namespace = (
@@ -2880,10 +2880,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # If repeat_success_strict is false, any passing experiment will pass the whole set
         repeat_success = False
         exp_status_list = []
-        for exp in repeat_experiments.keys():
-            if exp in self.experiment_set.experiments.keys():
+        for exp in repeat_experiments:
+            if exp in self.experiment_set.experiments:
                 exp_inst = self.experiment_set.experiments[exp]
-            elif exp in self.experiment_set.chained_experiments.keys():
+            elif exp in self.experiment_set.chained_experiments:
                 exp_inst = self.experiment_set.chained_experiments[exp]
             else:
                 continue
@@ -2915,10 +2915,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         results = []
 
         # Iterate through repeat experiment instances, extract foms, and aggregate them
-        for exp in repeat_experiments.keys():
-            if exp in self.experiment_set.experiments.keys():
+        for exp in repeat_experiments:
+            if exp in self.experiment_set.experiments:
                 exp_inst = self.experiment_set.experiments[exp]
-            elif exp in self.experiment_set.chained_experiments.keys():
+            elif exp in self.experiment_set.chained_experiments:
                 exp_inst = self.experiment_set.chained_experiments[exp]
             else:
                 continue
@@ -2931,7 +2931,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 for context in exp_inst.result.contexts:
                     context_name = context["name"]
 
-                    if context_name not in repeat_foms.keys():
+                    if context_name not in repeat_foms:
                         repeat_foms[context_name] = {}
 
                     for fom in context["foms"]:
@@ -2943,7 +2943,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         )
 
                         # Stats will not be calculated for non-numeric foms so they're skipped
-                        if fom_key not in repeat_foms[context_name].keys():
+                        if fom_key not in repeat_foms[context_name]:
                             repeat_foms[context_name][fom_key] = {
                                 "fom_type": fom["fom_type"],
                                 "fom_values": [],
@@ -3689,7 +3689,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             if len(required_vars_defined) < 2:
                 required_keys = "Two or more of the following are required to be defined.\n"
-                for var in required_vars.keys():
+                for var in required_vars:
                     required_keys += f"  - {var}\n"
 
                 defined_keys = f"Experiment {self.expander.experiment_namespace} only has:\n"

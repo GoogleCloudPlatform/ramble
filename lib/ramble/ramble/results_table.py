@@ -235,7 +235,7 @@ class ResultsTable:
                 remaining_columns.remove(col_name)
                 self._data[col_name].append(col_value)
 
-            elif col_name not in self._data.keys():
+            elif col_name not in self._data:
                 self._data[col_name] = [None] * self._num_rows + [col_value]
 
             column_values[col_name] = col_value

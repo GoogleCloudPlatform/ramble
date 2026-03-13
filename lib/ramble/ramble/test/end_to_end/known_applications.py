@@ -50,7 +50,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
         ]
         if package_manager == "user-managed":
             app_inst = ramble.repository.get(application)
-            for pkg in app_inst.required_packages.keys():
+            for pkg in app_inst.required_packages:
                 args.append("-v")
                 args.append(f"{pkg}_path='/not/real/path'")
 
@@ -114,7 +114,7 @@ def test_known_workflow_managers(
         ]
         # Handle `user-managed` package manager
         app_inst = ramble.repository.get("gromacs")
-        for pkg in app_inst.required_packages.keys():
+        for pkg in app_inst.required_packages:
             args.append("-v")
             args.append(f"{pkg}_path='/not/real/path'")
 

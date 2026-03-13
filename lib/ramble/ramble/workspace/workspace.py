@@ -735,14 +735,14 @@ ramble:
         error_sections = []
         deprecated_sections = []
 
-        if len(deprecated_sections) > 0:
+        if deprecated_sections:
             logger.warn("Your workspace configuration contains deprecated sections:")
             for section in deprecated_sections:
                 logger.warn(f"     {section}")
             logger.warn("Please see the current workspace documentation and update")
             logger.warn("to ensure your workspace continues to function properly")
 
-        if len(error_sections) > 0:
+        if error_sections:
             logger.warn("Your workspace configuration contains invalid sections:")
             for section in deprecated_sections:
                 logger.warn(f"     {section}")
@@ -1280,7 +1280,7 @@ ramble:
         # Unpack all workload names from `when` sets
         all_workload_names = set()
         for _, workloads in app_inst.workloads.items():
-            for workload in workloads.keys():
+            for workload in workloads:
                 all_workload_names.add(workload)
 
         workload_names = []
@@ -1722,7 +1722,7 @@ ramble:
                                 fom_summary = {}
                                 for fom in context["foms"]:
                                     name = fom["name"]
-                                    if name not in fom_summary.keys():
+                                    if name not in fom_summary:
                                         fom_summary[name] = []
                                     stat_name = fom["origin_type"]
                                     if not stat_name.startswith("summary::"):
@@ -2176,7 +2176,7 @@ ramble:
         return os.path.join(self.shared_dir, WORKSPACE_SHARED_LICENSE_PATH)
 
     def template_path(self, name):
-        if name in self._templates.keys():
+        if name in self._templates:
             return os.path.join(self.config_dir, name + TEMPLATE_EXTENSION)
         return None
 
@@ -2764,7 +2764,7 @@ def no_active_workspace():
     effect when there is no active workspace."""
     ws = active_workspace()
     env_var = None
-    if RAMBLE_WORKSPACE_VAR in os.environ.keys():
+    if RAMBLE_WORKSPACE_VAR in os.environ:
         env_var = os.environ[RAMBLE_WORKSPACE_VAR]
         del os.environ[RAMBLE_WORKSPACE_VAR]
 

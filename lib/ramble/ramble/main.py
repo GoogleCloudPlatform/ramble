@@ -763,7 +763,7 @@ class RambleCommand:
         if tty.is_verbose():
             fmt = self.command_name + ": {0}"
             for ln in out.getvalue().split("\n"):
-                if len(ln) > 0:
+                if ln:
                     logger.verbose(fmt.format(ln.replace("==> ", "")))
 
 
@@ -907,7 +907,7 @@ def _main(argv=None):
             os.environ[var] = os.environ[stored_var_name]
 
     # Just print help and exit if run with no arguments at all
-    no_args = (len(sys.argv) == 1) if argv is None else (len(argv) == 0)
+    no_args = (len(sys.argv) == 1) if argv is None else (not argv)
     if no_args:
         parser.print_help()
         return 1

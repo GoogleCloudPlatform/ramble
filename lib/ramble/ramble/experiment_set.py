@@ -819,7 +819,7 @@ class ExperimentSet:
         return filtered_list
 
     def add_chained_experiment(self, name, instance):
-        if name in self.chained_experiments.keys():
+        if name in self.chained_experiments:
             raise RambleExperimentSetError(
                 "Cannot add already defined chained "
                 + f"experiment {name} to this experiment set."
@@ -835,9 +835,9 @@ class ExperimentSet:
         return fnmatch.filter(self.experiment_order, pattern)
 
     def get_experiment(self, experiment):
-        if experiment in self.experiments.keys():
+        if experiment in self.experiments:
             return self.experiments[experiment]
-        if experiment in self.chained_experiments.keys():
+        if experiment in self.chained_experiments:
             return self.chained_experiments[experiment]
         return None
 
@@ -852,7 +852,7 @@ class ExperimentSet:
             variable: Name of variable to look up
         """
 
-        if experiment not in self.experiments.keys():
+        if experiment not in self.experiments:
             return None
 
         exp_app = self.experiments[experiment]

@@ -89,6 +89,6 @@ ramble:
 
         out_files = glob.glob(os.path.join(ws.log_dir, "**", "*.out"), recursive=True)
 
-        assert search_files_for_string(out_files, required_compiler_str) is True
-        assert search_files_for_string(out_files, unused_gcc9_str) is False
-        assert search_files_for_string(out_files, unused_gcc10_str) is False
+        assert search_files_for_string(out_files, required_compiler_str)
+        assert not search_files_for_string(out_files, unused_gcc9_str)
+        assert not search_files_for_string(out_files, unused_gcc10_str)

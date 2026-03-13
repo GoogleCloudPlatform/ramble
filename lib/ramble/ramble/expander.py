@@ -435,7 +435,7 @@ class ExpansionGraph:
                 cur_match.contents = self.str[left_idx : right_idx + 1]  # Define contents
                 cur_match.root = self.root
 
-                if len(opened) > 0:
+                if opened:
                     children[-1].append(cur_match)
                 else:
                     self.root.add_children(cur_match)
@@ -447,7 +447,7 @@ class ExpansionGraph:
             elif escaped:
                 escaped = False
 
-        if len(opened) > 0:
+        if opened:
             self.root.add_children(children.pop())
 
     def walk(self, in_node=None):
@@ -1096,13 +1096,13 @@ class Expander:
                 kw.value, expansion_vars=expansion_vars
             )
 
-        if node.func.id in supported_scalar_function_pointers.keys():
+        if node.func.id in supported_scalar_function_pointers:
             func = supported_scalar_function_pointers[node.func.id]
             return func(*args, **kwargs)
-        elif node.func.id in supported_list_function_pointers.keys():
+        elif node.func.id in supported_list_function_pointers:
             func = supported_list_function_pointers[node.func.id]
             return list(func(*args, **kwargs))
-        elif node.func.id in supported_scalar_function_with_self_arg_pointers.keys():
+        elif node.func.id in supported_scalar_function_with_self_arg_pointers:
             func = supported_scalar_function_with_self_arg_pointers[node.func.id]
             return func(self, *args, **kwargs)
         else:

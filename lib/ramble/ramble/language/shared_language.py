@@ -962,7 +962,7 @@ def environment_variable(
                         wl_group_when_map[wl_name].append(wl_group_when_set)
 
                 for when_set, app_workloads in obj.workloads.items():
-                    for app_wl_name in app_workloads.keys():
+                    for app_wl_name in app_workloads:
                         if app_wl_name in wl_group_when_map:
                             # Add each variation of merged 'when' set for each workload
                             for wl_group_when_set in wl_group_when_map[app_wl_name]:

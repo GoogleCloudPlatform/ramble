@@ -175,12 +175,12 @@ class Keywords:
     def update_keys(self, extra_keys):
         self.keys.update(extra_keys)
         # Define class attributes for all of the keys
-        for key in self.keys.keys():
+        for key in self.keys:
             setattr(self, key, key)
 
     def is_valid(self, key):
         """Check if a key is valid as a known keyword"""
-        return key in self.keys.keys()
+        return key in self.keys
 
     def is_reserved(self, key):
         """Check if a key is reserved"""
@@ -221,7 +221,7 @@ class Keywords:
         Yields:
             (str): Key name
         """
-        for key in self.keys.keys():
+        for key in self.keys:
             if self.is_required(key):
                 yield key
 
@@ -231,7 +231,7 @@ class Keywords:
         Yields:
             (str): Key name
         """
-        for key in self.keys.keys():
+        for key in self.keys:
             if self.is_reserved(key):
                 yield key
 
@@ -240,7 +240,7 @@ class Keywords:
         if not definitions:
             return
 
-        for definition in definitions.keys():
+        for definition in definitions:
             if self.is_reserved(definition):
                 raise RambleKeywordError(
                     f'Keyword "{definition}" has been defined, ' + "but is reserved by ramble."
@@ -252,15 +252,15 @@ class Keywords:
             return
 
         required_set = set()
-        for key in self.keys.keys():
+        for key in self.keys:
             if self.is_required(key):
                 required_set.add(key)
 
-        for definition in definitions.keys():
+        for definition in definitions:
             if definition in required_set:
                 required_set.remove(definition)
 
-        if len(required_set) > 0:
+        if required_set:
             if warn_validation:
                 for key in required_set:
                     logger.warn(f'Required key "{key}" is not defined')

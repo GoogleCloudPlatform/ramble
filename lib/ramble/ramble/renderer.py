@@ -106,7 +106,7 @@ class RenderGroup:
             f"{self.action} {self.object}", name_template, in_dict
         )
 
-        if len(self.matrices) > 0:
+        if self.matrices:
             extracted = True
 
         return extracted
@@ -187,7 +187,7 @@ class Renderer:
                         f"Variable {var_name} in zip {zip_group} " "does not refer to a vector."
                     )
 
-                if len(object_variables[var_name]) == 0:
+                if not object_variables[var_name]:
                     logger.die(
                         f"Variable {var_name} in zip {zip_group} " "has an invalid length of 0"
                     )

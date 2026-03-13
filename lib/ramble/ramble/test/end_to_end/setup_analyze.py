@@ -111,7 +111,7 @@ def test_setup_analyze(test_case_path, workspace_name):
         actual_content = f.read().strip()
     with open(str(expected_analyze)) as f:
         expected_content = f.read().strip()
-    assert len(expected_content) > 0
+    assert expected_content
     # The actual_content can contain some extra executor output, so only assert
     # the expected output is included.
     assert expected_content in actual_content
