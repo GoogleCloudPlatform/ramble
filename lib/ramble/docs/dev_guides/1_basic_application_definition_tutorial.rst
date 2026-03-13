@@ -234,7 +234,7 @@ create -a`` in a previous session or this one), you must first deactivate it
 with ``ramble workspace deactivate`` or unset the ``RAMBLE_WORKSPACE``
 environment variable to avoid conflicts when creating a new workspace. Also,
 creating a workspace *without* the ``-a`` (activate) flag means you will need
-to use the ``-D <workspace_name>`` flag with subsequent ``ramble`` commands to
+to use the ``-D <workspace_path>`` flag with subsequent ``ramble`` commands to
 specify which workspace to operate on.
 
 The following command can be used to add an experiment with the workload we defined earlier:
@@ -561,7 +561,7 @@ To begin with, delete the tutorial workspace, and recreate it using:
 
   $ ramble workspace deactivate
   $ rm -rf tutorial-workspace
-      $ ramble workspace create -d tutorial-workspace -a
+  $ ramble workspace create -d tutorial-workspace -a
 Now, we can add an experiment to exercise the local workload using:
 
 .. code-block:: console
