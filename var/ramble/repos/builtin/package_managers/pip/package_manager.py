@@ -508,7 +508,7 @@ class PipRunner(CommandRunner):
             raise RunnerError(f"Lock file {lock_file} is missing")
         pkgs = []
         with open(lock_file) as f:
-            for line in f.readlines():
+            for line in f:
                 # pip freeze generates such a comment, which serves as a divider
                 # for packages that are added as deps of the ones defined directly.
                 # This is a crude way to avoid defining path vars for
@@ -607,7 +607,7 @@ class PipRunner(CommandRunner):
                     pkgs.add(pkg_name)
         else:
             with open(os.path.join(self.env_path, self._lock_file_name)) as f:
-                reqs = f.readlines()
+                reqs = f
                 for req in reqs:
                     if "==" in req:
                         pkgs.add(req.split("==")[0].strip())
@@ -627,7 +627,7 @@ class PipRunner(CommandRunner):
 
         if os.path.exists(lock_file):
             with open(lock_file) as f:
-                for line in f.readlines():
+                for line in f:
                     software_info = PipSoftwareInfo()
                     software_info.parse_from_string(line.replace("\n", ""))
 
