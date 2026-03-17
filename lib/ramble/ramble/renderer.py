@@ -438,10 +438,14 @@ class Renderer:
             keep_object = True
             if exclude_where:
                 for where in exclude_where:
-                    evaluated = where_expander.expand_var(where)
-                    if evaluated == "True":
-                        keep_object = False
-                        break
+                    try:
+                        evaluated = where_expander.evaluate_predicate(where, extra_vars=obj)
+                        if evaluated:
+                            keep_object = False
+                            break
+                    except ramble.expander.RambleSyntaxError:
+                        # Fail-open to allow for late-binding of variables
+                        pass
 
             if keep_object:
                 repeats = ramble.repeats.Repeats()
