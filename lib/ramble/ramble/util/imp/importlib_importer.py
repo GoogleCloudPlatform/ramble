@@ -20,7 +20,7 @@ class PrependFileLoader(SourceFileLoader):
         self.prepend = prepend
 
     def path_stats(self, path):
-        stats = super().path_stats(path)
+        stats = dict(super().path_stats(path))
         if self.prepend:
             stats["size"] += len(self.prepend) + 1
         return stats

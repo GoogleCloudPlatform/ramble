@@ -8,6 +8,7 @@
 
 import hashlib
 import json
+from typing import Any, Dict
 
 import spack.util.spack_json as sjson
 
@@ -30,7 +31,7 @@ def hash_string(string):
 
 
 def hash_json(in_json):
-    _json_dump_args = {"indent": 2, "separators": (",", ": "), "sort_keys": True}
+    _json_dump_args: Dict[str, Any] = {"indent": 2, "separators": (",", ": "), "sort_keys": True}
 
     data = sjson._strify(in_json)
     json_data = json.dumps(data, **_json_dump_args)

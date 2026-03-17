@@ -17,6 +17,7 @@ import ssl
 import sys
 import traceback
 from html.parser import HTMLParser
+from typing import Any, Dict, List, Set, Tuple
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
@@ -109,13 +110,13 @@ def read_from_url(url, accept_content_type=None):
         # It would be nice to do this with the HTTP Accept header to avoid
         # one round-trip.  However, most servers seem to ignore the header
         # if you ask for a tarball with Accept: text/html.
-        req.get_method = lambda: "HEAD"
+        req.method = "HEAD"
         resp = _urlopen(req, timeout=timeout, context=context)
 
         content_type = get_header(resp.headers, "Content-type")
 
     # Do the real GET request when we know it's just HTML.
-    req.get_method = lambda: "GET"
+    req.method = "GET"
 
     try:
         response = _urlopen(req, timeout=timeout, context=context)
@@ -254,7 +255,7 @@ def remove_url(url, recursive=False):
             paginator = s3.get_paginator("list_objects_v2")
             pages = paginator.paginate(Bucket=bucket, Prefix=prefix)
 
-            delete_request = {"Objects": []}
+            delete_request: Dict[str, List[Dict[str, Any]]] = {"Objects": []}
             for item in pages.search("Contents"):
                 if not item:
                     continue
@@ -401,9 +402,9 @@ def spider(root_urls, depth=0, concurrency=32):
             - links: set of links encountered while visiting the pages.
             - spider_args: argument for subsequent call to spider
         """
-        pages = {}  # dict from page URL -> text content.
-        links = set()  # set of all links seen on visited pages.
-        subcalls = []
+        pages: Dict[str, str] = {}  # dict from page URL -> text content.
+        links: Set[str] = set()  # set of all links seen on visited pages.
+        subcalls: List[Tuple] = []
 
         try:
             response_url, _, response = read_from_url(url, "text/html")
@@ -512,11 +513,11 @@ def _urlopen(req, *args, **kwargs):
     if url_util.parse(url).scheme == "s3":
         import spack.s3_handler
 
-        opener = spack.s3_handler.open
+        opener = spack.s3_handler.open  # type: ignore[assignment]
     elif url_util.parse(url).scheme == "gs":
         import spack.gcs_handler
 
-        opener = spack.gcs_handler.gcs_open
+        opener = spack.gcs_handler.gcs_open  # type: ignore[assignment]
 
     try:
         return opener(req, *args, **kwargs)

@@ -36,11 +36,11 @@ def filter_by_name(glob_patterns, search_description, obj_type):
                 r = fnmatch.translate(f)
             rc = re.compile(r, flags=re.IGNORECASE)
             patts.append(rc)
-        obj_names = [
+        obj_names = {
             obj_name
             for obj_name in obj_names
             if any(_match(obj_name, patt, search_description, obj_type) for patt in patts)
-        ]
+        }
     return sorted(obj_names, key=lambda s: s.lower())
 
 

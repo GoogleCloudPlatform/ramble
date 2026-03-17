@@ -92,14 +92,12 @@ def _type_value(input_value):
     """
 
     try:
-        out = int(input_value)
-        return out
+        return int(input_value)
     except ValueError:
         pass
 
     try:
-        out = float(input_value)
-        return out
+        return float(input_value)
     except ValueError:
         pass
 
