@@ -53,7 +53,21 @@ Ramble supports various sections within its configuration files. These can exist
 *   `modifiers`: Specifies experiment modifiers to be applied to experiments, including mode and target executables. See the [Modifiers Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#modifiers-section).
 *   `repos`: Lists paths to repositories containing Application definitions.
 *   `modifier_repos`: Lists paths to repositories containing Modifier definitions.
-*   **Other Sections:** `formatted_executables`, `internals`, `licenses`, `mirrors`, `success_criteria`, `tables`, `zips`, `package_manager_repos`, `workflow_manager_repos`, `base_application_repos`, `base_modifier_repos`, `base_package_manager_repos`, `base_workflow_manager_repos`, and `base_class_repos`.
+*   **Other Sections:**
+    *   `base_application_repos`
+    *   `base_class_repos`
+    *   `base_modifier_repos`
+    *   `base_package_manager_repos`
+    *   `base_workflow_manager_repos`
+    *   `formatted_executables`
+    *   `internals`
+    *   `licenses`
+    *   `mirrors`
+    *   `package_manager_repos`
+    *   `success_criteria`
+    *   `tables`
+    *   `workflow_manager_repos`
+    *   `zips`
 
 *   **Full Details:** See the [Configuration Files Documentation](https://ramble.readthedocs.io/en/latest/configuration_files.html) for a complete description of all sections and scopes.
 
