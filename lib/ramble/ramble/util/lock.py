@@ -46,10 +46,6 @@ class Lock(llnl.util.lock.Lock):
         if self._enable:
             super()._unlock()
 
-    def _debug(self, *args):
-        if self._enable:
-            super()._debug(*args)  # type: ignore[misc]
-
     def cleanup(self, *args):
         if self._enable:
             super().cleanup(*args)
