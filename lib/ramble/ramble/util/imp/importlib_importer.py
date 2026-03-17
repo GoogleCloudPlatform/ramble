@@ -12,6 +12,7 @@
 """
 import types
 from importlib.machinery import SourceFileLoader  # novm
+from typing import Any, Dict
 
 
 class PrependFileLoader(SourceFileLoader):
@@ -19,7 +20,7 @@ class PrependFileLoader(SourceFileLoader):
         super().__init__(full_name, path)
         self.prepend = prepend
 
-    def path_stats(self, path):
+    def path_stats(self, path: str) -> Dict[str, Any]:
         stats = dict(super().path_stats(path))
         if self.prepend:
             stats["size"] += len(self.prepend) + 1

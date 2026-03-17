@@ -10,11 +10,12 @@
 
 import fnmatch
 import re
+from typing import Any, List
 
 import ramble.repository
 
 
-def filter_by_name(glob_patterns, search_description, obj_type):
+def filter_by_name(glob_patterns: List[str], search_description: bool, obj_type: Any) -> List[str]:
     """
     Filters the sequence of object names by the given glob patterns.
 

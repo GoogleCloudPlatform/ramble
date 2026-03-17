@@ -30,7 +30,7 @@ def hash_string(string):
     return hashlib.sha256(string.encode("UTF-8")).hexdigest()
 
 
-def hash_json(in_json):
+def hash_json(in_json: Any) -> str:
     _json_dump_args: Dict[str, Any] = {"indent": 2, "separators": (",", ": "), "sort_keys": True}
 
     data = sjson._strify(in_json)
