@@ -53,7 +53,21 @@ Ramble supports various sections within its configuration files. These can exist
 *   `modifiers`: Specifies experiment modifiers to be applied to experiments, including mode and target executables. See the [Modifiers Section](https://ramble.readthedocs.io/en/latest/configuration_files.html#modifiers-section).
 *   `repos`: Lists paths to repositories containing Application definitions.
 *   `modifier_repos`: Lists paths to repositories containing Modifier definitions.
-*   **Other Sections:** `formatted_executables`, `internals`, `licenses`, `mirrors`, `success_criteria`.
+*   **Other Sections:**
+    *   `base_application_repos`
+    *   `base_class_repos`
+    *   `base_modifier_repos`
+    *   `base_package_manager_repos`
+    *   `base_workflow_manager_repos`
+    *   `formatted_executables`
+    *   `internals`
+    *   `licenses`
+    *   `mirrors`
+    *   `package_manager_repos`
+    *   `success_criteria`
+    *   `tables`
+    *   `workflow_manager_repos`
+    *   `zips`
 
 *   **Full Details:** See the [Configuration Files Documentation](https://ramble.readthedocs.io/en/latest/configuration_files.html) for a complete description of all sections and scopes.
 
@@ -254,7 +268,7 @@ Using `-k` is particularly useful for running only newly added tests.
 
 ## Running Style Checks
 
-Ramble uses `isort`, `black`, and `flake8` to enforce a consistent code style. You can check and fix style issues using the `ramble style` command.
+Ramble uses `isort`, `black`, `flake8`, and `mypy` to enforce a consistent code style and type safety. You can check and fix style issues using the `ramble style` command.
 
 *   **Checking for Style Errors:** To check for any style violations in the files you've changed in your current branch:
     ```bash
@@ -278,7 +292,7 @@ Ramble uses `isort`, `black`, and `flake8` to enforce a consistent code style. Y
     ```bash
     ramble style -t isort -t black
     ```
-    To skip `flake8`:
+    To skip `flake8` and `mypy`:
     ```bash
-    ramble style -s flake8
+    ramble style -s flake8 -s mypy
     ```
