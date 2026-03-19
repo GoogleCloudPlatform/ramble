@@ -7,8 +7,9 @@
 # except according to those terms.
 
 import itertools
+from typing import List, Optional, Set
 
-ALL_PHASES = ["*"]
+ALL_PHASES: List[str] = ["*"]
 
 
 class Filters:
@@ -16,17 +17,18 @@ class Filters:
 
     def __init__(
         self,
-        phase_filters=None,
-        include_where_filters=None,
-        exclude_where_filters=None,
-        tags=None,
-    ):
+        phase_filters: Optional[List[str]] = None,
+        include_where_filters: Optional[List[List[str]]] = None,
+        exclude_where_filters: Optional[List[List[str]]] = None,
+        tags: Optional[List[List[str]]] = None,
+    ) -> None:
         """Create a new filter instance"""
 
-        self.phases = ALL_PHASES if phase_filters is None else phase_filters
-        self.include_where = None
-        self.exclude_where = None
-        self.tags = set()
+        self.phases: List[str] = ALL_PHASES if phase_filters is None else phase_filters
+        self.include_where: Optional[List[str]] = None
+        self.exclude_where: Optional[List[str]] = None
+        self.tags: Set[str] = set()
+
         if include_where_filters:
             self.include_where = list(itertools.chain.from_iterable(include_where_filters))
         if exclude_where_filters:

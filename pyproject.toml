@@ -162,6 +162,9 @@ ignore_errors = false
 # TODO: Add more modules here for exhaustive type-checking
 module = [
     "ramble.util.*",
+    "ramble.error",
+    "ramble.paths",
+    "ramble.filters",
 ]
 check_untyped_defs = true
 
