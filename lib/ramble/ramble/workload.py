@@ -187,7 +187,7 @@ class Workload:
         Returns:
             (bool): True if workload is valid, False otherwise
         """
-        if len(self.executables) == 0:
+        if not self.executables:
             return False
 
         return True

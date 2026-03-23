@@ -168,13 +168,13 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
 
     # Test variables
     for var, val in src_inst.variables.items():
-        assert var in clone_inst.variables.keys()
+        assert var in clone_inst.variables
         assert clone_inst.variables[var] == val
 
     # Test env-vars
     def _compare_env_var_groups(src_group, clone_group):
-        for var_set in src_group.keys():
-            assert var_set in clone_group.keys()
+        for var_set in src_group:
+            assert var_set in clone_group
             # Test set sets
             if var_set == "set":
                 for var, val in src_group[var_set].items():
@@ -225,7 +225,7 @@ def test_required_builtins(mutable_mock_apps_repo, app):
         if conf[app_inst._builtin_required_key]:
             required_builtins.append(builtin)
 
-    for workload in app_inst.workloads[_FS].keys():
+    for workload in app_inst.workloads[_FS]:
         app_inst.define_variable("workload_name", workload)
         exec_graph = app_inst._get_executable_graph(workload)
         for builtin in required_builtins:
@@ -246,7 +246,7 @@ def test_register_builtin_app(mutable_mock_apps_repo):
         else:
             excluded_builtins.append(builtin)
 
-    for workload in app_inst.workloads[_FS].keys():
+    for workload in app_inst.workloads[_FS]:
         exec_graph = app_inst._get_executable_graph(workload)
         app_inst.define_variable("workload_name", workload)
 

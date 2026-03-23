@@ -24,7 +24,7 @@ def specs_conflict(new, existing, prefix="", skip_conflicting_when=False):
             return False
 
     prefixed_keys = {}
-    for key in new.keys():
+    for key in new:
         if new[key] is not None:
             prefixed_keys[key] = f"{prefix}{key}"
 

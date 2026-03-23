@@ -277,7 +277,7 @@ class URLFetchStrategy(FetchStrategy):
         self.extra_options = kwargs.get("fetch_options", {})
         self._curl = None
 
-        self.extension = kwargs.get("extension", None)
+        self.extension = kwargs.get("extension")
 
         if not self.url:
             raise ValueError("URLFetchStrategy requires a url for fetching.")
@@ -692,12 +692,12 @@ class VCSFetchStrategy(FetchStrategy):
         super().__init__(**kwargs)
 
         # Set a URL based on the type of fetch strategy.
-        self.url = kwargs.get(self.url_attr, None)
+        self.url = kwargs.get(self.url_attr)
         if not self.url:
             raise ValueError(f"{self.__class__} requires {self.url_attr} argument.")
 
         for attr in self.optional_attrs:
-            setattr(self, attr, kwargs.get(attr, None))
+            setattr(self, attr, kwargs.get(attr))
 
     @_needs_stage
     def check(self):
@@ -714,7 +714,7 @@ class VCSFetchStrategy(FetchStrategy):
 
         tar = which("tar", required=True)
 
-        patterns = kwargs.get("exclude", None)
+        patterns = kwargs.get("exclude")
         if patterns is not None:
             if isinstance(patterns, str):
                 patterns = [patterns]

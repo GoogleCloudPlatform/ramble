@@ -226,12 +226,12 @@ def generate_result_index(experiments: list, all_vars=False, where_query=None):
         if all_vars:
             if "All Variables" not in app_dict[exp["workload_name"]]:
                 app_dict[exp["workload_name"]]["All Variables"] = set()
-            for var_name in exp.keys():
+            for var_name in exp:
                 if is_key_to_skip(var_name):
                     continue
                 app_dict[exp["workload_name"]]["All Variables"].add(var_name)
 
-            for var_name in exp["RAMBLE_VARIABLES"].keys():
+            for var_name in exp["RAMBLE_VARIABLES"]:
                 if is_key_to_skip(var_name):
                     continue
                 app_dict[exp["workload_name"]]["All Variables"].add(var_name)
@@ -268,7 +268,7 @@ def generate_result_index(experiments: list, all_vars=False, where_query=None):
                         app_dict[exp["workload_name"]]["FOMs"].add(fom["name"])
                 else:
                     # All other objects
-                    if fom["origin_type"] in OBJECT_NAMES.keys():
+                    if fom["origin_type"] in OBJECT_NAMES:
                         obj_dict = result_index[OBJECT_NAMES[fom["origin_type"]]]
                         if fom["origin"] not in obj_dict:
                             obj_dict[fom["origin"]] = {"FOMs": set()}
@@ -359,7 +359,7 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
 
                         if variables:
                             for var in variables:
-                                if var in exp.keys():
+                                if var in exp:
                                     exp_data[var] = exp[var]
                                 elif var in exp["RAMBLE_VARIABLES"]:
                                     exp_data[var] = exp["RAMBLE_VARIABLES"][var]
@@ -872,7 +872,7 @@ class FomPlot(PlotGenerator):
 
         # ax.set_label('Label via method')
         legend_text = perf_measure
-        if len(unit) > 0:
+        if unit:
             legend_text = f"{perf_measure} ({unit})"
 
         ax.legend([legend_text])

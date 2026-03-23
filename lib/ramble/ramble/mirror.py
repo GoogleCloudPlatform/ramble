@@ -141,8 +141,8 @@ class Mirror:
     def get_profile(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get("profile", None)
-            return self._fetch_url.get("profile", None)
+                return self._push_url.get("profile")
+            return self._fetch_url.get("profile")
         else:
             return None
 
@@ -155,8 +155,8 @@ class Mirror:
     def get_access_pair(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get("access_pair", None)
-            return self._fetch_url.get("access_pair", None)
+                return self._push_url.get("access_pair")
+            return self._fetch_url.get("access_pair")
         else:
             return None
 
@@ -169,8 +169,8 @@ class Mirror:
     def get_endpoint_url(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get("endpoint_url", None)
-            return self._fetch_url.get("endpoint_url", None)
+                return self._push_url.get("endpoint_url")
+            return self._fetch_url.get("endpoint_url")
         else:
             return None
 
@@ -183,8 +183,8 @@ class Mirror:
     def get_access_token(self, url_type):
         if isinstance(self._fetch_url, dict):
             if url_type == "push":
-                return self._push_url.get("access_token", None)
-            return self._fetch_url.get("access_token", None)
+                return self._push_url.get("access_token")
+            return self._fetch_url.get("access_token")
         else:
             return None
 

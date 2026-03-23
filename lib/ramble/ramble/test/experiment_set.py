@@ -59,7 +59,7 @@ def test_single_experiment_in_set():
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
 
 
 def test_vector_experiment_in_set():
@@ -92,8 +92,8 @@ def test_vector_experiment_in_set():
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
 
 
 def test_vector_length_mismatch_errors(workspace_name, capsys):
@@ -200,8 +200,8 @@ def test_zipped_vector_experiments(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_16_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_16_4" in exp_set.experiments
 
 
 def test_matrix_experiments(workspace_name):
@@ -235,8 +235,8 @@ def test_matrix_experiments(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
 
 
 def test_matrix_multiplication_experiments(workspace_name):
@@ -274,12 +274,12 @@ def test_matrix_multiplication_experiments(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_16" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_24" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_12" in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_16" in exp_set.experiments
+        assert "basic.test_wl.series1_24" in exp_set.experiments
 
 
 def test_matrix_vector_experiments(workspace_name):
@@ -317,10 +317,10 @@ def test_matrix_vector_experiments(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_12" in exp_set.experiments
 
 
 def test_multi_matrix_experiments(workspace_name):
@@ -358,8 +358,8 @@ def test_multi_matrix_experiments(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_12_4" in exp_set.experiments
 
 
 def test_full_experiments_from_dict(workspace_name):
@@ -397,10 +397,10 @@ def test_full_experiments_from_dict(workspace_name):
         exp_set.set_workload_context(wlContext)
         exp_set.set_experiment_context(expContext)
 
-        assert "basic.test_wl.test_4_2_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.test_6_2_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.test_8_4_3" in exp_set.experiments.keys()
-        assert "basic.test_wl.test_12_4_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.test_4_2_1" in exp_set.experiments
+        assert "basic.test_wl.test_6_2_2" in exp_set.experiments
+        assert "basic.test_wl.test_8_4_3" in exp_set.experiments
+        assert "basic.test_wl.test_12_4_4" in exp_set.experiments
 
         assert exp_set._context[exp_set._contexts.workspace].context_name is not None
 
@@ -481,8 +481,8 @@ def test_experiment_names_match(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_12_4" in exp_set.experiments
 
         for exp, app, _ in exp_set.all_experiments():
             assert exp == app.expander.expand_var("{experiment_namespace}")
@@ -547,8 +547,8 @@ def test_cross_experiment_variable_references(workspace_name):
         exp_set.set_experiment_context(experiment2_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series2_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series2_4" in exp_set.experiments
 
         exp2_app = exp_set.experiments["basic.test_wl.series2_4"]
         assert exp2_app.expander.expand_var("{test_var}") == "success"
@@ -633,8 +633,8 @@ def test_n_ranks_correct_defaults(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
 
 
 def test_n_nodes_correct_defaults(workspace_name):
@@ -671,8 +671,8 @@ def test_n_nodes_correct_defaults(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6_3" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_6_3" in exp_set.experiments
 
 
 def test_processes_per_node_correct_defaults(workspace_name):
@@ -710,8 +710,8 @@ def test_processes_per_node_correct_defaults(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6_2" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_6_2" in exp_set.experiments
 
 
 @pytest.mark.parametrize("var", ["env_path"])
@@ -1130,7 +1130,7 @@ def test_modifiers_set_correctly(workspace_name, mock_modifiers):
         for mod_def in app_inst.modifiers:
             assert mod_def["mode"] in expected_modifier_modes
             expected_modifier_modes.remove(mod_def["mode"])
-        assert len(expected_modifier_modes) == 0
+        assert not expected_modifier_modes
 
 
 def test_explicit_zips_work(workspace_name):
@@ -1165,8 +1165,8 @@ def test_explicit_zips_work(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
 
 
 def test_explicit_zips_in_matrix(workspace_name):
@@ -1206,12 +1206,12 @@ def test_explicit_zips_in_matrix(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_3" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_3" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_1" in exp_set.experiments
+        assert "basic.test_wl.series1_4_a" in exp_set.experiments
+        assert "basic.test_wl.series1_4_3" in exp_set.experiments
+        assert "basic.test_wl.series1_8_1" in exp_set.experiments
+        assert "basic.test_wl.series1_8_a" in exp_set.experiments
+        assert "basic.test_wl.series1_8_3" in exp_set.experiments
 
 
 def test_explicit_zips_unconsumed(workspace_name):
@@ -1251,12 +1251,12 @@ def test_explicit_zips_unconsumed(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_3" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_3" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_1" in exp_set.experiments
+        assert "basic.test_wl.series1_4_a" in exp_set.experiments
+        assert "basic.test_wl.series1_4_3" in exp_set.experiments
+        assert "basic.test_wl.series1_8_1" in exp_set.experiments
+        assert "basic.test_wl.series1_8_a" in exp_set.experiments
+        assert "basic.test_wl.series1_8_3" in exp_set.experiments
 
 
 def test_single_var_explicit_zip(workspace_name):
@@ -1293,8 +1293,8 @@ def test_single_var_explicit_zip(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
 
 
 def test_zip_multi_use_var_errors(workspace_name, capsys):
@@ -1445,8 +1445,8 @@ def test_vector_experiment_with_explicit_excludes(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" not in exp_set.experiments
 
 
 def test_matrix_experiments_explicit_excludes(workspace_name):
@@ -1487,8 +1487,8 @@ def test_matrix_experiments_explicit_excludes(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" not in exp_set.experiments
 
 
 def test_vector_experiment_with_where_excludes(workspace_name):
@@ -1527,11 +1527,11 @@ def test_vector_experiment_with_where_excludes(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" not in exp_set.experiments
+        assert "basic.test_wl.series1_8" not in exp_set.experiments
+        assert "basic.test_wl.series1_10" in exp_set.experiments
 
 
 def test_vector_experiment_with_late_where_excludes(workspace_name):
@@ -1570,12 +1570,12 @@ def test_vector_experiment_with_late_where_excludes(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert len(exp_set.experiments) == 0
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert not exp_set.experiments
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" not in exp_set.experiments
+        assert "basic.test_wl.series1_6" not in exp_set.experiments
+        assert "basic.test_wl.series1_8" not in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
 def test_vector_experiment_with_multi_where_excludes(workspace_name):
@@ -1614,11 +1614,11 @@ def test_vector_experiment_with_multi_where_excludes(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
 def test_unused_vector_no_error(workspace_name):
@@ -1658,11 +1658,11 @@ def test_unused_vector_no_error(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
 def test_unused_zip_no_error(workspace_name):
@@ -1706,11 +1706,11 @@ def test_unused_zip_no_error(workspace_name):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
 def test_unused_var_propagates_to_chain(workspace_name):
@@ -2002,4 +2002,4 @@ def test_modifiers_no_version_set_correctly(workspace_name, mock_modifiers):
         for mod_def in app_inst.modifiers:
             assert mod_def["mode"] in expected_modifier_modes
             expected_modifier_modes.remove(mod_def["mode"])
-        assert len(expected_modifier_modes) == 0
+        assert not expected_modifier_modes

@@ -122,8 +122,8 @@ def count_conflicts():
 
 def print_conflicts():
     """Print conflict information, if any exist"""
-    if len(conflicts) > 0 or len(unused_compilers) > 0:
-        if len(conflicts) > 0:
+    if conflicts or unused_compilers:
+        if conflicts:
             color.cprint(rucolor.section_title("Software Definition Conflicts:"))
             for pkg_name in conflicts:
 
@@ -139,7 +139,7 @@ def print_conflicts():
                 color.cprint("\tConflicts with objects:")
                 colify(conflicts[pkg_name], indent=24, output=sys.stdout)
 
-        if len(unused_compilers) > 0:
+        if unused_compilers:
             color.cprint(rucolor.section_title("Unused Compilers:"))
             for compiler_name, object_names in unused_compilers.items():
                 color.cprint(

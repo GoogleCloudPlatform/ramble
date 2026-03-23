@@ -127,11 +127,11 @@ class DirectiveMeta(abc.ABCMeta):
                 "_directive_names": DirectiveMeta._directive_names.copy(),
             }
 
-            for attr in directive_attrs.keys():
+            for attr in directive_attrs:
                 if hasattr(DirectiveMeta, attr):
                     directive_attrs[attr].update(getattr(DirectiveMeta, attr))
 
-            for attr in directive_attrs.keys():
+            for attr in directive_attrs:
                 setattr(cls, attr, directive_attrs[attr])
 
             # Lazily execute directives

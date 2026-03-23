@@ -679,13 +679,13 @@ ramble:
 
     ws1._re_read()
 
-    assert search_files_for_string([config_path], "packages: {}") is True
-    assert search_files_for_string([config_path], "pkg_spec: zlib") is False
+    assert search_files_for_string([config_path], "packages: {}")
+    assert not search_files_for_string([config_path], "pkg_spec: zlib")
 
     workspace("concretize", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([config_path], "packages: {}") is False
-    assert search_files_for_string([config_path], "pkg_spec: zlib") is True
+    assert not search_files_for_string([config_path], "packages: {}")
+    assert search_files_for_string([config_path], "pkg_spec: zlib")
 
 
 def test_concretize_nothing():
@@ -697,13 +697,13 @@ def test_concretize_nothing():
         add_basic(ws)
         check_basic(ws)
 
-        assert search_files_for_string([ws.config_file_path], "packages: {}") is True
-        assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
+        assert search_files_for_string([ws.config_file_path], "packages: {}")
+        assert not search_files_for_string([ws.config_file_path], "pkg_spec:")
 
         ws.concretize()
 
-        assert search_files_for_string([ws.config_file_path], "packages: {}") is True
-        assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
+        assert search_files_for_string([ws.config_file_path], "packages: {}")
+        assert not search_files_for_string([ws.config_file_path], "pkg_spec:")
 
 
 def test_concretize_concrete_config(workspace_name):
@@ -815,13 +815,13 @@ ramble:
 
     workspace("concretize", "-f", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([config_path], "zlib:") is True
-    assert search_files_for_string([config_path], "zlib-test") is True
+    assert search_files_for_string([config_path], "zlib:")
+    assert search_files_for_string([config_path], "zlib-test")
 
     workspace("concretize", "--simplify", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([config_path], "zlib:") is True
-    assert search_files_for_string([config_path], "zlib-test") is False
+    assert search_files_for_string([config_path], "zlib:")
+    assert not search_files_for_string([config_path], "zlib-test")
 
 
 def test_setup_command():
@@ -2263,25 +2263,25 @@ software:
 
     ws1._re_read()
 
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True
-    assert search_files_for_string([ws_config_path], "unused-pkg") is True
-    assert search_files_for_string([ws_config_path], "unused-env") is True
-    assert search_files_for_string([ws_config_path], "unused_exp_template") is True
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs") is True
-    assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
-    assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib")
+    assert search_files_for_string([ws_config_path], "unused-pkg")
+    assert search_files_for_string([ws_config_path], "unused-env")
+    assert search_files_for_string([ws_config_path], "unused_exp_template")
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs")
+    assert not search_files_for_string([ws_config_path], "app_not_in_ws_config")
+    assert not search_files_for_string([ws_config_path], "pkg_not_in_ws_config")
 
     workspace("concretize", "--simplify", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True  # keep used pkg
-    assert search_files_for_string([ws_config_path], "unused-pkg") is False  # remove unused pkg
-    assert search_files_for_string([ws_config_path], "unused-env") is False  # remove unused env
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib")  # keep used pkg
+    assert not search_files_for_string([ws_config_path], "unused-pkg")  # remove unused pkg
+    assert not search_files_for_string([ws_config_path], "unused-env")  # remove unused env
     # remove unused experiment template and associated pkgs/envs
-    assert search_files_for_string([ws_config_path], "unused_exp_template") is False
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs") is False
+    assert not search_files_for_string([ws_config_path], "unused_exp_template")
+    assert not search_files_for_string([ws_config_path], "pkg_spec: zlib-configs")
     # ensure apps/pkgs/envs are not merged into workspace config from other config files
-    assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
-    assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
+    assert not search_files_for_string([ws_config_path], "app_not_in_ws_config")
+    assert not search_files_for_string([ws_config_path], "pkg_not_in_ws_config")
 
 
 def write_variables_config_file(file_path, levels, value):

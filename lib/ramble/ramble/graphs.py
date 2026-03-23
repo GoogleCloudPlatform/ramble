@@ -445,7 +445,7 @@ class ExecutableGraph(AttributeGraph):
     def _resolve_builtin_node(self, builtin_name):
         if builtin_name in self.node_definitions:
             return self.node_definitions[builtin_name]
-        full_names = self._builtin_aliases.get(builtin_name, None)
+        full_names = self._builtin_aliases.get(builtin_name)
         if full_names is None:
             raise GraphNodeNotFoundError(f"builtin {builtin_name} does not exist")
         if len(full_names) > 1:
@@ -487,7 +487,7 @@ class FormattedExecutableGraph(AttributeGraph):
                     expansion_strs.update(expansion_pattern.findall(line))
             dep_nodes = []
             for expansion_str in expansion_strs:
-                if expansion_str in self.node_definitions.keys():
+                if expansion_str in self.node_definitions:
                     dep_node = self.node_definitions[expansion_str]
                     dep_nodes.append(dep_node)
 

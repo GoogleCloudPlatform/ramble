@@ -71,7 +71,7 @@ class Logger:
         If any logs are in the log stack, return the filepath of the active log.
         Otherwise, return the string 'stdout'
         """
-        if len(self.log_stack) > 0:
+        if self.log_stack:
             return self.log_stack[-1][0]
         return "stdout"
 
@@ -81,7 +81,7 @@ class Logger:
         If any logs are in the log stack, return the stream object of the active log.
         Otherwise, return None to indicate the system is handling printing.
         """
-        if len(self.log_stack) > 0:
+        if self.log_stack:
             return self.log_stack[-1][1]
         return None
 
@@ -118,7 +118,7 @@ class Logger:
                 )
 
         else:
-            if len(self.log_stack) > 0:
+            if self.log_stack:
                 stream_index = len(self.log_stack) - 1
 
         if stream_index is not None:

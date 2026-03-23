@@ -230,20 +230,20 @@ def update(data: Dict[str, Any]) -> bool:
 
     # Convert `spack_flags` to `spack:command_flags`
 
-    spack_flags = data.get("spack_flags", None)
+    spack_flags = data.get("spack_flags")
     if isinstance(spack_flags, dict):
-        if data.get("spack", None) is None:
+        if data.get("spack") is None:
             data["spack"] = {"flags": {}}
 
-        global_args = spack_flags.get("global_args", None)
+        global_args = spack_flags.get("global_args")
         if global_args is not None:
             data["spack"]["global"] = {"flags": global_args}
 
-        install_flags = spack_flags.get("install", None)
+        install_flags = spack_flags.get("install")
         if install_flags is not None:
             data["spack"]["install"] = {"flags": install_flags}
 
-        concretize_flags = spack_flags.get("concretize", None)
+        concretize_flags = spack_flags.get("concretize")
         if concretize_flags is not None:
             data["spack"]["concretize"] = {"flags": concretize_flags}
 

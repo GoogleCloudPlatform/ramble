@@ -74,7 +74,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert attr["digest"] is not None
             expected_attrs.remove(attr["name"])
 
-    assert len(expected_attrs) == 0
+    assert not expected_attrs
 
     # Test Templates
     expected_templates = {"execute_experiment"}
@@ -85,7 +85,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert temp["digest"] is not None
             expected_templates.remove(temp["name"])
 
-    assert len(expected_templates) == 0
+    assert not expected_templates
 
     # Test software environments
     expected_envs = {"software/spack/gromacs"}
@@ -96,7 +96,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert env["digest"] is not None
             expected_envs.remove(env["name"])
 
-    assert len(expected_envs) == 0
+    assert not expected_envs
 
     # Test objects
     expected_objects = {}
@@ -112,7 +112,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
                 assert object_def["digest"] is not None
 
     for obj_set in expected_objects.values():
-        assert len(obj_set) == 0
+        assert not obj_set
 
     # Test workspace inventory
     assert os.path.isfile(workspace_inventory)
@@ -130,7 +130,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert "contents" in exp
             expected_experiments.remove(exp["name"])
 
-    assert len(expected_experiments) == 0
+    assert not expected_experiments
 
     # Test versions
     expected_versions = {"ramble"}
@@ -141,4 +141,4 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert ver["digest"] != ""
             assert ver["digest"] is not None
             expected_versions.remove(ver["name"])
-    assert len(expected_versions) == 0
+    assert not expected_versions
