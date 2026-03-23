@@ -56,15 +56,7 @@ def version_json(obj_names, out, object_type):
     out.write("[\n")
 
     # output name and latest version for each object
-    obj_latest = ",\n".join(
-        [
-            '  {{"name": "{0}"\n'
-            "}}".format(
-                obj.name,
-            )
-            for obj in objs
-        ]
-    )
+    obj_latest = ",\n".join([f'  {{"name": "{obj.name}"\n}}' for obj in objs])
     out.write(obj_latest)
     # important: no trailing comma in JSON arrays
     out.write("\n]\n")
@@ -127,7 +119,7 @@ def html(obj_names, out, object_type):
 
     # Output some text for each objects.
     for obj in objs:
-        out.write('<div class="section" id="%s">\n' % obj.name)
+        out.write(f'<div class="section" id="{obj.name}">\n')
         head(2, span_id, obj.name)
         span_id += 1
 

@@ -161,7 +161,7 @@ def workspace_activate(args):
     else:
         logger.die(f"No such workspace: '{workspace_name_or_dir}'")
 
-    workspace_prompt = "[%s]" % short_name
+    workspace_prompt = f"[{short_name}]"
 
     # We only support one active workspace at a time, so deactivate the current one.
     if ramble.workspace.active_workspace() is None:
@@ -784,7 +784,7 @@ def workspace_info(args):
         color.cprint("")
         color.cprint(rucolor.section_title("Workspace Templates:"))
         for template, _ in ws.all_templates():
-            color.cprint("    %s" % template)
+            color.cprint(f"    {template}")
 
     # Print workspace variables information
     workspace_vars = ws.get_workspace_vars()
@@ -1796,14 +1796,14 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("workspace_%s" % name)
+        function_name = sanitize_arg_name(f"workspace_{name}")
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("workspace_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name(f"workspace_{name}_setup_parser")
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(
@@ -1847,14 +1847,14 @@ def workspace_manage_setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("workspace_manage_%s" % name)
+        function_name = sanitize_arg_name(f"workspace_manage_{name}")
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             manage_subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("workspace_manage_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name(f"workspace_manage_{name}_setup_parser")
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(

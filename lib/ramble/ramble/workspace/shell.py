@@ -58,18 +58,18 @@ def activate_header(ws, shell, prompt=None):
 def deactivate_header(shell):
     cmds = ""
     if shell == "csh":
-        cmds += "unsetenv %s;\n" % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
+        cmds += f"unsetenv {ramble.workspace.RAMBLE_WORKSPACE_VAR};\n"
         cmds += "if ( $?RAMBLE_OLD_PROMPT ) "
         cmds += '    eval \'set prompt="$RAMBLE_OLD_PROMPT" &&'
         cmds += "        unsetenv RAMBLE_OLD_PROMPT';\n"
     elif shell == "fish":
-        cmds += "set -e %s;\n" % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
+        cmds += f"set -e {ramble.workspace.RAMBLE_WORKSPACE_VAR};\n"
         #
         # NOTE: Not changing fish_prompt (above) => no need to restore it here.
         #
     elif shell == "bat":
         # TODO: Color
-        cmds += 'set "%s="\n' % (ramble.workspace.RAMBLE_WORKSPACE_VAR)
+        cmds += f'set "{ramble.workspace.RAMBLE_WORKSPACE_VAR}="\n'
         # TODO: despacktivate
         # TODO: prompt
     else:

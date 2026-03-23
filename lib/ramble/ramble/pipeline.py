@@ -483,17 +483,17 @@ class MirrorPipeline(Pipeline):
         logger.msg(
             f"Successfully {verb} spack software in {self.workspace.mirror_path}",
             "Archive stats:",
-            "  %-4d already present" % len(self.workspace.software_mirror_stats.present),
-            "  %-4d added" % len(self.workspace.software_mirror_stats.new),
-            "  %-4d failed to fetch." % len(self.workspace.software_mirror_stats.errors),
+            f"  {len(self.workspace.software_mirror_stats.present):<4} already present",
+            f"  {len(self.workspace.software_mirror_stats.new):<4} added",
+            f"  {len(self.workspace.software_mirror_stats.errors):<4} failed to fetch.",
         )
 
         logger.msg(
             f"Successfully {verb} inputs in {self.workspace.mirror_path}",
             "Archive stats:",
-            "  %-4d already present" % len(self.workspace.input_mirror_stats.present),
-            "  %-4d added" % len(self.workspace.input_mirror_stats.new),
-            "  %-4d failed to fetch." % len(self.workspace.input_mirror_stats.errors),
+            f"  {len(self.workspace.input_mirror_stats.present):<4} already present",
+            f"  {len(self.workspace.input_mirror_stats.new):<4} added",
+            f"  {len(self.workspace.input_mirror_stats.errors):<4} failed to fetch.",
         )
 
         if self.workspace.input_mirror_stats.errors:

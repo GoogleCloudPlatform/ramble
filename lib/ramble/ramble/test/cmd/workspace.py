@@ -1678,7 +1678,7 @@ ramble:
     # Create more temlates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
@@ -1695,7 +1695,7 @@ ramble:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
@@ -1751,7 +1751,7 @@ ramble:
     # Create more templates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
@@ -1768,7 +1768,7 @@ ramble:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
@@ -1830,7 +1830,7 @@ ramble:
     # Create more templates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
@@ -1847,7 +1847,7 @@ ramble:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
@@ -1857,9 +1857,7 @@ ramble:
     remote_archive_path = os.path.join(ws1.root, "archive_backup")
     fs.mkdirp(remote_archive_path)
 
-    config(
-        "add", "config:archive_url:%s/" % remote_archive_path, global_args=["-w", workspace_name]
-    )
+    config("add", f"config:archive_url:{remote_archive_path}/", global_args=["-w", workspace_name])
 
     workspace("archive", "-t", global_args=["-w", workspace_name])
 

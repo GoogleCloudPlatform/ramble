@@ -64,7 +64,7 @@ def mod_to_class(mod_name):
     # If a class starts with a number, prefix it with Number_ to make it
     # a valid Python class name.
     if re.match(r"^[0-9]", class_name):
-        class_name = "_%s" % class_name
+        class_name = f"_{class_name}"
 
     return class_name
 
@@ -210,10 +210,10 @@ class NamespaceTrie:
         first, _, rest = namespace.partition(self._sep)
         if not first:
             if not self._value:
-                raise KeyError("Can't find namespace '%s' in trie" % full_name)
+                raise KeyError(f"Can't find namespace '{full_name}' in trie")
             return self._value.value
         elif first not in self._subspaces:
-            raise KeyError("Can't find namespace '%s' in trie" % full_name)
+            raise KeyError(f"Can't find namespace '{full_name}' in trie")
         else:
             return self._subspaces[first]._get_helper(rest, full_name)
 

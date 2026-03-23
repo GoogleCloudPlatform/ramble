@@ -24,10 +24,10 @@ pytestmark = [
 def _make_exe(tmpdir_factory, name, contents=None):
     if sys.platform == "win32":
         name += ".exe"
-    path = str(tmpdir_factory.mktemp("%s_exe" % name).join(name))
+    path = str(tmpdir_factory.mktemp(f"{name}_exe").join(name))
     if contents is not None:
         with open(path, "w") as f:
-            f.write("#!/bin/sh\n%s\n" % contents)
+            f.write(f"#!/bin/sh\n{contents}\n")
         set_executable(path)
     return path
 
@@ -127,7 +127,7 @@ def test_editor_both_bad(nosuch_exe, vim_exe):
     os.environ["VISUAL"] = nosuch_exe
     os.environ["EDITOR"] = nosuch_exe
 
-    os.environ["PATH"] = "{}{}{}".format(os.path.dirname(vim_exe), os.pathsep, os.environ["PATH"])
+    os.environ["PATH"] = f"{os.path.dirname(vim_exe)}{os.pathsep}{os.environ['PATH']}"
 
     def assert_exec(exe, args):
         assert exe == vim_exe

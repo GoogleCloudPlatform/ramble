@@ -842,7 +842,7 @@ def get_checksums_for_versions(
     num_ver = len(sorted_versions)
 
     logger.msg(
-        "Found {} version{} of {}:".format(num_ver, "" if num_ver == 1 else "s", name),
+        f"Found {num_ver} version{'' if num_ver == 1 else 's'} of {name}:",
         "",
         *llnl.util.lang.elide_list(
             ["{0:{1}}  {2}".format(str(v), max_len, url_dict[v]) for v in sorted_versions]
@@ -903,15 +903,13 @@ def get_checksums_for_versions(
     # Generate the version directives to put in a package.py
     version_lines = "\n".join(
         [
-            "    version('{}', {}sha256='{}')".format(v, " " * (max_len - len(str(v))), h)
+            f"    version('{v}', {' ' * (max_len - len(str(v)))}sha256='{h}')"
             for v, h in version_hashes
         ]
     )
 
     num_hash = len(version_hashes)
-    logger.debug(
-        "Checksummed {} version{} of {}:".format(num_hash, "" if num_hash == 1 else "s", name)
-    )
+    logger.debug(f"Checksummed {num_hash} version{'' if num_hash == 1 else 's'} of {name}:")
 
     return version_lines
 

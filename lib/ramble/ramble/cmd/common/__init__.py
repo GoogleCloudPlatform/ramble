@@ -25,15 +25,15 @@ def shell_init_instructions(cmd, equivalent):
     shell_specific = "{sh_arg}" in equivalent
 
     msg = [
-        "`%s` requires ramble's shell support." % cmd,
+        f"`{cmd}` requires ramble's shell support.",
         "",
         "To set up shell support, run the command below for your shell.",
         "",
         color.colorize("@*c{For bash/zsh/sh:}"),
-        "  . %s/setup-env.sh" % ramble.paths.share_path,
+        f"  . {ramble.paths.share_path}/setup-env.sh",
         "",
         color.colorize("@*c{For csh/tcsh:}"),
-        "  source %s/setup-env.csh" % ramble.paths.share_path,
+        f"  source {ramble.paths.share_path}/setup-env.csh",
         "",
         "Or, if you do not want to use shell support, run "
         + ("one of these" if shell_specific else "this")

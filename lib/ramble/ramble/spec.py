@@ -108,7 +108,7 @@ class Spec:
                         current = getattr(current, part)
                     except AttributeError:
                         parent = ".".join(parts[:idx])
-                        m = "Attempted to format attribute %s." % attribute
+                        m = f"Attempted to format attribute {attribute}."
                         m += f"Spec {parent} has no attribute {part}"
                         raise SpecFormatStringError(m) from None
 

@@ -42,11 +42,11 @@ def test_application_type_features(app_class):
 
 
 def add_workload(app_inst, wl_num=1):
-    wl_name = "TestWorkload%s" % wl_num
-    exec_list = ["Workload%sExec1" % wl_num]
-    exec_var = "Workload%sExec2" % wl_num
-    inpt_list = ["Workload%sInput1" % wl_num]
-    inpt_var = "Workload%sInput2" % wl_num
+    wl_name = f"TestWorkload{wl_num}"
+    exec_list = [f"Workload{wl_num}Exec1"]
+    exec_var = f"Workload{wl_num}Exec2"
+    inpt_list = [f"Workload{wl_num}Input1"]
+    inpt_var = f"Workload{wl_num}Input2"
 
     app_inst.workload(
         wl_name,
@@ -65,10 +65,10 @@ def add_workload(app_inst, wl_num=1):
 
 
 def add_executable(app_inst, exe_num=1):
-    nompi_bg_exec_name = "SerialExe%s" % exe_num
-    mpi_exec_name = "MpiExe%s" % exe_num
-    nompi_list_exec_name = "MultiLineSerialExe%s" % exe_num
-    mpi_list_exec_name = "MultiLineMpiExe%s" % exe_num
+    nompi_bg_exec_name = f"SerialExe{exe_num}"
+    mpi_exec_name = f"MpiExe{exe_num}"
+    nompi_list_exec_name = f"MultiLineSerialExe{exe_num}"
+    mpi_list_exec_name = f"MultiLineMpiExe{exe_num}"
     template = "application%s.x -i {input_path}" % exe_num
     redirect_test = "{output_file}"
     output_capture = ">>"
@@ -128,10 +128,10 @@ def add_executable(app_inst, exe_num=1):
 
 
 def add_figure_of_merit(app_inst, fom_num=1):
-    fom_name = "TestFom%s" % fom_num
+    fom_name = f"TestFom{fom_num}"
     fom_log = "{log_file}"
-    fom_regex = ".*(?P<fom%s_val>[0-9]+).*" % fom_num
-    fom_group = "fom%s_val" % fom_num
+    fom_regex = f".*(?P<fom{fom_num}_val>[0-9]+).*"
+    fom_group = f"fom{fom_num}_val"
     fom_units = "(s)"
 
     app_inst.figure_of_merit(
@@ -155,9 +155,9 @@ def add_figure_of_merit(app_inst, fom_num=1):
 
 
 def add_input_file(app_inst, input_num=1):
-    input_name = "MainTestInput%s" % input_num
-    input_url = "https://input%s.com/file.tar.gz" % input_num
-    input_desc = "This is a test input file #%s" % input_num
+    input_name = f"MainTestInput{input_num}"
+    input_url = f"https://input{input_num}.com/file.tar.gz"
+    input_desc = f"This is a test input file #{input_num}"
     input_target = "{application_input_dir}/test_dir%s" % input_num
 
     # Add an input with a target dir
@@ -170,9 +170,9 @@ def add_input_file(app_inst, input_num=1):
         "target_dir": input_target,
     }
 
-    input_name = "SecondaryTestInput%s" % input_num
-    input_url = "https://input%s.com/file.tar.gz" % input_num
-    input_desc = "This is a test secondary input file #%s" % input_num
+    input_name = f"SecondaryTestInput{input_num}"
+    input_url = f"https://input{input_num}.com/file.tar.gz"
+    input_desc = f"This is a test secondary input file #{input_num}"
 
     # Add an input without a target dir
     app_inst.input_file(input_name, input_url, input_desc)

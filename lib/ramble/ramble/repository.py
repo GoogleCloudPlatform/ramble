@@ -630,7 +630,7 @@ class RepoIndex:
         """Get the index with the specified name, reindexing if needed."""
         indexer = self.indexers.get(name)
         if not indexer:
-            raise KeyError("no such index: %s" % name)
+            raise KeyError(f"no such index: {name}")
 
         if name not in self.indexes:
             self._build_all_indexes()
@@ -709,10 +709,10 @@ class RepoPath:
                 self.put_last(repo)
             except RepoError as e:
                 logger.warn(
-                    "Failed to initialize repository: '%s'." % repo,
+                    f"Failed to initialize repository: '{repo}'.",
                     e.message,
                     "To remove the bad repository, run this command:",
-                    "    ramble repo rm %s" % repo,
+                    f"    ramble repo rm {repo}",
                 )
 
     def put_first(self, repo):
@@ -833,7 +833,7 @@ class RepoPath:
             return sys.modules[fullname]
 
         if not self.by_namespace.is_prefix(fullname):
-            raise ImportError("No such ramble repo: %s" % fullname)
+            raise ImportError(f"No such ramble repo: {fullname}")
 
         module = ObjectNamespace(fullname)
         module.__loader__ = self
@@ -990,7 +990,7 @@ class Repo:
         config = self._read_config()
         check(
             "namespace" in config,
-            "%s must define a namespace." % os.path.join(root, self.config_name),
+            f"{os.path.join(root, self.config_name)} must define a namespace.",
         )
 
         self.namespace = config["namespace"]
@@ -1395,23 +1395,23 @@ def create_repo(
         namespace = os.path.basename(root)
 
     if not re.match(r"\w[\.\w-]*", namespace):
-        raise InvalidNamespaceError("'%s' is not a valid namespace." % namespace)
+        raise InvalidNamespaceError(f"'{namespace}' is not a valid namespace.")
 
     existed = False
     if os.path.exists(root):
         if os.path.isfile(root):
-            raise BadRepoError("File %s already exists and is not a directory" % root)
+            raise BadRepoError(f"File {root} already exists and is not a directory")
         elif os.path.isdir(root):
             if not os.access(root, os.R_OK | os.W_OK):
-                raise BadRepoError("Cannot create new repo in %s: cannot access directory." % root)
+                raise BadRepoError(f"Cannot create new repo in {root}: cannot access directory.")
             if os.listdir(root):
-                raise BadRepoError("Cannot create new repo in %s: directory is not empty." % root)
+                raise BadRepoError(f"Cannot create new repo in {root}: directory is not empty.")
         existed = True
 
     full_path = os.path.realpath(root)
     parent = os.path.dirname(full_path)
     if not os.access(parent, os.R_OK | os.W_OK):
-        raise BadRepoError("Cannot create repository in %s: can't access parent!" % root)
+        raise BadRepoError(f"Cannot create repository in {root}: can't access parent!")
 
     try:
         object_dirs = []
@@ -1455,7 +1455,7 @@ def create_repo(
         else:
             shutil.rmtree(root, ignore_errors=True)
 
-        raise BadRepoError("Failed to create new repository in %s." % root) from e
+        raise BadRepoError(f"Failed to create new repository in {root}.") from e
 
     return full_path, namespace
 
@@ -1660,7 +1660,7 @@ class UnknownNamespaceError(UnknownEntityError):
     """Raised when we encounter an unknown namespace"""
 
     def __init__(self, namespace):
-        super().__init__("Unknown namespace: %s" % namespace)
+        super().__init__(f"Unknown namespace: {namespace}")
 
 
 class FailedConstructorError(RepoError):
