@@ -70,6 +70,15 @@ def test_mirror_cache_symlinks(tmpdir):
     assert os.path.normpath(link_target) == os.path.join(cache.root, reference.storage_path)
 
 
+def test_mirror_str_and_repr():
+    m = ramble.mirror.Mirror("http://fetch.com", "http://push.com", name="my_mirror")
+    assert str(m) == '[Mirror "my_mirror" (fetch: http://fetch.com, push: http://push.com)]'
+    assert (
+        repr(m)
+        == "Mirror(fetch_url='http://fetch.com', push_url='http://push.com', name='my_mirror')"
+    )
+
+
 # Create an archive for the test input, with the correct file name
 def create_archive(archive_dir, app_class):
     tar = spack.util.executable.which("tar", required=True)
