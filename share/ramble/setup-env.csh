@@ -86,7 +86,7 @@ end
 
 # Set variables needed by this script
 _ramble_pathadd PATH "$RAMBLE_ROOT/bin"
-eval `ramble --print-shell-vars csh`
+eval `ramble csh`
 
 # done: unset sentinel variable as we're no longer initializing
 unsetenv _rmb_initializing
