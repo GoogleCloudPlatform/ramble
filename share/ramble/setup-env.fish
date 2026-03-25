@@ -727,7 +727,7 @@ end
 
 
 if test "$need_module" = "yes"
-    set -l rmb_shell_vars (command ramble --print-shell-vars sh,modules)
+    set -l rmb_shell_vars (command ramble sh,modules)
 
     for rmb_var_expr in $rmb_shell_vars
         rmb_apply_shell_vars $rmb_var_expr
@@ -741,7 +741,7 @@ if test "$need_module" = "yes"
 
 else
 
-    set -l rmb_shell_vars (command ramble --print-shell-vars sh)
+    set -l rmb_shell_vars (command ramble sh)
 
     for rmb_var_expr in $rmb_shell_vars
         rmb_apply_shell_vars $rmb_var_expr

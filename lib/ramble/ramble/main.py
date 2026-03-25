@@ -553,9 +553,6 @@ def make_argument_parser(**kwargs):
     parser.add_argument(
         "-V", "--version", action="store_true", help="show version number and exit"
     )
-    parser.add_argument(
-        "--print-shell-vars", action="store", help="print info needed by setup-env.[c]sh"
-    )
 
     return parser
 
@@ -801,27 +798,6 @@ def _profile_wrapper(command, parser, args, unknown_args):
         stats.print_stats(*restrictions)
 
 
-def print_setup_info(*info):
-    """Print basic information needed by setup-env.[c]sh.
-
-    Args:
-        info (list): list of things to print: comma-separated list
-            of 'csh', 'sh', or 'modules'
-
-    This is in ``main.py`` to make it fast; the setup scripts need to
-    invoke ramble in login scripts, and it needs to be quick.
-    """
-    shell = "csh" if "csh" in info else "sh"
-
-    def shell_set(var, value):
-        if shell == "sh":
-            print(f"{var}='{value}'")
-        elif shell == "csh":
-            print(f"set {var} = '{value}'")
-        else:
-            logger.die("shell must be sh or csh")
-
-
 def resolve_alias(cmd_name, cmd):
     """Resolves aliases in the given command.
 
@@ -958,9 +934,6 @@ def _main(argv=None):
     # ------------------------------------------------------------------------
     # Things that require configuration should go below here
     # ------------------------------------------------------------------------
-    if args.print_shell_vars:
-        print_setup_info(*args.print_shell_vars.split(","))
-        return 0
 
     # At this point we've considered all the options to ramble itself, so we
     # need a command or we're done.
