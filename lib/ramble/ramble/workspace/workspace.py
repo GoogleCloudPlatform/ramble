@@ -680,20 +680,6 @@ ramble:
     {namespace.environments}: {{}}
 """
 
-    def _read_application_config(self, path, f, raw_yaml=None):
-        """Read an application configuration file"""
-        if path not in self.application_configs:
-            self.application_configs[path] = {
-                "filename": os.path.basename(path),
-                "path": path,
-                "schema": applications_schema,
-                "raw_yaml": None,
-                "yaml": None,
-            }
-
-        config = self.application_configs[path]
-        self._read_yaml(config, f, raw_yaml)
-
     def _read_config(self, section, f, raw_yaml=None):
         """Read configuration file"""
         config = self.config_sections[section]
@@ -817,20 +803,6 @@ ramble:
             template_path = self.template_path(name)
             with open(template_path, "w+") as f:
                 f.write(conf["contents"])
-
-    def get_metadata(self, key):
-        """Get the value of a metadata key
-
-        Args:
-            key (str): Name of metadata key to retrieve
-
-        Returns:
-            (Any): Value associated with key in metadata
-        """
-        if key in self.metadata[namespace.metadata]:
-            return self.metadata[namespace.metadata][key]
-        else:
-            return None
 
     def update_metadata(self, key, value):
         """Set the metadata key value
@@ -1564,13 +1536,6 @@ ramble:
         )
 
         return
-
-    def write_json_results(self):
-        fs.mkdirp(self.results_dir)
-        out_file = os.path.join(self.results_dir, "results.json")
-        with open(out_file, "w+") as f:
-            sjson.dump(self.results, f)
-        return out_file
 
     def default_results(self):
         res = {}
@@ -2619,16 +2584,6 @@ ramble:
     def _get_application_dict_config(self, key):
         return self.application_configs[key]["yaml"] if key in self.application_configs else None
 
-    def _get_workspace_section(self, section):
-        """Return a dict of a workspace section"""
-        workspace_dict = self._get_workspace_dict()
-
-        return (
-            workspace_dict[namespace.ramble][section]
-            if section in workspace_dict[namespace.ramble]
-            else syaml.syaml_dict()
-        )
-
     def get_workspace_vars(self):
         """Return a dict of workspace variables"""
         return ramble.config.config.get_config(namespace.variables)
@@ -2817,22 +2772,3 @@ class RambleConflictingDefinitionError(RambleWorkspaceError):
 
 class RambleActiveWorkspaceError(RambleWorkspaceError):
     """Error when an invalid workspace is activated"""
-
-
-class RambleMissingApplicationError(RambleWorkspaceError):
-    """Error when using an undefined application in an experiment
-    specification"""
-
-
-class RambleMissingWorkloadError(RambleWorkspaceError):
-    """Error when using an undefined workload in an experiment
-    specification"""
-
-
-class RambleMissingExperimentError(RambleWorkspaceError):
-    """Error when using an undefined experiment in an experiment
-    specification"""
-
-
-class RambleMissingApplicationDirError(RambleWorkspaceError):
-    """Error when using a non-existent application directory"""

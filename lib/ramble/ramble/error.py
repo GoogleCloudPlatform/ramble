@@ -121,18 +121,6 @@ class FormattedExecutableError(ApplicationError):
     """
 
 
-class PhaseCycleDetectedError(ApplicationError):
-    """
-    Exception raised when a cycle is detected while ordering phases
-    """
-
-
-class InvalidPhaseError(ApplicationError):
-    """
-    Exception raised when a phase is used but not defined
-    """
-
-
 class ChainCycleDetectedError(ApplicationError):
     """
     Exception raised when a cycle is detected in a defined experiment chain

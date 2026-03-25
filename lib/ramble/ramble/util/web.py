@@ -560,11 +560,3 @@ def get_header(headers, header_name):
 
 class SpackWebError(spack.error.SpackError):
     """Superclass for Spack web spidering errors."""
-
-
-class NoNetworkConnectionError(SpackWebError):
-    """Raised when an operation can't get an internet connection."""
-
-    def __init__(self, message, url):
-        super().__init__("No network connection: " + str(message), "URL was: " + str(url))
-        self.url = url

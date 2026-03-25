@@ -139,12 +139,6 @@ class CommandExecutable:
 
         return self_str
 
-    def add_template(self, commands: Union[str, List[str]]):
-        if isinstance(commands, list):
-            self.template.extend(commands)
-        else:
-            self.template.append(commands)
-
 
 class CommandExecutableError(ramble.error.RambleError):
     """Class for errors when using command executable classes"""

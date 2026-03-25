@@ -165,22 +165,6 @@ class Workload:
         """
         self.executables.append(executable)
 
-    def add_input(self, input: str):
-        """Add an input to this workload
-
-        Args:
-            input (str): Name of input to add to this workload
-        """
-        self.inputs.append(input)
-
-    def add_tag(self, tag: str):
-        """Add a tag to this workload
-
-        Args:
-            tag (str): Tag to add to this workload
-        """
-        self.tags.append(tag)
-
     def is_valid(self):
         """Test if this workload is considered valid
 
@@ -236,22 +220,6 @@ class Workload:
                 if var.name == name:
                     named_vars.append(var)
         return named_vars
-
-    def find_environment_variable(self, name):
-        """Find an environment variable in this workload
-
-        Args:
-            env_var_name (str): Name of environment variable to find
-
-        Returns:
-            (ramble.definitions.variables.EnvironmentVariable | None): Environment variable
-                instance if it exists, None if it is not found
-        """
-        named_env_vars = []
-        for env_var_list in self.environment_variables.values():
-            for env_var in env_var_list:
-                named_env_vars.append(env_var)
-        return named_env_vars
 
 
 class WorkloadGroup:

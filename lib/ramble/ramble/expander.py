@@ -476,11 +476,6 @@ class ExpansionGraph:
         return "\n".join(lines)
 
 
-class ExpansionDict(dict):
-    def __missing__(self, key):
-        return "{" + key + "}"
-
-
 class Expander:
     """A class that will track and expand keyword arguments
 
@@ -1361,15 +1356,3 @@ class RambleSyntaxError(ExpanderError):
 
 class RamblePassthroughError(ExpanderError):
     """Raised when passthrough is disabled and variables fail to expand"""
-
-
-class ApplicationNotDefinedError(ExpanderError):
-    """Raised when an application is not defined properly"""
-
-
-class WorkloadNotDefinedError(ExpanderError):
-    """Raised when a workload is not defined properly"""
-
-
-class ExperimentNotDefinedError(ExpanderError):
-    """Raised when an experiment is not defined properly"""

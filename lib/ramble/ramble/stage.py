@@ -9,10 +9,8 @@
 
 import errno
 import getpass
-import glob
 import hashlib
 import os
-import shutil
 import stat
 import sys
 from typing import Dict
@@ -160,20 +158,6 @@ def _resolve_paths(candidates):
 
 # Cached stage path root
 _stage_root = None
-
-
-# TODO (dwj): If we want to support multiple mirrors, we'll need to
-#             figure out how to pass them to the stage.
-def _mirror_roots():
-    mirrors = ramble.config.get("mirrors")
-    return [
-        (
-            sup.substitute_path_variables(root)
-            if root.endswith(os.sep)
-            else sup.substitute_path_variables(root) + os.sep
-        )
-        for root in mirrors.values()
-    ]
 
 
 class InputStage:
@@ -488,41 +472,6 @@ class InputStage:
 
         print_errors(errors)
 
-    def steal_source(self, dest):
-        """Copy the source_path directory in its entirety to directory dest
-
-        This operation creates/fetches/expands the stage if it is not already,
-        and destroys the stage when it is done."""
-        if not self.created:
-            self.create()
-        if not self.expanded and not self.archive_file:
-            self.fetch()
-        if not self.expanded:
-            self.expand_archive()
-
-        if not os.path.isdir(dest):
-            mkdirp(dest)
-
-        # glob all files and directories in the source path
-        hidden_entries = glob.glob(os.path.join(self.source_path, ".*"))
-        entries = glob.glob(os.path.join(self.source_path, "*"))
-
-        # Move all files from stage to destination directory
-        # Include hidden files for VCS repo history
-        for entry in hidden_entries + entries:
-            if os.path.isdir(entry):
-                d = os.path.join(dest, os.path.basename(entry))
-                shutil.copytree(entry, d)
-            else:
-                shutil.copy2(entry, dest)
-
-        # copy archive file if we downloaded from url -- replaces for vcs
-        if self.archive_file and os.path.exists(self.archive_file):
-            shutil.copy2(self.archive_file, dest)
-
-        # remove leftover stage
-        self.destroy()
-
     def check(self):
         """Check the downloaded archive against a checksum digest.
         No-op if this stage checks code out of a repository."""
@@ -710,7 +659,6 @@ class StageComposite(pattern.Composite):
                 "destroy",
                 "cache_local",
                 "cache_mirror",
-                "steal_source",
                 "managed_by_ramble",
             ]
         )
@@ -817,10 +765,6 @@ class StagePathError(StageError):
 
 class RestageError(StageError):
     """ "Error encountered during restaging."""
-
-
-class VersionFetchError(StageError):
-    """Raised when we can't determine a URL to fetch an input."""
 
 
 # Keep this in namespace for convenience
