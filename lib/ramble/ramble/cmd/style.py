@@ -241,13 +241,13 @@ def setup_parser(subparser):
         "-t",
         "--tool",
         action="append",
-        help="specify which tools to run (default: %s)" % ",".join(tool_names),
+        help=f"specify which tools to run (default: {','.join(tool_names)})",
     )
     tool_group.add_argument(
         "-s",
         "--skip",
         action="append",
-        help="specify tools to skip (choose from %s)" % ",".join(tool_names),
+        help=f"specify tools to skip (choose from {','.join(tool_names)})",
     )
     subparser.add_argument("files", nargs=argparse.REMAINDER, help="specific files to check")
 

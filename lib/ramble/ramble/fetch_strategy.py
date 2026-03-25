@@ -477,7 +477,7 @@ class URLFetchStrategy(FetchStrategy):
 
             if curl.returncode == 22:
                 # This is a 404.  Curl will print the error.
-                raise FailedDownloadError(url, "URL %s was not found!" % url)
+                raise FailedDownloadError(url, f"URL {url} was not found!")
 
             elif curl.returncode == 60:
                 # This is a certificate error.  Suggest spack -k
@@ -530,7 +530,7 @@ class URLFetchStrategy(FetchStrategy):
 
         if not self.archive_file:
             raise NoArchiveFileError(
-                "Couldn't find archive file", "Failed on expand() for URL %s" % self.url
+                "Couldn't find archive file", f"Failed on expand() for URL {self.url}"
             )
 
         if not self.extension:
@@ -614,7 +614,7 @@ class URLFetchStrategy(FetchStrategy):
         if not self.archive_file:
             raise NoArchiveFileError(
                 "Tried to reset URLFetchStrategy before fetching",
-                "Failed on reset() for URL %s" % self.url,
+                f"Failed on reset() for URL {self.url}",
             )
 
         # Remove everything but the archive from the stage
@@ -647,7 +647,7 @@ class CacheURLFetchStrategy(URLFetchStrategy):
 
         # check whether the cache file exists.
         if not os.path.isfile(path):
-            raise NoCacheError("No cache of %s" % path)
+            raise NoCacheError(f"No cache of {path}")
 
         # remove old symlink if one is there.
         filename = self.stage.save_filename
@@ -719,7 +719,7 @@ class VCSFetchStrategy(FetchStrategy):
             if isinstance(patterns, str):
                 patterns = [patterns]
             for p in patterns:
-                tar.add_default_arg("--exclude=%s" % p)
+                tar.add_default_arg(f"--exclude={p}")
 
         with working_dir(self.stage.path):
             if self.stage.srcdir:
@@ -733,7 +733,7 @@ class VCSFetchStrategy(FetchStrategy):
                 tar("-czf", destination, os.path.basename(self.stage.source_path))
 
     def __str__(self):
-        return "VCS: %s" % self.url
+        return f"VCS: {self.url}"
 
     def __repr__(self):
         return f"{self.__class__}<{self.url}>"
@@ -806,7 +806,7 @@ class GoFetchStrategy(VCSFetchStrategy):
             self.go("clean")
 
     def __str__(self):
-        return "[go] %s" % self.url
+        return f"[go] {self.url}"
 
 
 @fetcher
@@ -1181,7 +1181,7 @@ class CvsFetchStrategy(VCSFetchStrategy):
             self.cvs("update", "-C", ".")
 
     def __str__(self):
-        return "[cvs] %s" % self.url
+        return f"[cvs] {self.url}"
 
 
 @fetcher
@@ -1275,7 +1275,7 @@ class SvnFetchStrategy(VCSFetchStrategy):
             self.svn("revert", ".", "-R")
 
     def __str__(self):
-        return "[svn] %s" % self.url
+        return f"[svn] {self.url}"
 
 
 @fetcher
@@ -1350,7 +1350,7 @@ class HgFetchStrategy(VCSFetchStrategy):
 
         args = []
         if self.revision:
-            args.append("at revision %s" % self.revision)
+            args.append(f"at revision {self.revision}")
         logger.debug(f"Cloning mercurial repository: {self.url} {args}")
 
         args = ["clone"]
@@ -1388,7 +1388,7 @@ class HgFetchStrategy(VCSFetchStrategy):
             shutil.move(scrubbed, source_path)
 
     def __str__(self):
-        return "[hg] %s" % self.url
+        return f"[hg] {self.url}"
 
 
 @fetcher
@@ -1587,7 +1587,7 @@ class FailedDownloadError(FetchError):
     """Raised when a download fails."""
 
     def __init__(self, url, msg=""):
-        super().__init__("Failed to fetch file from URL: %s" % url, msg)
+        super().__init__(f"Failed to fetch file from URL: {url}", msg)
         self.url = url
 
 
@@ -1624,4 +1624,4 @@ class NoStageError(FetchError):
     """Raised when fetch operations are called before set_stage()."""
 
     def __init__(self, method):
-        super().__init__("Must call FetchStrategy.set_stage() before calling %s" % method.__name__)
+        super().__init__(f"Must call FetchStrategy.set_stage() before calling {method.__name__}")

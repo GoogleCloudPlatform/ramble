@@ -113,7 +113,7 @@ def get_module(cmd_name):
         try:
             module = spack.extensions.get_module(cmd_name)
         except AttributeError:
-            raise RambleCommandError("Command %s does not exist." % cmd_name) from None
+            raise RambleCommandError(f"Command {cmd_name} does not exist.") from None
 
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op
     attr_setdefault(module, DESCRIPTION, "")
@@ -269,4 +269,4 @@ def find_workspace_path(args):
     if ramble.workspace.is_workspace_dir(ws):
         return ws
 
-    raise ramble.workspace.RambleWorkspaceError("no workspace in %s" % ws)
+    raise ramble.workspace.RambleWorkspaceError(f"no workspace in {ws}")

@@ -116,4 +116,4 @@ ramble:
             assert "spack install" not in content
             assert "spack concretize" not in content
     except RunnerError as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")

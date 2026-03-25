@@ -78,7 +78,7 @@ class RambleError(Exception):
     def __str__(self) -> str:
         msg = self.message
         if self._long_message:
-            msg += "\n    %s" % self._long_message
+            msg += f"\n    {self._long_message}"
         return msg
 
     def __repr__(self) -> str:

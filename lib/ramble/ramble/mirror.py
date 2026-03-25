@@ -110,7 +110,7 @@ class Mirror:
         if name is None:
             name = ""
         else:
-            name = ' "%s"' % name
+            name = f' "{name}"'
 
         if self._push_url is None:
             return f"[Mirror{name} ({self._fetch_url})]"
@@ -357,13 +357,13 @@ def mirror_archive_paths(fetcher, per_input_ref):
     ext = None or _determine_extension(fetcher)
 
     if ext:
-        per_input_ref += ".%s" % ext
+        per_input_ref += f".{ext}"
 
     global_ref = fetcher.mirror_id()
     if global_ref:
         global_ref = os.path.join("_input-cache", global_ref)
     if global_ref and ext:
-        global_ref += ".%s" % ext
+        global_ref += f".{ext}"
 
     return MirrorReference(per_input_ref, global_ref)
 

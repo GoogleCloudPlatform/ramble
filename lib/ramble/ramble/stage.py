@@ -17,8 +17,6 @@ import stat
 import sys
 from typing import Dict
 
-import llnl.util.lang
-import llnl.util.tty as tty
 from llnl.util.filesystem import (
     can_access,
     install,
@@ -807,113 +805,6 @@ def ensure_access(file):
     """Ensure we can access a directory and die with an error if we can't."""
     if not can_access(file):
         logger.die(f"Insufficient permissions for {file}")
-
-
-# TODO (dwj): Need to add checksums for inputs.
-def get_checksums_for_versions(
-    url_dict, name, first_stage_function=None, keep_stage=False, fetch_options=None, batch=False
-):
-    """Fetches and checksums archives from URLs.
-
-    This function is called by both ``ramble checksum`` and ``ramble
-    create``.  The ``first_stage_function`` argument allows the caller to
-    inspect the first downloaded archive, e.g., to determine the build
-    system.
-
-    Args:
-        url_dict (dict): A dictionary of the form: version -> URL
-        name (str): The name of the input
-        first_stage_function (Callable): function that takes a Stage and a URL;
-            this is run on the stage of the first URL downloaded
-        keep_stage (bool): whether to keep staging area when command completes
-        batch (bool): whether to ask user how many versions to fetch (false)
-            or fetch all versions (true)
-        fetch_options (dict): Options used for the fetcher (such as timeout
-            or cookies)
-
-    Returns:
-        (str): A multi-line string containing versions and corresponding hashes
-
-    """
-    sorted_versions = sorted(url_dict.keys(), reverse=True)
-
-    # Find length of longest string in the list for padding
-    max_len = max(len(str(v)) for v in sorted_versions)
-    num_ver = len(sorted_versions)
-
-    logger.msg(
-        "Found {} version{} of {}:".format(num_ver, "" if num_ver == 1 else "s", name),
-        "",
-        *llnl.util.lang.elide_list(
-            ["{0:{1}}  {2}".format(str(v), max_len, url_dict[v]) for v in sorted_versions]
-        ),
-    )
-    print()
-
-    if batch:
-        archives_to_fetch = len(sorted_versions)
-    else:
-        archives_to_fetch = tty.get_number(
-            "How many would you like to checksum?", default=1, abort="q"
-        )
-
-    if not archives_to_fetch:
-        logger.die("Aborted.")
-
-    versions = sorted_versions[:archives_to_fetch]
-    urls = [url_dict[v] for v in versions]
-
-    logger.debug("Downloading...")
-    version_hashes = []
-    i = 0
-    errors = []
-    for url, version in zip(urls, versions):
-        try:
-            if fetch_options:
-                url_or_fs = fs.URLFetchStrategy(url, fetch_options=fetch_options)
-            else:
-                url_or_fs = url
-            with InputStage(url_or_fs, keep=keep_stage) as stage:
-                # Fetch the archive
-                stage.fetch()
-                if i == 0 and first_stage_function:
-                    # Only run first_stage_function the first time,
-                    # no need to run it every time
-                    first_stage_function(stage, url)
-
-                # Checksum the archive and add it to the list
-                version_hashes.append(
-                    (version, spack.util.crypto.checksum(hashlib.sha256, stage.archive_file))
-                )
-                i += 1
-        except FailedDownloadError:
-            errors.append(f"Failed to fetch {url}")
-        except Exception as e:
-            logger.msg(f"Something failed on {url}, skipping.  ({e})")
-
-    for msg in errors:
-        logger.debug(msg)
-
-    if not version_hashes:
-        logger.die(f"Could not fetch any versions for {name}")
-
-    # Find length of longest string in the list for padding
-    max_len = max(len(str(v)) for v, h in version_hashes)
-
-    # Generate the version directives to put in a package.py
-    version_lines = "\n".join(
-        [
-            "    version('{}', {}sha256='{}')".format(v, " " * (max_len - len(str(v))), h)
-            for v, h in version_hashes
-        ]
-    )
-
-    num_hash = len(version_hashes)
-    logger.debug(
-        "Checksummed {} version{} of {}:".format(num_hash, "" if num_hash == 1 else "s", name)
-    )
-
-    return version_lines
 
 
 class StageError(ramble.error.RambleError):

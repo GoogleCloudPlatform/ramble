@@ -317,7 +317,7 @@ def create(name, read_default_template=True):
     """Create a named workspace in Ramble"""
     validate_workspace_name(name)
     if exists(name):
-        raise RambleWorkspaceError("'%s': workspace already exists" % name)
+        raise RambleWorkspaceError(f"'{name}': workspace already exists")
     return Workspace(root(name), read_default_template=read_default_template)
 
 
@@ -369,7 +369,7 @@ def get_workspace(args, cmd_name, required=False):
         elif is_workspace_dir(workspace):
             return Workspace(workspace)
         else:
-            raise RambleWorkspaceError("no workspace in %s" % workspace)
+            raise RambleWorkspaceError(f"no workspace in {workspace}")
 
     # try the active workspace. This is set by find_workspace (above)
     if _active_workspace:
@@ -1710,8 +1710,8 @@ ramble:
                 f.write(f"From Workspace: {self.name} (hash: {results['workspace_hash']})\n")
                 if namespace.experiment in results:
                     for exp in results[namespace.experiment]:
-                        f.write("Experiment %s figures of merit:\n" % exp["name"])
-                        f.write("  Status = %s\n" % exp["RAMBLE_STATUS"])
+                        f.write(f"Experiment {exp['name']} figures of merit:\n")
+                        f.write(f"  Status = {exp['RAMBLE_STATUS']}\n")
                         if "TAGS" in exp:
                             f.write(f'  Tags = {exp["TAGS"]}\n')
 
@@ -1752,8 +1752,8 @@ ramble:
                                         mod = fom["origin"]
                                         name = f"{fom['origin_type']}{delim}{mod}{delim}{name}"
 
-                                    output = "{} = {} {}".format(name, fom["value"], fom["units"])
-                                    f.write("    %s\n" % (output.strip()))
+                                    output = f"{name} = {fom['value']} {fom['units']}"
+                                    f.write(f"    {output.strip()}\n")
 
                             if software_key in exp and exp[software_key]:
                                 self.write_software_info(f, exp)
@@ -1836,9 +1836,7 @@ ramble:
                 try:
                     fs.mkdirp(subdir)
                 except OSError as e:
-                    raise ramble.mirror.MirrorError(
-                        "Cannot create directory '%s':" % subdir
-                    ) from e
+                    raise ramble.mirror.MirrorError(f"Cannot create directory '{subdir}':") from e
 
         self.software_mirror_stats = MirrorStats()
         self.input_mirror_stats = MirrorStats()
@@ -2710,7 +2708,7 @@ def read(name):
     """Get a workspace with the supplied name."""
     validate_workspace_name(name)
     if not exists(name):
-        raise RambleWorkspaceError("no such workspace '%s'" % name)
+        raise RambleWorkspaceError(f"no such workspace '{name}'")
     return Workspace(root(name))
 
 

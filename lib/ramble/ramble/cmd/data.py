@@ -75,14 +75,14 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("data_%s" % name)
+        function_name = sanitize_arg_name(f"data_{name}")
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("data_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name(f"data_{name}_setup_parser")
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(

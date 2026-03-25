@@ -151,33 +151,27 @@ class BashCompletionWriter(ArgparseCompletionWriter):
 
     def body(self, positionals, optionals, subcommands):
         if positionals:
-            return """
+            return f"""
     if $list_options
     then
-        {}
+        {self.optionals(optionals)}
     else
-        {}
+        {self.positionals(positionals)}
     fi
-""".format(
-                self.optionals(optionals), self.positionals(positionals)
-            )
+"""
         elif subcommands:
-            return """
+            return f"""
     if $list_options
     then
-        {}
+        {self.optionals(optionals)}
     else
-        {}
+        {self.subcommands(subcommands)}
     fi
-""".format(
-                self.optionals(optionals), self.subcommands(subcommands)
-            )
+"""
         else:
-            return """
-    {}
-""".format(
-                self.optionals(optionals)
-            )
+            return f"""
+    {self.optionals(optionals)}
+"""
 
     def positionals(self, positionals):
         # If match found, return function name
@@ -190,10 +184,10 @@ class BashCompletionWriter(ArgparseCompletionWriter):
         return 'RAMBLE_COMREPLY=""'
 
     def optionals(self, optionals):
-        return 'RAMBLE_COMPREPLY="{}"'.format(" ".join(optionals))
+        return f"RAMBLE_COMPREPLY=\"{' '.join(optionals)}\""
 
     def subcommands(self, subcommands):
-        return 'RAMBLE_COMPREPLY="{}"'.format(" ".join(subcommands))
+        return f"RAMBLE_COMPREPLY=\"{' '.join(subcommands)}\""
 
 
 @formatter
@@ -213,7 +207,7 @@ def rst_index(out):
     dmax = max(len(section_descriptions.get(s, s)) for s in sections) + 2
     cmax = max(len(c) for _, c in sections.items()) + 60
 
-    row = "{}  {}\n".format("=" * dmax, "=" * cmax)
+    row = f"{'=' * dmax}  {'=' * cmax}\n"
     line = "%%-%ds  %%s\n" % dmax
 
     out.write(row)

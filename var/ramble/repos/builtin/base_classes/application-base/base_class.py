@@ -2636,7 +2636,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         context_match,
                                         context_conf["format"],
                                     )
-                                    logger.debug("Line was: %s" % line)
+                                    logger.debug(f"Line was: {line}")
                                     logger.debug(
                                         f" Context match {context} -- {context_name}"
                                     )
@@ -2677,7 +2677,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         in fom_conf["regex"].groupindex
                                     ):
                                         logger.debug(
-                                            " --- Matched fom %s" % fom_name
+                                            f" --- Matched fom {fom_name}"
                                         )
                                         fom_contexts = []
                                         # if a FOM has contexts, check if each is active
@@ -3307,8 +3307,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 files[log_path]["contexts"][context] = []
                             files[log_path]["contexts"][context].append(fom)
 
-                            logger.debug("Log = %s" % log_path)
-                            logger.debug("Conf = %s" % fom_def)
+                            logger.debug(f"Log = {log_path}")
+                            logger.debug(f"Conf = {fom_def}")
 
         return files, file_fom_defs, inmem_fom_defs
 

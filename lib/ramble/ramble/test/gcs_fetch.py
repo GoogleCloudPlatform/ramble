@@ -74,8 +74,8 @@ def test_gcsfetchstrategy_download(tmpdir, _fetch_method):
             with ramble.stage.InputStage(fetcher, name="test", path=testpath):
                 fetcher.fetch()
     except google_api_core_exceptions.Forbidden as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")
     except google_auth_exceptions.RefreshError as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")
     except google_auth_exceptions.DefaultCredentialsError as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")

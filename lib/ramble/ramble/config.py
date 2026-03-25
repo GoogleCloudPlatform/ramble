@@ -195,7 +195,7 @@ class ConfigScope:
 
     def get_section_filename(self, section):
         _validate_section_name(section)
-        return os.path.join(self.path, "%s.yaml" % section)
+        return os.path.join(self.path, f"{section}.yaml")
 
     def get_section(self, section):
         if section not in self.sections:
@@ -342,7 +342,7 @@ class SingleFileScope(ConfigScope):
             parent = os.path.dirname(self.path)
             mkdirp(parent)
 
-            tmp = os.path.join(parent, ".%s.tmp" % os.path.basename(self.path))
+            tmp = os.path.join(parent, f".{os.path.basename(self.path)}.tmp")
             with open(tmp, "w") as f:
                 syaml.dump_config(data_to_write, stream=f, default_flow_style=False)
             rename(tmp, self.path)
@@ -361,7 +361,7 @@ class ImmutableConfigScope(ConfigScope):
     """
 
     def _write_section(self, section):
-        raise ConfigError("Cannot write to immutable scope %s" % self)
+        raise ConfigError(f"Cannot write to immutable scope {self}")
 
     def __repr__(self):
         return f"<ImmutableConfigScope: {self.name}: {self.path}>"
@@ -403,7 +403,7 @@ class InternalConfigScope(ConfigScope):
         self.sections[section] = _mark_internal(data, self.name)
 
     def __repr__(self):
-        return "<InternalConfigScope: %s>" % self.name
+        return f"<InternalConfigScope: {self.name}>"
 
     def clear(self):
         # no cache to clear here.
@@ -754,7 +754,7 @@ class Configuration:
             data[section] = self.get_config(section)
             syaml.dump_config(data, stream=sys.stdout, default_flow_style=False, blame=blame)
         except (yaml.YAMLError, OSError):
-            raise ConfigError("Error reading configuration: %s" % section) from None
+            raise ConfigError(f"Error reading configuration: {section}") from None
 
 
 @contextmanager
@@ -818,9 +818,9 @@ def _add_command_line_scopes(cfg, command_line_scopes):
         # We ensure that these scopes exist and are readable, as they are
         # provided on the command line by the user.
         if not os.path.isdir(path):
-            raise ConfigError("config scope is not a directory: '%s'" % path)
+            raise ConfigError(f"config scope is not a directory: '{path}'")
         elif not os.access(path, os.R_OK):
-            raise ConfigError("config scope is not readable: '%s'" % path)
+            raise ConfigError(f"config scope is not readable: '{path}'")
 
         # name based on order on the command line
         name = "cmd_scope_%d" % i
@@ -1016,10 +1016,10 @@ def read_config_file(filename, schema=None):
         return None
 
     elif not os.path.isfile(filename):
-        raise ConfigFileError("Invalid configuration. %s exists but is not a file." % filename)
+        raise ConfigFileError(f"Invalid configuration. {filename} exists but is not a file.")
 
     elif not os.access(filename, os.R_OK):
-        raise ConfigFileError("Config file is not readable: %s" % filename)
+        raise ConfigFileError(f"Config file is not readable: {filename}")
 
     try:
         logger.debug(f"Reading config file {filename}")
@@ -1035,7 +1035,7 @@ def read_config_file(filename, schema=None):
 
     except StopIteration:
         raise ConfigFileError(
-            "Config file is empty or is not a valid YAML dict: %s" % filename
+            f"Config file is empty or is not a valid YAML dict: {filename}"
         ) from None
 
     except MarkedYAMLError as e:
@@ -1115,7 +1115,7 @@ def get_valid_type(path):
                     return types[schema_type]()
     else:
         return type(None)
-    raise ConfigError("Cannot determine valid type for path '%s'." % path)
+    raise ConfigError(f"Cannot determine valid type for path '{path}'.")
 
 
 def merge_yaml(dest, source):
@@ -1193,7 +1193,7 @@ def process_config_path(path):
         if (sep and not path) or path.startswith(":"):
             if seen_override_in_path:
                 raise ConfigError(
-                    "Meaningless second override" " indicator `::' in path `{}'".format(path), ""
+                    f"Meaningless second override indicator `::' in path `{path}'", ""
                 )
             path = path.lstrip(":")
             front = syaml.syaml_str(front)

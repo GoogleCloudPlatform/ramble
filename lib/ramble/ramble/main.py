@@ -155,7 +155,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
             level (str): 'short' or 'long' (more commands shown for long)
         """
         if level not in levels:
-            raise ValueError("level must be one of: %s" % levels)
+            raise ValueError(f"level must be one of: {levels}")
 
         # lazily add all commands to the parser when needed.
         add_all_commands(self)
@@ -241,15 +241,12 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         # epilog
         formatter.add_text(
-            """\
-{help}:
+            f"""{section_descriptions['help']}:
   ramble help --all       list all commands and options
   ramble help <command>   help on a specific command
   ramble help --spec      help on the application specification syntax
   ramble docs             open https://ramble.readthedocs.io/ in a browser
-""".format(
-                help=section_descriptions["help"]
-            )
+"""
         )
 
         # determine help from format above
@@ -878,7 +875,7 @@ def _main(argv=None):
     # `ramble workspace activate that modify the user environment.
     recovered_vars = ("LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH")
     for var in recovered_vars:
-        stored_var_name = "RAMBLE_%s" % var
+        stored_var_name = f"RAMBLE_{var}"
         if stored_var_name in os.environ:
             os.environ[var] = os.environ[stored_var_name]
 
@@ -982,7 +979,7 @@ def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):
     if workspace_format_error:
         raise_error = False
         if cmd_name.strip() in edit_cmds:
-            subcommand = getattr(args, "%s_command" % cmd_name, None)
+            subcommand = getattr(args, f"{cmd_name}_command", None)
 
             if subcommand != "deactivate":
                 raise_error = True

@@ -91,6 +91,44 @@ def test_init_entry_is_dir_error(cache):
         cache.init_entry(key)
 
 
+def test_init_entry_file_no_access(cache, monkeypatch):
+    key = "no_access_file"
+    path = cache.cache_path(key)
+    with open(path, "w") as f:
+        f.write("data")
+
+    orig_access = os.access
+
+    def mock_access(p, mode):
+        if p == path:
+            return False
+        return orig_access(p, mode)
+
+    monkeypatch.setattr(os, "access", mock_access)
+
+    with pytest.raises(CacheError, match="Cannot access cache file"):
+        cache.init_entry(key)
+
+
+def test_init_entry_dir_no_access(cache, monkeypatch):
+    key = "a/no_access_dir_key"
+    path = cache.cache_path(key)
+    parent = os.path.dirname(path)
+    os.makedirs(parent)
+
+    orig_access = os.access
+
+    def mock_access(p, mode):
+        if p == parent:
+            return False
+        return orig_access(p, mode)
+
+    monkeypatch.setattr(os, "access", mock_access)
+
+    with pytest.raises(CacheError, match="Cannot access cache directory"):
+        cache.init_entry(key)
+
+
 def test_write_and_read_transaction(cache):
     """Test writing to and reading from the cache."""
     key = "my_data"

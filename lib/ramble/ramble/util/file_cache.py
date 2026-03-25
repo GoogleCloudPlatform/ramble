@@ -81,10 +81,10 @@ class FileCache:
         exists = os.path.exists(cache_path)
         if exists:
             if not os.path.isfile(cache_path):
-                raise CacheError("Cache file is not a file: %s" % cache_path)
+                raise CacheError(f"Cache file is not a file: {cache_path}")
 
             if not os.access(cache_path, os.R_OK | os.W_OK):
-                raise CacheError("Cannot access cache file: %s" % cache_path)
+                raise CacheError(f"Cannot access cache file: {cache_path}")
         else:
             # if the file is hierarchical, make parent directories
             parent = os.path.dirname(cache_path)
@@ -92,7 +92,7 @@ class FileCache:
                 mkdirp(parent)
 
             if not os.access(parent, os.R_OK | os.W_OK):
-                raise CacheError("Cannot access cache directory: %s" % parent)
+                raise CacheError(f"Cannot access cache directory: {parent}")
 
             # ensure lock is created for this key
             self._get_lock(key)
