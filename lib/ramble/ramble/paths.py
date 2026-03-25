@@ -17,39 +17,39 @@ import os
 from llnl.util.filesystem import ancestor
 
 #: This file lives in $prefix/lib/ramble/ramble/__file__
-prefix = ancestor(__file__, 4)
+prefix: str = ancestor(__file__, 4)
 
 #: synonym for prefix
-ramble_root = prefix
+ramble_root: str = prefix
 
 #: bin directory in the ramble prefix
-bin_path = os.path.join(prefix, "bin")
+bin_path: str = os.path.join(prefix, "bin")
 
 #: The ramble script itself
-ramble_script = os.path.join(bin_path, "ramble")
+ramble_script: str = os.path.join(bin_path, "ramble")
 
 #: The sbang script in the ramble installation
-sbang_script = os.path.join(bin_path, "sbang")
+sbang_script: str = os.path.join(bin_path, "sbang")
 
 # ramble directory hierarchy
-lib_path = os.path.join(prefix, "lib", "ramble")
-external_path = os.path.join(lib_path, "external")
-build_env_path = os.path.join(lib_path, "env")
-module_path = os.path.join(lib_path, "ramble")
-command_path = os.path.join(module_path, "cmd")
-test_path = os.path.join(module_path, "test")
-var_path = os.path.join(prefix, "var", "ramble")
-tests_path = os.path.join(var_path, "tests")
-share_path = os.path.join(prefix, "share", "ramble")
-repos_path = os.path.join(var_path, "repos")
+lib_path: str = os.path.join(prefix, "lib", "ramble")
+external_path: str = os.path.join(lib_path, "external")
+build_env_path: str = os.path.join(lib_path, "env")
+module_path: str = os.path.join(lib_path, "ramble")
+command_path: str = os.path.join(module_path, "cmd")
+test_path: str = os.path.join(module_path, "test")
+var_path: str = os.path.join(prefix, "var", "ramble")
+tests_path: str = os.path.join(var_path, "tests")
+share_path: str = os.path.join(prefix, "share", "ramble")
+repos_path: str = os.path.join(var_path, "repos")
 
 # Paths to built-in Ramble repositories.
-builtin_path = os.path.join(repos_path, "builtin")
-mock_builtin_path = os.path.join(repos_path, "builtin.mock")
+builtin_path: str = os.path.join(repos_path, "builtin")
+mock_builtin_path: str = os.path.join(repos_path, "builtin.mock")
 
 #: User configuration location
-user_config_path = os.path.expanduser("~/.ramble")
+user_config_path: str = os.path.expanduser("~/.ramble")
 
-opt_path = os.path.join(prefix, "opt")
-etc_path = os.path.join(prefix, "etc")
-system_etc_path = "/etc"
+opt_path: str = os.path.join(prefix, "opt")
+etc_path: str = os.path.join(prefix, "etc")
+system_etc_path: str = "/etc"

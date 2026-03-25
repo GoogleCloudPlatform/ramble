@@ -23,7 +23,7 @@ Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import ruamel.yaml as yaml
 
@@ -79,7 +79,7 @@ def all_config_options(config_data: Dict):
     return all_configs
 
 
-def _type_value(input_value):
+def _type_value(input_value: str) -> Union[int, float, str]:
     """Attempt to convert an input value to other types.
 
     Precedence order is:
@@ -92,14 +92,12 @@ def _type_value(input_value):
     """
 
     try:
-        out = int(input_value)
-        return out
+        return int(input_value)
     except ValueError:
         pass
 
     try:
-        out = float(input_value)
-        return out
+        return float(input_value)
     except ValueError:
         pass
 
