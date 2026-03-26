@@ -27,6 +27,11 @@ def gcs_client():
                   ' Please install to use the gs:// backend.')
         sys.exit(1)
 
+    # Disable GCE mTLS for the metadata server to workaround cert errors
+    # thrown by google-auth on some GCP VMs. The change on the auth side was introduced in
+    # https://github.com/googleapis/google-auth-library-python/pull/1856.
+    os.environ.setdefault("GCE_METADATA_MTLS_MODE", "none")
+
     storage_credentials, storage_project = google.auth.default()
     storage_client = storage.Client(storage_project,
                                     storage_credentials)
