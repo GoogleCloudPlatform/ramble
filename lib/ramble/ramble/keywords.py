@@ -191,12 +191,6 @@ class Keywords:
                 return True
         return False
 
-    def is_optional(self, key):
-        """Check if a key is optional"""
-        if not self.is_valid(key):
-            return False
-        return self.keys[key]["type"] == key_type.optional
-
     def is_required(self, key):
         """Check if a key is required"""
         if not self.is_valid(key):
@@ -209,12 +203,6 @@ class Keywords:
             return False
         return self.keys[key]["level"] == output_level.key
 
-    def is_variable_level(self, key):
-        """Check if key is part of the variable level"""
-        if not self.is_valid(key):
-            return False
-        return self.keys[key]["level"] == output_level.variable
-
     def all_required_keys(self):
         """Yield all required keys
 
@@ -223,16 +211,6 @@ class Keywords:
         """
         for key in self.keys:
             if self.is_required(key):
-                yield key
-
-    def all_reserved_keys(self):
-        """Yield all reserved keys
-
-        Yields:
-            (str): Key name
-        """
-        for key in self.keys:
-            if self.is_reserved(key):
                 yield key
 
     def check_reserved_keys(self, definitions):

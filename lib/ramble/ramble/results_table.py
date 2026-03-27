@@ -323,15 +323,6 @@ class ResultsTables:
         self.table_templates.append(new_table)
         return new_table
 
-    def all_table_templates(self):
-        """Yield all table templates
-
-        Yields:
-            (ResultsTable): All of the results table templates
-        """
-
-        yield from self.table_templates
-
     def build_tables(self, experiment_set, filters):
         """Extract data for each table in this set
 

@@ -55,7 +55,7 @@ import spack.util.url as url_util
 import spack.version
 from spack.util.compression import decompressor_for, extension
 from spack.util.executable import CommandNotFoundError, which
-from spack.version import Version, ver
+from spack.version import ver
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
 all_strategies = []
@@ -737,76 +737,6 @@ class VCSFetchStrategy(FetchStrategy):
 
     def __repr__(self):
         return f"{self.__class__}<{self.url}>"
-
-
-@fetcher
-class GoFetchStrategy(VCSFetchStrategy):
-    """Fetch strategy that employs the `go get` infrastructure.
-
-    Use like this in a package:
-
-       version('name',
-               go='github.com/monochromegane/the_platinum_searcher/...')
-
-    Go get does not natively support versions, they can be faked with git.
-
-    The fetched source will be moved to the standard stage sourcepath directory
-    during the expand step.
-    """
-
-    url_attr = "go"
-
-    def __init__(self, **kwargs):
-        # Discards the keywords in kwargs that may conflict with the next
-        # call to __init__
-        forwarded_args = copy.copy(kwargs)
-        forwarded_args.pop("name", None)
-        super().__init__(**forwarded_args)
-
-        self._go = None
-
-    @property
-    def go_version(self):
-        vstring = self.go("version", output=str).split(" ")[2]
-        return Version(vstring)
-
-    @property
-    def go(self):
-        if not self._go:
-            self._go = which("go", required=True)
-        return self._go
-
-    @_needs_stage
-    def fetch(self):
-        logger.debug(f"Getting go resource: {self.url}")
-
-        with working_dir(self.stage.path):
-            try:
-                os.mkdir("go")
-            except OSError:
-                pass
-            env = dict(os.environ)
-            env["GOPATH"] = os.path.join(os.getcwd(), "go")
-            self.go("get", "-v", "-d", self.url, env=env)
-
-    def archive(self, destination):
-        super().archive(destination, exclude=".git")
-
-    @_needs_stage
-    def expand(self):
-        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
-
-        # Move the directory to the well-known stage source path
-        repo_root = _ensure_one_stage_entry(self.stage.path)
-        shutil.move(repo_root, self.stage.source_path)
-
-    @_needs_stage
-    def reset(self):
-        with working_dir(self.stage.source_path):
-            self.go("clean")
-
-    def __str__(self):
-        return f"[go] {self.url}"
 
 
 @fetcher
@@ -1492,16 +1422,6 @@ def stable_target(fetcher):
     return False
 
 
-def from_url(url):
-    """Given a URL, find an appropriate fetch strategy for it.
-    Currently just gives you a URLFetchStrategy that uses curl.
-
-    TODO: make this return appropriate fetch strategies for other
-          types of URLs.
-    """
-    return URLFetchStrategy(url)
-
-
 def from_kwargs(**kwargs):
     """Construct an appropriate FetchStrategy from the given keyword arguments.
 
@@ -1597,14 +1517,6 @@ class NoArchiveFileError(FetchError):
 
 class NoDigestError(FetchError):
     """Raised after attempt to checksum when URL has no digest."""
-
-
-class ExtrapolationError(FetchError):
-    """Raised when we can't extrapolate a version for a package."""
-
-
-class FetcherConflict(FetchError):
-    """Raised for packages with invalid fetch attributes."""
 
 
 class InvalidArgsError(FetchError):

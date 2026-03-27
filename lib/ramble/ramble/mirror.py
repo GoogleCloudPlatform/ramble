@@ -31,7 +31,6 @@ from ramble.util.logger import logger
 import spack.url
 import spack.util.spack_json
 import spack.util.spack_yaml
-import spack.util.url as url_util
 from spack.util.spack_yaml import syaml_dict
 
 
@@ -137,62 +136,6 @@ class Mirror:
     @property
     def name(self):
         return self._name or "<unnamed>"
-
-    def get_profile(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("profile")
-            return self._fetch_url.get("profile")
-        else:
-            return None
-
-    def set_profile(self, url_type, profile):
-        if url_type == "push":
-            self._push_url["profile"] = profile
-        else:
-            self._fetch_url["profile"] = profile
-
-    def get_access_pair(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("access_pair")
-            return self._fetch_url.get("access_pair")
-        else:
-            return None
-
-    def set_access_pair(self, url_type, connection_tuple):
-        if url_type == "push":
-            self._push_url["access_pair"] = connection_tuple
-        else:
-            self._fetch_url["access_pair"] = connection_tuple
-
-    def get_endpoint_url(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("endpoint_url")
-            return self._fetch_url.get("endpoint_url")
-        else:
-            return None
-
-    def set_endpoint_url(self, url_type, url):
-        if url_type == "push":
-            self._push_url["endpoint_url"] = url
-        else:
-            self._fetch_url["endpoint_url"] = url
-
-    def get_access_token(self, url_type):
-        if isinstance(self._fetch_url, dict):
-            if url_type == "push":
-                return self._push_url.get("access_token")
-            return self._fetch_url.get("access_token")
-        else:
-            return None
-
-    def set_access_token(self, url_type, connection_token):
-        if url_type == "push":
-            self._push_url["access_token"] = connection_token
-        else:
-            self._fetch_url["access_token"] = connection_token
 
     @property
     def fetch_url(self):
@@ -424,10 +367,6 @@ class MirrorStats:
         self.added_resources = set()
         self.existing_resources = set()
 
-    def next_spec(self, spec):
-        self._tally_current_spec()
-        self.current_spec = spec
-
     def _tally_current_spec(self):
         if self.current_spec:
             if self.added_resources:
@@ -450,35 +389,6 @@ class MirrorStats:
 
     def error(self, resource):
         self.errors.add(self.current_spec)
-
-
-def push_url_from_directory(output_directory):
-    """Given a directory in the local filesystem, return the URL on
-    which to push resources.
-    """
-    scheme = url_util.parse(output_directory, scheme="<missing>").scheme
-    if scheme != "<missing>":
-        raise ValueError("expected a local path, but got a URL instead")
-    mirror_url = "file://" + output_directory
-    mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
-    return url_util.format(mirror.push_url)
-
-
-def push_url_from_mirror_name(mirror_name):
-    """Given a mirror name, return the URL on which to push resources."""
-    mirror = ramble.mirror.MirrorCollection().lookup(mirror_name)
-    if mirror.name == "<unnamed>":
-        raise ValueError(f'no mirror named "{mirror_name}"')
-    return url_util.format(mirror.push_url)
-
-
-def push_url_from_mirror_url(mirror_url):
-    """Given a mirror URL, return the URL on which to push resources."""
-    scheme = url_util.parse(mirror_url, scheme="<missing>").scheme
-    if scheme == "<missing>":
-        raise ValueError(f'"{mirror_url}" is not a valid URL')
-    mirror = ramble.mirror.MirrorCollection().lookup(mirror_url)
-    return url_util.format(mirror.push_url)
 
 
 class MirrorError(ramble.error.RambleError):

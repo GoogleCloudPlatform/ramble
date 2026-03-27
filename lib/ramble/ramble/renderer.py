@@ -8,7 +8,6 @@
 
 import itertools
 
-import ramble.error
 import ramble.expander
 import ramble.repeats
 import ramble.util.matrices
@@ -548,7 +547,3 @@ class Renderer:
         yield from self._filter_and_yield_objects(
             render_group, object_variables, new_objects, exclude_where, n_repeats
         )
-
-
-class RambleRendererError(ramble.error.RambleError):
-    """Class for all renderer errors"""

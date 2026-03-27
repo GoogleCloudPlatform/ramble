@@ -113,10 +113,6 @@ class ExperimentSet:
         """Set a base variable definition"""
         self._context[self._contexts.base].variables[var] = val
 
-    def set_required_var(self, var, val):
-        """Set a required variable definition"""
-        self._context[self._contexts.required].variables[var] = val
-
     def _set_context(self, context, in_context):
         """Abstraction method to set context attributes"""
         if context not in self._contexts:
