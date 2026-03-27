@@ -2988,7 +2988,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 # Use the app name as the origin of the FOM
                 summary_origin = self.name
                 n_total_dict = {
-                    "value": self.repeats.n_repeats,
+                    "value": str(self.repeats.n_repeats),
                     "units": "repeats",
                     "origin": summary_origin,
                     "origin_type": f"summary::{SummaryFoms.N_TOTAL.value}",
@@ -3000,7 +3000,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 n_success = exp_status_list.count(ExperimentStatus.SUCCESS)
 
                 n_success_dict = {
-                    "value": n_success,
+                    "value": str(n_success),
                     "units": "repeats",
                     "origin": summary_origin,
                     "origin_type": f"summary::{SummaryFoms.N_SUCCESS.value}",
@@ -3025,7 +3025,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         if calc[0] == ramble.util.stats.NA:
                             continue
                         fom_calc_dict = {
-                            "value": calc[0],
+                            "value": str(calc[0]),
                             "units": calc[1],
                             "origin": fom_origin,
                             "origin_type": calc[2],

@@ -372,7 +372,7 @@ def _prepare_data(results, uri):
         exps_to_insert.append(json_experiment)
 
         for fom in experiment.foms:
-            fom_data = fom
+            fom_data = fom.copy()
             fom_data["experiment_id"] = experiment.get_hash()
             fom_data["experiment_name"] = experiment.name
             foms_to_insert.append(fom_data)
