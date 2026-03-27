@@ -1,3 +1,7 @@
+locals {
+  pr_doc_env = local.image_matrix[10]
+}
+
 resource "google_cloudbuild_trigger" "pr_doc_build_tests" {
   name        = "PR-Doc-Build-Tests"
   description = "A presubmit check for building Ramble documentation"
@@ -16,9 +20,9 @@ resource "google_cloudbuild_trigger" "pr_doc_build_tests" {
   filename = "share/ramble/cloud-build/ramble-pr-docs.yaml"
 
   substitutions = {
-    _BASE_IMG   = "rockylinux"
-    _BASE_VER   = "8"
-    _PYTHON_VER = "3.13.5"
-    _SPACK_REF  = "v1.0.0"
+    _BASE_IMG   = local.pr_doc_env.base
+    _BASE_VER   = local.pr_doc_env.base_ver
+    _PYTHON_VER = local.pr_doc_env.python
+    _SPACK_REF  = local.pr_doc_env.spack
   }
 }

@@ -1,5 +1,9 @@
+locals {
+  perf_test_env = local.image_matrix[10]
+}
+
 resource "google_cloudbuild_trigger" "perf_test_pr" {
-  name        = "PerfTest-PR-rockylinux8-v1-0-0spack-3-13-5python"
+  name        = "PerfTest-PR-${local.perf_test_env.base}${local.perf_test_env.base_ver}-${replace(local.perf_test_env.spack, ".", "-")}spack-${replace(local.perf_test_env.python, ".", "-")}python"
   description = "Ramble perf tests for PR builds"
 
   github {
@@ -16,10 +20,10 @@ resource "google_cloudbuild_trigger" "perf_test_pr" {
   filename = "share/ramble/cloud-build/ramble-perf-tests.yaml"
 
   substitutions = {
-    _SPACK_REF    = "v1.0.0"
-    _PYTHON_VER   = "3.13.5"
-    _BASE_IMG     = "rockylinux"
-    _BASE_VER     = "8"
+    _SPACK_REF    = local.perf_test_env.spack
+    _PYTHON_VER   = local.perf_test_env.python
+    _BASE_IMG     = local.perf_test_env.base
+    _BASE_VER     = local.perf_test_env.base_ver
     _DATASET_ID   = "ramble_metrics"
     _PROJECT_ID   = var.project_id
     _TABLE_ID     = "perf_test_durations"
@@ -28,7 +32,7 @@ resource "google_cloudbuild_trigger" "perf_test_pr" {
 }
 
 resource "google_cloudbuild_trigger" "perf_test_push" {
-  name        = "PerfTest-Push-rockylinux8-v1-0-0spack-3-13-5python"
+  name        = "PerfTest-Push-${local.perf_test_env.base}${local.perf_test_env.base_ver}-${replace(local.perf_test_env.spack, ".", "-")}spack-${replace(local.perf_test_env.python, ".", "-")}python"
   description = "Continuous monitoring of Ramble performance for develop push"
 
   github {
@@ -44,10 +48,10 @@ resource "google_cloudbuild_trigger" "perf_test_push" {
   filename = "share/ramble/cloud-build/ramble-perf-tests.yaml"
 
   substitutions = {
-    _SPACK_REF    = "v1.0.0"
-    _PYTHON_VER   = "3.13.5"
-    _BASE_IMG     = "rockylinux"
-    _BASE_VER     = "8"
+    _SPACK_REF    = local.perf_test_env.spack
+    _PYTHON_VER   = local.perf_test_env.python
+    _BASE_IMG     = local.perf_test_env.base
+    _BASE_VER     = local.perf_test_env.base_ver
     _DATASET_ID   = "ramble_metrics"
     _PROJECT_ID   = var.project_id
     _TABLE_ID     = "perf_test_durations"

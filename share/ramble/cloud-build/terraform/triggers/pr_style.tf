@@ -1,5 +1,9 @@
+locals {
+  pr_style_env = local.image_matrix[8]
+}
+
 resource "google_cloudbuild_trigger" "pr_style" {
-  name        = "PR-Style-rockylinux8-v0-22-1spack-3-12-1python"
+  name        = "PR-Style-${local.pr_style_env.base}${local.pr_style_env.base_ver}-${replace(local.pr_style_env.spack, ".", "-")}spack-${replace(local.pr_style_env.python, ".", "-")}python"
   description = "Run linting on Ramble pull requests"
 
   github {
@@ -16,9 +20,9 @@ resource "google_cloudbuild_trigger" "pr_style" {
   filename = "share/ramble/cloud-build/ramble-pr-style.yaml"
 
   substitutions = {
-    _BASE_IMG   = "rockylinux"
-    _BASE_VER   = "8"
-    _PYTHON_VER = "3.12.1"
-    _SPACK_REF  = "v0.22.1"
+    _BASE_IMG   = local.pr_style_env.base
+    _BASE_VER   = local.pr_style_env.base_ver
+    _PYTHON_VER = local.pr_style_env.python
+    _SPACK_REF  = local.pr_style_env.spack
   }
 }
