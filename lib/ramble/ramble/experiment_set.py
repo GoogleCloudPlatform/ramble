@@ -292,6 +292,8 @@ class ExperimentSet:
         app_inst.define_variable(
             self.keywords.experiment_template_name, exp_template_name + experiment_suffix
         )
+        sanitized_block_name = exp_template_name.replace("{", "").replace("}", "")
+        app_inst.define_variable("experiment_block_name", sanitized_block_name)
         app_inst.define_variable(self.keywords.experiment_name, final_exp_name)
 
         app_inst.define_variable(
@@ -342,6 +344,8 @@ class ExperimentSet:
         exp_name = app_inst.expander.expand_var(exp_template_name, allow_passthrough=False)
 
         app_inst.define_variable(self.keywords.experiment_template_name, exp_template_name)
+        sanitized_block_name = exp_template_name.replace("{", "").replace("}", "")
+        app_inst.define_variable("experiment_block_name", sanitized_block_name)
         app_inst.define_variable(self.keywords.experiment_name, exp_name)
 
         app_inst.define_variable(

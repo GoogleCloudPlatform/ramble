@@ -47,7 +47,7 @@ properties = {
                 },
                 "where": where_clause,
             },
-            "required": ["name", "columns"],
+            "required": ["name"],
             "additionalProperties": False,
         },
     }

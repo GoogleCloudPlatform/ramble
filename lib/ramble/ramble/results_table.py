@@ -160,9 +160,12 @@ class ResultsTable:
 
         # Build table columns
         self.columns = []
+        self._default_columns = False
         if self._columns_name in conf_dict:
             for column_config in conf_dict[self._columns_name]:
                 self.columns.append(ResultsColumn(column_config))
+        else:
+            self._default_columns = True
 
     def render(self, app_inst):
         new_table = copy.deepcopy(self)
@@ -222,6 +225,43 @@ class ResultsTable:
         """
         column_values = {}
         remaining_columns = set(self._data.keys())
+
+        if self._default_columns:
+            # Add identity columns if not present
+            for var in ["application_name", "workload_name", "experiment_name"]:
+                if not any(c.name == var for c in self.columns):
+                    col_conf = {"name": var, "expression": f"{{{var}}}"}
+                    self.columns.append(ResultsColumn(col_conf))
+
+            # Add variables from experiment template name
+            unexpanded_exp_template_name = app_inst.variables.get("experiment_template_name")
+            if unexpanded_exp_template_name:
+                import re
+                vars_in_name = re.findall(r"\{([^}]+)\}", unexpanded_exp_template_name)
+                for var in vars_in_name:
+                    if not any(c.name == var for c in self.columns):
+                        col_conf = {"name": var, "expression": f"{{{var}}}"}
+                        self.columns.append(ResultsColumn(col_conf))
+
+            # Add FOM columns
+            results = app_inst.result
+            for context in results.contexts:
+                for fom in context["foms"]:
+                    fom_name = fom["name"]
+                    context_name = context["name"]
+                    # check if we already have it
+                    found = False
+                    for c in self.columns:
+                        if c.figure_of_merit == fom_name and c.figure_of_merit_context == context_name:
+                            found = True
+                            break
+                    if not found:
+                        col_conf = {
+                            "name": fom_name,
+                            "figure_of_merit": fom_name,
+                            "figure_of_merit_context": context_name,
+                        }
+                        self.columns.append(ResultsColumn(col_conf))
 
         for column in self.columns:
             col_value = column.extract_value(app_inst, extra_vars=column_values)

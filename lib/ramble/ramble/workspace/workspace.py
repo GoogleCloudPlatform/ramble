@@ -1616,6 +1616,12 @@ ramble:
             for table_conf in tables_config:
                 self.results_tables.add_table_template(table_conf)
 
+        if self.results_tables.num_tables == 0:
+            default_table_conf = {
+                "name": "{experiment_block_name}",
+            }
+            self.results_tables.add_table_template(default_table_conf)
+
         if self.results_tables.num_tables > 0:
             self.results_tables.build_tables(experiment_set, filters)
 

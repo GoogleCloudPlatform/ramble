@@ -2190,6 +2190,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "experiment_hash",
             "experiment_status",
             "RAMBLE_STATUS",
+            "experiment_block_name",
         ]
 
         for _, obj in self._objects():
