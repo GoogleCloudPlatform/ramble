@@ -2254,6 +2254,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                            consuming it.
         """
 
+        if self.repeats.is_repeat_base:
+            return False
+
         changed = False
         self._purge_inventory()
 
