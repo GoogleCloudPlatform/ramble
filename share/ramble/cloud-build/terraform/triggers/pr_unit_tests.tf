@@ -24,6 +24,8 @@ resource "google_cloudbuild_trigger" "pr_unit_tests" {
     "conftest.py"
   ]
 
+  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
+
   filename = "share/ramble/cloud-build/ramble-pr-unit-tests.yaml"
 
   substitutions = {

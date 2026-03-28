@@ -43,8 +43,6 @@ resource "google_cloudbuild_trigger" "perf_test_push" {
     }
   }
 
-  include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
-
   filename = "share/ramble/cloud-build/ramble-perf-tests.yaml"
 
   substitutions = {
