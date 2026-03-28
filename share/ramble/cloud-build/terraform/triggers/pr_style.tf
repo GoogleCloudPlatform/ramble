@@ -1,9 +1,9 @@
 locals {
-  pr_style_env = local.image_matrix[8]
+  pr_style_img = local.image_map["rocky8-py3-12-1-spack-v0-22-1"]
 }
 
 resource "google_cloudbuild_trigger" "pr_style" {
-  name        = "PR-Style-${local.pr_style_env.base}${local.pr_style_env.base_ver}-${replace(local.pr_style_env.spack, ".", "-")}spack-${replace(local.pr_style_env.python, ".", "-")}python"
+  name        = "PR-Style-${local.pr_style_img.base}${local.pr_style_img.base_ver}-${replace(local.pr_style_img.spack, ".", "-")}spack-${replace(local.pr_style_img.python, ".", "-")}python"
   description = "Run linting on Ramble pull requests"
 
   github {
@@ -20,9 +20,9 @@ resource "google_cloudbuild_trigger" "pr_style" {
   filename = "share/ramble/cloud-build/ramble-pr-style.yaml"
 
   substitutions = {
-    _BASE_IMG   = local.pr_style_env.base
-    _BASE_VER   = local.pr_style_env.base_ver
-    _PYTHON_VER = local.pr_style_env.python
-    _SPACK_REF  = local.pr_style_env.spack
+    _BASE_IMG   = local.pr_style_img.base
+    _BASE_VER   = local.pr_style_img.base_ver
+    _PYTHON_VER = local.pr_style_img.python
+    _SPACK_REF  = local.pr_style_img.spack
   }
 }

@@ -1,5 +1,5 @@
 resource "google_cloudbuild_trigger" "image_builders" {
-  for_each = { for img in local.image_matrix : "${img.base}${img.base_ver}-py${img.python}-spack${img.spack}" => img }
+  for_each = local.image_map
 
   name        = "ramble-image-builder-${each.value.base}${each.value.base_ver}-py${replace(each.value.python, ".", "-")}-spack${replace(each.value.spack, ".", "-")}"
   description = "Build Ramble cloud build image for ${each.value.base} ${each.value.base_ver} with Python ${each.value.python} and Spack ${each.value.spack}"

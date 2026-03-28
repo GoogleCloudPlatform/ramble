@@ -1,9 +1,9 @@
 locals {
-  pr_software_conflicts_env = local.image_matrix[8]
+  pr_software_conflicts_img = local.image_map["rocky8-py3-12-1-spack-v0-22-1"]
 }
 
 resource "google_cloudbuild_trigger" "pr_software_conflicts" {
-  name        = "PR-Software-Conflicts-${local.pr_software_conflicts_env.base}${local.pr_software_conflicts_env.base_ver}-${replace(local.pr_software_conflicts_env.spack, ".", "-")}spack-${replace(local.pr_software_conflicts_env.python, ".", "-")}python"
+  name        = "PR-Software-Conflicts-${local.pr_software_conflicts_img.base}${local.pr_software_conflicts_img.base_ver}-${replace(local.pr_software_conflicts_img.spack, ".", "-")}spack-${replace(local.pr_software_conflicts_img.python, ".", "-")}python"
   description = "Check for conflicts in application definitions on Ramble pull requests"
 
   github {
@@ -26,9 +26,9 @@ resource "google_cloudbuild_trigger" "pr_software_conflicts" {
   ]
 
   substitutions = {
-    _BASE_IMG   = local.pr_software_conflicts_env.base
-    _BASE_VER   = local.pr_software_conflicts_env.base_ver
-    _PYTHON_VER = local.pr_software_conflicts_env.python
-    _SPACK_REF  = local.pr_software_conflicts_env.spack
+    _BASE_IMG   = local.pr_software_conflicts_img.base
+    _BASE_VER   = local.pr_software_conflicts_img.base_ver
+    _PYTHON_VER = local.pr_software_conflicts_img.python
+    _SPACK_REF  = local.pr_software_conflicts_img.spack
   }
 }
