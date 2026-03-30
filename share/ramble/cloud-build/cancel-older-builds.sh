@@ -21,9 +21,16 @@ target_tag="${TRIGGER_NAME}-${PR_NUMBER}"
 echo "Current Build ID: $BUILD_ID"
 echo "Filtering for tag: ${target_tag} in project: ${PROJECT_ID}"
 
+current_create_time=$(gcloud builds describe "${BUILD_ID}" --project="${PROJECT_ID}" --format="value(create_time)")
+
+if [ -z "${current_create_time}" ]; then
+  echo "Warning: Could not retrieve creation time for build ${BUILD_ID}. Skipping cancellation of older builds."
+  exit 0
+fi
+
 builds_to_cancel=$(gcloud builds list \
   --project="${PROJECT_ID}" \
-  --filter="tags='${target_tag}' AND (status=WORKING OR status=QUEUED) AND id!=${BUILD_ID}" \
+  --filter="tags='${target_tag}' AND (status=WORKING OR status=QUEUED) AND id!=${BUILD_ID} AND create_time < '${current_create_time}'" \
   --format="value(id)")
 
 if [ -z "${builds_to_cancel}" ]; then
