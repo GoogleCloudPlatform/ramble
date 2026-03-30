@@ -7,7 +7,6 @@
 # except according to those terms.
 
 import os
-from pathlib import Path
 
 _DRY_RUN_PATH_PREFIX = os.path.join("dry-run", "path", "to")
 
@@ -53,14 +52,32 @@ def get_newest_experiment_file(base_directory):
         (str): Path to newest file (or None if not found)
         (int): Timestamp of file in seconds (or None if no file is found)
     """
-    files = Path(base_directory).rglob("*")
-    files = [f for f in files if f.is_file() and not os.path.basename(f).startswith("ramble_")]
+    newest_file = None
+    max_mtime = -1.0
 
-    if not files:
+    stack = [base_directory]
+
+    while stack:
+        current_dir = stack.pop()
+        try:
+            with os.scandir(current_dir) as entries:
+                for entry in entries:
+                    try:
+                        if entry.is_file():
+                            if not entry.name.startswith("ramble_"):
+                                mtime = entry.stat().st_mtime
+                                if mtime > max_mtime:
+                                    max_mtime = mtime
+                                    newest_file = entry.path
+                        elif entry.is_dir(follow_symlinks=False):
+                            stack.append(entry.path)
+                    except FileNotFoundError:
+                        # File was deleted concurrently
+                        continue
+        except FileNotFoundError:
+            continue
+
+    if newest_file is None:
         return None, None
 
-    newest_file_path = max(files, key=os.path.getmtime)
-
-    timestamp_seconds = os.path.getmtime(newest_file_path)
-
-    return str(newest_file_path), timestamp_seconds
+    return newest_file, max_mtime
