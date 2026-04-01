@@ -16,6 +16,8 @@ resource "google_cloudbuild_trigger" "pr_image_build_tests" {
   filename = "share/ramble/cloud-build/ramble-pr-image-builds.yaml"
 
   included_files = [
-    "share/ramble/cloud-build/**"
+    "share/ramble/cloud-build/**",
+    "requirements.txt",
+    "requirements-dev.txt"
   ]
 }
