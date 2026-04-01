@@ -1666,9 +1666,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             analysis_logs, _, _ = self._analysis_dicts(success_list)
             logs = list(set(logs) | analysis_logs.keys())
 
-            for log in logs:
-                self._command_list.append(f'rm -f "{log}"')
-                self._command_list.append(f'touch "{log}"')
+            if logs:
+                quoted_logs = " ".join(f'"{log}"' for log in logs)
+                self._command_list.append(f"rm -f {quoted_logs}")
+                self._command_list.append(f"touch {quoted_logs}")
 
             for exec_node in exec_graph.walk():
                 exec_vars = {"executable_name": exec_node.key}
