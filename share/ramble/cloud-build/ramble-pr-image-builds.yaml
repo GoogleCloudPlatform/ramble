@@ -25,23 +25,11 @@ steps:
       - 'BUILD_ID=$BUILD_ID'
       - 'PROJECT_ID=$PROJECT_ID'
   - name: 'gcr.io/cloud-builders/docker'
-    id: build-apt
+    id: build-image
     args:
       - 'build'
       - '-f'
-      - 'share/ramble/cloud-build/Dockerfile-apt'
-      - '--build-arg'
-      - 'SPACK_REF=${_SPACK_REF}'
-      - '--build-arg'
-      - 'PYTHON_VER=${_PYTHON_VER}'
-      - '.'
-    waitFor: ['-']
-  - name: 'gcr.io/cloud-builders/docker'
-    id: build-yum
-    args:
-      - 'build'
-      - '-f'
-      - 'share/ramble/cloud-build/Dockerfile-yum'
+      - 'share/ramble/cloud-build/Dockerfile-${_PKG_MANAGER}'
       - '--build-arg'
       - 'SPACK_REF=${_SPACK_REF}'
       - '--build-arg'
@@ -53,6 +41,7 @@ steps:
 substitutions:
   _SPACK_REF: v1.1.1
   _PYTHON_VER: 3.11.14
+  _PKG_MANAGER: apt
 
 timeout: 3600s
 options:
