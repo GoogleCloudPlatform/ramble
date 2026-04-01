@@ -12,7 +12,6 @@
    :lines: 12-
 """
 
-
 success_criteria_def = {
     "type": "object",
     "default": {},

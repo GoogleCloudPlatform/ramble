@@ -15,6 +15,7 @@ specified editor fails (e.g. no DISPLAY for a graphical editor). If
 neither variable is set, we fall back to one of several common editors,
 raising an EnvironmentError if we are unable to find one.
 """
+
 import os
 import shlex
 

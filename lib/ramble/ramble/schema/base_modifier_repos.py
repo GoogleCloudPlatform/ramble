@@ -12,7 +12,6 @@
    :lines: 13-
 """
 
-
 #: Properties for inclusion in other schemas
 properties = {
     "base_modifier_repos": {

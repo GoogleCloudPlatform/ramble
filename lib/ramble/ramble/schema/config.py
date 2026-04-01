@@ -11,6 +11,7 @@
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/config.py
    :lines: 15-
 """
+
 from typing import Any, Dict
 
 import spack.schema.config

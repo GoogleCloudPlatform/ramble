@@ -12,7 +12,6 @@
    :lines: 12-
 """
 
-
 zip_def = {"type": "array", "default": [], "items": {"type": "string"}}
 
 zips_def = {"type": "object", "default": {}, "properties": {}, "additionalProperties": zip_def}

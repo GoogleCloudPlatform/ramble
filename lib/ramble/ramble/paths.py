@@ -12,6 +12,7 @@ Do not import other ``ramble`` modules here. This module is used
 throughout Ramble and should bring in a minimal number of external
 dependencies.
 """
+
 import os
 
 from llnl.util.filesystem import ancestor

@@ -703,7 +703,7 @@ class NcclEnv(BasicModifier):
         env_var_dict = self.generate_env_var_dict(app_inst)
         env_var_cmds = []
         for action, conf in env_var_dict.items():
-            (env_cmds, _) = action_funcs[action](conf, set(), shell=shell)
+            env_cmds, _ = action_funcs[action](conf, set(), shell=shell)
 
             for cmd in env_cmds:
                 if cmd:

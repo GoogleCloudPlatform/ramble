@@ -7,6 +7,7 @@
 # except according to those terms.
 
 """Wrapper for ``llnl.util.lock`` allows locking to be enabled/disabled."""
+
 import os
 import stat
 
