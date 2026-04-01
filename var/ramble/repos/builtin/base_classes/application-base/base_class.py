@@ -1664,7 +1664,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         logs.append(expanded_log)
 
             analysis_logs, _, _ = self._analysis_dicts(success_list)
-            logs = list(set(logs) | analysis_logs.keys())
+            logs = sorted(set(logs) | analysis_logs.keys())
 
             if logs:
                 quoted_logs = " ".join(f'"{log}"' for log in logs)
