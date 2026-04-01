@@ -121,7 +121,7 @@ def _run_phase_hook(obj, workspace, pipeline, hook):
 def _get_phase_func_wrapper(workspace, phase_func, phase_name):
     if workspace.profile_config is None:
         return phase_func
-    (profiler, profile_phases) = workspace.profile_config
+    profiler, profile_phases = workspace.profile_config
     if phase_name not in profile_phases:
         return phase_func
     return profiler(phase_func)
@@ -2110,7 +2110,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         app_licenses = license_conf[lic]
 
                 for action, conf in app_licenses.items():
-                    (env_cmds, var_set) = action_funcs[action](
+                    env_cmds, var_set = action_funcs[action](
                         conf, self.expander, var_set, shell=shell
                     )
 
@@ -3510,7 +3510,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Process environment variable actions
         for env_var_set in self.environment_variable_sets:
             for action, conf in env_var_set.items():
-                (env_cmds, _) = action_funcs[action](
+                env_cmds, _ = action_funcs[action](
                     conf, self.expander, set(), shell=shell
                 )
 
@@ -3523,7 +3523,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 for method in env_var_mod.all_methods:
                     if getattr(env_var_mod, method):
                         conf = {env_var_mod.name: env_var_mod.set}
-                        (env_cmds, _) = action_funcs[method](
+                        env_cmds, _ = action_funcs[method](
                             getattr(env_var_mod, method),
                             self.expander,
                             set(),
