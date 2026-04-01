@@ -360,8 +360,7 @@ class URLFetchStrategy(FetchStrategy):
             try:
                 url, _, response = ramble.util.web.read_from_url(url)
             except ramble.util.web.SpackWebError as werr:
-                msg = "Urllib fetch failed to verify url\
-                      {}\n with error {}".format(url, werr)
+                msg = f"Urllib fetch failed to verify url {url}\n with error {werr}"
                 raise FailedDownloadError(url, msg) from None
             return response.getcode() is None or response.getcode() == 200
 
