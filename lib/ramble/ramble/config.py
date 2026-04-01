@@ -30,6 +30,7 @@ When read in, Ramble validates configurations with jsonschemas.  The
 schemas are in submodules of :py:mod:`ramble.schema`.
 
 """
+
 import collections
 import contextlib
 import copy

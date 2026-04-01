@@ -20,39 +20,33 @@ class ArchitectureCheck(ExecutableApplication):
 
     executable(
         "spack_test",
-        template=[
-            """which spack &> /dev/null
+        template=["""which spack &> /dev/null
 if [ $? == 0 ]; then
     echo "Spack tuple: `spack arch`" >> {log_file}
 fi
-"""
-        ],
+"""],
         redirect="",
         output_capture="",
     )
 
     executable(
         "gcc_version",
-        template=[
-            r"""which gcc &> /dev/null
+        template=[r"""which gcc &> /dev/null
 if [ $? == 0 ]; then
     echo "Gcc version: `gcc --version | grep "[0-9]*\.[0-9]*\.[0-9]*"`" >> {log_file}
 fi
-"""
-        ],
+"""],
         redirect="",
         output_capture="",
     )
 
     executable(
         "gcc_test",
-        template=[
-            """which gcc &> /dev/null
+        template=["""which gcc &> /dev/null
 if [ $? == 0 ]; then
     echo "Gcc arch: `gcc -march=native -Q --help=target | grep "march=  "`" >> {log_file}
 fi
-"""
-        ],
+"""],
         redirect="",
         output_capture="",
     )

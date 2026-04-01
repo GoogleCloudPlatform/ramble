@@ -11,6 +11,7 @@
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/merged.py
    :lines: 14-
 """
+
 from llnl.util.lang import union_dicts
 
 import ramble.schema.applications

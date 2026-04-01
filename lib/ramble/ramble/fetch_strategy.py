@@ -24,6 +24,7 @@ in order to build it.  They need to define the following methods:
     * archive()
         Archive a source directory, e.g. for creating a mirror.
 """
+
 import copy
 import functools
 import itertools
@@ -360,9 +361,7 @@ class URLFetchStrategy(FetchStrategy):
                 url, _, response = ramble.util.web.read_from_url(url)
             except ramble.util.web.SpackWebError as werr:
                 msg = "Urllib fetch failed to verify url\
-                      {}\n with error {}".format(
-                    url, werr
-                )
+                      {}\n with error {}".format(url, werr)
                 raise FailedDownloadError(url, msg) from None
             return response.getcode() is None or response.getcode() == 200
 

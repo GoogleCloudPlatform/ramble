@@ -109,8 +109,7 @@ class Lscpu(BasicModifier):
             shell,
             "gcc -march=native -Q --help=target | grep -- '-march=  ' | cut -f3",
         )
-        return [
-            f"""
+        return [f"""
 if which spack > /dev/null; then
     spack_arch={spack_arch}
     echo "Spack detected arch=$spack_arch" >> {{lscpu_log}}
@@ -119,8 +118,7 @@ fi
 if which gcc > /dev/null; then
     gcc_arch={gcc_arch}
     echo "GCC detected arch=$gcc_arch" >> {{lscpu_log}}
-fi\n"""
-        ]
+fi\n"""]
 
     figure_of_merit(
         "spack_arch",

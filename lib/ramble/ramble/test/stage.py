@@ -7,6 +7,7 @@
 # except according to those terms.
 
 """Test that the Stage class works correctly."""
+
 import collections
 import errno
 import getpass

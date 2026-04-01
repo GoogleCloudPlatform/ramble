@@ -331,11 +331,9 @@ def test_variant_nesting_works(workspace_name, test_value):
         ws.write()
 
         with open(os.path.join(ws.config_dir, "variants.yaml"), "w+") as f:
-            f.write(
-                f"""variants:
+            f.write(f"""variants:
   iterative_variant: {test_value}
-  iterative_variant2: {test_value}"""
-            )
+  iterative_variant2: {test_value}""")
         workspace(
             "manage",
             "experiments",

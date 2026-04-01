@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 """Perform tests of the fetch_strategy functions"""
+
 import contextlib
 import os
 import shutil
