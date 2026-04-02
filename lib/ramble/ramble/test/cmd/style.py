@@ -47,3 +47,30 @@ def test_changed_files_all():
 def test_skip_tools():
     output = style_cmd("--skip", ",".join(style.tool_names))
     assert "Nothing to run" in output
+
+
+def test_black_version_mismatch(capsys):
+    class MockExecutable:
+        def __init__(self, output):
+            self.output = output
+            self.returncode = 0
+
+        def __call__(self, *args, **kwargs):
+            return self.output
+
+    mock_black = MockExecutable("black, 25.0.0")
+
+    class MockArgs:
+        fix = False
+        root_relative = False
+
+    args = MockArgs()
+
+    style.run_black(mock_black, [], args)
+
+    captured = capsys.readouterr()
+    assert "WARNING: black version is 25.0.0" in captured.err
+    assert (
+        f"but the version used for the PR style test is {style._BLACK_GOLDEN_VERSION}"
+        in captured.err
+    )
