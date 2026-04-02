@@ -33,7 +33,7 @@ class IntelHpl(HplBase):
             compiler="gcc13p2",
         )
         software_spec(
-            "impi-mpi",
+            "impi2021p13",
             pkg_spec="intel-oneapi-mpi@2021.13.1",
         )
 
