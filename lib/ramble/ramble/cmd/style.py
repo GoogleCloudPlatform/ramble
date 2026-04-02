@@ -42,6 +42,9 @@ exclude_directories = [ramble.paths.external_path]
 # max line length we're enforcing (note: this duplicates what's in .flake8)
 max_line_length = 99
 
+# The black version used by the PR style test
+_BLACK_GOLDEN_VERSION = "26.3.1"
+
 common_object_exemptions = {
     # Exempt lines with urls and descriptions from overlong line errors.
     "E501": [
@@ -448,6 +451,19 @@ def run_flake8(flake8_cmd, file_list, args):
 @tool("black")
 def run_black(black_cmd, file_list, args):
     print_tool_header("black", file_list)
+
+    version_out = black_cmd("--version", output=str, error=str)
+    match = re.search(r"black,\s*(\d+\.\d+\.\d+)", version_out)
+    if match:
+        installed_version = match.group(1)
+        if installed_version != _BLACK_GOLDEN_VERSION:
+            print(
+                f"WARNING: black version is {installed_version}, "
+                f"but the version used for the PR style test is {_BLACK_GOLDEN_VERSION}. "
+                f"Please update black to {_BLACK_GOLDEN_VERSION} to ensure consistency.",
+                file=sys.stderr,
+            )
+
     common_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         common_args += ("--check", "--diff")
