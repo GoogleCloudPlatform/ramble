@@ -26,7 +26,7 @@ class Su2(ExecutableApplication):
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
         # See https://github.com/spack/spack/pull/50601 for building with intel mpi.
-        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.0")
+        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.1")
         software_spec(
             "su2-{application::su2::version}",
             pkg_spec="su2@{application::su2::version} +mpi +openmp",
