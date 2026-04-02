@@ -1205,7 +1205,30 @@ ramble:
         apps_dict = self.get_applications().copy()
 
         app_inst = ramble.repository.get(application)
-        app_inst.validate_version()
+        # Set version manually as in set_variables_and_variants
+        _, _, maybe_version = application.partition("@")
+        if maybe_version and "{" not in maybe_version:
+            try:
+                app_inst.set_version(version_number=maybe_version, description=application)
+                app_inst.validate_version()
+            except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
+                # If version validation fails (e.g. unknown version in strict mode),
+                # we still want to allow adding the experiment to the config.
+                # Full validation will happen during concretization/setup.
+                logger.debug(f"Version initialization failed for {application}: {e}")
+                pass
+        elif hasattr(app_inst, "preferred_version"):
+            try:
+                app_inst.set_version(version=app_inst.preferred_version, description=application)
+                app_inst.validate_version()
+            except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
+                # If version validation fails, we still want to allow adding the experiment.
+                # Full validation will happen during concretization/setup.
+                logger.debug(f"Version initialization failed for {application}: {e}")
+                pass
+
+        app_inst.variables = {}
+        app_inst.expander = ramble.expander.Expander({}, None)
 
         var_def_dict = {}
         def_regex = re.compile(r"\s*=\s*")
@@ -1294,6 +1317,16 @@ ramble:
 
         for workload_name in workload_names:
             edited = True
+            app_inst.expander._workload_name = None
+            app_inst.define_variable(app_inst.keywords.workload_name, workload_name)
+            try:
+                if app_inst.is_mpi_required(workload_name):
+                    app_inst.require_mpi_variables()
+            except (ramble.expander.WorkloadNotDefinedError, ramble.error.RambleError) as e:
+                # Workload may not be defined for the active 'when' conditions.
+                # Skip MPI requirement checks for now as full validation occurs later.
+                logger.debug(f"Skipping MPI requirement check for workload {workload_name}: {e}")
+                pass
             if workload_name not in workloads_dict:
                 workloads_dict[workload_name] = syaml.syaml_dict()
                 workloads_dict[workload_name][namespace.experiment] = syaml.syaml_dict()

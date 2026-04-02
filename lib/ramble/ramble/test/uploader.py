@@ -61,7 +61,7 @@ def test_data_preparation(request, mock_applications):
             "manage",
             "experiments",
             app_name,
-            "-w",
+            "--wf",
             wl_name,
             "-p",
             "spack",
