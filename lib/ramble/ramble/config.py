@@ -154,7 +154,7 @@ config_defaults = {
         "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
         "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
-        "workspace_dirs": "$ramble/var/ramble/workspaces",
+        "workspace_dirs": ["$ramble/var/ramble/workspaces"],
         "upload": {"push_failed": True},
         "report_dirs": "~/.ramble/reports",
         "enable_strict_versions": True,

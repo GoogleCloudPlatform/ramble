@@ -100,11 +100,9 @@ def test_spack_auxiliary_files(request):
     with open(
         os.path.join(ws.auxiliary_software_dir, "packages.yaml"), "w+"
     ) as f:
-        f.write(
-            """packages:
+        f.write("""packages:
   all:
-    target: ['{opt_target}']"""
-        )
+    target: ['{opt_target}']""")
 
     ws._re_read()
 
