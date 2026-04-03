@@ -25,8 +25,8 @@ class StatusMarkers(BasicModifier):
 
     tags("status", "info")
 
-    _started_marker = ".started"
-    _finished_marker = ".finished"
+    _started_marker = "status.{experiment_namespace}.started"
+    _finished_marker = "status.{experiment_namespace}.finished"
 
     maintainers("douglasjacobsen")
 
@@ -38,8 +38,8 @@ class StatusMarkers(BasicModifier):
 
     def write_started_marker(self):
         cmds = [
-            f'echo "Started" &> "{{experiment_run_dir}}/{self._started_marker}"',
-            f'rm -f "{{experiment_run_dir}}/{self._finished_marker}"',
+            f'echo "Started" > "{{workspace_root}}/{self._started_marker}" 2>&1',
+            f'rm -f "{{workspace_root}}/{self._finished_marker}"',
         ]
 
         return cmds
@@ -50,7 +50,7 @@ class StatusMarkers(BasicModifier):
 
     def write_finished_marker(self):
         cmds = [
-            f'echo "Finished" &> "{{experiment_run_dir}}/{self._finished_marker}"'
+            f'echo "Finished" > "{{workspace_root}}/{self._finished_marker}" 2>&1'
         ]
 
         return cmds
@@ -60,12 +60,12 @@ class StatusMarkers(BasicModifier):
     )
 
     def _clean_markers(self, workspace, app_inst=None):
-        exp_dir = self.expander.expand_var_name(
-            app_inst.keywords.experiment_run_dir
+        started_marker = self.expander.expand_var(
+            f"{{workspace_root}}/{self._started_marker}"
         )
-
-        started_marker = os.path.join(exp_dir, self._started_marker)
-        finished_marker = os.path.join(exp_dir, self._finished_marker)
+        finished_marker = self.expander.expand_var(
+            f"{{workspace_root}}/{self._finished_marker}"
+        )
 
         for marker in [started_marker, finished_marker]:
             if os.path.isfile(marker):
