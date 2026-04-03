@@ -15,7 +15,6 @@ from collections import defaultdict
 from typing import Callable, Dict
 
 import llnl.util.tty as tty
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
@@ -25,7 +24,7 @@ import ramble.expander
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
 from ramble.namespace import namespace
@@ -775,14 +774,14 @@ def workspace_info(args):
         args.phases = True
         args.executables = True
 
-    color.cprint(rucolor.section_title("Workspace: ") + ws.name)
+    color.cprint(color.section_title("Workspace: ") + "%s", ws.name)
     color.cprint("")
-    color.cprint(rucolor.section_title("Location: ") + ws.path)
+    color.cprint(color.section_title("Location: ") + "%s", ws.path)
 
     # Print workspace templates that currently exist
     if args.templates:
         color.cprint("")
-        color.cprint(rucolor.section_title("Workspace Templates:"))
+        color.cprint(color.section_title("Workspace Templates:"))
         for template, _ in ws.all_templates():
             color.cprint(f"    {template}")
 
@@ -798,7 +797,7 @@ def workspace_info(args):
     if args.tags:
         color.cprint("")
         all_tags = experiment_set.all_experiment_tags()
-        color.cprint(rucolor.section_title("All experiment tags:"))
+        color.cprint(color.section_title("All experiment tags:"))
         color.cprint(colified(all_tags, indent=4))
 
     # Print experiment information
@@ -807,7 +806,7 @@ def workspace_info(args):
     # The base experiment_set is used to list *all* experiments.
     all_pipelines = {}
     color.cprint("")
-    color.cprint(rucolor.section_title("Experiments:"))
+    color.cprint(color.section_title("Experiments:"))
 
     # Build an index of experiments to avoid re-rendering them in the loops below
     experiment_index_map = defaultdict(list)
@@ -840,13 +839,13 @@ def workspace_info(args):
                 # Define variable printing groups.
                 var_indent = "        "
                 var_group_names = [
-                    rucolor.config_title("Config"),
-                    rucolor.section_title("Workspace"),
-                    rucolor.nested_1("Application"),
-                    rucolor.nested_2("Workload"),
-                    rucolor.nested_3("Experiment"),
+                    color.config_title("Config"),
+                    color.section_title("Workspace"),
+                    color.nested_1("Application"),
+                    color.nested_2("Workload"),
+                    color.nested_3("Experiment"),
                 ]
-                header_base = rucolor.nested_4("Variables from")
+                header_base = color.nested_4("Variables from")
                 config_vars = ramble.config.config.get("config:variables")
 
                 # Retrieve experiments from index
@@ -899,10 +898,10 @@ def workspace_info(args):
 
                     if print_header:
                         color.cprint(
-                            rucolor.nested_1("  Application: ") + application_context.escaped_name
+                            color.nested_1("  Application: ") + application_context.escaped_name
                         )
                         color.cprint(
-                            rucolor.nested_2("    Workload: ") + workload_context.escaped_name
+                            color.nested_2("    Workload: ") + workload_context.escaped_name
                         )
                         print_header = False
 
@@ -919,41 +918,43 @@ def workspace_info(args):
 
                     if app_inst.is_template:
                         color.cprint(
-                            rucolor.nested_3(f"      Template Experiment {experiment_index}: ")
-                            + rucolor.plaintext(exp_name)
+                            color.nested_3(f"      Template Experiment {experiment_index}: ")
+                            + "%s",
+                            exp_name,
                         )
                     elif app_inst.repeats.is_repeat_base:
                         color.cprint(
-                            rucolor.nested_3(f"      Repeat Base Experiment {experiment_index}: ")
-                            + rucolor.plaintext(exp_name)
+                            color.nested_3(f"      Repeat Base Experiment {experiment_index}: ")
+                            + "%s",
+                            exp_name,
                         )
                     else:
                         color.cprint(
-                            rucolor.nested_3(f"      Experiment {experiment_index}: ")
-                            + rucolor.plaintext(exp_name)
+                            color.nested_3(f"      Experiment {experiment_index}: ") + "%s",
+                            exp_name,
                         )
 
                     if args.tags:
-                        color.cprint("        Experiment Tags: " + str(app_inst.experiment_tags))
+                        color.cprint("        Experiment Tags: %s", str(app_inst.experiment_tags))
 
                     if args.variants:
-                        color.cprint(rucolor.nested_4("        Variants: "))
+                        color.cprint(color.nested_4("        Variants: "))
                         variant_set = set()
                         for _, obj in app_inst._objects():
                             variant_set = variant_set.union(
                                 obj.experiment_variants().as_set(expander=app_inst.expander)
                             )
                         for variant in variant_set:
-                            color.cprint(f"          - {rucolor.plaintext(variant)}")
+                            color.cprint("          - %s", variant)
 
                     if args.executables:
-                        color.cprint(rucolor.nested_4("        Executables: "))
+                        color.cprint(color.nested_4("        Executables: "))
                         app_inst.define_variables_for_template_path(ws)
                         exec_graph = app_inst._get_executable_graph(
                             app_inst.expander.workload_name
                         )
                         for executable in exec_graph.walk():
-                            color.cprint(f"          {executable.key}")
+                            color.cprint("          %s", executable.key)
 
                     if args.expansions:
                         var_groups = [
@@ -978,13 +979,13 @@ def workspace_info(args):
     if args.phases:
         for pipeline in sorted(all_pipelines.keys()):
             color.cprint("")
-            color.cprint(rucolor.section_title(f"Phases for {pipeline} pipeline:"))
+            color.cprint(color.section_title(f"Phases for {pipeline} pipeline:"))
             colify(all_pipelines[pipeline], indent=4)
 
     # Print software stack information
     if args.software or args.all_software:
         color.cprint("")
-        color.cprint(rucolor.section_title("Software Stack:"))
+        color.cprint(color.section_title("Software Stack:"))
         only_used_software = args.software
         color.cprint(
             software_environments.info(

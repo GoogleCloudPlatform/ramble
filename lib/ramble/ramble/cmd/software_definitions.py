@@ -9,11 +9,10 @@
 import sys
 from typing import Dict, List
 
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
 
 import ramble.repository
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 description = "inspect software definitions in object definitions"
@@ -99,12 +98,12 @@ def collect_definitions():
 
 def print_summary():
     """Print a summary of all software definitions"""
-    color.cprint(rucolor.section_title("Software Summary:"))
+    color.cprint(color.section_title("Software Summary:"))
     color.cprint("\n")
     for spec_name in specs:
-        color.cprint(rucolor.nested_1(spec_headers[spec_name]) + ":")
+        color.cprint(color.nested_1(spec_headers[spec_name]) + ":")
         for spec_def in specs[spec_name]:
-            color.cprint(f'\t{rucolor.nested_2("Spec:")} {rucolor.plaintext(spec_def)}')
+            color.cprint(f'\t{color.nested_2("Spec:")} %s', spec_def)
             color.cprint("\tIn object:")
             colify(specs[spec_name][spec_def], indent=16, output=sys.stdout)
         color.cprint("\n")
@@ -124,31 +123,31 @@ def print_conflicts():
     """Print conflict information, if any exist"""
     if conflicts or unused_compilers:
         if conflicts:
-            color.cprint(rucolor.section_title("Software Definition Conflicts:"))
+            color.cprint(color.section_title("Software Definition Conflicts:"))
             for pkg_name in conflicts:
 
-                color.cprint(f'{rucolor.nested_1("Package")}: {pkg_name}:')
+                color.cprint(f'{color.nested_1("Package")}: {pkg_name}:')
                 color.cprint("\tDefined as:")
                 for attr in ["pkg_spec", "compiler_spec", "compiler"]:
                     if hasattr(definitions[pkg_name], attr):
                         attr_def = getattr(definitions[pkg_name], attr)
                         if attr_def:
-                            color.cprint(f"\t\t{attr} = {rucolor.plaintext(attr_def)}")
+                            color.cprint(f"\t\t{attr} = {attr_def}")
                 color.cprint("\tIn objects:")
                 colify(used_by[pkg_name], indent=24, output=sys.stdout)
                 color.cprint("\tConflicts with objects:")
                 colify(conflicts[pkg_name], indent=24, output=sys.stdout)
 
         if unused_compilers:
-            color.cprint(rucolor.section_title("Unused Compilers:"))
+            color.cprint(color.section_title("Unused Compilers:"))
             for compiler_name, object_names in unused_compilers.items():
                 color.cprint(
-                    rucolor.nested_1(f"    Compiler {compiler_name} is not used in packages:")
+                    color.nested_1(f"    Compiler {compiler_name} is not used in packages:")
                 )
                 colify(object_names, indent=8, output=sys.stdout)
                 color.cprint("\n")
     else:
-        color.cprint(rucolor.section_title("No Conflicts Detected"))
+        color.cprint(color.section_title("No Conflicts Detected"))
 
 
 def setup_parser(subparser):

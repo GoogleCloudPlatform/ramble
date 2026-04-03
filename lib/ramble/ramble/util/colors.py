@@ -6,6 +6,41 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import re
+
+import llnl.util.tty.color
+from llnl.util.tty.color import (
+    ColorParseError,
+    cescape,
+    cextra,
+    clen,
+    get_color_when,
+    set_color_when,
+)
+
+__all__ = [
+    "ColorParseError",
+    "cescape",
+    "cextra",
+    "clen",
+    "get_color_when",
+    "set_color_when",
+    "auto_escape",
+    "colorize",
+    "cprint",
+    "cwrite",
+    "escape_str",
+    "level_func",
+    "config_title",
+    "section_title",
+    "nested_1",
+    "nested_2",
+    "nested_3",
+    "nested_4",
+    "title_color",
+    "plaintext",
+]
+
 config_color = "@*Y"
 header_color = "@*b"
 level1_color = "@*g"
@@ -14,9 +49,66 @@ level3_color = "@*c"
 level4_color = "@*m"
 plain_format = "@."
 
+_valid_color_re = re.compile(
+    r"("
+    r"@@|"
+    r"@\.|"
+    r"@[*_]?[krgybmcwKRGYBMCW]?\{(?:[^}]|}})*\}|"
+    r"@[*_][krgybmcwKRGYBMCW]?|"
+    r"@[krgybmcwKRGYBMCW]"
+    r")"
+)
+
+
+def auto_escape(s):
+    """Escapes `@` characters that are not part of valid color formats."""
+    s = str(s)
+    parts = _valid_color_re.split(s)
+    for i in range(0, len(parts), 2):
+        parts[i] = parts[i].replace("@", "@@")
+    return "".join(parts)
+
+
+def colorize(string, **kwargs):
+    """Wrapper for llnl.util.tty.color.colorize that automatically escapes `@`"""
+    string = auto_escape(string)
+    return llnl.util.tty.color.colorize(string, **kwargs)
+
+
+def cprint(fmt, *args, **kwargs):
+    """
+    Wrapper for llnl.util.tty.color.cprint that automatically escapes `@`
+    characters in the formatting string and arguments if they do not match
+    valid color codes.
+    """
+    fmt = auto_escape(fmt)
+    if args:
+        escaped_args = tuple(auto_escape(arg) for arg in args)
+        msg = fmt % escaped_args
+    else:
+        msg = fmt
+
+    llnl.util.tty.color.cprint(msg, **kwargs)
+
+
+def cwrite(fmt, *args, **kwargs):
+    """
+    Wrapper for llnl.util.tty.color.cwrite that automatically escapes `@`
+    characters in the formatting string and arguments if they do not match
+    valid color codes.
+    """
+    fmt = auto_escape(fmt)
+    if args:
+        escaped_args = tuple(auto_escape(arg) for arg in args)
+        msg = fmt % escaped_args
+    else:
+        msg = fmt
+
+    llnl.util.tty.color.cwrite(msg, **kwargs)
+
 
 def escape_str(s):
-    return s.replace("@@", "@").replace("@", "@@")
+    return cescape(str(s))
 
 
 def level_func(level):

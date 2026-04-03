@@ -10,8 +10,9 @@ from contextlib import contextmanager
 from pathlib import Path
 
 import llnl.util.tty as tty
-import llnl.util.tty.color
 import llnl.util.tty.log
+
+import ramble.util.colors as color
 
 
 class Logger:
@@ -130,11 +131,11 @@ class Logger:
 
     @contextmanager
     def configure_colors(self, **kwargs):
-        old_value = llnl.util.tty.color.get_color_when()
+        old_value = color.get_color_when()
         if "stream" in kwargs:
-            llnl.util.tty.color.set_color_when("never")
+            color.set_color_when("never")
         yield
-        llnl.util.tty.color.set_color_when(old_value)
+        color.set_color_when(old_value)
 
     def all_msg(self, *args, **kwargs):
         """Print a message to all logs

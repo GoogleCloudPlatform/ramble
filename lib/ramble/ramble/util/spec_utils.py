@@ -9,7 +9,7 @@
 import copy
 from typing import Dict, List, Optional
 
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 
 
 def specs_conflict(new, existing, prefix="", skip_conflicting_when=False):
@@ -76,14 +76,14 @@ class SoftwareSpec:
         base_indent = " " * n_indent
         indentation = " " * (n_indent + 4)
         self_dict = self.to_dict()
-        color_name = rucolor.section_title(self.name)
+        color_name = color.section_title(self.name)
         output = f"{base_indent}{color_name}:\n"
         for key, val in self_dict.items():
-            output += f"{indentation}{rucolor.nested_1(key)}: {rucolor.plaintext(val)}\n"
+            output += f"{indentation}{color.nested_1(key)}: {val}\n"
         if self.when:
-            output += rucolor.nested_2(f"\n{indentation}When:\n")
+            output += color.nested_2(f"\n{indentation}When:\n")
             for condition in self.when:
-                output += f"{indentation}    {rucolor.plaintext(condition)}\n"
+                output += f"{indentation}    {condition}\n"
         return output
 
     def __str__(self):

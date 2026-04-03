@@ -32,7 +32,6 @@ import ramble.schema.applications
 import ramble.schema.merged
 import ramble.schema.workspace
 import ramble.software_environments
-import ramble.util.colors as rucolor
 import ramble.util.hashing
 import ramble.util.install_cache
 import ramble.util.lock as lk
@@ -1756,7 +1755,7 @@ ramble:
                         if exp["VARIANTS"]:
                             f.write("  Experiment variants:\n")
                             for variant in exp["VARIANTS"]:
-                                f.write(f"  - {rucolor.plaintext(variant)}\n")
+                                f.write(f"  - {variant}\n")
 
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")

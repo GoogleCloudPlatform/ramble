@@ -11,7 +11,7 @@ from enum import Enum
 from typing import Any, Callable, Optional, Union
 
 import ramble.error
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 from ramble.expander import Expander
 
 reserved_variants = {
@@ -422,7 +422,7 @@ class Variant:
         indentation = " " * n_indent
 
         if verbose:
-            out_str = rucolor.section_title(f"{indentation}{self.name}:\n")
+            out_str = color.section_title(f"{indentation}{self.name}:\n")
             attrs = [
                 ("Description", "description"),
                 ("Default", "default"),
@@ -432,7 +432,7 @@ class Variant:
                 if hasattr(self, attr_name):
                     value = getattr(self, attr_name, None)
                     if value is not None:
-                        out_str += f"{indentation}    {rucolor.nested_1(print_name)}: {value}\n"
+                        out_str += f"{indentation}    {color.nested_1(print_name)}: {value}\n"
         else:
             out_str = self.name
 

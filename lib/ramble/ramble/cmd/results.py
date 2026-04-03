@@ -9,13 +9,12 @@
 import json
 import os
 
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified
 
 import ramble.cmd
 import ramble.reports
 import ramble.uploader
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
@@ -229,7 +228,7 @@ def _load_results(args):
 def _print_attr_dict(attr_dict: dict, n_indent=0):
     for attr, values in attr_dict.items():
         indentation = " " * n_indent
-        color.cprint(f"{indentation}{rucolor.title_color(attr, n_indent)}:")
+        color.cprint(f"{indentation}{color.title_color(attr, n_indent)}:")
         if isinstance(values, dict):
             _print_attr_dict(values, n_indent + 4)
         else:
@@ -245,7 +244,7 @@ def results_index(args):
     )
     for obj_name, obj_dict in result_index.items():
         if obj_dict:
-            color.cprint(rucolor.title_color(f'{obj_name.replace("_", " ").title()}:'))
+            color.cprint(color.title_color(f'{obj_name.replace("_", " ").title()}:'))
             if obj_name == "All Variables" and not args.all_vars:
                 continue
             _print_attr_dict(obj_dict, n_indent=4)

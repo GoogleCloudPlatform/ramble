@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 
 
 class PackageManagerRequirement:
@@ -51,14 +51,13 @@ class PackageManagerRequirement:
         if verbose:
             print_attrs = ["command", "validation_type", "package_manager", "regex"]
 
-            out_str = f"{indentation}{rucolor.section_title('When:')} {self.when}\n"
+            out_str = f"{indentation}{color.section_title('When:')} {self.when}\n"
             for print_attr in print_attrs:
                 attr_val = getattr(self, print_attr, None)
 
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {rucolor.nested_1(print_attr)}: "
-                        f"{rucolor.plaintext(str(attr_val))}\n"
+                        f"{indentation}    {color.nested_1(print_attr)}: " f"{str(attr_val)}\n"
                     )
         else:
             out_str = f"{indentation}{self.when}"

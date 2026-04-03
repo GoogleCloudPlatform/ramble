@@ -7,9 +7,8 @@
 # except according to those terms.
 import os
 
-from llnl.util.tty.color import colorize
-
 import ramble.workspace
+from ramble.util.colors import colorize
 
 from spack.util.environment import EnvironmentModifications
 

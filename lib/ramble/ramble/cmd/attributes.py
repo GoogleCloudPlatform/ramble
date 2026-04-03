@@ -10,10 +10,10 @@
 import argparse
 from collections import defaultdict
 
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
 
 import ramble.repository
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 description = "get information about object attributes"
