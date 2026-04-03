@@ -138,6 +138,7 @@ def test_workspace_activate_fails(mutable_mock_workspace_path):
 
 
 def test_workspace_activate_prompt(workspace_name):
+    ramble.workspace.deactivate()
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 

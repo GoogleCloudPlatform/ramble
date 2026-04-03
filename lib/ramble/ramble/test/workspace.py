@@ -12,6 +12,7 @@ import shutil
 
 import pytest
 
+import ramble
 from ramble.workspace import TEMPLATE_EXTENSION, workspace
 
 # everything here uses the mock_workspace_path
@@ -136,3 +137,31 @@ def test_get_workspace():
             workspace.deactivate()
         if os.path.exists(ws_root):
             shutil.rmtree(ws_root)
+
+
+def test_all_workspace_names_multiple_dirs(tmpdir, monkeypatch):
+    dir1 = tmpdir.mkdir("dir1")
+    dir2 = tmpdir.mkdir("dir2")
+
+    orig_get = ramble.config.get
+
+    def mock_get(path, default=None, scope=None):
+        if path == "config:workspace_dirs":
+            return [str(dir1), str(dir2)]
+        return orig_get(path, default=default, scope=scope)
+
+    monkeypatch.setattr(ramble.config, "get", mock_get)
+
+    ws1_root = os.path.join(str(dir1), "ws1")
+    ws2_root = os.path.join(str(dir2), "ws2")
+
+    ws1 = workspace.Workspace(ws1_root, True)
+    ws1.write()
+
+    ws2 = workspace.Workspace(ws2_root, True)
+    ws2.write()
+
+    names = workspace.all_workspace_names()
+
+    assert "ws1" in names
+    assert "ws2" in names

@@ -195,22 +195,22 @@ def deactivate_config_scope(workspace):
 
 def all_workspace_names():
     """List the names of workspaces that currently exist."""
-    # just return empty if the workspace path does not exist.  A read-only
-    # operation like list should not try to create a directory.
-    wspath = get_workspace_path()
-    if not os.path.exists(wspath):
-        return []
-
-    candidates = sorted(os.listdir(wspath))
+    wspaths = get_workspace_path()
     names = []
-    for candidate in candidates:
-        configured = True
-        yaml_path = os.path.join(_root(candidate), WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
-        if not os.path.exists(yaml_path):
-            configured = False
-        if valid_workspace_name(candidate) and configured:
-            names.append(candidate)
-    return names
+    for wspath in wspaths:
+        if not os.path.exists(wspath):
+            continue
+
+        candidates = sorted(os.listdir(wspath))
+        for candidate in candidates:
+            configured = True
+            cand_root = os.path.join(wspath, candidate)
+            yaml_path = os.path.join(cand_root, WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
+            if not os.path.exists(yaml_path):
+                configured = False
+            if valid_workspace_name(candidate) and configured:
+                names.append(candidate)
+    return sorted(list(set(names)))
 
 
 def active_workspace():
@@ -225,14 +225,22 @@ def get_workspace_path():
         # command above should have worked, so if it doesn't, error out:
         logger.die("No config:workspace_dirs setting found in configuration!")
 
-    wspath = ramble.util.path.canonicalize_path(str(path_in_config))
-    return wspath
+    if isinstance(path_in_config, str):
+        paths = [path_in_config]
+    else:
+        paths = path_in_config
+
+    return [ramble.util.path.canonicalize_path(str(p)) for p in paths]
 
 
 def _root(name):
     """Non-validating version of root(), to be used internally."""
-    wspath = get_workspace_path()
-    return os.path.join(wspath, name)
+    wspaths = get_workspace_path()
+    for wspath in wspaths:
+        cand_root = os.path.join(wspath, name)
+        if os.path.exists(os.path.join(cand_root, WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)):
+            return cand_root
+    return os.path.join(wspaths[0], name)
 
 
 def root(name):
@@ -2062,8 +2070,8 @@ ramble:
     @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
-        wspath = get_workspace_path()
-        return self.path.startswith(wspath)
+        wspaths = get_workspace_path()
+        return any(self.path.startswith(wspath) for wspath in wspaths)
 
     @property
     def name(self):
