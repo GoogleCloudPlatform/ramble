@@ -60,9 +60,11 @@ def test_gcsfetchstrategy_downloaded(tmpdir, _fetch_method):
 
 @pytest.mark.network
 @pytest.mark.parametrize("_fetch_method", ["curl", "urllib"])
-def test_gcsfetchstrategy_download(tmpdir, _fetch_method):
+def test_gcsfetchstrategy_download(tmpdir, _fetch_method, monkeypatch):
     """Ensure fetch of fie."""
-
+    # Remove this env var, otherwise for newer google-auth lib, it will try to invoke the mTLS path
+    # and fail if pyopenssl is not installed.
+    monkeypatch.delenv("CLOUDSDK_CONTEXT_AWARE_USE_CLIENT_CERTIFICATE", raising=False)
     google_api_core_exceptions = pytest.importorskip("google.api_core.exceptions")
     google_auth_exceptions = pytest.importorskip("google.auth.exceptions")
     try:
