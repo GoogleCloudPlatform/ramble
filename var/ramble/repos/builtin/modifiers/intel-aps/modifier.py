@@ -125,7 +125,7 @@ class IntelAps(BasicModifier):
 
         exe_regex = self.expander.expand_var_name("apply_aps_exe_regex")
         applicable = exe_regex and re.match(exe_regex, executable_name)
-        if applicable or executable.mpi:
+        if applicable or (not exe_regex and executable.mpi):
             env_var_name = self.expander.expand_var_name(
                 "external_aps_env_var"
             )
