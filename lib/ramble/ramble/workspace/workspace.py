@@ -202,7 +202,7 @@ def all_workspace_names():
         if not os.path.exists(wspath):
             continue
 
-        candidates = sorted(os.listdir(wspath))
+        candidates = os.listdir(wspath)
         for candidate in candidates:
             cand_root = os.path.join(wspath, candidate)
             if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
