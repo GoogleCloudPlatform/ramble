@@ -59,7 +59,7 @@ class UserManaged(PackageManagerBase):
         if app_inst is None:
             package_objects = [(None, self)]
         else:
-            package_objects = app_inst._objects()
+            package_objects = app_inst.objects()
 
         for _, obj in package_objects:
             for pkgname in obj.required_packages.keys():

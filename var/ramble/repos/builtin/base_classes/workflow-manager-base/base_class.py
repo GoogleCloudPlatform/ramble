@@ -31,7 +31,7 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
         ("workflow_manager_builtin", "{obj_name}", "{name}")
     )
     _language_classes = [WorkflowManagerMeta, SharedMeta]
-    _pipelines = [
+    pipelines = [
         "analyze",
         "setup",
         "execute",

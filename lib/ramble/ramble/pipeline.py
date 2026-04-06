@@ -212,7 +212,7 @@ class Pipeline:
                 tty.warn("Unable to construct workspace hash due to missing file")
                 tty.warn(e)
 
-        self.workspace._write_metadata()
+        self.workspace.write_metadata()
 
     def run(self):
         """Run the full pipeline"""
@@ -462,7 +462,7 @@ class ArchivePipeline(Pipeline):
 
                 # Record upload URL to workspace metadata
                 self.workspace.update_metadata("archive_url", remote_tar_path)
-                self.workspace._write_metadata()
+                self.workspace.write_metadata()
 
 
 class MirrorPipeline(Pipeline):
@@ -657,7 +657,7 @@ class LogsPipeline(Pipeline):
             logger.all_msg(f"Experiment: {exp}")
             logger.all_msg(f"    Experiment log file: {log_file}")
 
-            analysis_logs, _, _ = app_inst._analysis_dicts(app_inst.success_list)
+            analysis_logs, _, _ = app_inst.analysis_dicts(app_inst.success_list)
 
             logger.all_msg("    Auxiliary experiment logs:")
             for log in analysis_logs:
@@ -672,7 +672,7 @@ class LogsPipeline(Pipeline):
                     app_inst.package_manager.archive_patterns,
                 )
 
-            for mod in app_inst._modifier_instances:
+            for mod in app_inst.modifier_instances:
                 print_archive_files(app_inst, f"modifier {mod.name}", mod.archive_patterns.keys())
 
             if self.first_only:

@@ -31,7 +31,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.workloads[_FS]["test_wl"].inputs == ["input"]
 
     app_inst.define_variable("workload_name", "test_wl")
-    exec_graph = app_inst._get_executable_graph("test_wl")
+    exec_graph = app_inst.get_executable_graph("test_wl")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
@@ -40,7 +40,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.workloads[_FS]["test_wl2"].inputs == ["input"]
 
     app_inst.define_variable("workload_name", "test_wl2")
-    exec_graph = app_inst._get_executable_graph("test_wl2")
+    exec_graph = app_inst.get_executable_graph("test_wl2")
     assert exec_graph.get_node("bar") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
@@ -49,7 +49,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.workloads[_FS]["test_wl3"].inputs == ["inherited_input"]
 
     app_inst.define_variable("workload_name", "test_wl3")
-    exec_graph = app_inst._get_executable_graph("test_wl3")
+    exec_graph = app_inst.get_executable_graph("test_wl3")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 

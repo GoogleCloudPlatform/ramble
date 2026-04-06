@@ -545,12 +545,12 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None, when=No
             when, obj, name, "register_phase"
         )
 
-        if pipeline not in obj._pipelines:
+        if pipeline not in obj.pipelines:
             raise ramble.language.language_base.DirectiveError(
                 "Directive register_phase was "
                 f'given an invalid pipeline "{pipeline}"\n'
                 "Available pipelines are: "
-                f" {obj._pipelines}"
+                f" {obj.pipelines}"
             )
 
         if not isinstance(run_before, list):

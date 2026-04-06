@@ -546,10 +546,10 @@ class Workspace:
 
             read_default = not os.path.exists(self.config_file_path)
             if read_default:
-                self._read_config(CONFIG_SECTION, self._default_config_yaml())
+                self.read_config(CONFIG_SECTION, self._default_config_yaml())
             else:
                 with open(self.config_file_path) as f:
-                    self._read_config(CONFIG_SECTION, f)
+                    self.read_config(CONFIG_SECTION, f)
 
             read_default_script = self.read_default_template
             ext_len = len(TEMPLATE_EXTENSION)
@@ -573,7 +573,7 @@ class Workspace:
                                 )
 
                             with open(template_path) as f:
-                                self._read_template(template_name, f.read())
+                                self.read_template(template_name, f.read())
 
                 if os.path.exists(self.auxiliary_software_dir):
                     for filename in os.listdir(self.auxiliary_software_dir):
@@ -583,7 +583,7 @@ class Workspace:
 
             if read_default_script:
                 template_name = WORKSPACE_EXECUTION_TEMPLATE[0:-ext_len]
-                self._read_template(template_name, self._template_execute_script())
+                self.read_template(template_name, self._template_execute_script())
 
             self._read_metadata()
             if hasattr(self, "results") and self.results:
@@ -677,7 +677,7 @@ ramble:
     {namespace.environments}: {{}}
 """
 
-    def _read_config(self, section, f, raw_yaml=None):
+    def read_config(self, section, f, raw_yaml=None):
         """Read configuration file"""
         config = self.config_sections[section]
         self._read_yaml(config, f, raw_yaml)
@@ -698,7 +698,7 @@ ramble:
             self.metadata = syaml.syaml_dict()
             self.metadata[namespace.metadata] = syaml.syaml_dict()
 
-    def _write_metadata(self):
+    def write_metadata(self):
         """Write out workspace metadata file
 
         Create, and populate the metadata file in the root of the workspace.
@@ -738,7 +738,7 @@ ramble:
         else:
             config["raw_yaml"], config["yaml"] = _read_yaml(f, config["schema"])
 
-    def _read_template(self, name, f):
+    def read_template(self, name, f):
         """Read a template file"""
         self._templates[name] = {
             "contents": f,
@@ -775,13 +775,13 @@ ramble:
             fs.mkdirp(self.shared_dir)
             fs.mkdirp(self.shared_license_dir)
 
-            self._write_config(CONFIG_SECTION)
+            self.write_config(CONFIG_SECTION)
 
-            self._write_templates()
+            self.write_templates()
 
-            self._write_metadata()
+            self.write_metadata()
 
-    def _write_config(self, section, force=False):
+    def write_config(self, section, force=False):
         """Update YAML config file for this workspace, based on
         changes and write it"""
         config = self.config_sections[section]
@@ -793,7 +793,7 @@ ramble:
             with fs.write_tmp_and_move(config["path"]) as f:
                 _write_yaml(config["yaml"], f, config["schema"])
 
-    def _write_templates(self):
+    def write_templates(self):
         """Write all templates out to workspace"""
 
         for name, conf in self._templates.items():
@@ -1936,7 +1936,7 @@ ramble:
         changed = changed or _remove_scoped_variables("workspace", workspace_used_variables)
 
         if changed:
-            self._write_config(CONFIG_SECTION)
+            self.write_config(CONFIG_SECTION)
         else:
             logger.all_msg("No variables were changed.")
 
@@ -2394,7 +2394,7 @@ ramble:
                     del base_section[namespace.modifiers]
 
                 if not dry_run:
-                    self._write_config(CONFIG_SECTION)
+                    self.write_config(CONFIG_SECTION)
 
         return removed
 
@@ -2458,7 +2458,7 @@ ramble:
             added += 1
 
         if not dry_run:
-            self._write_config(CONFIG_SECTION)
+            self.write_config(CONFIG_SECTION)
         return added
 
     def add_include(self, new_include):
@@ -2475,7 +2475,7 @@ ramble:
             namespace.include
         ]
         includes.append(new_include)
-        self._write_config(CONFIG_SECTION)
+        self.write_config(CONFIG_SECTION)
 
     def remove_include(self, index=None, pattern=None):
         """Remove one or more includes from this workspace.
@@ -2517,7 +2517,7 @@ ramble:
                     changed = True
 
         if changed:
-            self._write_config(CONFIG_SECTION)
+            self.write_config(CONFIG_SECTION)
 
     def included_config_scopes(self):
         """List of included configuration scopes from the environment.

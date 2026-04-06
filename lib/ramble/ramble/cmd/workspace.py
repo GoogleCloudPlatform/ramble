@@ -348,15 +348,15 @@ def _workspace_create(
 
     if config:
         with open(config) as f:
-            workspace._read_config("workspace", f)
-            workspace._write_config("workspace", force=True)
+            workspace.read_config("workspace", f)
+            workspace.write_config("workspace", force=True)
 
     if template_execute:
         with open(template_execute) as f:
             _, file_name = os.path.split(template_execute)
             template_name = os.path.splitext(file_name)[0]
-            workspace._read_template(template_name, f.read())
-            workspace._write_templates()
+            workspace.read_template(template_name, f.read())
+            workspace.write_templates()
 
     if activate:
         sys.stdout.write(activate_cmd)
@@ -907,7 +907,7 @@ def workspace_info(args):
                         print_header = False
 
                     # Aggregate pipeline phases
-                    for pipeline in app_inst._pipelines:
+                    for pipeline in app_inst.pipelines:
                         if pipeline not in all_pipelines:
                             all_pipelines[pipeline] = set()
                         for phase in app_inst.get_pipeline_phases(pipeline):
@@ -939,7 +939,7 @@ def workspace_info(args):
                     if args.variants:
                         color.cprint(rucolor.nested_4("        Variants: "))
                         variant_set = set()
-                        for _, obj in app_inst._objects():
+                        for _, obj in app_inst.objects():
                             variant_set = variant_set.union(
                                 obj.experiment_variants().as_set(expander=app_inst.expander)
                             )
@@ -949,7 +949,7 @@ def workspace_info(args):
                     if args.executables:
                         color.cprint(rucolor.nested_4("        Executables: "))
                         app_inst.define_variables_for_template_path(ws)
-                        exec_graph = app_inst._get_executable_graph(
+                        exec_graph = app_inst.get_executable_graph(
                             app_inst.expander.workload_name
                         )
                         for executable in exec_graph.walk():

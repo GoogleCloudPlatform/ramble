@@ -105,12 +105,12 @@ def test_basic_app(mutable_mock_apps_repo):
     assert example_input is not None
 
     basic_inst.define_variable("workload_name", "test_wl")
-    exec_graph = basic_inst._get_executable_graph("test_wl")
+    exec_graph = basic_inst.get_executable_graph("test_wl")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
     basic_inst.define_variable("workload_name", "test_wl2")
-    exec_graph = basic_inst._get_executable_graph("test_wl2")
+    exec_graph = basic_inst.get_executable_graph("test_wl2")
     assert exec_graph.get_node("bar") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
@@ -227,7 +227,7 @@ def test_required_builtins(mutable_mock_apps_repo, app):
 
     for workload in app_inst.workloads[_FS]:
         app_inst.define_variable("workload_name", workload)
-        exec_graph = app_inst._get_executable_graph(workload)
+        exec_graph = app_inst.get_executable_graph(workload)
         for builtin in required_builtins:
             assert exec_graph.get_node(builtin) is not None
 
@@ -247,7 +247,7 @@ def test_register_builtin_app(mutable_mock_apps_repo):
             excluded_builtins.append(builtin)
 
     for workload in app_inst.workloads[_FS]:
-        exec_graph = app_inst._get_executable_graph(workload)
+        exec_graph = app_inst.get_executable_graph(workload)
         app_inst.define_variable("workload_name", workload)
 
         for builtin in required_builtins:
@@ -291,7 +291,7 @@ def test_get_executable_graph_initial(mutable_mock_apps_repo):
     executable_application_instance.workloads[_FS] = {"test_wl": test_wl, "test_wl2": test_wl2}
     executable_application_instance.internals = {}
 
-    executable_graph = executable_application_instance._get_executable_graph("test_wl2")
+    executable_graph = executable_application_instance.get_executable_graph("test_wl2")
     bar_node = executable_graph.get_node("bar")
 
     assert bar_node is not None
@@ -320,7 +320,7 @@ def test_get_executable_graph_yaml_defined(mutable_mock_apps_repo):
     }
     executable_application_instance.set_internals(defined_internals)
 
-    executable_graph = executable_application_instance._get_executable_graph("test_wl")
+    executable_graph = executable_application_instance.get_executable_graph("test_wl")
 
     test_node = executable_graph.get_node("test_exec")
 
@@ -354,7 +354,7 @@ def test_get_executable_graph_custom_executables(mutable_mock_apps_repo):
     }
     executable_application_instance.set_internals(defined_internals)
 
-    executable_graph = executable_application_instance._get_executable_graph("test_wl2")
+    executable_graph = executable_application_instance.get_executable_graph("test_wl2")
     test_node = executable_graph.get_node("test_exec2")
 
     assert test_node is not None
@@ -461,7 +461,7 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
     executable_application_instance.set_variables_and_variants(expansion_vars, {}, None)
 
-    exec_graph = executable_application_instance._get_executable_graph("test_wl2")
+    exec_graph = executable_application_instance.get_executable_graph("test_wl2")
 
     executable_application_instance.set_formatted_executables(
         {"command": {"join_separator": "\n"}}
@@ -527,7 +527,7 @@ ramble:
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
     executable_application_instance.set_variables_and_variants(expansion_vars, {}, None)
 
-    exec_graph = executable_application_instance._get_executable_graph("test_wl2")
+    exec_graph = executable_application_instance.get_executable_graph("test_wl2")
 
     executable_application_instance.chain_prepend = []
     executable_application_instance._define_commands(exec_graph)
@@ -627,7 +627,7 @@ def test_undefined_executable_dies(mutable_mock_apps_repo, capsys):
     executable_application_instance.workloads[_FS]["wl_with_undefined_exec"] = undefined_exec_wl
 
     with pytest.raises(SystemExit):
-        executable_application_instance._get_executable_graph("wl_with_undefined_exec")
+        executable_application_instance.get_executable_graph("wl_with_undefined_exec")
     captured = capsys.readouterr()
     assert "Executable undefined_exec is not defined." in captured.err
 
