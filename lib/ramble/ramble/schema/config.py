@@ -155,7 +155,7 @@ properties["config"]["input_cache"] = {"type": "string", "default": "$ramble/var
 properties["config"]["workspace_dirs"] = {
     "type": ["string", "array"],
     "items": {"type": "string"},
-    "default": "$ramble/var/ramble/workspaces",
+    "default": ["$ramble/var/ramble/workspaces"],
 }
 
 properties["config"]["report_dirs"] = {
