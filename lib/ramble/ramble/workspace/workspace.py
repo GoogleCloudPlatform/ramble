@@ -203,12 +203,8 @@ def all_workspace_names():
 
         candidates = sorted(os.listdir(wspath))
         for candidate in candidates:
-            configured = True
             cand_root = os.path.join(wspath, candidate)
-            yaml_path = os.path.join(cand_root, WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
-            if not os.path.exists(yaml_path):
-                configured = False
-            if valid_workspace_name(candidate) and configured:
+            if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
                 names.append(candidate)
     return sorted(list(set(names)))
 
@@ -238,7 +234,7 @@ def _root(name):
     wspaths = get_workspace_path()
     for wspath in wspaths:
         cand_root = os.path.join(wspath, name)
-        if os.path.exists(os.path.join(cand_root, WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)):
+        if is_workspace_dir(cand_root):
             return cand_root
     return os.path.join(wspaths[0], name)
 
