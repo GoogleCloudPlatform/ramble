@@ -207,7 +207,7 @@ def all_workspace_names():
             cand_root = os.path.join(wspath, candidate)
             if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
                 names.append(candidate)
-    return sorted(list(set(names)))
+    return sorted(set(names))
 
 
 def active_workspace():
