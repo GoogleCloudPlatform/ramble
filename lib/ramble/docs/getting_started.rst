@@ -271,16 +271,15 @@ These files can be edited with your favorite editor, or though the command:
 Flags exist to control whether you want to edit a template file, or the
 configuration file.
 
-Variables are defined of the format ``{file_prefix}``, that contain the path to
-the rendered version within every experiment. As an example:
+Ramble automatically defines variables for each template file found in the
+``configs`` directory. The variable name is the template's path relative to
+the ``configs`` directory, without the ``.tpl`` extension. Its value contains the path to the rendered file
+within every experiment directory.
 
-.. code-block:: console
-
-    configs/execute_experiment.tpl
-
-Will define ``{execute_experiment}`` with a value set to the path of the
-generated file.
-(More explicitly, ``execute_experiment={experiment_run_dir}/{template_name_sans_extension}``)
+For example, a template named ``configs/execute_experiment.tpl`` will define
+a variable ``{execute_experiment}`` that expands to the path of the generated
+file within the experiment directory (more explicitly,
+``{experiment_run_dir}/execute_experiment``).
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 Concretizing A Workspace
