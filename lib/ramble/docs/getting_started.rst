@@ -272,8 +272,8 @@ Flags exist to control whether you want to edit a template file, or the
 configuration file.
 
 Ramble automatically defines variables for each template file found in the
-``configs`` directory. The variable name is the template's filename without
-the ``.tpl`` extension. Its value contains the path to the rendered file
+``configs`` directory. The variable name is the template's path relative to
+the ``configs`` directory, without the ``.tpl`` extension. Its value contains the path to the rendered file
 within every experiment directory.
 
 For example, a template named ``configs/execute_experiment.tpl`` will define
