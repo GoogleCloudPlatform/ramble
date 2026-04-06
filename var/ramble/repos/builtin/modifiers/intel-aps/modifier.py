@@ -80,7 +80,7 @@ class IntelAps(BasicModifier):
 
     modifier_variable(
         "apply_aps_exe_regex",
-        default=".*",
+        default="",
         description="apply aps to executables that match with the regex",
         mode="mpi",
     )
@@ -115,7 +115,7 @@ class IntelAps(BasicModifier):
 
         required_package("intel-oneapi-vtune")
 
-    executable_modifier("aps_summary", usage_filter="all_mpi")
+    executable_modifier("aps_summary")
 
     def aps_summary(self, executable_name, executable, app_inst=None):
         from ramble.util.executable import CommandExecutable
@@ -125,7 +125,7 @@ class IntelAps(BasicModifier):
 
         exe_regex = self.expander.expand_var_name("apply_aps_exe_regex")
         applicable = exe_regex and re.match(exe_regex, executable_name)
-        if applicable:
+        if applicable or executable.mpi:
             env_var_name = self.expander.expand_var_name(
                 "external_aps_env_var"
             )
