@@ -12,8 +12,7 @@ import pytest
 
 import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
-from ramble.error import InvalidModeError
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError, InvalidModeError
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import SCOPES, dry_run_config
 

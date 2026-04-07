@@ -12,7 +12,7 @@ import ramble.definitions.requirements
 import ramble.language.language_helpers
 import ramble.language.shared_language
 from ramble.definitions.variables import EnvironmentVariableModifications, VariableModification
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError
 
 
 class ModifierMeta(ramble.language.shared_language.SharedMeta):

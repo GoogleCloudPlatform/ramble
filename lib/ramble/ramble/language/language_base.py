@@ -18,8 +18,11 @@ from collections.abc import Sequence  # novm
 from typing import Any, Callable, Dict, List, Set
 
 import llnl.util.lang
+import llnl.util.tty as tty
 
 import ramble.error
+import ramble.language.language_helpers
+from ramble.error import DirectiveError
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
 
@@ -42,6 +45,12 @@ namespaces = [
 
 def _push_to_context(when_condition: str) -> None:
     DirectiveMeta._when_constraints_from_context.append(when_condition)
+
+    impossible, message = ramble.language.language_helpers.is_when_impossible(
+        DirectiveMeta._when_constraints_from_context
+    )
+    if impossible:
+        tty.warn(f"Entering an impossible 'when' context: {message}")
 
 
 def _pop_from_context() -> str:
@@ -247,6 +256,17 @@ class DirectiveMeta(abc.ABCMeta):
 
                     kwargs["when"] = when_constraints.copy()
 
+                if "when" in kwargs:
+                    impossible, message = ramble.language.language_helpers.is_when_impossible(
+                        kwargs["when"]
+                    )
+                    if impossible:
+                        tty.warn(
+                            f'Directive "{decorated_function.__name__}" has '
+                            f"an impossible when condition: {message}"
+                        )
+                        return lambda x: None
+
                 # If any of the arguments are executors returned by a
                 # directive passed as an argument, don't execute them
                 # lazily. Instead, let the called directive handle them.
@@ -290,7 +310,3 @@ class DirectiveMeta(abc.ABCMeta):
             return _wrapper
 
         return _decorator
-
-
-class DirectiveError(ramble.error.RambleError):
-    """This is raised when something is wrong with a language directive."""

@@ -10,7 +10,7 @@ import ramble.definitions.variables
 import ramble.language.language_helpers
 import ramble.language.shared_language
 import ramble.workload
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError
 
 """This package contains directives that can be used within an application.
 
@@ -125,16 +125,27 @@ def workload_group(name, workloads=None, mode=None, when=None, **kwargs):
             )
 
         # Apply any existing variables in the group to the workload
-        for workload in workloads:
-            for when_set in app.workloads:
-                if workload in app.workloads[when_set]:
-                    if name in app.workload_group_vars:
-                        for var in app.workload_group_vars[name]:
-                            app.workloads[when_set][workload].add_variable(var)
+        if name in app.workload_group_vars:
+            for var in app.workload_group_vars[name]:
+                var_when_frozenset = frozenset(var.when)
+                for workload in workloads:
+                    for when_set in app.workloads:
+                        if workload in app.workloads[when_set]:
+                            if ramble.language.language_helpers.are_when_compatible(
+                                when_set, var_when_frozenset
+                            ):
+                                app.workloads[when_set][workload].add_variable(var)
 
-                    if name in app.workload_group_env_vars:
-                        for env_var in app.workload_group_env_vars[name]:
-                            app.workloads[when_set][workload].add_environment_variable(env_var)
+        if name in app.workload_group_env_vars:
+            for env_var in app.workload_group_env_vars[name]:
+                env_var_when_frozenset = frozenset(env_var.when)
+                for workload in workloads:
+                    for when_set in app.workloads:
+                        if workload in app.workloads[when_set]:
+                            if ramble.language.language_helpers.are_when_compatible(
+                                when_set, env_var_when_frozenset
+                            ):
+                                app.workloads[when_set][workload].add_environment_variable(env_var)
 
     return _execute_workload_groups
 
@@ -318,17 +329,21 @@ def workload_variable(
                     when=when_list,
                     **kwargs,
                 )
+                workload_var_when_frozenset = frozenset(workload_var.when)
                 for when_set, app_workloads in app.workloads.items():
                     if wl_name in app_workloads:
-                        app.workloads[when_set][wl_name].add_variable(workload_var.copy())
-                        if validation:
-                            ramble.language.language_helpers.add_variable_validator(
-                                app, name, values, when_list, wl_name=wl_name
-                            )
-                        if env_var is not None:
-                            app.workloads[when_set][wl_name].add_environment_variable(
-                                env_var.copy()
-                            )
+                        if ramble.language.language_helpers.are_when_compatible(
+                            when_set, workload_var_when_frozenset
+                        ):
+                            app.workloads[when_set][wl_name].add_variable(workload_var.copy())
+                            if validation:
+                                ramble.language.language_helpers.add_variable_validator(
+                                    app, name, values, when_list, wl_name=wl_name
+                                )
+                            if env_var is not None:
+                                app.workloads[when_set][wl_name].add_environment_variable(
+                                    env_var.copy()
+                                )
             return
 
         # Handle the remainder of the workload_variable directive, if
@@ -343,16 +358,22 @@ def workload_variable(
             **kwargs,
         )
 
+        workload_var_when_frozenset = frozenset(workload_var.when)
         for when_set, app_workloads in app.workloads.items():
             for wl_name in all_workloads:
                 if wl_name in app_workloads:
-                    app.workloads[when_set][wl_name].add_variable(workload_var.copy())
-                    if validation:
-                        ramble.language.language_helpers.add_variable_validator(
-                            app, name, values, when_list, wl_name=wl_name
-                        )
-                    if env_var:
-                        app.workloads[when_set][wl_name].add_environment_variable(env_var.copy())
+                    if ramble.language.language_helpers.are_when_compatible(
+                        when_set, workload_var_when_frozenset
+                    ):
+                        app.workloads[when_set][wl_name].add_variable(workload_var.copy())
+                        if validation:
+                            ramble.language.language_helpers.add_variable_validator(
+                                app, name, values, when_list, wl_name=wl_name
+                            )
+                        if env_var:
+                            app.workloads[when_set][wl_name].add_environment_variable(
+                                env_var.copy()
+                            )
 
         if workload_group is not None:
             workload_group_inst = app.workload_groups[workload_group]
@@ -369,28 +390,35 @@ def workload_variable(
 
             for when_set, app_workloads in app.workloads.items():
                 for (
-                    wl_group_when_list,
+                    wl_group_when_set,
                     workload_group_list,
                 ) in workload_group_inst.workloads.items():
+                    # Apply the variable
+                    # Add wl group 'when' to variable to defer satisfies evaluation
+                    workload_var_copy = workload_var.copy()
+                    workload_var_copy.when += wl_group_when_set
+                    var_when_frozenset = frozenset(workload_var_copy.when)
+
+                    if env_var:
+                        env_var_copy = env_var.copy()
+                        env_var_copy.when += wl_group_when_set
+                    else:
+                        env_var_copy = None
+
                     for wl_name in workload_group_list:
                         if wl_name in app_workloads:
-                            # Apply the variable
-                            # Add wl group 'when' to variable to defer satisfies evaluation
-                            workload_var_copy = workload_var.copy()
-                            workload_var_copy.when += wl_group_when_list
-
-                            app.workloads[when_set][wl_name].add_variable(workload_var_copy)
-                            if validation:
-                                ramble.language.language_helpers.add_variable_validator(
-                                    app, name, values, when_list, wl_name=wl_name
-                                )
-                            if env_var:
-                                env_var_copy = env_var.copy()
-                                env_var_copy.when += wl_group_when_list
-
-                                app.workloads[when_set][wl_name].add_environment_variable(
-                                    env_var_copy
-                                )
+                            if ramble.language.language_helpers.are_when_compatible(
+                                when_set, var_when_frozenset
+                            ):
+                                app.workloads[when_set][wl_name].add_variable(workload_var_copy)
+                                if validation:
+                                    ramble.language.language_helpers.add_variable_validator(
+                                        app, name, values, when_list, wl_name=wl_name
+                                    )
+                                if env_var_copy:
+                                    app.workloads[when_set][wl_name].add_environment_variable(
+                                        env_var_copy
+                                    )
 
         if not all_workloads and workload_group is None:
             raise DirectiveError("A workload or workload group is required")
@@ -446,7 +474,7 @@ def cleanup(
 
     def _define_cleanup(obj):
         if not pre and not post:
-            raise ramble.language.language_base.DirectiveError(
+            raise DirectiveError(
                 f"Cleanup directive '{name}' must set at least one of 'pre' or 'post' to True."
             )
         when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "cleanup")

@@ -14,8 +14,7 @@ import ramble.variants
 import ramble.workspace
 from ramble.appkit import ExecutableApplication
 from ramble.definitions.versions import ObjectVersion
-from ramble.error import ObjectValidationError
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError, ObjectValidationError
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
