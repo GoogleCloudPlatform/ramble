@@ -55,7 +55,7 @@ def test_gromacs_dry_run_mock_spack_mod(
         workspace("setup", "--dry-run", global_args=["-D", ws1.root])
         out_files = glob.glob(os.path.join(ws1.log_dir, "**", "*.out"), recursive=True)
 
-        expected_str = "with args: ['--reuse', 'mod_compiler@1.1 target=x86_64']"
+        expected_str = "with args: ['--fresh', 'mod_compiler@1.1 target=x86_64']"
 
         assert search_files_for_string(out_files, expected_str)
 

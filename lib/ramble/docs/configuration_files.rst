@@ -179,9 +179,9 @@ The current default configuration is as follows:
       shell: 'bash'
       spack:
         install:
-          flags: '--reuse'
+          flags: '--fresh'
         concretize:
-          flags: '--reuse'
+          flags: '--fresh'
         buildcache:
           flags: ''
         env_create:

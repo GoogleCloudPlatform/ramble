@@ -28,9 +28,9 @@ config:
   stage_method: cp
   spack:
     install:
-      flags: --reuse
+      flags: --fresh
     concretize:
-      flags: --reuse
+      flags: --fresh
     buildcache:
       flags: ''
     env_create:
