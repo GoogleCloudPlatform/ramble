@@ -20,14 +20,18 @@ class Hpl(HplBase):
     version("2.3", "Version 2.3 of HPL", preferred=True)
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
-        software_spec("impi2021p13", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
             "hpl-{application::hpl::version}",
             pkg_spec="hpl@{application::hpl::version} +openmp",
-            compiler="gcc9",
+            compiler="gcc14",
         )
 
         required_package("hpl")

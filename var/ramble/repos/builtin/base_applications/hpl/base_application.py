@@ -269,6 +269,43 @@ class Hpl(ExecutableApplication):
         workload_group="calculator",
     )
 
+    workload_variable(
+        "NPFACTs",
+        default="1",
+        description="Number of PFACTs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "PFACTs",
+        default="1",
+        description="PFACT Values",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "N-NBMINs",
+        default="1",
+        description="Number of NBMINs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "NBMINs",
+        default="4",
+        description="NBMIN values",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "N-RFACTs",
+        default="1",
+        description="Number of RFACTs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "RFACTs",
+        default="1",
+        description="RFACT values",
+        workload_group="calculator",
+    )
+
     # FOMs:
     figure_of_merit(
         "Time",
