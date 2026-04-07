@@ -134,3 +134,63 @@ def test_experiment_result_get_newest_experiment_file(tmpdir):
     # Test that ramble_file is ignored
     newest_file, _ = get_newest_experiment_file(str(experiment_dir))
     assert "ramble_file" not in newest_file
+
+
+def test_get_newest_experiment_file_outer_file_not_found(tmpdir, monkeypatch):
+    """Test that FileNotFoundError is handled in outer loop of get_newest_experiment_file"""
+    experiment_dir = tmpdir.mkdir("experiment")
+    sub_dir = os.path.join(str(experiment_dir), "sub")
+    os.mkdir(sub_dir)
+
+    file1 = os.path.join(str(experiment_dir), "file1")
+    with open(file1, "w") as f:
+        f.write("test")
+
+    orig_scandir = os.scandir
+
+    def mock_scandir(path):
+        if str(path) == sub_dir:
+            raise FileNotFoundError("Mock file not found")
+        return orig_scandir(path)
+
+    monkeypatch.setattr(os, "scandir", mock_scandir)
+
+    # Should not raise exception and should find file1
+    newest_file, _ = get_newest_experiment_file(str(experiment_dir))
+    assert newest_file == file1
+
+
+def test_get_newest_experiment_file_inner_file_not_found(tmpdir, monkeypatch):
+    """Test that FileNotFoundError is handled in inner loop of get_newest_experiment_file"""
+    experiment_dir = tmpdir.mkdir("experiment")
+
+    class MockEntry:
+        def __init__(self, path):
+            self.path = path
+            self.name = os.path.basename(path)
+
+        def is_file(self):
+            return True
+
+        def is_dir(self, follow_symlinks=False):
+            return False
+
+        def stat(self):
+            raise FileNotFoundError("Mock file not found")
+
+    class MockScandir:
+        def __init__(self, path):
+            self.path = path
+
+        def __enter__(self):
+            return iter([MockEntry(os.path.join(self.path, "phantom_file"))])
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+    monkeypatch.setattr(os, "scandir", MockScandir)
+
+    # Should not raise exception and should return None, None as no valid file is found
+    newest_file, max_mtime = get_newest_experiment_file(str(experiment_dir))
+    assert newest_file is None
+    assert max_mtime is None
