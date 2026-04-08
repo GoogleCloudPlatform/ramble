@@ -83,7 +83,7 @@ def get_installation_token(client_id, private_key, repo):
     install_id = install_data["id"]
     
     url_token = f"https://api.github.com/app/installations/{install_id}/access_tokens"
-    print(f"Fetching installation access token...")
+    print("Fetching installation access token...")
     token_data = make_github_request(url_token, encoded_jwt, method="POST")
     return token_data["token"]
 
@@ -174,11 +174,11 @@ def main():
     if existing_comment:
         print(f"Found existing comment (ID: {existing_comment['id']}). Updating...")
         update_url = f"https://api.github.com/repos/{args.repo}/issues/comments/{existing_comment['id']}"
-        res = make_github_request(update_url, token, method="PATCH", data={"body": body})
+        make_github_request(update_url, token, method="PATCH", data={"body": body})
         print("Comment updated successfully.")
     else:
         print("Creating new comment...")
-        res = make_github_request(url_comments, token, method="POST", data={"body": body})
+        make_github_request(url_comments, token, method="POST", data={"body": body})
         print("Comment created successfully.")
 
 if __name__ == "__main__":
