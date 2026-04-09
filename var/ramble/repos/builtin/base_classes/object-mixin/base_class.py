@@ -40,10 +40,17 @@ class ObjectMixin:
     @property
     def name(self):
         if not self._name:
-            logger.warn(
-                f"Application {self.__class__.__name__} is missing explicit name."
-            )
-            self._name = os.path.basename(os.path.dirname(self._file_path))
+            # When yielding base classes in _objects, we might encounter
+            # ObjectMixin itself. ObjectMixin does not have an explicit name,
+            # but we want to avoid a warning that it's missing a name, as it's
+            # a known base class.
+            if type(self) is ObjectMixin:
+                self._name = "object-mixin"
+            else:
+                logger.warn(
+                    f"Application {self.__class__.__name__} is missing explicit name."
+                )
+                self._name = os.path.basename(os.path.dirname(self._file_path))
         return self._name
 
     @property

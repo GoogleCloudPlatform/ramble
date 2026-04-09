@@ -778,7 +778,11 @@ class Expander:
         except RamblePassthroughError as e:
             if not passthrough_setting:
                 raise RambleSyntaxError(
-                    f"Encountered a passthrough error while expanding {var}\n" f"{e}"
+                    f"Encountered a passthrough error while expanding {var}\n"
+                    f"{e}\n"
+                    "This error means a variable could not be fully expanded and still "
+                    "contains variable-style references, which is not allowed in this "
+                    "context."
                 ) from None
 
         logger.debug(f"END OF EXPAND_VAR STACK {value}")

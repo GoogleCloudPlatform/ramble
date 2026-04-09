@@ -214,7 +214,7 @@ def test_default_concretize_flags(tmpdir, capsys, request):
         sr.concretize()
         captured = capsys.readouterr()
         assert "spack concretize" in captured.out
-        assert "with args: ['--reuse']" in captured.out
+        assert "with args: ['--fresh']" in captured.out
     except RunnerError as e:
         pytest.skip("%s" % e)
 
@@ -344,9 +344,7 @@ compilers::
     modules: []
     environment: {}
     extra_rpaths: []
-""".replace(
-            "tmpdir_path", os.path.join(os.getcwd(), "bin")
-        )
+""".replace("tmpdir_path", os.path.join(os.getcwd(), "bin"))
 
         packages_config = f"""
 packages:

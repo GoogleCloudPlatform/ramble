@@ -3,9 +3,9 @@ config:
     overwrite_inventories: false
     spack:
       install:
-        flags: --reuse
+        flags: --fresh
       concretize:
-        flags: --reuse
+        flags: --fresh
       env_view:
         link_type: symlink
     include:

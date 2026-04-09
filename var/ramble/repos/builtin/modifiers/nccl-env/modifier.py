@@ -671,7 +671,7 @@ class NcclEnv(BasicModifier):
         env_var_set = {}
         set_env_vars = {}
 
-        for var_name in self.mode_variables().keys():
+        for var_name in self.selected_variables:
             val = app_inst.expander.expand_var_name(var_name)
             if val:
                 set_env_vars[var_name.upper()] = val

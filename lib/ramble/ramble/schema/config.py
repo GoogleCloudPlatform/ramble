@@ -25,7 +25,7 @@ properties["config"]["shell"] = {"type": "string", "enum": ["sh", "bash", "csh",
 
 properties["config"]["spack"] = {
     "type": "object",
-    "default": {"install": {"flags": "--reuse"}, "concretize": {"flags": "--reuse"}},
+    "default": {"install": {"flags": "--fresh"}, "concretize": {"flags": "--fresh"}},
     "properties": {
         "global": {
             "type": "object",
@@ -36,13 +36,13 @@ properties["config"]["spack"] = {
         "install": {
             "type": "object",
             "default": {
-                "flags": "--reuse",
+                "flags": "--fresh",
                 "prefix": "",
             },
             "properties": {
                 "flags": {
                     "type": "string",
-                    "default": "--reuse",
+                    "default": "--fresh",
                 },
                 "prefix": {"type": "string", "default": ""},
             },
@@ -51,13 +51,13 @@ properties["config"]["spack"] = {
         "concretize": {
             "type": "object",
             "default": {
-                "flags": "--reuse",
+                "flags": "--fresh",
                 "prefix": "",
             },
             "properties": {
                 "flags": {
                     "type": "string",
-                    "default": "--reuse",
+                    "default": "--fresh",
                 },
                 "prefix": {"type": "string", "default": ""},
             },

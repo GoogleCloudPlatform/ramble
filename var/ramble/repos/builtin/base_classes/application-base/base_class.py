@@ -9,6 +9,7 @@
 
 import copy
 import fnmatch
+import importlib.util
 import operator
 import os
 import re
@@ -128,6 +129,8 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
 
 
 class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
+    _mro_obj_type_cache = {}
+    name = "application-base"
     origin_type = "application"
     _builtin_name = NS_SEPARATOR.join(("builtin", "{name}"))
     _builtin_required_key = "required"
@@ -1263,8 +1266,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         experiment_run_dir = self.expander.experiment_run_dir
         return os.path.join(experiment_run_dir, self._inventory_file_name)
 
-    def object_hashes(self):
-        for obj_type, obj in self.objects():
+    def object_hashes(self, yield_all=True):
+        for obj_type, obj in self.objects(yield_all=yield_all):
             yield obj_type, obj, ramble.util.hashing.hash_file(obj._file_path)
 
     def object_inventory(self, workspace):
@@ -1277,14 +1280,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if obj.name not in added_objects[obj_type]:
                 obj_inventory = {
                     "name": obj.name,
+                    "object_type": obj_type.name,
                     "type": obj_type.name,
                     "digest": obj_hash,
                 }
 
-                if hasattr(obj, "get_version"):
-                    obj_inventory["external_version"] = obj.get_version(
-                        workspace=workspace
-                    )
+                if not getattr(obj, "_is_base_class", False) and hasattr(
+                    obj, "get_version"
+                ):
+                    version = obj.get_version(workspace=workspace)
+                    obj_inventory["version"] = version
+                    obj_inventory["external_version"] = version
 
                 object_definitions.append(obj_inventory)
                 added_objects[obj_type].add(obj.name)
@@ -2266,6 +2272,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self.repeats.is_repeat_base:
             return False
 
+        if self.expander is None:
+            return False
+
         changed = False
         self._purge_inventory()
 
@@ -2299,7 +2308,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ]
 
         added_objects = {}
-        for obj_type, obj in self.objects():
+        for obj_type, obj in self.objects(yield_all=True):
             if obj_type not in added_objects:
                 added_objects[obj_type] = set()
 
@@ -2308,22 +2317,33 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 object_inventory = {
                     "name": obj.name,
                     "object_type": obj_type.name,
+                    "type": obj_type.name,
                     "digest": ramble.util.hashing.hash_file(obj._file_path),
                 }
 
-                version_func = getattr(obj, "get_version", None)
-                if version_func is not None and callable(version_func):
-                    object_inventory["version"] = obj.get_version(
-                        workspace=workspace
-                    )
+                is_base_class = getattr(obj, "_is_base_class", False)
 
-                if obj is not self:
+                version_func = getattr(obj, "get_version", None)
+                if (
+                    not is_base_class
+                    and version_func is not None
+                    and callable(version_func)
+                ):
+                    version = obj.get_version(workspace=workspace)
+                    object_inventory["version"] = version
+                    object_inventory["external_version"] = version
+
+                if not is_base_class and obj is not self:
                     populate_func = getattr(obj, "populate_inventory", None)
                     if populate_func is not None and callable(populate_func):
                         obj.populate_inventory(workspace, force)
 
                 artifact_func = getattr(obj, "artifact_inventory", None)
-                if artifact_func is not None and callable(artifact_func):
+                if (
+                    not is_base_class
+                    and artifact_func is not None
+                    and callable(artifact_func)
+                ):
                     inventory = obj.artifact_inventory(workspace, self)
                     if inventory:
                         if hasattr(obj, "_usage_mode"):
@@ -3645,7 +3665,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f_out.write("\n")
             os.chmod(out_path, perm)
 
-    def objects(self, exclude_types=None):
+    def objects(self, exclude_types=None, yield_all=False):
         """Return a tuple for each object instance associated with the app_inst.
 
         The tuple format is (obj_type, obj_inst). This is used to iterate over
@@ -3653,35 +3673,103 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         Args:
           exclude_types (list(obj_type) | None): object types to exclude
+          yield_all (bool): If True, yield all registered objects in the MRO
         """
         if exclude_types is None:
             exclude_types = set()
         else:
             exclude_types = set(exclude_types)
 
-        if ramble.repository.ObjectTypes.applications not in exclude_types:
-            yield (ramble.repository.ObjectTypes.applications, self)
+        def _yield_registered(obj_inst):
+            if obj_inst is None:
+                return
 
-        if ramble.repository.ObjectTypes.package_managers not in exclude_types:
-            if self.package_manager is not None:
-                yield (
-                    ramble.repository.ObjectTypes.package_managers,
-                    self.package_manager,
-                )
+            if not yield_all:
+                obj_type = obj_inst._get_object_type()
+                if obj_type and obj_type not in exclude_types:
+                    yield (obj_type, obj_inst)
+                return
 
-        if (
-            ramble.repository.ObjectTypes.workflow_managers
-            not in exclude_types
-        ):
-            if self.workflow_manager is not None:
-                yield (
-                    ramble.repository.ObjectTypes.workflow_managers,
-                    self.workflow_manager,
-                )
+            for cls in obj_inst.__class__.__mro__:
+                if cls not in ApplicationBase._mro_obj_type_cache:
+                    try:
+                        spec = importlib.util.find_spec(cls.__module__)
+                        if not spec or not spec.origin:
+                            ApplicationBase._mro_obj_type_cache[cls] = (
+                                None,
+                                None,
+                            )
+                            continue
+                        source_file = spec.origin
+                    except (TypeError, OSError, AttributeError) as e:
+                        # Workaround: Skip classes that do not have accessible source files.
+                        # This occurs for base types like 'object' or compiled extensions
+                        # in the MRO, which are not relevant for Ramble's inventory.
+                        logger.debug(
+                            f"Failed to find source for class {cls.__name__}: {e}"
+                        )
+                        ApplicationBase._mro_obj_type_cache[cls] = (None, None)
+                        continue
 
-        if ramble.repository.ObjectTypes.modifiers not in exclude_types:
-            for mod_inst in self._modifier_instances:
-                yield (ramble.repository.ObjectTypes.modifiers, mod_inst)
+                    found_type = False
+                    for obj_type, repo_path in ramble.repository.paths.items():
+                        for repo in repo_path.repos:
+                            if source_file.startswith(repo.objects_path):
+                                ApplicationBase._mro_obj_type_cache[cls] = (
+                                    obj_type,
+                                    source_file,
+                                )
+                                found_type = True
+                                break
+                        if found_type:
+                            break
+
+                    if not found_type:
+                        ApplicationBase._mro_obj_type_cache[cls] = (None, None)
+
+                obj_type, source_file = ApplicationBase._mro_obj_type_cache[
+                    cls
+                ]
+
+                if obj_type is None or obj_type in exclude_types:
+                    continue
+
+                if cls == obj_inst.__class__:
+                    yield (obj_type, obj_inst)
+                else:
+                    try:
+                        # Workaround: Instantiate base classes using __new__
+                        # to avoid side effects from __init__. Base classes
+                        # are only used to retrieve metadata, so full
+                        # initialization is unnecessary and often fragile.
+                        new_inst = cls.__new__(cls)
+
+                        # Set the source file, so its name property works
+                        new_inst._file_path = source_file
+                        new_inst._is_base_class = True
+
+                        yield (obj_type, new_inst)
+                    except (TypeError, AttributeError, ValueError) as e:
+                        # If a base class fails to instantiate, it is likely
+                        # because it requires arguments that are not
+                        # provided here. We can safely skip these as they
+                        # are not the concrete classes we are looking for.
+                        logger.debug(
+                            f"Failed to instantiate base class {cls.__name__}: {e}"
+                        )
+
+        # Yield for self
+        yield from _yield_registered(self)
+
+        # Yield for package manager
+        yield from _yield_registered(self.package_manager)
+
+        # Yield for workflow manager
+        yield from _yield_registered(self.workflow_manager)
+
+        # Yield for modifiers
+        for mod_inst in self._modifier_instances:
+            yield from _yield_registered(mod_inst)
 
     def require_mpi_variables(self):
         self.keywords.update_keys(
