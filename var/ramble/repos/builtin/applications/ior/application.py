@@ -123,17 +123,9 @@ class Ior(ExecutableApplication):
 
     with when("+ior_include_iter_foms"):
         iter_regex = ""
-        for metric in metrics[0:3]:  # iter is non-float
-            iter_regex += (
-                r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
-            )  # xfer => total
-        iter_regex += r"\s+(?P<" + metrics[3] + r">[0-9]+)"  # handle block
-
-        for metric in metrics[4:-1]:  # iter is non-float
-            iter_regex += (
-                r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
-            )  # xfer => total
-        iter_regex += r"\s+(?P<" + metrics[-1] + r">[0-9]+)\s*$"  # handle iter
+        for metric in metrics:
+            iter_regex += r"\s+(?P<" + metric + r">[0-9]+(?:\.[0-9]+)?)"
+        iter_regex += r"\s*$"
 
         access_regex = "(?P<access>(read|write))" + iter_regex
         figure_of_merit_context(
