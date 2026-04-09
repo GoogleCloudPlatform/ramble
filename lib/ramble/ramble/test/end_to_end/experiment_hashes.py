@@ -102,14 +102,20 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
     expected_objects = {}
     expected_objects["applications"] = {"gromacs"}
     expected_objects["workflow_managers"] = {"user-managed"}
-    expected_objects["package_managers"] = {"spack"}
+    expected_objects["package_managers"] = {"spack", "spack-lightweight"}
+    expected_objects["base_classes"] = {
+        "executable-application",
+        "application-base",
+        "object-mixin",
+    }
     for object_def in data["object_configuration"]:
         if "object_type" in object_def:
             obj_type = object_def["object_type"]
-            if "name" in object_def and object_def["name"] in expected_objects[obj_type]:
-                expected_objects[obj_type].remove(object_def["name"])
-                assert object_def["digest"] != ""
-                assert object_def["digest"] is not None
+            if obj_type in expected_objects:
+                if "name" in object_def and object_def["name"] in expected_objects[obj_type]:
+                    expected_objects[obj_type].remove(object_def["name"])
+                    assert object_def["digest"] != ""
+                    assert object_def["digest"] is not None
 
     for obj_set in expected_objects.values():
         assert not obj_set
