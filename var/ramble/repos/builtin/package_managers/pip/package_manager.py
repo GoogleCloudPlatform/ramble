@@ -17,7 +17,7 @@ import llnl.util.filesystem as fs
 
 from ramble.error import ApplicationError
 from ramble.pkgmankit import *
-from ramble.util.executable import which
+from ramble.util.executable import PrefixedExecutable, which
 from ramble.util.hashing import hash_string
 from ramble.util.logger import logger
 from ramble.util.shell_utils import source_str
@@ -337,7 +337,10 @@ class PipRunner(CommandRunner):
 
     def __init__(self, dry_run=False):
         super().__init__(name="pip", command=sys.executable, dry_run=dry_run)
-        self.bs_python = self.command
+        if self.command is None:
+            self.bs_python = PrefixedExecutable(sys.executable)
+        else:
+            self.bs_python = self.command
         self.env_path = None
         self.configs = []
         self.specs = set()
@@ -369,9 +372,13 @@ class PipRunner(CommandRunner):
         if isinstance(exec, Executable):
             self.bs_python = exec
         elif isinstance(path, str):
-            self.bs_python = which("python", path=path)
+            self.bs_python = which("python", path=path) or PrefixedExecutable(
+                sys.executable
+            )
         else:
-            self.bs_python = which("python")
+            self.bs_python = which("python") or PrefixedExecutable(
+                sys.executable
+            )
 
     def _get_venv_python(self):
         if self.dry_run:

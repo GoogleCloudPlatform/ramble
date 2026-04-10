@@ -22,7 +22,7 @@ supported_formats = enum.Enum("supported_formats", ["text", "lists"])
 obj_attribute_map = {
     "maintainers": None,
     "tags": None,
-    "pipelines": "_pipelines",
+    "pipelines": None,
     "figure_of_merit_contexts": None,
     "figures_of_merit": None,
     "builtins": None,

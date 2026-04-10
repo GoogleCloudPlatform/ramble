@@ -36,7 +36,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         ("package_manager_builtin", "{obj_name}", "{name}")
     )
     _language_classes = [PackageManagerMeta, SharedMeta]
-    _pipelines = [
+    pipelines = [
         "analyze",
         "archive",
         "mirror",
@@ -228,7 +228,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         software_envs = workspace.software_environments
 
         # Inject any missing, but injected compilers
-        for _, obj in self.app_inst._objects():
+        for _, obj in self.app_inst.objects():
             for comps in obj.compilers.values():
                 for comp in comps:
                     if (
@@ -265,7 +265,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             ):
                 env_packages.add(self.package_name_from_spec(pkg_spec))
 
-            for _, obj in self.app_inst._objects():
+            for _, obj in self.app_inst.objects():
                 required_compilers = set()
                 # Inject any specs that need to be injected.
                 for specs in obj.software_specs.values():
@@ -398,7 +398,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         self, attr_name="software_specs", app_inst=None, prefixed=False
     ):
         specs = {}
-        for obj_type, obj in app_inst._objects():
+        for obj_type, obj in app_inst.objects():
             include_modifier = None
             if obj_type == ramble.repository.ObjectTypes.modifiers:
                 include_modifier = obj

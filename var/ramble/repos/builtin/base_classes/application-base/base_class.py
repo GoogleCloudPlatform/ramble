@@ -136,7 +136,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     _builtin_required_key = "required"
     _inventory_file_name = "ramble_inventory.json"
     _status_file_name = "ramble_status.json"
-    _pipelines = [
+    pipelines = [
         "analyze",
         "archive",
         "mirror",
@@ -238,6 +238,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self._exp_lock = lk.Lock(lock_path)
 
         return self._exp_lock
+
+    @property
+    def modifier_instances(self):
+        """Return the modifier instances for this application"""
+        return self._modifier_instances
 
     def clone(self):
         """Deep clone an application instance"""
@@ -476,7 +481,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             return
 
         self._pipeline_graphs = {}
-        for pipeline in self._pipelines:
+        for pipeline in self.pipelines:
             if pipeline not in self.phase_definitions:
                 self.phase_definitions[pipeline] = {}
 
@@ -652,7 +657,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # applications.
         # Also, define object version variables
         object_when_map = {}
-        for _, obj in self._objects(
+        for _, obj in self.objects(
             exclude_types=[ramble.repository.ObjectTypes.applications]
         ):
             object_when_map[obj] = []
@@ -774,10 +779,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.build_modifier_instances()
         self.build_phase_order()
 
-        if pipeline not in self._pipelines:
+        if pipeline not in self.pipelines:
             logger.die(
                 f"Requested pipeline {pipeline} is not valid.\n",
-                f"\tAvailable pipelinese are {self._pipelines}",
+                f"\tAvailable pipelinese are {self.pipelines}",
             )
 
         if pipeline not in self._pipeline_graphs:
@@ -947,7 +952,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         logger.msg(f"  Executing phase {phase}")
         start_time = time.time()
 
-        for _, obj in self._objects(
+        for _, obj in self.objects(
             exclude_types=[ramble.repository.ObjectTypes.applications]
         ):
             _run_phase_hook(obj, workspace, pipeline, phase)
@@ -1260,7 +1265,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         return os.path.join(experiment_run_dir, self._inventory_file_name)
 
     def object_hashes(self, yield_all=True):
-        for obj_type, obj in self._objects(yield_all=yield_all):
+        for obj_type, obj in self.objects(yield_all=yield_all):
             yield obj_type, obj, ramble.util.hashing.hash_file(obj._file_path)
 
     def object_inventory(self, workspace):
@@ -1303,7 +1308,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _check_object_validators(self):
         expander = self.expander
-        for _, obj in self._objects():
+        for _, obj in self.objects():
             for when_set, validator_defs in obj.validators.items():
                 if not self.expander.satisfies(
                     when_set, variant_set=self.experiment_variants()
@@ -1420,7 +1425,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     ramble.util.executable.CommandExecutable(name=name, **conf)
                 )
 
-    def _get_executable_graph(self, workload_name):
+    def get_executable_graph(self, workload_name):
         """Construct and return an executable graph
 
         Builds an executable graph for a given workload.
@@ -1437,7 +1442,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         builtin_objects = []
         all_builtins = []
-        for _, obj in self._objects():
+        for _, obj in self.objects():
             for when_set, builtins in obj.builtins.items():
                 if self.expander.satisfies(
                     when_set, variant_set=self.experiment_variants()
@@ -1590,7 +1595,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "unset": set(),
         }
 
-        for _, obj in self._objects():
+        for _, obj in self.objects():
             for env_var in obj.selected_environment_variables.values():
                 action = env_var.method
 
@@ -1633,7 +1638,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         exec_graph = getattr(self, "_executable_graph", exec_graph)
         if exec_graph is None:
-            self._executable_graph = self._get_executable_graph(
+            self._executable_graph = self.get_executable_graph(
                 self.expander.workload_name
             )
             exec_graph = self._executable_graph
@@ -1670,7 +1675,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         )
                         logs.append(expanded_log)
 
-            analysis_logs, _, _ = self._analysis_dicts(success_list)
+            analysis_logs, _, _ = self.analysis_dicts(success_list)
             logs = sorted(set(logs) | analysis_logs.keys())
 
             if logs:
@@ -2200,7 +2205,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "RAMBLE_STATUS",
         ]
 
-        for _, obj in self._objects():
+        for _, obj in self.objects():
             remove_variables.append(f"{obj.origin_type}_version")
             remove_variables.append(f"{obj.origin_type}::{obj.name}::version")
 
@@ -2227,7 +2232,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         variant_definitions = set()
 
-        for _, obj in self._objects():
+        for _, obj in self.objects():
             variant_definitions = variant_definitions.union(
                 obj.experiment_variants(app_inst=self).as_set()
             )
@@ -2301,7 +2306,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ]
 
         added_objects = {}
-        for obj_type, obj in self._objects(yield_all=True):
+        for obj_type, obj in self.objects(yield_all=True):
             if obj_type not in added_objects:
                 added_objects[obj_type] = set()
 
@@ -2478,7 +2483,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             # Copy all figure of merit files
             criteria_list = self.success_list
-            analysis_files, _, _ = self._analysis_dicts(criteria_list)
+            analysis_files, _, _ = self.analysis_dicts(criteria_list)
             for file in analysis_files:
                 if os.path.exists(file):
                     shutil.copy(file, archive_experiment_dir)
@@ -2523,7 +2528,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """
         pass
 
-    def _extract_inmem_foms(self, inmem_fom_defs, fom_values):
+    def extract_inmem_foms(self, inmem_fom_defs, fom_values):
         """Extract in-memory FOMs"""
         for context, foms in inmem_fom_defs.items():
             if context not in fom_values:
@@ -2606,7 +2611,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             criteria_list = ramble.success_criteria.ScopedCriteriaList()
         criteria_list.reset()
 
-        files, f_defs, inmem_defs = self._analysis_dicts(criteria_list)
+        files, f_defs, inmem_defs = self.analysis_dicts(criteria_list)
 
         exp_lock = self.experiment_lock
 
@@ -2751,7 +2756,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     "fom_type"
                                                 ],
                                             }
-        self._extract_inmem_foms(inmem_defs, fom_values)
+        self.extract_inmem_foms(inmem_defs, fom_values)
 
         # Test all non-file based success criteria
         for criteria_obj, _ in criteria_list.all_criteria():
@@ -3092,7 +3097,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Create a dictionary to represent a new log file"""
         return {"success_criteria": [], "contexts": {}}
 
-    def _analysis_dicts(self, criteria_list):
+    def analysis_dicts(self, criteria_list):
         """Extract files that need to be analyzed.
 
         Process figures_of_merit, and return the manipulated dictionaries
@@ -3113,7 +3118,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Add the object defined criteria
         criteria_list.flush_scope("object_definitions")
 
-        for _, obj_inst in self._objects():
+        for _, obj_inst in self.objects():
             if obj_inst.success_criteria:
                 for criteria, conf in obj_inst.success_criteria.items():
                     if not self.expander.satisfies(
@@ -3496,7 +3501,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         repo_lock = lk.Lock(os.path.join(repo_path, ".ramble-obj-repos.lock"))
 
         with lk.WriteTransaction(repo_lock):
-            for obj_type, obj in self._objects():
+            for obj_type, obj in self.objects():
                 _copy_files(obj, obj_type, repo_path)
 
     register_builtin("env_vars", required=True)
@@ -3626,7 +3631,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 {**tpl_config, "src_path": src_path, "dest_path": dest_path},
             )
 
-        for obj_type, obj in self._objects():
+        for obj_type, obj in self.objects():
             for when_set, tpl in obj.templates.items():
                 if not self.expander.satisfies(
                     when_set, variant_set=self.experiment_variants()
@@ -3658,7 +3663,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f_out.write("\n")
             os.chmod(out_path, perm)
 
-    def _objects(self, exclude_types=None, yield_all=False):
+    def objects(self, exclude_types=None, yield_all=False):
         """Return a tuple for each object instance associated with the app_inst.
 
         The tuple format is (obj_type, obj_inst). This is used to iterate over
@@ -3783,7 +3788,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         )
 
     def is_mpi_required(self, workload_name):
-        for exec_node in self._get_executable_graph(workload_name).walk():
+        for exec_node in self.get_executable_graph(workload_name).walk():
             if isinstance(
                 exec_node.attribute,
                 ramble.util.executable.CommandExecutable,
@@ -3840,7 +3845,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self.keywords.n_threads not in self.variables:
             self.define_variable(self.keywords.n_threads, 1)
 
-        for _, obj in self._objects():
+        for _, obj in self.objects():
             logger.debug(f"Setting required variables for {obj.name}")
             self.keywords.update_keys(obj.required_variables)
 
