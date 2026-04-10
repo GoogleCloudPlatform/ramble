@@ -774,9 +774,9 @@ def workspace_info(args):
         args.phases = True
         args.executables = True
 
-    color.cprint(color.section_title("Workspace: ") + "%s", ws.name)
+    color.cprint(f'{color.section_title("Workspace: ")}{ws.name}')
     color.cprint("")
-    color.cprint(color.section_title("Location: ") + "%s", ws.path)
+    color.cprint(f'{color.section_title("Location: ")}{ws.path}')
 
     # Print workspace templates that currently exist
     if args.templates:
@@ -917,25 +917,17 @@ def workspace_info(args):
                     )
 
                     if app_inst.is_template:
-                        color.cprint(
-                            color.nested_3(f"      Template Experiment {experiment_index}: ")
-                            + "%s",
-                            exp_name,
-                        )
+                        prefix = f"      Template Experiment {experiment_index}: "
+                        color.cprint(f"{color.nested_3(prefix)}{exp_name}")
                     elif app_inst.repeats.is_repeat_base:
-                        color.cprint(
-                            color.nested_3(f"      Repeat Base Experiment {experiment_index}: ")
-                            + "%s",
-                            exp_name,
-                        )
+                        prefix = f"      Repeat Base Experiment {experiment_index}: "
+                        color.cprint(f"{color.nested_3(prefix)}{exp_name}")
                     else:
-                        color.cprint(
-                            color.nested_3(f"      Experiment {experiment_index}: ") + "%s",
-                            exp_name,
-                        )
+                        prefix = f"      Experiment {experiment_index}: "
+                        color.cprint(f"{color.nested_3(prefix)}{exp_name}")
 
                     if args.tags:
-                        color.cprint("        Experiment Tags: %s", str(app_inst.experiment_tags))
+                        color.cprint(f"        Experiment Tags: {app_inst.experiment_tags}")
 
                     if args.variants:
                         color.cprint(color.nested_4("        Variants: "))
@@ -945,7 +937,7 @@ def workspace_info(args):
                                 obj.experiment_variants().as_set(expander=app_inst.expander)
                             )
                         for variant in variant_set:
-                            color.cprint("          - %s", variant)
+                            color.cprint(f"          - {variant}")
 
                     if args.executables:
                         color.cprint(color.nested_4("        Executables: "))
@@ -954,7 +946,7 @@ def workspace_info(args):
                             app_inst.expander.workload_name
                         )
                         for executable in exec_graph.walk():
-                            color.cprint("          %s", executable.key)
+                            color.cprint(f"          {executable.key}")
 
                     if args.expansions:
                         var_groups = [
@@ -1010,7 +1002,7 @@ def workspace_list(args):
     color_names = []
     for name in names:
         if ramble.workspace.active(name):
-            name = color.colorize("@*g{%s}" % name)
+            name = color.colorize(f"@*g{{{name}}}")
         color_names.append(name)
 
     # say how many there are if writing to a tty

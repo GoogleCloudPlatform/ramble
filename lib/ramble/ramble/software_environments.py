@@ -216,11 +216,11 @@ class RenderedPackage(SoftwarePackage):
 
         indentation = " " * (indent + SUB_INDENT)
         out_str = super().info(indent, verbosity, color_level, only_used)
-        out_str += f"{indentation}Spec: {color.plaintext(self.spec)}\n"
+        out_str += f"{indentation}Spec: {self.spec}\n"
         if self.compiler:
-            out_str += f"{indentation}Compiler: {color.plaintext(self.compiler)}\n"
+            out_str += f"{indentation}Compiler: {self.compiler}\n"
         if self.compiler_spec:
-            out_str += f"{indentation}Compiler Spec: {color.plaintext(self.compiler_spec)}\n"
+            out_str += f"{indentation}Compiler Spec: {self.compiler_spec}\n"
         return out_str
 
     def __eq__(self, other):

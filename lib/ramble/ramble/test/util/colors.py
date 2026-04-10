@@ -17,9 +17,11 @@ from ramble.util.colors import auto_escape
         # Literal @
         ("@@", "@@"),
         ("@@@", "@@@@"),
-        # Valid color code (blue) within a string
-        ("foo@bar", "foo@bar"),
+        # Valid color code (blue) within a string - now escaped because it looks like a version
+        ("foo@bar", "foo@@bar"),
         ("email@example.com", "email@@example.com"),  # @e is not a color
+        # Preceded by special chars (should NOT be escaped if valid color)
+        (" (@gLinked@.)", " (@gLinked@.)"),
         # Valid color codes (should NOT be escaped)
         ("@r", "@r"),
         ("@R", "@R"),
@@ -30,7 +32,8 @@ from ramble.util.colors import auto_escape
         ("@*W", "@*W"),
         ("@*", "@*"),
         ("@_", "@_"),
-        # Valid color codes with braces
+        # Valid color codes with braces (should NOT be escaped even if preceded by alnum)
+        ("foo@r{text}", "foo@r{text}"),
         ("@{text}", "@{text}"),
         ("@r{text}", "@r{text}"),
         ("@*b{text}", "@*b{text}"),
@@ -42,6 +45,10 @@ from ramble.util.colors import auto_escape
         ("Multiple @@ characters", "Multiple @@ characters"),
         # Missing closing brace: @r is matched by itself
         ("Missing brace: @r{text", "Missing brace: @r{text"),
+        # Versions and specs
+        ("gromacs@2021", "gromacs@@2021"),
+        ("package-name@version", "package-name@@version"),
+        ("package_name@version", "package_name@@version"),
     ],
 )
 def test_auto_escape(input_str, expected):

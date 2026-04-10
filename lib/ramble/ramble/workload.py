@@ -92,18 +92,16 @@ class Workload:
             # TODO: Remove this after adding 'when' to the loop in 'ramble info' that prints
             # workloads. Better to group workloads under 'when' than print 'when' for each workload
             if attr[0] == "When" and isinstance(attr_val, list):
-                out_str += f"{' AND '.join(color.plaintext(x) for x in attr_val)}\n"
+                out_str += f"{' AND '.join(x for x in attr_val)}\n"
             else:
-                out_str += f"{color.plaintext(attr_val)}\n"
+                out_str += f"{attr_val}\n"
 
         if self.variables:
             out_str += color.nested_1(f"{indentation}    Variables:\n")
             for when_set, var_list in self.variables.items():
                 if when_set:
                     out_str += color.nested_2(f"{indentation}        When: ")
-                    when_str = " AND ".join(
-                        color.plaintext(x) for x in sorted(when_set, key=when_order)
-                    )
+                    when_str = " AND ".join(x for x in sorted(when_set, key=when_order))
                     out_str += f"{when_str}\n"
                 else:
                     out_str += color.nested_2(f"{indentation}        Unconditional\n")
@@ -119,9 +117,7 @@ class Workload:
             for when_set, env_var_list in self.environment_variables.items():
                 if when_set:
                     out_str += color.nested_2(f"{indentation}        When: ")
-                    when_str = " AND ".join(
-                        color.plaintext(x) for x in sorted(when_set, key=when_order)
-                    )
+                    when_str = " AND ".join(x for x in sorted(when_set, key=when_order))
                     out_str += f"{when_str}\n"
                 else:
                     out_str += color.nested_2(f"{indentation}        Unconditional\n")
@@ -262,9 +258,7 @@ class WorkloadGroup:
         for when_set, workload_list in self.workloads.items():
             if when_set:
                 out_str += color.nested_1(f"{indentation}    When: ")
-                when_str = " AND ".join(
-                    color.plaintext(x) for x in sorted(when_set, key=when_order)
-                )
+                when_str = " AND ".join(x for x in sorted(when_set, key=when_order))
                 out_str += f"{when_str}\n"
             else:
                 out_str += color.nested_1(f"{indentation}    Unconditional\n")

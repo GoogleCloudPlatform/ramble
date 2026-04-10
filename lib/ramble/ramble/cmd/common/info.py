@@ -136,7 +136,7 @@ def print_object_header(obj_type, obj):
     singular = ramble.repository.type_definitions[obj_type]["singular"]
     parts = [part[0].upper() + part[1:] for part in singular.split()]
     type_name = color.section_title(" ".join(parts))
-    color.cprint(f"{type_name}: %s\n", obj.name)
+    color.cprint(f"{type_name}: {obj.name}\n")
 
     color.cprint(color.section_title("Description:"))
     if obj.__doc__:
@@ -144,7 +144,7 @@ def print_object_header(obj_type, obj):
         for part in obj.__doc__.split("\n"):
             doc_str += f"    {part}\n"
 
-        color.cprint("%s", doc_str)
+        color.cprint(f"{doc_str}")
 
 
 def print_object_overview(obj):
@@ -154,7 +154,7 @@ def print_object_overview(obj):
     """
     color.cprint("Available attributes:")
     for name in all_object_attributes(obj):
-        color.cprint("\t%s", name)
+        color.cprint(f"\t{name}")
 
 
 def _unpack_when_set_if_needed(internal_attr: dict):
@@ -184,9 +184,9 @@ def _unpack_when_set_if_needed(internal_attr: dict):
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
     to_print = fnmatch.filter(map(str, internal_attr), pattern)
     if format == supported_formats.lists:
-        color.cprint("    %s", str(list(to_print)))
+        color.cprint(f"    {list(to_print)}")
     elif format == supported_formats.text:
-        color.cprint("%s", colified(to_print, tty=True, indent=4))
+        color.cprint(f"{colified(to_print, tty=True, indent=4)}")
 
 
 def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
@@ -205,10 +205,10 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
             for sub_name, sub_val in vals.items():
                 # Avoid showing duplicate names for variables
                 if isinstance(sub_val, Variable) and sub_name == sub_val.name:
-                    color.cprint(f"{indentation}%s", sub_val)
+                    color.cprint(f"{indentation}{sub_val}")
                 else:
                     color_sub_name = color.nested_1(sub_name)
-                    color.cprint(f"{indentation}{color_sub_name}: %s", sub_val)
+                    color.cprint(f"{indentation}{color_sub_name}: {sub_val}")
             color.cprint("")
         elif isinstance(vals, set):
             color_name = color.section_title(name)
@@ -224,12 +224,12 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
                 if hasattr(val, "as_str"):
                     color.cprint(val.as_str(verbose=True))
                 else:
-                    color.cprint("%s", str(val))
+                    color.cprint(f"{val}")
         else:
             if hasattr(vals, "as_str"):
                 color.cprint(vals.as_str(verbose=True))
             else:
-                color.cprint("%s", str(vals))
+                color.cprint(f"{vals}")
                 #  Necessary to add a line break after unformmated sections
                 if i == len(internal_attr.keys()):
                     color.cprint("")
@@ -266,10 +266,10 @@ def _print_phases(obj, attr, verbose=False, pattern="*", format=supported_format
         color_pipeline = color_func(pipeline)
         if format == supported_formats.lists:
             color.cprint(f"{indentation}{color_pipeline}:")
-            color.cprint(f"{indentation}    %s", str(list(to_print)))
+            color.cprint(f"{indentation}    {list(to_print)}")
         elif format == supported_formats.text:
             color.cprint(f"{indentation}{color_pipeline}:")
-            color.cprint("%s", colified(to_print, tty=True, indent=base_indent + 4))
+            color.cprint(f"{colified(to_print, tty=True, indent=base_indent + 4)}")
 
 
 def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
@@ -294,7 +294,7 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
                 if isinstance(to_print, list):
                     _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
                 else:
-                    color.cprint("    %s\n", str(to_print))
+                    color.cprint(f"    {to_print}\n")
             else:
                 _print_verbose_dict_attr(fom_dict, pattern=pattern, indentation=indentation)
 
@@ -339,7 +339,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                 to_print = [key for attr_dict in internal_attr for key in attr_dict]
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
-            color.cprint("    %s\n", str(to_print))
+            color.cprint(f"    {to_print}\n")
     else:
         if isinstance(internal_attr, dict):
             _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
@@ -359,15 +359,15 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                 else:
                     to_print = fnmatch.filter(map(str, internal_attr), pattern)
                     if format == supported_formats.lists:
-                        color.cprint("    %s", str(list(to_print)))
+                        color.cprint(f"    {list(to_print)}")
                     elif format == supported_formats.text:
-                        color.cprint("%s", colified(to_print, tty=True, indent=4))
+                        color.cprint(f"{colified(to_print, tty=True, indent=4)}")
                     color.cprint("")
         else:
             if hasattr(internal_attr, "as_str"):
                 color.cprint(internal_attr.as_str(verbose=True))
             else:
-                color.cprint("%s\n", f"{indentation}{str(internal_attr)}")
+                color.cprint(f"{indentation}{internal_attr}\n")
 
 
 def print_attribute_header(attr, verbose=False):
@@ -381,9 +381,9 @@ def print_attribute_header(attr, verbose=False):
     if verbose:
         num = len(attr) + 4
         banner = f"{banner_char}" * num
-        color.cprint("%s", banner)
-        color.cprint(f"{banner_char} %s {banner_char}", attr)
-        color.cprint("%s", banner)
+        color.cprint(f"{banner}")
+        color.cprint(f"{banner_char} {attr} {banner_char}")
+        color.cprint(f"{banner}")
     else:
         attr_name = color.section_title(attr)
         color.cprint(f"{attr_name}:")

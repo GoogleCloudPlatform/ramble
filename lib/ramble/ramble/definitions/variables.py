@@ -76,7 +76,7 @@ class Variable:
                 if attr_val:
                     out_str += (
                         f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
-                        f"{color.plaintext(str(attr_val))}\n"
+                        f"{str(attr_val)}\n"
                     )
         else:
             out_str = f"{indentation}{self.name}"
@@ -217,7 +217,7 @@ class EnvironmentVariable:
                 if attr_val:
                     out_str += (
                         f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
-                        f"{color.plaintext(str(attr_val))}\n"
+                        f"{str(attr_val)}\n"
                     )
         else:
             out_str = f"{indentation}{self.name}"

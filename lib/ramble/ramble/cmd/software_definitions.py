@@ -103,7 +103,7 @@ def print_summary():
     for spec_name in specs:
         color.cprint(color.nested_1(spec_headers[spec_name]) + ":")
         for spec_def in specs[spec_name]:
-            color.cprint(f'\t{color.nested_2("Spec:")} %s', spec_def)
+            color.cprint(f'\t{color.nested_2("Spec:")} {spec_def}')
             color.cprint("\tIn object:")
             colify(specs[spec_name][spec_def], indent=16, output=sys.stdout)
         color.cprint("\n")

@@ -38,7 +38,6 @@ __all__ = [
     "nested_3",
     "nested_4",
     "title_color",
-    "plaintext",
 ]
 
 config_color = "@*Y"
@@ -64,9 +63,26 @@ def auto_escape(s):
     """Escapes `@` characters that are not part of valid color formats."""
     s = str(s)
     parts = _valid_color_re.split(s)
-    for i in range(0, len(parts), 2):
-        parts[i] = parts[i].replace("@", "@@")
-    return "".join(parts)
+
+    new_parts = []
+    for i, part in enumerate(parts):
+        if i % 2 == 0:
+            new_parts.append(part.replace("@", "@@"))
+        else:
+            # Heuristic: If it looks like a version separator (preceded by alnum or -_)
+            # and is not a braced color code or special escape, escape it.
+            if part in ["@@", "@."]:
+                new_parts.append(part)
+            elif "{" in part:
+                new_parts.append(part)
+            elif (
+                i > 0 and parts[i - 1] and (parts[i - 1][-1].isalnum() or parts[i - 1][-1] in "-_")
+            ):
+                new_parts.append(part.replace("@", "@@"))
+            else:
+                new_parts.append(part)
+
+    return "".join(new_parts)
 
 
 def colorize(string, **kwargs):
@@ -75,36 +91,22 @@ def colorize(string, **kwargs):
     return llnl.util.tty.color.colorize(string, **kwargs)
 
 
-def cprint(fmt, *args, **kwargs):
+def cprint(string, **kwargs):
     """
     Wrapper for llnl.util.tty.color.cprint that automatically escapes `@`
-    characters in the formatting string and arguments if they do not match
-    valid color codes.
+    characters in the string if they do not match valid color codes.
     """
-    fmt = auto_escape(fmt)
-    if args:
-        escaped_args = tuple(auto_escape(arg) for arg in args)
-        msg = fmt % escaped_args
-    else:
-        msg = fmt
-
-    llnl.util.tty.color.cprint(msg, **kwargs)
+    string = auto_escape(string)
+    llnl.util.tty.color.cprint(string, **kwargs)
 
 
-def cwrite(fmt, *args, **kwargs):
+def cwrite(string, **kwargs):
     """
     Wrapper for llnl.util.tty.color.cwrite that automatically escapes `@`
-    characters in the formatting string and arguments if they do not match
-    valid color codes.
+    characters in the string if they do not match valid color codes.
     """
-    fmt = auto_escape(fmt)
-    if args:
-        escaped_args = tuple(auto_escape(arg) for arg in args)
-        msg = fmt % escaped_args
-    else:
-        msg = fmt
-
-    llnl.util.tty.color.cwrite(msg, **kwargs)
+    string = auto_escape(string)
+    llnl.util.tty.color.cwrite(string, **kwargs)
 
 
 def escape_str(s):
@@ -164,8 +166,3 @@ def title_color(title: str, n_indent: int = 0):
         out_str = nested_4(f"{title}")
 
     return out_str
-
-
-def plaintext(s):
-    """Escapes `@` characters to print plaintext with cprint"""
-    return escape_str(s)
