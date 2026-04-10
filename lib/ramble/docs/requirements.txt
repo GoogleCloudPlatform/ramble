@@ -1,8 +1,19 @@
 -r ../../../requirements.txt
-sphinx
-docutils
-sphinx_rtd_theme
-sphinxcontrib-programoutput
-sphinxcontrib-jquery
-sphinx-copybutton
-pytest
+
+# Python >= 3.10
+docutils==0.20.1; python_version >= "3.10"
+pytest==8.2.2; python_version >= "3.10"
+sphinx==7.3.7; python_version >= "3.10"
+sphinx-copybutton==0.5.2; python_version >= "3.10"
+sphinx_rtd_theme==2.0.0; python_version >= "3.10"
+sphinxcontrib-jquery==4.1; python_version >= "3.10"
+sphinxcontrib-programoutput==0.17; python_version >= "3.10"
+
+# Python < 3.10
+docutils; python_version < "3.10"
+pytest; python_version < "3.10"
+sphinx; python_version < "3.10"
+sphinx-copybutton; python_version < "3.10"
+sphinx_rtd_theme; python_version < "3.10"
+sphinxcontrib-jquery; python_version < "3.10"
+sphinxcontrib-programoutput; python_version < "3.10"

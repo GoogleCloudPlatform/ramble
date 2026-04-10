@@ -1,15 +1,33 @@
-google-cloud-storage # for gcs fetch test
-google-api-core # for gcs fetch error .execptions
-graphlib-backport;python_version<"3.9"
-urllib3==1.26.18;python_version<="3.6"
-protobuf;python_version>"3.6"
-protobuf==3.19.4;python_version<="3.6"
-pyarrow==3.0.0;python_version<="3.6"
-google-cloud-bigquery
-tqdm
-deprecation
-pandas
-matplotlib
-setuptools
-scipy
-types-PyYAML
+# Python >= 3.10
+deprecation==2.1.0; python_version >= "3.10"
+google-api-core==2.19.1; python_version >= "3.10" # for gcs fetch error .execptions
+google-cloud-bigquery==3.25.0; python_version >= "3.10"
+google-cloud-storage==2.18.2; python_version >= "3.10" # for gcs fetch test
+matplotlib==3.9.0; python_version >= "3.10"
+pandas==2.2.3; python_version >= "3.10"
+protobuf==5.27.1; python_version >= "3.10"
+scipy==1.14.1; python_version >= "3.10"
+setuptools==70.0.0; python_version >= "3.10"
+tqdm==4.66.4; python_version >= "3.10"
+types-PyYAML==6.0.12.20240311; python_version >= "3.10"
+
+# Python < 3.10
+deprecation; python_version < "3.10"
+google-api-core; python_version < "3.10" # for gcs fetch error .execptions
+google-cloud-bigquery; python_version < "3.10"
+google-cloud-storage; python_version < "3.10" # for gcs fetch test
+matplotlib; python_version < "3.10"
+pandas; python_version < "3.10"
+protobuf; python_version > "3.6" and python_version < "3.10"
+scipy; python_version < "3.10"
+setuptools; python_version < "3.10"
+tqdm; python_version < "3.10"
+types-PyYAML; python_version < "3.10"
+
+# Python < 3.9
+graphlib-backport; python_version < "3.9"
+
+# Python <= 3.6
+protobuf==3.19.4; python_version <= "3.6"
+pyarrow==3.0.0; python_version <= "3.6"
+urllib3==1.26.18; python_version <= "3.6"

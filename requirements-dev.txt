@@ -1,14 +1,32 @@
 -r requirements.txt
-pytest
-flake8
-black==26.3.1;python_version>="3.10"
-black;python_version<"3.10"
-coverage>=7.10;python_version>="3.9"
-coverage;python_version<"3.9"
-pre-commit
-pytest-xdist
-pytest-clarity
-line_profiler
-isort
-codecov-cli
-mypy
+
+# Python >= 3.10
+black==26.3.1; python_version >= "3.10"
+codecov-cli==0.6.0; python_version >= "3.10"
+coverage==7.10.0; python_version >= "3.10"
+flake8==7.1.0; python_version >= "3.10"
+isort==5.13.2; python_version >= "3.10"
+line_profiler==4.1.3; python_version >= "3.10"
+mypy==1.10.0; python_version >= "3.10"
+pre-commit==3.6.2; python_version >= "3.10"
+pytest==8.2.2; python_version >= "3.10"
+pytest-clarity==1.0.1; python_version >= "3.10"
+pytest-xdist==3.6.1; python_version >= "3.10"
+
+# Python < 3.10
+black; python_version < "3.10"
+codecov-cli; python_version < "3.10"
+flake8; python_version < "3.10"
+isort; python_version < "3.10"
+line_profiler; python_version < "3.10"
+mypy; python_version < "3.10"
+pre-commit; python_version < "3.10"
+pytest; python_version < "3.10"
+pytest-clarity; python_version < "3.10"
+pytest-xdist; python_version < "3.10"
+
+# Python == 3.9
+coverage>=7.10; python_version == "3.9"
+
+# Python < 3.9
+coverage; python_version < "3.9"
