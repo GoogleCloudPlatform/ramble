@@ -80,7 +80,7 @@ the ``package_manager`` variant will change this behavior.
 
 Note that specifying compilers that Spack doesn't have installed may take a while.
 To see available compilers, use ``spack compilers`` or see `Spack's documentation
-<https://spack.readthedocs.io/en/latest/getting_started.html#spack-compilers>`_
+<https://spack.readthedocs.io/en/latest/configuring_compilers.html>`_
 for more information.
 
 The second file you should edit is the ``execute_experiment.tpl`` template file.

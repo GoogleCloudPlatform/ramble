@@ -31,6 +31,7 @@ def workflow_manager_variable(
     **kwargs,
 ):
     """Define a variable for this wm
+
     Args:
         name: Name of variable
         default: Default value if the variable is not defined
@@ -40,7 +41,6 @@ def workflow_manager_variable(
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
         when (list | None): List of when conditions to apply to directive
-
     """
 
     def _define_wm_variable(wm):

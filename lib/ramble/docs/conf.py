@@ -424,3 +424,12 @@ intersphinx_mapping = {
 copybutton_exclude = ".gp, .go"
 # Escape hatch for turning off the copy button.
 copybutton_selector = "div:not(.hide-copy) > div.highlight > pre"
+
+# sphinx.ext.linkcheck
+linkcheck_ignore = [
+    r"^https://$",  # Ignore the bare https:// used as an example
+    r"http://www.example.com/.*",  # Ignore example URLs
+    r"https://github.com/project/repo.git",  # Ignore example URLs
+    r"https://jay.grs.rwth-aachen.de/hg/lwm2",  # Ignore problematic URL
+    r"https://www.intel.com/.*",  # Intel site often returns 403 to linkcheck
+]

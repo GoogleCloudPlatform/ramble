@@ -125,7 +125,7 @@ The HPL application definition file is named ``application.py`` and is stored
 within a directory named ``hpl``. Within the ``application.py`` file, a python
 class is defined with a similar name to the application directory. Ramble's
 application definition naming syntax follows
-`Spack's package naming rules <https://spack.readthedocs.io/en/latest/packaging_guide.html#naming-directory-structure>`_.
+`Spack's package naming rules <https://spack.readthedocs.io/en/latest/packaging_guide_creation.html#package-names-and-the-package-directory>`_.
 
 ^^^^^^^^^^^^
 Base Classes
@@ -330,7 +330,7 @@ Ramble allows objects to be defined with multiple versions, and then to use
 :ref:`conditional logic<application-dev-conditional-logic>` to set other
 directives based on the version. The ``version`` directive 
 (:py:meth:`ramble.language.shared_language.version`) is used to set a version,
- and ``when`` conditions can be described using the following syntax:
+and ``when`` conditions can be described using the following syntax:
 
 * ``application_version@<version_number>`` Apply to only a specific version.
 * ``application_version@:<version_number>`` Apply to a range up to and including

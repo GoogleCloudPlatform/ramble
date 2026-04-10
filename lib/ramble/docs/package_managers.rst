@@ -136,7 +136,7 @@ mirror software source.
 
 The use of this package manager requires an external installation of Spack. For
 instructions on installing Spack, see
-`Spack's documentation <https://github.com/spack/spack#-spack>`_.
+`Spack's documentation <https://spack.readthedocs.io/en/latest/getting_started.html>`_.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -159,7 +159,7 @@ mirror software source.
 
 The use of this package manager requires an external installation of Spack. For
 instructions on installing Spack, see
-`Spack's documentation <https://github.com/spack/spack#-spack>`_.
+`Spack's documentation <https://spack.readthedocs.io/en/latest/getting_started.html>`_.
 
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -72,7 +72,7 @@ and is stored within a directory named ``spack``. Witihn the
 ``package_manager.py`` file, a python class is defined with a similar name to
 the package manager directory.  Ramble's package manager definition naming
 syntax follows
-`Spack's package naming rules <https://spack.readthedocs.io/en/latest/packaging_guide.html#naming-directory-structure>`_.
+`Spack's package naming rules <https://spack.readthedocs.io/en/latest/packaging_guide_creation.html#package-names-and-the-package-directory>`_.
 
 When creating a new package manager, it is recommended that a ``runner`` class
 is created to encapsulate executing commands under the specific package

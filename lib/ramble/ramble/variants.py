@@ -332,10 +332,12 @@ class VariantSet:
         The set of variant definitions will be used to determine if a when
         clause is valid or not.
 
-        Returns:
-            set: A set consisting of strings with the variant definitions
+        Args:
             expander (ramble.expander.Expander): Expander to use when expanding
                                                  variant definitions
+
+        Returns:
+            set: A set consisting of strings with the variant definitions
         """
         if self._set_cache is not None:
             return self._expanded_set(expander)

@@ -84,7 +84,7 @@ The lscpu modifier definition file is named ``modifier.py`` and is stored
 within a directory named ``lscpu``. Within the ``modifier.py`` file, a python
 class is defined with a similar name to the modifier directory. Ramble's
 modifier definition naming syntax follows
-`Spack's package naming rules <https://spack.readthedocs.io/en/latest/packaging_guide.html#naming-directory-structure>`_.
+`Spack's package naming rules <https://spack.readthedocs.io/en/latest/packaging_guide_creation.html#package-names-and-the-package-directory>`_.
 
 ^^^^^^^^^^^^
 Base Classes

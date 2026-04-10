@@ -148,23 +148,21 @@ def executable(name, template, when=None, **kwargs):
 
     Executables may or may not use MPI.
 
-    Required Args:
+    Args:
         name (str): Name of the executable
         template (list[str] | str): The template command this executable should generate from
-
-    Optional Args:
-        use_mpi or mpi (bool): determines if this executable should be
-                        wrapped with an `mpirun` like command or not.
-
+        use_mpi (bool): Determines if this executable should be
+            wrapped with an `mpirun` like command or not. (Alternative: mpi)
         variables (dict): Dictionary of variable definitions to use for this
-                          executable only
+            executable only
         redirect (str): Optional, sets the path for outputs to be written to.
-                             defaults to {log_file}
+            Defaults to {log_file}
         output_capture (str): Optional, Declare which output (stdout, stderr,
-                              both) to capture. Defaults to stdout
+            both) to capture. Defaults to stdout
         run_in_background (bool): Optional, Declare if the command should
-                                     run in the background. Defaults to False
+            run in the background. Defaults to False
         when (list | None): List of when conditions to apply to directive
+
     """
 
     def _execute_executable(app):
@@ -199,16 +197,18 @@ def input_file(
     fetched from.
 
     Args:
+        name (str): Name of the input file
         url (str): Path to the input file / archive
         description (str): Description of this input file
         target_dir (str): Optional, the directory where the archive will be
-                               expanded. Defaults to the '{workload_input_dir}'
-                               + os.sep + '{input_name}'
+            expanded. Defaults to the '{workload_input_dir}'
+            + os.sep + '{input_name}'
         sha256 (str): Optional, the expected sha256 checksum for the input file
-        extension (str): Optiona, the extension to use for the input, if it isn't part of the
-                              file name.
+        extension (str): Optional, the extension to use for the input, if it
+            isn't part of the file name.
         expand (bool): Optional. Whether the input should be expanded or not. Defaults to True
         when (list | None): List of when conditions to apply to directive
+
     """
 
     def _execute_input_file(app):

@@ -451,6 +451,7 @@ some file in the experiment directory. We will use the following definition to
 track whatever the output from the experiment is as the possible hostname:
 
 .. code-block:: python
+
     figure_of_merit(
       "possible hostname",
       fom_regex=r"(?P<hostname>\S+)",
@@ -562,6 +563,7 @@ To begin with, delete the tutorial workspace, and recreate it using:
   $ ramble workspace deactivate
   $ rm -rf tutorial-workspace
   $ ramble workspace create -d tutorial-workspace -a
+
 Now, we can add an experiment to exercise the local workload using:
 
 .. code-block:: console
