@@ -18,7 +18,6 @@ import py.path
 
 import llnl.util.filesystem as fs
 import llnl.util.tty as tty
-from llnl.util.tty.color import cprint
 
 import ramble.config
 import ramble.expander
@@ -30,6 +29,7 @@ import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
+from ramble.util.colors import cprint
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
 

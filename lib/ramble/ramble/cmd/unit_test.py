@@ -14,11 +14,11 @@ import os
 import shutil
 import sys
 
-import llnl.util.tty.color as color
 from llnl.util.filesystem import working_dir
 from llnl.util.tty.colify import colify
 
 import ramble.paths
+import ramble.util.colors as color
 import ramble.workspace
 from ramble.util.logger import logger
 

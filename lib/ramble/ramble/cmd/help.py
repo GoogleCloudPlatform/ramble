@@ -8,7 +8,7 @@
 
 import sys
 
-from llnl.util.tty.color import colorize
+from ramble.util.colors import colorize
 
 description = "get help on ramble and its commands"
 section = "help"

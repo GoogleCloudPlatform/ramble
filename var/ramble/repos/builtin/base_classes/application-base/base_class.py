@@ -816,9 +816,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for var, val in print_vars.items():
             expansion_var = self.expander.expansion_str(var)
             expanded = self.expander.expand_var(expansion_var)
-            color.cprint(
-                rucolor.plaintext(f"{indent}  {var} = {val} ==> {expanded}")
-            )
+            color.cprint(f"{indent}  {var} = {val} ==> {expanded}")
 
     def build_used_variables(self, workspace):
         """Build a set of all used variables

@@ -9,12 +9,11 @@
 import enum
 import fnmatch
 
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified
 
 import ramble.cmd.common.arguments as arguments
 import ramble.repository
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 
@@ -136,16 +135,16 @@ def print_object_header(obj_type, obj):
     """Print an object header"""
     singular = ramble.repository.type_definitions[obj_type]["singular"]
     parts = [part[0].upper() + part[1:] for part in singular.split()]
-    type_name = rucolor.section_title(" ".join(parts))
+    type_name = color.section_title(" ".join(parts))
     color.cprint(f"{type_name}: {obj.name}\n")
 
-    color.cprint(rucolor.section_title("Description:"))
+    color.cprint(color.section_title("Description:"))
     if obj.__doc__:
         doc_str = ""
         for part in obj.__doc__.split("\n"):
             doc_str += f"    {part}\n"
 
-        color.cprint(doc_str)
+        color.cprint(f"{doc_str}")
 
 
 def print_object_overview(obj):
@@ -185,9 +184,9 @@ def _unpack_when_set_if_needed(internal_attr: dict):
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
     to_print = fnmatch.filter(map(str, internal_attr), pattern)
     if format == supported_formats.lists:
-        color.cprint("    " + str(list(to_print)))
+        color.cprint(f"    {list(to_print)}")
     elif format == supported_formats.text:
-        color.cprint(colified(to_print, tty=True, indent=4))
+        color.cprint(f"{colified(to_print, tty=True, indent=4)}")
 
 
 def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
@@ -201,48 +200,36 @@ def _print_verbose_dict_attr(internal_attr, pattern="*", indentation=(" " * 4)):
         if pattern and not fnmatch.fnmatch(name, pattern):
             continue
         if isinstance(vals, dict):
-            color_name = rucolor.section_title(name)
+            color_name = color.section_title(name)
             color.cprint(f"{color_name}:")
             for sub_name, sub_val in vals.items():
                 # Avoid showing duplicate names for variables
                 if isinstance(sub_val, Variable) and sub_name == sub_val.name:
-                    to_print = f"{indentation}{sub_val}"
+                    color.cprint(f"{indentation}{sub_val}")
                 else:
-                    color_sub_name = rucolor.nested_1(sub_name)
-                    to_print = f"{indentation}{color_sub_name}: {sub_val}"
-                try:
-                    color.cprint(to_print)
-                except color.ColorParseError:
-                    if not isinstance(sub_val, str) and hasattr(sub_val, "__iter__"):
-                        escaped_sub_val = [rucolor.plaintext(str(item)) for item in sub_val]
-                    else:
-                        escaped_sub_val = rucolor.plaintext(str(sub_val))
-                    color.cprint(f"{indentation}{color_sub_name}: {escaped_sub_val}")
+                    color_sub_name = color.nested_1(sub_name)
+                    color.cprint(f"{indentation}{color_sub_name}: {sub_val}")
             color.cprint("")
         elif isinstance(vals, set):
-            color_name = rucolor.section_title(name)
+            color_name = color.section_title(name)
             color.cprint(f"{color_name}:")
             for sub_name in vals:
                 # Avoid showing duplicate names for variables
-                color_sub_name = rucolor.nested_1(sub_name)
+                color_sub_name = color.nested_1(sub_name)
                 to_print = f"{indentation}{color_sub_name}"
-                try:
-                    color.cprint(to_print)
-                except color.ColorParseError:
-                    escaped_sub_name = rucolor.nested_1(sub_name)
-                    color.cprint(f"{indentation}{escaped_sub_name}")
+                color.cprint(to_print)
             color.cprint("")
         elif isinstance(vals, list):
             for val in vals:
                 if hasattr(val, "as_str"):
-                    color.cprint(f"{val.as_str(verbose=True)}")
+                    color.cprint(val.as_str(verbose=True))
                 else:
-                    color.cprint(f"{str(val)}")
+                    color.cprint(f"{val}")
         else:
             if hasattr(vals, "as_str"):
-                color.cprint(f"{vals.as_str(verbose=True)}")
+                color.cprint(vals.as_str(verbose=True))
             else:
-                color.cprint(f"{str(vals)}")
+                color.cprint(f"{vals}")
                 #  Necessary to add a line break after unformmated sections
                 if i == len(internal_attr.keys()):
                     color.cprint("")
@@ -260,10 +247,10 @@ def _print_phases(obj, attr, verbose=False, pattern="*", format=supported_format
     print_attribute_header(attr, verbose)
 
     if not verbose:
-        color_func = rucolor.level_func(1)
+        color_func = color.level_func(1)
         base_indent = 4
     else:
-        color_func = rucolor.level_func(0)
+        color_func = color.level_func(0)
         base_indent = 0
 
     indentation = " " * base_indent
@@ -279,10 +266,10 @@ def _print_phases(obj, attr, verbose=False, pattern="*", format=supported_format
         color_pipeline = color_func(pipeline)
         if format == supported_formats.lists:
             color.cprint(f"{indentation}{color_pipeline}:")
-            color.cprint(f"{indentation}    {str(list(to_print))}")
+            color.cprint(f"{indentation}    {list(to_print)}")
         elif format == supported_formats.text:
             color.cprint(f"{indentation}{color_pipeline}:")
-            color.cprint(colified(to_print, tty=True, indent=base_indent + 4))
+            color.cprint(f"{colified(to_print, tty=True, indent=base_indent + 4)}")
 
 
 def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
@@ -307,7 +294,7 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
                 if isinstance(to_print, list):
                     _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
                 else:
-                    color.cprint(f"    {str(to_print)}\n")
+                    color.cprint(f"    {to_print}\n")
             else:
                 _print_verbose_dict_attr(fom_dict, pattern=pattern, indentation=indentation)
 
@@ -352,7 +339,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                 to_print = [key for attr_dict in internal_attr for key in attr_dict]
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
-            color.cprint(f"    {str(to_print)}\n")
+            color.cprint(f"    {to_print}\n")
     else:
         if isinstance(internal_attr, dict):
             _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
@@ -368,19 +355,19 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                         if pattern and not fnmatch.fnmatch(obj.name, pattern):
                             continue
 
-                        color.cprint(f"{obj.as_str(verbose=True)}")
+                        color.cprint(obj.as_str(verbose=True))
                 else:
                     to_print = fnmatch.filter(map(str, internal_attr), pattern)
                     if format == supported_formats.lists:
-                        color.cprint("    " + str(list(to_print)))
+                        color.cprint(f"    {list(to_print)}")
                     elif format == supported_formats.text:
-                        color.cprint(colified(to_print, tty=True, indent=4))
+                        color.cprint(f"{colified(to_print, tty=True, indent=4)}")
                     color.cprint("")
         else:
             if hasattr(internal_attr, "as_str"):
-                color.cprint(f"{internal_attr.as_str(verbose=True)}")
+                color.cprint(internal_attr.as_str(verbose=True))
             else:
-                color.cprint(f"{indentation}" + str(internal_attr) + "\n")
+                color.cprint(f"{indentation}{internal_attr}\n")
 
 
 def print_attribute_header(attr, verbose=False):
@@ -394,11 +381,11 @@ def print_attribute_header(attr, verbose=False):
     if verbose:
         num = len(attr) + 4
         banner = f"{banner_char}" * num
-        color.cprint(banner)
+        color.cprint(f"{banner}")
         color.cprint(f"{banner_char} {attr} {banner_char}")
-        color.cprint(banner)
+        color.cprint(f"{banner}")
     else:
-        attr_name = rucolor.section_title(attr)
+        attr_name = color.section_title(attr)
         color.cprint(f"{attr_name}:")
 
 

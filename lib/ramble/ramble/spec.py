@@ -9,9 +9,8 @@
 import io
 from typing import Mapping
 
-import llnl.util.tty.color as clr
-
 import ramble.error
+import ramble.util.colors as clr
 
 color_formats: Mapping[str, str] = {}
 default_format = "{name}"

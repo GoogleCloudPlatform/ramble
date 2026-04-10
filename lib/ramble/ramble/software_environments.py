@@ -10,7 +10,7 @@ from collections import defaultdict
 from typing import DefaultDict, Dict, List, Set
 
 import ramble.error
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 from ramble.expander import Expander
 from ramble.namespace import namespace
 from ramble.util.logger import logger
@@ -107,11 +107,13 @@ class SoftwarePackage:
             return ""
 
         indentation = " " * indent
-        color = rucolor.level_func(color_level)
+        color_func = color.level_func(color_level)
 
         injected_str = "" if not self.injected else " (injected by ramble)"
 
-        out_str = color(f"{indentation}{self._package_type} package: {self.name} {injected_str}\n")
+        out_str = color_func(
+            f"{indentation}{self._package_type} package: {self.name} {injected_str}\n"
+        )
         return out_str
 
     def __str__(self):
@@ -214,11 +216,11 @@ class RenderedPackage(SoftwarePackage):
 
         indentation = " " * (indent + SUB_INDENT)
         out_str = super().info(indent, verbosity, color_level, only_used)
-        out_str += rucolor.plaintext(f"{indentation}Spec: {self.spec}\n")
+        out_str += f"{indentation}Spec: {self.spec}\n"
         if self.compiler:
-            out_str += rucolor.plaintext(f"{indentation}Compiler: {self.compiler}\n")
+            out_str += f"{indentation}Compiler: {self.compiler}\n"
         if self.compiler_spec:
-            out_str += rucolor.plaintext(f"{indentation}Compiler Spec: {self.compiler_spec}\n")
+            out_str += f"{indentation}Compiler Spec: {self.compiler_spec}\n"
         return out_str
 
     def __eq__(self, other):
@@ -283,10 +285,10 @@ class TemplatePackage(SoftwarePackage):
         out_str = ""
         pkg_man_indent = indent + SUB_INDENT
         indentation = " " * pkg_man_indent
-        color = rucolor.level_func(color_level + 1)
+        color_func = color.level_func(color_level + 1)
         for pkg_man, pkgs in self._rendered_packages.items():
             if pkgs:
-                out_str += color(f"{indentation}{pkg_man} packages:\n")
+                out_str += color_func(f"{indentation}{pkg_man} packages:\n")
 
             for pkg in pkgs.values():
                 out_str += pkg.info(
@@ -428,8 +430,8 @@ class SoftwareEnvironment:
             return ""
 
         indentation = " " * indent
-        color = rucolor.level_func(color_level)
-        out_str = color(f"{indentation}{self._environment_type} environment: {self.name}\n")
+        color_func = color.level_func(color_level)
+        out_str = color_func(f"{indentation}{self._environment_type} environment: {self.name}\n")
 
         if self._packages:
             indentation = " " * (indent + SUB_INDENT)
@@ -437,9 +439,9 @@ class SoftwareEnvironment:
 
         for pkg in self._packages:
             if verbosity >= 1:
-                out_str += rucolor.plaintext(f"{indentation}- {pkg.name} = {pkg.spec_str()}\n")
+                out_str += f"{indentation}- {pkg.name} = {pkg.spec_str()}\n"
             else:
-                out_str += rucolor.plaintext(f"{indentation}- {pkg.name}\n")
+                out_str += f"{indentation}- {pkg.name}\n"
         return out_str
 
     def __str__(self):

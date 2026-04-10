@@ -11,7 +11,7 @@ from typing import Callable, Optional
 from packaging.specifiers import SpecifierSet
 from packaging.version import InvalidVersion, Version
 
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 from ramble.language.language_base import DirectiveError
 
 
@@ -88,9 +88,9 @@ class ObjectVersion:
             (str): Representation of this version
         """
         indentation = " " * n_indent
-        out_str = rucolor.section_title(f"{indentation}{self.version}") + "\n"
-        out_str += rucolor.nested_1(f"{indentation}    Description: ") + f"{self.description}\n"
-        out_str += rucolor.nested_1(f"{indentation}    Preferred: ") + f"{self.preferred}\n"
+        out_str = color.section_title(f"{indentation}{self.version}") + "\n"
+        out_str += color.nested_1(f"{indentation}    Description: ") + f"{self.description}\n"
+        out_str += color.nested_1(f"{indentation}    Preferred: ") + f"{self.preferred}\n"
 
         return out_str
 

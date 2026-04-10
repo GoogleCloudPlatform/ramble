@@ -30,7 +30,6 @@ import ruamel
 import llnl.util.lang
 import llnl.util.tty as tty
 import llnl.util.tty.colify
-import llnl.util.tty.color as color
 from llnl.util.tty.log import log_output
 
 import ramble.cmd
@@ -38,6 +37,7 @@ import ramble.cmd.common.arguments
 import ramble.config
 import ramble.paths
 import ramble.repository
+import ramble.util.colors as color
 import ramble.util.version
 import ramble.workspace
 import ramble.workspace.shell
