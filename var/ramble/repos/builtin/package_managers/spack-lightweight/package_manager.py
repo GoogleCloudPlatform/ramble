@@ -84,7 +84,7 @@ class SpackLightweight(PackageManagerBase):
 
         cache_tupl = ("spack-compilers", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug(f"{cache_tupl} already in cache.")
+            logger.debug("%s already in cache.", cache_tupl)
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -147,7 +147,7 @@ class SpackLightweight(PackageManagerBase):
 
         cache_tupl = ("spack-env", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug(f"{cache_tupl} already in cache.")
+            logger.debug("%s already in cache.", cache_tupl)
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -272,7 +272,7 @@ class SpackLightweight(PackageManagerBase):
 
         cache_tupl = ("concretize-env", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug(f"{cache_tupl} already in cache.")
+            logger.debug("%s already in cache.", cache_tupl)
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -328,7 +328,7 @@ class SpackLightweight(PackageManagerBase):
 
         cache_tupl = ("spack-mirror", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug(f"{cache_tupl} already in cache.")
+            logger.debug("%s already in cache.", cache_tupl)
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -389,7 +389,7 @@ class SpackLightweight(PackageManagerBase):
         env_path = app_inst.expander.env_path
         cache_tupl = ("push-to-cache", env_path)
         if workspace.check_cache(cache_tupl):
-            logger.debug(f"{cache_tupl} already pushed, skipping")
+            logger.debug("%s already pushed, skipping", cache_tupl)
             return
         else:
             workspace.add_to_cache(cache_tupl)
@@ -1380,7 +1380,7 @@ class SpackRunner(CommandRunner):
         base_args = ["buildcache", "push"]
         user_flags = ramble.config.get(f"{self.buildcache_config_name}:flags")
 
-        logger.debug(f"Running with user flags: {user_flags}")
+        logger.debug("Running with user flags: %s", user_flags)
 
         if user_flags is not None:
             base_args.extend(shlex.split(user_flags))

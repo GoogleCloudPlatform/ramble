@@ -30,4 +30,4 @@ class FileOpen(ExecutableApplication):
         )
         with open(config_path) as conf:
             yaml.safe_load(conf)
-            logger.info(f"Config loaded from {config_path}")
+            logger.info("Config loaded from %s", config_path)

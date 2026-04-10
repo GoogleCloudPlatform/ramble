@@ -154,13 +154,13 @@ def filter_exp_results(experiments: list):
 
     for exp in experiments:
         if exp["name"] in skip_exps or is_repeat_child(exp):
-            logger.debug(f"Skipping import of experiment {exp['name']}")
+            logger.debug("Skipping import of experiment %s", exp["name"])
             continue
 
         elif exp["RAMBLE_STATUS"] != "SUCCESS":
             continue
         else:
-            logger.debug(f"Importing experiment {exp['name']}")
+            logger.debug("Importing experiment %s", exp["name"])
             # For repeat experiments, use summary stats from base exp and skip repeats
             # Repeats are sequenced after base exp
 
@@ -366,7 +366,9 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
                                 elif var in _ADDITIONAL_VARS:
                                     continue
                                 else:
-                                    logger.debug(f"{var} not found in the results data. Skipping.")
+                                    logger.debug(
+                                        "%s not found in the results data. Skipping.", var
+                                    )
 
                     extracted_data.append(exp_data)
 
@@ -375,7 +377,7 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
 
     # Apply where to down select
     if where_query:
-        logger.info(f"Applying where query: {where_query}")
+        logger.info("Applying where query: %s", where_query)
         extracted_df = extracted_df.query(where_query)
 
     return extracted_df
@@ -511,7 +513,7 @@ class PlotGenerator:
             f"{perf_measure} vs {scale_var} for {series}"
             f"{get_direction_suffix(self.better_direction)}"
         )
-        logger.debug(f"Generating plot for {title}")
+        logger.debug("Generating plot for %s", title)
 
         # TODO: prep_draw method in subclass ScalingPlotGenerator, not this class
         fig, ax = self.prep_draw(perf_measure, scale_var)
@@ -578,7 +580,7 @@ class PlotGenerator:
         # FIXME: DRY THIS
         """Draws a filler figure in cases where a chart cannot be drawn due to errors."""
         title = f"{perf_measure} vs {scale_var} for {series}"
-        logger.debug(f"Generating filler figure for {title}")
+        logger.debug("Generating filler figure for %s", title)
 
         fig, ax = plt.subplots(figsize=self.figsize)
         fig.text(
@@ -704,7 +706,7 @@ class ScalingPlotGenerator(PlotGenerator):
             )
             return selected_data
 
-        logger.debug(f"Normalizing data (by {first_perf_value})")
+        logger.debug("Normalizing data (by %s)", first_perf_value)
 
         selected_data.loc[:, ReportVars.IDEAL_PERF_VALUE.value] = first_perf_value
 
@@ -985,7 +987,7 @@ class MultiLinePlot(ScalingPlotGenerator):
     def draw_multiline(self, perf_measure, scale_var, pdf_report, y_label):
         # TODO: add suffix 'higher/lower is better' to chart title based on better_direction
         title = f"{perf_measure} vs {scale_var}"
-        logger.debug(f"Generating plot for {title}")
+        logger.debug("Generating plot for %s", title)
 
         # TODO: prep_draw method in subclass ScalingPlotGenerator, not this class
         fig, ax = self.prep_draw(perf_measure, scale_var)

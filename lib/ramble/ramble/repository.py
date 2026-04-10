@@ -856,7 +856,7 @@ class RepoPath:
         """Given a spec, get the repository for its object."""
         # We don't @_autospec this function b/c it's called very frequently
         # and we want to avoid parsing str's into Specs unnecessarily.
-        logger.debug(f"Getting repo for obj {spec}")
+        logger.debug("Getting repo for obj %s", spec)
         namespace = None
         if isinstance(spec, ramble.spec.Spec):
             namespace = spec.namespace
@@ -865,7 +865,7 @@ class RepoPath:
             # handle strings directly for speed instead of @_autospec'ing
             namespace, _, name = spec.rpartition(".")
 
-        logger.debug(f" Name and namespace = {namespace} - {name}")
+        logger.debug(" Name and namespace = %s - %s", namespace, name)
         # If the spec already has a namespace, then return the
         # corresponding repo if we know about it.
         if namespace:
@@ -1161,7 +1161,7 @@ class Repo:
         # it actually exists, because we have to load it anyway, and that ends
         # up checking for existence. We avoid constructing
         # FastObjectChecker, which will stat all objects.
-        logger.debug(f"Getting obj {spec} from repo")
+        logger.debug("Getting obj %s from repo", spec)
         if spec.name is None:
             raise UnknownObjectError(None, self)
 
@@ -1359,7 +1359,7 @@ class Repo:
             )
 
         class_name = nm.mod_to_class(obj_name)
-        logger.debug(f" Class name = {class_name}")
+        logger.debug(" Class name = %s", class_name)
         module = self._get_obj_module(obj_name)
 
         cls = getattr(module, class_name)

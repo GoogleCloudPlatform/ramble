@@ -123,7 +123,7 @@ def _first_accessible_path(paths):
                 return path
 
         except OSError as e:
-            logger.debug(f"OSError while checking stage path {path}: {e}")
+            logger.debug("OSError while checking stage path %s: %s", path, e)
 
     return None
 
@@ -284,7 +284,7 @@ class InputStage:
                 lock_id = prefix_bits(sha1, bit_length(sys.maxsize))
                 stage_lock_path = os.path.join(self.path, ".lock")
 
-                logger.debug(f"Creating stage lock {self.name}")
+                logger.debug("Creating stage lock %s", self.name)
                 InputStage.stage_locks[self.name] = ramble.util.lock.Lock(
                     stage_lock_path, lock_id, 1, desc=self.name
                 )
@@ -514,14 +514,14 @@ class InputStage:
         absolute_storage_path = os.path.join(mirror.root, self.mirror_paths.storage_path)
 
         if os.path.exists(absolute_storage_path):
-            logger.debug(f"Already existed: {absolute_storage_path}")
+            logger.debug("Already existed: %s", absolute_storage_path)
             stats.already_existed(absolute_storage_path)
-            logger.debug(f"   Stats? {stats.present}")
+            logger.debug("   Stats? %s", stats.present)
         else:
             self.fetch()
             self.check()
             mirror.store(self.fetcher, self.mirror_paths.storage_path)
-            logger.debug(f"Added: {absolute_storage_path}")
+            logger.debug("Added: %s", absolute_storage_path)
             stats.added(absolute_storage_path)
 
         if not os.path.exists(absolute_storage_path):
@@ -535,9 +535,9 @@ class InputStage:
         downloaded."""
         if not self.expanded:
             self.fetcher.expand()
-            logger.debug(f"Created stage in {self.path}")
+            logger.debug("Created stage in %s", self.path)
         else:
-            logger.debug(f"Already staged {self.name} in {self.path}")
+            logger.debug("Already staged %s in %s", self.name, self.path)
 
     def restage(self):
         """Removes the expanded archive path if it exists, then re-expands
@@ -728,7 +728,7 @@ class DIYStage:
         logger.debug("No checksum needed for DIY.")
 
     def expand_archive(self):
-        logger.debug(f"Using source directory: {self.source_path}")
+        logger.debug("Using source directory: %s", self.source_path)
 
     @property
     def expanded(self):

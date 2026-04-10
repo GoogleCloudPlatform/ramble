@@ -108,7 +108,7 @@ def setup_parser(subparser):
 
 def _get_scope_and_section(args):
     """Extract config scope and section from arguments."""
-    logger.debug(f" Args = {str(args)}")
+    logger.debug(" Args = %s", str(args))
     scope = args.scope
     section = getattr(args, "section", None)
     path = getattr(args, "path", None)

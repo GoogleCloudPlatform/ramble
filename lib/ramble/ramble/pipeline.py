@@ -451,7 +451,7 @@ class ArchivePipeline(Pipeline):
 
             create_symlink(tar_path, tar_path_latest)
 
-            logger.debug(f"Archive url: {archive_url}")
+            logger.debug("Archive url: %s", archive_url)
 
             if archive_url:
                 # Perform Upload
@@ -580,10 +580,10 @@ class ExecutePipeline(Pipeline):
 
         for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
             if app_inst.is_template:
-                logger.debug(f"{app_inst.name} is a template. Skipping execution.")
+                logger.debug("%s is a template. Skipping execution.", app_inst.name)
                 continue
             if app_inst.repeats.is_repeat_base:
-                logger.debug(f"{app_inst.name} is a repeat base. Skipping execution.")
+                logger.debug("%s is a repeat base. Skipping execution.", app_inst.name)
                 continue
 
             app_inst.define_variables_for_template_path(self.workspace)

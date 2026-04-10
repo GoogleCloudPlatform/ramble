@@ -45,7 +45,7 @@ def validate_data(data, schema):
     try:
         jsonschema.validate(instance=data, schema=schema)
     except jsonschema.exceptions.ValidationError as err:
-        logger.error(f"Schema validation error: {err}")
+        logger.error("Schema validation error: %s", err)
         raise
 
 
@@ -512,7 +512,7 @@ class BigQueryUploader(Uploader):
         try:
             client.get_dataset(uri)
         except NotFound:
-            logger.info(f"Dataset {uri} is not found, creating it.")
+            logger.info("Dataset %s is not found, creating it.", uri)
             client.create_dataset(uri)
 
         # Check schema version
@@ -540,13 +540,15 @@ class BigQueryUploader(Uploader):
             table_id = f"{uri}.{table_def['table']}"
             try:
                 client.get_table(table_id)
-                logger.info(f"Table {table_id} already exists.")
+                logger.info("Table %s already exists.", table_id)
             except NotFound:
-                logger.info(f"Creating table {table_id}")
+                logger.info("Creating table %s", table_id)
                 bq_schema = self._schema_to_bigquery(table_def["schema"][table_def["version"]])
                 table = bigquery.Table(table_id, schema=bq_schema)
                 table = client.create_table(table)
-                logger.info(f"Created table {table.project}.{table.dataset_id}.{table.table_id}")
+                logger.info(
+                    "Created table %s.%s.%s", table.project, table.dataset_id, table.table_id
+                )
                 tables_created = True
 
         if tables_created:
@@ -572,16 +574,16 @@ class BigQueryUploader(Uploader):
         if rows_per_batch <= 1:
             rows_per_batch = 1
 
-        logger.debug(f"Size: {sys.getsizeof(json.dumps(data))}B")
-        logger.debug(f"Length in rows: {data_len}")
-        logger.debug(f"Num Batches: {approx_num_batches}")
-        logger.debug(f"Rows per Batch: {rows_per_batch}")
+        logger.debug("Size: %sB", sys.getsizeof(json.dumps(data)))
+        logger.debug("Length in rows: %s", data_len)
+        logger.debug("Num Batches: %s", approx_num_batches)
+        logger.debug("Rows per Batch: %s", rows_per_batch)
 
         for i in range(0, data_len, rows_per_batch):
             end = i + rows_per_batch
             if end > data_len:
                 end = data_len
-            logger.debug(f"Uploading rows {i} to {end}")
+            logger.debug("Uploading rows %s to %s", i, end)
             table_name = table_id.split(".")[-1]
             table_def = next((t for t in self.schema if t["table"] == table_name), None)
             if table_def and table_def["schema"].get(table_def["version"]):
@@ -636,24 +638,26 @@ class PrintOnlyUploader(Uploader):
             software_to_insert,
         ) = _prepare_data(results, uri)
         logger.info("NOTE: The PrintOnly uploader only logs, but does not upload any data.")
-        logger.info(f"{len(exps_to_insert)} experiment(s) would be uploaded to {exp_table_id}:")
+        logger.info("%s experiment(s) would be uploaded to %s:", len(exps_to_insert), exp_table_id)
         for exp in exps_to_insert:
-            logger.info(f"  {exp}")
-        logger.info(f"{len(foms_to_insert)} fom(s) would be uploaded to {fom_table_id}:")
+            logger.info("  %s", exp)
+        logger.info("%s fom(s) would be uploaded to %s:", len(foms_to_insert), fom_table_id)
         for fom in foms_to_insert:
-            logger.info(f"  {fom}")
+            logger.info("  %s", fom)
         logger.info(
-            f"{len(metadata_to_insert)} experiment metadata item(s) "
-            f"would be uploaded to {metadata_table_id}:"
+            "%s experiment metadata item(s) would be uploaded to %s:",
+            len(metadata_to_insert),
+            metadata_table_id,
         )
         for metadata_item in metadata_to_insert:
-            logger.info(f"  {metadata_item}")
+            logger.info("  %s", metadata_item)
         logger.info(
-            f"{len(software_to_insert)} "
-            f"software package(s) would be uploaded to {software_table_id}:"
+            "%s software package(s) would be uploaded to %s:",
+            len(software_to_insert),
+            software_table_id,
         )
         for software in software_to_insert:
-            logger.info(f"  {software}")
+            logger.info("  %s", software)
 
 
 class SQLiteUploader(Uploader):
@@ -725,9 +729,9 @@ class SQLiteUploader(Uploader):
                     f"type='table' AND name='{table_name}'"
                 )
                 if cursor.fetchone()[0] == 1:
-                    logger.info(f"Table {table_name} already exists.")
+                    logger.info("Table %s already exists.", table_name)
                 else:
-                    logger.info(f"Creating table {table_name}")
+                    logger.info("Creating table %s", table_name)
                     sqlite_schema = self._schema_to_sqlite(
                         table_def["schema"][table_def["version"]]
                     )

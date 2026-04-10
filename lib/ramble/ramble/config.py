@@ -1023,7 +1023,7 @@ def read_config_file(filename, schema=None):
         raise ConfigFileError(f"Config file is not readable: {filename}")
 
     try:
-        logger.debug(f"Reading config file {filename}")
+        logger.debug("Reading config file %s", filename)
         with open(filename) as f:
             data = syaml.load_config(f)
 

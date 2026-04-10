@@ -42,7 +42,7 @@ def read_config_file(conf_path: str):
         (dict): Dictionary representation of the data contained in conf_path
     """
     with open(conf_path) as base_conf:
-        logger.debug(f"Reading config from {conf_path}")
+        logger.debug("Reading config from %s", conf_path)
         try:
             config_dict = syaml.load(base_conf)
         except yaml.YAMLError:

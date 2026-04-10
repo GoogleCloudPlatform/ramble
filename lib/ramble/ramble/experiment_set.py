@@ -606,7 +606,7 @@ class ExperimentSet:
 
         # The results are now processed serially to update the experiment set state
         for app_inst, final_exp_namespace, is_base_experiment in all_processed_experiments:
-            logger.debug(f"   Final name: {final_exp_namespace}")
+            logger.debug("   Final name: %s", final_exp_namespace)
 
             if final_exp_namespace in rendered_experiments:
                 left_vars = self.experiments[final_exp_namespace].variables

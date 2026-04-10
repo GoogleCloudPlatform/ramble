@@ -370,7 +370,7 @@ class ExpansionNode:
                 try:
                     old_value = self.value
                     self.value = evaluation_func(self.value)
-                    logger.debug(f"  Expanded: {old_value} -> {self.value}")
+                    logger.debug("  Expanded: %s -> %s", old_value, self.value)
                     if old_value != self.value:
                         required_passthrough = False
                 except SyntaxError:
@@ -759,9 +759,9 @@ class Expander:
         if ramble.config.get("config:disable_passthrough"):
             passthrough_setting = False
 
-        logger.debug(f"BEGINNING OF EXPAND_VAR STACK ON {var}")
-        logger.debug(f" REPLACE VAR (1): {replace_escaped_braces}")
-        logger.debug(f" REPLACE VAR (2): {self._replace_escaped_braces}")
+        logger.debug("BEGINNING OF EXPAND_VAR STACK ON %s", var)
+        logger.debug(" REPLACE VAR (1): %s", replace_escaped_braces)
+        logger.debug(" REPLACE VAR (2): %s", self._replace_escaped_braces)
 
         if extra_vars:
             expansions = collections.ChainMap(extra_vars, self._variables)
@@ -785,12 +785,12 @@ class Expander:
                     "context."
                 ) from None
 
-        logger.debug(f"END OF EXPAND_VAR STACK {value}")
+        logger.debug("END OF EXPAND_VAR STACK %s", value)
         if typed:
-            logger.debug(f"BEGINNING OF TYPING ON {value}")
+            logger.debug("BEGINNING OF TYPING ON %s", value)
             try:
                 value = ast.literal_eval(value)
-                logger.debug(f"END OF TYPING {value}")
+                logger.debug("END OF TYPING %s", value)
             except ValueError:
                 logger.debug("END OF TYPING Failed with ValueError")
             except SyntaxError:
@@ -986,12 +986,12 @@ class Expander:
 
                     return out_str
                 except MathEvaluationError as e:
-                    logger.debug(f'   Math input is: "{in_str}"')
+                    logger.debug('   Math input is: "%s"', in_str)
                     logger.debug(e)
                 except RambleSyntaxError as e:
                     raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
                 except SyntaxError as e:
-                    logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
+                    logger.debug("ast.parse hit the following syntax error on input: %s", in_str)
                     logger.debug(e)
 
                 for warn in wal:
@@ -1339,8 +1339,8 @@ class Expander:
 def raise_passthrough_error(in_str, out_str):
     """Raise an error when passthrough is disabled but variables are not all expanded"""
 
-    logger.debug(f"Expansion stack errors: attempted to expand " f'"{in_str}"')
-    logger.debug(f"  As: {out_str}")
+    logger.debug('Expansion stack errors: attempted to expand "%s"', in_str)
+    logger.debug("  As: %s", out_str)
     raise RamblePassthroughError("Error Stack:\n" f'Input: "{in_str}"\n' f'Output: "{out_str}"\n')
 
 

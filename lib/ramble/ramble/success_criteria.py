@@ -71,10 +71,10 @@ class ScopedCriteriaList:
         self.validate_scope(scope)
 
         for s in self._flush_scopes[scope]:
-            logger.debug(f" Flushing scope: {s}")
+            logger.debug(" Flushing scope: %s", s)
             logger.debug("    It contained:")
             for crit in self.criteria[s]:
-                logger.debug(f"      {crit.name}")
+                logger.debug("      %s", crit.name)
             del self.criteria[s]
             self.criteria[s] = []
 
@@ -163,7 +163,7 @@ class SuccessCriteria:
             self.fom_context = fom_context
 
     def passed(self, test=None, app_inst=None, fom_values=None):
-        logger.debug(f"Testing criteria {self.name} mode = {self.mode}")
+        logger.debug("Testing criteria %s mode = %s", self.name, self.mode)
         if self.mode == "string":
             if self.match is not None:
                 match_obj = self.match.match(test)
@@ -227,7 +227,7 @@ class SuccessCriteria:
         return False
 
     def anti_matched(self, test=None):
-        logger.debug(f"Testing anti-criterion {self.name} mode = {self.mode}")
+        logger.debug("Testing anti-criterion %s mode = %s", self.name, self.mode)
         if self.mode == "string":
             if self.anti_match is not None:
                 anti_match_obj = self.anti_match.match(test)
@@ -236,11 +236,11 @@ class SuccessCriteria:
         return False
 
     def mark_found(self):
-        logger.debug(f"   {self.name} was matched!")
+        logger.debug("   %s was matched!", self.name)
         self.found = True
 
     def mark_anti_found(self):
-        logger.debug(f"   {self.name} was anti-matched!")
+        logger.debug("   %s was anti-matched!", self.name)
         self.anti_found = True
 
     def reset(self):

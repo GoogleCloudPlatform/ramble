@@ -933,10 +933,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     def run_phase(self, pipeline, phase, workspace):
         """Run a phase, by getting its function pointer"""
         if self.is_template:
-            logger.debug(f"{self.name} is a template. Skipping phases")
+            logger.debug("%s is a template. Skipping phases", self.name)
             return
         if self.repeats.is_repeat_base:
-            logger.debug(f"{self.name} is a repeat base. Skipping phases")
+            logger.debug("%s is a repeat base. Skipping phases", self.name)
             return
 
         phase_node = self._pipeline_graphs[pipeline].get_node(phase)
@@ -2617,7 +2617,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                 # Start with no active contexts in a file.
                 active_contexts = {}
-                logger.debug(f"Reading log file: {file}")
+                logger.debug("Reading log file: %s", file)
 
                 if not os.path.exists(file):
                     logger.debug(
@@ -2661,7 +2661,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         context_match,
                                         context_conf["format"],
                                     )
-                                    logger.debug(f"Line was: {line}")
+                                    logger.debug("Line was: %s", line)
                                     logger.debug(
                                         f" Context match {context} -- {context_name}"
                                     )
@@ -3332,8 +3332,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                 files[log_path]["contexts"][context] = []
                             files[log_path]["contexts"][context].append(fom)
 
-                            logger.debug(f"Log = {log_path}")
-                            logger.debug(f"Conf = {fom_def}")
+                            logger.debug("Log = %s", log_path)
+                            logger.debug("Conf = %s", fom_def)
 
         return files, file_fom_defs, inmem_fom_defs
 
@@ -3841,7 +3841,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.define_variable(self.keywords.n_threads, 1)
 
         for _, obj in self._objects():
-            logger.debug(f"Setting required variables for {obj.name}")
+            logger.debug("Setting required variables for %s", obj.name)
             self.keywords.update_keys(obj.required_variables)
 
     def _format_docs_details(self, out):

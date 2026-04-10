@@ -381,7 +381,7 @@ def workspace_remove(args):
         workspace = ramble.workspace.read(workspace_name)
         read_workspaces.append(workspace)
 
-    logger.debug(f"Removal args: {args}")
+    logger.debug("Removal args: %s", args)
 
     if not args.yes_to_all:
         answer = tty.get_yes_or_no(
@@ -1113,7 +1113,7 @@ def workspace_edit(args, unknown_args):
     else:
         try:
             if unknown_args:
-                logger.debug(f"Passing {unknown_args} to editor...")
+                logger.debug("Passing %s to editor...", unknown_args)
             edit_files += unknown_args or []
             editor(*edit_files)
         except TypeError:

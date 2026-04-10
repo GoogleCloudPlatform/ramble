@@ -320,7 +320,7 @@ class URLFetchStrategy(FetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            logger.debug(f"Already downloaded {self.archive_file}")
+            logger.debug("Already downloaded %s", self.archive_file)
             return
 
         url = None
@@ -344,7 +344,7 @@ class URLFetchStrategy(FetchStrategy):
             raise FailedDownloadError(url)
 
     def _existing_url(self, url):
-        logger.debug(f"Checking existence of {url}")
+        logger.debug("Checking existence of %s", url)
 
         if ramble.config.get("config:url_fetch_method") == "curl":
             curl = self.curl
@@ -524,7 +524,7 @@ class URLFetchStrategy(FetchStrategy):
             shutil.move(self.archive_file, dest)
             return
 
-        logger.debug(f"Staging archive: {self.archive_file}")
+        logger.debug("Staging archive: %s", self.archive_file)
 
         if not self.archive_file:
             raise NoArchiveFileError(
@@ -535,7 +535,7 @@ class URLFetchStrategy(FetchStrategy):
             self.extension = extension(self.archive_file)
 
         if self.stage.expanded:
-            logger.debug(f"Source already staged to {self.stage.source_path}")
+            logger.debug("Source already staged to %s", self.stage.source_path)
             return
 
         decompress = decompressor_for(self.archive_file, self.extension)
@@ -699,11 +699,11 @@ class VCSFetchStrategy(FetchStrategy):
 
     @_needs_stage
     def check(self):
-        logger.debug(f"No checksum needed when fetching with {self.url_attr}")
+        logger.debug("No checksum needed when fetching with %s", self.url_attr)
 
     @_needs_stage
     def expand(self):
-        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
+        logger.debug("Source fetched with %s is already expanded.", self.url_attr)
 
     @_needs_stage
     def archive(self, destination, **kwargs):
@@ -847,7 +847,7 @@ class GitFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            logger.debug(f"Already fetched {self.stage.source_path}")
+            logger.debug("Already fetched %s", self.stage.source_path)
             return
 
         self.clone(commit=self.commit, branch=self.branch, tag=self.tag)
@@ -869,7 +869,7 @@ class GitFetchStrategy(VCSFetchStrategy):
         """
         # Default to spack source path
         dest = dest or self.stage.source_path
-        logger.debug(f"Cloning git repository: {self._repo_info()}")
+        logger.debug("Cloning git repository: %s", self._repo_info())
 
         git = self.git
         debug = ramble.config.get("config:debug")
@@ -1163,10 +1163,10 @@ class SvnFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            logger.debug(f"Already fetched {self.stage.source_path}")
+            logger.debug("Already fetched %s", self.stage.source_path)
             return
 
-        logger.debug(f"Checking out subversion repository: {self.url}")
+        logger.debug("Checking out subversion repository: %s", self.url)
 
         args = ["checkout", "--force", "--quiet"]
         if self.revision:
@@ -1273,13 +1273,13 @@ class HgFetchStrategy(VCSFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.stage.expanded:
-            logger.debug(f"Already fetched {self.stage.source_path}")
+            logger.debug("Already fetched %s", self.stage.source_path)
             return
 
         args = []
         if self.revision:
             args.append(f"at revision {self.revision}")
-        logger.debug(f"Cloning mercurial repository: {self.url} {args}")
+        logger.debug("Cloning mercurial repository: %s %s", self.url, args)
 
         args = ["clone"]
 
@@ -1335,14 +1335,14 @@ class S3FetchStrategy(URLFetchStrategy):
     @_needs_stage
     def fetch(self):
         if self.archive_file:
-            logger.debug(f"Already downloaded {self.archive_file}")
+            logger.debug("Already downloaded %s", self.archive_file)
             return
 
         parsed_url = url_util.parse(self.url)
         if parsed_url.scheme != "s3":
             raise FetchError("S3FetchStrategy can only fetch from s3:// urls.")
 
-        logger.debug(f"Fetching {self.url}")
+        logger.debug("Fetching %s", self.url)
 
         basename = os.path.basename(parsed_url.path)
 
@@ -1382,14 +1382,14 @@ class GCSFetchStrategy(URLFetchStrategy):
         import ramble.util.web as web_util
 
         if self.archive_file:
-            logger.debug(f"Already downloaded {self.archive_file}")
+            logger.debug("Already downloaded %s", self.archive_file)
             return
 
         parsed_url = url_util.parse(self.url)
         if parsed_url.scheme != "gs":
             raise FetchError("GCSFetchStrategy can only fetch from gs:// urls.")
 
-        logger.debug(f"Fetching {self.url}")
+        logger.debug("Fetching %s", self.url)
 
         basename = os.path.basename(parsed_url.path)
 

@@ -269,7 +269,7 @@ class Maxtext(ExecutableApplication):
 
             model_config = app_inst.expander.expand_var("{model_config}")
             if not os.path.exists(model_config):
-                logger.debug(f"Model config file not found: {model_config}")
+                logger.debug("Model config file not found: %s", model_config)
 
     register_phase(
         "create_config", pipeline="setup", run_after=["make_experiments"]
@@ -300,7 +300,7 @@ class Maxtext(ExecutableApplication):
         with open(base_config) as conf:
             try:
                 config_data = yaml.safe_load(conf)
-                logger.debug(f"Loaded config as dict: \n{config_data}")
+                logger.debug("Loaded config as dict: \n%s", config_data)
             except yaml.YAMLError:
                 logger.die(
                     "YAML Error: Failed to load config file: {base_config}"
@@ -399,10 +399,10 @@ class Maxtext(ExecutableApplication):
                 with open(file) as f:
                     imported_metrics_data.append(f.read().strip())
             except FileNotFoundError:
-                logger.debug(f"File not found: {file}")
+                logger.debug("File not found: %s", file)
             except Exception as e:
-                logger.debug(f"An error occurred when reading file: {file}\n")
-                logger.debug(f"Error: {e}")
+                logger.debug("An error occurred when reading file: %s\n", file)
+                logger.debug("Error: %s", e)
         imported_metrics_data = "\n".join(imported_metrics_data)
 
         aggregated_metrics = {}

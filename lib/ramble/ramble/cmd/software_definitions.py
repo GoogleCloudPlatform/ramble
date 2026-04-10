@@ -77,7 +77,7 @@ def collect_definitions():
                                 definitions[pkg_name] = pkg_def.copy()
                                 used_by[pkg_name] = [obj_namespace]
                             else:
-                                logger.debug(f" Checking package: {pkg_name}")
+                                logger.debug(" Checking package: %s", pkg_name)
                                 if pkg_def.conflict_spec(
                                     definitions[pkg_name], skip_conflicting_when=True
                                 ):

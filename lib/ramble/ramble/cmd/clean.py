@@ -83,12 +83,12 @@ def remove_python_caches():
             for f in files:
                 if f.endswith(".pyc") or f.endswith(".pyo"):
                     fname = os.path.join(root, f)
-                    logger.debug(f"Removing {fname}")
+                    logger.debug("Removing %s", fname)
                     os.remove(fname)
             for d in dirs:
                 if d == "__pycache__":
                     dname = os.path.join(root, d)
-                    logger.debug(f"Removing {dname}")
+                    logger.debug("Removing %s", dname)
                     shutil.rmtree(dname)
 
 
@@ -116,18 +116,18 @@ def remove_reports_files():
                 for inv_file in inventory["files"]:
                     if inv_file in files:
                         fname = os.path.join(root, inv_file)
-                        logger.debug(f"Removing {fname}")
+                        logger.debug("Removing %s", fname)
                         os.remove(fname)
-                logger.debug(f"Removing {inventory_file}")
+                logger.debug("Removing %s", inventory_file)
                 os.remove(inventory_file)
 
             if not os.listdir(root):
-                logger.debug(f"Removing empty directory {root}")
+                logger.debug("Removing empty directory %s", root)
                 os.rmdir(root)
 
         # Clean up symlinks in root dir
         for item in os.listdir(reports_path):
             item_path = os.path.join(reports_path, item)
             if os.path.islink(item_path):
-                logger.debug(f"Removing {item_path}")
+                logger.debug("Removing %s", item_path)
                 os.remove(item_path)

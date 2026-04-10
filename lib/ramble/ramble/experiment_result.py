@@ -76,7 +76,7 @@ class ExperimentResult:
         experiment_dir = app_inst.expander.experiment_run_dir
         cache_file = os.path.join(experiment_dir, self.cache_file_name)
 
-        logger.debug(f"Experiment results cache file is: {cache_file}")
+        logger.debug("Experiment results cache file is: %s", cache_file)
 
         if not os.path.isfile(cache_file):
             logger.debug("No valid experiment results cache found. Will create one.")

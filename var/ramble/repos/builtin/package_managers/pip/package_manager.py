@@ -144,7 +144,7 @@ class Pip(PackageManagerBase):
             workspace.add_to_cache(cache_tupl)
 
         env_context = app_inst.expander.expand_var_name(self.keywords.env_name)
-        logger.debug(f" Required environment: {self.environment_required}")
+        logger.debug(" Required environment: %s", self.environment_required)
         try:
             self.runner.set_dry_run(workspace.dry_run)
             self.runner.configure_env(env_path)

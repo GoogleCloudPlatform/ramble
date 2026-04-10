@@ -432,7 +432,7 @@ class Renderer:
         where_expander = ramble.expander.Expander(object_variables, None)
 
         for obj in new_objects:
-            logger.debug(f"Rendering {render_group.object}:")
+            logger.debug("Rendering %s:", render_group.object)
 
             keep_object = True
             if exclude_where:

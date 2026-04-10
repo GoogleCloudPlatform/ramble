@@ -212,10 +212,10 @@ def _load_results(args):
         json_results_path = os.path.join(ramble_ws, "results.latest.json")
         yaml_results_path = os.path.join(ramble_ws, "results.latest.yaml")
         if os.path.exists(json_results_path):
-            logger.debug(f"Importing {json_results_path}")
+            logger.debug("Importing %s", json_results_path)
             results_dict = import_results_file(json_results_path)
         elif os.path.exists(yaml_results_path):
-            logger.debug(f"Importing {yaml_results_path}")
+            logger.debug("Importing %s", yaml_results_path)
             results_dict = import_results_file(yaml_results_path)
         else:
             logger.die(

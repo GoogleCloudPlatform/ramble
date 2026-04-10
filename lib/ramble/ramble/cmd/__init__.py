@@ -102,13 +102,13 @@ def get_module(cmd_name):
     require_cmd_name(cmd_name)
     pname = python_name(cmd_name)
 
-    logger.debug(f"Getting module for command {cmd_name}")
+    logger.debug("Getting module for command %s", cmd_name)
 
     try:
         # Try to import the command from the built-in directory
         module_name = f"{__name__}.{pname}"
         module = __import__(module_name, fromlist=[pname, SETUP_PARSER, DESCRIPTION], level=0)
-        logger.debug(f"Imported {pname} from built-in commands")
+        logger.debug("Imported %s from built-in commands", pname)
     except ImportError:
         try:
             module = spack.extensions.get_module(cmd_name)

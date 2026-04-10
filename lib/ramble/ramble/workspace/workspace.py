@@ -130,7 +130,7 @@ def valid_workspace_name(name):
 
 def validate_workspace_name(name):
     if not valid_workspace_name(name):
-        logger.debug(f"Validation failed for {name}")
+        logger.debug("Validation failed for %s", name)
         raise ValueError(
             (
                 "'%s': names must start with a letter, and only contain "
@@ -161,7 +161,7 @@ def activate(ws):
     # below.
     prepare_config_scope(ws)
 
-    logger.debug(f"Using workspace '{ws.root}'")
+    logger.debug("Using workspace '%s'", ws.root)
 
     # Do this last, because setting up the config must succeed first.
     _active_workspace = ws
@@ -174,7 +174,7 @@ def deactivate():
     if not _active_workspace:
         return
 
-    logger.debug(f"Deactivated workspace '{_active_workspace.root}'")
+    logger.debug("Deactivated workspace '%s'", _active_workspace.root)
 
     deactivate_config_scope(_active_workspace)
 
@@ -440,7 +440,7 @@ class Workspace:
     hash_file_name = "workspace_hash.sha256"
 
     def __init__(self, root, dry_run=False, read_default_template=True):
-        logger.debug(f"In workspace init. Root = {root}")
+        logger.debug("In workspace init. Root = %s", root)
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
         self.dry_run = dry_run
@@ -849,7 +849,7 @@ ramble:
         """
 
         ws_dict = self._get_workspace_dict()
-        logger.debug(f" With ws dict: {ws_dict}")
+        logger.debug(" With ws dict: %s", ws_dict)
 
         # Iterate over applications in ramble.yaml first
         app_dict = ramble.config.config.get_config(namespace.application)
@@ -1214,7 +1214,7 @@ ramble:
                 # If version validation fails (e.g. unknown version in strict mode),
                 # we still want to allow adding the experiment to the config.
                 # Full validation will happen during concretization/setup.
-                logger.debug(f"Version initialization failed for {application}: {e}")
+                logger.debug("Version initialization failed for %s: %s", application, e)
                 pass
         elif hasattr(app_inst, "preferred_version"):
             try:
@@ -1223,7 +1223,7 @@ ramble:
             except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
                 # If version validation fails, we still want to allow adding the experiment.
                 # Full validation will happen during concretization/setup.
-                logger.debug(f"Version initialization failed for {application}: {e}")
+                logger.debug("Version initialization failed for %s: %s", application, e)
                 pass
 
         app_inst.variables = {}
@@ -1324,7 +1324,9 @@ ramble:
             except (ramble.expander.WorkloadNotDefinedError, ramble.error.RambleError) as e:
                 # Workload may not be defined for the active 'when' conditions.
                 # Skip MPI requirement checks for now as full validation occurs later.
-                logger.debug(f"Skipping MPI requirement check for workload {workload_name}: {e}")
+                logger.debug(
+                    "Skipping MPI requirement check for workload %s: %s", workload_name, e
+                )
                 pass
             if workload_name not in workloads_dict:
                 workloads_dict[workload_name] = syaml.syaml_dict()
@@ -1489,8 +1491,8 @@ ramble:
                         and comp in packages_dict
                         and info.conflict_dict(packages_dict[comp])
                     ):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
+                        logger.debug("  Spec 1: %s", str(info))
+                        logger.debug("  Spec 2: %s", str(packages_dict[comp]))
                         raise RambleConflictingDefinitionError(
                             f"Compiler {comp} would be defined " "in multiple conflicting ways"
                         )
@@ -1504,7 +1506,7 @@ ramble:
                     for conf in info.config_opts():
                         ramble.config.add(conf, scope=self.ws_file_config_scope_name())
 
-            logger.debug(f"Trying to define packages for {env_name}")
+            logger.debug("Trying to define packages for %s", env_name)
             app_packages = []
             if env_name in environments_dict:
                 if namespace.packages in environments_dict[env_name]:
@@ -1515,14 +1517,14 @@ ramble:
             )
             for spec_name, definitions in software_packages.items():
                 for info in definitions:
-                    logger.debug(f"    Found spec: {spec_name}")
+                    logger.debug("    Found spec: %s", spec_name)
                     if (
                         not quiet
                         and spec_name in packages_dict
                         and info.conflict_dict(packages_dict[spec_name])
                     ):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
+                        logger.debug("  Spec 1: %s", str(info))
+                        logger.debug("  Spec 2: %s", str(packages_dict[spec_name]))
                         raise RambleConflictingDefinitionError(
                             f"Package {spec_name} would be defined in multiple " "conflicting ways"
                         )
@@ -2441,7 +2443,7 @@ ramble:
         ]
 
         if len(mod_names) < 1:
-            logger.error(f"No modifiers found matching name pattern of {name_pattern}")
+            logger.error("No modifiers found matching name pattern of %s", name_pattern)
 
         added = 0
         for mod_name in mod_names:
@@ -2657,7 +2659,7 @@ ramble:
     def get_applications(self):
         """Get the dictionary of applications"""
         logger.debug("Getting app dict.")
-        logger.debug(f" {self._get_workspace_dict()}")
+        logger.debug(" %s", self._get_workspace_dict())
         workspace_dict = self._get_workspace_dict()
         if namespace.application not in workspace_dict[namespace.ramble]:
             workspace_dict[namespace.ramble][namespace.application] = syaml.syaml_dict()

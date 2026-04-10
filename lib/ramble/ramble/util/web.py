@@ -148,7 +148,7 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
             remote_path = "file://" + remote_path
     remote_url = url_util.parse(remote_path)
     remote_file_path = url_util.local_file_path(remote_url)
-    logger.debug(f"Trying to backup file to: {remote_file_path}")
+    logger.debug("Trying to backup file to: %s", remote_file_path)
     if remote_file_path is not None:
         mkdirp(os.path.dirname(remote_file_path))
         if keep_original:
@@ -227,10 +227,10 @@ def url_exists(url):
 def _debug_print_delete_results(result):
     if "Deleted" in result:
         for d in result["Deleted"]:
-            logger.debug(f'Deleted {d["Key"]}')
+            logger.debug("Deleted %s", d["Key"])
     if "Errors" in result:
         for e in result["Errors"]:
-            logger.debug(f'Failed to delete {e["Key"]} ({e["Message"]})')
+            logger.debug("Failed to delete %s (%s)", e["Key"], e["Message"])
 
 
 def remove_url(url, recursive=False):
@@ -455,10 +455,10 @@ def spider(root_urls, depth=0, concurrency=32):
         except Exception as e:
             # Other types of errors are completely ignored,
             # except in debug mode
-            logger.debug(f"Error in _spider: {type(e)}:{str(e)}", traceback.format_exc())
+            logger.debug("Error in _spider: %s:%s\n%s", type(e), str(e), traceback.format_exc())
 
         finally:
-            logger.debug(f"SPIDER: [url={url}]")
+            logger.debug("SPIDER: [url=%s]", url)
 
         return pages, links, subcalls
 

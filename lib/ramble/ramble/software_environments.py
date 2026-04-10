@@ -990,8 +990,8 @@ class SoftwareEnvironments:
             if isinstance(pkg, RenderedPackage) and pkg.compiler and pkg.compiler in pkg_names:
                 compiler_warnings.append((pkg.name, pkg.compiler))
 
-        logger.debug(f" Used compilers: {used_compilers}")
-        logger.debug(f" Compiler warnings: {compiler_warnings}")
+        logger.debug(" Used compilers: %s", used_compilers)
+        logger.debug(" Compiler warnings: %s", compiler_warnings)
         if compiler_warnings:
             logger.warn(
                 f"Environment {environment.name} contains packages and their "

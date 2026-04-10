@@ -227,7 +227,7 @@ class SpackStack(ExecutableApplication):
         with open(spack_file) as f:
             spack_data = syaml.load_config(f)
 
-        logger.debug(f"Spack data: {spack_data}")
+        logger.debug("Spack data: %s", spack_data)
 
         for spec in spack_data["spack"]["specs"]:
             spec_list.append(spec)

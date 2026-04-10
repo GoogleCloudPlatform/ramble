@@ -129,6 +129,18 @@ class Logger:
 
         return kwargs
 
+    def _format_args(self, args):
+        """Format arguments if the first argument is a string and there are more arguments.
+
+        Uses % formatting if possible. Fallback to original args if TypeError occurs.
+        """
+        if len(args) > 1 and isinstance(args[0], str):
+            try:
+                return (args[0] % args[1:],)
+            except TypeError:
+                return args
+        return args
+
     @contextmanager
     def configure_colors(self, **kwargs):
         old_value = color.get_color_when()
@@ -144,12 +156,13 @@ class Logger:
         print). Perform this action for all logs and the default log (to
         screen).
         """
+        formatted_args = self._format_args(args)
         for idx, _ in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(default_kwargs=kwargs, index=idx)
             with self.configure_colors(**st_kwargs):
-                tty.info(*args, **st_kwargs)
+                tty.info(*formatted_args, **st_kwargs)
 
-        tty.msg(*args, **kwargs)
+        tty.msg(*formatted_args, **kwargs)
 
     def msg(self, *args, **kwargs):
         """Print a message to the active log
@@ -157,9 +170,10 @@ class Logger:
         Pass all args and kwargs to tty.info (which will concatenate and
         print). Perform this action for the active log only.
         """
+        formatted_args = self._format_args(args)
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
         with self.configure_colors(**st_kwargs):
-            tty.info(*args, **st_kwargs)
+            tty.info(*formatted_args, **st_kwargs)
 
     def info(self, *args, **kwargs):
         """Print a message to the active log
@@ -167,9 +181,10 @@ class Logger:
         Pass all args and kwargs to tty.info (which will concatenate and
         print). Perform this action for the active log only.
         """
+        formatted_args = self._format_args(args)
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
         with self.configure_colors(**st_kwargs):
-            tty.info(*args, **st_kwargs)
+            tty.info(*formatted_args, **st_kwargs)
 
     def verbose(self, *args, **kwargs):
         """Print a verbose message to the active log
@@ -177,9 +192,10 @@ class Logger:
         Pass all args and kwargs to tty.verbose (which will concatenate and
         print). Perform this action for the active log only.
         """
+        formatted_args = self._format_args(args)
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
         with self.configure_colors(**st_kwargs):
-            tty.verbose(*args, **st_kwargs)
+            tty.verbose(*formatted_args, **st_kwargs)
 
     def warn(self, *args, **kwargs):
         """Print a warning message to the active log
@@ -187,23 +203,23 @@ class Logger:
         Pass all args and kwargs to tty.warn (which will concatenate and
         print). Perform this action for the active log only.
         """
-
+        formatted_args = self._format_args(args)
         st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
         if self._aggregated_warnings:
             if "stream" in st_kwargs:
                 file_name = st_kwargs["stream"].name
                 if file_name not in self.file_warnings:
                     self.file_warnings[file_name] = []
-                self.file_warnings[file_name].append((args, kwargs))
+                self.file_warnings[file_name].append((formatted_args, kwargs))
             else:
-                self.global_warnings.append((args, kwargs))
+                self.global_warnings.append((formatted_args, kwargs))
 
         else:
             if "stream" in st_kwargs:
                 with self.configure_colors(**st_kwargs):
-                    tty.warn(*args, **st_kwargs)
+                    tty.warn(*formatted_args, **st_kwargs)
 
-            tty.warn(*args, **kwargs)
+            tty.warn(*formatted_args, **kwargs)
 
     def all_warnings(self):
         """Print all warnings that have been encountered
@@ -235,9 +251,10 @@ class Logger:
         print). Perform this action for the active log only.
         """
         if tty._debug:
+            formatted_args = self._format_args(args)
             st_kwargs = self._stream_kwargs(default_kwargs=kwargs)
             with self.configure_colors(**st_kwargs):
-                tty.debug(*args, **st_kwargs)
+                tty.debug(*formatted_args, **st_kwargs)
 
     def error(self, *args, **kwargs):
         """Print an error message
@@ -246,12 +263,13 @@ class Logger:
         print). Perform this action all logs, and the default stream (print to
         screen).
         """
+        formatted_args = self._format_args(args)
         for idx, _ in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(index=idx, default_kwargs=kwargs)
             with self.configure_colors(**st_kwargs):
-                tty.error(*args, **st_kwargs)
+                tty.error(*formatted_args, **st_kwargs)
 
-        tty.error(*args, **kwargs)
+        tty.error(*formatted_args, **kwargs)
 
     def die(self, *args, **kwargs):
         """Print an error message and terminate execution
@@ -260,15 +278,16 @@ class Logger:
         print). Perform this action all logs. After all logs are printed to,
         terminate execution (and error) using tty.die.
         """
+        formatted_args = self._format_args(args)
         for idx, _ in enumerate(self.log_stack):
             st_kwargs = self._stream_kwargs(index=idx, default_kwargs=kwargs)
             with self.configure_colors(**st_kwargs):
-                tty.error(*args, **st_kwargs)
+                tty.error(*formatted_args, **st_kwargs)
 
         while self.log_stack:
             self.remove_log()
 
-        tty.die(*args, **kwargs)
+        tty.die(*formatted_args, **kwargs)
 
 
 logger = Logger()
