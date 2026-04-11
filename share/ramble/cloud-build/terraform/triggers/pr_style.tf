@@ -15,6 +15,16 @@ resource "google_cloudbuild_trigger" "pr_style" {
     }
   }
 
+  ignored_files = local.docs_files
+
+  included_files = concat(
+    local.core_source_files,
+    local.dependency_and_config_files,
+    [
+      "share/ramble/cloud-build/**"
+    ]
+  )
+
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 
   filename = "share/ramble/cloud-build/ramble-pr-style.yaml"
