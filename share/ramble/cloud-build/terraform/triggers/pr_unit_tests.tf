@@ -13,16 +13,15 @@ resource "google_cloudbuild_trigger" "pr_unit_tests" {
     }
   }
 
-  ignored_files = [
-    "lib/ramble/docs/**"
-  ]
+  ignored_files = local.docs_files
 
-  included_files = [
-    "lib/ramble/**",
-    "var/ramble/repos/**",
-    "share/ramble/cloud-build/**",
-    "conftest.py"
-  ]
+  included_files = concat(
+    local.core_source_files,
+    local.dependency_and_config_files,
+    [
+      "share/ramble/cloud-build/**"
+    ]
+  )
 
   include_build_logs = "INCLUDE_BUILD_LOGS_WITH_STATUS"
 

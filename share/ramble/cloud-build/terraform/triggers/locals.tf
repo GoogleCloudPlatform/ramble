@@ -20,4 +20,21 @@ locals {
     "debian"     = "apt"
     "rockylinux" = "yum"
   }
+
+  docs_files = [
+    "lib/ramble/docs/**"
+  ]
+
+  core_source_files = [
+    "bin/**",
+    "lib/ramble/**",
+    "var/ramble/repos/**",
+    "conftest.py"
+  ]
+
+  dependency_and_config_files = [
+    "requirements.txt",
+    "requirements-dev.txt",
+    "pyproject.toml"
+  ]
 }

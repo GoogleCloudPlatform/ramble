@@ -20,19 +20,16 @@ resource "google_cloudbuild_trigger" "codecov_pr" {
     }
   }
 
-  ignored_files = [
-    "lib/ramble/docs/**"
-  ]
+  ignored_files = local.docs_files
 
-  included_files = [
-    "lib/ramble/**",
-    "var/ramble/repos/**",
-    "share/ramble/cloud-build/**",
-    "share/ramble/qa/**",
-    "pyproject.toml",
-    "requirements-dev.txt",
-    "requirements.txt"
-  ]
+  included_files = concat(
+    local.core_source_files,
+    local.dependency_and_config_files,
+    [
+      "share/ramble/cloud-build/**",
+      "share/ramble/qa/**"
+    ]
+  )
 
   filename = "share/ramble/cloud-build/ramble-pr-unit-tests.yaml"
 
