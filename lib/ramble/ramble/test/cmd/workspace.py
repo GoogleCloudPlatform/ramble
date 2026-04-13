@@ -616,6 +616,103 @@ def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
         assert "test1" not in out
 
 
+def test_workspace_create_parent_dir(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        os.makedirs(wsdir1)
+        os.makedirs(wsdir2)
+
+        with ramble.config.override("config:workspace_dirs", [wsdir1, wsdir2]):
+            # Create in default (wsdir1)
+            workspace("create", "test_default")
+            assert os.path.exists(os.path.join(wsdir1, "test_default"))
+
+            # Create in wsdir2 using --parent-dir
+            workspace("create", "--parent-dir", wsdir2, "test_specific")
+            assert os.path.exists(os.path.join(wsdir2, "test_specific"))
+
+            # Verify both are listed
+            out = workspace("list")
+            assert "test_default" in out
+            assert "test_specific" in out
+
+        # Test validation of parent-dir
+        with ramble.config.override("config:workspace_dirs", [wsdir1]):
+            with pytest.raises(
+                ramble.workspace.RambleWorkspaceError,
+                match="is not in configured workspace_dirs",
+            ):
+                ramble.workspace.create("test_fail", parent_dir=wsdir2)
+
+
+def test_workspace_list_parent_dir(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        os.makedirs(wsdir1)
+        os.makedirs(wsdir2)
+
+        with ramble.config.override("config:workspace_dirs", [wsdir1, wsdir2]):
+            workspace("create", "--parent-dir", wsdir1, "test1")
+            workspace("create", "--parent-dir", wsdir2, "test2")
+
+            # List all
+            out = workspace("list")
+            assert "test1" in out
+            assert "test2" in out
+
+            # List only ws1
+            out = workspace("list", "--parent-dir", wsdir1)
+            assert "test1" in out
+            assert "test2" not in out
+
+            # List only ws2
+            out = workspace("list", "--parent-dir", wsdir2)
+            assert "test1" not in out
+            assert "test2" in out
+
+        # Test validation of parent-dir in list
+        with ramble.config.override("config:workspace_dirs", [wsdir1]):
+            with pytest.raises(
+                ramble.workspace.RambleWorkspaceError,
+                match="is not in configured workspace_dirs",
+            ):
+                ramble.workspace.all_workspace_names(parent_dir=wsdir2)
+
+
+def test_workspace_activate_parent_dir(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        os.makedirs(wsdir1)
+        os.makedirs(wsdir2)
+
+        with ramble.config.override("config:workspace_dirs", [wsdir1, wsdir2]):
+            workspace("create", "--parent-dir", wsdir1, "test1")
+            workspace("create", "--parent-dir", wsdir2, "test1")
+
+            # Activate without parent-dir (should pick first one, wsdir1)
+            out = workspace("activate", "test1", "--sh")
+            assert wsdir1 in out
+
+            # Activate with parent-dir wsdir1
+            out = workspace("activate", "test1", "--parent-dir", wsdir1, "--sh")
+            assert wsdir1 in out
+
+            # Activate with parent-dir wsdir2
+            out = workspace("activate", "test1", "--parent-dir", wsdir2, "--sh")
+            assert wsdir2 in out
+
+        # Test validation of parent-dir in activate (via exists)
+        with ramble.config.override("config:workspace_dirs", [wsdir1]):
+            with pytest.raises(
+                ramble.workspace.RambleWorkspaceError,
+                match="is not in configured workspace_dirs",
+            ):
+                ramble.workspace.exists("test1", parent_dir=wsdir2)
+
+
 def test_remove_workspace():
     workspace("create", "foo")
     workspace("create", "bar")

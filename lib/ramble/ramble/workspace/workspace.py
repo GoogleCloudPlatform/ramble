@@ -193,9 +193,19 @@ def deactivate_config_scope(workspace):
         ramble.config.config.remove_scope(scope.name)
 
 
-def all_workspace_names():
+def all_workspace_names(parent_dir=None):
     """List the names of workspaces that currently exist."""
-    wspaths = get_workspace_path()
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Directory '{parent_dir}' is not in configured workspace_dirs"
+            )
+        wspaths = [canonical_parent]
+    else:
+        wspaths = get_workspace_path()
+
     names = []
     for wspath in wspaths:
         if not os.path.exists(wspath):
@@ -229,9 +239,19 @@ def get_workspace_path():
     return [ramble.util.path.canonicalize_path(str(p)) for p in paths]
 
 
-def _root(name):
+def _root(name, parent_dir=None):
     """Non-validating version of root(), to be used internally."""
-    wspaths = get_workspace_path()
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Directory '{parent_dir}' is not in configured workspace_dirs"
+            )
+        wspaths = [canonical_parent]
+    else:
+        wspaths = get_workspace_path()
+
     for wspath in wspaths:
         cand_root = os.path.join(wspath, name)
         if is_workspace_dir(cand_root):
@@ -239,17 +259,17 @@ def _root(name):
     return os.path.join(wspaths[0], name)
 
 
-def root(name):
+def root(name, parent_dir=None):
     """Get the root directory for a workspace by name."""
     validate_workspace_name(name)
-    return _root(name)
+    return _root(name, parent_dir=parent_dir)
 
 
-def exists(name):
+def exists(name, parent_dir=None):
     """Whether a workspace with this name exists or not."""
     if not valid_workspace_name(name):
         return False
-    return os.path.isdir(root(name))
+    return os.path.isdir(root(name, parent_dir=parent_dir))
 
 
 def active(name):
@@ -316,12 +336,24 @@ def is_workspace_dir(path):
     return ret_val
 
 
-def create(name, read_default_template=True):
+def create(name, read_default_template=True, parent_dir=None):
     """Create a named workspace in Ramble"""
     validate_workspace_name(name)
-    if exists(name):
+    if exists(name, parent_dir=parent_dir):
         raise RambleWorkspaceError(f"'{name}': workspace already exists")
-    return Workspace(root(name), read_default_template=read_default_template)
+
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Parent directory '{parent_dir}' is not in configured workspace_dirs: {wspaths}"
+            )
+        ws_root = os.path.join(canonical_parent, name)
+    else:
+        ws_root = root(name)
+
+    return Workspace(ws_root, read_default_template=read_default_template)
 
 
 def config_dict(yaml_data):

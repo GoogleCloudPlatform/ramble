@@ -631,7 +631,7 @@ _ramble_workspace() {
 _ramble_workspace_activate() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir"
+        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir --parent-dir"
     else
         _workspaces
     fi
@@ -648,7 +648,7 @@ _ramble_workspace_deactivate() {
 _ramble_workspace_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir -a --activate"
+        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir --parent-dir -a --activate"
     else
         RAMBLE_COMREPLY=""
     fi
@@ -696,7 +696,7 @@ _ramble_workspace_experiment_logs() {
 }
 
 _ramble_workspace_list() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help --parent-dir"
 }
 
 _ramble_workspace_remove() {
