@@ -19,7 +19,7 @@ workspace = RambleCommand("workspace")
 
 @pytest.mark.perf
 @pytest.mark.maybeslow
-def test_matrix_filter_perf(make_workspace_from_config):
+def test_matrix_filter_perf(make_workspace_from_config, ramble_benchmark):
     # Create a matrix of 10000 experiments, but exclude 9999 of them.
     # This test is to monitor the efficiency of the filtering.
     test_config = (
@@ -52,7 +52,7 @@ ramble:
     )
     ws, ws_name = make_workspace_from_config(test_config)
 
-    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    ramble_benchmark(workspace, "setup", "--dry-run", global_args=["-w", ws_name])
 
     exp_dir = os.path.join(ws.root, "experiments", "hostname", "local", "test_1_1")
     assert os.path.isdir(exp_dir)

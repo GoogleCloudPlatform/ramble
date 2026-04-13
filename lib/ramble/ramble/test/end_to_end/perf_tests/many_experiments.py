@@ -22,7 +22,7 @@ workspace = RambleCommand("workspace")
 
 @pytest.mark.perf
 @pytest.mark.long
-def test_many_experiments(workspace_name):
+def test_many_experiments(workspace_name, ramble_benchmark):
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     global_args = ["-w", workspace_name]
@@ -50,6 +50,6 @@ def test_many_experiments(workspace_name):
         global_args=global_args,
     )
 
-    output = workspace("info", global_args=global_args)
+    output = ramble_benchmark(workspace, "info", global_args=global_args)
 
     assert "Experiment 8100" in output

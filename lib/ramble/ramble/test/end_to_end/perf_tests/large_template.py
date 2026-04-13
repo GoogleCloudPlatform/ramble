@@ -21,7 +21,9 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.perf
-def test_large_template_expansion(make_workspace_from_config, mutable_mock_apps_repo, tmpdir):
+def test_large_template_expansion(
+    make_workspace_from_config, mutable_mock_apps_repo, tmpdir, ramble_benchmark
+):
     # Define a mock template app in a temporary repo
     repo_dir = tmpdir.mkdir("mock_repo")
     with open(os.path.join(str(repo_dir), "repo.yaml"), "w") as f:
@@ -91,7 +93,7 @@ ramble:
         f.write(template_content)
 
     # Run workspace setup to trigger template expansion
-    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    ramble_benchmark(workspace, "setup", "--dry-run", global_args=["-w", ws_name])
 
     # Verify the expanded file exists and has correct content
     run_dir = os.path.join(ws.experiment_dir, "template", "test_template", "test")

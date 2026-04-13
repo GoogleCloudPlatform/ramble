@@ -18,7 +18,7 @@ workspace = RambleCommand("workspace")
 
 @pytest.mark.perf
 @pytest.mark.long
-def test_many_objects_defaults(make_workspace_from_config):
+def test_many_objects_defaults(make_workspace_from_config, ramble_benchmark):
     # This test is designed to stress the variable expansion and object creation
     # by using many modifiers, each with many default variables.
     # It aims to verify performance when a large number of objects are present.
@@ -71,7 +71,7 @@ ramble:
     ws, ws_name = make_workspace_from_config(test_config)
 
     # We only run setup --dry-run to trigger the expansion and object creation
-    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+    ramble_benchmark(workspace, "setup", "--dry-run", global_args=["-w", ws_name])
 
     # Verify that the correct number of experiments were created
     # 10 n_nodes * 100 matrix_var = 1000 experiments

@@ -76,10 +76,15 @@ def pytest_runtest_makereport(item, call):
     res = outcome.get_result()
 
     if res.when == "call" and "perf" in item.keywords:
+        if hasattr(item, "benchmark_stats"):
+            duration = item.benchmark_stats.stats.median
+        else:
+            duration = res.duration
+
         metric = {
             "test_name": item.name,
             "test_id": item.nodeid,
-            "duration": res.duration,
+            "duration": duration,
             "outcome": res.outcome,
         }
         item.session.perf_metrics.append(metric)
@@ -129,6 +134,22 @@ def pytest_collection_modifyitems(config, items):
 #
 # These fixtures are applied to all tests
 #
+
+
+@pytest.fixture
+def ramble_benchmark(benchmark, request):
+    """A wrapper around pytest-benchmark that automatically exposes benchmark stats."""
+
+    def runner(*args, **kwargs):
+        if hasattr(request.node, "benchmark_stats"):
+            raise RuntimeError("ramble_benchmark can only be called at most once per test.")
+        result = benchmark(*args, **kwargs)
+        request.node.benchmark_stats = benchmark.stats
+        return result
+
+    return runner
+
+
 @pytest.fixture(scope="function", autouse=True)
 def no_chdir():
     """Ensure that no test changes Ramble's working directory.
