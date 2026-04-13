@@ -363,3 +363,27 @@ def test_sqlite_uploader_chunked_upload_errors(tmpdir, mock_results_with_metadat
         uploader.chunked_upload(exp_table_id, bad_exps_to_insert, uri)
         captured = capsys.readouterr()
         assert "Could not find a valid schema" in captured.err
+
+
+def test_fom_validation_fails_with_none():
+    """Test that FOM validation fails when value is None"""
+    import jsonschema
+
+    from ramble.schema.fom import fom_schema, fom_schema_version
+    from ramble.uploader import validate_data
+
+    bad_fom = {
+        "name": "test_fom",
+        "value": None,  # This should be a string according to schema
+        "unit": "s",
+        "origin": "test",
+        "origin_type": "test",
+        "context": "test",
+        "experiment_id": 1,
+        "experiment_name": "test_exp",
+    }
+
+    schema = fom_schema[fom_schema_version]
+
+    with pytest.raises(jsonschema.exceptions.ValidationError):
+        validate_data(bad_fom, schema)

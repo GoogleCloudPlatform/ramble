@@ -2545,6 +2545,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if fom_map_key not in self._fom_map:
                     continue
                 fom_value = self._fom_map.get(fom_map_key)
+                if fom_value is None:
+                    continue
                 expanded_fom_value = self.expander.expand_var(fom_value)
                 fom_values[context][fom_name] = {
                     "value": expanded_fom_value,
@@ -2731,6 +2733,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                             fom_val = fom_match.group(
                                                 fom_conf["group"]
                                             )
+                                            if fom_val is None:
+                                                continue
                                             if (
                                                 fom_conf["units_expanded"]
                                                 is not None

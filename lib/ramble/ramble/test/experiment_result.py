@@ -194,3 +194,130 @@ def test_get_newest_experiment_file_inner_file_not_found(tmpdir, monkeypatch):
     newest_file, max_mtime = get_newest_experiment_file(str(experiment_dir))
     assert newest_file is None
     assert max_mtime is None
+
+
+def test_extract_inmem_foms_skips_none(mutable_mock_apps_repo):
+    """Test that _extract_inmem_foms skips FOMs with None value"""
+    app_inst = mutable_mock_apps_repo.get("basic")
+
+    # Set up _fom_map to return None for a key
+    app_inst._fom_map = {"test_key": None}
+
+    inmem_defs = {
+        "test_context": {
+            "foms": {
+                "test_fom": {
+                    "fom_name_expanded": "test_fom",
+                    "fom_map_key": "test_key",
+                    "units_expanded": "s",
+                    "origin": "test",
+                    "origin_type": "test",
+                    "fom_type": "test",
+                }
+            }
+        }
+    }
+
+    fom_values = {}
+    app_inst._extract_inmem_foms(inmem_defs, fom_values)
+
+    # Assert that test_fom is NOT in fom_values
+    assert "test_context" not in fom_values or "test_fom" not in fom_values["test_context"]
+
+
+def test_analyze_experiments_skips_none_fom(mutable_mock_apps_repo, monkeypatch, tmpdir):
+    """Test that _analyze_experiments skips FOMs when value group is None"""
+    app_inst = mutable_mock_apps_repo.get("basic")
+
+    # Create a temp file to analyze
+    log_file = tmpdir.join("test.out")
+    log_file.write("Match line but optional group is empty: Value=\nValid Value=42\n")
+
+    import re
+
+    # Mock analysis_dicts
+    def mock_analysis_dicts(criteria_list):
+        files = {
+            str(log_file): {
+                "success_criteria": [],
+                "contexts": {"null": ["test_fom", "valid_fom"]},
+            }
+        }
+        f_defs = {
+            "null": {
+                "foms": {
+                    "test_fom": {
+                        "regex": re.compile(r"Value=(?P<val>\d*)"),  # Optional digits
+                        "group": "val",
+                        "fom_name_expanded": "test_fom",
+                        "units": "",
+                        "origin": "test",
+                        "origin_type": "test",
+                        "fom_type": "test",
+                        "contexts": [],
+                        "units_expanded": None,
+                        "origin_type_expanded": "test",
+                        "fom_type_expanded": "test",
+                    },
+                    "valid_fom": {
+                        "regex": re.compile(r"Valid Value=(?P<val>\d+)"),
+                        "group": "val",
+                        "fom_name_expanded": "valid_fom",
+                        "units": "",
+                        "origin": "test",
+                        "origin_type": "test",
+                        "fom_type": "test",
+                        "contexts": [],
+                        "units_expanded": None,
+                        "origin_type_expanded": "test",
+                        "fom_type_expanded": "test",
+                    },
+                }
+            }
+        }
+        inmem_defs = {}
+        return files, f_defs, inmem_defs
+
+    monkeypatch.setattr(app_inst, "_analysis_dicts", mock_analysis_dicts)
+
+    # Mock other dependencies of _analyze_experiments
+    monkeypatch.setattr(app_inst.result, "read_cache", lambda *args: False)
+    monkeypatch.setattr(app_inst, "get_status", lambda: None)
+    monkeypatch.setattr(app_inst, "set_status", lambda status: None)
+    monkeypatch.setattr(app_inst.result, "finalize", lambda workspace: None)
+
+    from unittest.mock import MagicMock
+
+    app_inst._exp_lock = MagicMock()
+
+    class MockExpander:
+        def expand_var(self, val, extra_vars=None):
+            return val
+
+    app_inst.expander = MockExpander()
+
+    class MockCriteriaList:
+        def all_criteria(self):
+            return []
+
+        def passed(self):
+            return True
+
+    criteria_list = MockCriteriaList()
+
+    # Call the method
+    app_inst._analyze_experiments(criteria_list)
+
+    # Verify that the FOM was not added to app_inst.result.contexts
+    fom_found = False
+    valid_fom_found = False
+    for context in app_inst.result.contexts:
+        if context["name"] == "null":
+            for fom in context["foms"]:
+                if fom["name"] == "test_fom":
+                    fom_found = True
+                if fom["name"] == "valid_fom":
+                    valid_fom_found = True
+
+    assert not fom_found
+    assert valid_fom_found
