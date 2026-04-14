@@ -197,7 +197,7 @@ def test_get_newest_experiment_file_inner_file_not_found(tmpdir, monkeypatch):
 
 
 def test_extract_inmem_foms_skips_none(mutable_mock_apps_repo):
-    """Test that _extract_inmem_foms skips FOMs with None value"""
+    """Test that extract_inmem_foms skips FOMs with None value"""
     app_inst = mutable_mock_apps_repo.get("basic")
 
     # Set up _fom_map to return None for a key
@@ -219,7 +219,7 @@ def test_extract_inmem_foms_skips_none(mutable_mock_apps_repo):
     }
 
     fom_values = {}
-    app_inst._extract_inmem_foms(inmem_defs, fom_values)
+    app_inst.extract_inmem_foms(inmem_defs, fom_values)
 
     # Assert that test_fom is NOT in fom_values
     assert "test_context" not in fom_values or "test_fom" not in fom_values["test_context"]
@@ -278,7 +278,7 @@ def test_analyze_experiments_skips_none_fom(mutable_mock_apps_repo, monkeypatch,
         inmem_defs = {}
         return files, f_defs, inmem_defs
 
-    monkeypatch.setattr(app_inst, "_analysis_dicts", mock_analysis_dicts)
+    monkeypatch.setattr(app_inst, "analysis_dicts", mock_analysis_dicts)
 
     # Mock other dependencies of _analyze_experiments
     monkeypatch.setattr(app_inst.result, "read_cache", lambda *args: False)
