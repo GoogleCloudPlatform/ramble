@@ -30,7 +30,10 @@ class Ior(ExecutableApplication):
 
     workload("single-file", executables=["ior-prep", "ior"])
 
-    workload_group("all_workloads", workloads=["multi-file", "single-file"])
+    # For read-only performance testing: write once to files and then read many times.
+    workload("write-once-read-many", executables=["ior-prep", "ior-write", "ior-read", "ior-finalize"])
+
+    workload_group("all_workloads", workloads=["multi-file", "single-file", "write-once-read-many"])
 
     workload_variable(
         "transfer-size",
@@ -53,14 +56,14 @@ class Ior(ExecutableApplication):
     workload_variable(
         "iterations",
         default="1",
-        description="Segment Count",
+        description="Iterations",
         workload_group="all_workloads",
     )
     workload_variable(
         "file_args",
         default="-F",
         description="FilePerProc flag",
-        workloads=["multi-file"],
+        workloads=["multi-file", "write-once-read-many"],
     )
     workload_variable(
         "file_args",
@@ -78,7 +81,25 @@ class Ior(ExecutableApplication):
         "additional_args",
         default="-C -e",
         description="Additional args to pass. The default aims to suppress the use of page cache.",
-        workload_group="all_workloads",
+        workload_group=["multi-file", "single-file"],
+    )
+    workload_variable(
+        "write_args",
+        default="",
+        description="Additional args to pass for write. Used to apply Lustre Stripe count",
+        workloads=["write-once-read-many"],
+    )
+    workload_variable(
+        "read_args",
+        default="",
+        description="Additional args to pass for read.",
+        workloads=["write-once-read-many"],
+    )
+    workload_variable(
+        "file_stat_cmd",
+        default=":",
+        description="Additional args to file distribution on storage, e.g. lfs df -h.",
+        workloads=["write-once-read-many"],
     )
 
     executable(
@@ -91,6 +112,27 @@ class Ior(ExecutableApplication):
         name="ior",
         template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {additional_args}",
         use_mpi=True,
+    )
+
+    executable(
+        name="ior-write",
+        template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} {file_args} {write_args} -w -k",
+        use_mpi=True,
+    )
+
+    executable(
+        name="ior-read",
+        template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {read_args} -r -k",
+        use_mpi=True,
+    )
+
+    executable(
+        name="ior-finalize",
+        template=[
+            "{file_stat_cmd}",
+            "rm -rf {target_directory}/testFile*"
+        ],
+        use_mpi=False,
     )
 
     variant(
