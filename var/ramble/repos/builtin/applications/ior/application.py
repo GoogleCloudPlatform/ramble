@@ -98,7 +98,7 @@ class Ior(ExecutableApplication):
     workload_variable(
         "file_stat_cmd",
         default=":",
-        description="Additional args to file distribution on storage, e.g. lfs df -h.",
+        description="Command to check file distribution or storage status, e.g., 'lfs getstripe' or 'lfs df -h'.",
         workloads=["write-once-read-many"],
     )
 
