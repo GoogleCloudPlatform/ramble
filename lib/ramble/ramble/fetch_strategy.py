@@ -542,7 +542,7 @@ class URLFetchStrategy(FetchStrategy):
 
         # Expand all tarballs in their own directory to contain
         # exploding tarballs.
-        tarball_container = os.path.join(self.stage.path, "spack-expanded-archive")
+        tarball_container = os.path.join(self.stage.path, "expanded-archive")
 
         # Below we assume that the command to decompress expand the
         # archive in the current working directory
