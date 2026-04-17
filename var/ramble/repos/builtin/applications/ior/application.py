@@ -33,12 +33,12 @@ class Ior(ExecutableApplication):
     # For read-only performance testing: write once to files and then read many times.
     workload(
         "write-once-read-many",
-        executables=["ior-prep", "ior-write", "ior-read", "ior-finalize"]
+        executables=["ior-prep", "ior-write", "ior-read", "ior-finalize"],
     )
 
     workload_group(
         "all_workloads",
-        workloads=["multi-file", "single-file", "write-once-read-many"]
+        workloads=["multi-file", "single-file", "write-once-read-many"],
     )
 
     workload_variable(
