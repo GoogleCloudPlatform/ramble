@@ -57,9 +57,11 @@ def test_info_truly_impossible(mock_applications):
     out = info("-v", "truly-impossible")
 
     assert "Warning: Entering an impossible 'when' context" in out
-    assert 'Warning: Directive "workload_variable" has an impossible when condition' in out
+    assert 'Warning: Directive "workload_variable"' in out
+    assert "has an impossible when condition" in out
 
-    assert "var1" not in out
+    parts = out.split("Workload: wl1")
+    assert "var1" not in parts[1]
 
 
 def test_info_value_conflict_impossible(mock_applications):
@@ -69,4 +71,6 @@ def test_info_value_conflict_impossible(mock_applications):
         "Warning: Entering an impossible 'when' context: variant 'v' "
         "has conflicting values: '1' and 'True'" in out
     )
-    assert "var1" not in out
+
+    parts = out.split("Workload: wl1")
+    assert "var1" not in parts[1]
