@@ -14,11 +14,11 @@ RUN cd /opt && \
     spack install --deprecated py-pip ^python@${PYTHON_VER} && \
     spack clean -a
 RUN echo ". /opt/spack/share/spack/setup-env.sh\n spack load py-pip ^python@${PYTHON_VER}\n export SPACK_PYTHON=`which python3`" > /etc/profile.d/ramble.sh
-COPY requirements.txt requirements-dev.txt /opt/
+COPY requirements.txt requirements-dev.txt requirements-pinned.txt /opt/
 RUN cd /opt &&  \
     . spack/share/spack/setup-env.sh && \
     spack load py-pip ^python@${PYTHON_VER} && \
-    python -m pip install --no-cache-dir -r /opt/requirements-dev.txt
+    python -m pip install --no-cache-dir -r /opt/requirements-pinned.txt
 COPY share/ramble/cloud-build/container_test.sh /container_test.sh
 RUN chmod a+x /container_test.sh
 FROM ${BASE_IMG}:${BASE_VER}

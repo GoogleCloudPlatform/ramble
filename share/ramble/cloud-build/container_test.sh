@@ -20,7 +20,7 @@ git checkout "$BRANCH"
 . /opt/spack/share/spack/setup-env.sh
 spack load py-pip
 
-python -m pip install -r /workspace/requirements-dev.txt
+python -m pip install -r /workspace/requirements-pinned.txt
 
 cat > /load_test_env.sh <<'EOF'
 #!/bin/bash

@@ -86,6 +86,10 @@ e.g.
 
     pip install -r requirements-dev.txt
 
+Ramble's CI tests use a pinned set of dependencies. These can be installed
+using:
+
+    pip install -r requirements-pinned.txt
 
 Contributing to Ramble is relatively easy.  Just send us a
 [pull request](https://help.github.com/articles/using-pull-requests/).
