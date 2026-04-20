@@ -1,0 +1,8 @@
+-r requirements-dev.txt
+flake8==7.3.0
+black==25.12.0
+isort==7.0.0
+mypy==1.20.1
+coverage==7.13.5
+codecov-cli==10.4.0
+line_profiler==5.0.2
