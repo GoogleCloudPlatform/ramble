@@ -205,3 +205,19 @@ ramble:
 
     assert "default (null) context figures of merit" in output_filtered
     assert "test_fom = 12.3" in output_filtered
+
+
+def test_analyze_garbage_output(make_workspace_from_config):
+    """Test analyze can tolerate invalid UTF-8 bytes in the log file"""
+    ws, ws_name = _setup_workspace(make_workspace_from_config)
+
+    exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
+    with open(exp_out, "wb") as f:
+        f.write(b"\x9e\ntest-user.c.googlers.com\n")
+
+    workspace("analyze", "-p", global_args=["-w", ws_name])
+    result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
+
+    with open(result_file) as f:
+        content = f.read()
+        assert "possible hostname = test-user.c.googlers.com" in content
