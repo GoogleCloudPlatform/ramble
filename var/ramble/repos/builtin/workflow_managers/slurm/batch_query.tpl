@@ -19,18 +19,27 @@ if [ ! -z "$status" ]; then
 fi
 
 saved="{experiment_run_dir}/.slurm_job_info"
+tmp_saved="${saved}.tmp"
 
-echo "job {job_name} with id ${job_id} has status: $status" | tee $saved
+echo "job {job_name} with id ${job_id} has status: $status" | tee $tmp_saved
 
 # Print out various info about the job
-echo "job info:" | tee -a $saved
-echo "  job_id: ${job_id}" | tee -a $saved
-echo "  job_name: {job_name}" | tee -a $saved
-echo "  job_status: $status" | tee -a $saved
+echo "job info:" | tee -a $tmp_saved
+echo "  job_id: ${job_id}" | tee -a $tmp_saved
+echo "  job_name: {job_name}" | tee -a $tmp_saved
+echo "  job_status: $status" | tee -a $tmp_saved
 
 # To avoid nodelist truncation, use a big number. `xargs` handles the extra space correctly.
 paste -d ":" \
   <(echo "job_nodes job_start job_end job_elapsed_seconds job_exit_code" | xargs -n1) \
   <(sacct -j "${job_id}" -o 'nodelist%4096,start,end,elapsedraw,exitcode' -X -n | xargs -n1) \
   | sed "s/^/  /" \
-  | tee -a $saved
+  | tee -a $tmp_saved
+
+# Only update the actual file if the content has changed to preserve its mtime,
+# this is to avoid unnecessary analyze cache invalidations.
+if [ -f "$saved" ] && cmp -s "$saved" "$tmp_saved"; then
+    rm "$tmp_saved"
+else
+    mv "$tmp_saved" "$saved"
+fi
