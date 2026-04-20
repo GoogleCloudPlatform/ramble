@@ -43,7 +43,7 @@ exclude_directories = [ramble.paths.external_path]
 max_line_length = 99
 
 # The black version used by the PR style test
-_BLACK_GOLDEN_VERSION = "26.3.1"
+_BLACK_GOLDEN_VERSION = "25.12.0"
 
 common_object_exemptions = {
     # Exempt lines with urls and descriptions from overlong line errors.

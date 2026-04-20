@@ -53,13 +53,15 @@ class IntelHpl(HplBase):
     )
     executable(
         "prepare",
-        template=[r"""
+        template=[
+            r"""
 hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack"
 if [ ! -d ${hpl_bench_dir} ]; then
     hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/share/mkl/benchmarks/mp_linpack"
 fi
 hpl_run="${hpl_bench_dir}/runme_intel64_prv"
-    """.strip()],
+    """.strip()
+        ],
         mpi=False,
         redirect="",
         output_capture="",

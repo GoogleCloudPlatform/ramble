@@ -592,7 +592,9 @@ class Workspace:
     def _template_execute_script(self):
         shell = ramble.config.get("config:shell")
         shell_path = os.path.join("/bin/", shell)
-        script = f"#!{shell_path}\n" + """\
+        script = (
+            f"#!{shell_path}\n"
+            + """\
 # This is a template execution script for
 # running the execute pipeline.
 #
@@ -614,6 +616,7 @@ cd "{experiment_run_dir}"
 
 {command}
 """
+        )
 
         return script
 
