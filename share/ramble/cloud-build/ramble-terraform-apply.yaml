@@ -7,11 +7,11 @@
 # except according to those terms.
 
 steps:
-  - name: 'hashicorp/terraform:latest'
-    entrypoint: 'bash'
+  - name: 'hashicorp/terraform:1.14.9'
+    entrypoint: 'sh'
     args:
       - '-c'
       - |
         cd share/ramble/cloud-build/terraform/triggers
-        terraform init
+        terraform init -input=false
         terraform apply -auto-approve
