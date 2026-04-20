@@ -8,10 +8,10 @@
 
 steps:
   - name: 'hashicorp/terraform:1.14.9'
+    dir: 'share/ramble/cloud-build/terraform/triggers'
     entrypoint: 'sh'
     args:
       - '-c'
       - |
-        cd share/ramble/cloud-build/terraform/triggers
         terraform init -input=false
         terraform apply -auto-approve
