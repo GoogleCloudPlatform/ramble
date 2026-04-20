@@ -2637,7 +2637,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     for c in file_conf["success_criteria"]
                 ]
 
-                with open(file) as f:
+                with open(file, encoding="utf-8", errors="replace") as f:
                     for line in f:
                         new_per_file_crit_objs = []
                         for crit_obj in per_file_crit_objs:
