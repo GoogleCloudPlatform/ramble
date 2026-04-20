@@ -23,7 +23,7 @@ workspace = RambleCommand("workspace")
 
 @pytest.mark.perf
 @pytest.mark.maybeslow
-def test_analyze_large_file(workspace_name):
+def test_analyze_large_file(workspace_name, ramble_benchmark):
     global_args = ["-w", workspace_name]
     ws = ramble.workspace.create(workspace_name)
     workspace(
@@ -48,6 +48,17 @@ def test_analyze_large_file(workspace_name):
         for _ in range(10_000):
             f.write("no match\n" * 1_000)
         f.write("Sleep for 10 seconds\n")
-    output = workspace("analyze", "-p", global_args=global_args)
+
+    cache_file = os.path.join(
+        ws.experiment_dir, "sleep", "rand_sleep", "generated", "ramble_results_cache.json"
+    )
+
+    def run_analyze_no_cache():
+        if os.path.exists(cache_file):
+            os.remove(cache_file)
+        return workspace("analyze", "-p", global_args=global_args)
+
+    output = ramble_benchmark(run_analyze_no_cache)
+
     assert "Status = SUCCESS" in output
     assert "Sleep time = 10 s" in output
