@@ -17,4 +17,5 @@ class BasicModifier(ModifierBase):
     experiment definitions.
     """
 
+    name = "basic-modifier"
     modifier_class = "BasicModifier"
