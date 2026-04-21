@@ -7,10 +7,11 @@
 # except according to those terms.
 
 import fnmatch
+import functools
 from collections import OrderedDict
 from typing import Any, List, Optional, Union
 
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError
 
 
 def check_definition(
@@ -307,3 +308,100 @@ def build_when_list(
                 )
         when_list.extend(when_arg)
     return when_list
+
+
+@functools.lru_cache(maxsize=None)
+def _parse_when(w_set):
+    from ramble.util.format import when_order
+
+    variants = {}
+    versions = {}
+    for w_entry in sorted(w_set, key=when_order):
+        for w in w_entry.split():
+            if "=" in w:
+                name, val = w.split("=", 1)
+                if name in variants and variants[name] != val:
+                    return (
+                        None,
+                        None,
+                        f"variant '{name}' has conflicting values: '{variants[name]}' and '{val}'",
+                    )
+                variants[name] = val
+            elif w.startswith(("+", "~")):
+                name = w[1:]
+                val = "True" if w.startswith("+") else "False"
+                if name in variants and variants[name] != val:
+                    return (
+                        None,
+                        None,
+                        f"variant '{name}' has conflicting values: '{variants[name]}' and '{val}'",
+                    )
+                variants[name] = val
+            elif "@" in w:
+                name, ver = w.split("@", 1)
+                if name in versions and versions[name] != ver:
+                    return (
+                        None,
+                        None,
+                        f"version '{name}' has conflicting values: '{versions[name]}' and '{ver}'",
+                    )
+                versions[name] = ver
+    return variants, versions, None
+
+
+def are_when_compatible(when_set1, when_set2):
+    """Determine if two sets of when conditions are compatible
+
+    Args:
+        when_set1 (list): First set of when conditions
+        when_set2 (list): Second set of when conditions
+
+    Returns:
+        (bool): True if they are compatible, False otherwise
+    """
+    if not isinstance(when_set1, frozenset):
+        when_set1 = frozenset(when_set1)
+
+    if not isinstance(when_set2, frozenset):
+        when_set2 = frozenset(when_set2)
+
+    v1, ver1, _ = _parse_when(when_set1)
+    v2, ver2, _ = _parse_when(when_set2)
+
+    if v1 is None or v2 is None:
+        return False
+
+    for name in v1:
+        if name in v2:
+            if v1[name] != v2[name]:
+                return False
+
+    for name in ver1:
+        if name in ver2:
+            if ver1[name] != ver2[name]:
+                return False
+    return True
+
+
+def is_when_impossible(when_list):
+    """Determine if a single list of when conditions is self-contradictory
+
+    Args:
+        when_list (list): list of when conditions
+
+    Returns:
+        (bool, str): True and a message if it is impossible, False and None otherwise
+    """
+    if when_list is None:
+        return False, None
+
+    if isinstance(when_list, str):
+        when_list = [when_list]
+
+    if not isinstance(when_list, frozenset):
+        when_list = frozenset(when_list)
+
+    _, _, conflict = _parse_when(when_list)
+    if conflict:
+        return True, conflict
+    return False, None

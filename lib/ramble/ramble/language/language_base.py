@@ -20,8 +20,31 @@ from typing import Any, Callable, Dict, List, Set
 import llnl.util.lang
 
 import ramble.error
+import ramble.language.language_helpers
+from ramble.error import DirectiveError
+from ramble.util.logger import logger
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
+
+
+def _impossible_when_warning(directive_name, obj_type, obj_name, message, args, kwargs):
+    arg_lines = ["Directive Arguments:"] + [f" - {arg}" for arg in args] if args else []
+    kwarg_lines = (
+        ["Directive Keyword Arguments:"] + [f"  {k} = {v}" for k, v in kwargs.items()]
+        if kwargs
+        else []
+    )
+
+    parts = [
+        f'Directive "{directive_name}"'
+        f'{f" in {obj_type} {obj_name}" if obj_name and obj_type else ""} '
+        "has an impossible when condition:",
+        message,
+        *arg_lines,
+        *kwarg_lines,
+    ]
+
+    logger.warn("\n".join(parts))
 
 
 #: These are variant names used by ramble internally; applications can't use
@@ -42,6 +65,12 @@ namespaces = [
 
 def _push_to_context(when_condition: str) -> None:
     DirectiveMeta._when_constraints_from_context.append(when_condition)
+
+    impossible, message = ramble.language.language_helpers.is_when_impossible(
+        DirectiveMeta._when_constraints_from_context
+    )
+    if impossible:
+        logger.warn(f"Entering an impossible 'when' context: {message}")
 
 
 def _pop_from_context() -> str:
@@ -247,6 +276,27 @@ class DirectiveMeta(abc.ABCMeta):
 
                     kwargs["when"] = when_constraints.copy()
 
+                if "when" in kwargs:
+                    impossible, message = ramble.language.language_helpers.is_when_impossible(
+                        kwargs["when"]
+                    )
+                    if impossible:
+
+                        def _warn_impossible(obj):
+                            obj_type = obj.origin_type if hasattr(obj, "origin_type") else ""
+                            obj_name = obj.name if hasattr(obj, "name") else ""
+                            _impossible_when_warning(
+                                decorated_function.__name__,
+                                obj_type,
+                                obj_name,
+                                message,
+                                args,
+                                kwargs,
+                            )
+
+                        DirectiveMeta._directives_to_be_executed.append(_warn_impossible)
+                        return _warn_impossible
+
                 # If any of the arguments are executors returned by a
                 # directive passed as an argument, don't execute them
                 # lazily. Instead, let the called directive handle them.
@@ -290,7 +340,3 @@ class DirectiveMeta(abc.ABCMeta):
             return _wrapper
 
         return _decorator
-
-
-class DirectiveError(ramble.error.RambleError):
-    """This is raised when something is wrong with a language directive."""

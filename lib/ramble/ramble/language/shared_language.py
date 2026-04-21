@@ -936,12 +936,16 @@ def environment_variable(
                 workload, workloads, obj.workloads, "workload", "workloads", "environment_variable"
             )
 
+            env_var_when_frozenset = frozenset(workload_env_var.when)
             for when_set, app_workloads in obj.workloads.items():
                 for wl_name in all_workloads:
                     if wl_name in app_workloads:
-                        obj.workloads[when_set][wl_name].add_environment_variable(
-                            workload_env_var.copy()
-                        )
+                        if ramble.language.language_helpers.are_when_compatible(
+                            when_set, env_var_when_frozenset
+                        ):
+                            obj.workloads[when_set][wl_name].add_environment_variable(
+                                workload_env_var.copy()
+                            )
 
             if workload_group is not None:
                 workload_group_inst = obj.workload_groups[workload_group]
@@ -961,17 +965,20 @@ def environment_variable(
                     for wl_name in wl_group_workloads:
                         wl_group_when_map[wl_name].append(wl_group_when_set)
 
-                for when_set, app_workloads in obj.workloads.items():
-                    for app_wl_name in app_workloads:
-                        if app_wl_name in wl_group_when_map:
-                            # Add each variation of merged 'when' set for each workload
-                            for wl_group_when_set in wl_group_when_map[app_wl_name]:
-                                workload_env_var_copy = workload_env_var.copy()
-                                workload_env_var_copy.when.extend(wl_group_when_set)
+                for app_wl_name, wl_group_when_sets in wl_group_when_map.items():
+                    for wl_group_when_set in wl_group_when_sets:
+                        workload_env_var_copy = workload_env_var.copy()
+                        workload_env_var_copy.when.extend(wl_group_when_set)
+                        env_var_when_frozenset = frozenset(workload_env_var_copy.when)
 
-                                obj.workloads[when_set][app_wl_name].add_environment_variable(
-                                    workload_env_var_copy
-                                )
+                        for when_set, app_workloads in obj.workloads.items():
+                            if app_wl_name in app_workloads:
+                                if ramble.language.language_helpers.are_when_compatible(
+                                    when_set, env_var_when_frozenset
+                                ):
+                                    obj.workloads[when_set][app_wl_name].add_environment_variable(
+                                        workload_env_var_copy
+                                    )
         else:
             when_set = frozenset(when_list)
             if when_set not in obj.object_environment_variables:

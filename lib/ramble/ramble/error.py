@@ -95,6 +95,10 @@ class RambleError(Exception):
         return type(self), (self.message, self.long_message)
 
 
+class DirectiveError(RambleError):
+    """This is raised when something is wrong with a language directive."""
+
+
 class SpecError(RambleError):
     """Superclass for all errors that occur while constructing specs."""
 

@@ -12,9 +12,8 @@ from typing import FrozenSet
 import deprecation
 import pytest
 
-from ramble import language
 from ramble.appkit import *  # noqa
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError
 
 app_types = [
     ApplicationBase,  # noqa: F405
@@ -282,9 +281,7 @@ def test_figure_of_merit_directive(app_class):
 
 def test_figure_of_merit_directive_required_args():
     app_inst = ExecutableApplication("/not/a/path")  # noqa: F405
-    with pytest.raises(
-        language.language_base.DirectiveError, match="required for defining file-based FOM"
-    ):
+    with pytest.raises(DirectiveError, match="required for defining file-based FOM"):
         app_inst.figure_of_merit(
             "test_fom",
             units="s",
