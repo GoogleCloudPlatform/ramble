@@ -3808,43 +3808,49 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Set required variables from all objects"""
 
         def define_mpi_vars():
-            required_vars_defined = set()
+            mpi_required = self.is_mpi_required(self.expander.workload_name)
 
-            required_vars = {
+            mpi_vars_defined = set()
+
+            mpi_vars = {
                 self.keywords.n_ranks: "int({processes_per_node}*{n_nodes})",
                 self.keywords.processes_per_node: "int({n_ranks}/{n_nodes})",
                 self.keywords.n_nodes: "int({n_ranks}/{processes_per_node})",
             }
 
-            for required_var in required_vars:
-                if required_var in self.variables:
-                    required_vars_defined.add(required_var)
+            for mpi_var in mpi_vars:
+                if mpi_var in self.variables:
+                    mpi_vars_defined.add(mpi_var)
 
-            if len(required_vars_defined) < 2:
-                required_keys = "Two or more of the following are required to be defined.\n"
-                for var in required_vars:
-                    required_keys += f"  - {var}\n"
+            if mpi_required and len(mpi_vars_defined) < 2:
+                mpi_keys = "Two or more of the following are required to be defined.\n"
+                for var in mpi_vars:
+                    mpi_keys += f"  - {var}\n"
 
                 defined_keys = f"Experiment {self.expander.experiment_namespace} only has:\n"
-                for var in required_vars_defined:
+                for var in mpi_vars_defined:
                     defined_keys += f"  - {var}\n"
                 raise ramble.error.ObjectValidationError(
                     "Invalid number of required variables defined.\n"
-                    + required_keys
+                    + mpi_keys
                     + defined_keys
                 )
 
-            for required_var in required_vars_defined:
-                del required_vars[required_var]
+            for mpi_var in mpi_vars_defined:
+                del mpi_vars[mpi_var]
 
-            for var_name, formula in required_vars.items():
-                value = self.expander.expand_var(
-                    formula, allow_passthrough=False
-                )
+            for var_name, formula in mpi_vars.items():
+                # If two variables are defined, use the formula to compute the missing ones.
+                if len(mpi_vars_defined) >= 2:
+                    value = self.expander.expand_var(
+                        formula, allow_passthrough=False
+                    )
+                # If there is not enough information to use the formulas, set missing vars to 0
+                else:
+                    value = 0
                 self.define_variable(var_name, value)
 
-        if self.is_mpi_required(self.expander.workload_name):
-            define_mpi_vars()
+        define_mpi_vars()
 
         if self.keywords.n_threads not in self.variables:
             self.define_variable(self.keywords.n_threads, 1)
