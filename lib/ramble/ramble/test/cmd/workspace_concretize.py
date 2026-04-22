@@ -60,8 +60,10 @@ def test_workspace_concretize_additive(workspace_name):
     modifiers_path = os.path.join(ws.config_dir, "modifiers.yaml")
 
     with open(modifiers_path, "w+") as f:
-        f.write("""modifiers:
-- name: intel-aps""")
+        f.write(
+            """modifiers:
+- name: intel-aps"""
+        )
 
     workspace("concretize", "-q", global_args=global_args)
 

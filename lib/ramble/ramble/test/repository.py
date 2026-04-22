@@ -18,10 +18,12 @@ def extra_repo(tmpdir_factory, request):
     repo_dir.ensure(request.param, dir=True)
 
     with open(str(repo_dir.join("repo.yaml")), "w") as f:
-        f.write("""
+        f.write(
+            """
 repo:
   namespace: extra_test_repo
-""")
+"""
+        )
         if request.param != "applications":
             f.write(f"  subdirectory: '{request.param}'")
     return (

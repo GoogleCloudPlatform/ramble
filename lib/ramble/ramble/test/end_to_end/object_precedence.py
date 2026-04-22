@@ -67,8 +67,10 @@ def test_object_precedence_variables(workspace_name, test_args, disabled_value, 
         assert disabled_value in f.read()
 
     with open(variants_file, "w+") as f:
-        f.write("""variants:
-  set_precedence_var: True""")
+        f.write(
+            """variants:
+  set_precedence_var: True"""
+        )
 
     workspace("setup", "--dry-run", global_args=global_args)
 

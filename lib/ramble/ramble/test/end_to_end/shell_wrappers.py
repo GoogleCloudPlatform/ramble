@@ -36,10 +36,12 @@ def test_shell_wrapper_workspace_activate_missing(shell, tmpdir):
     test_script_path = str(tmpdir.join("test_missing.sh"))
 
     with open(test_script_path, "w") as f:
-        f.write(f"""
+        f.write(
+            f"""
 source "{setup_env}"
 ramble workspace activate non_existent_workspace
-""")
+"""
+        )
 
     cmd = [shell, test_script_path]
     process = subprocess.run(

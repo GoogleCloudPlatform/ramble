@@ -71,8 +71,10 @@ def test_executable_modifier_usage_filters(
         )
 
         with open(os.path.join(ws.config_dir, "variants.yaml"), "w+") as f:
-            f.write(f"""variants:
-  usage_filter_type: {filter_type}""")
+            f.write(
+                f"""variants:
+  usage_filter_type: {filter_type}"""
+            )
 
         ws._re_read()
 
@@ -151,8 +153,10 @@ def test_executable_modifier_usage_filters_broken_errors(
         )
 
         with open(os.path.join(ws.config_dir, "variants.yaml"), "w+") as f:
-            f.write("""variants:
-  usage_filter_type: broken""")
+            f.write(
+                """variants:
+  usage_filter_type: broken"""
+            )
 
         ws._re_read()
 

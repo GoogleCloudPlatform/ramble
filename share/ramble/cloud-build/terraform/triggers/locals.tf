@@ -35,6 +35,7 @@ locals {
   dependency_and_config_files = [
     "requirements.txt",
     "requirements-dev.txt",
+    "requirements-pinned.txt",
     "pyproject.toml"
   ]
 }

@@ -62,7 +62,8 @@ ramble:
             assert "grep -i HugePages_Total /proc/meminfo" in content
 
         with open(os.path.join(run_dir, "tunables.log"), "w+") as f:
-            f.write("""
+            f.write(
+                """
 nodeset-1: fom:address-space-randomization:2
 nodeset-0: fom:address-space-randomization:2
 nodeset-0: fom:smt-active:1
@@ -71,7 +72,8 @@ nodeset-0: fom:thp-enabled:always
 nodeset-1: fom:thp-enabled:madvise
 nodeset-1: fom:hugepage-size:    2048 kB
 nodeset-0: fom:hugepage-size:    2048 kB
-""")
+"""
+            )
         workspace("analyze", global_args=["-w", ws_name])
         with open(os.path.join(ws.root, "results.latest.txt")) as f:
             content = f.read()

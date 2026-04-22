@@ -60,7 +60,7 @@ if [ ! -d {ramble_venv_path} ]; then
   . {ramble_venv_path}/bin/activate
   pip install --upgrade pip
   pip install -r {ramble_install_dir}/requirements.txt
-  pip install -r {ramble_install_dir}/requirements-dev.txt
+  pip install -r {ramble_install_dir}/requirements-pinned.txt
 fi
 """
 
