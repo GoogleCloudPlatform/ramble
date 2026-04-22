@@ -19,7 +19,6 @@ from typing import Any, Callable, Dict, List, Set
 
 import llnl.util.lang
 
-import ramble.error
 import ramble.language.language_helpers
 from ramble.error import DirectiveError
 from ramble.util.logger import logger
