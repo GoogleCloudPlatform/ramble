@@ -6,8 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 import pytest
 
+import ramble.paths
 from ramble import main
 from ramble.cmd import style
 
@@ -63,6 +66,7 @@ def test_black_version_mismatch(capsys):
     class MockArgs:
         fix = False
         root_relative = False
+        repo_path = None
 
     args = MockArgs()
 
@@ -74,3 +78,28 @@ def test_black_version_mismatch(capsys):
         f"but the version used for the PR style test is {style._BLACK_GOLDEN_VERSION}"
         in captured.err
     )
+
+
+def test_style_invalid_repo(tmpdir):
+    with tmpdir.as_cwd():
+        out = style_cmd("--repo-path", str(tmpdir), fail_on_error=False)
+        assert style_cmd.returncode != 0
+        assert "is not a valid Ramble repository" in out
+
+
+def test_style_valid_repo():
+    builtin_mock_repo = os.path.join(ramble.paths.prefix, "var", "ramble", "repos", "builtin.mock")
+    out = style_cmd("--repo-path", builtin_mock_repo)
+    assert "style checks were clean" in out
+
+
+def test_changed_files_git_failure(tmpdir):
+    file1 = tmpdir.join("file1.py")
+    file1.write("import os")
+    file2 = tmpdir.join("file2.py")
+    file2.write("import sys")
+
+    files = style.changed_files(root=str(tmpdir))
+
+    assert "file1.py" in files
+    assert "file2.py" in files
