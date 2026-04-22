@@ -54,7 +54,7 @@ class Template(ExecutableApplication):
     mutable_mock_apps_repo.put_first(repo)
 
     # Create a large template with math and non-math statements
-    n_lines = 10000
+    n_lines = 20000
     template_lines = []
     for i in range(n_lines):
         if i % 3 == 0:
