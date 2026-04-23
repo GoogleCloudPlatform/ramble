@@ -12,12 +12,13 @@ resource "google_cloudbuild_trigger" "image_builders" {
     }
   }
 
-  included_files = [
-    "share/ramble/cloud-build/ramble-image-builder.yaml",
-    "share/ramble/cloud-build/Dockerfile-${local.pm_map[each.value.base]}",
-    "requirements.txt",
-    "requirements-dev.txt"
-  ]
+  included_files = concat(
+    local.dependency_and_config_files,
+    [
+      "share/ramble/cloud-build/ramble-image-builder.yaml",
+      "share/ramble/cloud-build/Dockerfile-${local.pm_map[each.value.base]}"
+    ]
+  )
 
   filename = "share/ramble/cloud-build/ramble-image-builder.yaml"
 

@@ -15,12 +15,13 @@ resource "google_cloudbuild_trigger" "pr_image_build_tests_debian" {
 
   filename = "share/ramble/cloud-build/ramble-pr-image-builds.yaml"
 
-  included_files = [
-    "share/ramble/cloud-build/ramble-pr-image-builds.yaml",
-    "share/ramble/cloud-build/Dockerfile-apt",
-    "requirements.txt",
-    "requirements-dev.txt"
-  ]
+  included_files = concat(
+    local.dependency_and_config_files,
+    [
+      "share/ramble/cloud-build/ramble-pr-image-builds.yaml",
+      "share/ramble/cloud-build/Dockerfile-apt"
+    ]
+  )
 
   substitutions = {
     _PKG_MANAGER = "apt"
@@ -44,12 +45,13 @@ resource "google_cloudbuild_trigger" "pr_image_build_tests_rocky" {
 
   filename = "share/ramble/cloud-build/ramble-pr-image-builds.yaml"
 
-  included_files = [
-    "share/ramble/cloud-build/ramble-pr-image-builds.yaml",
-    "share/ramble/cloud-build/Dockerfile-yum",
-    "requirements.txt",
-    "requirements-dev.txt"
-  ]
+  included_files = concat(
+    local.dependency_and_config_files,
+    [
+      "share/ramble/cloud-build/ramble-pr-image-builds.yaml",
+      "share/ramble/cloud-build/Dockerfile-yum"
+    ]
+  )
 
   substitutions = {
     _PKG_MANAGER = "yum"

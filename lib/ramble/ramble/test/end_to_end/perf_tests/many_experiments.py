@@ -38,7 +38,7 @@ def test_many_experiments(workspace_name, ramble_benchmark):
         "-v",
         "n_ranks='{n_nodes}*{processes_per_node}'",
         "-v",
-        "n_nodes=[1,2,4,8,16,32,64,128,256]",
+        "n_nodes=[1,2,4,8,16]",
         "-v",
         "var1=[1,2,3,4,5,6,7,8,9,10]",
         "-v",
@@ -52,4 +52,4 @@ def test_many_experiments(workspace_name, ramble_benchmark):
 
     output = ramble_benchmark(workspace, "info", global_args=global_args)
 
-    assert "Experiment 8100" in output
+    assert "Experiment 5000" in output

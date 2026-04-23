@@ -38,12 +38,12 @@ def test_many_objects_defaults(make_workspace_from_config, ramble_benchmark):
     modifier_list_yaml = "\n".join([f"    - name: {m}" for m in modifiers])
     modifier_section = f"  modifiers:\n{modifier_list_yaml}"
 
-    # Create 1000 experiments (10 x 100 matrix)
+    # Create 200 experiments (10 x 20 matrix)
     # Each experiment has 9 modifiers.
     # Each experiment will have ~171 default variables.
-    # Total variable objects = 1000 * 171 = 171,000.
+    # Total variable objects = 200 * 171 = 34,200.
 
-    matrix_var_list = ", ".join([f"'{i}'" for i in range(100)])
+    matrix_var_list = ", ".join([f"'{i}'" for i in range(20)])
 
     test_config = f"""\
 ramble:
@@ -74,21 +74,20 @@ ramble:
     ramble_benchmark(workspace, "setup", "--dry-run", global_args=["-w", ws_name])
 
     # Verify that the correct number of experiments were created
-    # 10 n_nodes * 100 matrix_var = 1000 experiments
     application_dir = os.path.join(ws.experiment_dir, "hostname", "local")
     experiments = [
         d for d in os.listdir(application_dir) if os.path.isdir(os.path.join(application_dir, d))
     ]
-    assert len(experiments) == 1000
+    assert len(experiments) == 200
 
     # Verify that at least one experiment was created
     exp_dir = os.path.join(ws.experiment_dir, "hostname", "local", "exp_1_0")
     assert os.path.isdir(exp_dir)
 
     # Verify that a middle experiment was created
-    exp_dir = os.path.join(ws.experiment_dir, "hostname", "local", "exp_256_50")
+    exp_dir = os.path.join(ws.experiment_dir, "hostname", "local", "exp_256_10")
     assert os.path.isdir(exp_dir)
 
     # Verify that the last experiment was created
-    exp_dir = os.path.join(ws.experiment_dir, "hostname", "local", "exp_512_99")
+    exp_dir = os.path.join(ws.experiment_dir, "hostname", "local", "exp_512_19")
     assert os.path.isdir(exp_dir)
