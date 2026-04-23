@@ -161,39 +161,39 @@ class Pipeline:
                 logger.all_msg(f"    root experiment_index: {experiment_index_value}")
                 logger.all_msg(f"    log file: {exp_log_path}")
 
-            logger.add_log(exp_log_path)
+            with logger.add_log_context(exp_log_path):
+                phase_list = list(app_inst.get_pipeline_phases(self.name, self.filters.phases))
 
-            phase_list = list(app_inst.get_pipeline_phases(self.name, self.filters.phases))
-
-            disable_progress = (
-                ramble.config.get("config:disable_progress_bar", False)
-                or self.suppress_per_experiment_prints
-            )
-            if not disable_progress:
-                try:
-                    progress = tqdm.tqdm(
-                        total=len(phase_list),
-                        leave=True,
-                        ascii=" >=",
-                        bar_format="{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}",
-                    )
-                except AttributeError:
-                    logger.die("tdqm.tdqm is not found. Ensure requirements.txt are installed.")
-            for phase_idx, phase in enumerate(phase_list):
+                disable_progress = (
+                    ramble.config.get("config:disable_progress_bar", False)
+                    or self.suppress_per_experiment_prints
+                )
                 if not disable_progress:
-                    progress.set_description(
-                        f"Processing phase {phase} ({phase_idx}/{len(phase_list)})"
-                    )
-                app_inst.run_phase(self.name, phase, self.workspace)
-                phase_total += 1
+                    try:
+                        progress = tqdm.tqdm(
+                            total=len(phase_list),
+                            leave=True,
+                            ascii=" >=",
+                            bar_format="{l_bar}{bar}| Elapsed (s): {elapsed_s:.2f}",
+                        )
+                    except AttributeError:
+                        logger.die(
+                            "tqdm.tqdm is not found. Ensure requirements.txt are installed."
+                        )
+                for phase_idx, phase in enumerate(phase_list):
+                    if not disable_progress:
+                        progress.set_description(
+                            f"Processing phase {phase} ({phase_idx}/{len(phase_list)})"
+                        )
+                    app_inst.run_phase(self.name, phase, self.workspace)
+                    phase_total += 1
+                    if not disable_progress:
+                        progress.update()
+                app_inst.print_phase_times(self.name, self.filters.phases)
                 if not disable_progress:
-                    progress.update()
-            app_inst.print_phase_times(self.name, self.filters.phases)
-            if not disable_progress:
-                progress.set_description("Experiment complete")
-                progress.close()
+                    progress.set_description("Experiment complete")
+                    progress.close()
 
-            logger.remove_log()
             if not self.suppress_per_experiment_prints:
                 logger.all_msg(f"  Returning to log file: {logger.active_log()}")
 
@@ -229,14 +229,13 @@ class Pipeline:
                 f"{experiment_total} experiments:"
             )
 
-        logger.add_log(self.log_path)
-        if logger.enabled:
-            create_symlink(self.log_path, self.log_path_latest)
+        with logger.add_log_context(self.log_path):
+            if logger.enabled:
+                create_symlink(self.log_path, self.log_path_latest)
 
-        self._prepare()
-        self._execute()
-        self._complete()
-        logger.remove_log()
+            self._prepare()
+            self._execute()
+            self._complete()
 
     def _copy_workspace_root_files(self, workspace, dest_dir):
         root_files = [

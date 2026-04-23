@@ -66,6 +66,20 @@ class Logger:
             last_log = self.log_stack.pop()
             last_log[1].close()
 
+    @contextmanager
+    def add_log_context(self, path):
+        """Context manager to add and remove a log file
+
+        Ensures that the log is removed from the stack even if an exception occurs.
+        """
+        initial_len = len(self.log_stack)
+        try:
+            self.add_log(path)
+            yield
+        finally:
+            if len(self.log_stack) > initial_len:
+                self.remove_log()
+
     def active_log(self):
         """Return the path for the active log
 
