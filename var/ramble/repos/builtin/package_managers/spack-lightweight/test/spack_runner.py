@@ -344,7 +344,9 @@ compilers::
     modules: []
     environment: {}
     extra_rpaths: []
-""".replace("tmpdir_path", os.path.join(os.getcwd(), "bin"))
+""".replace(
+            "tmpdir_path", os.path.join(os.getcwd(), "bin")
+        )
 
         packages_config = f"""
 packages:

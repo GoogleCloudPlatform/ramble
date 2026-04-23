@@ -154,8 +154,7 @@ def workspace_activate(args):
 
     # Named workspace
     elif (
-        ramble.workspace.exists(workspace_name_or_dir, parent_dir=args.parent_dir)
-        and not args.dir
+        ramble.workspace.exists(workspace_name_or_dir, parent_dir=args.parent_dir) and not args.dir
     ):
         workspace_path = ramble.workspace.root(workspace_name_or_dir, parent_dir=args.parent_dir)
         short_name = workspace_name_or_dir
