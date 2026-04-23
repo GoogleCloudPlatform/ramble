@@ -327,8 +327,8 @@ def test_version_variable_expansion_info(workspace_name):
         output_v = workspace("info", "-vv", global_args=global_args)
         assert "versions@1.0.test_wl.generated" in output_v
         assert "versions@2.0a1.test_wl.generated" in output_v
-        assert "custom_var = 'val_{version}' ==> val_1.0" in output_v
-        assert "custom_var = 'val_{version}' ==> val_2.0a1" in output_v
+        assert "custom_var = val_{version} ==> val_1.0" in output_v
+        assert "custom_var = val_{version} ==> val_2.0a1" in output_v
         assert "zlib-exact = zlib@1.2.14" in output_v
         assert "zlib-greater = zlib@1.2.13" in output_v
 

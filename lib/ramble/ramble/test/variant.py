@@ -15,7 +15,11 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo", "mock_modifiers"
+    "mutable_config",
+    "mutable_mock_workspace_path",
+    "mutable_mock_apps_repo",
+    "mock_modifiers",
+    "mock_base_applications",
 )
 
 config = RambleCommand("config")
@@ -357,3 +361,72 @@ def test_variant_nesting_works(workspace_name, test_value):
         exec_out = on("--executor='echo {leaf_value}'", global_args=global_args)
 
         assert test_value in exec_out
+
+
+@pytest.mark.parametrize(
+    "variant_scope,expected_bool,expected_val",
+    [
+        ("pkg_args", True, "one"),
+        ("pkg_args", False, "two"),
+        ("mod_pkg_args", True, "one"),
+        ("mod_pkg_args", False, "two"),
+    ],
+)
+def test_variant_expansion(workspace_name, variant_scope, expected_bool, expected_val):
+    global_args = ["-w", workspace_name]
+
+    app_env_name = "when-variants-{application::variant::bool}-{application::variant::val}"
+    mod_env_name = "mod_package_with_args-{modifier::variant::bool}-{modifier::variant::val}"
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants@1.0",
+            "--wf",
+            "test_wl",
+            "-e",
+            "generated",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:{variant_scope}:true", global_args=global_args)
+        config("add", f"variants:bool:{expected_bool}", global_args=global_args)
+        config("add", f"variants:val:{expected_val}", global_args=global_args)
+
+        if variant_scope == "mod_pkg_args":
+            with open(os.path.join(ws.config_dir, "modifiers.yaml"), "w+") as f:
+                f.write(
+                    """modifiers:
+- name: spack-mod"""
+                )
+
+        ws._re_read()
+        workspace("concretize", global_args=global_args)
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+
+            if variant_scope == "pkg_args":
+                assert f"{app_env_name}:" in data
+            elif variant_scope == "mod_pkg_args":
+                assert f"{mod_env_name}:" in data
+
+        b_spec = "+bool" if expected_bool else "~bool"
+        v_spec = f"val={expected_val}"
+        if variant_scope == "pkg_args":
+            spack_spec = "when-variants@1.0 " + b_spec + " " + v_spec
+        elif variant_scope == "mod_pkg_args":
+            spack_spec = "mod_package@1.1 " + b_spec + " " + v_spec
+
+        captured = workspace("info", "-v", global_args=global_args)
+
+        assert spack_spec in captured

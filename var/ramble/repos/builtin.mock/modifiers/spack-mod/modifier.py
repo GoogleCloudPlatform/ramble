@@ -109,3 +109,31 @@ class SpackMod(BasicModifier):
         modes=["default"],
         regex=r"\s*Broken versions:\s*",
     )
+
+    variant(
+        "mod_pkg_args",
+        values=[True, False],
+        default=False,
+        description="Use pkg_args for modifier",
+    )
+
+    with when("package_manager_family=spack"):
+        with when("+mod_pkg_args"):
+            software_spec(
+                "mod_package_with_args-{modifier::variant::bool}-{modifier::variant::val}",
+                pkg_spec="mod_package@1.1 {modifier::variant::bool} {modifier::variant::val}",
+            )
+
+    variant(
+        "bool",
+        values=[True, False],
+        default=False,
+        description="Include bool in versions package spec",
+    )
+
+    variant(
+        "val",
+        values=["one", "two", "three"],
+        default="three",
+        description="Include val option in versions package spec",
+    )

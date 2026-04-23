@@ -644,24 +644,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if var not in self.variables:
                 default_variables[var] = val.default
 
-        # TODO: Remove the {origin_type}_version variable when we can
-        self.define_variable(
-            f"{self.origin_type}_version", str(self.selected_version)
-        )
-        self.define_variable(
-            f"{self.origin_type}::{self.name}::version",
-            str(self.selected_version),
-        )
-
-        # Extract a merged set of when_keys from objects that are not
+        # Define object version and variant variables
+        # Also, extract a merged set of when_keys from objects that are not
         # applications.
-        # Also, define object version variables
         object_when_map = {}
-        for _, obj in self.objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            object_when_map[obj] = []
-
+        for _, obj in self.objects():
             # TODO: Remove the {origin_type}_version variable when we can
             self.define_variable(
                 f"{obj.origin_type}_version", str(obj.selected_version)
@@ -671,17 +658,36 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 str(obj.selected_version),
             )
 
-            for when_key, var_list in obj.object_variables.items():
-                keep = False
-                for var in var_list:
-                    if var.name not in self.variables:
-                        keep = True
+            # Define variant variables for Spack-like syntax expansion
+            for (
+                name,
+                variant,
+            ) in obj.object_variants.experiment_variants.items():
+                self.define_variable(
+                    f"{obj.origin_type}::variant::{name}",
+                    variant.as_definition(),
+                )
 
-                if keep:
-                    object_when_map[obj].append(when_key)
+            for name, variant in obj.object_variants.default_variants.items():
+                if name not in obj.object_variants.experiment_variants:
+                    self.define_variable(
+                        f"{obj.origin_type}::variant::{name}",
+                        variant.as_definition(),
+                    )
 
-            if not object_when_map[obj]:
-                object_when_map.pop(obj, None)
+            if obj.origin_type != "application":
+                object_when_map[obj] = []
+                for when_key, var_list in obj.object_variables.items():
+                    keep = False
+                    for var in var_list:
+                        if var.name not in self.variables:
+                            keep = True
+
+                    if keep:
+                        object_when_map[obj].append(when_key)
+
+                if not object_when_map[obj]:
+                    object_when_map.pop(obj, None)
 
         while True:
             to_define = {}

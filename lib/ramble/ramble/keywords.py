@@ -165,6 +165,7 @@ class Keywords:
             object_type = type_definition["singular"]
             self.reserved_patterns.add(re.compile(rf"{object_type}::\S+::version"))
             self.reserved_patterns.add(re.compile(rf"{object_type}_version"))
+            self.reserved_patterns.add(re.compile(rf"{object_type}::variant::\S+"))
 
     def copy(self):
         new_inst = type(self)()
