@@ -55,8 +55,13 @@ obj_attribute_map = {
     "env_var_modifications": None,
     "required_vars": None,
     "package_manager_requirements": None,
-    # Package / workflow manager specific:
+    # Package / workflow manager / system/ platform specific:
     "families": None,
+    # System specific:
+    "available_platforms": None,
+    "platform_variable_maps": None,
+    "variable_defaults": None,
+    "auxiliary_software_files": None,
 }
 
 

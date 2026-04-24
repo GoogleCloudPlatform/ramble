@@ -257,6 +257,12 @@ class SpackLightweight(PackageManagerBase):
             "software_install_requested_compilers",
         ],
     )
+    register_phase(
+        "render_auxiliary_software_files",
+        pipeline="setup",
+        run_after=["software_create_env"],
+        run_before=["software_configure"],
+    )
 
     def _software_configure(self, workspace, app_inst=None):
         """Concretize the spack environment for this experiment

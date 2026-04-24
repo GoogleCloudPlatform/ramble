@@ -109,6 +109,18 @@ pattern_exemptions = {
         "F403": [r"^from ramble.wmkit import \*$"],
         **common_object_exemptions,
     },
+    rf"platform.py|{base_class_file}$": {
+        # Allow 'from ramble.modkit import *' in workflow_managers,
+        # but no other wildcards
+        "F403": [r"^from ramble.platkit import \*$"],
+        **common_object_exemptions,
+    },
+    rf"system.py|{base_class_file}$": {
+        # Allow 'from ramble.modkit import *' in workflow_managers,
+        # but no other wildcards
+        "F403": [r"^from ramble.syskit import \*$"],
+        **common_object_exemptions,
+    },
     # exemptions applied to all files.
     r".py$": {
         "E501": [

@@ -343,6 +343,70 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             pass
 
     register_phase(
+        "render_auxiliary_software_files",
+        pipeline="setup",
+        run_before=["make_experiments"],
+    )
+
+    def _render_auxiliary_software_files(self, workspace, app_inst=None):
+        """Render auxiliary software files from system objects"""
+        if app_inst is None:
+            return
+
+        for obj_type, obj in app_inst.objects():
+            include_modifier = None
+            if obj_type == ramble.repository.ObjectTypes.modifiers:
+                include_modifier = obj
+
+            obj_variants = self.experiment_variants(
+                include_modifier=include_modifier, allow_caching=False
+            )
+
+            aux_files = getattr(obj, "auxiliary_software_files", {})
+            for when_set, files_info in aux_files.items():
+                if app_inst.expander.satisfies(
+                    when_set, variant_set=obj_variants
+                ):
+                    for name, file_info in files_info.items():
+                        src_path = app_inst.expander.expand_var(
+                            file_info["src_path"]
+                        )
+                        dest_path = app_inst.expander.expand_var(
+                            file_info["dest_path"]
+                        )
+
+                        if not os.path.isabs(src_path):
+                            # Find source file relative to the system object
+                            object_paths = [
+                                e[1]
+                                for e in ramble.repository.list_object_files(
+                                    obj, obj_type
+                                )
+                            ]
+                            for obj_path in object_paths:
+                                test_path = os.path.join(
+                                    os.path.dirname(obj_path), src_path
+                                )
+                                if os.path.isfile(test_path):
+                                    src_path = test_path
+                                    break
+
+                        logger.msg(
+                            f"Rendering auxiliary software file {name} to {dest_path}"
+                        )
+                        content = workspace.read_file_content(src_path)
+                        rendered = app_inst.expander.expand_var(content)
+
+                        if not os.path.isabs(dest_path):
+                            dest_path = os.path.join(
+                                app_inst.expander.env_path, dest_path
+                            )
+
+                        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+                        with open(dest_path, "w") as f:
+                            f.write(rendered)
+
+    register_phase(
         "add_software_to_results",
         pipeline="analyze",
         run_after=["analyze_experiments"],

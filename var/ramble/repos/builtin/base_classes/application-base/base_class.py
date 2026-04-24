@@ -221,6 +221,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.license_file = ""
 
         self.workflow_manager = None
+        self.system = None
+        self.platform = None
 
         self.result = ExperimentResult(self)
 
@@ -437,6 +439,119 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         }
                     )
 
+    def _set_system(self):
+        sys_var = conversions.canonical_none(
+            self.experiment_variants(allow_caching=False).value(
+                namespace.system
+            )
+        )
+
+        if sys_var is None:
+            sys_var = "user-managed"
+
+        if sys_var is not None:
+            sys_name, _, maybe_sys_ver = sys_var.partition("@")
+
+            try:
+                sys_type = ramble.repository.ObjectTypes.systems
+                self.system = ramble.repository.get(sys_name, sys_type).copy()
+                self.system.set_application(self)
+                if maybe_sys_ver:
+                    self.system.set_version(
+                        version_number=maybe_sys_ver,
+                        description=f"{sys_name} {maybe_sys_ver}",
+                    )
+            except ramble.repository.UnknownObjectError:
+                logger.die(
+                    f"{sys_name} is not a valid system. "
+                    "Valid systems can be listed via:\n"
+                    "\tramble list --type systems"
+                )
+
+            for variant in ["platform", "package_manager", "workflow_manager"]:
+                if (
+                    self.experiment_variants(allow_caching=False).value(
+                        variant
+                    )
+                    is None
+                ):
+                    default_value = getattr(
+                        self.system, f"default_{variant}", None
+                    )
+                    if default_value:
+                        self.experiment_variants(
+                            allow_caching=False
+                        ).default_variant(
+                            variant,
+                            default=default_value,
+                            description=f"{variant} selection variant",
+                        )
+
+    def _set_platform(self):
+        plat_var = conversions.canonical_none(
+            self.experiment_variants(allow_caching=False).value(
+                namespace.platform
+            )
+        )
+
+        if plat_var is None:
+            plat_var = self.system.default_platform
+
+        if plat_var is not None:
+            plat_name, _, maybe_plat_ver = plat_var.partition("@")
+
+            if self.system and self.system.available_platforms:
+                if plat_name not in self.system.available_platforms:
+                    logger.die(
+                        f"Platform {plat_name} is not available in system {self.system.name}. "
+                        f"Available platforms are: {', '.join(self.system.available_platforms)}"
+                    )
+
+            try:
+                plat_type = ramble.repository.ObjectTypes.platforms
+                self.platform = ramble.repository.get(
+                    plat_name, plat_type
+                ).copy()
+                self.platform.set_application(self)
+                if maybe_plat_ver:
+                    self.platform.set_version(
+                        version_number=maybe_plat_ver,
+                        description=f"{plat_name} {maybe_plat_ver}",
+                    )
+            except ramble.repository.UnknownObjectError:
+                logger.die(
+                    f"{plat_name} is not a valid platform. "
+                    "Valid platforms can be listed via:\n"
+                    "\tramble list --type platforms"
+                )
+
+    def _apply_system_and_platform_variables(self):
+        """Apply variables from system and platform objects"""
+
+        if self.system:
+            # Apply platform_variable_maps
+            plat_name = conversions.canonical_none(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.platform
+                )
+            )
+
+            if plat_name:
+                for (
+                    var_name,
+                    var_map,
+                ) in self.system.platform_variable_maps.items():
+                    if plat_name in var_map:
+                        if var_name not in self.variables:
+                            self.define_variable(var_name, var_map[plat_name])
+
+            # Apply variable_defaults
+            for when_key, var_defs in self.system.variable_defaults.items():
+                if self.system.satisfy_when(when_key):
+                    for var_name, var_val in var_defs.items():
+                        if var_name not in self.variables:
+                            self.define_variable(var_name, var_val)
+
     def _set_workflow_manager(self):
         workflow = conversions.canonical_none(
             self.experiment_variants(allow_caching=False).value(
@@ -565,8 +680,45 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.object_variants.experiment_variant(name, expanded_value)
 
         # Set up remaining variants
+        self._set_system()
+        self._set_platform()
+
+        # Apply defaults from system and platform
+        if self.system:
+            if (
+                self.system.default_platform
+                and namespace.platform not in self.variants
+            ):
+                self.object_variants.experiment_variant(
+                    namespace.platform, self.system.default_platform
+                )
+                self._set_platform()
+
+            if (
+                self.system.default_package_manager
+                and namespace.package_manager not in self.variants
+            ):
+                self.object_variants.experiment_variant(
+                    namespace.package_manager,
+                    self.system.default_package_manager,
+                )
+
+            if (
+                self.system.default_workflow_manager
+                and namespace.workflow_manager not in self.variants
+            ):
+                self.object_variants.experiment_variant(
+                    namespace.workflow_manager,
+                    self.system.default_workflow_manager,
+                )
+
         self._set_package_manager()
         self._set_workflow_manager()
+
+        self._apply_system_and_platform_variables()
+
+        for _, obj in self.objects():
+            self.keywords.update_keys(obj.required_variables)
 
         base_chain = self.__class__.__mro__
         for cls in base_chain:
@@ -714,8 +866,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for var, val in to_define.items():
                 default_variables[var] = val
 
-        for var, val in default_variables.items():
-            self.define_variable(var, val)
+            for var, val in default_variables.items():
+                self.define_variable(var, val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
@@ -3778,18 +3930,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             f"Failed to instantiate base class {cls.__name__}: {e}"
                         )
 
-        # Yield for self
-        yield from _yield_registered(self)
+        # Yield for modifiers
+        for mod_inst in self._modifier_instances:
+            yield from _yield_registered(mod_inst)
 
-        # Yield for package manager
-        yield from _yield_registered(self.package_manager)
+        # Yield for system
+        yield from _yield_registered(self.system)
+
+        # Yield for platform
+        yield from _yield_registered(self.platform)
 
         # Yield for workflow manager
         yield from _yield_registered(self.workflow_manager)
 
-        # Yield for modifiers
-        for mod_inst in self._modifier_instances:
-            yield from _yield_registered(mod_inst)
+        # Yield for package manager
+        yield from _yield_registered(self.package_manager)
+
+        # Yield for self
+        yield from _yield_registered(self)
 
     def require_mpi_variables(self):
         self.keywords.update_keys(

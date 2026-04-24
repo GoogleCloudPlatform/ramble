@@ -19,6 +19,8 @@ import ramble.schema.base_application_repos
 import ramble.schema.base_class_repos
 import ramble.schema.base_modifier_repos
 import ramble.schema.base_package_manager_repos
+import ramble.schema.base_platform_repos
+import ramble.schema.base_system_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
@@ -29,9 +31,11 @@ import ramble.schema.mirrors
 import ramble.schema.modifier_repos
 import ramble.schema.modifiers
 import ramble.schema.package_manager_repos
+import ramble.schema.platform_repos
 import ramble.schema.repos
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.system_repos
 import ramble.schema.tables
 import ramble.schema.variables
 import ramble.schema.variants
@@ -46,12 +50,16 @@ properties = union_dicts(
     ramble.schema.base_modifier_repos.properties,
     ramble.schema.base_package_manager_repos.properties,
     ramble.schema.base_workflow_manager_repos.properties,
+    ramble.schema.base_system_repos.properties,
+    ramble.schema.base_platform_repos.properties,
     ramble.schema.config.properties,
     ramble.schema.formatted_executables.properties,
     ramble.schema.licenses.properties,
     ramble.schema.mirrors.properties,
     ramble.schema.modifier_repos.properties,
     ramble.schema.package_manager_repos.properties,
+    ramble.schema.system_repos.properties,
+    ramble.schema.platform_repos.properties,
     ramble.schema.repos.properties,
     ramble.schema.software.properties,
     ramble.schema.success_criteria.properties,

@@ -96,6 +96,10 @@ class ObjectMixin:
             return ObjectTypes.workflow_managers
         elif self.origin_type == "modifier":
             return ObjectTypes.modifiers
+        elif self.origin_type == "system":
+            return ObjectTypes.systems
+        elif self.origin_type == "platform":
+            return ObjectTypes.platforms
         return None
 
     def satisfy_when(self, when_key, variant_set=None):

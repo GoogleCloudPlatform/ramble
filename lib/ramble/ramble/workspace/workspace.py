@@ -391,8 +391,14 @@ def _get_all_obj_var_names(obj, obj_type):
             variant_name = namespace.package_manager
         elif obj_type == ramble.repository.ObjectTypes.workflow_managers:
             variant_name = namespace.workflow_manager
+        elif obj_type == ramble.repository.ObjectTypes.systems:
+            variant_name = namespace.system
+        elif obj_type == ramble.repository.ObjectTypes.platforms:
+            variant_name = namespace.platform
         else:
-            raise ValueError("Only package manager and workflow manager types are supported")
+            raise ValueError(
+                "Only package manager, workflow manager, system, and platform types are supported"
+            )
         variants_dict = ramble.config.get(namespace.variants)
         obj_name = variants_dict.get(variant_name)
         if obj_name is None:

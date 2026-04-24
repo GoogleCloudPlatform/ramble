@@ -18,6 +18,8 @@ reserved_variants = {
     "modifier",
     "package_manager",
     "package_manager_prefix",
+    "system",
+    "platform",
     "version",
     "workflow_manager",
 }
@@ -353,9 +355,10 @@ class VariantSet:
         out_set = set()
 
         for name, variant in self.experiment_variants.items():
-            if name in self.default_variants:
+            if name in self.default_variants or name in reserved_variants:
                 if (
-                    name not in reserved_variants
+                    name in self.default_variants
+                    and name not in reserved_variants
                     and self.default_variants[name].values
                     and variant.default not in self.default_variants[name].values
                 ):
