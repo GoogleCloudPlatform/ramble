@@ -604,7 +604,7 @@ _ramble_software_definitions() {
 _ramble_style() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -b --base -a --all -o --output -r --root-relative -U --no-untracked -f --fix -k --keep-temp -t --tool -s --skip"
+        RAMBLE_COMPREPLY="-h --help -b --base -a --all -o --output -r --root-relative -U --no-untracked -f --fix -k --keep-temp -t --tool -s --skip --repo-path"
     else
         RAMBLE_COMREPLY=""
     fi
