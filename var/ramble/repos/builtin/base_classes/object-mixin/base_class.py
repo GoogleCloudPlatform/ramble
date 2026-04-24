@@ -47,8 +47,9 @@ class ObjectMixin:
             if type(self) is ObjectMixin:
                 self._name = "object-mixin"
             else:
+                base_type = getattr(self, "origin_type", "base_class")
                 logger.warn(
-                    f"Application {self.__class__.__name__} is missing explicit name."
+                    f"{base_type} {self.__class__.__name__} is missing explicit name."
                 )
                 self._name = os.path.basename(os.path.dirname(self._file_path))
         return self._name

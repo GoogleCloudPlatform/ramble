@@ -470,7 +470,7 @@ def test_modifier_variable_directive(mod_class):
         for when_set, var_list in mod_inst.object_variables.items():
             for var in var_list:
                 if var.name == test_def["name"]:
-                    mode_variant = f"mock-test-mod_mode={test_def['mode']}"
+                    mode_variant = f"{mod_inst.name}_mode={test_def['mode']}"
                     assert mode_variant in when_set
                     assert test_def["description"] == var.description
                     assert test_def["default"] == var.default
@@ -508,7 +508,7 @@ def test_merge_conditions_creates_when_list(mod_class):
     expected_modes = ["mode_0", "mode_1", "mode_2"]
     assert len(when_lists) == 3
     for i, mode_name in enumerate(expected_modes):
-        assert f"test-mod_mode={mode_name}" in when_lists[i]
+        assert f"{mod_inst.name}_mode={mode_name}" in when_lists[i]
         assert "test-mod_mode=mode_3" in when_lists[i]
 
 

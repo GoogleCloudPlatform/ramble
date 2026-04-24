@@ -33,6 +33,7 @@ ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
 
 class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
+    name = "modifier-base"
     origin_type = "modifier"
     _builtin_name = NS_SEPARATOR.join(
         ("modifier_builtin", "{obj_name}", "{name}")
