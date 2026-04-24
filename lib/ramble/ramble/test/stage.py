@@ -14,6 +14,7 @@ import getpass
 import os
 import shutil
 import stat
+from enum import IntEnum
 
 import pytest
 
@@ -38,11 +39,16 @@ _extra_contents = "#!/bin/sh\n"
 _hidden_contents = ""
 _readme_contents = "hello world!\n"
 
-# TODO: Replace the following with an enum once guarantee supported (or
-# include enum34 for python versions < 3.4.
-_include_readme = 1
-_include_hidden = 2
-_include_extra = 3
+
+class StageInclude(IntEnum):
+    readme = 1
+    hidden = 2
+    extra = 3
+
+
+_include_readme = StageInclude.readme
+_include_hidden = StageInclude.hidden
+_include_extra = StageInclude.extra
 
 
 # Mock fetch directories are expected to appear as follows:
@@ -775,20 +781,13 @@ class TestStage:
         user_dir.ensure(dir=True)
         user_path = str(user_dir)
 
-        # TODO: If we could guarantee access to the monkeypatch context
-        # function (i.e., 3.6.0 on), the call and assertion could be moved
-        # to a with block, such as:
-        #
-        #  with monkeypatch.context() as m:
-        #      m.setattr(os, 'stat', _stat)
-        #      spack.stage.create_stage_root(user_path)
-        #      assert os.stat(user_path).st_uid != os.getuid()
-        monkeypatch.setattr(os, "stat", _stat)
-        spack.stage.create_stage_root(user_path)
+        with monkeypatch.context() as m:
+            m.setattr(os, "stat", _stat)
+            spack.stage.create_stage_root(user_path)
 
-        # The following check depends on the patched os.stat as a poor
-        # substitute for confirming the generated warnings.
-        assert os.stat(user_path).st_uid != os.getuid()
+            # The following check depends on the patched os.stat as a poor
+            # substitute for confirming the generated warnings.
+            assert os.stat(user_path).st_uid != os.getuid()
 
     def test_resolve_paths(self):
         """Test _resolve_paths."""
