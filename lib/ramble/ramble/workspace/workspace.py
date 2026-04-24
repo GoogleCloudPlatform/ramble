@@ -206,17 +206,17 @@ def all_workspace_names(parent_dir=None):
     else:
         wspaths = get_workspace_path()
 
-    names = []
+    names = set()
     for wspath in wspaths:
         if not os.path.exists(wspath):
             continue
 
-        candidates = sorted(os.listdir(wspath))
+        candidates = os.listdir(wspath)
         for candidate in candidates:
             cand_root = os.path.join(wspath, candidate)
             if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
-                names.append(candidate)
-    return sorted(list(set(names)))
+                names.add(candidate)
+    return sorted(names)
 
 
 def active_workspace():
@@ -342,16 +342,7 @@ def create(name, read_default_template=True, parent_dir=None):
     if exists(name, parent_dir=parent_dir):
         raise RambleWorkspaceError(f"'{name}': workspace already exists")
 
-    if parent_dir:
-        wspaths = get_workspace_path()
-        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
-        if canonical_parent not in wspaths:
-            raise RambleWorkspaceError(
-                f"Parent directory '{parent_dir}' is not in configured workspace_dirs: {wspaths}"
-            )
-        ws_root = os.path.join(canonical_parent, name)
-    else:
-        ws_root = root(name)
+    ws_root = root(name, parent_dir=parent_dir)
 
     return Workspace(ws_root, read_default_template=read_default_template)
 
