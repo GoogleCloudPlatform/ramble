@@ -23,7 +23,6 @@ from llnl.util.filesystem import mkdirp, partition_path, touch, working_dir
 import ramble.stage
 from ramble.stage import InputStage, ResourceStage, StageComposite
 
-import spack.stage
 import spack.util.executable
 from spack.resource import Resource
 from spack.util.path import canonicalize_path
@@ -79,8 +78,8 @@ _include_extra = StageInclude.extra
 
 @pytest.fixture
 def clear_stage_root(monkeypatch):
-    """Ensure spack.stage._stage_root is not set at test start."""
-    monkeypatch.setattr(spack.stage, "_stage_root", None)
+    """Ensure ramble.stage._stage_root is not set at test start."""
+    monkeypatch.setattr(ramble.stage, "_stage_root", None)
     yield
 
 
@@ -783,7 +782,7 @@ class TestStage:
 
         with monkeypatch.context() as m:
             m.setattr(os, "stat", _stat)
-            spack.stage.create_stage_root(user_path)
+            ramble.stage.create_stage_root(user_path)
 
             # The following check depends on the patched os.stat as a poor
             # substitute for confirming the generated warnings.
@@ -859,7 +858,7 @@ def test_cannot_access(capsys):
     """Ensure can_access dies with the expected error."""
     with pytest.raises(SystemExit):
         # It's far more portable to use a non-existent filename.
-        spack.stage.ensure_access("/no/such/file")
+        ramble.stage.ensure_access("/no/such/file")
 
     captured = capsys.readouterr()
     assert "Insufficient permissions" in str(captured)
