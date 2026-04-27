@@ -245,14 +245,14 @@ This workflow details how to create a workspace, configure it for a single exper
 
 Ramble uses `pytest` for its unit tests. Tests **must** be run using the `ramble unit-test` wrapper command, not by invoking `pytest` directly, as the wrapper handles necessary test environment setup.
 
-*   **Running all tests:**
-    ```bash
-    ramble unit-test
-    ```
-
-*   **Running tests in parallel:** To speed up the test suite, you can run tests in parallel across all available CPU cores:
+*   **Running all tests in parallel:** The `-n auto` option enables parallel test execution:
     ```bash
     ramble unit-test -n auto
+    ```
+
+*   **Running all tests serially:** For troubleshooting or if `pytest-xdist` is unavailable:
+    ```bash
+    ramble unit-test
     ```
 
 *   **Passing Pytest Arguments:** You can pass any `pytest` arguments to the command. For example, to only run tests with "gromacs" in their name:
