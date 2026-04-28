@@ -225,12 +225,13 @@ def unit_test(parser, args, unknown_args):
                     return os.path.join(os.getcwd(), filename)
                 return None
 
-            copied_conftest_path = _ensure_path_in_cwd("conftest.py")
-            copied_ini_path = _ensure_path_in_cwd("pytest.ini")
-            # This specific test should be run against custom repos, so copy it over.
-            copied_test_path = _ensure_path_in_cwd(
-                "setup_analyze.py", src_root=os.path.join(ramble.paths.test_path, "end_to_end")
-            )
+            if args.repo_path is not None:
+                copied_conftest_path = _ensure_path_in_cwd("conftest.py")
+                copied_ini_path = _ensure_path_in_cwd("pytest.ini")
+                # This specific test should be run against custom repos, so copy it over.
+                copied_test_path = _ensure_path_in_cwd(
+                    "setup_analyze.py", src_root=os.path.join(ramble.paths.test_path, "end_to_end")
+                )
 
             if args.list:
                 do_list(args, pytest_args)
