@@ -76,6 +76,7 @@ class Lammps(ExecutableApplication):
         workload_group="all_workloads",
     )
 
+    version("20250722", "Version 20250722 of LAMMPS")
     version("20220623.4", "Version 20220623.4 of LAMMPS", preferred=True)
 
     with when("package_manager_family=spack"):
