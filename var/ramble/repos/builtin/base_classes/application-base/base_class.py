@@ -4028,6 +4028,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         define_mpi_vars()
 
+        if self.keywords.accelerators_per_node not in self.variables:
+            self.define_variable(self.keywords.accelerators_per_node, 0)
+        if self.keywords.n_accelerators not in self.variables:
+            self.define_variable(self.keywords.n_accelerators, 0)
+
         if self.keywords.n_threads not in self.variables:
             self.define_variable(self.keywords.n_threads, 1)
 

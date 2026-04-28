@@ -33,12 +33,40 @@ class PlatformBase(ObjectMixin, metaclass=PlatformMeta):
     _language_classes = [PlatformMeta, SharedMeta]
 
     variant(
+        "accelerator",
+        default=False,
+        description="Whether platform has accelerator or not",
+    )
+
+    variant(
+        "accelerator_type",
+        default=None,
+        values=[None],
+        description="Type of accelerator on this platform",
+    )
+
+    variant(
         "validate_platform",
         default=True,
         description="Whether to validate the platform configuration",
     )
 
+    required_variable(
+        "platform_accelerators",
+        description="Number of accelerators for this platform",
+    )
+
     with when("+validate_platform"):
+        required_variable(
+            "sockets_per_node",
+            description="Number of sockets per node for this platform",
+        )
+
+        required_variable(
+            "threads_per_core",
+            description="Number of threads per core for this platform",
+        )
+
         required_variable(
             "cores_per_node",
             description="Number of cores per node for this platform",
@@ -50,10 +78,17 @@ class PlatformBase(ObjectMixin, metaclass=PlatformMeta):
         )
 
         register_validator(
-            "threads_per_node_validation",
+            "threads_per_node_platform_validation",
             predicate="{n_threads} * {processes_per_node} <= {cores_per_node}",
-            message="Total number of threads ({n_threads} * {processes_per_node}) "
+            message="Number of threads per node ({n_threads} * {processes_per_node}) "
             "exceeds cores per node ({cores_per_node})",
+        )
+
+        register_validator(
+            "accelerators_per_node_platform_validation",
+            predicate="{accelerators_per_node} <= {platform_accelerators}",
+            message="Number of accelerators per node ({accelerators_per_node}) "
+            "exceeds available accelerators on node ({platform_accelerators})",
         )
 
     def __init__(self, file_path):

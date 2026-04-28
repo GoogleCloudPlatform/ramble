@@ -40,20 +40,20 @@ class SystemBase(ObjectMixin, metaclass=SystemMeta):
 
     with when("+validate_system"):
         required_variable(
-            "platform_nodes",
-            description="Number of nodes available for this system",
+            "max_nodes",
+            description="Maximum number of nodes available in this system for this platform",
         )
 
         register_validator(
-            "n_nodes_validation",
-            predicate="{n_nodes} <= {platform_nodes}",
-            message="Number of nodes requested ({n_nodes}) exceeds available nodes ({platform_nodes})",
+            "n_nodes_system_validation",
+            predicate="{n_nodes} <= {max_nodes}",
+            message="Number of nodes requested ({n_nodes}) exceeds available nodes ({max_nodes})",
         )
 
         register_validator(
-            "n_ranks_validation",
-            predicate="{n_ranks} <= {cores_per_node} * {n_nodes}",
-            message="Total number of ranks ({n_ranks}) exceeds total cores ({cores_per_node} * {n_nodes})",
+            "n_ranks_system_validation",
+            predicate="{n_ranks} <= {max_cores_per_node} * {n_nodes}",
+            message="Total number of ranks ({n_ranks}) exceeds total cores ({max_cores_per_node} * {n_nodes})",
         )
 
     def __init__(self, file_path):
