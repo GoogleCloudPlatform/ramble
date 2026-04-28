@@ -138,32 +138,6 @@ def variable_defaults(variable_definitions, when=None, **kwargs):
     return _execute_variable_defaults
 
 
-@system_directive(dicts="auxiliary_software_files")
-def auxiliary_software_file(name, src_path, dest_path, when=None, **kwargs):
-    """Defines an auxiliary software file
-
-    Args:
-      name (str): Name of the auxiliary file
-      src_path (str): Source path of the auxiliary file
-      dest_path (str): Destination path of the auxiliary file
-    """
-
-    def _execute_auxiliary_software_file(obj):
-        when_list = ramble.language.language_helpers.build_when_list(
-            when, obj, name, "auxiliary_software_files"
-        )
-
-        when_key = frozenset(when_list)
-        if when_key not in obj.auxiliary_software_files:
-            obj.auxiliary_software_files[when_key] = {}
-        obj.auxiliary_software_files[when_key][name] = {
-            "src_path": src_path,
-            "dest_path": dest_path,
-        }
-
-    return _execute_auxiliary_software_file
-
-
 @system_directive("class_families")
 def system_family(*names: str, **kwargs):
     """Add a new family to this system

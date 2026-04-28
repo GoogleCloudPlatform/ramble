@@ -88,6 +88,9 @@ class MockSpackRunner:
     def configure_env(self, env_path):
         pass
 
+    def add_config_file(self, config_file):
+        pass
+
     def inventory_hash(self):
         return "dummy_hash"
 

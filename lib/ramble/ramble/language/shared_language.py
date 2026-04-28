@@ -1147,6 +1147,33 @@ def required_variable(
     return _mark_required_var
 
 
+@shared_directive("auxiliary_software_files")
+def auxiliary_software_file(name, src_path, dest_path, when=None, **kwargs):
+    """Defines an auxiliary software file
+
+    Args:
+      name (str): Name of the auxiliary file
+      src_path (str): Source path of the auxiliary file
+      dest_path (str): Destination path of the auxiliary file
+    """
+
+    def _execute_auxiliary_software_file(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "auxiliary_software_files"
+        )
+
+        when_key = frozenset(when_list)
+        if when_key not in obj.auxiliary_software_files:
+            obj.auxiliary_software_files[when_key] = {}
+        obj.auxiliary_software_files[when_key][name] = {
+            "src_path": src_path,
+            "dest_path": dest_path,
+            "consumed": False,
+        }
+
+    return _execute_auxiliary_software_file
+
+
 @contextlib.contextmanager
 def when(condition):
     ramble.language.language_base.DirectiveMeta.push_to_context(condition)
