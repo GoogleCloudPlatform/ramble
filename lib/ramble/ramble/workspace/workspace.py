@@ -17,6 +17,8 @@ import shutil
 from collections import defaultdict
 from typing import Optional, Set
 
+from ruamel import yaml
+
 import llnl.util.filesystem as fs
 from llnl.util import tty
 from llnl.util.tty import log
@@ -632,10 +634,10 @@ cd "{experiment_run_dir}"
         # Construct string for default variants
         variant_string = ""
 
-        # Set default workflow_manager to the user-managed one,
+        # Set default system to the user-managed one,
         # which provides defaults for required variables such as
         # batch_submit and mpi_command.
-        all_variants = {"workflow_manager": "user-managed"}
+        all_variants = {"system": "user-managed"}
         for scope in ramble.config.scopes():
             if namespace.workspace not in scope:
                 variant_dict = ramble.config.get(namespace.variants, scope=scope)
@@ -1121,6 +1123,7 @@ ramble:
         include_default_variables,
         variable_filters,
         variable_definitions,
+        variant_definitions,
         experiment_name,
         package_manager=None,
         workflow_manager=None,
@@ -1144,6 +1147,8 @@ ramble:
             variable_filters (list(str)): List of filters to downselect variables with
             variable_definitions (list(str)): List of variable definitions to use
                                               within generated experiments
+            variant_definitions (list(str)): List of variant definitions to use
+                                             within generated experiments
             experiment_name (str): The name of the experiments to add
             package_manager (str): Name of package manager to use for the generated experiments
             workflow_manager (str): Name of workflow manager to use for the generated experiments
@@ -1175,8 +1180,6 @@ ramble:
                 clear (bool): Whether to clear previous comments or not
                 start_char (str): Character to begin the comment with
             """
-            from ruamel import yaml
-
             key_comment = base.ca.items.setdefault(key, [None, [], None, None])
 
             if clear:
@@ -1205,7 +1208,24 @@ ramble:
 
             return base
 
-        from ruamel import yaml
+        def process_definitions(definitions, def_type="variable"):
+            def_dict = {}
+            def_regex = re.compile(r"\s*=\s*")
+            for definition in definitions:
+                m = def_regex.search(definition)
+
+                if m:
+                    key = definition[0 : m.start()]
+                    value = list_str_to_list(definition[m.end() :])
+                    if isinstance(value, str):
+                        value = strip_quotes(value)
+                    def_dict[key] = value
+                else:
+                    logger.die(
+                        f"Invalid {def_type} definition provided: {definition}. "
+                        + "Accepted form is 'key=value'"
+                    )
+            return def_dict
 
         edited = False
 
@@ -1236,22 +1256,15 @@ ramble:
         app_inst.variables = {}
         app_inst.expander = ramble.expander.Expander({}, None)
 
-        var_def_dict = {}
-        def_regex = re.compile(r"\s*=\s*")
-        for definition in variable_definitions:
-            m = def_regex.search(definition)
+        var_def_dict = process_definitions(variable_definitions, def_type="variable")
+        variant_def_dict = process_definitions(variant_definitions, def_type="variant")
 
-            if m:
-                key = definition[0 : m.start()]
-                value = list_str_to_list(definition[m.end() :])
-                if isinstance(value, str):
-                    value = strip_quotes(value)
-                var_def_dict[key] = value
-            else:
-                logger.die(
-                    f"Invalid variable definition provided: {definition}. "
-                    + "Accepted form is 'key=value'"
-                )
+        # TODO: Deprecate / remove in favor of explicit variant definitions
+        if package_manager:
+            variant_def_dict["package_manager"] = package_manager
+
+        if workflow_manager:
+            variant_def_dict["workflow_manager"] = workflow_manager
 
         if application not in apps_dict:
             apps_dict[application] = syaml.syaml_dict()
@@ -1260,6 +1273,7 @@ ramble:
         workloads_dict = apps_dict[application][namespace.workload]
 
         exp_zips = {}
+        def_regex = re.compile(r"\s*=\s*")
         for zip_def in zips:
             m = def_regex.match(zip_def)
             if m:
@@ -1342,15 +1356,11 @@ ramble:
             exps_dict[experiment_name] = syaml.syaml_dict()
             exp_dict = exps_dict[experiment_name]
 
-            if package_manager is not None or workflow_manager is not None:
+            if variant_def_dict:
                 exp_dict[namespace.variants] = syaml.syaml_dict()
                 variants_dict = exp_dict[namespace.variants]
-
-                if package_manager is not None:
-                    variants_dict[namespace.package_manager] = package_manager
-
-                if workflow_manager is not None:
-                    variants_dict[namespace.workflow_manager] = workflow_manager
+                for name, val in variant_def_dict.items():
+                    variants_dict[name] = val
 
             if namespace.variables not in exp_dict:
                 exp_dict[namespace.variables] = yaml.comments.CommentedMap()

@@ -14,6 +14,8 @@ import tempfile
 from collections import defaultdict
 from typing import Callable, Dict
 
+import deprecation
+
 from llnl.util import tty
 from llnl.util.tty.colify import colified, colify
 
@@ -26,6 +28,7 @@ import ramble.software_environments
 import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
+from ramble import ramble_version
 from ramble.cmd.common import arguments
 from ramble.namespace import namespace
 from ramble.util.logger import logger
@@ -37,6 +40,17 @@ from spack.util.editor import editor
 description = "manage experiment workspaces"
 section = "workspaces"
 level = "short"
+
+
+@deprecation.deprecated(
+    deprecated_in="0.6.0",
+    removed_in="0.7.0",
+    current_version=ramble_version,
+    details="Use the -V option instead",
+)
+def _deprecated_manage_experiments_arguments():
+    pass
+
 
 subcommands = [
     "activate",
@@ -1267,6 +1281,15 @@ def workspace_manage_experiments_setup_parser(subparser):
     )
 
     subparser.add_argument(
+        "--variant-definition",
+        "-V",
+        dest="variant_definitions",
+        action="append",
+        help="variant definition to set in the generated experiments. "
+        + "Given in the form name=value",
+    )
+
+    subparser.add_argument(
         "--experiment-name",
         "-e",
         dest="experiment_name",
@@ -1274,20 +1297,22 @@ def workspace_manage_experiments_setup_parser(subparser):
         help="name of generated experiment",
     )
 
+    # TODO: remove in 0.7.0
     subparser.add_argument(
         "--package-manager",
         "-p",
         dest="package_manager",
         default=None,
-        help="name of (optional) package manager to use within the experiment scope",
+        help="(DEPRECATED) name of (optional) package manager to use within the experiment scope",
     )
 
+    # TODO: remove in 0.7.0
     subparser.add_argument(
         "--workflow-manager",
         "--wm",
         dest="workflow_manager",
         default=None,
-        help="name of (optional) workflow manager to use within the experiment scope",
+        help="(DEPRECATED) name of (optional) workflow manager to use within the experiment scope",
     )
 
     subparser.add_argument(
@@ -1340,6 +1365,10 @@ def workspace_manage_experiments_setup_parser(subparser):
 
 def workspace_manage_experiments(args):
     """Perform experiment management"""
+
+    if args.package_manager or args.workflow_manager:
+        _deprecated_manage_experiments_arguments()
+
     ws = ramble.cmd.find_workspace(args)
 
     if ws is None:
@@ -1363,6 +1392,8 @@ def workspace_manage_experiments(args):
     if args.variable_definitions:
         variable_definitions = args.variable_definitions
 
+    variant_definitions = args.variant_definitions if args.variant_definitions else []
+
     zips = []
     if args.zips:
         zips = args.zips
@@ -1378,6 +1409,7 @@ def workspace_manage_experiments(args):
         args.include_default_variables,
         variable_filters,
         variable_definitions,
+        variant_definitions,
         args.experiment_name,
         args.package_manager,
         args.workflow_manager,
