@@ -17,3 +17,13 @@ class UserManaged(SystemBase):
     """
 
     name = "user-managed"
+
+    variant(
+        "validate_system",
+        default=False,
+        description="Whether to validate the platform configuration",
+    )
+
+    default_package_manager("user-managed")
+    default_platform("user-managed")
+    default_workflow_manager("user-managed")

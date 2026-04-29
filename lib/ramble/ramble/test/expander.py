@@ -50,6 +50,7 @@ def build_variant_set():
         "test_variant": "defined",
         "package_manager": "spack",
         "workflow_manager": "slurm",
+        "compiler": "gcc@14.2.0",
     }
 
     multi_value_variants = [
@@ -281,6 +282,7 @@ def test_expansion_namespaces():
         (["test_variant=undefined", "package_manager=spack"], False),
         (["test_variant=undefined", "package_manager=spack", "workflow_manager=slurm"], False),
         (["test_variant=defined", "package_manager=spack", "workflow_manager=slurm"], True),
+        (["compiler=gcc@14.2.0"], True),
     ],
 )
 def test_satisfies_works(input_list, output):

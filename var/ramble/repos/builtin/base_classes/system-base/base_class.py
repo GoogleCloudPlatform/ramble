@@ -32,6 +32,11 @@ class SystemBase(ObjectMixin, metaclass=SystemMeta):
     )
     _language_classes = [SystemMeta, SharedMeta]
 
+    system_default_platform = None
+    system_default_workflow_manager = None
+    system_default_package_manager = None
+    system_available_platforms = []
+
     variant(
         "validate_system",
         default=True,
@@ -47,13 +52,13 @@ class SystemBase(ObjectMixin, metaclass=SystemMeta):
         register_validator(
             "n_nodes_system_validation",
             predicate="{n_nodes} <= {max_nodes}",
-            message="Number of nodes requested ({n_nodes}) exceeds available nodes ({max_nodes})",
+            message="Number of nodes requested ({n_nodes}) exceeds max nodes ({max_nodes})",
         )
 
         register_validator(
             "n_ranks_system_validation",
             predicate="{n_ranks} <= {max_cores_per_node} * {n_nodes}",
-            message="Total number of ranks ({n_ranks}) exceeds total cores ({max_cores_per_node} * {n_nodes})",
+            message="Total number of ranks ({n_ranks}) exceeds max cores ({max_cores_per_node} * {n_nodes})",
         )
 
     def __init__(self, file_path):

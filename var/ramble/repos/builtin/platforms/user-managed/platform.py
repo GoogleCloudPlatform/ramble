@@ -17,3 +17,9 @@ class UserManaged(PlatformBase):
     """
 
     name = "user-managed"
+
+    variant(
+        "validate_platform",
+        default=False,
+        description="Whether to validate the platform configuration",
+    )

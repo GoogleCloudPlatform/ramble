@@ -30,21 +30,7 @@ class SystemMeta(ramble.language.shared_language.SharedMeta):
 system_directive = SystemMeta.directive
 
 
-@system_directive("class_families")
-def family(name, **kwargs):
-    """Adds a family to this system
-
-    Args:
-      name (str): The name of the family
-    """
-
-    def _execute_family(obj):
-        obj.class_families[name] = True
-
-    return _execute_family
-
-
-@system_directive(dicts="default_workflow_manager", init_value=None)
+@system_directive("default_workflow_managers")
 def default_workflow_manager(name, **kwargs):
     """Sets the default workflow manager for this system
 
@@ -53,12 +39,12 @@ def default_workflow_manager(name, **kwargs):
     """
 
     def _execute_default_workflow_manager(obj):
-        obj.default_workflow_manager = name
+        obj.system_default_workflow_manager = name
 
     return _execute_default_workflow_manager
 
 
-@system_directive(dicts="default_package_manager", init_value=None)
+@system_directive(dicts=())
 def default_package_manager(name, **kwargs):
     """Sets the default package manager for this system
 
@@ -67,12 +53,12 @@ def default_package_manager(name, **kwargs):
     """
 
     def _execute_default_package_manager(obj):
-        obj.default_package_manager = name
+        obj.system_default_package_manager = name
 
     return _execute_default_package_manager
 
 
-@system_directive(dicts="default_platform", init_value=None)
+@system_directive(dicts=())
 def default_platform(name, **kwargs):
     """Sets the default platform for this system
 
@@ -81,12 +67,12 @@ def default_platform(name, **kwargs):
     """
 
     def _execute_default_platform(obj):
-        obj.default_platform = name
+        obj.system_default_platform = name
 
     return _execute_default_platform
 
 
-@system_directive(dicts="available_platforms", init_value=[])
+@system_directive(dicts=())
 def available_platforms(platforms, **kwargs):
     """Sets the available platforms for this system
 
@@ -95,7 +81,14 @@ def available_platforms(platforms, **kwargs):
     """
 
     def _execute_available_platforms(obj):
-        obj.available_platforms = platforms
+        platform_set = set(getattr(obj, "system_available_platforms", []))
+
+        if isinstance(platforms, list):
+            for platform in platforms:
+                platform_set.add(platform)
+        else:
+            platform_set.add(platforms)
+        obj.system_available_platforms = sorted(platform_set)
 
     return _execute_available_platforms
 
@@ -146,8 +139,8 @@ def system_family(*names: str, **kwargs):
         name (str): Name of family to apply to this system
     """
 
-    def _define_system_family(wm):
+    def _define_system_family(sys):
         for name in names:
-            wm.class_families[name] = True
+            sys.class_families[name] = True
 
     return _define_system_family

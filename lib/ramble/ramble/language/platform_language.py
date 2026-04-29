@@ -31,20 +31,6 @@ platform_directive = PlatformMeta.directive
 
 
 @platform_directive("class_families")
-def family(name, **kwargs):
-    """Adds a family to this platform
-
-    Args:
-      name (str): The name of the family
-    """
-
-    def _execute_family(obj):
-        obj.class_families[name] = True
-
-    return _execute_family
-
-
-@platform_directive("class_families")
 def platform_family(*names: str, **kwargs):
     """Add a new family to this platform
 
@@ -52,8 +38,8 @@ def platform_family(*names: str, **kwargs):
         name (str): Name of family to apply to this platform
     """
 
-    def _define_platform_family(wm):
+    def _define_platform_family(plat):
         for name in names:
-            wm.class_families[name] = True
+            plat.class_families[name] = True
 
     return _define_platform_family

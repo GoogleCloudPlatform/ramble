@@ -397,8 +397,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_package_manager(self):
         pkgman = conversions.canonical_none(
-            self.experiment_variants(allow_caching=False).value(
-                namespace.package_manager
+            self.expander.expand_var(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.package_manager
+                )
             )
         )
 
@@ -476,7 +478,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     is None
                 ):
                     default_value = getattr(
-                        self.system, f"default_{variant}", None
+                        self.system, f"system_default_{variant}", None
                     )
                     if default_value:
                         self.experiment_variants(
@@ -489,22 +491,27 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_platform(self):
         plat_var = conversions.canonical_none(
-            self.experiment_variants(allow_caching=False).value(
-                namespace.platform
+            self.expander.expand_var(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.platform
+                )
             )
         )
 
         if plat_var is None:
-            plat_var = self.system.default_platform
+            plat_var = self.system.system_default_platform
+
+        if plat_var is None:
+            plat_var = "user-managed"
 
         if plat_var is not None:
             plat_name, _, maybe_plat_ver = plat_var.partition("@")
 
-            if self.system and self.system.available_platforms:
-                if plat_name not in self.system.available_platforms:
+            if self.system and self.system.system_available_platforms:
+                if plat_name not in self.system.system_available_platforms:
                     logger.die(
                         f"Platform {plat_name} is not available in system {self.system.name}. "
-                        f"Available platforms are: {', '.join(self.system.available_platforms)}"
+                        f"Available platforms are: {', '.join(self.system.system_available_platforms)}"
                     )
 
             try:
@@ -554,8 +561,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_workflow_manager(self):
         workflow = conversions.canonical_none(
-            self.experiment_variants(allow_caching=False).value(
-                namespace.workflow_manager
+            self.expander.expand_var(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.workflow_manager
+                )
             )
         )
 
@@ -681,7 +690,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Set up remaining variants
         self._set_system()
-        self._set_platform()
 
         # Apply defaults from system and platform
         if self.system:
@@ -690,9 +698,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 and namespace.platform not in self.variants
             ):
                 self.object_variants.experiment_variant(
-                    namespace.platform, self.system.default_platform
+                    namespace.platform, self.system.system_default_platform
                 )
-                self._set_platform()
 
             if (
                 self.system.default_package_manager
@@ -700,7 +707,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             ):
                 self.object_variants.experiment_variant(
                     namespace.package_manager,
-                    self.system.default_package_manager,
+                    self.system.system_default_package_manager,
                 )
 
             if (
@@ -709,9 +716,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             ):
                 self.object_variants.experiment_variant(
                     namespace.workflow_manager,
-                    self.system.default_workflow_manager,
+                    self.system.system_default_workflow_manager,
                 )
 
+        self._set_platform()
         self._set_package_manager()
         self._set_workflow_manager()
 
@@ -1462,9 +1470,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             warn_validation=warn_validation,
             die_on_validate_error=die_on_validate_error,
         )
-        self._check_object_validators()
+        self._check_object_validators(
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+        )
 
-    def _check_object_validators(self):
+    def _check_object_validators(
+        self, warn_validation=True, die_on_validate_error=True
+    ):
         expander = self.expander
         for _, obj in self.objects():
             for when_set, validator_defs in obj.validators.items():
@@ -1486,9 +1499,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             f"Validator '{name}' (defined in '{obj.name}') "
                             f"fails with message: '{msg}'"
                         )
-                        if validator["fail_on_invalid"]:
+                        if (
+                            die_on_validate_error
+                            and validator["fail_on_invalid"]
+                        ):
                             raise ObjectValidationError(err_msg)
-                        else:
+                        elif warn_validation:
                             logger.warn(err_msg)
 
     def _generate_cleanup_cmd(self, key):
@@ -3930,24 +3946,25 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             f"Failed to instantiate base class {cls.__name__}: {e}"
                         )
 
-        # Yield for modifiers
-        for mod_inst in self._modifier_instances:
-            yield from _yield_registered(mod_inst)
+        object_precedence_order = [
+            "_modifier_instances",
+            "system",
+            "platform",
+            "workflow_manager",
+            "package_manager",
+            None,
+        ]
 
-        # Yield for system
-        yield from _yield_registered(self.system)
-
-        # Yield for platform
-        yield from _yield_registered(self.platform)
-
-        # Yield for workflow manager
-        yield from _yield_registered(self.workflow_manager)
-
-        # Yield for package manager
-        yield from _yield_registered(self.package_manager)
-
-        # Yield for self
-        yield from _yield_registered(self)
+        for attr_name in object_precedence_order:
+            if attr_name:
+                attr_val = getattr(self, attr_name, None)
+                if attr_val and isinstance(attr_val, list):
+                    for attr_inst in attr_val:
+                        yield from _yield_registered(attr_inst)
+                elif attr_val:
+                    yield from _yield_registered(attr_val)
+            else:
+                yield from _yield_registered(self)
 
     def require_mpi_variables(self):
         self.keywords.update_keys(
