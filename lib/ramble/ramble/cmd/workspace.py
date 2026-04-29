@@ -1362,6 +1362,13 @@ def workspace_manage_experiments_setup_parser(subparser):
         help="comma delimited list of variable names to matrix in the experiments",
     )
 
+    subparser.add_argument(
+        "--default-variable-value",
+        default="",
+        help="default value for any required, but undefined, variable. Default is '' "
+        "which is likely to cause validation errors",
+    )
+
 
 def workspace_manage_experiments(args):
     """Perform experiment management"""
@@ -1407,6 +1414,7 @@ def workspace_manage_experiments(args):
         args.workload_name_variable,
         workload_filters,
         args.include_default_variables,
+        args.default_variable_value,
         variable_filters,
         variable_definitions,
         variant_definitions,

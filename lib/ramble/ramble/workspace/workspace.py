@@ -10,7 +10,6 @@ import contextlib
 import copy
 import datetime
 import fnmatch
-import itertools
 import os
 import re
 import shutil
@@ -384,35 +383,6 @@ def get_workspace(args, cmd_name, required=False):
             "or use:",
             f"    ramble -w WRKSPC {cmd_name} ...",
         )
-
-
-def _get_all_obj_var_names(obj, obj_type):
-    """Return a set of all variables names defined in the given object."""
-    if obj is None:
-        if obj_type == ramble.repository.ObjectTypes.package_managers:
-            variant_name = namespace.package_manager
-        elif obj_type == ramble.repository.ObjectTypes.workflow_managers:
-            variant_name = namespace.workflow_manager
-        elif obj_type == ramble.repository.ObjectTypes.systems:
-            variant_name = namespace.system
-        elif obj_type == ramble.repository.ObjectTypes.platforms:
-            variant_name = namespace.platform
-        else:
-            raise ValueError(
-                "Only package manager, workflow manager, system, and platform types are supported"
-            )
-        variants_dict = ramble.config.get(namespace.variants)
-        obj_name = variants_dict.get(variant_name)
-        if obj_name is None:
-            return set()
-    else:
-        obj_name = obj
-    try:
-        obj_inst = ramble.repository.get(obj_name, object_type=obj_type)
-    except ramble.repository.UnknownObjectError:
-        return set()
-    vars = list(itertools.chain.from_iterable(obj_inst.object_variables.values()))
-    return {var.name for var in vars}
 
 
 class Workspace:
@@ -1121,6 +1091,7 @@ ramble:
         workload_name_variable,
         workload_filters,
         include_default_variables,
+        default_variable_value,
         variable_filters,
         variable_definitions,
         variant_definitions,
@@ -1144,6 +1115,7 @@ ramble:
             workload_filters (list(str)): List of filters to downselect workloads with
             include_default_variables (bool): Whether to include default variables in the
                                               resulting config or not
+            default_variable_value (str): Default value to set undefined variables to
             variable_filters (list(str)): List of filters to downselect variables with
             variable_definitions (list(str)): List of variable definitions to use
                                               within generated experiments
@@ -1233,38 +1205,22 @@ ramble:
         apps_dict = self.get_applications().copy()
 
         app_inst = ramble.repository.get(application)
-        # Set version manually as in set_variables_and_variants
-        _, _, maybe_version = application.partition("@")
-        if maybe_version and "{" not in maybe_version:
-            try:
-                app_inst.set_version(version_number=maybe_version, description=application)
-                app_inst.validate_version()
-            except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
-                # If version validation fails (e.g. unknown version in strict mode),
-                # we still want to allow adding the experiment to the config.
-                # Full validation will happen during concretization/setup.
-                logger.debug(f"Version initialization failed for {application}: {e}")
-        elif hasattr(app_inst, "preferred_version"):
-            try:
-                app_inst.set_version(version=app_inst.preferred_version, description=application)
-                app_inst.validate_version()
-            except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
-                # If version validation fails, we still want to allow adding the experiment.
-                # Full validation will happen during concretization/setup.
-                logger.debug(f"Version initialization failed for {application}: {e}")
+
+        exp_context = ramble.context.Context()
+        exp_context.context_name = experiment_name
 
         app_inst.variables = {}
         app_inst.expander = ramble.expander.Expander({}, None)
 
-        var_def_dict = process_definitions(variable_definitions, def_type="variable")
-        variant_def_dict = process_definitions(variant_definitions, def_type="variant")
+        exp_context.variables = process_definitions(variable_definitions, def_type="variable")
+        exp_context.variants = process_definitions(variant_definitions, def_type="variant")
 
         # TODO: Deprecate / remove in favor of explicit variant definitions
         if package_manager:
-            variant_def_dict["package_manager"] = package_manager
+            exp_context.variants["package_manager"] = package_manager
 
         if workflow_manager:
-            variant_def_dict["workflow_manager"] = workflow_manager
+            exp_context.variants["workflow_manager"] = workflow_manager
 
         if application not in apps_dict:
             apps_dict[application] = syaml.syaml_dict()
@@ -1272,24 +1228,21 @@ ramble:
 
         workloads_dict = apps_dict[application][namespace.workload]
 
-        exp_zips = {}
         def_regex = re.compile(r"\s*=\s*")
         for zip_def in zips:
             m = def_regex.match(zip_def)
             if m:
                 key = m.group("key")
                 value = list_str_to_list(m.group("value"))
-                exp_zips[key] = value
+                exp_context.zips[key] = value
             else:
                 logger.die(
                     f"Invalid zip definition provided: {zip_def}. "
                     + "Accepted form is 'zipname=[var1,var2,var3]'"
                 )
 
-        exp_matrix = []
         if matrix:
-            for part in matrix.split(","):
-                exp_matrix.append(part)
+            exp_context.matrices.append(list(matrix.split(",")))
 
         # Unpack all workload names from `when` sets
         all_workload_names = set()
@@ -1327,39 +1280,45 @@ ramble:
             if add_workload:
                 workload_names.append(workload)
 
+        if not workload_names:
+            logger.die(f"No workloads match filter '{wl_filter}' in application {application}")
+
         if workload_name_variable:
-            var_def_dict[workload_name_variable] = workload_names.copy()
+            exp_context.variables[workload_name_variable] = workload_names.copy()
             workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
 
-        obj_var_names = _get_all_obj_var_names(
-            workflow_manager, obj_type=ramble.repository.ObjectTypes.package_managers
-        ) | _get_all_obj_var_names(
-            workflow_manager, obj_type=ramble.repository.ObjectTypes.workflow_managers
-        )
-
+        missing_vars = set()
+        self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
         for workload_name in workload_names:
             edited = True
-            app_inst.expander._workload_name = None
-            app_inst.define_variable(app_inst.keywords.workload_name, workload_name)
-            try:
-                if app_inst.is_mpi_required(workload_name):
-                    app_inst.require_mpi_variables()
-            except (ramble.expander.WorkloadNotDefinedError, ramble.error.RambleError) as e:
-                # Workload may not be defined for the active 'when' conditions.
-                # Skip MPI requirement checks for now as full validation occurs later.
-                logger.debug(f"Skipping MPI requirement check for workload {workload_name}: {e}")
+            exp_set = ramble.experiment_set.ExperimentSet(self)
+            exp_list = exp_set.render_experiment_set(
+                app_inst.name,
+                workload_name,
+                exp_context,
+                warn_validation=False,
+                die_on_validate_error=False,
+            )
+
+            for exp_inst in exp_list:
+                missing_exp_vars = {
+                    var
+                    for var in exp_inst.keywords.all_required_keys()
+                    if var not in exp_inst.variables
+                }
+                missing_vars = missing_vars | missing_exp_vars
+
             if workload_name not in workloads_dict:
-                workloads_dict[workload_name] = syaml.syaml_dict()
-                workloads_dict[workload_name][namespace.experiment] = syaml.syaml_dict()
+                workloads_dict[workload_name] = {namespace.experiment: {}}
 
             exps_dict = workloads_dict[workload_name][namespace.experiment]
             exps_dict[experiment_name] = syaml.syaml_dict()
             exp_dict = exps_dict[experiment_name]
 
-            if variant_def_dict:
+            if exp_context.variants:
                 exp_dict[namespace.variants] = syaml.syaml_dict()
                 variants_dict = exp_dict[namespace.variants]
-                for name, val in variant_def_dict.items():
+                for name, val in exp_context.variants.items():
                     variants_dict[name] = val
 
             if namespace.variables not in exp_dict:
@@ -1368,20 +1327,14 @@ ramble:
             vars_dict = exp_dict[namespace.variables]
 
             # Ensure required variables are defined
-            for key in app_inst.keywords.all_required_keys():
-                # Do not define missing required variables that are defined in
-                # the associated package and workflow managers.
-                # TODO: should include consideration for when clause, right now
-                # the `selected_variables` property cannot be used due to no associated
-                # expander at this stage.
-                if key not in workspace_vars and key not in obj_var_names:
-                    vars_dict[key] = ""
+            for key in sorted(missing_vars):
+                if key not in workspace_vars and key not in exp_context.variables:
+                    vars_dict[key] = default_variable_value
 
             # Only extract variable defaults if requested.
             # This is mutually exclusive with workload_name_variable
             if include_default_variables:
-                # At this point we should only have a valid workload name
-                workload = app_inst.workloads[workload_name]
+                workload = exp_inst.get_workloads()
                 if workload.variables:
                     first_var = True
                     for var in workload.variables.values():
@@ -1425,16 +1378,16 @@ ramble:
                         env_vars_dict[env_var.name] = env_var.value
 
             # Add any variables that are defined to the variables dict
-            if var_def_dict:
-                vars_dict.update(var_def_dict)
+            if exp_context.variables:
+                vars_dict.update(exp_context.variables)
 
-            if exp_zips:
+            if exp_context.zips:
                 if namespace.zips not in exp_dict:
-                    exp_dict[namespace.zips] = exp_zips.copy()
+                    exp_dict[namespace.zips] = exp_context.zips.copy()
 
-            if exp_matrix:
+            if exp_context.matrices:
                 if namespace.matrix not in exp_dict:
-                    exp_dict[namespace.matrix] = exp_matrix.copy()
+                    exp_dict[namespace.matrix] = exp_context.matrices.copy()[0]
 
         if edited and not self.dry_run:
             ramble.config.config.update_config(

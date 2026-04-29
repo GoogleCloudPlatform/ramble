@@ -58,7 +58,9 @@ obj_attribute_map = {
     # Package / workflow manager / system/ platform specific:
     "families": None,
     # System specific:
-    "available_platforms": None,
+    "default_package_manager": "system_default_package_manager",
+    "default_workflow_manager": "system_default_workflow_manager",
+    "available_platforms": "system_available_platforms",
     "platform_variable_maps": None,
     "variable_defaults": None,
     "auxiliary_software_files": None,
