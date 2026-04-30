@@ -43,6 +43,7 @@ import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
 import ramble.variants
+from ramble.definitions.variables import CommandVariable
 from ramble.error import (
     ApplicationError,
     ChainCycleDetectedError,
@@ -177,6 +178,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.repeats = ramble.repeats.Repeats()
         self._command_list = []
         self._command_list_without_logs = []
+        self._missing_command_variables = {}
         self.chained_experiments = None
         self.chain_order = []
         self.chain_prepend = []
@@ -648,7 +650,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self._env_variable_sets = env_variable_sets.copy()
 
-    def set_variables_and_variants(self, variables, variants, experiment_set):
+    def set_variables_and_variants(
+        self, variables, variants, workspace, experiment_set
+    ):
         """Set internal reference to variables and variants
 
         Also, create an application specific expander class.
@@ -658,6 +662,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                              experiment.
             variants (dict): Dictionary of variant controls for this
                              experiment.
+            workspace: Reference to workspace object
             experiment_set: Reference to experiment set, for expanding
                             referenced variables.
         """
@@ -755,7 +760,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
 
-        self.define_missing_variables()
+        self.define_missing_variables(workspace)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
         if experiment_set and experiment_set._workspace:
@@ -794,7 +799,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return cleaned_variables
 
-    def define_missing_variables(self):
+    def register_missing_command_variable(self, var):
+        """Register a missing command variable, so we can report it later in
+        the correct log file.
+
+        Args:
+            var: Instance of a CommandVariable
+        """
+        self._missing_command_variables[var.name] = var
+
+    def define_missing_variables(self, workspace):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
 
@@ -807,8 +821,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Define object version and variant variables
         # Also, extract a merged set of when_keys from objects that are not
         # applications.
-        object_when_map = {}
-        for _, obj in self.objects():
+        # Also, define object version variables
+        object_when_map = {"object_variables": {}, "command_variables": {}}
+        for obj_type, obj in self.objects():
             # TODO: Remove the {origin_type}_version variable when we can
             self.define_variable(
                 f"{obj.origin_type}_version", str(obj.selected_version)
@@ -835,47 +850,61 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         variant.as_definition(),
                     )
 
-            if obj.origin_type != "application":
-                object_when_map[obj] = []
-                for when_key, var_list in obj.object_variables.items():
-                    keep = False
-                    for var in var_list:
-                        if var.name not in self.variables:
-                            keep = True
-
-                    if keep:
-                        object_when_map[obj].append(when_key)
-
-                if not object_when_map[obj]:
-                    object_when_map.pop(obj, None)
-
-        while True:
-            to_define = {}
-            changed_definitions = False
-            # Process any missing variables from other objects
-            for obj, when_keys in object_when_map.items():
-                to_remove = set()
-                for when_key in when_keys:
-                    if obj.satisfy_when(when_key):
-                        to_remove.add(when_key)
-                        for var in obj.object_variables[when_key]:
+            if obj_type != ramble.repository.ObjectTypes.applications:
+                # variable_sets = [obj.object_variables, obj.command_variables]
+                for variable_set_attr, when_map in object_when_map.items():
+                    when_map[obj] = []
+                    variable_set = getattr(obj, variable_set_attr, {})
+                    for when_key, var_list in variable_set.items():
+                        keep = False
+                        for var in var_list:
                             if var.name not in self.variables:
-                                to_define[var.name] = var.default
-                                changed_definitions = True
+                                keep = True
 
-                # Remove any satisfied when_keys, as we won't need to check
-                # them (since their variables have already been defined).
-                for when_key in to_remove:
-                    when_keys.remove(when_key)
+                        if keep:
+                            when_map[obj].append(when_key)
 
-            if not changed_definitions:
-                break
+                    if not when_map[obj]:
+                        when_map.pop(obj, None)
 
-            for var, val in to_define.items():
-                default_variables[var] = val
+        # Process any missing variables from other objects
+        # Handle object_variables before handling command_variables
+        for variable_set_attr, when_map in object_when_map.items():
+            while True:
+                to_define = {}
+                changed_definitions = False
+                for obj, when_keys in when_map.items():
+                    to_remove = set()
+                    for when_key in when_keys:
+                        if obj.satisfy_when(when_key):
+                            to_remove.add(when_key)
+                            variable_dict = getattr(obj, variable_set_attr, {})
+                            if when_key in variable_dict:
+                                for var in variable_dict[when_key]:
+                                    if var.name not in self.variables:
+                                        if isinstance(var, CommandVariable):
+                                            to_define[var.name] = (
+                                                var.extract_value(
+                                                    workspace, self
+                                                )
+                                            )
+                                        else:
+                                            to_define[var.name] = var.default
+                                        changed_definitions = True
 
-            for var, val in default_variables.items():
-                self.define_variable(var, val)
+                    # Remove any satisfied when_keys, as we won't need to check
+                    # them (since their variables have already been defined).
+                    for when_key in to_remove:
+                        when_keys.remove(when_key)
+
+                if not changed_definitions:
+                    break
+
+                for var, val in to_define.items():
+                    default_variables[var] = val
+
+                for var, val in default_variables.items():
+                    self.define_variable(var, val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
@@ -892,11 +921,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if chained_experiments:
             self.chained_experiments = chained_experiments.copy()
 
-    def set_modifiers(self, modifiers):
+    def set_modifiers(self, modifiers, workspace):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
-            self.build_modifier_instances()
+            self.build_modifier_instances(workspace)
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -938,11 +967,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             os.path.join(logs_dir, self.expander.experiment_namespace) + ".out"
         )
 
-    def get_pipeline_phases(self, pipeline, phase_filters=None):
+    def get_pipeline_phases(self, pipeline, workspace, phase_filters=None):
         if phase_filters is None:
             phase_filters = ["*"]
 
-        self.build_modifier_instances()
+        self.build_modifier_instances(workspace)
         self.build_phase_order()
 
         if pipeline not in self.pipelines:
@@ -1005,7 +1034,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Returns:
             (set): All variable names used by this experiment.
         """
-        self.build_modifier_instances()
+        self.build_modifier_instances(workspace)
         self.define_variables_for_template_path(workspace)
 
         backup_variables = self.variables.copy()
@@ -1016,7 +1045,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ########################
         # Define extra variables
         ########################
-        self.define_missing_variables()
+        self.define_missing_variables(workspace)
 
         ##########################################
         # Expand used variables to track all usage
@@ -1128,18 +1157,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         phase_func(workspace, app_inst=self)
         self._phase_times[phase] = time.time() - start_time
 
-    def print_phase_times(self, pipeline, phase_filters=None):
+    def print_phase_times(self, pipeline, workspace, phase_filters=None):
         """Print phase execution times by pipeline phase order
 
         Args:
             pipeline (str): Name of pipeline to print timing information for
+            workspace: Reference to workspace object
             phase_filters (list(str) | None): Filters to limit phases to print
         """
         logger.msg("Phase timing statistics:")
         if phase_filters is None:
             phase_filters = ["*"]
         for phase in self.get_pipeline_phases(
-            pipeline, phase_filters=phase_filters
+            pipeline, workspace, phase_filters=phase_filters
         ):
             # Set default time to 0.0 s, to prevent KeyError from skipped phases
             if phase not in self._phase_times:
@@ -1365,7 +1395,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for mod_inst in self._modifier_instances:
             mod_inst.define_variable(var_name, var_value)
 
-    def build_modifier_instances(self):
+    def build_modifier_instances(self, workspace):
         """Built a map of modifier names to modifier instances needed for this
         application instance
         """
@@ -1423,7 +1453,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 mod_inst.expander.add_no_expand_var(var)
 
         # Define any missing modifier variables
-        self.define_missing_variables()
+        self.define_missing_variables(workspace)
 
     @property
     def inventory_file(self):
@@ -2327,6 +2357,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         _check_shell_support(self)
 
         exp_lock = self.experiment_lock
+
+        # Report missing command variables
+        if self._missing_command_variables:
+            logger.msg("Missing Command Variable Summary:")
+            dry_run_str = " (dry-run)" if workspace.dry_run else ""
+            for name, var in self._missing_command_variables.items():
+                command = self.expander.expand_var(var.command)
+                logger.msg(
+                    f"- {name} = {self.variables[name]}{dry_run_str} from '{command}'"
+                )
 
         self._set_input_path()
         self._define_commands(success_list=self.success_list)

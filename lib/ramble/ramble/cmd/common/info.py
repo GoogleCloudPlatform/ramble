@@ -40,6 +40,7 @@ obj_attribute_map = {
     "validators": None,
     "object_variables": None,
     "object_environment_variables": None,
+    "command_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,

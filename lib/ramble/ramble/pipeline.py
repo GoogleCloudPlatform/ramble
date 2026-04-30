@@ -163,7 +163,9 @@ class Pipeline:
 
             with logger.add_log_context(exp_log_path):
                 logger.msg(f"Experiment inventory:\n{sjson.dump(app_inst.hash_inventory)}")
-                phase_list = list(app_inst.get_pipeline_phases(self.name, self.filters.phases))
+                phase_list = list(
+                    app_inst.get_pipeline_phases(self.name, self.workspace, self.filters.phases)
+                )
 
                 disable_progress = (
                     ramble.config.get("config:disable_progress_bar", False)
@@ -190,7 +192,7 @@ class Pipeline:
                     phase_total += 1
                     if not disable_progress:
                         progress.update()
-                app_inst.print_phase_times(self.name, self.filters.phases)
+                app_inst.print_phase_times(self.name, self.workspace, self.filters.phases)
                 if not disable_progress:
                     progress.set_description("Experiment complete")
                     progress.close()

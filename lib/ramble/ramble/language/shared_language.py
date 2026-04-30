@@ -1174,6 +1174,50 @@ def auxiliary_software_file(name, src_path, dest_path, when=None, **kwargs):
     return _execute_auxiliary_software_file
 
 
+@shared_directive("command_variables")
+def command_variable(
+    name,
+    command,
+    dry_run_value,
+    description="",
+    expandable=True,
+    track_used=True,
+    when=None,
+    **kwargs,
+):
+    """Defines an variable, backed by a command
+
+    Args:
+      name (str): Name of the variable
+      command (str): Command to execute to get the variable value
+      dry_run_value (str): Value to use when part of a dry-run
+      description (str): Description of variable
+    """
+
+    def _execute_command_variable(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "command_variable"
+        )
+
+        when_key = frozenset(when_list)
+        if when_key not in obj.command_variables:
+            obj.command_variables[when_key] = []
+
+        obj.command_variables[when_key].append(
+            ramble.definitions.variables.CommandVariable(
+                name=name,
+                command=command,
+                dry_run_value=dry_run_value,
+                description=description,
+                expandable=expandable,
+                track_used=track_used,
+                when=when_key,
+            )
+        )
+
+    return _execute_command_variable
+
+
 @contextlib.contextmanager
 def when(condition):
     ramble.language.language_base.DirectiveMeta.push_to_context(condition)

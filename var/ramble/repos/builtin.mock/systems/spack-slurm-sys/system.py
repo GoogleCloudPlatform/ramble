@@ -27,10 +27,16 @@ class SpackSlurmSys(SystemBase):
             dest_path="packages.yaml",
         )
 
+    command_variable(
+        "max_nodes",
+        command="sinfo -p {slurm_partition} -O 'Nodes' | tail -n 1",
+        dry_run_value="4",
+        description="Number of nodes in a partition",
+    )
+
     with when("platform=mock-platform1"):
         variable_defaults(
             variable_definitions={
-                "platform_nodes": "4",
                 "slurm_partition": "mock-partition",
             }
         )

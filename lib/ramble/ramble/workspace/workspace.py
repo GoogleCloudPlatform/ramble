@@ -1289,6 +1289,8 @@ ramble:
 
         missing_vars = set()
         self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
+        is_dry_run = self.dry_run
+        self.dry_run = True
         for workload_name in workload_names:
             edited = True
             exp_set = ramble.experiment_set.ExperimentSet(self)
@@ -1389,6 +1391,7 @@ ramble:
                 if namespace.matrix not in exp_dict:
                     exp_dict[namespace.matrix] = exp_context.matrices.copy()[0]
 
+        self.dry_run = is_dry_run
         if edited and not self.dry_run:
             ramble.config.config.update_config(
                 namespace.application, apps_dict, scope=self.ws_file_config_scope_name()
@@ -1433,7 +1436,7 @@ ramble:
         force_prefix = False
         pkgman_prefixes = set()
         for _, app_inst, _ in experiment_set.all_experiments():
-            app_inst.build_modifier_instances()
+            app_inst.build_modifier_instances(self)
             app_inst.define_variables_for_template_path(self)
             if app_inst.package_manager is not None:
                 pkgman_prefixes.add(app_inst.package_manager.spec_prefix)
@@ -1442,7 +1445,7 @@ ramble:
         force_prefix = force_prefix or len(pkgman_prefixes) > 1
 
         for _, app_inst, _ in experiment_set.all_experiments():
-            app_inst.build_modifier_instances()
+            app_inst.build_modifier_instances(self)
             app_inst.define_variables_for_template_path(self)
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)

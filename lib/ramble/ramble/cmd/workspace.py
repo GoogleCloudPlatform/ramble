@@ -923,7 +923,7 @@ def workspace_info(args):
                     for pipeline in app_inst.pipelines:
                         if pipeline not in all_pipelines:
                             all_pipelines[pipeline] = set()
-                        for phase in app_inst.get_pipeline_phases(pipeline):
+                        for phase in app_inst.get_pipeline_phases(pipeline, ws):
                             all_pipelines[pipeline].add(phase)
 
                     experiment_index = app_inst.expander.expand_var_name(
