@@ -115,7 +115,7 @@ class Perf(BasicModifier):
     figure_of_merit(
         "cycles",
         log_file="perf_{experiment_name}_*.out",
-        fom_regex=r"\s+(?P<cycles>\d+)\s+cycles",
+        fom_regex=r"\s+(?P<cycles>[\d,]+)\s+cycles",
         group_name="cycles",
         units="count"
     )
