@@ -20,7 +20,10 @@ class AmdUprof(BasicModifier):
 
     mode("mpi", description="Mode for profiling mpi apps")
     mode("standard", description="Mode for profiling serial apps")
-    mode("roofline", description="Mode for generating roofline using AMDuProfPcm")
+    mode(
+        "roofline",
+        description="Mode for generating roofline using AMDuProfPcm",
+    )
     default_mode("mpi")
 
     modifier_variable(
@@ -93,8 +96,12 @@ class AmdUprof(BasicModifier):
         "setup_uprof_results_dir", required=True, injection_method="prepend"
     )
 
+    register_builtin(
+        "generate_uprof_report", required=True, injection_method="append"
+    )
+
     def setup_uprof_results_dir(self):
-        return ["rm -rf {uprof_results_dir}*"]
+        return ["rm -rf {uprof_results_dir} {uprof_report_file}"]
 
     def wrap_executable(self, executable_name, executable, app_inst=None):
         prepend_execs = []
@@ -107,3 +114,10 @@ class AmdUprof(BasicModifier):
             ]
 
         return prepend_execs, append_execs
+
+    def generate_uprof_report(self):
+        if self._usage_mode in ["mpi", "standard"]:
+            return [
+                "AMDuProfCLI report -i {uprof_results_dir} --report-output {uprof_report_file}"
+            ]
+        return []
