@@ -6,10 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import re
 import ramble.util.shell_utils
 from ramble.modkit import *
 from ramble.util.executable import CommandExecutable
+
 
 class Perf(BasicModifier):
     """Define a modifier for capturing performance counters using 'perf'."""
@@ -19,7 +19,9 @@ class Perf(BasicModifier):
     tags("performance-analysis", "pmu")
 
     mode("stat", description="Capture performance counters using 'perf stat'")
-    mode("record", description="Capture performance samples using 'perf record'")
+    mode(
+        "record", description="Capture performance samples using 'perf record'"
+    )
 
     default_mode("stat")
 
@@ -36,7 +38,7 @@ class Perf(BasicModifier):
         "perf_events",
         default="cycles,instructions",
         description="Comma separated list of events to capture",
-        modes=["stat"],
+        modes=["stat", "record"],
     )
 
     modifier_variable(
@@ -80,7 +82,11 @@ class Perf(BasicModifier):
         if metrics and metrics != "None":
             perf_cmd += f" -M '{metrics}'"
 
-        log_path = "{experiment_run_dir}/perf_{experiment_name}_" + hostname_cmd + ".out"
+        log_path = (
+            "{experiment_run_dir}/perf_{experiment_name}_"
+            + hostname_cmd
+            + ".out"
+        )
 
         pre_cmds.append(
             CommandExecutable(
@@ -101,8 +107,8 @@ class Perf(BasicModifier):
                 f"stop-perf-{exe_name}",
                 template=[
                     'sudo kill -INT "$perf_pid"',
-                    'sleep 2',
-                    'if ps -p "$perf_pid" > /dev/null; then sudo kill -9 "$perf_pid"; fi'
+                    "sleep 2",
+                    'if ps -p "$perf_pid" > /dev/null; then sudo kill -9 "$perf_pid"; fi',
                 ],
                 mpi=False,
                 redirect="",
@@ -117,7 +123,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<cycles>[\d,]+)\s+cycles",
         group_name="cycles",
-        units="count"
+        units="count",
     )
 
     figure_of_merit(
@@ -125,7 +131,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<instructions>\d+)\s+instructions",
         group_name="instructions",
-        units="count"
+        units="count",
     )
 
     figure_of_merit(
@@ -133,7 +139,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"instructions\s+#\s+(?P<ipc>\d+\.\d+)\s+insn per cycle",
         group_name="ipc",
-        units="insn/cycle"
+        units="insn/cycle",
     )
 
     figure_of_merit(
@@ -141,7 +147,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<l1d_refill>\d+)\s+l1d_cache_refill",
         group_name="l1d_refill",
-        units="count"
+        units="count",
     )
 
     figure_of_merit(
@@ -149,7 +155,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<l2d_refill>\d+)\s+l2d_cache_refill",
         group_name="l2d_refill",
-        units="count"
+        units="count",
     )
 
     figure_of_merit(
@@ -157,7 +163,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<mesh_miss>\d+)\s+.*/hnf_cache_miss/",
         group_name="mesh_miss",
-        units="count"
+        units="count",
     )
 
     figure_of_merit(
@@ -165,7 +171,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<read_bw>\d+\.?\d*)\s+.*/rni_actual_read_bandwidth/",
         group_name="bandwidth",
-        units="GB/s"
+        units="GB/s",
     )
 
     figure_of_merit(
@@ -173,7 +179,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"\s+(?P<write_bw>\d+\.?\d*)\s+.*/rni_actual_write_bandwidth/",
         group_name="bandwidth",
-        units="GB/s"
+        units="GB/s",
     )
 
     figure_of_merit(
@@ -181,7 +187,7 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"(?P<be_pct>\d+\.\d+)\s+percent of slots\s+backend_bound",
         group_name="stalls",
-        units="%"
+        units="%",
     )
 
     figure_of_merit(
@@ -189,5 +195,5 @@ class Perf(BasicModifier):
         log_file="perf_{experiment_name}_*.out",
         fom_regex=r"(?P<br_pct>\d+\.\d+)\s+percent of slots\s+bad_speculation",
         group_name="branches",
-        units="%"
+        units="%",
     )
