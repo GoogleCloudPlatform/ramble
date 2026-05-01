@@ -153,6 +153,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     archive_pattern("{experiment_run_dir}/" + ExperimentResult.cache_file_name)
 
+    mpi_definitions = {
+        ramble.keywords.keywords.n_ranks: "int({processes_per_node}*{n_nodes})",
+        ramble.keywords.keywords.processes_per_node: "int({n_ranks}/{n_nodes})",
+        ramble.keywords.keywords.n_nodes: "int({n_ranks}/{processes_per_node})",
+    }
+
     def __init__(self, file_path):
         super().__init__()
 
@@ -180,6 +186,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._command_list = []
         self._command_list_without_logs = []
         self._missing_command_variables = {}
+        self.missing_mpi_variables = set()
         self.chained_experiments = None
         self.chain_order = []
         self.chain_prepend = []
@@ -199,7 +206,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._exp_lock = None
         self._input_lock = None
         self._software_lock = None
-        self._experiment_graph = None
         # A dict storing fom values, currently it only stores inmem FOMs
         self._fom_map = {}
 
@@ -1498,6 +1504,31 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     def validate_experiment(
         self, warn_validation=True, die_on_validate_error=True
     ):
+
+        mpi_required = self.is_mpi_required(self.expander.workload_name)
+
+        mpi_vars_defined = self.defined_mpi_vars()
+
+        if mpi_required and len(mpi_vars_defined) < 2:
+            mpi_keys = (
+                "Two or more of the following are required to be defined.\n"
+            )
+            for var in self.mpi_definitions:
+                mpi_keys += f"  - {var}\n"
+
+            defined_keys = (
+                f"Experiment {self.expander.experiment_namespace} only has:\n"
+            )
+            for var in mpi_vars_defined:
+                defined_keys += f"  - {var}\n"
+
+            if die_on_validate_error:
+                raise ramble.error.ObjectValidationError(
+                    "Invalid number of required variables defined.\n"
+                    + mpi_keys
+                    + defined_keys
+                )
+
         # Validate the new modifiers variables exist
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(
@@ -1613,9 +1644,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for name, conf in self.internals[
                 namespace.custom_executables
             ].items():
+                custom_exec = ramble.util.executable.CommandExecutable(
+                    name=name, **conf
+                )
+                existing_exec = self.custom_executables.get(name, None)
+
+                if custom_exec == existing_exec:
+                    continue
+
                 filtered_executabls, _ = (
                     self._get_filtered_and_full_executables()
                 )
+
                 if (
                     name in filtered_executabls
                     or name in self.custom_executables
@@ -1630,9 +1670,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         "defined"
                     )
 
-                self.custom_executables[name] = (
-                    ramble.util.executable.CommandExecutable(name=name, **conf)
-                )
+                self.custom_executables[name] = custom_exec
 
     def get_executable_graph(self, workload_name):
         """Construct and return an executable graph
@@ -1936,6 +1974,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             n_nodes = self.expander.expand_var_name(
                                 self.keywords.n_nodes
                             )
+                            n_nodes = 1 if "{n_nodes}" else n_nodes
                             n_nodes = 1 if not n_nodes else int(n_nodes)
                             if not raw_mpi_cmd and n_nodes > 1:
                                 logger.warn(
@@ -4042,51 +4081,52 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     return True
         return False
 
-    def set_required_variables(self):
+    def defined_mpi_vars(self):
+        mpi_vars_defined = set()
+
+        for mpi_var in self.mpi_definitions:
+            if mpi_var in self.variables:
+                mpi_vars_defined.add(mpi_var)
+
+        return mpi_vars_defined
+
+    def set_required_variables(self, app_inst=None):
         """Set required variables from all objects"""
 
         def define_mpi_vars():
             mpi_required = self.is_mpi_required(self.expander.workload_name)
 
-            mpi_vars_defined = set()
+            mpi_vars_defined = self.defined_mpi_vars()
+            mpi_vars_to_define = set()
 
-            mpi_vars = {
-                self.keywords.n_ranks: "int({processes_per_node}*{n_nodes})",
-                self.keywords.processes_per_node: "int({n_ranks}/{n_nodes})",
-                self.keywords.n_nodes: "int({n_ranks}/{processes_per_node})",
-            }
+            for mpi_var in self.mpi_definitions:
+                if mpi_var not in mpi_vars_defined:
+                    mpi_vars_to_define.add(mpi_var)
 
-            for mpi_var in mpi_vars:
-                if mpi_var in self.variables:
-                    mpi_vars_defined.add(mpi_var)
-
-            if mpi_required and len(mpi_vars_defined) < 2:
-                mpi_keys = "Two or more of the following are required to be defined.\n"
-                for var in mpi_vars:
-                    mpi_keys += f"  - {var}\n"
-
-                defined_keys = f"Experiment {self.expander.experiment_namespace} only has:\n"
-                for var in mpi_vars_defined:
-                    defined_keys += f"  - {var}\n"
-                raise ramble.error.ObjectValidationError(
-                    "Invalid number of required variables defined.\n"
-                    + mpi_keys
-                    + defined_keys
-                )
-
-            for mpi_var in mpi_vars_defined:
-                del mpi_vars[mpi_var]
-
-            for var_name, formula in mpi_vars.items():
+            for var_name in mpi_vars_to_define:
+                formula = self.mpi_definitions[var_name]
+                value = None
                 # If two variables are defined, use the formula to compute the missing ones.
                 if len(mpi_vars_defined) >= 2:
                     value = self.expander.expand_var(
                         formula, allow_passthrough=False
                     )
-                # If there is not enough information to use the formulas, set missing vars to 0
-                else:
+                # If there is not enough information to use the formulas, or they are not required.
+                # Set missing vars to 0
+                elif not mpi_required:
                     value = 0
-                self.define_variable(var_name, value)
+
+                if value is not None:
+                    self.missing_mpi_variables.add(var_name)
+                    self.define_variable(var_name, value)
+
+            if mpi_required:
+                required_dict = {
+                    "type": ramble.keywords.key_type.required,
+                    "level": ramble.keywords.output_level.key,
+                }
+                for var_name in self.mpi_definitions:
+                    self.keywords.update_keys({var_name: required_dict})
 
         define_mpi_vars()
 
@@ -4101,6 +4141,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self.objects():
             logger.debug(f"Setting required variables for {obj.name}")
             self.keywords.update_keys(obj.required_variables)
+            if obj is not self and hasattr(obj, "set_required_variables"):
+                obj.set_required_variables(self)
 
     def _format_docs_details(self, out):
         if self.workloads:

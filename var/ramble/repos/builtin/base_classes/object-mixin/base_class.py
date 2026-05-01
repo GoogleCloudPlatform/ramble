@@ -162,6 +162,10 @@ class ObjectMixin:
             f"{self.origin_type}_version", self.selected_version
         )
 
+    def set_required_variables(self, app_inst=None):
+        """Stub that allows objects to update required variables"""
+        pass
+
     @staticmethod
     def version_to_pep440(version_str):
         """Converts object version number to PEP 440 compliant version number.

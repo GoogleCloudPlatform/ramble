@@ -1308,6 +1308,7 @@ ramble:
                     for var in exp_inst.keywords.all_required_keys()
                     if var not in exp_inst.variables
                 }
+                missing_exp_vars = missing_exp_vars | exp_inst.missing_mpi_variables
                 missing_vars = missing_vars | missing_exp_vars
 
             if workload_name not in workloads_dict:
