@@ -26,6 +26,8 @@ def define_experiments(global_args):
         "n_nodes=1",
         "-v",
         "n_ranks=1",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

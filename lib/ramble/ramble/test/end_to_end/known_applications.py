@@ -47,6 +47,8 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
             "n_ranks=1",
             "-w",
             "test_workload",
+            "--default-variable-value",
+            "1",
         ]
         if package_manager == "user-managed":
             app_inst = ramble.repository.get(application)
@@ -111,6 +113,8 @@ def test_known_workflow_managers(
             "n_ranks=1",
             "-w",
             "test_workload",
+            "--default-variable-value",
+            "1",
         ]
         # Handle `user-managed` package manager
         app_inst = ramble.repository.get("gromacs")

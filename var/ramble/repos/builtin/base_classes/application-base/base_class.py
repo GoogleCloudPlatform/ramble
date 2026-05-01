@@ -172,6 +172,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._active_workload = None
         self.no_expand_vars = None
         self.experiment_set = None
+        self.workspace = None
         self.internals = {}
         self.is_template = False
         self.generated_experiments = []
@@ -258,7 +259,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         clone_variables = {} if not self.variables else self.variables
         clone_variants = {} if not self.variants else self.variants
         new_clone.set_variables_and_variants(
-            clone_variables, clone_variants, self.experiment_set
+            clone_variables,
+            clone_variants,
+            self.workspace,
+            self.experiment_set,
         )
         if self._env_variable_sets:
             new_clone.set_env_variable_sets(self._env_variable_sets.copy())
@@ -670,6 +674,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.variables = variables.copy()
         self.variants = variants.copy()
         self.experiment_set = experiment_set
+        self.workspace = workspace
         self.expander = ramble.expander.Expander(
             self.variables, self.experiment_set
         )

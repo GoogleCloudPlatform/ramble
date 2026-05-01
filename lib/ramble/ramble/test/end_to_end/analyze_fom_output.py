@@ -98,6 +98,8 @@ def test_analyze_success_with_no_fom_defined(mock_applications, workspace_name):
         "processes_per_node=1",
         "-v",
         "batch_submit={execute_experiment}",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -125,6 +127,8 @@ def test_analyze_fail_with_no_fom_detected(mock_applications, workspace_name):
         "batch_submit={execute_experiment}",
         "--wf",
         "working_wl",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()

@@ -71,6 +71,8 @@ def test_data_preparation(request, mock_applications):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

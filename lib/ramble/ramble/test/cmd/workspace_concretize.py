@@ -89,6 +89,8 @@ def test_workspace_multispec_concretize(workspace_name):
         "spack_test",
         "--wf",
         "water_*",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     workspace(
@@ -101,6 +103,8 @@ def test_workspace_multispec_concretize(workspace_name):
         "eessi_test",
         "--wf",
         "water_*",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     workspace("concretize", "-q", global_args=global_args)

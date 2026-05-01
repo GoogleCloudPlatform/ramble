@@ -36,7 +36,9 @@ pytestmark = pytest.mark.usefixtures(
 def test_package_manager_names(pkgman_name, expect_success_setup):
     ws_name = f"test-{pkgman_name}"
     ws = ramble.workspace.create(ws_name)
-    workspace(
+
+    global_args = ["-w", ws_name]
+    args = [
         "manage",
         "experiments",
         "hostname",
@@ -52,15 +54,18 @@ def test_package_manager_names(pkgman_name, expect_success_setup):
         "mpi_command=''",
         "-v",
         "batch_submit=''",
-        global_args=["-w", ws_name],
-    )
+        "--default-variable-value",
+        "1",
+    ]
+
     ws._re_read()
     if expect_success_setup:
+        workspace(*args, global_args=global_args)
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
         assert os.path.isfile(os.path.join(ws.log_dir, "setup.latest.out"))
     else:
         with pytest.raises(RambleCommandError):
-            workspace("setup", "--dry-run", global_args=["-D", ws.root])
+            workspace(*args, global_args=global_args)
 
 
 def test_software_info_string():
