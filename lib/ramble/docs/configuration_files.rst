@@ -848,21 +848,22 @@ Variants Section
 
 The variants config section is used to customize variants to the experiment creation.
 These can include application defined variants, or higher level Ramble provided
-variants. Currently, the only supported variants is ``package_manager`` which
-allows an experiment to define the package manager it should use.
-
-The format of this section is as follows:
+variants. The format of this section, along with some example variants, can be seen below:
 
 .. code-block:: yaml
 
     variants:
-      package_manager: <pkg_man_name> or null or None
+      package_manager: <pkg_man_name> or user-managed
+      workflow_manager: <work_flow_man_name> or user-managed
+      system: <sys_name> or user-managed
+      platform: <plat_name> or user-managed
 
 Variants are expanded following the same logic to expand variables (so a
 variant could be lazily expanded based on an experiment's variable definitions).
 
-The default value for ``package_manager`` is ``null`` which disables the use of
-a package manager.
+Selection of variants can customize your workspace beyond the YAML
+configuration. These can be used to change the behavior of experiment objects,
+or define system or platform selections that can encapsulate many defaults.
 
 .. _zips-config:
 
