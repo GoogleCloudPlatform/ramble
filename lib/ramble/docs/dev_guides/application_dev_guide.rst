@@ -330,7 +330,7 @@ Ramble allows objects to be defined with multiple versions, and then to use
 :ref:`conditional logic<application-dev-conditional-logic>` to set other
 directives based on the version. The ``version`` directive 
 (:py:meth:`ramble.language.shared_language.version`) is used to set a version,
- and ``when`` conditions can be described using the following syntax:
+and ``when`` conditions can be described using the following syntax:
 
 * ``application_version@<version_number>`` Apply to only a specific version.
 * ``application_version@:<version_number>`` Apply to a range up to and including

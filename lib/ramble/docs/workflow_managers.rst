@@ -9,9 +9,9 @@
 
 .. _workflow-manager-control:
 
-================
+=================
 Workflow Managers
-================
+=================
 
 Within Ramble's :ref:`variants configuration section <variants-config>`, users
 can control which workflow manager is used for a set of experiments.
@@ -23,9 +23,9 @@ templates and logic that can construct complex workflows. These can include
 getting an experiment's status, cancelling an experiment, or submitting an
 experiment to a scheduler.
 
-----------------------------
+-----------------------------
 Configuring Workflow Managers
-----------------------------
+-----------------------------
 
 Workflow managers are controlled through a config option in the 
 :ref:`variants configuration section <variants-config>`. The following shows an
@@ -42,9 +42,9 @@ workflow. The value of the workflow manager variant used can be a reference to a
 variable, and will be expanded following Ramble's :ref:`variable definitions
 <variable-dictionaries>` logic.
 
---------------------------
+---------------------------
 Supported Workflow Managers
---------------------------
+---------------------------
 
 Some of the currently supported workflow managers in Ramble include:
 
