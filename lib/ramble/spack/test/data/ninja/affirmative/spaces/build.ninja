@@ -1,6 +1,0 @@
-# Tests that Spack allows spaces following the target name
-
-rule cc
-  command = true
-
-build check   : cc
