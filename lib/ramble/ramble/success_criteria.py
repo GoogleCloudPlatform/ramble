@@ -189,11 +189,15 @@ class SuccessCriteria:
             comparison_tested = False
             result = True
 
-            contexts = fnmatch.filter(
-                fom_values.keys(), app_inst.expander.expand_var(self.fom_context)
-            )
+            fom_context_glob = app_inst.expander.expand_var(self.fom_context)
+            matching_keys = []
+            for k in fom_values.keys():
+                name = k[0] if isinstance(k, tuple) else k
+                if fnmatch.fnmatch(name, fom_context_glob):
+                    matching_keys.append(k)
+
             # If fom context doesn't exist, fail the comparison
-            if not contexts:
+            if not matching_keys:
                 logger.debug(
                     f'When checking success criteria "{self.name}" FOM '
                     f'context "{self.fom_context}" matches no contexts.'
@@ -202,16 +206,16 @@ class SuccessCriteria:
 
             fom_name_glob = app_inst.expander.expand_var(self.fom_name)
 
-            for context in contexts:
-                fom_names = fnmatch.filter(fom_values[context].keys(), fom_name_glob)
+            for context_key in matching_keys:
+                fom_names = fnmatch.filter(fom_values[context_key].keys(), fom_name_glob)
 
                 for fom_name in fom_names:
                     comparison_vars = {
-                        "value": fom_values[context][fom_name]["value"],
+                        "value": fom_values[context_key][fom_name]["value"],
                     }
 
                     comparison_tested = True
-                    result = app_inst.expander.evaluate_predicate(
+                    result = result and app_inst.expander.evaluate_predicate(
                         self.fom_formula, extra_vars=comparison_vars
                     )
 

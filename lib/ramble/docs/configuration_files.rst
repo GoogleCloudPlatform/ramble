@@ -773,6 +773,7 @@ In the above, ``[optional table attributes]`` includes any of the following:
    - "list of expressions"
    - "to filter experiments"
    - "to build table from"
+   transpose: true # Optional: transpose the table before writing out
 
 The ``group_method`` can be selected from any `groupby method supported by
 Pandas dataframes
@@ -798,8 +799,40 @@ a context is not provided, Ramble will attempt to auto-detect the context.
 Similarly, if the origin type is not provided, Ramble will auto detect the
 origin type.
 
+Tables also support ``autocolumns``, which allow columns to be generated
+dynamically based on the contexts and figures of merit found in an experiment's
+results. The attributes for ``autocolumns`` are as follows:
+
+.. code-block:: yaml
+
+   autocolumns:
+   - name: "column name template"
+     context_name: "glob or regex for context definition name or instance name"
+     figure_of_merit: "glob or regex for figure of merit name"
+     figure_of_merit_origin_type: "Origin type to extract figure of merit from"
+     sort_by:
+     - "list of context variables"
+     - "to sort generated columns by"
+     where:
+     - "list of expressions"
+     - "to filter experiments"
+     - "when building this column"
+
+In an ``autocolumn``, ``name`` and ``figure_of_merit`` are required. If
+``context_name`` is omitted, Ramble will match figures of merit that are not
+within any specific context (the "null" context).
+
+The ``name`` template for an ``autocolumn`` can include any variables from the
+matched context, as well as the special variables ``{fom_name}`` and
+``{context_name}`` (the name of the specific context instance). If regular
+expressions are used for ``context_name`` or ``figure_of_merit``, any named
+capture groups will also be available as variables in the ``name`` template.
+
 Columns are built in YAML order. The ``expression`` attribute can be used to
 refer to values from other columns that are defined before the current column.
+Explicitly defined columns are always added to the table before any generated
+``autocolumns``. Within a set of generated columns from the same template, the
+``sort_by`` field determines their relative order.
 
 Both ``table_name_template`` and ``column_name_template`` can include Ramble
 variables, to automatically generate new tables and columns. As an example:
