@@ -470,25 +470,51 @@ Versions can also be parameterized as a variable:
 Variant Control
 ^^^^^^^^^^^^^^^
 
-Within a workspace configuration file, experiments are able to define variants.
-Variants are able to manipulate specific aspects of experiments and
-applications. More information on these configuration options can be seen in
-the :ref:`Variants Configuration Section <variants-config>` documentation. To
-begin with, the only variant that can be specific is the ``package_manager``.
+Within a workspace configuration file, experiments are able to customize variants to manipulate specific aspects of the experiments and applications. 
 
-The ``package_manager`` variant is used to define which package manager is used
-to configure and execute the experiments. To select ``spack`` as the package
-manager, the following block can be added to any scope that variables can be
-defined in.
+Variants are expanded following the same logic as variable expansions, allowing them to be lazily expanded based on an experiment's variable definitions. More information on variants can be seen in the :ref:`Variants Configuration Section <variants-config>` documentation.
+
+To set the package manager for an experiment, the ``package_manager`` variant can be set:
 
 .. code-block:: yaml
 
   variants:
     package_manager: spack
 
-For more information about controlling package managers see the
-:ref:`package manager documentation <package-manager-control>`.
+For more information about controlling package managers, see the :ref:`package manager documentation <package-manager-control>`.
 
+-----------------
+Variant Expansion
+-----------------
+
+Variants can be expanded like variables into a Spack-like syntax by using the syntax ``{{object_type}::variant::{variant_name}``. For example, a boolean variant with a value of ``True`` formats to ``+bool``, whereas ``False`` formats to ``~bool``. A value-based variant formats to ``key=value``.
+
+Variant Expansion Example
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Suppose multiple applications in a workspace use the variant ``openmp`` (boolean) to parameterize their software specs for Spack. We can define it under the workspace ``variants:`` section:
+
+.. code-block:: yaml
+
+  ramble:
+    variants:
+      openmp: true
+
+An application can then use this variant in its software spec:
+
+.. code-block:: python
+  
+  with when("package_manager_family=spack"):
+    software_spec(
+        "my-pkg",
+        pkg_spec="my-pkg {application::variant::openmp}",
+    )
+
+During concretization, ``{application::variant::openmp}`` expands to ``+openmp``, resulting in the Spack package spec:
+
+.. code-block:: console
+
+  my-pkg +openmp
 
 .. _ramble-experiment-exclusion:
 

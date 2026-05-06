@@ -850,6 +850,7 @@ The variants config section is used to customize variants to the experiment crea
 These can include application defined variants, or higher level Ramble provided
 variants. Currently, the only supported variants is ``package_manager`` which
 allows an experiment to define the package manager it should use.
+
 The format of this section is as follows:
 
 .. code-block:: yaml
