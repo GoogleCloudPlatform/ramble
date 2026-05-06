@@ -127,7 +127,7 @@ pattern_exemptions = {
 }
 
 # Tools run in the given order
-tool_names = ["isort", "black", "flake8", "mypy"]
+tool_names = ["isort", "black", "flake8", "mypy", "ruff"]
 
 tools = {}
 
@@ -563,6 +563,31 @@ def run_mypy(mypy_cmd, file_list, args):
 
     print_output(output, args)
     print_tool_result("mypy", returncode)
+    return returncode
+
+
+@tool("ruff")
+def run_ruff(ruff_cmd, file_list, args):
+    # Even though Ruff hasn't reached v1 yet, it has been effective in catching
+    # issues like unused imports that flake8 misses.
+    del file_list
+    if args.repo_path is not None:
+        print("Skipping ruff for external repository.")
+        return 0
+    # ruff check always applies to all relevant files.
+    print_tool_header("ruff", [])
+
+    config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
+    ruff_args = ["check", "--config", config_file]
+
+    if args.fix:
+        ruff_args.append("--fix")
+
+    output = ruff_cmd(*ruff_args, fail_on_error=False, output=str, error=str)
+    returncode = ruff_cmd.returncode
+
+    print_output(output, args)
+    print_tool_result("ruff", returncode)
     return returncode
 
 

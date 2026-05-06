@@ -168,8 +168,6 @@ module = [
 ]
 check_untyped_defs = true
 
-# TODO: Add ruff into `ramble style` once it reaches v1.
-# For now, the ruff check can be invoked manually with `ruff check`.
 [tool.ruff]
 extend-include = ["bin/ramble"]
 extend-exclude = [
@@ -179,7 +177,7 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-preview = true
+preview = false
 # B905 requires Python 3.9 or up.
 ignore = ["B905"]
 extend-select = ["B", "C4", "F401"]

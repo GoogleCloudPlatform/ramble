@@ -11,3 +11,4 @@ line_profiler
 isort
 codecov-cli
 mypy
+ruff
