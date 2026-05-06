@@ -570,18 +570,18 @@ def run_mypy(mypy_cmd, file_list, args):
 def run_ruff(ruff_cmd, file_list, args):
     # Even though Ruff hasn't reached v1 yet, it has been effective in catching
     # issues like unused imports that flake8 misses.
-    del file_list
     if args.repo_path is not None:
         print("Skipping ruff for external repository.")
         return 0
-    # ruff check always applies to all relevant files.
-    print_tool_header("ruff", [])
 
     config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
-    ruff_args = ["check", "--config", config_file]
+    ruff_args = ["check", "--config", config_file, "--force-exclude"]
 
     if args.fix:
         ruff_args.append("--fix")
+
+    print_tool_header("ruff", file_list)
+    ruff_args.extend(file_list)
 
     output = ruff_cmd(*ruff_args, fail_on_error=False, output=str, error=str)
     returncode = ruff_cmd.returncode
