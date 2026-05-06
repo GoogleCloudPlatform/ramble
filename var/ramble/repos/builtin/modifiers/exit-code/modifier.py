@@ -154,7 +154,7 @@ class ExitCode(BasicModifier):
 
         if os.path.exists(log_file):
             with open(log_file) as f:
-                for line in f.readlines():
+                for line in f:
                     m = exit_regex.match(line)
 
                     if m:

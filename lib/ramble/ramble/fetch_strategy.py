@@ -36,7 +36,7 @@ import sys
 import urllib.parse
 from typing import List, Optional
 
-import llnl.util.tty as tty
+from llnl.util import tty
 from llnl.util.filesystem import (
     get_single_file,
     mkdirp,
@@ -50,10 +50,9 @@ import ramble.config
 import ramble.util.web as web_util
 from ramble.util.logger import logger
 
-import spack.util.crypto as crypto
-import spack.util.pattern as pattern
 import spack.util.url as url_util
 import spack.version
+from spack.util import crypto, pattern
 from spack.util.compression import decompressor_for, extension
 from spack.util.executable import CommandNotFoundError, which
 from spack.version import ver

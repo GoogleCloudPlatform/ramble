@@ -90,7 +90,6 @@ class Uploader:
             raise ValueError(f"{self.__class__} requires {uri} argument.")
         if not data:
             raise ValueError(f"{self.__class__} requires %{data} argument.")
-        pass
 
     def chunked_upload(self, table_id, data, uri=None):
         """Abstract method for chunked uploads. Must be implemented by subclasses."""

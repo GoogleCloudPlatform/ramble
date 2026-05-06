@@ -187,7 +187,6 @@ class Pip(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     register_phase(
         "define_package_paths",
@@ -308,12 +307,12 @@ class PipSoftwareInfo(ramble.software_info.SoftwareInfo):
         """
 
         if not in_str:
-            return None
+            return
 
         parts = in_str.replace("\n", "").split("==")
 
         if len(parts) <= 1:
-            return None
+            return
 
         self.version = parts[1]
 

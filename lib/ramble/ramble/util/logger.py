@@ -9,8 +9,8 @@
 from contextlib import contextmanager
 from pathlib import Path
 
-import llnl.util.tty as tty
 import llnl.util.tty.log
+from llnl.util import tty
 
 import ramble.util.colors as color
 

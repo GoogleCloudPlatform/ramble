@@ -21,7 +21,7 @@ from html import escape
 from typing import Dict, List
 
 import llnl.util.filesystem as fs
-import llnl.util.tty.color as color
+from llnl.util.tty import color
 
 import ramble.config
 import ramble.expander
@@ -1934,8 +1934,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if workload
             else self.get_all_workloads()
         )
-        for workload in workloads:
-            for input_file in workload.inputs:
+        for wl in workloads:
+            for input_file in wl.inputs:
                 inputs_found = 0
                 active_inputs = 0
                 input_conf = {}
@@ -1948,7 +1948,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                 if not inputs_found:
                     logger.die(
-                        f"Workload {workload.name} references a non-existent input file "
+                        f"Workload {wl.name} references a non-existent input file "
                         f"{input_file}.\n"
                         f"Make sure this input file is defined before using it in a workload."
                     )
@@ -1977,7 +1977,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                 file_name = file_name.replace(f".{fetcher.extension}", "")
 
-                namespace = f"{self.name}.{workload.name}"
+                namespace = f"{self.name}.{wl.name}"
 
                 inputs[file_name] = {
                     "fetcher": fetcher,
@@ -2526,7 +2526,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         This function can be overridden at the application level to perform
         application specific processing of the output.
         """
-        pass
 
     def extract_inmem_foms(self, inmem_fom_defs, fom_values):
         """Extract in-memory FOMs"""
@@ -2651,7 +2650,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                         # Iterate over contexts and add matched contexts to active_contexts
                         for context, foms in file_conf["contexts"].items():
-                            if not context == _NULL_CONTEXT:
+                            if context != _NULL_CONTEXT:
                                 context_conf = f_defs[context]["definition"]
                                 if (
                                     context_conf.get("pre_filter", "")
@@ -2716,10 +2715,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         if fom_conf["contexts"]:
                                             for _ in fom_conf["contexts"]:
                                                 context_name = (
-                                                    active_contexts[context]
-                                                    if context
-                                                    in active_contexts
-                                                    else _NULL_CONTEXT
+                                                    active_contexts.get(
+                                                        context, _NULL_CONTEXT
+                                                    )
                                                 )
                                                 fom_contexts.append(
                                                     context_name

@@ -24,7 +24,7 @@ import types
 from enum import Enum
 from typing import Mapping
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 import llnl.util.filesystem as fs
 import llnl.util.lang

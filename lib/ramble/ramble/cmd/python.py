@@ -13,7 +13,7 @@ import platform
 import runpy
 import sys
 
-import llnl.util.tty as tty
+from llnl.util import tty
 
 import ramble
 
