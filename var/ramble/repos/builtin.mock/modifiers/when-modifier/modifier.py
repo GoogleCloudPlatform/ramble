@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -13,6 +13,7 @@ class WhenModifier(BasicModifier):
     name = "when-modifier"
 
     mode("standard", "Standard execution mode")
+    mode("test", "Test mode")
     default_mode("standard")
 
     variant(
@@ -83,3 +84,59 @@ class WhenModifier(BasicModifier):
         ]
 
         return prepend_execs, append_execs
+
+    variant(
+        "variable_modification_active",
+        default=False,
+        values=[True, False],
+        description="Test variable modifier",
+    )
+
+    variable_modification(
+        "test_variable",
+        modification="test var modified",
+        method="set",
+        mode="test",
+        when=["+variable_modification_active"],
+    )
+
+    variant(
+        "pkg_man_reqt_fails_when_enabled",
+        default=False,
+        values=[True, False],
+        description="Test package manager requirement",
+    )
+
+    package_manager_requirement(
+        "list not-a-package",
+        validation_type="not_empty",
+        modes=["standard"],
+        when=["+pkg_man_reqt_fails_when_enabled"],
+    )
+
+    variant(
+        "mod_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test modifier required variable",
+    )
+
+    with when("+mod_required_variable"):
+        required_variable(
+            "test_mod_required_variable",
+            description="Test modifier required variable",
+        )
+
+    variant(
+        "mod_required_key",
+        default=False,
+        values=[True, False],
+        description="Test modifier required key",
+    )
+
+    with when("+mod_required_key"):
+        required_variable(
+            "test_mod_required_key",
+            results_level="key",
+            description="Test modifier required key",
+        )

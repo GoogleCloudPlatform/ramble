@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -53,7 +53,24 @@ def test_list_format_version_json():
 @pytest.mark.maybeslow
 def test_list_format_html():
     output = list("--format", "html")
-    assert '<div class="section" id="hostname">' in output
+    assert '<div class="section" id="gromacs">' in output
+    assert "<dt>Workloads:</dt>" in output
+    assert "<details>" in output
+    assert "<summary>lignocellulose</summary>" in output
+    assert "<dt>Executables:</dt>" in output
+    assert "execute" in output
+    assert "<dt>Variables:</dt>" in output
+    assert "<dt>mdrun</dt>" in output
+    # Assert on input_file descriptions
+    assert "<dt>lignocellulose</dt>" in output
+    assert "A model of cellulose and lignocellulosic biomass in an aqueous solution" in output
+    assert "</details>" in output
+
+
+@pytest.mark.maybeslow
+def test_list_base_html():
+    output = list("--type", "base_applications", "--format", "html")
+    assert '<div class="section" id="hpl">' in output
 
 
 def test_list_update(tmpdir):

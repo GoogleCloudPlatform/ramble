@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -85,10 +85,7 @@ Base Classes
 
 Ramble provides base classes which can be inherited when creating new package manager
 definition files. These encapsulate most of the basic package manager functionality,
-and allow new package managers to function with only a little syntax. These can be
-seen in more detail in :mod:`ramble.package_manager_types`, however most
-package managers inherit from the base package manager class defined in the
-`package manager module <https://github.com/GoogleCloudPlatform/ramble/blob/develop/lib/ramble/ramble/package_manager.py>`_.
+and allow new package managers to function with only a little syntax.
 
 New package manager definitions can also inherit their behavior from other
 package manager classes to replicate aspects of their behavior.
@@ -119,6 +116,7 @@ class variables, as in:
 
   class Spack(PackageManagerBase):
     package_manager_variable(...)
+    package_manager_family(...)
     register_builtin(...)
     register_phase(...)
 
@@ -130,6 +128,15 @@ When aspects of a package manager are able to be parameterized, it can be
 useful for a package manager to define a variable which users can modify to
 control the package manager's behavior. The ``package_manager_variable``
 directive can be used to define these variables.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Families
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Package managers can be grouped into families. This allows other objects to
+conditionally apply logic based on the family of the package manager being
+used. The ``package_manager_family`` directive is used to add a package manager
+to one or more families.
 
 ^^^^^^^^
 Builtins
@@ -183,3 +190,15 @@ package managers can be used as a reference.
 This unit test by default will dry-run every possible application with every
 possible package manager. As a result, it is unlikely that a package manager
 without dry-run support would pass Ramble's unit tests.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Versions, Variants, and Conditional Logic
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Ramble package managers support version and variants, just as applications do
+(see :ref:`application-dev-version-directive` and
+:ref:`application-dev-variant-directive`).
+
+Versions and variants can be used to control the behavior of many of the
+directives within a package manager, and their use follows the
+discussion in :ref:`application-dev-conditional-logic`.

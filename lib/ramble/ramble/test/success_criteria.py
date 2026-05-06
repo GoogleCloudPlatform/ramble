@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -29,7 +29,7 @@ def remark_all(crit_list, file_path):
         c.reset()
 
     with open(file_path) as f:
-        for line in f.readlines():
+        for line in f:
             for c in crit_list:
                 if c.passed(line):
                     c.mark_found()
@@ -65,23 +65,27 @@ def test_criteria_list(tmpdir):
     criteria_list = ramble.success_criteria.ScopedCriteriaList()
 
     criteria_list.add_criteria(
-        "application_definition", "test-success", "string", r".*Success string.*", log_path
+        "object_definitions",
+        "test-success",
+        "string",
+        r".*Success string.*",
+        log_path,
     )
 
     criteria_list.add_criteria("experiment", "test-exp", "string", r".*Experiment.*", log_path)
 
-    remark_all(list(criteria_list.all_criteria()), log_path)
+    remark_all([criteria for criteria, _ in criteria_list.all_criteria()], log_path)
 
     assert criteria_list.passed()
 
     criteria_list.add_criteria(
-        scope="application_definition",
+        scope="object_definitions",
         name="test-anti",
         mode="string",
         file=log_path,
         anti_match=r"From",
     )
 
-    remark_all(list(criteria_list.all_criteria()), log_path)
+    remark_all([criteria for criteria, _ in criteria_list.all_criteria()], log_path)
 
     assert not criteria_list.passed()

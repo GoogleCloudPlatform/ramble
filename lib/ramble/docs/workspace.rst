@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -178,6 +178,21 @@ will activate a workspace until it is deactivated, while
 
 will activate a workspace for the specific command.
 
+To indicate the activated workspace, an option ``-p`` can be supplied to the ``activate`` command.
+This updates the shell prompt to display the name of the currently active workspace.
+
+.. code-block:: console
+
+    $ ramble workspace activate -p <name_or_path>
+
+Alternatively, a config ``enable_workspace_prompt`` exists, to allow controlling for this behavior
+at the desired configuration granularity.
+
+.. code-block:: console
+
+    $ ramble config add 'config:enable_workspace_prompt:true'
+
+
 ------------------------------
 Printing Workspace Information
 ------------------------------
@@ -218,6 +233,8 @@ as well as unused experiment templates, one can use:
 
 Note: This command will also remove comments within the edited section
 of the workspace config file.
+
+.. _workspace-manage:
 
 ------------------------
 Workspace Manage
@@ -261,9 +278,9 @@ different version, one may type:
 
 .. code-block:: console
 
-    $ ramble workspace manage software --pkg gcc9 --package-spec gcc@9.4.0 --overwrite
+    $ ramble workspace manage software --pkg gcc14 --package-spec gcc@14.2.0 --overwrite
 
-This would update the software package definition names ``gcc9`` to have a new package spec.
+This would update the software package definition names ``gcc14`` to have a new package spec.
 
 Modifiers can be applied to various levels of a workspace configuration. To
 simplify the workflow around adding and removing modifiers from a set of

@@ -1,10 +1,12 @@
-ARG BASE_IMG=rocklinux
+ARG BASE_IMG=rockylinux
 ARG BASE_VER=8
 FROM ${BASE_IMG}:${BASE_VER} as builder
 
 ARG SPACK_REF=releases/latest
-ARG PYTHON_VER=3.11.6
-RUN yum install -yq make git python3 python3-pip wget mercurial which svn curl gcc tar bzip2 gcc gcc-c++ gcc-gfortran tar xz gzip patch && rm -rf /var/lib/apt/lists/*
+ARG PYTHON_VER=3.11.14
+
+# TODO: install fish shell. Building from spack takes a long time, and a simple yum install doesn't work. Right now fish is installed on the debian-based image only
+RUN yum install -yq make git python3 python3-pip wget mercurial which svn curl gcc tar bzip2 gcc-c++ gcc-gfortran xz gzip patch findutils tcsh && yum clean all && rm -rf /var/cache/yum
 RUN cd /opt && \
     git clone https://github.com/spack/spack && \
     cd spack && \
@@ -13,12 +15,13 @@ RUN cd /opt && \
     spack install --deprecated py-pip ^python@${PYTHON_VER} && \
     spack clean -a
 RUN echo -e ". /opt/spack/share/spack/setup-env.sh\n spack load py-pip ^python@${PYTHON_VER}\n export SPACK_PYTHON=`which python3`" > /etc/profile.d/ramble.sh
+COPY requirements.txt requirements-dev.txt requirements-pinned.txt /opt/
 RUN cd /opt &&  \
     . spack/share/spack/setup-env.sh && \
     spack load py-pip ^python@${PYTHON_VER} && \
-    wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements.txt && \
-    wget https://raw.githubusercontent.com/GoogleCloudPlatform/ramble/develop/requirements-dev.txt && \
-    python -m pip install -r /opt/requirements-dev.txt
+    python -m pip install --no-cache-dir -r /opt/requirements-pinned.txt
+COPY share/ramble/cloud-build/container_test.sh /container_test.sh
+RUN chmod a+x /container_test.sh
 FROM ${BASE_IMG}:${BASE_VER}
 
 COPY --from=builder / /

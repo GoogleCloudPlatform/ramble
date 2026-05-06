@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -139,7 +139,7 @@ class SpackStack(ExecutableApplication):
         "Stage",
         "Total",
     ]
-    for i, fom_part in enumerate(fom_parts):
+    for fom_part in fom_parts:
         full_regex = r".*?\s*" + fom_part + r":\s+(?P<fom>[0-9\.]+)s"
         figure_of_merit(
             fom_part,
@@ -208,6 +208,9 @@ class SpackStack(ExecutableApplication):
     def evaluate_success(self):
         import spack.util.spack_yaml as syaml
 
+        if not self.expander.satisfies("package_manager_family=spack"):
+            return True
+
         spack_file = self.expander.expand_var("{env_path}/spack.yaml")
         spec_list = []
 
@@ -224,7 +227,7 @@ class SpackStack(ExecutableApplication):
         with open(spack_file) as f:
             spack_data = syaml.load_config(f)
 
-        tty.debug(f"Spack data: {spack_data}")
+        logger.debug(f"Spack data: {spack_data}")
 
         for spec in spack_data["spack"]["specs"]:
             spec_list.append(spec)

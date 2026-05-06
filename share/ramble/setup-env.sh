@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -122,7 +122,10 @@ _ramble_shell_wrapper() {
                             command ramble workspace activate "$@"
                         else
                             # Actual call to activate: source the output.
-                            eval $(command ramble $_rmb_flags workspace activate --sh "$@")
+                            _activate_cmd=$(command ramble $_rmb_flags workspace activate --sh "$@")
+                            _rs=$?
+                            eval "$_activate_cmd" || return $?
+                            return $_rs
                         fi
                         ;;
                     deactivate)
@@ -143,28 +146,52 @@ _ramble_shell_wrapper() {
                             command ramble workspace deactivate -h
                         else
                             # No args: source the output of the command.
-                            eval $(command ramble $_rmb_flags workspace deactivate --sh)
+                            _deactivate_cmd=$(command ramble $_rmb_flags workspace deactivate --sh)
+                            _rs=$?
+                            eval "$_deactivate_cmd" || return $?
+                            return $_rs
                         fi
                         ;;
                     create)
-                        _a=" $@"
-                        if [ "${_a#* -a}" != "$_a" ] || \
-                           [ "${_a#* --activate}" != "$_a" ];
-                        then
+                        _a=" $@ "
+                        # Do not invalidate cache for help flags
+                        if [[ "$_a" =~ " -h " ]] || [[ "$_a" =~ " --help " ]]; then
+                            command ramble $_rmb_flags workspace create "$@"
+                        elif [[ "$_a" =~ " -a " ]] || [[ "$_a" =~ " --activate " ]]; then
                             # With -a, the command writes only the activation command
                             # into stdout (`ramble workspace activate <ws>`.)
                             # And the eval routes that command back to the wrapper to
                             # inject shell args, etc.
-                            _activate_cmd="$(command ramble $_rmb_flags workspace create "$@")"
-                            eval $_activate_cmd
-                            _workspace="$(echo $_activate_cmd | awk '{print $NF}')"
-                            echo "==> Created and activated workspace in $_workspace"
+                            _create_activate_cmd="$(command ramble $_rmb_flags workspace create "$@")"
+                            _rs=$?
+                            if [ $_rs -eq 0 ]; then
+                                unset RAMBLE_WORKSPACES
+                                eval "$_create_activate_cmd" || return $?
+                                _workspace="$(echo $_create_activate_cmd | awk '{print $NF}')"
+                                echo "==> Created and activated workspace in $_workspace"
+                            fi
+                            return $_rs
                         else
                             command ramble $_rmb_flags workspace create "$@"
+                            _rs=$?
+                            if [ $_rs -eq 0 ]; then
+                                unset RAMBLE_WORKSPACES
+                            fi
+                            return $_rs
                         fi
                         ;;
                     *)
-                        command ramble $_rmb_flags workspace $_rmb_arg "$@"
+                        _a=" $@ "
+                        if [[ ( "$_rmb_arg" = "rm" || "$_rmb_arg" = "remove" ) ]] && \
+                           [[ ! "$_a" =~ " -h " ]] && [[ ! "$_a" =~ " --help " ]];
+                        then
+                            command ramble $_rmb_flags workspace $_rmb_arg "$@"
+                            if [ $? -eq 0 ]; then
+                                unset RAMBLE_WORKSPACES
+                            fi
+                        else
+                            command ramble $_rmb_flags workspace $_rmb_arg "$@"
+                        fi
                         ;;
                 esac
             fi
@@ -198,7 +225,7 @@ _ramble_pathadd() {
 
     _pa_canonical=":$_pa_oldvalue:"
     if [ -d "$_pa_new_path" ] && \
-       [ "${_pa_canonical#*:${_pa_new_path}:}" = "${_pa_canonical}" ];
+       [ "${_pa_canonical#${_pa_new_path}:}" = "${_pa_canonical}" ];
     then
         if [ -n "$_pa_oldvalue" ]; then
             eval "export $_pa_varname=\"$_pa_new_path:$_pa_oldvalue\""
@@ -332,6 +359,11 @@ done
 #
 if [ "$_rmb_shell" = bash ]; then
     source $_rmb_share_dir/ramble-completion.bash
+    # The custom version includes support for command aliases, it is
+    # generated via `ramble commands --update-completion`.
+    if [ -f "$_rmb_share_dir/custom-ramble-completion.bash" ]; then
+        source $_rmb_share_dir/custom-ramble-completion.bash
+    fi
 fi
 
 # done: unset sentinel variable as we're no longer initializing

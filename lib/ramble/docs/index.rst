@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,9 +14,15 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Tutorials
+   :caption: User Tutorials
 
    tutorials
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer Tutorials
+
+   developer_tutorials
 
 .. toctree::
    :maxdepth: 2

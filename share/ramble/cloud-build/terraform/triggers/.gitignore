@@ -1,0 +1,2 @@
+# We don't ignore any tfstate files, as those should reside on the GCS bucket instead
+.terraform/

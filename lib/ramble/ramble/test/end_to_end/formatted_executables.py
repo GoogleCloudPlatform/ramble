@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_formatted_executables(workspace_name):
+def test_formatted_executables(make_workspace_from_config):
     test_config = r"""
 ramble:
   variables:
@@ -31,6 +31,7 @@ ramble:
     batch_submit: '{execute_experiment}'
     processes_per_node: '16'
     n_threads: '1'
+    n_ranks: '{processes_per_node}*{n_nodes}'
   formatted_executables:
     ws_exec_def:
       prefix: 'from_ws '
@@ -65,38 +66,32 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+        f.write("{ws_exec_def}\n")
+        f.write("{app_exec_def}\n")
+        f.write("{wl_exec_def}\n")
+        f.write("{exp_exec_def}\n")
+        f.write("{ws_test_def}\n")
+    ws._re_read()
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
-            f.write("{ws_exec_def}\n")
-            f.write("{app_exec_def}\n")
-            f.write("{wl_exec_def}\n")
-            f.write("{exp_exec_def}\n")
-            f.write("{ws_test_def}\n")
-        ws._re_read()
+    experiment_root = ws.experiment_dir
+    exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
+    exp_script = os.path.join(exp_dir, "execute_experiment")
 
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-
-        experiment_root = ws.experiment_dir
-        exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
-        exp_script = os.path.join(exp_dir, "execute_experiment")
-
-        with open(exp_script) as f:
-            data = f.read()
-            assert "from_app echo" in data
-            assert ";" + " " * 9 + "from_ws echo" in data
-            assert "\n" + " " * 11 + "from_wl echo" in data
-            assert "\n" + " " * 10 + "from_exp echo" in data
-            assert "\n" + " " * 2 + "test_from_ws mpirun -n 16 -ppn 16 test" in data
+    with open(exp_script) as f:
+        data = f.read()
+        assert "from_app echo" in data
+        assert ";" + " " * 9 + "from_ws echo" in data
+        assert "\n" + " " * 11 + "from_wl echo" in data
+        assert "\n" + " " * 10 + "from_exp echo" in data
+        assert "\n" + " " * 2 + "test_from_ws mpirun -n 16 -ppn 16 test" in data
 
 
-def test_redefined_executable_errors(workspace_name):
+def test_redefined_executable_errors(make_workspace_from_config):
     test_config = r"""
 ramble:
   variables:
@@ -121,19 +116,10 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
-
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
-
-        with open(config_path, "w+") as f:
-            f.write(test_config)
-
-        ws._re_read()
-
-        with pytest.raises(FormattedExecutableError):
-            output = workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-            assert "Formatted executable var_exec_name defined" in output
+    _, ws_name = make_workspace_from_config(test_config)
+    with pytest.raises(FormattedExecutableError):
+        output = workspace("setup", "--dry-run", global_args=["-w", ws_name])
+        assert "Formatted executable var_exec_name defined" in output
 
 
 def test_object_formatted_executables(mock_modifiers, workspace_name):
@@ -187,7 +173,7 @@ modifiers:
         assert '    FROM_MOD echo "Test formatted exec"' in data
 
 
-def test_nested_formatted_executables_are_properly_formatted(workspace_name):
+def test_nested_formatted_executables_are_properly_formatted(make_workspace_from_config):
     test_config = r"""
 ramble:
   variables:
@@ -231,49 +217,123 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+        f.write("{level_three}\n")
+        f.write("\n\n    {level_three}\n")
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
-            f.write("{level_three}\n")
-            f.write("\n\n    {level_three}\n")
-        ws._re_read()
+    experiment_root = ws.experiment_dir
+    exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
+    exp_script = os.path.join(exp_dir, "execute_experiment")
 
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    test_regexes = [
+        re.compile(r"^  test_l3 l3line1$"),
+        re.compile(r"^  test_l3   test_l2 l2line1$"),
+        re.compile(r"^  test_l3   test_l2   test_l1 l1line1$"),
+        re.compile(r"^      test_l3 l3line1$"),
+    ]
 
-        experiment_root = ws.experiment_dir
-        exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
-        exp_script = os.path.join(exp_dir, "execute_experiment")
+    tests = [
+        False,
+        False,
+        False,
+        False,
+    ]
 
-        test_regexes = [
-            re.compile(r"^  test_l3 l3line1$"),
-            re.compile(r"^  test_l3   test_l2 l2line1$"),
-            re.compile(r"^  test_l3   test_l2   test_l1 l1line1$"),
-            re.compile(r"^      test_l3 l3line1$"),
-        ]
+    with open(exp_script) as f:
+        for line in f:
+            for idx, regex in enumerate(test_regexes):
+                if regex.search(line):
+                    tests[idx] = True
 
-        tests = [
-            False,
-            False,
-            False,
-            False,
-        ]
-
-        with open(exp_script) as f:
-            for line in f.readlines():
-                for idx, regex in enumerate(test_regexes):
-                    if regex.search(line):
-                        tests[idx] = True
-
-        assert all(tests)
+    assert all(tests)
 
 
-def test_formatted_executables_escaped_braces(workspace_name):
+def test_nested_formatted_executables_dependencies_are_evaluated_correctly(
+    make_workspace_from_config,
+):
+    test_config = r"""
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: '{execute_experiment}'
+    processes_per_node: '16'
+    n_threads: '1'
+  formatted_executables:
+    level_three:
+      prefix: 'test_l3 '
+      join_separator: '\n'
+      indentation: 2
+      commands:
+      - 'l3line1'
+      - '{level_two}'
+    level_two:
+      prefix: 'test_l2 '
+      join_separator: '\n'
+      indentation: 2
+      commands:
+      - 'l2line1'
+      - 'l2line2'
+      - '{level_one}'
+    level_one:
+      prefix: 'test_l1 '
+      indentation: 2
+      join_separator: '\n'
+      commands:
+      - 'l1line1'
+      - 'l1line2'
+      - 'l1line3'
+  applications:
+    basic:
+      workloads:
+        working_wl:
+          experiments:
+            simple_test:
+              variables:
+                n_nodes: 1
+  software:
+    packages: {}
+    environments: {}
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+        f.write("{level_three}\n")
+        f.write("\n\n    {level_three}\n")
+
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
+
+    experiment_root = ws.experiment_dir
+    exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
+    exp_script = os.path.join(exp_dir, "execute_experiment")
+
+    test_regexes = [
+        re.compile(r"^  test_l3 l3line1$"),
+        re.compile(r"^  test_l3   test_l2 l2line1$"),
+        re.compile(r"^  test_l3   test_l2   test_l1 l1line1$"),
+        re.compile(r"^      test_l3 l3line1$"),
+    ]
+
+    tests = [
+        False,
+        False,
+        False,
+        False,
+    ]
+
+    with open(exp_script) as f:
+        for line in f:
+            for idx, regex in enumerate(test_regexes):
+                if regex.search(line):
+                    tests[idx] = True
+
+    assert all(tests)
+
+
+def test_formatted_executables_escaped_braces(make_workspace_from_config):
     test_config = r"""
 ramble:
   variables:
@@ -305,24 +365,16 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
+    experiment_root = ws.experiment_dir
+    exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
+    exp_script = os.path.join(exp_dir, "execute_experiment")
 
-        ws._re_read()
-
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-
-        experiment_root = ws.experiment_dir
-        exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
-        exp_script = os.path.join(exp_dir, "execute_experiment")
-
-        with open(exp_script) as f:
-            data = f.read()
-            assert r'echo "{experiment_index}"' in data
-            assert r'echo "{experiment_namespace}"' in data
-            assert "{escaped_formatted_exec}" not in data
+    with open(exp_script) as f:
+        data = f.read()
+        assert r'echo "{experiment_index}"' in data
+        assert r'echo "{experiment_namespace}"' in data
+        assert "{escaped_formatted_exec}" not in data

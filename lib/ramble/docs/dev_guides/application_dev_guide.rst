@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -134,8 +134,7 @@ Base Classes
 Ramble provides base classes which can be inherited from when creating new
 application definition files. Currently, these are used to abstract the package
 manager logic, but more generally change the behavior of the underlying
-application definitions. These can be seen in more detail in
-:mod:`ramble.application_types`.
+application definitions.
 
 New application definitions can also inherit their behavior from other
 application classes to replicate aspects of their behavior.
@@ -211,6 +210,16 @@ workload in an ``application.py`` allows it to be used within a
 :ref:`workspace-config` and will be shown when executing ``ramble info <app>``
 on the named application.
 
+^^^^^^^^^^^^^^^
+Workload Groups
+^^^^^^^^^^^^^^^
+
+Workload groups allow for grouping multiple workloads together under a single
+name. This can be used to apply variables or environment variables to all
+workloads in the group. The ``workload_group`` directive 
+(:py:meth:`ramble.language.application_language.workload_group`) is used to
+define a workload group.
+
 ^^^^^^^^^^^^^^^^^^
 Workload Variables
 ^^^^^^^^^^^^^^^^^^
@@ -221,8 +230,25 @@ definition of the workload (such as executable commands). Each workload can
 have an arbitrary number of workload variables, defined by
 :py:meth:`ramble.language.application_language.workload_variable`.
 
-Each variable has a default value, which can be override within a
+Each variable has a default value, which can be overridden within a
 :ref:`workspace-config`.
+
+^^^^^^^^^^^^^^^^^^^^^^
+Environment Variables
+^^^^^^^^^^^^^^^^^^^^^^
+
+Applications can define environment variables that should be set, appended, or
+prepended during an experiment. The ``environment_variable`` directive
+(:py:meth:`ramble.language.shared_language.environment_variable`) is used for
+this purpose.
+
+^^^^^^^^^^^^^^^^^^
+Required Variables
+^^^^^^^^^^^^^^^^^^
+
+If an application requires certain variables to be defined in the workspace
+configuration, it can mark them as required using the ``required_variable``
+directive (:py:meth:`ramble.language.shared_language.required_variable`).
 
 ^^^^^^^^^^^^^^^^
 Success Criteria
@@ -268,6 +294,23 @@ context. Each context represents a grouping of figures of merit that are
 collected together. A figure of merit context can be defined using
 :py:meth:`ramble.language.shared_language.figure_of_merit_context`.
 
+^^^^^^^^^^^^^^^^^^^^
+Cleaning up Files
+^^^^^^^^^^^^^^^^^^^^
+
+Applications can define cleanup operations to remove files matching a regex
+before or after execution. The ``cleanup`` directive
+(:py:meth:`ramble.language.application_language.cleanup`) is used to define
+these operations.
+
+^^^^^^^^^^^^^^^^^^^^
+Staging Files
+^^^^^^^^^^^^^^^^^^^^
+
+The ``stage_files`` directive
+(:py:meth:`ramble.language.application_language.stage_files`) can be used to
+copy or link files and directories into the experiment directory.
+
 ^^^^^^^^^^^^^^^^^^
 File path handling
 ^^^^^^^^^^^^^^^^^^
@@ -276,6 +319,150 @@ Ramble provides a utility function :py:meth:`ramble.util.file_util.get_file_path
 that should be used when referencing file paths in application definitions. This
 helps with Ramble to properly mock out these paths during unit testing, where the
 files may not exist under the dry-run setting.
+
+.. _application-dev-version-directive:
+
+^^^^^^^^^^^^^^^^^^^^
+Application Versions
+^^^^^^^^^^^^^^^^^^^^
+
+Ramble allows objects to be defined with multiple versions, and then to use 
+:ref:`conditional logic<application-dev-conditional-logic>` to set other
+directives based on the version. The ``version`` directive 
+(:py:meth:`ramble.language.shared_language.version`) is used to set a version,
+ and ``when`` conditions can be described using the following syntax:
+
+* ``application_version@<version_number>`` Apply to only a specific version.
+* ``application_version@:<version_number>`` Apply to a range up to and including
+  the specified version.
+* ``application_version@<version_number>:`` Apply to a range including the
+  specified version and above.
+* ``application_version@<start_number>:<end_number>`` Apply to a range of
+  versions, inclusive of specified versions.
+
+Ramble relies on `Python packaging.version`_ to calculate whether a version
+satisfies ``when`` criteria. In some cases, it may be necessary to adjust the
+format of version numbers to conform with `PEP 440 version specifiers`_. For
+example, ``iozone`` uses underscores instead of periods in its versioning on
+Spack. To make this compatible, static methods must be defined to convert to and
+from PEP 440 format for the purpose of version comparisons:
+
+.. code-block:: python
+
+    version("3_506", "Version 3_506 of Iozone", preferred=True)
+
+    @staticmethod
+    def version_to_pep440(version):
+        return version.replace("_", ".")
+
+    @staticmethod
+    def pep440_to_version(version):
+        return version.replace(".", "_")
+
+    with when("package_manager_family=spack"):
+        software_spec(
+            "iozone-{application::iozone::version}",
+            pkg_spec="iozone@{application::iozone::version}",
+            compiler="gcc15",
+        )
+    
+.. _Python packaging.version: https://packaging.python.org/en/latest/specifications/version-specifiers/
+.. _PEP 440 version specifiers: https://peps.python.org/pep-0440/
+
+Versions can be set for any object by substituting ``application::iozone::version`` with
+``<object_type>::<object_name>::version``.
+
+By default, users must select from versions defined in the ``application.py``.
+Strict version checking can be disabled for the entire application using the
+``strict_versions`` directive
+(:py:meth:`ramble.language.shared_language.strict_versions`) or by setting the
+configuration ``config:enable_strict_versions:false`` in the ``ramble.yaml``
+file.
+
+.. _application-dev-variant-directive:
+
+^^^^^^^^^^^^^^^^^^^^
+Application Variants
+^^^^^^^^^^^^^^^^^^^^
+
+Ramble supports objects defining variants to help control their conditional
+behavior. Variants can be used to control most aspects of an application
+definition in Ramble, and their usage within an application will be
+described in :ref:`application-dev-conditional-logic`.
+
+To define a new variant within an application, developers can use the
+``variant`` directive. An example can be seen below:
+
+.. code-block:: python
+
+  variant(
+    "gpu",
+    default=False,
+    description="Enables the usage of GPU features in this application.",
+    values=[True, False]
+  )
+
+The previous example would define a new variant named ``gpu`` within
+an application. The allowed values are either ``True`` or ``False``
+(implying it is a boolean variant), and the default is ``False``.
+
+Users will be able to control this variants value by using
+:ref:`variants<variants-config>`. Within the application, this
+variant can be used in ``when`` arguments. This will be discussed in
+more detail later, but an example of this specific variant would be:
+
+.. code-block:: python
+
+  workload_variable("gpu_flag", default="-g", description="Flag that controls GPU features", when="+gpu")
+  workload_variable("gpu_flag", default="", description="Flag that controls GPU features", when="~gpu")
+
+In this case, the variable ``gpu_flag`` will be defined, and will have
+a value of ``-g`` or an empty string, depending on the value of the
+``gpu`` variant.
+
+
+^^^^^^^^^^^^^^^^^^^^
+License Names
+^^^^^^^^^^^^^^^^^^^^
+
+The ``license_name`` directive
+(:py:meth:`ramble.language.application_language.license_name`) can be used to
+declaratively set the name of a license required by the application.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Package Manager Configs
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+Applications can provide configurations to the package manager using the
+``package_manager_config`` directive
+(:py:meth:`ramble.language.shared_language.package_manager_config`).
+
+^^^^^^^^^^^^^^^^^^^^
+Target Shells
+^^^^^^^^^^^^^^^^^^^^
+
+The ``target_shells`` directive
+(:py:meth:`ramble.language.shared_language.target_shells`) can be used to
+specify which shells are supported by the application.
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Formatted Executables
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+The ``formatted_executable`` directive
+(:py:meth:`ramble.language.shared_language.formatted_executable`) allows
+defining variables that represent a formatted merging of multiple executables.
+
+^^^^^^^^^^^^^^^^^^^^
+Validators
+^^^^^^^^^^^^^^^^^^^^
+
+Validators can be registered to ensure certain conditions are met during
+experiment setup. The ``register_validator`` directive
+(:py:meth:`ramble.language.shared_language.register_validator`) is used for this.
+
+
+.. _application-dev-conditional-logic:
 
 ^^^^^^^^^^^^^^^^^
 Conditional Logic
@@ -293,17 +480,17 @@ package manager variant:
 .. code-block:: python
 
     with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
         software_spec(
             "impi",
-            pkg_spec="intel-oneapi-mpi@2021.13.1",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
         )
 
-        with default_args(compiler="gcc9"):
+        with default_args(compiler="gcc14"):
             software_spec(
                 "gromacs",
-                pkg_spec="gromacs@2020.5",
+                pkg_spec="gromacs@2025.3",
             )
 
     software_spec(
@@ -323,6 +510,8 @@ along with any variants created in definition files:
     workflow_manager_family  
     modifier  
     <mod-name>_mode 
+
+Most of the directives in Ramble support 
 
 --------------------------
 Package Manager Directives
@@ -359,10 +548,28 @@ definition needs to contain a complete definition of at least one workload.
 This includes its executables, input files, and workload variables.
 
 Once this is complete, a workspace can be configured (following
-:ref:`workspace-config`) to create experiments from the new workload. After
-setting up the workspace, requested experiments directories will be created
-following :ref:`workspace-structure`. In order to debug any issues with the
-experiments, you can use the dry-run option from :ref:`workspace-setup`.
+:ref:`workspace-config`) to create experiments from the new workload.
+
+In order to have Ramble generate a workspace configuration, you can use the
+``workspace manage`` command from :ref:`workspace-manage`. For example:
+
+.. code-block::
+
+  $ ramble workspace manage experiments <app_name> --wf <workload_name> -v n_nodes=1 -v n_ranks=1
+
+
+The ``--dry-run`` option, from :ref:`workspace-setup`, can be used when setting
+up the workspace to avoid expensive operations (like download inputs, or
+installing software). The resulting workspace will not be functional, but this
+option can be useful to iterate quickly with the rendered templates or debug
+issues in the resulting configuration. Before attempting to actually execute
+the experiments, ensure the workspace was set up without using ``--dry-run``.
+
+After setting up the workspace, requested experiments directories will be
+created following :ref:`workspace-structure`. The execution scripts will be
+rendered into the experiment directories, and can be compared with what was
+manually executed to begin with.
+
 Additionally, you can filter the experiments you want to setup using the
 ``--where`` option, as in :ref:`filter-experiments`
 
@@ -380,3 +587,25 @@ have the output file from :ref:`collect-output`, you can copy it into one of
 the experiment directories to allow analyze to extract the correct information
 without having to execute the experiment.
 
+^^^^^^^^^^^^^
+Writing Tests
+^^^^^^^^^^^^^
+
+Tests added to a ``test`` directory alongside the object definition file get picked by
+Ramble's unit testing facility. This applies to all Ramble object types. As an example,
+the tests defined under `tunables <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/modifiers/tunables/test>`_
+can be run via ``ramble unit-test``.
+
+.. code-block:: console
+
+    # Run all unit tests
+    $ ramble unit-test
+
+    # Target specific tests
+    $ ramble unit-test -k tunables
+
+For testing custom Ramble object repositories, the ``--repo-path`` option can be used.
+
+.. code-block:: console
+
+    $ ramble unit-test --repo-path /path/to/custom/repo

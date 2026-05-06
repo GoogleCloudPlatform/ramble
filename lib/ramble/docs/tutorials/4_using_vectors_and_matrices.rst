@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -42,18 +42,18 @@ might contain the following information:
 .. code-block:: console
 
     Experiments:
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.pme_single_rank
-      Application: gromacs
+          Experiment 1: gromacs@2025.3.water_gmx50.pme_single_rank
+      Application: gromacs@2025.3
         Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.rf_single_rank
-      Application: gromacs
+          Experiment 2: gromacs@2025.3.water_gmx50.rf_single_rank
+      Application: gromacs@2025.3
         Workload: water_bare
-          Experiment: gromacs.water_bare.pme_single_rank
-      Application: gromacs
+          Experiment 3: gromacs@2025.3.water_bare.pme_single_rank
+      Application: gromacs@2025.3
         Workload: water_bare
-          Experiment: gromacs.water_bare.rf_single_rank
+          Experiment 4: gromacs@2025.3.water_bare.rf_single_rank
 
 To get detailed information about where variable definitions come from, you can use:
 
@@ -66,9 +66,9 @@ The experiments section of this command's output might contain the following:
 .. code-block:: console
 
     Experiments:
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.pme_single_rank
+          Experiment 1: gromacs@2025.3.water_gmx50.pme_single_rank
             Variables from Workspace:
               processes_per_node = 16 ==> 16
               mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
@@ -78,9 +78,9 @@ The experiments section of this command's output might contain the following:
               n_threads = 1 ==> 1
               size = 0003 ==> 0003
               type = pme ==> pme
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.rf_single_rank
+          Experiment 2: gromacs@2025.3.water_gmx50.rf_single_rank
             Variables from Workspace:
               processes_per_node = 16 ==> 16
               mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
@@ -90,9 +90,9 @@ The experiments section of this command's output might contain the following:
               n_threads = 1 ==> 1
               size = 0003 ==> 0003
               type = rf ==> rf
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: water_bare
-          Experiment: gromacs.water_bare.pme_single_rank
+          Experiment 3: gromacs@2025.3.water_bare.pme_single_rank
             Variables from Workspace:
               processes_per_node = 16 ==> 16
               mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
@@ -102,9 +102,9 @@ The experiments section of this command's output might contain the following:
               n_threads = 1 ==> 1
               size = 0003 ==> 0003
               type = pme ==> pme
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: water_bare
-          Experiment: gromacs.water_bare.rf_single_rank
+          Experiment 4: gromacs@2025.3.water_bare.rf_single_rank
             Variables from Workspace:
               processes_per_node = 16 ==> 16
               mpi_command = mpirun -n {n_ranks} -ppn {processes_per_node} ==> mpirun -n 1 -ppn 16
@@ -185,7 +185,12 @@ above, you should see the following error printed to the screen:
 
 .. code-block:: console
 
-    ==> Error: Experiment gromacs.water_bare.pme_single_rank is not unique.
+    ==> Warning: Two experiments are defined with the name gromacs@2025.3.water_gmx50.pme_single_rank
+    ==> Warning: Variables unique to previously defined experiment:
+    ==> Warning:   - experiment_index
+    ==> Warning: Variable differences between experiment definitions:
+    ==> Warning:   - type: {'previous': 'pme', 'new': 'rf'}
+    ==> Error: Experiment gromacs@2025.3.water_gmx50.pme_single_rank is not unique.
 
 Within Ramble, each experiment is required to have a unique namespace. The
 namespace of an experiment is defined as:
@@ -241,14 +246,14 @@ experiment definition under both workloads):
 .. code-block:: console
 
     Experiments:
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: water_gmx50
-          Experiment: gromacs.water_gmx50.pme_single_rank
-          Experiment: gromacs.water_gmx50.rf_single_rank
-      Application: gromacs
+          Experiment 1: gromacs@2025.3.water_gmx50.pme_single_rank
+          Experiment 2: gromacs@2025.3.water_gmx50.rf_single_rank
+      Application: gromacs@2025.3
         Workload: water_bare
-          Experiment: gromacs.water_bare.pme_single_rank
-          Experiment: gromacs.water_bare.rf_single_rank
+          Experiment 3: gromacs@2025.3.water_bare.pme_single_rank
+          Experiment 4: gromacs@2025.3.water_bare.rf_single_rank
 
 Vectorizing Workload Names
 --------------------------
@@ -290,10 +295,10 @@ Should show the following output:
 .. code-block:: console
 
     Experiments:
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: {app_workload}
-          Experiment: gromacs.water_bare.pme_single_rank
-          Experiment: gromacs.water_gmx50.rf_single_rank
+          Experiment 1: gromacs@2025.3.water_bare.pme_single_rank
+          Experiment 2: gromacs@2025.3.water_gmx50.rf_single_rank
 
 However, at this point you should only see two experiments while we expect to
 see four. This is because of the way multiple vector variables are handled in
@@ -377,12 +382,12 @@ command. Which should present the following output:
 .. code-block:: console
 
     Experiments:
-      Application: gromacs
+      Application: gromacs@2025.3
         Workload: {app_workload}
-          Experiment: gromacs.water_bare.pme_single_rank
-          Experiment: gromacs.water_bare.rf_single_rank
-          Experiment: gromacs.water_gmx50.pme_single_rank
-          Experiment: gromacs.water_gmx50.rf_single_rank
+          Experiment 1: gromacs@2025.3.water_bare.pme_single_rank
+          Experiment 2: gromacs@2025.3.water_bare.rf_single_rank
+          Experiment 3: gromacs@2025.3.water_gmx50.pme_single_rank
+          Experiment 4: gromacs@2025.3.water_gmx50.rf_single_rank
 
 
 Defining a Scaling Study
@@ -417,17 +422,17 @@ Which should contain the following output:
 
 .. code-block:: console
 
-    Experiments:
-      Application: gromacs
-        Workload: {app_workload}
-          Experiment: gromacs.water_bare.pme_1ranks
-          Experiment: gromacs.water_bare.pme_2ranks
-          Experiment: gromacs.water_bare.rf_1ranks
-          Experiment: gromacs.water_bare.rf_2ranks
-          Experiment: gromacs.water_gmx50.pme_1ranks
-          Experiment: gromacs.water_gmx50.pme_2ranks
-          Experiment: gromacs.water_gmx50.rf_1ranks
-          Experiment: gromacs.water_gmx50.rf_2ranks
+Experiments:
+  Application: gromacs@2025.3
+    Workload: {app_workload}
+      Experiment 1: gromacs@2025.3.water_bare.pme_1ranks
+      Experiment 2: gromacs@2025.3.water_bare.pme_2ranks
+      Experiment 3: gromacs@2025.3.water_bare.rf_1ranks
+      Experiment 4: gromacs@2025.3.water_bare.rf_2ranks
+      Experiment 5: gromacs@2025.3.water_gmx50.pme_1ranks
+      Experiment 6: gromacs@2025.3.water_gmx50.pme_2ranks
+      Experiment 7: gromacs@2025.3.water_gmx50.rf_1ranks
+      Experiment 8: gromacs@2025.3.water_gmx50.rf_2ranks
 
 .. include:: shared/gromacs_execute.rst
 

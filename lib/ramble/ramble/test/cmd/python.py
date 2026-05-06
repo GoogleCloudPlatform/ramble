@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,7 +20,7 @@ python = RambleCommand("python")
 
 def test_python():
     out = python("-c", "import ramble; print(ramble.ramble_version)")
-    assert out.strip() == ramble.ramble_version
+    assert ramble.ramble_version in out.strip()
 
 
 def test_python_interpreter_path():

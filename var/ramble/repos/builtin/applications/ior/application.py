@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -26,48 +26,124 @@ class Ior(ExecutableApplication):
 
         required_package("ior")
 
-    workload("multi-file", executable="ior")
+    workload("multi-file", executables=["ior-prep", "ior"])
 
-    workload("single-file", executable="ior")
+    workload("single-file", executables=["ior-prep", "ior"])
+
+    # For read-only performance testing: write once to files and then read many times.
+    workload(
+        "write-once-read-many",
+        executables=["ior-prep", "ior-write", "ior-read", "ior-finalize"],
+    )
+
+    workload_group(
+        "all_workloads",
+        workloads=["multi-file", "single-file", "write-once-read-many"],
+    )
 
     workload_variable(
         "transfer-size",
         default="1m",
         description="Transfer Size",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
     workload_variable(
         "block-size",
         default="16m",
         description="Block Size",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
     workload_variable(
         "segment-count",
         default="16",
         description="Segment Count",
-        workloads=["multi-file", "single-file"],
+        workload_group="all_workloads",
     )
-
     workload_variable(
         "iterations",
         default="1",
-        description="Segment Count",
-        workloads=["multi-file", "single-file"],
+        description="Iterations",
+        workload_group="all_workloads",
+    )
+    workload_variable(
+        "file_args",
+        default="-F",
+        description="FilePerProc flag",
+        workloads=["multi-file", "write-once-read-many"],
+    )
+    workload_variable(
+        "file_args",
+        default="",
+        description="FilePerProc flag, default to empty",
+        workloads=["single-file"],
+    )
+    workload_variable(
+        "target_directory",
+        default="{experiment_run_dir}",
+        description="Target directory for the r/w test. This can be used to target different file systems.",
+        workload_group="all_workloads",
     )
     workload_variable(
         "additional_args",
-        default="",
-        description="Additional args to pass",
+        default="-C -e",
+        description="Additional args to pass. The default aims to suppress the use of page cache.",
         workloads=["multi-file", "single-file"],
+    )
+    workload_variable(
+        "write_args",
+        default="-C -e",
+        description="Additional args to pass for write. Used to apply Lustre Stripe count",
+        workloads=["write-once-read-many"],
+    )
+    workload_variable(
+        "read_args",
+        default="-C -e",
+        description="Additional args to pass for read.",
+        workloads=["write-once-read-many"],
+    )
+    workload_variable(
+        "file_stat_cmd",
+        default=":",
+        description="Command to check file distribution or storage status, e.g., 'lfs getstripe' or 'lfs df -h'.",
+        workloads=["write-once-read-many"],
+    )
+
+    executable(
+        name="ior-prep",
+        template="mkdir -p {target_directory}",
+        use_mpi=False,
     )
 
     executable(
         name="ior",
-        template="ior -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {additional_args}",
+        template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {additional_args}",
         use_mpi=True,
     )
-    executable(name="ior-shared", template="{ior_path} -F", use_mpi=True)
+
+    executable(
+        name="ior-write",
+        template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} {file_args} {write_args} -w -k",
+        use_mpi=True,
+    )
+
+    executable(
+        name="ior-read",
+        template="ior -o {target_directory}/testFile -t {transfer-size} -b {block-size} -s {segment-count} -i {iterations} {file_args} {read_args} -r -k",
+        use_mpi=True,
+    )
+
+    executable(
+        name="ior-finalize",
+        template=["{file_stat_cmd}", "rm -rf {target_directory}/testFile*"],
+        use_mpi=False,
+    )
+
+    variant(
+        "ior_include_iter_foms",
+        default=True,
+        values=[True, False],
+        description="Whether to include per iteration FOMs in analyze",
+    )
 
     # FOMS
     # Match per iteration output in the format:
@@ -88,37 +164,32 @@ class Ior(ExecutableApplication):
     ]
     units = ["MiB/s", "count", "s", "KiB", "KiB", "s", "s", "s", "s", "count"]
 
-    iter_regex = ""
-    for metric in metrics[0:3]:  # iter is non-float
-        iter_regex += (
-            r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
-        )  # xfer => total
-    iter_regex += r"\s+(?P<" + metrics[3] + r">[0-9]+)"  # handle block
-
-    for metric in metrics[4:-1]:  # iter is non-float
-        iter_regex += (
-            r"\s+(?P<" + metric + r">[0-9]+\.[0-9]+)"
-        )  # xfer => total
-    iter_regex += r"\s+(?P<" + metrics[-1] + r">[0-9]+)\s*$"  # handle iter
-
-    access_regex = "(?P<access>(read|write))" + iter_regex
-    figure_of_merit_context(
-        "iter", regex=access_regex, output_format="iter {iter}"
-    )
-
     log_str = Expander.expansion_str("log_file")
 
-    # Capture Per Iteration Data
-    for metric, unit in zip(metrics, units):
-        fom_regex = r"\w+" + iter_regex
-        figure_of_merit(
-            metric,
-            log_file=log_str,
-            fom_regex=fom_regex,
-            group_name=metric,
-            units=unit,
-            contexts=["iter"],
+    with when("+ior_include_iter_foms"):
+        iter_regex = ""
+        for metric in metrics:
+            iter_regex += r"\s+(?P<" + metric + r">[0-9]+(?:\.[0-9]+)?)"
+        iter_regex += r"\s*$"
+
+        access_regex = "(?P<access>(read|write))" + iter_regex
+        figure_of_merit_context(
+            "iter",
+            regex=access_regex,
+            output_format="{access} iter {iter}",
         )
+
+        # Capture Per Iteration Data
+        for metric, unit in zip(metrics, units):
+            fom_regex = r"\w+" + iter_regex
+            figure_of_merit(
+                metric,
+                log_file=log_str,
+                fom_regex=fom_regex,
+                group_name=metric,
+                units=unit,
+                contexts=["iter"],
+            )
 
     # Capture Summary Data in the format:
     # Operation   Max(MiB)   Min(MiB)  Mean(MiB)     StdDev   Max(OPs)   Min(OPs)  Mean(OPs)     StdDev    Mean(s) Stonewall(s) Stonewall(MiB) Test# #Tasks tPN reps fPP reord reordoff reordrand seed segcnt   blksiz    xsize aggs(MiB)   API RefNum
@@ -163,7 +234,7 @@ class Ior(ExecutableApplication):
     ]
 
     summary_regex = "(?P<Operation>(read|write))"
-    for metric_name, unit, variant in metrics:
+    for metric_name, _, variant in metrics:
         if "str" in variant:
             summary_regex += r"\s+(?P<" + metric_name + r">\w+)"
         elif "int" in variant:
@@ -171,7 +242,7 @@ class Ior(ExecutableApplication):
         elif "float" in variant:
             summary_regex += r"\s+(?P<" + metric_name + r">[0-9]+\.[0-9]+)"
         else:
-            tty.error("Incorrect metric for FOMs")
+            logger.error("Incorrect metric for FOMs")
 
     figure_of_merit_context(
         "summary", regex=summary_regex, output_format="{Operation}"

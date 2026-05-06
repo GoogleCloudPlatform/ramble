@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,12 +9,16 @@
 import enum
 import graphlib
 import itertools
+import re
 from collections import defaultdict
+from typing import DefaultDict
 
 import ramble.error
+import ramble.expander
 import ramble.util.graph
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
+from ramble.workspace import namespace
 
 
 class AttributeGraph:
@@ -128,8 +132,8 @@ class AttributeGraph:
                     exp_name = self._obj_inst.name
                 raise GraphCycleError(
                     f"In experiment {exp_name} a cycle was detected "
-                    f"when processing the {self.node_type} graph.\n" + str(e)
-                )
+                    f"when processing the {self.node_type} graph."
+                ) from e
             self._prepared = True
 
         yield from self._sorted
@@ -144,9 +148,9 @@ class AttributeGraph:
             (ramble.util.graph.GraphNode): Node representing the key
                 requested. Returns None if the key isn't found.
         """
-        for node in self.walk():
-            if node.key == key:
-                return node
+        node = self.node_definitions.get(key)
+        if node is not None and node in self.adj_list:
+            return node
         return None
 
 
@@ -441,7 +445,7 @@ class ExecutableGraph(AttributeGraph):
     def _resolve_builtin_node(self, builtin_name):
         if builtin_name in self.node_definitions:
             return self.node_definitions[builtin_name]
-        full_names = self._builtin_aliases.get(builtin_name, None)
+        full_names = self._builtin_aliases.get(builtin_name)
         if full_names is None:
             raise GraphNodeNotFoundError(f"builtin {builtin_name} does not exist")
         if len(full_names) > 1:
@@ -449,6 +453,45 @@ class ExecutableGraph(AttributeGraph):
                 f"builtin {builtin_name} matches more than one node ({full_names})"
             )
         return self.node_definitions[full_names[0]]
+
+
+class FormattedExecutableGraph(AttributeGraph):
+    """Graph that handles formatted executables"""
+
+    node_type = "formatted executable"
+
+    def __init__(self, formatted_execs: dict, obj_inst):
+        """Constructs a new FormattedExecutableGraph and evaluates dependencies"""
+        super().__init__(obj_inst)
+        self._formatted_executable_dependencies: DefaultDict[str, list] = defaultdict(list)
+
+        # Define all graph nodes
+        for exec_name, exec_def in formatted_execs.items():
+            exec_node = ramble.util.graph.GraphNode(exec_name, attribute=exec_def)
+            super().add_node(exec_node)
+
+        # Search for internal dependencies and define edges
+        for exec_node in self.node_definitions.values():
+            formatted_conf = exec_node.attribute
+
+            capture_group = r"(\w+)"
+            expansion_pattern = re.compile(
+                rf"{ramble.expander.Expander.expansion_str(capture_group)}"
+            )
+            expansion_strs = set()
+
+            if namespace.prefix in formatted_conf:
+                expansion_strs.update(expansion_pattern.findall(formatted_conf[namespace.prefix]))
+            if namespace.commands in formatted_conf:
+                for line in formatted_conf[namespace.commands]:
+                    expansion_strs.update(expansion_pattern.findall(line))
+            dep_nodes = []
+            for expansion_str in expansion_strs:
+                if expansion_str in self.node_definitions:
+                    dep_node = self.node_definitions[expansion_str]
+                    dep_nodes.append(dep_node)
+
+            super().define_edges(exec_node, dep_nodes)
 
 
 class GraphError(ramble.error.RambleError):

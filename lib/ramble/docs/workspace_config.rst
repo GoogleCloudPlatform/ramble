@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -36,6 +36,9 @@ responsible for configuring, executing, analyzing, and archiving.
 .. code-block:: yaml
 
     ramble:
+      variants:
+          workflow_manager: user-managed
+          package_manager: user-managed
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -73,6 +76,9 @@ string, and can take variables for expansion.
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: user-managed
+        package_manager: user-managed
       applications:
         hostname:
           workloads:
@@ -109,6 +115,9 @@ individual experiments take precedence.
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -130,7 +139,6 @@ individual experiments take precedence.
 In this example, ``n_ranks`` will take a value of ``1`` within the ``test_exp``
 experiment. This experiment will also include definitions for
 ``processes_per_node``, ``n_nodes``, and ``n_threads``.
-
 
 .. _ramble-supported-functions:
 
@@ -174,17 +182,28 @@ Supported functions are:
 * ``max()`` (maximum)
 * ``ceil()`` (ceiling of input)
 * ``floor()`` (floor of input)
+* ``log2()`` (Base-2 logarithm of input)
+* ``log10()`` (Base-10 logarithm of input)
+* ``sqrt()`` (Square root of input)
+
 * ``range()`` (construct range, see :ref:`ramble vector logic<ramble-vector-logic>` for more information)
 * ``simplify_str()`` (convert input string to only alphanumerical characters and dashes)
 * ``randrange`` (from `random.randrange`)
 * ``randint`` (from `random.randint`)
 * ``join_str(iterable, sep=",")`` (concatenate iterable into ``sep``-separated string)
 * ``re_search(regex, str)`` (determine if ``str`` contains pattern ``regex``, based on ``re.search``)
+* ``replace(str, old, new)`` (returns a copy of ``str`` with all occurrences of ``old`` replaced by ``new``)
 * ``maybe(var_name, default="")`` (returns the expanded ``var_name`` if it is defined, otherwise returns ``default``)
+
+Besides the above listed, any functions from the ``math`` module can be used in Ramble by referencing ``math_<function_name>``.
+For instance, ``math_log(<num>, <base>)`` invokes the ``math.log(<num>, <base>)`` function.
 
 String slicing is supported:
 
 * ``str[start:end:step]`` (string slicing)
+
+In addition to the listed, any string methods can be used by referencing ``str_<method_name>``.
+For example, ``str_upper(<str>)`` invokes the ``<str>.upper()`` method.
 
 Dictionary references are supported:
 
@@ -216,6 +235,9 @@ math and variable expansion syntax as defined above).
 .. code-block:: yaml
 
     ramble:
+      variants:
+          workflow_manager: slurm
+          package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -248,6 +270,9 @@ to create a list. With this functionality, the example above could be re-written
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -282,6 +307,9 @@ consumes.
 .. code-block:: yaml
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -312,6 +340,9 @@ Multiple matrices are allowed to be defined:
    :linenos:
 
     ramble:
+      variants:
+          workflow_manager: slurm
+          package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -366,6 +397,9 @@ Below is an example showing how to define explicit zips:
    :linenos:
 
     ramble:
+      variants:
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -396,8 +430,41 @@ Below is an example showing how to define explicit zips:
 Which would result in eight experiments, crossing the ``n_nodes`` variable with
 the zip of ``partition`` and ``processes_per_node``.
 
-.. _ramble-experiment-variants:
+.. _ramble-application-versions:
 
+^^^^^^^^^^^^^^^
+Object Versions
+^^^^^^^^^^^^^^^
+
+Ramble objects (Applications, Modifiers, etc.) support versioning using the ``@`` syntax. This 
+allows you to select a specific definition for an object:
+
+.. code-block:: yaml
+
+  applications:
+    wrf@4.2:
+      workloads: ...
+
+By default, you must choose from known versions registered in the 
+:ref:`application.py file <application-list>`. A list of known versions can be viewed using the
+``ramble info`` command. If no version is specified, the preferred version will be used. Strict
+version checking can be disabled by setting the configuration
+``config:enable_strict_versions:false`` in the ``ramble.yaml`` file.
+
+Versions can also be parameterized as a variable:
+
+.. code-block:: yaml
+
+  applications:
+    wrf@{wrf_version}:
+      workloads:
+        CONUS_12km:
+          experiments:
+            test_exp:
+              variables:
+                wrf_version: ['4.2', '3.9.1.1']
+
+.. _ramble-experiment-variants:
 
 ^^^^^^^^^^^^^^^
 Variant Control
@@ -535,7 +602,7 @@ level.
     ramble:
       config:
         n_repeats: int
-        repeats_success_strict: [True/False]
+        repeat_success_strict: [True/False]
       applications:
         hostname:
           n_repeats: int
@@ -954,9 +1021,21 @@ Generated Variables
 
 Ramble automatically generates definitions for the following variables:
 
+* ``workspace_name`` - Set to the name of the workspace
 * ``application_name`` - Set to the name of the application
+* ``application_namespace`` - Set to the namespace of the application
+* ``simplified_application_namespace`` - Set to a simplified version of the application namespace
+* ``application_version`` - Set to the version of the application, if applicable
 * ``workload_name`` - Set to the name of the workload within the application
+* ``workload_namespace`` - Set to the namespace of the workload
+* ``simplified_workload_namespace`` - Set to a simplified version of the workload namespace
 * ``experiment_name`` - Set to the name of the experiment
+* ``experiment_namespace`` - Set to the namespace of the experiment
+* ``simplified_experiment_namespace`` - Set to a simplified version of the experiment namespace
+* ``experiment_hash`` - Set to the hash of the experiment
+* ``experiment_status`` - Set to the status of the experiment (e.g., SUCCESS, FAILED)
+* ``RAMBLE_STATUS`` - Set to the status of the experiment
+* ``experiments_file`` - Path to the experiments file
 * ``env_name`` - By default defined as ``{application_name}``. Can be
   overridden to control the software environment to use.
 * ``application_run_dir`` - Absolute path to
@@ -971,6 +1050,7 @@ Ramble automatically generates definitions for the following variables:
   ``$workspace_root/inputs/{application_name}/{workload_name}``
 * ``experiment_index`` - Index, in set, of experiment. If part of a chain,
   shares a value with its root.
+* ``repeat_index`` - Index of the current repeat for an experiment.
 * ``env_path`` - Absolute path to
   ``$workspace_root/software/{package_manager_name}/{env_name}.{workload_name}``
   if no package manager is used, ``{package_manager_name}`` is replaced with
@@ -978,6 +1058,8 @@ Ramble automatically generates definitions for the following variables:
 * ``log_dir`` - Absolute path to ``$workspace_root/logs``
 * ``log_file`` - Absolute path to
   ``{experiment_run_dir}/{experiment_name}.out``
+* ``err_file`` - Absolute path to
+  ``{experiment_run_dir}/{experiment_name}.err``
 * ``<input_name>`` - Applications that have input files have variables defined
   that contain the absolute path to:
   ``$workspace_root/inputs/{application_name}/{workload_name}/<input_name>``
@@ -992,10 +1074,25 @@ Ramble automatically generates definitions for the following variables:
   to the ``configs`` directory. For example:
   ``$workspace_root/configs/templates/foo.tpl`` would create a variable named
   ``templates/foo``.
+* ``workload_template_name`` - Set to the name of the workload template
+* ``experiment_template_name`` - Set to the name of the experiment template
 * ``unformatted_command`` - A multi-line string with the command for running
   the experiment. Unformatted so it can be formatted for various experiments.
 * ``unformatted_command_without_logs`` - The same as ``unformatted_command`` but
   has no log removal, creation, or redirection.
+* ``workspace`` - Path to the root of the workspace
+* ``workspace_root`` - Path to the root of the workspace
+* ``workspace_configs`` - Path to the workspace configs directory
+* ``workspace_software`` - Path to the workspace software directory
+* ``workspace_logs`` - Path to the workspace logs directory
+* ``workspace_inputs`` - Path to the workspace inputs directory
+* ``workspace_experiments`` - Path to the workspace experiments directory
+* ``workspace_shared`` - Path to the workspace shared directory
+* ``workspace_archives`` - Path to the workspace archives directory
+* ``workspace_deployments`` - Path to the workspace deployments directory
+* ``<object_type>_version`` - Version of the object (i.e. ``application_version``)
+* ``<object_type>::<object_name>::version`` - Version of the object (i.e. ``application::wrf::version``)
+
 
 Package Manager Specific Generated Variables
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -1024,7 +1121,7 @@ As an example:
       software:
         packages:
           grm:
-            pkg_spec: gromacs@2023.1
+            pkg_spec: gromacs@2025.3
         environments:
           grm_env:
             packages:
@@ -1109,17 +1206,17 @@ Below is an example of running a Gromacs experiment in both MPICH and OpenMPI:
                     env_name: ['gromacs-mpich', 'gromacs-ompi']
     software:
       packages:
-        gcc9:
-          pkg_spec: gcc@9.3.0 target=x86_64
+        gcc14:
+          pkg_spec: gcc@14.2.0 target=x86_64
         mpich:
           pkg_spec: mpich@4.0.2 target=x86_64
-          compiler: gcc9
+          compiler: gcc14
         ompi:
-          pkg_spec: openmpi@4.1.4 target=x86_64
-          compiler: gcc9
+          pkg_spec: openmpi@5.0.8 target=x86_64
+          compiler: gcc14
         gromacs:
-          pkg_spec: gromacs@2022.4
-          compiler: gcc9
+          pkg_spec: gromacs@2025.3
+          compiler: gcc14
       environments:
         gromacs-{mpi}:
           variables:
@@ -1174,18 +1271,18 @@ variable can be used to submit the same experiment to multiple batch systems.
                     n_nodes: '1'
     software:
       packages:
-        gcc9:
-          pkg_spec: gcc@9.3.0 target=x86_64
-        impi2021:
-          pkg_spec: intel-oneapi-mpi@2021.11.0 target=x86_64
-          compiler: gcc9
+        gcc14:
+          pkg_spec: gcc@14.2.0 target=x86_64
+        intel-mpi:
+          pkg_spec: intel-oneapi-mpi@2021.17.2 target=x86_64
+          compiler: gcc14
         gromacs:
-          pkg_spec: gromacs@2022.4
-          compiler: gcc9
+          pkg_spec: gromacs@2025.3
+          compiler: gcc14
       environments:
         gromacs:
           packages:
-          - impi2021
+          - intel-mpi
           - gromacs
 
 The above example overrides the generated ``batch_submit`` variable to change
@@ -1196,6 +1293,210 @@ Note that each of the two ``batch_submit`` commands submits a different
 template. This means the workspace's configs directory should have two files:
 ``execute_slurm.tpl`` and ``execute_pbs.tpl`` which will be template submission
 scripts to each of the batch systems.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^
+Workflow Manager Control
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+A Workflow Manager in Ramble is a component responsible for defining how an
+experiment's jobs are submitted, monitored, and managed. They provide an
+abstraction layer over different batch scheduling systems (like Slurm, GKE,
+Google Batch, etc.) or local execution environments, allowing the same
+experiment definition to be run across various platforms without modification.
+
+Key Responsibilities
+~~~~~~~~~~~~~~~~~~~~
+
+- **Job Submission**: Generating and executing the commands required to submit a
+  job to the target environment (e.g., using `sbatch` for Slurm).
+- **Status Monitoring**: Providing mechanisms to query the status of a running
+  or completed job.
+- **Environment Setup**: Configuring the execution environment, which can
+  include setting up hostfiles for MPI, defining environment variables, and
+  inserting necessary pragmas or headers into job scripts.
+- **Templating**: Rendering specialized scripts for different stages of the
+  workflow, such as `setup`, `execute`, and `analyze`.
+
+Using a Workflow Manager
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+The default workflow manager is ``user-defined`` which will execute experiments
+locally, sequentially, and have only a basic definition for ``mpi_command``.
+Users can override these beahviors by customizing the values for
+``mpi_command`` and ``batch_submit`` rather than having Ramble provided
+definitions for these. The ``user-defined`` workflow manager is added to
+workspace configuration files when they are written by default.
+
+To use a specific workflow manager for your experiments, you specify it in your
+`ramble.yaml` configuration file within the `config` section.
+
+.. code-block:: yaml
+
+   ramble:
+     config:
+       workflow_manager: slurm
+
+If no workflow manager is specified, Ramble defaults to the `user-managed`
+workflow manager, which provides sensible defaults for running experiments
+directly on the local machine.
+
+Alternatively, when generating a specific set of experiments, you can assign a
+workflow manager directly using the `ramble workspace manage experiments`
+command. This will add the workflow manager configuration to the scope of the
+experiments being created within your `ramble.yaml`. Use the
+`--workflow-manager` (or `--wm`) flag to specify which manager to use.
+
+This approach is useful when you need different sets of experiments within the
+same workspace to use different workflow managers, rather than setting one
+globally.
+
+.. code-block:: console
+
+   $ ramble workspace manage experiments --workflow-manager slurm <application_name>
+
+Built-in Workflow Managers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Ramble comes with several built-in workflow managers. You can list them by
+running:
+
+.. code-block:: console
+
+   $ ramble list --type workflow_managers
+
+A few common examples include:
+
+- **user-managed**: The default manager for local execution. It runs the
+  experiment commands directly without a batch scheduler.
+- **slurm**: A comprehensive manager for submitting jobs to the Slurm Workload
+  Manager. It handles `sbatch` script generation, job status queries with
+  `squeue` and `sacct`, and cancellation with `scancel`.
+- **slurm-intel-mpi**: A specialized Slurm manager for use with Intel MPI.
+- **slurm-pyxis**: A Slurm manager that supports running jobs within containers
+  using Pyxis and Enroot.
+- **gke-mpi**: A workflow manager for running MPI jobs on Google Kubernetes
+  Engine (GKE).
+- **google-batch**: A workflow manager for submitting jobs to Google Cloud Batch.
+
+Configuration and Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Workflow managers expose configurable variables that can be set in your
+`ramble.yaml`. These are defined in the workflow manager's definition file using
+the `workflow_manager_variable` directive.
+
+Common built-in variables include:
+
+- ``workflow_banner``: A descriptive banner added to generated execution scripts.
+- ``workflow_pragmas``: System-specific directives or headers inserted into job
+  scripts (e.g., `#SBATCH` directives for Slurm).
+- ``workflow_hostfile_cmd``: The command used to generate a hostfile for MPI jobs.
+- ``hostfile``: The path where the hostfile will be stored.
+- ``mpi_command``: The command prefix for running MPI applications (e.g., `mpirun`,
+  `srun`).
+- ``batch_submit``: The command used to execute each experiment, or submit them
+  to a workload manager instead.
+
+Letting the Workflow Manager Take the Lead
+''''''''''''''''''''''''''''''''''''''''''
+
+To get the most out of a workflow manager, it's often best to let it control
+key aspects of the job submission and execution environment. If you define
+certain variables in your workspace configuration, you may inadvertently
+override the specialized settings provided by the workflow manager.
+
+For a seamless experience, consider **not** defining the following variables in
+your `ramble.yaml`, allowing the selected workflow manager's defaults to take
+effect:
+
+- ``batch_submit``: Workflow managers typically generate this command to correctly
+  interface with the batch scheduler (e.g., `sbatch` for Slurm).
+- ``mpi_command``: Many workflow managers provide an optimized command for launching
+  MPI applications that is integrated with the scheduler (e.g., using `srun`
+  instead of a generic `mpirun`).
+- ``hostlist``: The workflow manager sometimes knows how to obtain the correct list
+  of nodes allocated to a job from the scheduler (e.g., from `$SLURM_JOB_NODELIST`).
+
+By leaving these variables unset, you allow Ramble to use the tailored definitions
+from the workflow manager, leading to more robust and portable experiments.
+
+Additionally, if the workflow manager you are using does not contain
+definitions for required variables, you will be presented with an error
+requiring you to fix this.
+
+Example: Customizing the Slurm Workflow Manager
+'''''''''''''''''''''''''''''''''''''''''''''''
+
+The `slurm` workflow manager provides additional variables for fine-tuning job
+submissions. You can override these in the `variables` section of your
+`ramble.yaml`.
+
+.. code-block:: yaml
+
+   ramble:
+     config:
+       workflow_manager: slurm
+     variables:
+       slurm_partition: debug
+       n_nodes: 4
+       extra_sbatch_headers: |
+         #SBATCH --constraint=gpu
+         #SBATCH --time=01:00:00
+
+This configuration directs Ramble to submit the job to the `debug` partition,
+request 4 nodes, and add extra `sbatch` headers for GPU constraints and a time
+limit.
+
+Creating a Custom Workflow Manager
+''''''''''''''''''''''''''''''''''
+
+While Ramble's built-in workflow managers cover many common use cases, you can
+also create your own to support a new scheduler or a custom execution environment.
+This involves creating a new Python class that inherits from `WorkflowManagerBase`.
+
+Workflow managers are written similar to all other object definitions in
+Ramble. For a complete example, the 
+`SLURM workflow manager <https://github.com/GoogleCloudPlatform/ramble/blob/develop/var/ramble/repos/builtin/workflow_managers/slurm/workflow_manager.py>`_
+can be used to see how workflow managers can function.
+
+Interacting with Batch Systems
+''''''''''''''''''''''''''''''
+
+Workflow managers that interface with batch systems often provide more ways to
+interact with jobs than just submitting them. They can also include commands
+for checking the status of a job, canceling it, or waiting for it to complete.
+Ramble exposes this functionality through the `ramble on` command's
+`--executor` flag.
+
+By default, `ramble on` executes the command defined in the `batch_submit`
+variable. However, you can specify other commands to run instead. For example,
+the `slurm` workflow manager defines the following commands:
+
+- **batch_submit**: Submits the job to Slurm. This is the default action.
+- **batch_query**: Checks the status of the submitted job.
+- **batch_cancel**: Cancels a running job.
+- **batch_wait**: Blocks until the job has finished.
+
+You can use these commands with the `--executor` flag like so:
+
+.. code-block:: console
+
+   # Submit a job
+   $ ramble on
+
+   # Check the status of the job
+   $ ramble on --executor "{batch_query}"
+
+   # Cancel the job
+   $ ramble on --executor "{batch_cancel}"
+
+   # Wait for the job to complete
+   $ ramble on --executor "{batch_wait}"
+
+This allows you to manage the entire lifecycle of a batch job directly from the
+command line. To see the available commands for a specific workflow manager,
+run `ramble info --type workflow_managers <workflow_manager_name>`.
 
 -----------------
 Experiment Chains

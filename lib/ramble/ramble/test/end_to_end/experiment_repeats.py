@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,6 +14,7 @@ import pytest
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import search_files_for_string
+from ramble.util.foms import SummaryFoms
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -79,10 +80,10 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         aux_software_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
@@ -107,7 +108,7 @@ ramble:
         assert search_files_for_string(
             out_files,
             "Would download https://ftp.gromacs.org/pub/benchmarks/water_GMX50_bare.tar.gz",
-        )  # noqa
+        )
 
         # Test software directories
         software_dirs = ["gromacs"]
@@ -156,9 +157,9 @@ ramble:
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        json_results_files = glob.glob(os.path.join(ws1.root, "results*.json"))
-        yaml_results_files = glob.glob(os.path.join(ws1.root, "results*.yaml"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
+        json_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.json"))
+        yaml_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.yaml"))
 
         # Match both the file and the symlink
         assert len(text_results_files) == 2
@@ -171,16 +172,31 @@ ramble:
                 assert "Core Time = 11.111 s" in data
                 assert "Core Time = 22.222 s" in data
                 assert "summary::mean = 16.666 s" in data
+                assert "summary::harmonic_mean = 14.815 s" in data
+                assert "summary::median = 16.666 s" in data
                 assert "summary::variance = 61.727 s^2" in data
+                assert "summary::stdev = 7.857 s" in data
+                assert "summary::cv = 0.471" in data
 
         # When --summary-only, only the base experiments are included
-        workspace("analyze", "-s", global_args=["-w", workspace_name])  # noqa: E501
-        result_file = glob.glob(os.path.join(ws1.root, "results.latest.txt"))[0]
+        workspace("analyze", "-s", global_args=["-w", workspace_name])
+        result_file = glob.glob(os.path.join(ws1.results_dir, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
             assert "gromacs.water_bare.pme_single_rank" in data
             assert "gromacs.water_bare.pme_single_rank.1" not in data
             assert "gromacs.water_bare.pme_single_rank.2" not in data
+
+        # Assert that "NA" stats are not displayed
+        os.remove(result_file)
+        workspace(
+            "analyze", "-s", "--where", "'{type}' == 'rf'", global_args=["-w", workspace_name]
+        )
+        with open(result_file) as f:
+            data = f.read()
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 1 repeats" in data
+            assert "summary::mean = 11.111 s" in data
+            assert "= NA" not in data
 
 
 @pytest.mark.long
@@ -202,7 +218,7 @@ ramble:
 """
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
@@ -220,12 +236,45 @@ ramble:
                     f.write(f"Sleep for {60 * r} seconds\n")
 
         workspace("analyze", "-s", global_args=["-w", workspace_name])
-        result_file = glob.glob(os.path.join(ws.root, "results.latest.txt"))[0]
+        result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
         with open(result_file) as f:
             data = f.read()
-            assert "summary::n_total_repeats = 3 repeats" in data
-            assert "summary::n_successful_repeats = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 3 repeats" in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
             assert "summary::min = 1.0 minutes" in data
             # Assert that the last experiment is not included in the stats
             assert "summary::max = 2.0 minutes" in data
             assert "summary::mean = 1.5 minutes" in data
+            assert "mode:\n      value = Sleep" in data
+
+
+def test_repeat_info(mutable_config, mutable_mock_workspace_path, workspace_name):
+    test_config = """
+ramble:
+  variables:
+    n_nodes: 1
+    processes_per_node: 1
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+  applications:
+    sleep:
+      workloads:
+        sleep:
+          experiments:
+            sleep_test:
+              n_repeats: 3
+"""
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+        with open(config_path, "w+") as f:
+            f.write(test_config)
+        ws._re_read()
+
+        output = workspace("info", global_args=["-w", workspace_name])
+
+        assert "Experiment 1:" in output
+        assert "Experiment 2:" in output
+        assert "Experiment 3:" in output
+        assert "Experiment 4:" in output

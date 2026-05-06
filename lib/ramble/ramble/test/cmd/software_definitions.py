@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -48,3 +48,22 @@ def test_software_definitions_error_on_conflicts():
             out = software_defs("-c")
             for expected_str in expected_strs:
                 assert expected_str in out
+
+
+def test_software_definitions_conflicts_output(mock_applications, mock_base_applications):
+    out = software_defs("-c")
+    assert "Software Definition Conflicts:" in out
+    assert "Package: zlib" in out
+    assert "Defined as:" in out
+    assert "pkg_spec = zlib@1.2.11" in out
+    assert "In objects:" in out
+    assert "ramble.app.builtin.mock.conflict-test" in out
+    assert "Conflicts with objects:" in out
+    assert "ramble.app.builtin.mock.multi-package-manager-specs" in out
+
+
+def test_software_definitions_unused_compilers_output(mock_applications, mock_base_applications):
+    out = software_defs("-c")
+    assert "Unused Compilers:" in out
+    assert "Compiler my_unused_compiler is not used in packages:" in out
+    assert "ramble.app.builtin.mock.unused-compiler-test" in out

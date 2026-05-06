@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,6 +15,7 @@ specified editor fails (e.g. no DISPLAY for a graphical editor). If
 neither variable is set, we fall back to one of several common editors,
 raising an EnvironmentError if we are unable to find one.
 """
+
 import os
 import shlex
 

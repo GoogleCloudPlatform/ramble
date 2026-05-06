@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -55,7 +55,7 @@ def test_success_modifier(
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config("modifiers", modifier, config_path, "basic", "test_wl")
         ws._re_read()
@@ -72,7 +72,7 @@ def test_success_modifier(
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert result in data
 
@@ -105,7 +105,7 @@ ramble:
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -122,7 +122,7 @@ ramble:
         f.write("0.35 seconds\nExperiment status: SUCCESS\n")
 
     workspace("analyze", global_args=["-w", workspace_name])
-    result_file = os.path.join(ws.root, "results.latest.txt")
+    result_file = os.path.join(ws.results_dir, "results.latest.txt")
 
     with open(result_file) as f:
         content = f.read()

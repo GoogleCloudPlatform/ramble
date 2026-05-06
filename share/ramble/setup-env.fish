@@ -449,13 +449,21 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
                         if check_workspace_activate_flags $_a
                             # no args or args contain -h/--help, --sh, or --csh: just execute
                             command ramble workspace activate $_a
+                            return $status
                         else
                             # actual call to activate: source the output
                             set -l rmb_workspace_cmd "command ramble $rmb_flags workspace activate --fish $__rmb_remaining_args"
                             capture_all $rmb_workspace_cmd __rmb_stat __rmb_stdout __rmb_stderr
+                            set -l rmb_eval_stat 0
                             eval $__rmb_stdout
+                            set rmb_eval_stat $status
                             if test -n "$__rmb_stderr"
                                 echo -s \n$__rmb_stderr 1>&2  # current fish bug: handle stderr manually
+                            end
+                            if test $__rmb_stat -eq 0
+                                return $rmb_eval_stat
+                            else
+                                return $__rmb_stat
                             end
                         end
 
@@ -465,6 +473,7 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
                         if check_workspace_deactivate_flags $_a
                             # just  execute the command if --sh, --csh, or --fish are provided
                             command ramble workspace deactivate $_a
+                            return $status
 
                         # Test of further (unparsed arguments). Any other
                         # arguments are an error or help, so just run help
@@ -473,16 +482,21 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
                         # -> Notes: [1] (cf. EOF).
                         else if test -n "$__rmb_remaining_args"
                             command ramble workspace deactivate -h
+                            return $status
                         else
                             # no args: source the output of the command
                             set -l rmb_workspace_cmd "command ramble $rmb_flags workspace deactivate --fish"
                             capture_all $rmb_workspace_cmd __rmb_stat __rmb_stdout __rmb_stderr
+                            set -l rmb_eval_stat 0
                             eval $__rmb_stdout
-                            if test $__rmb_stat -ne 0
-                                if test -n "$__rmb_stderr"
-                                    echo -s \n$__rmb_stderr 1>&2  # current fish bug: handle stderr manually
-                                end
-                                return 1
+                            set rmb_eval_stat $status
+                            if test -n "$__rmb_stderr"
+                                echo -s \n$__rmb_stderr 1>&2  # current fish bug: handle stderr manually
+                            end
+                            if test $__rmb_stat -eq 0
+                                return $rmb_eval_stat
+                            else
+                                return $__rmb_stat
                             end
                         end
 
@@ -495,12 +509,21 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
                             if test -n "$__rmb_stderr"
                                 echo -s \n$__rmb_stderr 1>&2  # current fish bug: handle stderr manually
                             end
-                            set -l activate_cmd $__rmb_stdout
-                            eval $activate_cmd
-                            set -l ws (echo $activate_cmd | awk '{print $NF}')
-                            echo "==> Created and activated workspace in $ws"
+                            if test $__rmb_stat -eq 0
+                                set -l activate_cmd $__rmb_stdout
+                                set -l rmb_eval_stat 0
+                                eval $activate_cmd
+                                set rmb_eval_stat $status
+                                if test $rmb_eval_stat -eq 0
+                                    set -l ws (echo $activate_cmd | awk '{print $NF}')
+                                    echo "==> Created and activated workspace in $ws"
+                                end
+                                return $rmb_eval_stat
+                            end
+                            return $__rmb_stat
                         else
                             command ramble workspace create $_a
+                            return $status
                         end
 
                     case "*"
@@ -512,6 +535,7 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
                         else
                             command ramble workspace $rmb_arg
                         end
+                        return $status
                 end
             end
 
@@ -519,6 +543,7 @@ function ramble_runner -d "Runner function for the `ramble` wrapper"
 
         case "*"
             command ramble $argv
+            return $status
 
     end
 
@@ -702,7 +727,7 @@ end
 
 
 if test "$need_module" = "yes"
-    set -l rmb_shell_vars (command ramble --print-shell-vars sh,modules)
+    set -l rmb_shell_vars (command ramble sh,modules)
 
     for rmb_var_expr in $rmb_shell_vars
         rmb_apply_shell_vars $rmb_var_expr
@@ -716,7 +741,7 @@ if test "$need_module" = "yes"
 
 else
 
-    set -l rmb_shell_vars (command ramble --print-shell-vars sh)
+    set -l rmb_shell_vars (command ramble sh)
 
     for rmb_var_expr in $rmb_shell_vars
         rmb_apply_shell_vars $rmb_var_expr

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,6 +15,7 @@ import ramble.variants
 def exp_dict():
     return {
         "application_name": "foo",
+        "application_spec": "foo@1.2",
         "workload_name": "bar",
         "experiment_name": "baz",
         "application_input_dir": "/workspace/inputs/foo",
@@ -37,6 +38,8 @@ def exp_dict():
         "max_len": 9,
         "test_dict": {"test_key1": "test_val1", "test_key2": "test_val2"},
         "experiment_index": 5,
+        "var4": "a-b",
+        "test::var": "value",
     }
 
 
@@ -133,10 +136,36 @@ def build_variant_set():
         ("0b10 & 0b01", "0", set(), 1),
         ("0b10 | 0b01", "3", set(), 1),
         ("0b10 ^ 0b01", "3", set(), 1),
+        ("~0", "-1", set(), 1),
+        ("~2", "-3", set(), 1),
         ("0b10 << 1", "4", set(), 1),
         ("0b10 >> 1", "1", set(), 1),
         # Can be a handy way to select experiments to run
         ("(1 << {experiment_index} & 0b1011010) == 0", "True", set(), 1),
+        ("$HOSTNAME", "$HOSTNAME", set(), 1),
+        ("${HOSTNAME}", "${HOSTNAME}", set(), 1),
+        ("log2(8)", "3.0", set(), 1),
+        ("log10(100)", "2.0", set(), 1),
+        ("sqrt(16)", "4.0", set(), 1),
+        # Can also reference functions available in the math module directly
+        ("math_sqrt(64)", "8.0", set(), 1),
+        ("math_log(9, 3)", "2.0", set(), 1),
+        ("math_not_exist(1)", "math_not_exist(1)", set(), 1),
+        ("str_upper('foo')", "FOO", set(), 1),
+        ("str_lower('FOO')", "foo", set(), 1),
+        ("str_upper(foobar)", "FOOBAR", set(), 1),
+        ("str_capitalize('foo')", "Foo", set(), 1),
+        ("str_lstrip('AAAbbb', 'A')", "bbb", set(), 1),
+        ("str_join('.', str_split('a b c 1'))", "a.b.c.1", set(), 1),
+        ("str_no_such_method('a')", "str_no_such_method('a')", set(), 1),
+        ("replace('abc', 'a', 'd')", "dbc", set(), 1),
+        ("replace('{application_name}', 'f', 'F')", "Foo", set(), 1),
+        ("str_upper({var4})", "A-B", set(), 1),
+        ("{test::var}", "value", set(), 1),
+        ("{n_ranks:05d}", "00004", set(), 1),
+        ("1_01", "1_01", set(), 1),
+        ("0x10", "0x10", set(), 1),
+        ("{application_name}-1_01", "foo-1_01", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
@@ -197,6 +226,8 @@ def test_expansions(input, output, no_expand_vars, passes):
         ("2 or 1", 2, set(), 1),
         ("randrange(2, 3, 1)", 2, set(), 1),
         ("randint(3, 3)", 3, set(), 1),
+        ("~0", -1, set(), 1),
+        ("~2", -3, set(), 1),
     ],
 )
 def test_typed_expansions(input, output, no_expand_vars, passes):
@@ -236,9 +267,10 @@ def test_expansion_namespaces():
 
     expander = ramble.expander.Expander(expansion_vars, None)
 
-    assert expander.application_namespace == "foo"
-    assert expander.workload_namespace == "foo.bar"
-    assert expander.experiment_namespace == "foo.bar.baz"
+    assert expander.application_name == "foo"
+    assert expander.application_namespace == "foo@1.2"
+    assert expander.workload_namespace == "foo@1.2.bar"
+    assert expander.experiment_namespace == "foo@1.2.bar.baz"
 
 
 @pytest.mark.parametrize(
@@ -261,3 +293,52 @@ def test_satisfies_works(input_list, output):
     satisfied = expander.satisfies(input_list, variant_set=variants)
 
     assert satisfied == output
+
+
+def test_variable_mutation():
+    """Test that variable changes are reflected in expansions"""
+    expansion_vars = {"my_dict": {"key": 1}}
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    in_str = "{my_dict['key']}"
+
+    res1 = expander.expand_var(in_str)
+    assert res1 == "1"
+
+    # sneaky mutation
+    expander._variables["my_dict"]["key"] = 2
+    res2 = expander.expand_var(in_str)
+    assert res2 == "2"
+
+
+def test_extra_vars_propagation():
+    """Test that extra_vars are propagated properly"""
+    expansion_vars = {
+        "my_dict": {"key": 1},
+        "my_val": 10,
+        "my_bool": 1,
+    }
+
+    expander = ramble.expander.Expander(expansion_vars, None)
+
+    in_str_dict = "{my_dict['key']}"
+    assert expander.expand_var(in_str_dict) == "1"
+    assert expander.expand_var(in_str_dict, extra_vars={"my_dict": {"key": 3}}) == "3"
+
+    in_str_bin = "{{my_val} * 2}"
+    assert expander.expand_var(in_str_bin) == "20"
+    assert expander.expand_var(in_str_bin, extra_vars={"my_val": 5}) == "10"
+
+    in_str_un = "{~{my_val}}"
+    assert expander.expand_var(in_str_un) == "-11"
+    assert expander.expand_var(in_str_un, extra_vars={"my_val": 1}) == "-2"
+
+    in_str_func = "{max({my_val}, 15)}"
+    assert expander.expand_var(in_str_func) == "15"
+    assert expander.expand_var(in_str_func, extra_vars={"my_val": 20}) == "20"
+
+    in_str_bool = "{{my_bool} and ({my_val} > 5)}"
+    assert expander.expand_var(in_str_bool) == "True"
+    assert expander.expand_var(in_str_bool, extra_vars={"my_val": 4}) == "False"
+    assert expander.expand_var(in_str_bool, extra_vars={"my_bool": 0}) == "0"

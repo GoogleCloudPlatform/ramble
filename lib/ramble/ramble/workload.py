@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,131 +6,20 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import copy
-from typing import List, Optional
+from typing import Dict, FrozenSet, List, Optional
 
-import ramble.util.colors as rucolor
-
-
-class WorkloadVariable:
-    """Class representing a variable definition"""
-
-    def __init__(
-        self,
-        name: str,
-        default=None,
-        description: str = None,
-        values=None,
-        expandable: bool = True,
-        track_used: bool = True,
-        when=None,
-        **kwargs,
-    ):
-        """Constructor for a new variable
-
-        Args:
-            name (str): Name of variable
-            default: Default value of variable
-            description (str): Description of variable
-            values: List of suggested values for variable
-            expandable (bool): True if variable can be expanded, False otherwise
-            track_used (bool): True if variable should be considered used,
-                               False to ignore it for vectorizing experiments
-            when (list | None): List of when conditions to apply to directive
-        """
-        self.name = name
-        self.default = default
-        self.description = description
-        self.values = values.copy() if isinstance(values, list) else [values]
-        self.expandable = expandable
-        self.track_used = track_used
-        self.when = when.copy() if when else []
-
-    def __str__(self):
-        if not hasattr(self, "_str_indent"):
-            self._str_indent = 0
-        return self.as_str(n_indent=self._str_indent)
-
-    def as_str(self, n_indent: int = 0):
-        """String representation of this variable
-
-        Args:
-          n_indent (int): Number of spaces to indent string lines with
-
-        Returns:
-            (str): Representation of this variable
-        """
-        indentation = " " * n_indent
-
-        print_attrs = ["Description", "Default", "Values"]
-
-        out_str = rucolor.nested_3(f"{indentation}{self.name}:\n")
-        for print_attr in print_attrs:
-            name = print_attr
-            if print_attr == "Values":
-                name = "Suggested Values"
-            attr_name = print_attr.lower()
-
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                out_str += f'{indentation}    {name}: {str(attr_val).replace("@", "@@")}\n'
-        return out_str
-
-    def copy(self):
-        return copy.deepcopy(self)
-
-
-class WorkloadEnvironmentVariable:
-    """Class representing an environment variable in a workload"""
-
-    def __init__(
-        self,
-        name: str,
-        value=None,
-        description: str = None,
-        when=None,
-        **kwargs,
-    ):
-        """WorkloadEnvironmentVariable constructor
-
-        Args:
-            name (str): Name of environment variable
-            value: Value to set environment variable to
-            description (str): Description of the environment variable
-            when (list | None): List of when conditions to apply to directive
-        """
-        self.name = name
-        self.value = value
-        self.description = description
-        self.when = when.copy() if when else []
-
-    def as_str(self, n_indent: int = 0):
-        """String representation of environment variable
-
-        Args:
-            n_indent (int): Number of spaces to indent string representation by
-
-        Returns:
-            (str): String representing this environment variable
-        """
-        indentation = " " * n_indent
-
-        print_attrs = ["Description", "Value"]
-
-        out_str = rucolor.nested_2(f"{indentation}{self.name}:\n")
-        for name in print_attrs:
-            attr_name = name.lower()
-            attr_val = getattr(self, attr_name, None)
-            if attr_val:
-                out_str += f'{indentation}    {name}: {attr_val.replace("@", "@@")}\n'
-        return out_str
-
-    def copy(self):
-        return copy.deepcopy(self)
+import ramble.util.colors as color
+from ramble.definitions.variables import EnvironmentVariable, Variable
+from ramble.util.format import when_order
+from ramble.util.logger import logger
 
 
 class Workload:
     """Class representing a single workload"""
+
+    executables: List[str]
+    inputs: List[str]
+    tags: List[str]
 
     def __init__(
         self,
@@ -138,6 +27,7 @@ class Workload:
         executables: List[str],
         inputs: Optional[List[str]] = None,
         tags: Optional[List[str]] = None,
+        when: Optional[List[str]] = None,
     ):
         """Constructor for a workload
 
@@ -151,10 +41,13 @@ class Workload:
             inputs = []
         if tags is None:
             tags = []
+        if when is None:
+            when = []
 
         self.name = name
-        self.variables = {}
-        self.environment_variables = {}
+        self.variables: Dict[FrozenSet[str], List[Variable]] = {}
+        self.environment_variables: Dict[FrozenSet[str], List[EnvironmentVariable]] = {}
+        self.when = when
 
         attr_names = ["executables", "inputs", "tags"]
         attr_vals = [executables, inputs, tags]
@@ -173,7 +66,7 @@ class Workload:
             self._str_indent = 0
         return self.as_str(n_indent=self._str_indent)
 
-    def as_str(self, n_indent: int = 0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String representation of this workload
 
         Args:
@@ -182,67 +75,80 @@ class Workload:
         Returns:
             (str): Representation of this workload
         """
-        attrs = [("Executables", "executables"), ("Inputs", "inputs"), ("Tags", "tags")]
+        attrs = [
+            ("Executables", "executables"),
+            ("Inputs", "inputs"),
+            ("Tags", "tags"),
+            ("When", "when"),
+        ]
 
         indentation = " " * n_indent
 
-        out_str = rucolor.section_title(f"{indentation}Workload: ")
+        out_str = color.section_title(f"{indentation}Workload: ")
         out_str += f"{self.name}\n"
         for attr in attrs:
-            out_str += rucolor.nested_1(f"{indentation}    {attr[0]}: ")
+            out_str += color.nested_1(f"{indentation}    {attr[0]}: ")
             attr_val = getattr(self, attr[1], [])
-            out_str += f"{attr_val}\n"
+            # TODO: Remove this after adding 'when' to the loop in 'ramble info' that prints
+            # workloads. Better to group workloads under 'when' than print 'when' for each workload
+            if attr[0] == "When" and isinstance(attr_val, list):
+                out_str += f"{' AND '.join(x for x in attr_val)}\n"
+            else:
+                out_str += f"{attr_val}\n"
 
         if self.variables:
-            out_str += rucolor.nested_1(f"{indentation}    Variables:\n")
+            out_str += color.nested_1(f"{indentation}    Variables:\n")
             for when_set, var_list in self.variables.items():
                 if when_set:
-                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
-                    for variant in when_set:
-                        out_str += f"{indentation}            {variant}\n"
+                    out_str += color.nested_2(f"{indentation}        When: ")
+                    when_str = " AND ".join(x for x in sorted(when_set, key=when_order))
+                    out_str += f"{when_str}\n"
                 else:
-                    out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
+                    out_str += color.nested_2(f"{indentation}        Unconditional\n")
 
                 var_dict = {}
                 for var in var_list:
                     var_dict[var.name] = var
                 for var_name in sorted(var_dict.keys()):
-                    out_str += var_dict[var_name].as_str(n_indent + 12)
+                    out_str += var_dict[var_name].as_str(n_indent=(n_indent + 12), verbose=verbose)
 
         if self.environment_variables:
-            out_str += rucolor.nested_1(f"{indentation}    Environment Variables:\n")
+            out_str += color.nested_1(f"{indentation}    Environment Variables:\n")
             for when_set, env_var_list in self.environment_variables.items():
                 if when_set:
-                    out_str += rucolor.nested_2(f"{indentation}        When conditions:\n")
-                    for variant in when_set:
-                        out_str += f"{indentation}            {variant}\n"
+                    out_str += color.nested_2(f"{indentation}        When: ")
+                    when_str = " AND ".join(x for x in sorted(when_set, key=when_order))
+                    out_str += f"{when_str}\n"
                 else:
-                    out_str += rucolor.nested_2(f"{indentation}        Unconditional\n")
+                    out_str += color.nested_2(f"{indentation}        Unconditional\n")
 
                 env_var_dict = {}
                 for env_var in env_var_list:
-                    env_var_dict[var.name] = env_var
+                    env_var_dict[env_var.name] = env_var
                 for env_var_name in sorted(env_var_dict.keys()):
-                    out_str += env_var_dict[env_var_name].as_str(n_indent + 12)
+                    out_str += env_var_dict[env_var_name].as_str(
+                        n_indent=(n_indent + 12), verbose=verbose
+                    )
 
         return out_str
 
-    def add_variable(self, variable: WorkloadVariable):
+    def add_variable(self, variable: Variable):
         """Add a variable to this workload
 
         Args:
-            variable (WorkloadVariable): New variable to add to this workload
+            variable (ramble.definitions.variables.Variable): New variable to add to this workload
         """
         when_key = frozenset(variable.when)
         if when_key not in self.variables:
             self.variables[when_key] = []
         self.variables[when_key].append(variable)
 
-    def add_environment_variable(self, env_var: WorkloadEnvironmentVariable):
+    def add_environment_variable(self, env_var: EnvironmentVariable):
         """Add an environment variable to this workload
 
         Args:
-            env_var (WorkloadEnvironmentVariable): New environment variable to add to this workload
+            env_var (ramble.definitions.variables.EnvironmentVariable): New environment variable to
+                add to this workload
         """
         when_key = frozenset(env_var.when)
         if when_key not in self.environment_variables:
@@ -257,29 +163,13 @@ class Workload:
         """
         self.executables.append(executable)
 
-    def add_input(self, input: str):
-        """Add an input to this workload
-
-        Args:
-            input (str): Name of input to add to this workload
-        """
-        self.inputs.append(input)
-
-    def add_tag(self, tag: str):
-        """Add a tag to this workload
-
-        Args:
-            tag (str): Tag to add to this workload
-        """
-        self.tags.append(tag)
-
     def is_valid(self):
         """Test if this workload is considered valid
 
         Returns:
             (bool): True if workload is valid, False otherwise
         """
-        if len(self.executables) == 0:
+        if not self.executables:
             return False
 
         return True
@@ -319,7 +209,8 @@ class Workload:
             var_name (str): Name of variable to find
 
         Returns:
-            (WorkloadVariable | None): Variable instance if it exists, None if it is not found
+            (ramble.definitions.variables.Variable | None): Variable instance if it exists, None if
+                it is not found
         """
         named_vars = []
         for var_list in self.variables.values():
@@ -328,18 +219,73 @@ class Workload:
                     named_vars.append(var)
         return named_vars
 
-    def find_environment_variable(self, name):
-        """Find an environment variable in this workload
+
+class WorkloadGroup:
+    """Class representing a single workload group"""
+
+    name: str
+    workloads: Dict[FrozenSet[str], List[str]]
+
+    def __init__(self, name: str, workloads: List[str], when_list: List[str]):
+        """Constructor for a workload group. A workload group can have different lists of workloads
+        for different 'when' conditions.
 
         Args:
-            env_var_name (str): Name of environment variable to find
+            name: Name of this workload group
+            workloads: List of workloads
+            when_list: List of when conditions for this list of workloads
+        """
+        self.name = name
+        self.workloads = {frozenset(when_list): workloads}
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of this workload group
+
+        Args:
+            n_indent: Number of spaces to indent string with
 
         Returns:
-            (WorkloadEnvironmentVariable | None): Environment variable instance
-                                                  if it exists, None if it is not found
+            (str): Representation of this workload
+
         """
-        named_env_vars = []
-        for env_var_list in self.environment_variables.values():
-            for env_var in env_var_list:
-                named_env_vars.append(env_var)
-        return named_env_vars
+        indentation = " " * n_indent
+        out_str = color.section_title(f"{indentation}{self.name}\n")
+        for when_set, workload_list in self.workloads.items():
+            if when_set:
+                out_str += color.nested_1(f"{indentation}    When: ")
+                when_str = " AND ".join(x for x in sorted(when_set, key=when_order))
+                out_str += f"{when_str}\n"
+            else:
+                out_str += color.nested_1(f"{indentation}    Unconditional\n")
+
+            for workload in workload_list:
+                out_str += color.nested_2(f"{indentation}        {workload}\n")
+
+        return out_str
+
+    def add_workloads(self, workloads: List[str], when_list: List[str], mode: str):
+        """Add workloads to this workload group using a different set of 'when'
+        condition
+
+        Args:
+            workloads: List of workloads
+            when_list: List of 'when' conditions for this list of workloads
+            mode: Append or overwrite workloads in this set of 'when' conditions
+        """
+        when_set = frozenset(when_list)
+
+        if mode == "append":
+            self.workloads.setdefault(when_set, []).extend(workloads)
+        else:
+            if when_set in self.workloads and self.workloads[when_set] != workloads:
+                logger.debug(
+                    f"Workload group {self.name} has been defined twice with the same "
+                    "`when` conditions. Overwriting by default. Use mode `append` to extend "
+                    "workload group instead."
+                )
+            self.workloads[when_set] = workloads

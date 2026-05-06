@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,9 +6,8 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import llnl.util.tty.color as color
-
 import ramble.paths
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 
@@ -25,15 +24,15 @@ def shell_init_instructions(cmd, equivalent):
     shell_specific = "{sh_arg}" in equivalent
 
     msg = [
-        "`%s` requires ramble's shell support." % cmd,
+        f"`{cmd}` requires ramble's shell support.",
         "",
         "To set up shell support, run the command below for your shell.",
         "",
         color.colorize("@*c{For bash/zsh/sh:}"),
-        "  . %s/setup-env.sh" % ramble.paths.share_path,
+        f"  . {ramble.paths.share_path}/setup-env.sh",
         "",
         color.colorize("@*c{For csh/tcsh:}"),
-        "  source %s/setup-env.csh" % ramble.paths.share_path,
+        f"  source {ramble.paths.share_path}/setup-env.csh",
         "",
         "Or, if you do not want to use shell support, run "
         + ("one of these" if shell_specific else "this")

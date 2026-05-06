@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -37,3 +37,48 @@ class WhenWorkflowManager(WorkflowManagerBase):
             value="WF_ENV_VAR_SET",
             description="Test env variable",
         )
+
+    variant(
+        "wf_man_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test required variable",
+    )
+
+    required_variable(
+        "test_wf_man_required_variable",
+        description="Test required variable",
+        when=["+wf_man_required_variable"],
+    )
+
+    variant(
+        "wf_man_required_key",
+        default=False,
+        values=[True, False],
+        description="Test required key",
+    )
+
+    required_variable(
+        "test_wf_man_required_key",
+        results_level="key",
+        description="Test required key",
+        when=["+wf_man_required_key"],
+    )
+
+    variant(
+        "set_precedence_var",
+        default=False,
+        values=[True, False],
+        description="Variant to control the value of object_precedence_var",
+    )
+
+    with when("+set_precedence_var"):
+        workflow_manager_variable(
+            "object_precedence_var",
+            default="object_precedence_var from workflow_manager",
+            description="Variable to exercise object precedence",
+        )
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None

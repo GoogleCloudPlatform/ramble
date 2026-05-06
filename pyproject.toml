@@ -1,3 +1,35 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ramble"
+version = "0.6.0"
+description = "A multi-platform experimentation framework written in python."
+readme = "README.md"
+requires-python = ">=3.6"
+license = "Apache-2.0 OR MIT"
+license-files = ["LICENSE-APACHE", "LICENSE-MIT"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+]
+dynamic = ["dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+
+[tool.setuptools]
+package-dir = { "" = "." }
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["lib*", "etc*", "var*", "bin*", "share*"]
+namespaces = true
+
+[tool.setuptools.package-data]
+"*" = ["*"]
+
 [tool.black]
 line-length = 99
 # Older versions of black (like the ones compatible with py3.7)
@@ -44,6 +76,10 @@ known_third_party = ["ruamel", "jsonschema"]
 
 [tool.coverage.run]
 parallel = true
+# subprocess assumes parallel=true
+# This patch allows coverage.py to accurately capture
+# subprocess calls.
+patch = ["subprocess"]
 data_file = "./tests-coverage/.coverage"
 include = [
   "**/bin/ramble",
@@ -60,6 +96,9 @@ omit = [
     "lib/ramble/external/**",
     "lib/ramble/llnl/**",
     "share/**",
+    # Perf tests don't run in the coverage CI build, so exclude them here.
+    # They do run in a separate CI build though.
+    "**/lib/ramble/ramble/test/end_to_end/perf_tests/**",
 ]
 
 [tool.coverage.report]
@@ -80,12 +119,6 @@ exclude_lines = [
     'if 0:',
     'if False:',
     'if __name__ == .__main__.:',
-
-    # Ignore import statements:
-    # Imports (and defs) are not counted due to coverage being run after
-    # these modules are already initialized.
-    '^import .*',
-    '^from .* import .*',
 ]
 ignore_errors = true
 include = [
@@ -106,3 +139,50 @@ omit = [
 
 [tool.coverage.html]
 directory = "htmlcov"
+
+[tool.mypy]
+# Use a common version (3.10 is the lowest supported version)
+# Otherwise mypy uses the running python's version
+python_version = "3.10"
+# TODO: Add in more files for type-checking
+# For now, only type-check the util directory
+files = [
+  "lib/ramble/ramble/**/*.py",
+]
+ignore_errors = true
+ignore_missing_imports = true
+allow_redefinition = true
+
+[[tool.mypy.overrides]]
+# Only enable ramble modules
+module = "ramble.*"
+ignore_errors = false
+
+[[tool.mypy.overrides]]
+# TODO: Add more modules here for exhaustive type-checking
+module = [
+    "ramble.util.*",
+    "ramble.error",
+    "ramble.paths",
+    "ramble.filters",
+]
+check_untyped_defs = true
+
+[tool.ruff]
+extend-include = ["bin/ramble"]
+extend-exclude = [
+  "lib/ramble/external",
+  "lib/ramble/spack",
+  "lib/ramble/llnl",
+]
+
+[tool.ruff.lint]
+preview = false
+# B905 requires Python 3.9 or up.
+ignore = ["B905"]
+extend-select = ["B", "C4", "F401"]
+
+[tool.ruff.lint.per-file-ignores]
+"lib/ramble/ramble/*kit.py" = ["F403"]
+"var/ramble/repos/**/*.py" = ["F403", "F405"]
+

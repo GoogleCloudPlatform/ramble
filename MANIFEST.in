@@ -1,0 +1,5 @@
+recursive-include bin *
+recursive-include etc *
+recursive-include lib *
+recursive-include share *
+recursive-include var *

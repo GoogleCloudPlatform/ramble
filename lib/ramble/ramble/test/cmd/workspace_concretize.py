@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -24,25 +24,37 @@ def test_workspace_concretize_additive(workspace_name):
     global_args = ["-w", workspace_name]
 
     workspace(
-        "generate-config", "gromacs", "-p", "spack", "--wf", "water_*", global_args=global_args
+        "generate-config",
+        "gromacs",
+        "-p",
+        "spack",
+        "--wf",
+        "water_*",
+        global_args=global_args,
     )
     workspace("concretize", "-q", global_args=global_args)
 
     with open(ws.config_file_path) as f:
         content = f.read()
         assert "gromacs" in content
-        assert "gcc9" in content
-        assert "wrfv4" not in content
+        assert "gcc14" in content
+        assert "wrf" not in content
         assert "intel-oneapi-vtune" not in content
 
-    workspace("generate-config", "wrfv4", "-p", "spack", global_args=global_args)
+    workspace(
+        "generate-config",
+        "wrf",
+        "-p",
+        "spack",
+        global_args=global_args,
+    )
     workspace("concretize", "-q", global_args=global_args)
 
     with open(ws.config_file_path) as f:
         content = f.read()
         assert "gromacs" in content
-        assert "gcc9" in content
-        assert "wrfv4" in content
+        assert "gcc14" in content
+        assert "wrf" in content
         assert "intel-oneapi-vtune" not in content
 
     modifiers_path = os.path.join(ws.config_dir, "modifiers.yaml")
@@ -58,8 +70,8 @@ def test_workspace_concretize_additive(workspace_name):
     with open(ws.config_file_path) as f:
         content = f.read()
         assert "gromacs" in content
-        assert "gcc9" in content
-        assert "wrfv4" in content
+        assert "gcc14" in content
+        assert "wrf" in content
         assert "intel-oneapi-vtune" in content
 
 
@@ -82,7 +94,7 @@ def test_workspace_multispec_concretize(workspace_name):
     workspace(
         "manage",
         "experiments",
-        "gromacs",
+        "gromacs@2024.1",
         "-p",
         "eessi",
         "-e",

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,6 +8,7 @@
 
 import hashlib
 import json
+from typing import Any, Dict
 
 import spack.util.spack_json as sjson
 
@@ -29,8 +30,8 @@ def hash_string(string):
     return hashlib.sha256(string.encode("UTF-8")).hexdigest()
 
 
-def hash_json(in_json):
-    _json_dump_args = {"indent": 2, "separators": (",", ": "), "sort_keys": True}
+def hash_json(in_json: Any) -> str:
+    _json_dump_args: Dict[str, Any] = {"indent": 2, "separators": (",", ": "), "sort_keys": True}
 
     data = sjson._strify(in_json)
     json_data = json.dumps(data, **_json_dump_args)

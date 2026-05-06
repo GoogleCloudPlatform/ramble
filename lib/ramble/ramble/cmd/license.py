@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -147,7 +147,7 @@ def _check_license(lines, path):
     # The years are hard-coded in the license header to allow them to be out-dated.
     # The `strict_copyright_date` below issues warnings as reminders for refreshing.
     license_lines = [
-        r"Copyright 2022-2025 The Ramble Authors",
+        r"Copyright 2022-2026 The Ramble Authors",
         r"Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or",
         r"https://www.apache.org/licenses/LICENSE-2.0> or the MIT license",
         r"<LICENSE-MIT or https://opensource.org/licenses/MIT>, at your",
@@ -170,7 +170,7 @@ def _check_license(lines, path):
                         logger.warn(f"{path}: copyright date mismatch")
                 found.append(i)
 
-    if len(found) == len(license_lines) and found == list(sorted(found)):
+    if len(found) == len(license_lines) and found == sorted(found):
         return
 
     def old_license(line, path):
@@ -211,7 +211,7 @@ def verify(args):
         if not os.path.exists(path):
             continue
         with open(path) as f:
-            lines = [line for line in f][:license_lines]
+            lines = list(f)[:license_lines]
 
         error = _check_license(lines, path)
         if error:

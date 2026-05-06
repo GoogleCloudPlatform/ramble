@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -81,10 +81,10 @@ class FileCache:
         exists = os.path.exists(cache_path)
         if exists:
             if not os.path.isfile(cache_path):
-                raise CacheError("Cache file is not a file: %s" % cache_path)
+                raise CacheError(f"Cache file is not a file: {cache_path}")
 
             if not os.access(cache_path, os.R_OK | os.W_OK):
-                raise CacheError("Cannot access cache file: %s" % cache_path)
+                raise CacheError(f"Cannot access cache file: {cache_path}")
         else:
             # if the file is hierarchical, make parent directories
             parent = os.path.dirname(cache_path)
@@ -92,7 +92,7 @@ class FileCache:
                 mkdirp(parent)
 
             if not os.access(parent, os.R_OK | os.W_OK):
-                raise CacheError("Cannot access cache directory: %s" % parent)
+                raise CacheError(f"Cannot access cache directory: {parent}")
 
             # ensure lock is created for this key
             self._get_lock(key)
@@ -125,7 +125,7 @@ class FileCache:
         # TODO: the locking code.
         class WriteContextManager:
 
-            def __enter__(cm):  # noqa
+            def __enter__(cm):
                 cm.orig_filename = self.cache_path(key)
                 cm.orig_file = None
                 if os.path.exists(cm.orig_filename):
@@ -136,14 +136,14 @@ class FileCache:
 
                 return cm.orig_file, cm.tmp_file
 
-            def __exit__(cm, type, value, traceback):  # noqa
+            def __exit__(cm, type, value, traceback):
                 if cm.orig_file:
                     cm.orig_file.close()
                 cm.tmp_file.close()
 
                 if value:
                     # remove tmp on exception & raise it
-                    shutil.rmtree(cm.tmp_filename, True)
+                    os.remove(cm.tmp_filename)
 
                 else:
                     os.rename(cm.tmp_filename, cm.orig_filename)

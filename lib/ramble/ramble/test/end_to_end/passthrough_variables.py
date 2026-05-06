@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -51,7 +51,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -68,7 +68,7 @@ ramble:
         # Assert undefined variable is found
         with open(exp1_script) as f:
             undefined_found = False
-            for line in f.readlines():
+            for line in f:
                 if undefined_regex.search(line):
                     undefined_found = True
             assert undefined_found
@@ -96,7 +96,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)

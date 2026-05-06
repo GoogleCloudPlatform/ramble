@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -40,6 +40,7 @@ ramble:
     partition: 'part1'
     processes_per_node: '1'
     n_threads: '1'
+    modeless_required_var: '1'
   applications:
     shared-context:
       workloads:
@@ -57,7 +58,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -76,7 +77,7 @@ ramble:
 
         workspace("analyze", "-f", "text", "json", global_args=["-w", workspace_name])
 
-        results_files = glob.glob(os.path.join(ws.root, "results.latest.txt"))
+        results_files = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))
 
         with open(results_files[0]) as f:
             data = f.read()

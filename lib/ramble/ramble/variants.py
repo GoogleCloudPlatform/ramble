@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,6 +11,8 @@ from enum import Enum
 from typing import Any, Callable, Optional, Union
 
 import ramble.error
+import ramble.util.colors as color
+from ramble.expander import Expander
 
 reserved_variants = {
     "modifier",
@@ -20,7 +22,7 @@ reserved_variants = {
     "workflow_manager",
 }
 
-variant_types = Enum("variant_types", ["default", "experiment"])
+variant_types = Enum("variant_types", ["default", "experiment", "version"])
 
 
 class VariantSet:
@@ -31,7 +33,44 @@ class VariantSet:
         self.default_variants = {}
         self.multi_value_variants = {}
         self.experiment_variants = {}
+        self.version_variants = {}
         self._set_cache = None
+
+    def __str__(self):
+        if not hasattr(self, "_str_indent"):
+            self._str_indent = 0
+        return self.as_str(n_indent=self._str_indent)
+
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        """String representation of this variant set
+
+        Args:
+            n_indent (int): Number of spaces to indent string with
+            verbose: Print verbose
+
+        Returns:
+            (str): Representation of this variant set
+        """
+        to_print = []
+        for variant in self.default_variants.values():
+            to_print.append(variant)
+
+        for variant_set in self.multi_value_variants.values():
+            for variant in variant_set:
+                to_print.append(variant)
+
+        for variant in self.experiment_variants.values():
+            to_print.append(variant)
+
+        for variant in self.version_variants.values():
+            to_print.append(variant)
+
+        if verbose:
+            out_str = "\n".join(v.as_str(verbose=True) for v in to_print)
+        else:
+            out_str = "  ".join(v.as_str(verbose=False) for v in to_print)
+
+        return out_str
 
     def copy(self):
         new_set = VariantSet()
@@ -44,11 +83,20 @@ class VariantSet:
                 dest_attr_set[name] = variant.copy()
 
         for name, var_list in self.multi_value_variants.items():
-            new_set.multi_value_variants[name] = []
+            new_set.multi_value_variants[name] = set()
             for variant in var_list:
-                new_set.multi_value_variants[name].append(variant.copy())
+                new_set.multi_value_variants[name].add(variant.copy())
+
+        for name, variant in self.version_variants.items():
+            new_set.version_variants[name] = variant.copy()
 
         return new_set
+
+    def merge_variants(self, in_set):
+        self.merge_default_variants(in_set)
+        self.merge_experiment_variants(in_set)
+        self.merge_multi_value_variants(in_set)
+        self.merge_version_variants(in_set)
 
     def merge_default_variants(self, in_set):
         """Merge another variant set's default variants into this variant set.
@@ -61,6 +109,18 @@ class VariantSet:
         for name, variant in in_set.default_variants.items():
             if name not in self.default_variants:
                 self.default_variants[name] = variant.copy()
+
+    def merge_experiment_variants(self, in_set):
+        """Merge another variant set's experiment variants into this variant set.
+
+        Args:
+            in_set: VariantSet to merge into self
+        """
+
+        self._set_cache = None
+        for name, variant in in_set.experiment_variants.items():
+            if name not in self.experiment_variants:
+                self.experiment_variants[name] = variant.copy()
 
     def merge_multi_value_variants(self, in_set):
         """Merge another variant set's multi value variants into this variant set.
@@ -75,6 +135,18 @@ class VariantSet:
                 self.multi_value_variants[name] = set()
             for variant in variant_list:
                 self.multi_value_variants[name].add(variant)
+
+    def merge_version_variants(self, in_set):
+        """Merge another variant set's version variants into this variant set.
+
+        Args:
+            in_set: VariantSet to merge into self
+        """
+
+        self._set_cache = None
+        for name, variant in in_set.version_variants.items():
+            if name not in self.version_variants:
+                self.version_variants[name] = variant.copy()
 
     def default_variant(
         self,
@@ -118,16 +190,7 @@ class VariantSet:
             name: Name of variant
             value: The value the variant should take.
         """
-        if name in self.default_variants:
-            if (
-                self.default_variants[name].values
-                and value not in self.default_variants[name].values
-            ):
-                raise RambleVariantError(
-                    f"When defining variant {name} the value {value} is not valid.\n"
-                    f"   Valid values include: {self.default_variants[name].values}"
-                )
-
+        if name in reserved_variants:
             self._define_variant(
                 name,
                 variant_type=variant_types.experiment,
@@ -135,7 +198,7 @@ class VariantSet:
                 description=None,
                 values=None,
             )
-        elif name in reserved_variants:
+        else:
             self._define_variant(
                 name,
                 variant_type=variant_types.experiment,
@@ -151,12 +214,33 @@ class VariantSet:
 
         self.multi_value_variants[name].add(Variant(name, default=value))
 
+    def version_variant(self, name: str, value: Any):
+        """Define a new version variant within this set.
+
+        Version variants are variants defined within the software section of a workspace's
+        configuration file.
+
+        Args:
+            name: Name of variant
+            default: Default value of the variant
+            description: Description of the variant, and what it's used for
+            values: Set of valid values for the variant
+        """
+
+        self._define_variant(
+            name,
+            variant_type=variant_types.version,
+            default=value,
+            description=None,
+            values=None,
+        )
+
     def _define_variant(
         self,
         name: str,
-        variant_type: int,
+        variant_type: variant_types,
         default: Optional[Any] = None,
-        description: str = "",
+        description: Optional[str] = "",
         values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         """Define a variant within this set.
@@ -179,6 +263,9 @@ class VariantSet:
 
         elif variant_type == variant_types.default:
             variant_dict = self.default_variants
+
+        elif variant_type == variant_types.version:
+            variant_dict = self.version_variants
 
         else:
             raise RambleVariantError(
@@ -207,7 +294,39 @@ class VariantSet:
 
         return None
 
-    def as_set(self):
+    def version(self, name: str):
+        """Extract the version of the named variant
+
+        Args:
+            name: Name of the variant to determine version of
+
+        Returns:
+            ramble.definitions.versions.ObjectVersion: Version of the variant
+        """
+        if name in self.version_variants:
+            return self.version_variants[name].default
+
+        return None
+
+    def _expanded_set(self, expander: Optional[Expander] = None) -> set:
+        """Return an expanded version of the cached set in this variant set.
+
+        Args:
+            expander (ramble.expander.Expander): Expander to use for expanding this set
+
+        Returns:
+            (set): Set of exanded variant definitions
+        """
+
+        if expander is None:
+            return self._set_cache
+
+        expanded_set = set()
+        for variant in self._set_cache:
+            expanded_set.add(expander.expand_var(variant))
+        return expanded_set
+
+    def as_set(self, expander: Optional[Expander] = None) -> set:
         """Construct a set of definitions for this variant set
 
         The set of variant definitions will be used to determine if a when
@@ -215,29 +334,46 @@ class VariantSet:
 
         Returns:
             set: A set consisting of strings with the variant definitions
+            expander (ramble.expander.Expander): Expander to use when expanding
+                                                 variant definitions
         """
         if self._set_cache is not None:
-            return self._set_cache
+            return self._expanded_set(expander)
 
         defined_variants = set()
         out_set = set()
 
-        # Define default variants after experiment variants so we only define
-        # undefined variants.
-        variant_sets = [self.experiment_variants, self.default_variants]
+        for name, variant in self.experiment_variants.items():
+            if name in self.default_variants:
+                if (
+                    name not in reserved_variants
+                    and self.default_variants[name].values
+                    and variant.default not in self.default_variants[name].values
+                ):
+                    raise RambleVariantError(
+                        f"When defining variant {name} the value {variant.default} is not valid.\n"
+                        f"   Valid values include: {self.default_variants[name].values}"
+                    )
 
-        for variant_set in variant_sets:
-            for name, variant in variant_set.items():
-                if name not in defined_variants:
-                    out_set.add(variant.as_definition())
-                    defined_variants.add(name)
+                out_set.add(variant.as_definition())
+                defined_variants.add(name)
 
-        for name, variant_list in self.multi_value_variants.items():
+        for name, variant in self.default_variants.items():
+            if name not in defined_variants:
+                out_set.add(variant.as_definition())
+                defined_variants.add(name)
+
+        for variant_list in self.multi_value_variants.values():
             for variant in variant_list:
                 out_set.add(variant.as_definition())
 
+        # Version variants are included as strings in the set for completeness, but should be
+        # checked using the stored ObjectVersion class instead of a string comparison.
+        for variant in self.version_variants.values():
+            out_set.add(variant.as_definition())
+
         self._set_cache = out_set
-        return out_set
+        return self._expanded_set(expander)
 
 
 class Variant:
@@ -248,7 +384,7 @@ class Variant:
         self,
         name: str,
         default: Optional[Any] = None,
-        description: str = "",
+        description: Optional[str] = "",
         values: Optional[Union[Sequence, Callable[[Any], bool]]] = None,
     ):
         self.name = name
@@ -266,7 +402,7 @@ class Variant:
             name=self.name, default=self.default, description=self.description, values=self.values
         )
 
-    def as_definition(self):
+    def as_definition(self) -> str:
         """Build a definition for this variant
 
         Format the variant as a string which can be used to test against when
@@ -277,35 +413,33 @@ class Variant:
         """
         return self._definition
 
-        if isinstance(self.default, bool):
-            if self.default:
-                return f"+{self.name}"
-            else:
-                return f"~{self.name}"
-        return f"{self.name}={str(self.default)}"
-
-    def as_str(self, indent=0):
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String documentation of this variant
 
         Returns:
             str: String for information of this variant
         """
-        indentation = " " * indent
-        out_str = f"{indentation}Variant: {self.name}\n"
-        attrs = [
-            ("Description", "description"),
-            ("Default", "default"),
-            ("Values", "values"),
-        ]
-        for print_name, attr_name in attrs:
-            if hasattr(self, attr_name):
-                value = getattr(self, attr_name, None)
-                if value is not None:
-                    out_str += f"{indentation}  {print_name}: {value}"
+        indentation = " " * n_indent
+
+        if verbose:
+            out_str = color.section_title(f"{indentation}{self.name}:\n")
+            attrs = [
+                ("Description", "description"),
+                ("Default", "default"),
+                ("Values", "values"),
+            ]
+            for print_name, attr_name in attrs:
+                if hasattr(self, attr_name):
+                    value = getattr(self, attr_name, None)
+                    if value is not None:
+                        out_str += f"{indentation}    {color.nested_1(print_name)}: {value}\n"
+        else:
+            out_str = self.name
+
         return out_str
 
     def __str__(self):
-        return self.as_str(indent=0)
+        return self.as_str(n_indent=0)
 
 
 def validate_variant(variant: str):

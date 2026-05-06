@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 # 
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,7 +17,7 @@ ramble:
     mpi_command: mpirun -n {n_ranks} -ppn {processes_per_node}
     batch_submit: '{execute_experiment}'
   applications:
-    gromacs: # Application name
+    gromacs@2025.3: # Application name and version
       workloads:
         water_gmx50: # Workload name from application
           experiments:
@@ -49,17 +49,17 @@ ramble:
                 type: rf
   software:
     packages:
-      gcc9:
-        pkg_spec: gcc@9.4.0 target=x86_64
-        compiler_spec: gcc@9.4.0
+      gcc14:
+        pkg_spec: gcc@14.2.0 target=x86_64
+        compiler_spec: gcc@14.2.0
       intel-mpi:
-        pkg_spec: intel-oneapi-mpi@2021.13.1 target=x86_64
-        compiler: gcc9
-      gromacs:
-        pkg_spec: gromacs@2021.6
-        compiler: gcc9
+        pkg_spec: intel-oneapi-mpi@2021.17.2 target=x86_64
+        compiler: gcc14
+      gromacs-{application::gromacs::version}:
+        pkg_spec: gromacs@{application::gromacs::version}
+        compiler: gcc14
     environments:
-      gromacs:
+      gromacs@2025.3:
         packages:
-        - gromacs
+        - gromacs-{application::gromacs::version}
         - intel-mpi

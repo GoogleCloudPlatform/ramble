@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -29,6 +29,7 @@ ramble:
     mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
     batch_submit: 'batch_submit {execute_experiment}'
     n_threads: '1'
+    my_var: 'testvar'
   applications:
     expanded_foms:
       workloads:
@@ -46,7 +47,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -75,8 +76,10 @@ ramble:
         output = workspace("analyze", global_args=["-w", workspace_name])
         print(output)
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
         with open(text_results_files[0]) as f:
             data = f.read()
+            assert "Status = SUCCESS" in data
             for expected in expected_expansions:
                 assert f"test_fom {expected} = 567.8 {unit}" in data
+            assert "test_inmem_testvar = inmem_val" in data

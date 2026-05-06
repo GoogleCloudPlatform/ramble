@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,6 +21,8 @@ class TestMod(BasicModifier):
 
     mode("test", description="This is a test mode")
     default_mode("test")
+
+    modifier_conflict(MODIFIER_CONFLICT.name_mode_executables)
 
     mode(
         "app-scope", description="This is a test mode at the application scope"
@@ -46,11 +48,32 @@ class TestMod(BasicModifier):
         modes=["test"],
     )
 
+    modifier_variable(
+        "modeless_variable",
+        default="is defined",
+        environment_variable_name="MODELESS_ENV_VAR",
+        description="Test a modifier variable without a mode",
+    )
+
+    env_var_modification(
+        "MODELESS_ENV_VAR_2",
+        "modeless_val",
+        method="set",
+    )
+
+    required_variable("modeless_required_var")
+
     variable_modification(
         "test_var_mod",
         "test-mod-append",
         method="append",
         modes=["test"],
+    )
+
+    variable_modification(
+        "modeless_var_mod",
+        "modeless-append",
+        method="append",
     )
 
     variable_modification(

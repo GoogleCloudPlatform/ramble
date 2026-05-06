@@ -50,7 +50,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         config_path = os.path.join(
-            ws.config_dir, ramble.workspace.config_file_name
+            ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
         )
         with open(config_path, "w+") as f:
             f.write(test_config)

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,21 +10,45 @@
 directives, which are to allow functions to be invoked at class level
 """
 
+import abc
 import copy
 import functools
+import inspect
 from collections.abc import Sequence  # novm
-from typing import Any, Dict, List
+from typing import Any, Callable, Dict, List, Set
 
 import llnl.util.lang
 
-import ramble.error
+import ramble.language.language_helpers
+from ramble.error import DirectiveError
+from ramble.util.logger import logger
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
 
 
+def _impossible_when_warning(directive_name, obj_type, obj_name, message, args, kwargs):
+    arg_lines = ["Directive Arguments:"] + [f" - {arg}" for arg in args] if args else []
+    kwarg_lines = (
+        ["Directive Keyword Arguments:"] + [f"  {k} = {v}" for k, v in kwargs.items()]
+        if kwargs
+        else []
+    )
+
+    parts = [
+        f'Directive "{directive_name}"'
+        f'{f" in {obj_type} {obj_name}" if obj_name and obj_type else ""} '
+        "has an impossible when condition:",
+        message,
+        *arg_lines,
+        *kwarg_lines,
+    ]
+
+    logger.warn("\n".join(parts))
+
+
 #: These are variant names used by ramble internally; applications can't use
 #: them
-reserved_names = []
+reserved_names: List[str] = []
 
 namespaces = [
     "ramble.app",
@@ -41,6 +65,12 @@ namespaces = [
 def _push_to_context(when_condition: str) -> None:
     DirectiveMeta._when_constraints_from_context.append(when_condition)
 
+    impossible, message = ramble.language.language_helpers.is_when_impossible(
+        DirectiveMeta._when_constraints_from_context
+    )
+    if impossible:
+        logger.warn(f"Entering an impossible 'when' context: {message}")
+
 
 def _pop_from_context() -> str:
     return DirectiveMeta._when_constraints_from_context.pop()
@@ -54,18 +84,18 @@ def _pop_default_args() -> dict:
     return DirectiveMeta._default_args.pop()
 
 
-class DirectiveMeta(type):
+class DirectiveMeta(abc.ABCMeta):
     """Flushes the directives that were temporarily stored in the staging
     area into the package.
     """
 
     # Set of all known directives
-    _directive_names = set()
-    _directive_init_values = {}
-    _directives_to_be_executed = []
-    _directive_functions = {}
-    _directive_classes = {}
-    _when_constraints_from_context = []
+    _directive_names: Set[str] = set()
+    _directive_init_values: Dict[str, Any] = {}
+    _directives_to_be_executed: List[Callable[..., Any]] = []
+    _directive_functions: Dict[str, Callable[..., Any]] = {}
+    _directive_classes: Dict[str, type] = {}
+    _when_constraints_from_context: List[str] = []
     _default_args: List[dict] = []
 
     push_to_context = _push_to_context
@@ -90,9 +120,9 @@ class DirectiveMeta(type):
                 pass
 
         # De-duplicates directives from base classes
-        attr_dict["_directives_to_be_executed"] = [
-            x for x in llnl.util.lang.dedupe(attr_dict["_directives_to_be_executed"])
-        ]
+        attr_dict["_directives_to_be_executed"] = list(
+            llnl.util.lang.dedupe(attr_dict["_directives_to_be_executed"])
+        )
 
         # Move things to be executed from module scope (where they
         # are collected first) to class scope
@@ -125,11 +155,11 @@ class DirectiveMeta(type):
                 "_directive_names": DirectiveMeta._directive_names.copy(),
             }
 
-            for attr in directive_attrs.keys():
+            for attr in directive_attrs:
                 if hasattr(DirectiveMeta, attr):
                     directive_attrs[attr].update(getattr(DirectiveMeta, attr))
 
-            for attr in directive_attrs.keys():
+            for attr in directive_attrs:
                 setattr(cls, attr, directive_attrs[attr])
 
             # Lazily execute directives
@@ -212,7 +242,7 @@ class DirectiveMeta(type):
             @functools.wraps(decorated_function)
             def _wrapper(*args, **_kwargs):
                 # First merge default args with kwargs
-                kwargs = dict()
+                kwargs = {}
                 for default_args in DirectiveMeta._default_args:
                     kwargs.update(default_args)
                 kwargs.update(_kwargs)
@@ -221,30 +251,8 @@ class DirectiveMeta(type):
                 if DirectiveMeta._when_constraints_from_context:
                     # Check that directives not yet supporting the when= argument
                     # are not used inside the context manager
-                    if decorated_function.__name__ not in [
-                        "software_spec",
-                        "required_package",
-                        "define_compiler",
-                        "package_manager_config",
-                        "register_builtin",
-                        "register_phase",
-                        "register_template",
-                        "figure_of_merit",
-                        "figure_of_merit_context",
-                        "formatted_executable",
-                        "register_validator",
-                        "variable",
-                        "workload_variable",
-                        "modifier_variable",
-                        "package_manager_variable",
-                        "workflow_manager_variable",
-                        "environment_variable",
-                        "env_var_modification",
-                        "workload",
-                        "executable",
-                        "executable_modifier",
-                        "input_file",
-                    ]:
+                    sig = inspect.signature(decorated_function)
+                    if "when" not in sig.parameters:
                         msg = (
                             'directive "{0}" cannot be used within a "when"'
                             ' context since it does not support a "when=" '
@@ -266,6 +274,27 @@ class DirectiveMeta(type):
                         when_constraints.extend(when_list)
 
                     kwargs["when"] = when_constraints.copy()
+
+                if "when" in kwargs:
+                    impossible, message = ramble.language.language_helpers.is_when_impossible(
+                        kwargs["when"]
+                    )
+                    if impossible:
+
+                        def _warn_impossible(obj):
+                            obj_type = obj.origin_type if hasattr(obj, "origin_type") else ""
+                            obj_name = obj.name if hasattr(obj, "name") else ""
+                            _impossible_when_warning(
+                                decorated_function.__name__,
+                                obj_type,
+                                obj_name,
+                                message,
+                                args,
+                                kwargs,
+                            )
+
+                        DirectiveMeta._directives_to_be_executed.append(_warn_impossible)
+                        return _warn_impossible
 
                 # If any of the arguments are executors returned by a
                 # directive passed as an argument, don't execute them
@@ -310,7 +339,3 @@ class DirectiveMeta(type):
             return _wrapper
 
         return _decorator
-
-
-class DirectiveError(ramble.error.RambleError):
-    """This is raised when something is wrong with a language directive."""

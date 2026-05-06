@@ -1,10 +1,12 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
 # <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
+
+from typing import List
 
 from ramble.pkgmankit import *
 
@@ -37,6 +39,9 @@ class UserManaged(PackageManagerBase):
     def __init__(self, file_path):
         super().__init__(file_path)
 
+    def package_name_from_spec(self, spec):
+        return spec
+
     register_phase(
         "define_requirements",
         pipeline="setup",
@@ -54,7 +59,7 @@ class UserManaged(PackageManagerBase):
         if app_inst is None:
             package_objects = [(None, self)]
         else:
-            package_objects = app_inst._objects()
+            package_objects = app_inst.objects()
 
         for _, obj in package_objects:
             for pkgname in obj.required_packages.keys():
@@ -95,3 +100,9 @@ class UserManaged(PackageManagerBase):
                 pkg_list.append(software_info)
 
         return pkg_list
+
+    def environment_load_commands(self) -> List[str]:
+        return []
+
+    def environment_unload_commands(self) -> List[str]:
+        return []

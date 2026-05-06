@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -51,6 +51,8 @@ Currently supported package managers in Ramble include:
  * pip
  * spack
  * spack-lightweight
+ * spack-pip
+ * user-managed
 
 ^^^^^^^^^^^^^^^^^^^^
 None Package Manager
@@ -158,3 +160,21 @@ mirror software source.
 The use of this package manager requires an external installation of Spack. For
 instructions on installing Spack, see
 `Spack's documentation <https://github.com/spack/spack#-spack>`_.
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^
+Spack Pip Package Manager
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Setting the package manager config option to ``spack-pip`` enables a hybrid
+mode where Spack is used to install base software, and ``pip`` is used to
+install additional Python packages into the environment.
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+User-Managed Package Manager
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Setting the package manager config option to ``user-managed`` disables Ramble's
+automatic software installation. In this mode, the user is responsible for
+ensuring that the required software is available in the environment before
+running experiments.

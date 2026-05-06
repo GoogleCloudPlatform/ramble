@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -301,6 +301,60 @@ class WhenDirectives(ExecutableApplication):
         when=["+workload_defined_twice"],
     )
 
+    # for workload_group()
+    variant(
+        "workload_group_options",
+        default="group1",
+        values=["group1", "group2"],
+        description="Workload group options",
+    )
+
+    with when("workload_group_options=group1"):
+        executable("test_exec2", "echo '{test_variable2}'", use_mpi=False)
+
+        workload(
+            "test_wl2",
+            executables=["test_exec2"],
+        )
+        workload_group("all_workloads", workloads=["test_wl", "test_wl2"])
+
+        workload_variable(
+            "test_variable2",
+            default="Var2",
+            description="This is variable 2",
+            workload_group="all_workloads",
+        )
+
+        environment_variable(
+            "APP_ENV_VAR2",
+            value="TEST_WL2_ENV_VAR",
+            description="Test app environment variable",
+            workload_group="all_workloads",
+        )
+
+    with when("workload_group_options=group2"):
+        executable("test_exec3", "echo '{test_variable3}'", use_mpi=False)
+
+        workload(
+            "test_wl3",
+            executables=["test_exec3"],
+        )
+        workload_group("all_workloads", workloads=["test_wl", "test_wl3"])
+
+        workload_variable(
+            "test_variable3",
+            default="Var3",
+            description="This is variable 3",
+            workload_group="all_workloads",
+        )
+
+        environment_variable(
+            "APP_ENV_VAR3",
+            value="TEST_WL3_ENV_VAR",
+            description="Test app environment variable",
+            workload_group="all_workloads",
+        )
+
     variant(
         "app_env_var_included",
         default=False,
@@ -315,3 +369,31 @@ class WhenDirectives(ExecutableApplication):
             description="Test app environment variable",
             workload_group="test_wl_group",
         )
+
+    variant(
+        "app_required_variable",
+        default=False,
+        values=[True, False],
+        description="Test required variable",
+    )
+
+    required_variable(
+        "test_app_required_variable",
+        results_level="variable",
+        description="Test required variable",
+        when=["+app_required_variable"],
+    )
+
+    variant(
+        "app_required_key",
+        default=False,
+        values=[True, False],
+        description="Test required key",
+    )
+
+    required_variable(
+        "test_app_required_key",
+        results_level="key",
+        description="Test required key",
+        when=["+app_required_key"],
+    )

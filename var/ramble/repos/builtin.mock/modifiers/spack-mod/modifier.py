@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,6 +17,27 @@ class SpackMod(BasicModifier):
     tags("test")
 
     mode("default", description="This is the default mode for the spack-mod")
+
+    variant(
+        "missing_compiler",
+        description="This variant enables software specs that refer to undefined compilers",
+        default=False,
+        values=[True, False],
+    )
+
+    variant(
+        "implicit_compiler",
+        description="This variant enables a software spec that uses an implicit compiler",
+        default=False,
+        values=[True, False],
+    )
+
+    variant(
+        "injected_compiler",
+        description="This variant enables a compiler spec that needs to be injected",
+        default=False,
+        values=[True, False],
+    )
 
     with when("package_manager_family=spack"):
         package_manager_config("enable_debug", "config:debug:true")
@@ -38,6 +59,37 @@ class SpackMod(BasicModifier):
             pkg_spec="mod_package2@1.1",
             compiler="mod_compiler",
         )
+
+        with when("+injected_compiler"):
+            define_compiler(
+                "injected_compiler",
+                pkg_spec="injected_compiler@1.1",
+                compiler_spec="injected_compiler@1.1",
+                inject_if_missing=True,
+            )
+
+        with when("~missing_compiler"):
+            with when("+implicit_compiler"):
+                software_spec(
+                    "missing_mod_package",
+                    pkg_spec="missing_package@1.1",
+                    compiler="mod_compiler",
+                    inject_if_missing=True,
+                )
+
+            # with when("~implicit_compiler"):
+            #    software_spec(
+            #        "missing_mod_package",
+            #        pkg_spec="missing_package@1.1",
+            #    )
+
+        with when("+missing_compiler"):
+            software_spec(
+                "missing_mod_package",
+                pkg_spec="missing_package@1.1",
+                compiler="non_existent_compiler",
+                inject_if_missing=True,
+            )
 
     package_manager_requirement(
         "list not-a-package", validation_type="empty", modes=["default"]

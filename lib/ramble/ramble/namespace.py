@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -26,6 +26,7 @@ class namespace:
     template = "template"
     chained_experiments = "chained_experiments"
     modifiers = "modifiers"
+    tables = "tables"
     tags = "tags"
     n_repeats = "n_repeats"
     formatted_executables = "formatted_executables"
@@ -63,6 +64,7 @@ class namespace:
     # For variants
     package_manager = "package_manager"
     workflow_manager = "workflow_manager"
+    version = "version"
 
     metadata = "metadata"
     include = "include"

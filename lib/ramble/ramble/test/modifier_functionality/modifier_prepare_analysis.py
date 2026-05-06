@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -39,7 +39,7 @@ def test_basic_dry_run_mock_prepare_analysis_mod(
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config(
             "modifiers", test_modifiers, config_path, "basic", "working_wl", batch_cmd=""
@@ -55,8 +55,8 @@ def test_basic_dry_run_mock_prepare_analysis_mod(
 
         expected_regex = re.compile(".*This test worked")
         found_str = False
-        with open(os.path.join(ws1.root, "results.latest.txt")) as f:
-            for line in f.readlines():
+        with open(os.path.join(ws1.results_dir, "results.latest.txt")) as f:
+            for line in f:
                 if expected_regex.match(line):
                     found_str = True
 

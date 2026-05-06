@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -30,14 +30,17 @@ When read in, Ramble validates configurations with jsonschemas.  The
 schemas are in submodules of :py:mod:`ramble.schema`.
 
 """
+
 import collections
 import contextlib
 import copy
 import functools
+import itertools
 import os
 import re
 import sys
 from contextlib import contextmanager
+from typing import Any, Dict, List
 
 import ruamel.yaml as yaml
 from ruamel.yaml.error import MarkedYAMLError
@@ -66,8 +69,8 @@ import ramble.schema.package_manager_repos
 # Objects
 import ramble.schema.repos
 import ramble.schema.software
-import ramble.schema.spack
 import ramble.schema.success_criteria
+import ramble.schema.tables
 import ramble.schema.variables
 import ramble.schema.variants
 import ramble.schema.workflow_manager_repos
@@ -83,7 +86,7 @@ import spack.util.spack_yaml as syaml
 from spack.util.cpus import cpus_available
 
 #: Dict from section names -> schema for that section
-section_schemas = {
+section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,
     "config": ramble.schema.config.schema,
     "env_vars": ramble.schema.env_vars.schema,
@@ -91,9 +94,9 @@ section_schemas = {
     "licenses": ramble.schema.licenses.schema,
     "mirrors": ramble.schema.mirrors.schema,
     "modifiers": ramble.schema.modifiers.schema,
-    "spack": ramble.schema.spack.schema,
     "software": ramble.schema.software.schema,
     "success_criteria": ramble.schema.success_criteria.schema,
+    "tables": ramble.schema.tables.schema,
     "applications": ramble.schema.applications.schema,
     "variables": ramble.schema.variables.schema,
     "variants": ramble.schema.variants.schema,
@@ -112,7 +115,7 @@ section_schemas = {
 # Same as above, but including keys for workspaces
 # this allows us to unify config reading between configs and workspaces
 all_schemas = copy.deepcopy(section_schemas)
-all_schemas.update({key: ramble.schema.workspace.schema for key in ramble.schema.workspace.keys})
+all_schemas.update(dict.fromkeys(ramble.schema.workspace.keys, ramble.schema.workspace.schema))
 
 #: Builtin paths to configuration files in ramble
 configuration_paths = (
@@ -148,12 +151,13 @@ config_defaults = {
         "concretizer": "clingo",
         "license_dir": spack.paths.default_license_dir,
         "shell": "bash",
-        "spack": {"flags": {"install": "--reuse", "concretize": "--reuse"}},
+        "spack": {"install": {"flags": "--fresh"}, "concretize": {"flags": "--fresh"}},
         "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
         "workspace_dirs": "$ramble/var/ramble/workspaces",
         "upload": {"push_failed": True},
         "report_dirs": "~/.ramble/reports",
+        "enable_strict_versions": True,
     }
 }
 
@@ -167,9 +171,10 @@ overrides_base_name = "overrides-"
 
 def first_existing(dictionary, keys):
     """Get the value of the first key in keys that is in the dictionary."""
-    try:
-        return next(k for k in keys if k in dictionary)
-    except StopIteration:
+    for k in keys:
+        if k in dictionary:
+            return k
+    else:
         raise KeyError(f"None of {keys} is in dict!")
 
 
@@ -191,7 +196,7 @@ class ConfigScope:
 
     def get_section_filename(self, section):
         _validate_section_name(section)
-        return os.path.join(self.path, "%s.yaml" % section)
+        return os.path.join(self.path, f"{section}.yaml")
 
     def get_section(self, section):
         if section not in self.sections:
@@ -214,7 +219,7 @@ class ConfigScope:
             with open(filename, "w") as f:
                 syaml.dump_config(data, stream=f, default_flow_style=False)
         except (yaml.YAMLError, OSError) as e:
-            raise ConfigFileError("Error writing to config file: '%s'" % str(e))
+            raise ConfigFileError("Error writing to config file") from e
 
     def clear(self):
         """Empty cached config information."""
@@ -303,7 +308,7 @@ class SingleFileScope(ConfigScope):
             for section_key, data in section_data.items():
                 self.sections[section_key] = {section_key: data}
 
-        return self.sections.get(section, None)
+        return self.sections.get(section)
 
     def _write_section(self, section):
         data_to_write = self._raw_data
@@ -338,13 +343,13 @@ class SingleFileScope(ConfigScope):
             parent = os.path.dirname(self.path)
             mkdirp(parent)
 
-            tmp = os.path.join(parent, ".%s.tmp" % os.path.basename(self.path))
+            tmp = os.path.join(parent, f".{os.path.basename(self.path)}.tmp")
             with open(tmp, "w") as f:
                 syaml.dump_config(data_to_write, stream=f, default_flow_style=False)
             rename(tmp, self.path)
 
         except (yaml.YAMLError, OSError) as e:
-            raise ConfigFileError("Error writing to config file: '%s'" % str(e))
+            raise ConfigFileError("Error writing to config file") from e
 
     def __repr__(self):
         return f"<SingleFileScope: {self.name}: {self.path}>"
@@ -357,7 +362,7 @@ class ImmutableConfigScope(ConfigScope):
     """
 
     def _write_section(self, section):
-        raise ConfigError("Cannot write to immutable scope %s" % self)
+        raise ConfigError(f"Cannot write to immutable scope {self}")
 
     def __repr__(self):
         return f"<ImmutableConfigScope: {self.name}: {self.path}>"
@@ -399,7 +404,7 @@ class InternalConfigScope(ConfigScope):
         self.sections[section] = _mark_internal(data, self.name)
 
     def __repr__(self):
-        return "<InternalConfigScope: %s>" % self.name
+        return f"<InternalConfigScope: {self.name}>"
 
     def clear(self):
         # no cache to clear here.
@@ -489,7 +494,7 @@ class Configuration:
         return [
             s
             for s in self.scopes.values()
-            if (type(s) == ConfigScope or type(s) == SingleFileScope)  # noqa: E721
+            if (type(s) is ConfigScope or type(s) is SingleFileScope)
         ]
 
     def highest_precedence_scope(self):
@@ -750,7 +755,7 @@ class Configuration:
             data[section] = self.get_config(section)
             syaml.dump_config(data, stream=sys.stdout, default_flow_style=False, blame=blame)
         except (yaml.YAMLError, OSError):
-            raise ConfigError("Error reading configuration: %s" % section)
+            raise ConfigError(f"Error reading configuration: {section}") from None
 
 
 @contextmanager
@@ -794,7 +799,7 @@ def override(path_or_scope, value=None):
 
 #: configuration scopes added on the command line
 #: set by ``ramble.main.main()``.
-command_line_scopes = []
+command_line_scopes: List[str] = []
 
 
 def _add_platform_scope(cfg, scope_type, name, path):
@@ -814,9 +819,9 @@ def _add_command_line_scopes(cfg, command_line_scopes):
         # We ensure that these scopes exist and are readable, as they are
         # provided on the command line by the user.
         if not os.path.isdir(path):
-            raise ConfigError("config scope is not a directory: '%s'" % path)
+            raise ConfigError(f"config scope is not a directory: '{path}'")
         elif not os.access(path, os.R_OK):
-            raise ConfigError("config scope is not readable: '%s'" % path)
+            raise ConfigError(f"config scope is not readable: '{path}'")
 
         # name based on order on the command line
         name = "cmd_scope_%d" % i
@@ -840,8 +845,6 @@ def _config():
     # first do the builtin, hardcoded defaults
     defaults = InternalConfigScope("_builtin", config_defaults)
     cfg.push_scope(defaults)
-
-    # TODO: do we need the configuration here from Spack?
 
     # add each scope
     for name, path in configuration_paths:
@@ -871,8 +874,8 @@ def add_from_file(filename, scope=None):
 
     # update all sections from config dict
     # We have to iterate on keys to keep overrides from the file
-    for section in data.keys():
-        if section in section_schemas.keys():
+    for section in data:
+        if section in section_schemas:
             # Special handling for compiler scope difference
             # Has to be handled after we choose a section
             if scope is None:
@@ -895,7 +898,7 @@ def add(fullpath, scope=None):
     has_existing_value = True
     path = ""
     override = False
-    for idx, name in enumerate(components[:-1]):
+    for idx, name in enumerate(itertools.islice(components, len(components) - 1)):
         # First handle double colons in constructing path
         colon = "::" if override else ":" if path else ""
         path += colon + name
@@ -1014,10 +1017,10 @@ def read_config_file(filename, schema=None):
         return None
 
     elif not os.path.isfile(filename):
-        raise ConfigFileError("Invalid configuration. %s exists but is not a file." % filename)
+        raise ConfigFileError(f"Invalid configuration. {filename} exists but is not a file.")
 
     elif not os.access(filename, os.R_OK):
-        raise ConfigFileError("Config file is not readable: %s" % filename)
+        raise ConfigFileError(f"Config file is not readable: {filename}")
 
     try:
         logger.debug(f"Reading config file {filename}")
@@ -1032,13 +1035,15 @@ def read_config_file(filename, schema=None):
         return data
 
     except StopIteration:
-        raise ConfigFileError("Config file is empty or is not a valid YAML dict: %s" % filename)
+        raise ConfigFileError(
+            f"Config file is empty or is not a valid YAML dict: {filename}"
+        ) from None
 
     except MarkedYAMLError as e:
-        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}")
+        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}") from e
 
     except OSError as e:
-        raise ConfigFileError(f"Error reading configuration file {filename}: {str(e)}")
+        raise ConfigFileError(f"Error reading configuration file {filename}") from e
 
 
 def _override(string):
@@ -1111,7 +1116,7 @@ def get_valid_type(path):
                     return types[schema_type]()
     else:
         return type(None)
-    raise ConfigError("Cannot determine valid type for path '%s'." % path)
+    raise ConfigError(f"Cannot determine valid type for path '{path}'.")
 
 
 def merge_yaml(dest, source):
@@ -1149,7 +1154,7 @@ def merge_yaml(dest, source):
     elif they_are(dict):
         # save dest keys to reinsert later -- this ensures that  source items
         # come *before* dest in OrderedDicts
-        dest_keys = [dk for dk in dest.keys() if dk not in source]
+        dest_keys = [dk for dk in dest if dk not in source]
 
         for sk, sv in source.items():
             # always remove the dest items. Python dicts do not overwrite
@@ -1168,9 +1173,7 @@ def merge_yaml(dest, source):
         for dk in dest_keys:
             dest[dk] = dest.pop(dk)
 
-        import ruamel.yaml
-
-        return ruamel.yaml.comments.CommentedMap(dest)
+        return yaml.comments.CommentedMap(dest)
 
     # If we reach here source and dest are either different types or are
     # not both lists or dicts: replace with source.
@@ -1191,7 +1194,7 @@ def process_config_path(path):
         if (sep and not path) or path.startswith(":"):
             if seen_override_in_path:
                 raise ConfigError(
-                    "Meaningless second override" " indicator `::' in path `{}'".format(path), ""
+                    f"Meaningless second override indicator `::' in path `{path}'", ""
                 )
             path = path.lstrip(":")
             front = syaml.syaml_str(front)

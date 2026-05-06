@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,6 +17,7 @@ import ssl
 import sys
 import traceback
 from html.parser import HTMLParser
+from typing import Any, Dict, List, Set, Tuple
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
@@ -27,9 +28,7 @@ import ramble
 import ramble.config
 from ramble.util.logger import logger
 
-import spack
 import spack.error
-import spack.url
 import spack.util.gcs as gcs_util
 import spack.util.s3 as s3_util
 import spack.util.url as url_util
@@ -79,14 +78,8 @@ def uses_ssl(parsed_url):
     return False
 
 
-__UNABLE_TO_VERIFY_SSL = (lambda pyver: ((pyver < (2, 7, 9)) or ((3,) < pyver < (3, 4, 3))))(
-    sys.version_info
-)
-
-
 def read_from_url(url, accept_content_type=None):
     url = url_util.parse(url)
-    context = None
 
     verify_ssl = ramble.config.get("config:verify_ssl")
 
@@ -97,17 +90,11 @@ def read_from_url(url, accept_content_type=None):
     # SSL certs.
     if uses_ssl(url):
         if verify_ssl:
-            if __UNABLE_TO_VERIFY_SSL:
-                # User wants SSL verification, but it cannot be provided.
-                warn_no_ssl_cert_checking()
-            else:
-                # User wants SSL verification, and it *can* be provided.
-                context = ssl.create_default_context()  # novm
+            context = ssl.create_default_context()  # novm
         else:
-            # User has explicitly indicated that they do not want SSL
-            # verification.
-            if not __UNABLE_TO_VERIFY_SSL:
-                context = ssl._create_unverified_context()
+            context = ssl._create_unverified_context()
+    else:
+        context = None
 
     url_scheme = url.scheme
     url = url_util.format(url)
@@ -123,18 +110,18 @@ def read_from_url(url, accept_content_type=None):
         # It would be nice to do this with the HTTP Accept header to avoid
         # one round-trip.  However, most servers seem to ignore the header
         # if you ask for a tarball with Accept: text/html.
-        req.get_method = lambda: "HEAD"
+        req.method = "HEAD"
         resp = _urlopen(req, timeout=timeout, context=context)
 
         content_type = get_header(resp.headers, "Content-type")
 
     # Do the real GET request when we know it's just HTML.
-    req.get_method = lambda: "GET"
+    req.method = "GET"
 
     try:
         response = _urlopen(req, timeout=timeout, context=context)
     except URLError as err:
-        raise SpackWebError(f"Download failed: {str(err)}")
+        raise SpackWebError("Download failed") from err
 
     if accept_content_type and not is_web_url:
         content_type = get_header(response.headers, "Content-type")
@@ -155,23 +142,11 @@ def read_from_url(url, accept_content_type=None):
     return response.geturl(), response.headers, response
 
 
-def warn_no_ssl_cert_checking():
-    logger.warn(
-        "Ramble will not check SSL certificates. You need to update "
-        "your Python to enable certificate verification."
-    )
-
-
 def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=None):
     if sys.platform == "win32":
         if remote_path[1] == ":":
             remote_path = "file://" + remote_path
     remote_url = url_util.parse(remote_path)
-    verify_ssl = ramble.config.get("config:verify_ssl")
-
-    if __UNABLE_TO_VERIFY_SSL and verify_ssl and uses_ssl(remote_url):
-        warn_no_ssl_cert_checking()
-
     remote_file_path = url_util.local_file_path(remote_url)
     logger.debug(f"Trying to backup file to: {remote_file_path}")
     if remote_file_path is not None:
@@ -202,7 +177,7 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
 
         s3 = s3_util.create_s3_session(
             remote_url, connection=s3_util.get_mirror_connection(remote_url)
-        )  # noqa: E501
+        )
         s3.upload_file(local_file_path, remote_url.netloc, remote_path, ExtraArgs=extra_args)
 
         if not keep_original:
@@ -226,9 +201,7 @@ def url_exists(url):
 
     if url.scheme == "s3":
         # Check for URL specific connection information
-        s3 = s3_util.create_s3_session(
-            url, connection=s3_util.get_mirror_connection(url)
-        )  # noqa: E501
+        s3 = s3_util.create_s3_session(url, connection=s3_util.get_mirror_connection(url))
 
         try:
             s3.get_object(Bucket=url.netloc, Key=url.path.lstrip("/"))
@@ -273,9 +246,7 @@ def remove_url(url, recursive=False):
 
     if url.scheme == "s3":
         # Try to find a mirror for potential connection information
-        s3 = s3_util.create_s3_session(
-            url, connection=s3_util.get_mirror_connection(url)
-        )  # noqa: E501
+        s3 = s3_util.create_s3_session(url, connection=s3_util.get_mirror_connection(url))
         bucket = url.netloc
         if recursive:
             # Because list_objects_v2 can only return up to 1000 items
@@ -284,7 +255,7 @@ def remove_url(url, recursive=False):
             paginator = s3.get_paginator("list_objects_v2")
             pages = paginator.paginate(Bucket=bucket, Prefix=prefix)
 
-            delete_request = {"Objects": []}
+            delete_request: Dict[str, List[Dict[str, Any]]] = {"Objects": []}
             for item in pages.search("Contents"):
                 if not item:
                     continue
@@ -334,7 +305,7 @@ def _iter_s3_contents(contents, prefix):
 
 
 def _list_s3_objects(client, bucket, prefix, num_entries, start_after=None):
-    list_args = dict(Bucket=bucket, Prefix=prefix[1:], MaxKeys=num_entries)
+    list_args = {"Bucket": bucket, "Prefix": prefix[1:], "MaxKeys": num_entries}
 
     if start_after is not None:
         list_args["StartAfter"] = start_after
@@ -431,9 +402,9 @@ def spider(root_urls, depth=0, concurrency=32):
             - links: set of links encountered while visiting the pages.
             - spider_args: argument for subsequent call to spider
         """
-        pages = {}  # dict from page URL -> text content.
-        links = set()  # set of all links seen on visited pages.
-        subcalls = []
+        pages: Dict[str, str] = {}  # dict from page URL -> text content.
+        links: Set[str] = set()  # set of all links seen on visited pages.
+        subcalls: List[Tuple] = []
 
         try:
             response_url, _, response = read_from_url(url, "text/html")
@@ -479,11 +450,6 @@ def spider(root_urls, depth=0, concurrency=32):
         except HTMLParseError as e:
             # This error indicates that Python's HTML parser sucks.
             msg = "Got an error parsing HTML."
-
-            # Pre-2.7.3 Pythons in particular have rather prickly HTML parsing.
-            if sys.version_info[:3] < (2, 7, 3):
-                msg += " Use Python 2.7.3 or newer for better HTML parsing."
-
             logger.warn(msg, url, "HTMLParseError: " + str(e))
 
         except Exception as e:
@@ -543,20 +509,15 @@ def _urlopen(req, *args, **kwargs):
     except AttributeError:
         pass
 
-    # Note: 'context' parameter was only introduced starting
-    # with versions 2.7.9 and 3.4.3 of Python.
-    if __UNABLE_TO_VERIFY_SSL:
-        del kwargs["context"]
-
     opener = urlopen
     if url_util.parse(url).scheme == "s3":
         import spack.s3_handler
 
-        opener = spack.s3_handler.open
+        opener = spack.s3_handler.open  # type: ignore[assignment]
     elif url_util.parse(url).scheme == "gs":
         import spack.gcs_handler
 
-        opener = spack.gcs_handler.gcs_open
+        opener = spack.gcs_handler.gcs_open  # type: ignore[assignment]
 
     try:
         return opener(req, *args, **kwargs)
@@ -565,122 +526,6 @@ def _urlopen(req, *args, **kwargs):
         if "context" in kwargs and "context" in str(err):
             del kwargs["context"]
         return opener(req, *args, **kwargs)
-
-
-def find_versions_of_archive(
-    archive_urls, list_url=None, list_depth=0, concurrency=32, reference_package=None
-):
-    """Scrape web pages for new versions of a tarball. This function prefers URLs in the
-    following order: links found on the scraped page that match a url generated by the
-    reference package, found and in the archive_urls list, found and derived from those
-    in the archive_urls list, and if none are found for a version then the item in the
-    archive_urls list is included for the version.
-
-    Args:
-        archive_urls (str | list | tuple): URL or sequence of URLs for
-            different versions of a package. Typically these are just the
-            tarballs from the package file itself. By default, this searches
-            the parent directories of archives.
-        list_url (str | None): URL for a listing of archives.
-            Spack will scrape these pages for download links that look
-            like the archive URL.
-        list_depth (int): max depth to follow links on list_url pages.
-            Defaults to 0.
-        concurrency (int): maximum number of concurrent requests
-        reference_package (spack.package.Package | None): a spack package
-            used as a reference for url detection.  Uses the url_for_version
-            method on the package to produce reference urls which, if found,
-            are preferred.
-    """
-    if not isinstance(archive_urls, (list, tuple)):
-        archive_urls = [archive_urls]
-
-    # Generate a list of list_urls based on archive urls and any
-    # explicitly listed list_url in the package
-    list_urls = set()
-    if list_url is not None:
-        list_urls.add(list_url)
-    for aurl in archive_urls:
-        list_urls |= spack.url.find_list_urls(aurl)
-
-    # Add '/' to the end of the URL. Some web servers require this.
-    additional_list_urls = set()
-    for lurl in list_urls:
-        if not lurl.endswith("/"):
-            additional_list_urls.add(lurl + "/")
-    list_urls |= additional_list_urls
-
-    # Grab some web pages to scrape.
-    _, links = spider(list_urls, depth=list_depth, concurrency=concurrency)
-
-    # Scrape them for archive URLs
-    regexes = []
-    for aurl in archive_urls:
-        # This creates a regex from the URL with a capture group for
-        # the version part of the URL.  The capture group is converted
-        # to a generic wildcard, so we can use this to extract things
-        # on a page that look like archive URLs.
-        url_regex = spack.url.wildcard_version(aurl)
-
-        # We'll be a bit more liberal and just look for the archive
-        # part, not the full path.
-        url_regex = os.path.basename(url_regex)
-
-        # We need to add a / to the beginning of the regex to prevent
-        # Spack from picking up similarly named packages like:
-        #   https://cran.r-project.org/src/contrib/pls_2.6-0.tar.gz
-        #   https://cran.r-project.org/src/contrib/enpls_5.7.tar.gz
-        #   https://cran.r-project.org/src/contrib/autopls_1.3.tar.gz
-        #   https://cran.r-project.org/src/contrib/matrixpls_1.0.4.tar.gz
-        url_regex = "/" + url_regex
-
-        # We need to add a $ anchor to the end of the regex to prevent
-        # Spack from picking up signature files like:
-        #   .asc
-        #   .md5
-        #   .sha256
-        #   .sig
-        # However, SourceForge downloads still need to end in '/download'.
-        url_regex += r"(\/download)?"
-        # PyPI adds #sha256=... to the end of the URL
-        url_regex += "(#sha256=.*)?"
-        url_regex += "$"
-
-        regexes.append(url_regex)
-
-    # Build a dict version -> URL from any links that match the wildcards.
-    # Walk through archive_url links first.
-    # Any conflicting versions will be overwritten by the list_url links.
-    versions = {}
-    matched = set()
-    for url in sorted(links):
-        url = convert_to_posix_path(url)
-        if any(re.search(r, url) for r in regexes):
-            try:
-                ver = spack.url.parse_version(url)
-                if ver in matched:
-                    continue
-                versions[ver] = url
-                # prevent this version from getting overwritten
-                if reference_package is not None:
-                    if url == reference_package.url_for_version(ver):
-                        matched.add(ver)
-                else:
-                    extrapolated_urls = [
-                        spack.url.substitute_version(u, ver) for u in archive_urls
-                    ]
-                    if url in extrapolated_urls:
-                        matched.add(ver)
-            except spack.url.UndetectableVersionError:
-                continue
-
-    for url in archive_urls:
-        url = convert_to_posix_path(url)
-        ver = spack.url.parse_version(url)
-        if ver not in versions:
-            versions[ver] = url
-
-    return versions
 
 
 def get_header(headers, header_name):
@@ -715,11 +560,3 @@ def get_header(headers, header_name):
 
 class SpackWebError(spack.error.SpackError):
     """Superclass for Spack web spidering errors."""
-
-
-class NoNetworkConnectionError(SpackWebError):
-    """Raised when an operation can't get an internet connection."""
-
-    def __init__(self, message, url):
-        super().__init__("No network connection: " + str(message), "URL was: " + str(url))
-        self.url = url

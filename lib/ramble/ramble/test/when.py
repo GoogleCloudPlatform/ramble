@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,13 +6,16 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import json
 import os
 
 import pytest
 
+import ramble.config
 import ramble.workspace
 from ramble.error import ObjectValidationError, RambleCommandError
 from ramble.main import RambleCommand
+from ramble.pkg_man.builtin.spack_lightweight import ValidationFailedError
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
@@ -90,10 +93,11 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
+        ws._re_read()
         with open(output_path, "w+") as f:
             f.write(test_output)
 
@@ -109,8 +113,8 @@ test inheritance 12.0
 
         config("add", "variants:register_fom_context_when:true", global_args=global_args)
 
-        ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -151,7 +155,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -172,7 +176,8 @@ test inheritance 12.0
         config("add", "variants:register_fom_when:true", global_args=global_args)
 
         ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -213,7 +218,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -232,10 +237,11 @@ test inheritance 12.0
 
         ws._re_read()
 
-        with pytest.raises(RambleCommandError):
-
-            captured = workspace("analyze", global_args=global_args)
-            assert "context 'test_context_when'" in captured
+        with pytest.raises(
+            RambleCommandError,
+            match=r"(?s)Command output:.*context 'test_context_when'.*is not found",
+        ):
+            workspace("analyze", global_args=global_args)
 
 
 def test_same_fom_name_different_context(workspace_name):
@@ -269,7 +275,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         ws._re_read()
         workspace("setup", global_args=global_args)
@@ -290,7 +296,8 @@ test inheritance 12.0
         config("add", "variants:register_fom_context_when:true", global_args=global_args)
 
         ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -332,7 +339,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives-inherited", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         ws._re_read()
         workspace("setup", global_args=global_args)
@@ -354,7 +361,8 @@ test inheritance 12.0
 
         ws._re_read()
 
-        output = workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            output = workspace("analyze", global_args=global_args)
 
         assert "Overwriting with new definition from when-directives-inherited" in output
 
@@ -760,7 +768,7 @@ test inheritance 12.0
         output_path = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "test.out"
         )
-        results_path = os.path.join(ws.root, "results.latest.txt")
+        results_path = os.path.join(ws.results_dir, "results.latest.txt")
 
         workspace("setup", global_args=global_args)
 
@@ -778,7 +786,8 @@ test inheritance 12.0
         config("add", "variants:success_criteria_when:true", global_args=global_args)
 
         ws._re_read()
-        workspace("analyze", global_args=global_args)
+        with ramble.config.override("config:overwrite_inventories", True):
+            workspace("analyze", global_args=global_args)
 
         with open(results_path) as f:
             results = f.read()
@@ -1146,6 +1155,117 @@ def test_workload_errors_when_overlapping_conditions(workspace_name):
             assert "test_wl is defined for overlapping `when` conditions" in captured
 
 
+@pytest.mark.parametrize(
+    "active_variant,active_workload,disabled_variant,disabled_workload",
+    [
+        ("group1", "test_wl2", "group2", "test_wl3"),
+        ("group2", "test_wl3", "group1", "test_wl2"),
+    ],
+)
+def test_workload_group_when(
+    workspace_name, active_variant, active_workload, disabled_variant, disabled_workload
+):
+    global_args = ["-w", workspace_name]
+
+    expected_commands = {
+        "group1_test_wl": [
+            "echo 'Test'",
+            "export APP_ENV_VAR2=TEST_WL2_ENV_VAR",
+        ],
+        "group1_test_wl2": [
+            "echo 'Var2'",
+            "export APP_ENV_VAR2=TEST_WL2_ENV_VAR",
+        ],
+        "group2_test_wl": [
+            "echo 'Test'",
+            "export APP_ENV_VAR3=TEST_WL3_ENV_VAR",
+        ],
+        "group2_test_wl3": [
+            "echo 'Var3'",
+            "export APP_ENV_VAR3=TEST_WL3_ENV_VAR",
+        ],
+    }
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:workload_group_options:{active_variant}", global_args=global_args)
+
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            f"{active_workload}",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        base_wl_exec_file = os.path.join(
+            ws.experiment_dir, "when-directives", "test_wl", "generated", "execute_experiment"
+        )
+
+        active_wl_exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            f"{active_workload}",
+            "generated",
+            "execute_experiment",
+        )
+
+        disabled_wl_exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            f"{disabled_workload}",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(base_wl_exec_file) as f:
+            base_script = f.read()
+
+            for cmd in expected_commands[f"{active_variant}_test_wl"]:
+                assert cmd in base_script
+
+            assert expected_commands[f"{disabled_variant}_test_wl"][1] not in base_script
+
+            for cmd in expected_commands[f"{disabled_variant}_{disabled_workload}"]:
+                assert cmd not in base_script
+
+        with open(active_wl_exec_file) as f:
+            active_script = f.read()
+
+            for cmd in expected_commands[f"{active_variant}_{active_workload}"]:
+                assert cmd in active_script
+
+            for cmd in expected_commands[f"{disabled_variant}_{disabled_workload}"]:
+                assert cmd not in active_script
+
+        assert not os.path.exists(disabled_wl_exec_file)
+
+
 @pytest.mark.parametrize("obj", ["app", "mod", "wf_man", "pkg_man"])
 def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mock_pkg_mans_repo):
     global_args = ["-w", workspace_name]
@@ -1212,8 +1332,8 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
         with open(exec_file) as f:
             data = f.read()
 
-            for obj_under_test, exec_test_str in exec_test_str.items():
-                assert (exec_test_str in data) == (obj_under_test == obj)
+            for obj_under_test, test_str in exec_test_str.items():
+                assert (test_str in data) == (obj_under_test == obj)
 
 
 @pytest.mark.parametrize(
@@ -1326,3 +1446,237 @@ def test_executable_modification_when(workspace_name, exec_mod_when, expected_ex
             data = f.read()
 
             assert (exec_test_str in data) == expected_exec
+
+
+@pytest.mark.parametrize(
+    "var_mod_when,modifier_mode,expected_exec",
+    [
+        (False, "standard", False),
+        (True, "standard", False),
+        (False, "test", False),
+        (True, "test", True),
+    ],
+)
+def test_variable_modification_when(workspace_name, var_mod_when, modifier_mode, expected_exec):
+    global_args = ["-w", workspace_name]
+
+    exec_original_str = "echo 'Test'"
+    exec_test_str = "echo 'test var modified'"
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(mod_config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+            f.write(f"   mode: {modifier_mode}\n")
+
+        config(
+            "add",
+            f"variants:variable_modification_active:{var_mod_when}",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        with open(exec_file) as f:
+            data = f.read()
+
+            assert (exec_original_str in data) != expected_exec
+            assert (exec_test_str in data) == expected_exec
+
+
+@pytest.mark.long
+def test_package_manager_requirement_when(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+        with open(mod_config_path, "w+") as f:
+            f.write("modifiers:\n")
+            f.write(" - name: when-modifier\n")
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+        config(
+            "add",
+            "variants:pkg_man_reqt_fails_when_enabled:true",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        with pytest.raises(
+            ValidationFailedError, match='Validation of: "spack list not-a-package" failed'
+        ):
+            workspace("setup", global_args=global_args)
+
+
+@pytest.mark.parametrize("obj", ["app", "mod", "wf_man", "pkg_man"])
+def test_obj_required_var_when(
+    workspace_name, obj, mutable_mock_wms_repo, mutable_mock_pkg_mans_repo
+):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        args = [
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            "--wm",
+            "when-workflow-manager",
+        ]
+
+        config("add", f"variants:{obj}_required_variable:true", global_args=global_args)
+        if obj == "mod":
+            mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+            with open(mod_config_path, "w+") as f:
+                f.write("modifiers:\n")
+                f.write(" - name: when-modifier\n")
+                f.write("   mode: test")
+        elif obj == "wf_man":
+            config("add", "variants:workflow_manager_included:true", global_args=global_args)
+        elif obj == "pkg_man":
+            config("add", "variants:package_manager_included:true", global_args=global_args)
+
+        workspace("manage", "experiments", *args, global_args=global_args)
+
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        assert not os.path.exists(exec_file)
+
+        config("add", f"variables:test_{obj}_required_variable:'test'", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        assert os.path.exists(exec_file)
+
+
+@pytest.mark.parametrize("obj", ["app", "mod", "wf_man", "pkg_man"])
+def test_obj_required_key_when(
+    workspace_name, obj, mutable_mock_wms_repo, mutable_mock_pkg_mans_repo
+):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        args = [
+            "when-directives",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "when-package-manager",
+            "--wm",
+            "when-workflow-manager",
+        ]
+
+        config("add", f"variants:{obj}_required_key:true", global_args=global_args)
+        if obj == "mod":
+            mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
+            with open(mod_config_path, "w+") as f:
+                f.write("modifiers:\n")
+                f.write(" - name: when-modifier\n")
+                f.write("   mode: test")
+        elif obj == "wf_man":
+            config("add", "variants:workflow_manager_included:true", global_args=global_args)
+        elif obj == "pkg_man":
+            config("add", "variants:package_manager_included:true", global_args=global_args)
+
+        workspace("manage", "experiments", *args, global_args=global_args)
+
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+            workspace("setup", "--dry-run", global_args=global_args)
+
+        exec_file = os.path.join(
+            ws.experiment_dir,
+            "when-directives",
+            "test_wl",
+            "generated",
+            "execute_experiment",
+        )
+
+        assert not os.path.exists(exec_file)
+
+        config("add", f"variables:test_{obj}_required_key:'test'", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        assert os.path.exists(exec_file)
+
+        workspace("analyze", "-f", "json", global_args=global_args)
+
+        results_file = os.path.join(ws.results_dir, "results.latest.json")
+
+        assert os.path.exists(results_file)
+
+        with open(results_file) as f:
+            data = json.load(f)
+
+        for exp in data["experiments"]:
+            assert f"test_{obj}_required_key" in exp

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -26,6 +26,9 @@ workspace = RambleCommand("workspace")
 def test_nested_compilers_are_installed(
     mutable_config, mutable_mock_workspace_path, capsys, workspace_name
 ):
+    # Use a bunch of compiler versions not actually present in Spack,
+    # to avoid the test accidentally hit cases where the asked-for
+    # compilers actually exist.
     test_config = """
 ramble:
   variants:
@@ -47,12 +50,12 @@ ramble:
   software:
     packages:
       gcc8:
-        pkg_spec: gcc@8.5.0
+        pkg_spec: gcc@8.5.1
       gcc9:
-        pkg_spec: gcc@9.3.0
+        pkg_spec: gcc@9.3.1
         compiler: gcc8
       gcc10:
-        pkg_spec: gcc@10.1.0
+        pkg_spec: gcc@10.1.1
         compiler: gcc9
       intel:
         pkg_spec: intel-oneapi-mpi@2021.13.1
@@ -74,7 +77,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -85,12 +88,12 @@ ramble:
         setup_pipeline = setup_cls(ws, filters)
         setup_pipeline.run()
 
-        gcc8_str = "gcc@8.5.0"
-        gcc9_str = "gcc@9.3.0"
-        gcc10_str = "gcc@10.1.0"
+        gcc8_str = "gcc@8.5.1"
+        gcc9_str = "gcc@9.3.1"
+        gcc10_str = "gcc@10.1.1"
 
         out_files = glob.glob(os.path.join(ws.log_dir, "**", "*.out"), recursive=True)
 
-        assert search_files_for_string(out_files, gcc8_str) is True
-        assert search_files_for_string(out_files, gcc9_str) is True
-        assert search_files_for_string(out_files, gcc10_str) is True
+        assert search_files_for_string(out_files, gcc8_str)
+        assert search_files_for_string(out_files, gcc9_str)
+        assert search_files_for_string(out_files, gcc10_str)

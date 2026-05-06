@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -52,240 +52,150 @@ class NvidiaHpl(HplBase, NvidiaHPCBase):
 
     workload_variable(
         "hpl_fct_comm_policy",
+        environment_variable_name="HPL_FCT_COMM_POLICY",
         default="1",
         values=["0", "1"],
         description="Which communication library to use in the panel factorization. 0 = NVSHMEM, 1 = Host MPI",
         workload_group="all_workloads",
     )
-    environment_variable(
-        "HPL_FCT_COMM_POLICY",
-        "{hpl_fct_comm_policy}",
-        description="",
-        workload_group="all_workloads",
-    )
 
     workload_variable(
         "hpl_use_nvshmem",
+        environment_variable_name="HPL_USE_NVSHMEM",
         default="0",
         values=["0", "1"],
         description="Whether to use NVSHMEM or not. 0 = Disable, 1 = Enable.",
         workload_group="all_workloads",
     )
-    environment_variable(
-        "HPL_USE_NVSHMEM",
-        "{hpl_use_nvshmem}",
-        description="Whether or not to use NVSHMEM",
-        workload_group="all_workloads",
-    )
 
     workload_variable(
         "hpl_p2p_as_bcast",
+        environment_variable_name="HPL_P2P_AS_BCAST",
         default="0",
         values=["0", "1", "2", "3", "4"],
         description="0 = ncclBcast, 1 = ncclSend/Recv, 2 = CUDA-aware MPI, 3 = host MPI, 4 = NVSHMEM",
         workload_group="all_workloads",
     )
-    environment_variable(
-        "HPL_P2P_AS_BCAST",
-        "{hpl_p2p_as_bcast}",
-        description="Which communication library to use in the final solve step.",
-        workload_group="all_workloads",
-    )
 
     workload_variable(
         "hpl_nvshmem_swap",
+        environment_variable_name="HPL_NVSHMEM_SWAP",
         default="0",
         values=["0", "1"],
-        description="Performs row swaps using NVSHMEM instead of NCCL. 0 = Disable, 1 = Enable.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_NVSHMEM_SWAP",
-        "{hpl_nvshmem_swap}",
         description="Performs row swaps using NVSHMEM instead of NCCL. 0 = Disable, 1 = Enable.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_chunk_size_nbs",
+        environment_variable_name="HPL_CHUNK_SIZE_NBS",
         default="16",
-        description="Number of matrix blocks to group for computations. Needs to be > 0",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_CHUNK_SIZE_NBS",
-        "{hpl_chunk_size_nbs}",
         description="Number of matrix blocks to group for computations. Needs to be > 0",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_dist_trsm_flag",
+        environment_variable_name="HPL_DIST_TRSM_FLAG",
         default="1",
         values=["0", "1"],
-        description="Perform the solve step (TRSM) in parallel, rather than on only the ranks that own part of the matrix.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_DIST_TRSM_FLAG",
-        "{hpl_dist_trsm_flag}",
         description="Perform the solve step (TRSM) in parallel, rather than on only the ranks that own part of the matrix.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_cta_per_fct",
+        environment_variable_name="HPL_CTA_PER_FCT",
         default="16",
-        description="Sets the number of CTAs (thread blocks) for factorization. Needs to be > 0.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_CTA_PER_FCT",
-        "{hpl_cta_per_fct}",
         description="Sets the number of CTAs (thread blocks) for factorization. Needs to be > 0.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_alloc_hugepages",
+        environment_variable_name="HPL_ALLOC_HUGEPAGES",
         default="0",
         values=["0", "1"],
-        description="Use 2MB hugepages for host-side allocations. Done through the madvise syscall.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_ALLOC_HUGEPAGES",
-        "{hpl_alloc_hugepages}",
         description="Use 2MB hugepages for host-side allocations. Done through the madvise syscall.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "warmup_end_prog",
+        environment_variable_name="WARMUP_END_PROG",
         default="5",
-        description="Runs the main loop once before the 'real' run. Stops the warmup at x%. Values can be 1 - 100.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "WARMUP_END_PROG",
-        "{warmup_end_prog}",
         description="Runs the main loop once before the 'real' run. Stops the warmup at x%. Values can be 1 - 100.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "test_loops",
+        environment_variable_name="TEST_LOOPS",
         default="1",
-        description="Runs the main loop X many times",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "TEST_LOOPS",
-        "{test_loops}",
         description="Runs the main loop X many times",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_cusolver_mp_tests",
+        environment_variable_name="HPL_CUSOLVER_MP_TESTS",
         default="1",
-        description="Runs several tests of individual components of HPL (GEMMS, comms, etc.)",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_CUSOLVER_MP_TESTS",
-        "{hpl_cusolver_mp_tests}",
         description="Runs several tests of individual components of HPL (GEMMS, comms, etc.)",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_cusolver_mp_tests_gemm_iters",
+        environment_variable_name="HPL_CUSOLVER_MP_TESTS_GEMM_ITERS",
         default="128",
-        description="Number of repeat GEMM calls in tests. Needs to be > 0.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_CUSOLVER_MP_TESTS_GEMM_ITERS",
-        "{hpl_cusolver_mp_tests_gemm_iters}",
         description="Number of repeat GEMM calls in tests. Needs to be > 0.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_ooc_mode",
+        environment_variable_name="HPL_OOC_MODE",
         default="0",
-        description="Enables / disales out-of-core mode",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_OOC_MODE",
-        "{hpl_ooc_mode}",
         description="Enables / disales out-of-core mode",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_ooc_max_gpu_mem",
+        environment_variable_name="HPL_OOC_MAX_GPU_MEM",
         default="-1",
-        description="Limits the amount of GPU memory used for OOC. In GiB. Needs to be >= -1.",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_OOC_MAX_GPU_MEM",
-        "{hpl_ooc_max_gpu_mem}",
         description="Limits the amount of GPU memory used for OOC. In GiB. Needs to be >= -1.",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_ooc_tile_m",
+        environment_variable_name="HPL_OOC_TILE_M",
         default="4096",
-        description="Row blocking factor. Needs to be > 0",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_OOC_TILE_M",
-        "{hpl_ooc_tile_m}",
         description="Row blocking factor. Needs to be > 0",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_ooc_tile_n",
+        environment_variable_name="HPL_OOC_TILE_N",
         default="4096",
-        description="Column blocking factor. Needs to be > 0",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_OOC_TILE_N",
-        "{hpl_ooc_tile_n}",
         description="Column blocking factor. Needs to be > 0",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_ooc_num_streams",
+        environment_variable_name="HPL_OOC_NUM_STREAMS",
         default="3",
-        description="Number of streams used for OCC operations",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_OOC_NUM_STREAMS",
-        "{hpl_ooc_num_streams}",
         description="Number of streams used for OCC operations",
         workload_group="all_workloads",
     )
 
     workload_variable(
         "hpl_ooc_safe_size",
+        environment_variable_name="HPL_OOC_SAFE_SIZE",
         default="2.0",
-        description="GPU memory (in GiB) needed for driver. This amount will not be used by HPL OCC",
-        workload_group="all_workloads",
-    )
-    environment_variable(
-        "HPL_OOC_SAFE_SIZE",
-        "{hpl_ooc_safe_size}",
         description="GPU memory (in GiB) needed for driver. This amount will not be used by HPL OCC",
         workload_group="all_workloads",
     )

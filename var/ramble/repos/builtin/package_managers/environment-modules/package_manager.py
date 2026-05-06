@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -43,13 +43,23 @@ class EnvironmentModules(PackageManagerBase):
         run_before=["make_experiments"],
     )
 
+    name_regex = re.compile(r"\s*(?P<name>[\w-]+).*")
+
+    def package_name_from_spec(self, spec):
+        m = self.name_regex.match(spec)
+        pkg_name = None
+        if m:
+            pkg_name = m.group("name")
+
+        return pkg_name
+
     def _generate_loads_content(self, workspace):
         if not hasattr(self, "_load_string"):
             app_context = self.app_inst.expander.expand_var_name(
                 self.keywords.env_name
             )
 
-            require_env = self.environment_required()
+            require_env = self.environment_required
 
             software_envs = workspace.software_environments
             software_env = software_envs.render_environment(
@@ -68,15 +78,7 @@ class EnvironmentModules(PackageManagerBase):
 
         return self._load_string
 
-    def populate_inventory(
-        self, workspace, force_compute=False, require_exist=False
-    ):
-        self.app_inst.hash_inventory["package_manager"].append(
-            {
-                "name": self.name,
-            }
-        )
-
+    def populate_inventory(self, workspace, force_compute=False) -> bool:
         env_path = self.app_inst.expander.env_path
         env_hash = ramble.util.hashing.hash_string(
             self._generate_loads_content(workspace)
@@ -85,6 +87,7 @@ class EnvironmentModules(PackageManagerBase):
         self.app_inst.hash_inventory["software"].append(
             {
                 "name": env_path.replace(workspace.root + os.path.sep, ""),
+                "package_manager": self.name,
                 "digest": env_hash,
             }
         )

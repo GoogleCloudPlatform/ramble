@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import shlex
+from typing import Any, Dict, List, Optional, Union
 
 import ramble.error
 import ramble.util.colors
@@ -20,13 +21,13 @@ class PrefixedExecutable(spack.util.executable.Executable):
     """A version of spack.util.executable.Executable that allows command prefixes to be added"""
 
     @system_path_filter
-    def add_default_prefix(self, prefix):
+    def add_default_prefix(self, prefix: Optional[str]):
         """Add a prefixed arg / cmd to the command"""
         if prefix is not None:
             for part in reversed(shlex.split(prefix)):
                 self.exe.insert(0, part)
 
-    def copy(self):
+    def copy(self) -> "PrefixedExecutable":
         from copy import deepcopy
 
         new_exec = deepcopy(self)
@@ -34,7 +35,7 @@ class PrefixedExecutable(spack.util.executable.Executable):
         return new_exec
 
 
-def which(*args, **kwargs):
+def which(*args: str, **kwargs: Any) -> Optional[PrefixedExecutable]:
     """Finds an executable in the path like command-line which.
 
     If given multiple executables, returns the first one that is found.
@@ -65,15 +66,16 @@ class CommandExecutable:
 
     def __init__(
         self,
-        name,
-        template,
-        use_mpi=False,
-        mpi=False,
-        variables=None,
-        redirect="{log_file}",
-        output_capture=OUTPUT_CAPTURE.DEFAULT,
-        run_in_background=False,
-        **kwargs,
+        name: str,
+        template: Union[str, List[str]],
+        use_mpi: bool = False,
+        mpi: bool = False,
+        variables: Optional[Dict[str, Any]] = None,
+        redirect: str = "{log_file}",
+        output_capture: OUTPUT_CAPTURE = OUTPUT_CAPTURE.DEFAULT,
+        run_in_background: bool = False,
+        allow_extension: bool = False,
+        **kwargs: Any,
     ):
         """Create a CommandExecutable instance
 
@@ -107,8 +109,9 @@ class CommandExecutable:
         self.output_capture = output_capture
         self.run_in_background = run_in_background
         self.variables = variables.copy()
+        self.allow_extension = allow_extension
 
-    def copy(self):
+    def copy(self) -> "CommandExecutable":
         """Replicate a CommandExecutable instance"""
         new_inst = type(self)(
             self.name,
@@ -121,7 +124,7 @@ class CommandExecutable:
         )
         return new_inst
 
-    def __str__(self):
+    def __str__(self) -> str:
         """String representation of CommandExecutable instance"""
 
         color_name = ramble.util.colors.section_title(self.name)

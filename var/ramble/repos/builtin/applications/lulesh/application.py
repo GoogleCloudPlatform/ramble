@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,15 +21,21 @@ class Lulesh(ExecutableApplication):
 
     tags("mini-app", "shock-physics")
 
-    with when("package_manager_family"):
-        define_compiler("gcc13", pkg_spec="gcc@13.1.0")
+    version("2.0.3", "Version 2.0.3 of LULESH", preferred=True)
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
         software_spec(
-            "lulesh",
-            pkg_spec="lulesh@2.0.3 +openmp",
-            compiler="gcc13",
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
+
+        software_spec(
+            "lulesh-{application::lulesh::version}",
+            pkg_spec="lulesh@{application::lulesh::version} +openmp",
+            compiler="gcc14",
         )
 
         required_package("lulesh")

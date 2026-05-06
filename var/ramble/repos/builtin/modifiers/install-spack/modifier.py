@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -87,7 +87,7 @@ fi
         modes=["standard", "quiet"],
     )
 
-    executable_modifier("source_installed_spack")
+    executable_modifier("source_installed_spack", usage_filter="once")
 
     def source_installed_spack(
         self, executable_name, executable, app_inst=None
@@ -100,15 +100,13 @@ fi
         if self._usage_mode == "quiet":
             return pre_exec, post_exec
 
-        if not hasattr(self, "_already_applied"):
-            pre_exec.append(
-                CommandExecutable(
-                    "source-installed-spack",
-                    template=[
-                        "{source_spack}",
-                    ],
-                )
+        pre_exec.append(
+            CommandExecutable(
+                "source-installed-spack",
+                template=[
+                    "{source_spack}",
+                ],
             )
+        )
 
-            self._already_applied = True
         return pre_exec, post_exec

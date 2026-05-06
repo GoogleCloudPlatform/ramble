@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -33,6 +33,8 @@ def test_nested_modifier_var(
             "n_nodes=1",
             "-v",
             "n_ranks=1",
+            "-v",
+            "modeless_required_var=1",
             "-p",
             "spack",
             global_args=global_args,

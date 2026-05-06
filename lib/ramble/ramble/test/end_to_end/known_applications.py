@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -50,7 +50,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
         ]
         if package_manager == "user-managed":
             app_inst = ramble.repository.get(application)
-            for pkg in app_inst.required_packages.keys():
+            for pkg in app_inst.required_packages:
                 args.append("-v")
                 args.append(f"{pkg}_path='/not/real/path'")
 
@@ -114,7 +114,7 @@ def test_known_workflow_managers(
         ]
         # Handle `user-managed` package manager
         app_inst = ramble.repository.get("gromacs")
-        for pkg in app_inst.required_packages.keys():
+        for pkg in app_inst.required_packages:
             args.append("-v")
             args.append(f"{pkg}_path='/not/real/path'")
 
@@ -128,7 +128,8 @@ def test_known_workflow_managers(
         if workflow_manager != "None":
             ws._re_read()
             wm_inst = ramble.repository.get(
-                workflow_manager, object_type=ramble.repository.ObjectTypes.workflow_managers
+                workflow_manager,
+                object_type=ramble.repository.ObjectTypes.workflow_managers,
             )
             for var in wm_inst.object_variables[frozenset()]:
                 config("remove", f"variables:{var.name}", global_args=["-w", workspace_name])

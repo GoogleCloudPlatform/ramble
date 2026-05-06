@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -18,14 +18,36 @@ class IntelMlc(ExecutableApplication):
 
     tags("memory-benchmark", "intel-tool")
 
-    required_package("intel-mlc")
+    with when("package_manager_family=spack"):
+        required_package("intel-mlc")
+        software_spec(
+            "intel-mlc",
+            pkg_spec="intel-mlc",
+        )
+
+    variant(
+        "configure_hugepage",
+        default=False,
+        values=[False, True],
+        description="When true, configure hugepage setting",
+    )
+
+    executable(
+        "configure_hugepage",
+        template=[
+            "sudo sysctl -w vm.nr_hugepages={nr_hugepages}",
+            "sudo sysctl -p",
+        ],
+        use_mpi=False,
+        when=["+configure_hugepage"],
+    )
 
     executable(
         "execute_bw",
-        "{intel-mlc_path}/{exec_name} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
+        "{mlc_exec_path} --max_bandwidth {isa_flag} -k{cpu_list} -b{buffer_size} {additional_args}",
     )
 
-    workload("max_bandwidth", executables=["execute_bw"])
+    workload("max_bandwidth", executables=["configure_hugepage", "execute_bw"])
 
     workload_group("all_workloads", workloads=["max_bandwidth"])
 
@@ -34,6 +56,13 @@ class IntelMlc(ExecutableApplication):
         default="mlc",
         values=["mlc", "mlc.exe"],
         description="Name of executable to use for Intel MLC",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "mlc_exec_path",
+        default="{intel-mlc_path}/bin/{exec_name}",
+        description="Path to MLC executable",
         workload_group="all_workloads",
     )
 
@@ -88,6 +117,13 @@ class IntelMlc(ExecutableApplication):
         workload_group="all_workloads",
     )
 
+    workload_variable(
+        "nr_hugepages",
+        default="4000",
+        description="Number of hugepages to configure",
+        workload_group="all_workloads",
+    )
+
     register_validator(
         name="single_node",
         predicate="{n_nodes} == 1",
@@ -96,15 +132,6 @@ class IntelMlc(ExecutableApplication):
             "node, but is configured with n_nodes = {n_nodes}"
         ),
         fail_on_invalid=False,
-    )
-
-    register_validator(
-        name="validate_thread_distribution",
-        predicate='"{thread_distribution}" in ["spread", "compact"]',
-        message=(
-            "Unsupported thread distribution method {thread_distribution} requested. "
-            "Options are 'spread' and 'compact'"
-        ),
     )
 
     figure_of_merit(
@@ -142,6 +169,14 @@ class IntelMlc(ExecutableApplication):
         units="MB/s",
     )
 
+    figure_of_merit(
+        "vm.nr_hugepages",
+        fom_type=FomType.INFO,
+        fom_regex=r"vm.nr_hugepages\s+=\s+(?P<nr_hp>[0-9]+)",
+        group_name="nr_hp",
+        units="",
+    )
+
     def _compact_thread_indices(self, n_threads, max_thread, spread_divisions):
         if n_threads > max_thread:
             logger.die(
@@ -162,7 +197,7 @@ class IntelMlc(ExecutableApplication):
         threads = []
         cur_indices = []
         numa_index = 0
-        for i in range(0, spread_divisions):
+        for _ in range(0, spread_divisions):
             cur_indices.append(numa_index)
             numa_index += max_thread // spread_divisions
 
@@ -176,30 +211,19 @@ class IntelMlc(ExecutableApplication):
             cur_node = (cur_node + 1) % spread_divisions
         return threads
 
-    def add_expand_vars(self, workspace):
-        if not self._vars_are_expanded:
-            self._generate_input_file(workspace, self)
-            super().add_expand_vars(workspace)
+    register_phase(
+        "generate_input_variables",
+        pipeline="setup",
+        run_before=["make_experiments"],
+    )
 
-    def _generate_input_file(self, workspace, app_inst=None):
-        workload = app_inst.get_workload()
-
-        thread_dist = app_inst.expander.expand_var_name("thread_distribution")
-        if thread_dist == "{thread_distribution}":
-            possible_vars = workload.find_variable("thread_distribution")
-            assert len(possible_vars) == 1
-            thread_dist = possible_vars[0].default
-
+    def _generate_input_variables(self, workspace, app_inst=None):
         ppn = int(app_inst.expander.expand_var_name("processes_per_node"))
         n_threads = int(app_inst.expander.expand_var_name("n_threads"))
-
+        thread_dist = app_inst.expander.expand_var_name("thread_distribution")
         spread_divisions = app_inst.expander.expand_var_name(
             "spread_divisions"
         )
-        if spread_divisions == "{spread_divisions}":
-            possible_vars = workload.find_variable("spread_divisions")
-            assert len(possible_vars) == 1
-            spread_divisions = possible_vars[0].default
 
         try:
             spread_divisions = int(spread_divisions)

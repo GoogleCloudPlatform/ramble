@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -72,7 +72,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -89,6 +89,6 @@ ramble:
 
         out_files = glob.glob(os.path.join(ws.log_dir, "**", "*.out"), recursive=True)
 
-        assert search_files_for_string(out_files, required_compiler_str) is True
-        assert search_files_for_string(out_files, unused_gcc9_str) is False
-        assert search_files_for_string(out_files, unused_gcc10_str) is False
+        assert search_files_for_string(out_files, required_compiler_str)
+        assert not search_files_for_string(out_files, unused_gcc9_str)
+        assert not search_files_for_string(out_files, unused_gcc10_str)

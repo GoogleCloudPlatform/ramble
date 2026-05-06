@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -22,9 +22,14 @@ class Wrfv3(ExecutableApplication):
     tags("weather", "nwp", "climate-modeling")
 
     with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
         define_compiler("gcc8", pkg_spec="gcc@8.2.0")
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
             "wrfv3",
@@ -48,47 +53,50 @@ class Wrfv3(ExecutableApplication):
         description="12 km resolution mesh of the continental United States.",
     )
 
-    executable(
-        "cleanup",
-        "rm -f rsl.* wrfout*",
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
+    stage_files(
+        stages=[
+            ("{wrf_path}/run/*", "{experiment_run_dir}/."),
+            ("{input_path}/*", "{experiment_run_dir}/."),
+        ]
     )
+
+    stage_files(
+        name="stage-namelist",
+        method="cp",
+        src="{input_path}/namelist.*",
+        dst="{experiment_run_dir}/.",
+    )
+
     executable(
-        "copy",
+        "setup",
         template=[
-            "cp -R {input_path}/* {experiment_run_dir}/.",
-            "ln -s {wrf_path}/run/* {experiment_run_dir}/.",
+            "rm -f rsl.* wrfout* namelist*",
         ],
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
+
     executable("execute", "wrf.exe", use_mpi=True)
 
     workload(
         "CONUS_2p5km",
-        executables=["cleanup", "copy", "execute"],
+        executables=["stage-files", "stage-namelist", "setup", "execute"],
         input="CONUS_2p5km",
     )
 
     workload(
         "CONUS_12km",
-        executables=["cleanup", "copy", "execute"],
+        executables=["stage-files", "stage-namelist", "setup", "execute"],
         input="CONUS_12km",
     )
 
     workload_variable(
         "input_path",
-        default="{CONUS_12km}",
-        description="Path for CONUS 12km inputs.",
-        workloads=["CONUS_12km"],
-    )
-
-    workload_variable(
-        "input_path",
-        default="{CONUS_2p5km}",
-        description="Path for CONUS 2.5km inputs.",
-        workloads=["CONUS_2p5km"],
+        description="Path for workload inputs.",
+        workload_defaults={
+            "CONUS_12km": "{CONUS_12km}",
+            "CONUS_2p5km": "{CONUS_2p5km}",
+        },
     )
 
     log_str = os.path.join(

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -89,3 +89,43 @@ def test_on_executor():
         assert os.path.exists(ws.root + "/all_experiments")
 
         on("--executor", 'echo "Index = {experiment_index}"', global_args=["-w", ws_name])
+
+
+def test_on_executor_in_run_dir(workspace_name):
+    global_args = ["-w", workspace_name]
+    ws = ramble.workspace.create(workspace_name)
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "--wf",
+        "working_wl",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "processes_per_node=1",
+        "-v",
+        "batch_submit={execute_experiment}",
+        "-v",
+        "my_var=10",
+        global_args=global_args,
+    )
+
+    # Assert executor not found
+    with pytest.raises(Exception, match="my_exit: No such file or directory"):
+        on("--executor", "my_exit", global_args=global_args)
+
+    # Now set up the executor template
+    tpl_path = os.path.join(ws.config_dir, "my_exit.tpl")
+    with open(tpl_path, "w") as f:
+        f.write("#!/bin/bash\n\nexit {my_var}")
+    ws._re_read()
+    workspace("setup", global_args=global_args)
+
+    # Assert no executable permission against the template
+    with pytest.raises(Exception, match="my_exit.tpl: Permission denied"):
+        on("--executor", tpl_path, global_args=global_args)
+
+    # Assert the executable is invoked
+    with pytest.raises(Exception, match="Command exited with status 10"):
+        on("--executor", "my_exit", global_args=global_args)

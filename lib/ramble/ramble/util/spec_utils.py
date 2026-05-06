@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,9 +7,9 @@
 # except according to those terms.
 
 import copy
-from typing import Dict, List
+from typing import Dict, List, Optional
 
-import ramble.util.colors
+import ramble.util.colors as color
 
 
 def specs_conflict(new, existing, prefix="", skip_conflicting_when=False):
@@ -24,7 +24,7 @@ def specs_conflict(new, existing, prefix="", skip_conflicting_when=False):
             return False
 
     prefixed_keys = {}
-    for key in new.keys():
+    for key in new:
         if new[key] is not None:
             prefixed_keys[key] = f"{prefix}{key}"
 
@@ -41,19 +41,21 @@ class SoftwareSpec:
         name: str,
         pkg_spec: str,
         prefix: str = "",
-        compiler: str = None,
-        compiler_spec: str = None,
-        when: List[str] = None,
+        compiler: Optional[str] = None,
+        compiler_spec: Optional[str] = None,
+        inject_if_missing: bool = False,
+        when: Optional[List[str]] = None,
     ):
         self.name = name
         self.pkg_spec = pkg_spec
         self.prefix = prefix
         self.compiler = compiler
         self.compiler_spec = compiler_spec
-        self.when = when.copy()
+        self.inject_if_missing = inject_if_missing
+        self.when = when.copy() if when else []
 
-    def to_dict(self, prefix: str = None):
-        prefix_base = prefix if prefix is not None else self.prefix
+    def to_dict(self, apply_prefix: bool = False):
+        prefix_base = self.prefix if apply_prefix else ""
         prefix_str = f"{prefix_base}_" if prefix_base else ""
 
         attrs = ["pkg_spec", "compiler", "compiler_spec"]
@@ -70,24 +72,22 @@ class SoftwareSpec:
         for key, val in self_dict.items():
             yield f"software:packages:{self.name}:{key}:{val}"
 
-    def as_str(self, indent=0):
-        base_indent = " " * indent
-        indentation = " " * (indent + 4)
+    def as_str(self, n_indent: int = 0, verbose: bool = False):
+        base_indent = " " * n_indent
+        indentation = " " * (n_indent + 4)
         self_dict = self.to_dict()
-        color_name = ramble.util.colors.section_title(self.name)
+        color_name = color.section_title(self.name)
         output = f"{base_indent}{color_name}:\n"
         for key, val in self_dict.items():
-            color_key = ramble.util.colors.nested_1(key)
-            escaped_val = val.replace("@", "@@")
-            output += f"{indentation}{color_key}: {escaped_val}\n"
+            output += f"{indentation}{color.nested_1(key)}: {val}\n"
         if self.when:
-            output += ramble.util.colors.nested_2(f"\n{indentation}When:\n")
+            output += color.nested_2(f"\n{indentation}When:\n")
             for condition in self.when:
                 output += f"{indentation}    {condition}\n"
         return output
 
     def __str__(self):
-        self_dict = self.to_dict(prefix="")
+        self_dict = self.to_dict()
         self_dict["prefix"] = self.prefix
         return str(self_dict)
 

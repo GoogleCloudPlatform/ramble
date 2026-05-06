@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -94,10 +94,10 @@ like the following:
 
     packages:
       openmpi:
-        pkg_spec: openmpi@3.1.6 +orterunprefix
+        pkg_spec: openmpi@5.0.8 +orterunprefix
 
 In the definition of the Intel MPI package above, you'll see we originally
-specified a ``compiler`` attribute (with the value of ``gcc9``). This can be
+specified a ``compiler`` attribute (with the value of ``gcc14``). This can be
 explicitly selected if you like, however when using Spack, Ramble generates
 Spack environments with ``unify: true``
 (See `Spack's environment documentation <https://spack.readthedocs.io/en/latest/environments.html#spec-concretization>`_
@@ -105,29 +105,35 @@ for more details). As a result, OpenMPI should be compiled with the same
 compiler used for WRF.
 
 We also need to generate additional software environments, however we will
-parameterize the generation of these using a new variable definition.
+parameterize the generation of these using a new variable definition. Since the
+``mpi_name`` variable will be needed for both experiment generation and
+environments, you'll put it under the workspace variables.
+
+.. code-block:: YAML
+
+    ramble:
+      variables:
+        mpi_name: ['intel-mpi', 'openmpi']
 
 .. code-block:: YAML
 
     environments:
-      wrfv4-{mpi_name}:
+      wrf@4.2-{mpi_name}:
         packages:
-        - {mpi_name}
-        - wrfv4
-        variables:
-          mpi_name: ['intel-mpi', 'openmpi']
+        - '{mpi_name}'
+        - wrfv4-{application::wrf::version}
 
-Will create two software environments. One named ``wrfv4-intel-mpi`` and
-another named ``wrfv4-openmpi``. However, the definition of ``mpi_name`` can be
-hoisted to the workspace level because we need to include it in the experiment
-generation as well. The result might look like the following:
-
-.. literalinclude:: ../../../../examples/tutorial_8_mpi_config.yaml
-   :language: YAML
+This will create two software environments. One named ``wrf@4.2-intel-mpi`` and
+another named ``wrf@4.2-openmpi``.
 
 **NOTE** The reference to ``{mpi_name}`` within the environment package list is
 escaped using single quotes. This is to prevent YAML from parsing this as a
 dictionary.
+
+The result might look like the following:
+
+.. literalinclude:: ../../../../examples/tutorial_8_mpi_config.yaml
+   :language: YAML
 
 At this point, executing:
 
@@ -139,13 +145,45 @@ Should result in the following error:
 
 .. code-block:: console
 
-    ==> Error: Experiment wrfv4.CONUS_12km.scaling_1_platform1 is not unique.
+    ==> Error: Experiment wrf@4.2.CONUS_12km.scaling_1_platform1 is not unique.
 
 As you have implicitly defined 8 experiments (2 from ``n_nodes``, times 2 from
 ``platform_config``, times another 2 from ``mpi_name``), but you haven't
 updated the experiment name template. To resolve this, add ``{mpi_name}`` into
 the experiment name template. Additionally, you may explicitly add ``mpi_name``
-into the matrix. The result might look like the following:
+into the matrix.
+
+The experiments are still not completely defined. Running:
+
+.. code-block:: console
+
+    $ ramble workspace info
+
+Should result in the following error:
+
+.. code-block:: console
+
+    ==> Error: Environment wrf@4.2 is not defined.
+
+The default software environment every application uses is named the same as the
+application (in this case, both would be named ``wrf@4.2``). Now that you've
+changed the name of the environment, you need to connect each experiment to the
+proper environment.
+
+To control the software environment used within an experiment, Ramble allows
+you to use the ``env_name`` variable definition. Because ``mpi_name`` is a list
+variable, you might want ``env_name`` to be a list that is zipped with
+``mpi_name`` to make sure they are iterated over together. However, you may
+also utilize variable indirection / expansion to fix this issue. For the
+purposes of this tutorial, we will use indirection instead of explicit zips. In
+the experiment variables, add:
+
+.. code-block:: YAML
+
+    variables:
+      env_name: 'wrf@4.2-{mpi_name}'
+
+The resulting configuration file might look like the following:
 
 .. literalinclude:: ../../../../examples/tutorial_8_mpi_matrix_config.yaml
    :language: YAML
@@ -213,42 +251,7 @@ resulting configuration might look like the following:
 system if you require additional arguments. To be able to execute these on your
 system, make sure you modify these appropriately.
 
-At this point, you have described the 8 experiments you want to run, however
-they are still not completely defined. Running:
-
-.. code-block:: console
-
-    $ ramble workspace setup --dry-run
-
-Should result in the following error:
-
-.. code-block:: console
-
-    ==> Error: Environment wrfv4 is not defined.
-
-This is because the default software environment every application uses is
-named the same as the application (in this case, both would be named
-``wrfv4``). You changed the name of the software environment, but didn't
-connect each experiment to the proper environment.
-
-Controlling Experiment Software Environments
---------------------------------------------
-
-To control the software environment used within an experiment, Ramble allows
-you to use the ``env_name`` variable definition. Because ``mpi_name`` is a list
-variable, you might want ``env_name`` to be a list that is zipped with
-``mpi_name`` to make sure they are iterated over together. However, you may
-also utilize variable indirection / expansion to fix this issue. For the
-purposes of this tutorial, we will use indirection instead of explicit zips.
-
-The resulting configuration file might look like the following:
-
-
-.. literalinclude:: ../../../../examples/tutorial_8_software_environments_config.yaml
-   :language: YAML
-
-In this case, we defined ``env_name`` to be ``wrfv4-{mpi_name}`` which matches
-the definition of the software environments.
+At this point, you have described the 8 experiments you want to run.
 
 Dry Run Setup
 -------------

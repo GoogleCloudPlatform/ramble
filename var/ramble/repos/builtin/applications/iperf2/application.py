@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,10 +23,12 @@ class Iperf2(ExecutableApplication):
 
     define_compiler("gcc9", pkg_spec="gcc@9.3.0")
 
+    version("2.0.12", "Version 2.0.12 of iperf2", preferred=True)
+
     with when("package_manager_family=spack"):
         software_spec(
-            "iperf2",
-            pkg_spec="iperf2@2.0.12",
+            "iperf2-{application::iperf2::version}",
+            pkg_spec="iperf2@{application::iperf2::version}",
             compiler="gcc9",
         )
 

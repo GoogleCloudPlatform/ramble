@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -54,7 +54,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -66,7 +66,7 @@ ramble:
             "analyze", "--where", "{experiment_index} == 1", global_args=["-w", workspace_name]
         )
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "Status = SUCCESS" in data
 
@@ -74,6 +74,6 @@ ramble:
             "analyze", "--where", "{experiment_index} == 2", global_args=["-w", workspace_name]
         )
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "Status = FAILED" in data

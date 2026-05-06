@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,8 +12,7 @@ import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
-from ramble.pkg_man.builtin.spack_lightweight import SpackRunner, ValidationFailedError
-from ramble.util.command_runner import RunnerError
+from ramble.pkg_man.builtin.spack_lightweight import ValidationFailedError
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
@@ -21,7 +20,9 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_package_manager_requirements_zlib(mock_applications, mock_modifiers, workspace_name):
+def test_package_manager_requirements_zlib(
+    mock_applications, mock_modifiers, workspace_name, ensure_spack_runner
+):
     test_config = """
 ramble:
   variants:
@@ -47,15 +48,10 @@ ramble:
         packages: []
 """
 
-    try:
-        SpackRunner()
-    except RunnerError as e:
-        pytest.skip(e)
-
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -73,7 +69,9 @@ ramble:
             assert "debug: true" in data
 
 
-def test_package_manager_requirements_error(mock_applications, mock_modifiers, workspace_name):
+def test_package_manager_requirements_error(
+    mock_applications, mock_modifiers, workspace_name, ensure_spack_runner
+):
     test_config = """
 ramble:
   variants:
@@ -99,15 +97,10 @@ ramble:
         packages: []
 """
 
-    try:
-        SpackRunner()
-    except RunnerError as e:
-        pytest.skip(e)
-
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)

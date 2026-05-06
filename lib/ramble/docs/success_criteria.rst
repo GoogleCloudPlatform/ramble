@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -132,8 +132,9 @@ Mode: String
 
 Success criteria with ``mode='string'`` allow experiments to define expected
 string regular expression matching. This criteria mode is useful if an
-application prints a string whenever it successfully completes. Defining these
-criteria within a workspace configuration file is as follows:
+application prints a string whenever it successfully completes, or if it
+prints an error message when it fails. Defining these criteria within a
+workspace configuration file is as follows:
 
 .. code-block:: yaml
 
@@ -141,16 +142,25 @@ criteria within a workspace configuration file is as follows:
     - name: my_criteria
       mode: 'string'
       match: '\s+Completed\s+'
-      [file: '{log_file}]
+      [file: '{log_file}']
 
 
-The above shows the full interface for degining success criteria with
+The above shows the full interface for defining success criteria with
 ``mode='string'``. The available attributes are:
 
 * ``name``: The name of the specific criteria.
 * ``mode``: The mode of the specific criteria.
-* ``match``: The regular expression used to test for success.
-* ``file``: (Optional) The file (or variable that refers to a file) to test for the ``match`` in.
+* ``match``: The regular expression used to test for success. If this is found
+  the criteria is marked as a success.
+* ``anti_match``: The regular expression used to test for failure. If this is
+  found the criteria is marked as a failure.
+* ``file``: (Optional) The file (or variable that refers to a file) to test
+  for the ``match`` or ``anti_match`` in.
 
-If ``match`` is found inside ``file`` this criteria is marked as success. If it
-is not found, then the criteria is marked as failed.
+Note that ``match`` and ``anti_match`` are mutually exclusive.
+
+If ``match`` is used, and found inside ``file`` this criteria is marked as
+success. If it is not found, then the criteria is marked as failed.
+
+If ``anti_match`` is used, and found inside ``file`` this criteria is marked as
+failed. If it is not found, then the criteria is marked as success.

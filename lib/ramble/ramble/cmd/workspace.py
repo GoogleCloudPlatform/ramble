@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,23 +11,20 @@ import itertools
 import os
 import sys
 import tempfile
+from collections import defaultdict
+from typing import Callable, Dict
 
 import llnl.util.tty as tty
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
-import ramble.cmd.common.arguments
 import ramble.cmd.common.arguments as arguments
 import ramble.config
-import ramble.context
 import ramble.expander
-import ramble.experiment_set
 import ramble.filters
 import ramble.pipeline
 import ramble.software_environments
-import ramble.uploader
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
 from ramble.namespace import namespace
@@ -163,7 +160,7 @@ def workspace_activate(args):
     else:
         logger.die(f"No such workspace: '{workspace_name_or_dir}'")
 
-    workspace_prompt = "[%s]" % short_name
+    workspace_prompt = f"[{short_name}]"
 
     # We only support one active workspace at a time, so deactivate the current one.
     if ramble.workspace.active_workspace() is None:
@@ -175,8 +172,11 @@ def workspace_activate(args):
 
     # Activate new workspace
     active_workspace = ramble.workspace.Workspace(workspace_path)
+    enable_prompt = args.prompt or ramble.config.get("config:enable_workspace_prompt")
     cmds += ramble.workspace.shell.activate_header(
-        ws=active_workspace, shell=args.shell, prompt=workspace_prompt if args.prompt else None
+        ws=active_workspace,
+        shell=args.shell,
+        prompt=workspace_prompt if enable_prompt else None,
     )
     env_mods.extend(ramble.workspace.shell.activate(ws=active_workspace))
     cmds += env_mods.shell_modifications(args.shell)
@@ -233,7 +233,7 @@ def workspace_deactivate(args):
         )
 
     if ramble.workspace.active_workspace() is None:
-        if ramble.workspace.ramble_workspace_var not in os.environ:
+        if ramble.workspace.RAMBLE_WORKSPACE_VAR not in os.environ:
             logger.die("No workspace is currently active.")
 
     cmds = ramble.workspace.shell.deactivate_header(args.shell)
@@ -347,15 +347,15 @@ def _workspace_create(
 
     if config:
         with open(config) as f:
-            workspace._read_config("workspace", f)
-            workspace._write_config("workspace", force=True)
+            workspace.read_config("workspace", f)
+            workspace.write_config("workspace", force=True)
 
     if template_execute:
         with open(template_execute) as f:
             _, file_name = os.path.split(template_execute)
             template_name = os.path.splitext(file_name)[0]
-            workspace._read_template(template_name, f.read())
-            workspace._write_templates()
+            workspace.read_template(template_name, f.read())
+            workspace.write_templates()
 
     if activate:
         sys.stdout.write(activate_cmd)
@@ -541,6 +541,16 @@ def workspace_analyze_setup_parser(subparser):
     )
 
     subparser.add_argument(
+        "--fom-origin-types",
+        dest="fom_origin_types",
+        nargs="+",
+        action="append",
+        help="FOM origin types to include in analysis output. "
+        + "Accepts space-delimited lists and can be specified multiple times.",
+        required=False,
+    )
+
+    subparser.add_argument(
         "-s",
         "--summary-only",
         dest="summary_only",
@@ -573,6 +583,11 @@ def workspace_analyze(args):
         tags=args.filter_tags,
     )
 
+    if args.fom_origin_types:
+        fom_origin_types = [item for sublist in args.fom_origin_types for item in sublist]
+    else:
+        fom_origin_types = None
+
     pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
 
     logger.debug("Analyzing workspace")
@@ -583,6 +598,7 @@ def workspace_analyze(args):
         upload=args.upload,
         print_results=args.print_results,
         summary_only=args.summary_only,
+        fom_origin_types=fom_origin_types,
     )
 
     with ws.read_transaction():
@@ -592,6 +608,9 @@ def workspace_analyze(args):
 def workspace_push_to_cache(args):
     current_pipeline = ramble.pipeline.pipelines.pushtocache
     ws = ramble.cmd.require_active_workspace(cmd_name="workspace pushtocache")
+
+    if args.dry_run:
+        ws.dry_run = True
 
     filters = ramble.filters.Filters(
         phase_filters="*",
@@ -609,6 +628,14 @@ def workspace_push_to_cache(args):
 
 def workspace_push_to_cache_setup_parser(subparser):
     """push workspace envs to a given buildcache"""
+
+    subparser.add_argument(
+        "--dry-run",
+        dest="dry_run",
+        action="store_true",
+        help="perform a dry run. Acts like it will push "
+        + "to a cache, but will not actually create a cache.",
+    )
 
     subparser.add_argument(
         "-d", dest="cache_path", default=None, required=True, help="Path to cache."
@@ -747,16 +774,16 @@ def workspace_info(args):
         args.phases = True
         args.executables = True
 
-    color.cprint(rucolor.section_title("Workspace: ") + ws.name)
+    color.cprint(f'{color.section_title("Workspace: ")}{ws.name}')
     color.cprint("")
-    color.cprint(rucolor.section_title("Location: ") + ws.path)
+    color.cprint(f'{color.section_title("Location: ")}{ws.path}')
 
     # Print workspace templates that currently exist
     if args.templates:
         color.cprint("")
-        color.cprint(rucolor.section_title("Workspace Templates:"))
+        color.cprint(color.section_title("Workspace Templates:"))
         for template, _ in ws.all_templates():
-            color.cprint("    %s" % template)
+            color.cprint(f"    {template}")
 
     # Print workspace variables information
     workspace_vars = ws.get_workspace_vars()
@@ -770,7 +797,7 @@ def workspace_info(args):
     if args.tags:
         color.cprint("")
         all_tags = experiment_set.all_experiment_tags()
-        color.cprint(rucolor.section_title("All experiment tags:"))
+        color.cprint(color.section_title("All experiment tags:"))
         color.cprint(colified(all_tags, indent=4))
 
     # Print experiment information
@@ -779,50 +806,84 @@ def workspace_info(args):
     # The base experiment_set is used to list *all* experiments.
     all_pipelines = {}
     color.cprint("")
-    color.cprint(rucolor.section_title("Experiments:"))
+    color.cprint(color.section_title("Experiments:"))
+
+    # Build an index of experiments to avoid re-rendering them in the loops below
+    experiment_index_map = defaultdict(list)
+    for exp_name, app_inst, _ in experiment_set.all_experiments():
+        experiment_template_name = app_inst.variables[app_inst.keywords.experiment_template_name]
+        if app_inst.repeats.repeat_index:
+            suffix = f".{app_inst.repeats.repeat_index}"
+            if experiment_template_name.endswith(suffix):
+                experiment_template_name = experiment_template_name[: -len(suffix)]
+
+        key = (
+            app_inst.variables[app_inst.keywords.application_name],
+            app_inst.variables[app_inst.keywords.workload_template_name],
+            experiment_template_name,
+        )
+        experiment_index_map[key].append(exp_name)
+
+    # Construct filters here...
+    filters = ramble.filters.Filters(
+        phase_filters=[],
+        include_where_filters=args.where,
+        exclude_where_filters=args.exclude_where,
+        tags=args.filter_tags,
+    )
+
     for workloads, application_context in ws.all_applications():
         for experiments, workload_context in ws.all_workloads(workloads):
             for _, experiment_context in ws.all_experiments(experiments):
-                print_experiment_set = ramble.experiment_set.ExperimentSet(ws)
-                print_experiment_set.set_application_context(application_context)
-                print_experiment_set.set_workload_context(workload_context)
-                print_experiment_set.set_experiment_context(experiment_context)
-                print_experiment_set.build_experiment_chains()
-
-                # Reindex the experiments in the print set to match the overall set
-                for exp_name, print_app_inst, _ in print_experiment_set.all_experiments():
-                    app_inst = experiment_set.get_experiment(exp_name)
-                    experiment_index = app_inst.expander.expand_var_name(
-                        app_inst.keywords.experiment_index
-                    )
-
-                    print_app_inst.define_variable(
-                        print_app_inst.keywords.experiment_index, experiment_index
-                    )
-
                 print_header = True
                 # Define variable printing groups.
                 var_indent = "        "
                 var_group_names = [
-                    rucolor.config_title("Config"),
-                    rucolor.section_title("Workspace"),
-                    rucolor.nested_1("Application"),
-                    rucolor.nested_2("Workload"),
-                    rucolor.nested_3("Experiment"),
+                    color.config_title("Config"),
+                    color.section_title("Workspace"),
+                    color.nested_1("Application"),
+                    color.nested_2("Workload"),
+                    color.nested_3("Experiment"),
                 ]
-                header_base = rucolor.nested_4("Variables from")
+                header_base = color.nested_4("Variables from")
                 config_vars = ramble.config.config.get("config:variables")
 
-                # Construct filters here...
-                filters = ramble.filters.Filters(
-                    phase_filters=[],
-                    include_where_filters=args.where,
-                    exclude_where_filters=args.exclude_where,
-                    tags=args.filter_tags,
+                # Retrieve experiments from index
+                key = (
+                    application_context.context_name,
+                    workload_context.context_name,
+                    experiment_context.context_name,
                 )
+                matching_experiments = experiment_index_map.get(key, [])
 
-                for exp_name, _, _ in print_experiment_set.filtered_experiments(filters):
+                for exp_name in matching_experiments:
                     app_inst = experiment_set.get_experiment(exp_name)
+
+                    # Apply filters manually since we are iterating a raw list
+                    active = True
+                    if filters.include_where:
+                        for expression in filters.include_where:
+                            if not app_inst.expander.evaluate_predicate(expression):
+                                active = False
+                                break
+                    if not active:
+                        continue
+
+                    if filters.exclude_where:
+                        for expression in filters.exclude_where:
+                            if app_inst.expander.evaluate_predicate(expression):
+                                active = False
+                                break
+                    if not active:
+                        continue
+
+                    if filters.tags:
+                        if not app_inst.has_tags(filters.tags):
+                            active = False
+
+                    if not active:
+                        continue
+
                     if app_inst.package_manager is not None:
                         software_environments.render_environment(
                             app_inst.expander.expand_var("{env_name}"),
@@ -837,15 +898,15 @@ def workspace_info(args):
 
                     if print_header:
                         color.cprint(
-                            rucolor.nested_1("  Application: ") + application_context.context_name
+                            color.nested_1("  Application: ") + application_context.escaped_name
                         )
                         color.cprint(
-                            rucolor.nested_2("    Workload: ") + workload_context.context_name
+                            color.nested_2("    Workload: ") + workload_context.escaped_name
                         )
                         print_header = False
 
                     # Aggregate pipeline phases
-                    for pipeline in app_inst._pipelines:
+                    for pipeline in app_inst.pipelines:
                         if pipeline not in all_pipelines:
                             all_pipelines[pipeline] = set()
                         for phase in app_inst.get_pipeline_phases(pipeline):
@@ -856,32 +917,32 @@ def workspace_info(args):
                     )
 
                     if app_inst.is_template:
-                        color.cprint(
-                            rucolor.nested_3(f"      Template Experiment {experiment_index}: ")
-                            + exp_name
-                        )
+                        prefix = f"      Template Experiment {experiment_index}: "
+                        color.cprint(f"{color.nested_3(prefix)}{exp_name}")
                     elif app_inst.repeats.is_repeat_base:
-                        color.cprint(
-                            rucolor.nested_3(f"      Repeat Base Experiment {experiment_index}: ")
-                            + exp_name
-                        )
+                        prefix = f"      Repeat Base Experiment {experiment_index}: "
+                        color.cprint(f"{color.nested_3(prefix)}{exp_name}")
                     else:
-                        color.cprint(
-                            rucolor.nested_3(f"      Experiment {experiment_index}: ") + exp_name
-                        )
+                        prefix = f"      Experiment {experiment_index}: "
+                        color.cprint(f"{color.nested_3(prefix)}{exp_name}")
 
                     if args.tags:
-                        color.cprint("        Experiment Tags: " + str(app_inst.experiment_tags))
+                        color.cprint(f"        Experiment Tags: {app_inst.experiment_tags}")
 
                     if args.variants:
-                        color.cprint(rucolor.nested_4("        Variants: "))
-                        for key, value in app_inst.variants.items():
-                            color.cprint(f"          {key}: {value}")
+                        color.cprint(color.nested_4("        Variants: "))
+                        variant_set = set()
+                        for _, obj in app_inst.objects():
+                            variant_set = variant_set.union(
+                                obj.experiment_variants().as_set(expander=app_inst.expander)
+                            )
+                        for variant in variant_set:
+                            color.cprint(f"          - {variant}")
 
                     if args.executables:
-                        color.cprint(rucolor.nested_4("        Executables: "))
-                        app_inst.add_expand_vars(ws)
-                        exec_graph = app_inst._executable_graph
+                        color.cprint(color.nested_4("        Executables: "))
+                        app_inst.define_variables_for_template_path(ws)
+                        exec_graph = app_inst.get_executable_graph(app_inst.expander.workload_name)
                         for executable in exec_graph.walk():
                             color.cprint(f"          {executable.key}")
 
@@ -908,13 +969,13 @@ def workspace_info(args):
     if args.phases:
         for pipeline in sorted(all_pipelines.keys()):
             color.cprint("")
-            color.cprint(rucolor.section_title(f"Phases for {pipeline} pipeline:"))
+            color.cprint(color.section_title(f"Phases for {pipeline} pipeline:"))
             colify(all_pipelines[pipeline], indent=4)
 
     # Print software stack information
     if args.software or args.all_software:
         color.cprint("")
-        color.cprint(rucolor.section_title("Software Stack:"))
+        color.cprint(color.section_title("Software Stack:"))
         only_used_software = args.software
         color.cprint(
             software_environments.info(
@@ -939,7 +1000,7 @@ def workspace_list(args):
     color_names = []
     for name in names:
         if ramble.workspace.active(name):
-            name = color.colorize("@*g{%s}" % name)
+            name = color.colorize(f"@*g{{{name}}}")
         color_names.append(name)
 
     # say how many there are if writing to a tty
@@ -1283,8 +1344,6 @@ def workspace_manage_experiments(args):
     ws = ramble.cmd.find_workspace(args)
 
     if ws is None:
-        import tempfile
-
         logger.warn("No active workspace found. Defaulting to `--dry-run`")
 
         root = tempfile.TemporaryDirectory()
@@ -1728,14 +1787,14 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("workspace_%s" % name)
+        function_name = sanitize_arg_name(f"workspace_{name}")
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("workspace_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name(f"workspace_{name}_setup_parser")
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(
@@ -1759,7 +1818,7 @@ def workspace(parser, args, unknown_args):
         action(args)
 
 
-manage_subcommand_functions = {}
+manage_subcommand_functions: Dict[str, Callable] = {}
 
 
 def workspace_manage(args):
@@ -1779,14 +1838,14 @@ def workspace_manage_setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("workspace_manage_%s" % name)
+        function_name = sanitize_arg_name(f"workspace_manage_{name}")
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             manage_subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("workspace_manage_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name(f"workspace_manage_{name}_setup_parser")
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.util.colors as color
 import ramble.util.matrices
 from ramble.namespace import namespace
 
@@ -19,6 +20,24 @@ class Context:
     (such as application, workload, or experiment) and logic to merge in
     additional contexts by order of precedence."""
 
+    output_mapping = {
+        "variables": namespace.variables,
+        "variants": namespace.variants,
+        "env_variables": namespace.env_var,
+        "internals": namespace.internals,
+        "chained_experiments": namespace.chained_experiments,
+        "modifiers": namespace.modifiers,
+        "template": namespace.template,  # TODO: Make sure this is good
+        "exclude": namespace.exclude,
+        "zips": namespace.zips,
+        "tables": namespace.tables,
+        "tags": namespace.tags,
+        "matrices": namespace.matrices,
+        "n_repeats": namespace.n_repeats,
+        "formatted_executables": namespace.formatted_executables,
+        "success_criteria": namespace.success,
+    }
+
     def __init__(self):
         """Constructor for a Context
 
@@ -27,6 +46,7 @@ class Context:
         self.env_variables = []
         self.variables = syaml.syaml_dict()
         self.variants = syaml.syaml_dict()
+        self.version = None
         self.internals = {}
         self.templates = None
         self.formatted_executables = {}
@@ -38,8 +58,13 @@ class Context:
         self.zips = {}
         self.matrices = []
         self.tags = []
+        self.tables = []
         self.is_template = False
         self.n_repeats = 0
+
+    @property
+    def escaped_name(self):
+        return color.escape_str(self.context_name)
 
     def merge_context(self, in_context):
         """Merges another Context into this Context."""
@@ -54,6 +79,8 @@ class Context:
             self.variables.update(in_context.variables)
         if in_context.variants:
             self.variants.update(in_context.variants)
+        if in_context.version:
+            self.version = in_context.version
         if in_context.env_variables:
             self.env_variables.append(in_context.env_variables)
         if in_context.internals:
@@ -95,6 +122,30 @@ class Context:
             self.formatted_executables.update(in_context.formatted_executables)
         if in_context.success_criteria:
             self.success_criteria.extend(in_context.success_criteria)
+        if in_context.tables:
+            self.tables.extend(in_context.tables)
+
+    def to_workspace_config(self, application_spec, workload_name):
+        experiment_config = {}
+
+        for attr_name, namespace_name in self.output_mapping.items():
+            attr_val = getattr(self, attr_name, None)
+            if attr_val:
+                experiment_config[namespace_name] = attr_val
+
+        workspace_config = {
+            "ramble": {
+                "applications": {
+                    application_spec: {
+                        "workloads": {
+                            workload_name: {"experiments": {self.context_name: experiment_config}}
+                        }
+                    }
+                }
+            }
+        }
+
+        return workspace_config
 
 
 def create_context_from_dict(context_name, in_dict):
@@ -141,6 +192,9 @@ def create_context_from_dict(context_name, in_dict):
     if namespace.variants in in_dict:
         new_context.variants = in_dict[namespace.variants]
 
+    if namespace.version in in_dict:
+        new_context.version = in_dict[namespace.version]
+
     if namespace.internals in in_dict:
         new_context.internals = in_dict[namespace.internals]
 
@@ -158,6 +212,9 @@ def create_context_from_dict(context_name, in_dict):
 
     if namespace.zips in in_dict:
         new_context.zips = in_dict[namespace.zips]
+
+    if namespace.tables in in_dict:
+        new_context.tables = in_dict[namespace.tables].copy()
 
     if namespace.tags in in_dict:
         new_context.tags = in_dict[namespace.tags].copy()

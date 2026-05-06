@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,10 +10,10 @@
 import argparse
 from collections import defaultdict
 
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
 
 import ramble.repository
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 description = "get information about object attributes"
@@ -162,7 +162,7 @@ def attributes(parser, args):
                 args.object_or_attr, attr_name=attr_name, object_type=object_type
             )
             for user, objects in sorted(attributes.items()):
-                color.cprint("@c{{{}}}: {}".format(user, ", ".join(sorted(objects))))
+                color.cprint(f"@c{{{user}}}: {', '.join(sorted(objects))}")
             return 0 if attributes else 1
 
         else:
@@ -170,7 +170,7 @@ def attributes(parser, args):
                 args.object_or_attr, attr_name=attr_name, object_type=object_type
             )
             for app, attributes in sorted(objects.items()):
-                color.cprint("@c{{{}}}: {}".format(app, ", ".join(sorted(attributes))))
+                color.cprint(f"@c{{{app}}}: {', '.join(sorted(attributes))}")
             return 0 if objects else 1
 
     if args.by_attribute:

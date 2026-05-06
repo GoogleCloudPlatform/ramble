@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 """
 
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 import ruamel.yaml as yaml
 
@@ -79,7 +79,7 @@ def all_config_options(config_data: Dict):
     return all_configs
 
 
-def _type_value(input_value):
+def _type_value(input_value: str) -> Union[int, float, str]:
     """Attempt to convert an input value to other types.
 
     Precedence order is:
@@ -92,14 +92,12 @@ def _type_value(input_value):
     """
 
     try:
-        out = int(input_value)
-        return out
+        return int(input_value)
     except ValueError:
         pass
 
     try:
-        out = float(input_value)
-        return out
+        return float(input_value)
     except ValueError:
         pass
 
@@ -211,15 +209,12 @@ def apply_default_config_values(config_data, app_inst, default_config_string):
 
     Args:
         config_data (dict): Dictionary of config data read from a YAML file
-        app_inst (ramble.base_cls.builtin.ApplicationBase): Application instance
-            representing an experiment
+        app_inst: Application instance representing an experiment
         default_config_string (str): String that conveys the default config_data
                                      should be used in place of the current value.
     """
-    workload = app_inst.workloads[app_inst.expander.workload_name]
-
     # Set all '{default_config_value}' values to value from the base config
-    for var_name in workload.variables.keys():
+    for var_name in app_inst.selected_variables:
         if len(var_name.split(".")) > 1:
             var_val = app_inst.expander.expand_var(app_inst.expander.expansion_str(var_name))
 

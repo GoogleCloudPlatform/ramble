@@ -1,12 +1,14 @@
 -r requirements.txt
 pytest
+pytest-benchmark
 flake8
 black
 coverage
 pre-commit
 pytest-xdist
-pytest-cov
 pytest-clarity
 line_profiler
 isort
 codecov-cli
+mypy
+ruff

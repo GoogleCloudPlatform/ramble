@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,43 +7,27 @@
 # except according to those terms.
 
 import sys
+from typing import Dict, List
 
-import llnl.util.tty.color as color
 from llnl.util.tty.colify import colify
 
 import ramble.repository
-import ramble.software_environments
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 description = "inspect software definitions in object definitions"
 section = "developer"
 level = "long"
 
+unused_compilers = {}
 definitions = {}
 conflicts = {}
 used_by = {}
-specs = {"pkg_spec": {}, "compiler_spec": {}}
+specs: Dict[str, Dict[str, List[str]]] = {"pkg_spec": {}, "compiler_spec": {}}
 spec_headers = {
     "pkg_spec": "Software Packages",
     "compiler_spec": "Compiler Definitions",
 }
-
-header_color = "@*b"
-level1_color = "@*g"
-level2_color = "@*r"
-plain_format = "@."
-
-
-def section_title(s):
-    return header_color + s + plain_format
-
-
-def nested_1(s):
-    return level1_color + s + plain_format
-
-
-def nested_2(s):
-    return level2_color + s + plain_format
 
 
 def collect_definitions():
@@ -57,7 +41,12 @@ def collect_definitions():
     """
     top_level_attrs = ["compilers", "software_specs"]
 
-    types_to_print = [ramble.repository.ObjectTypes.applications]
+    types_to_print = [
+        ramble.repository.ObjectTypes.applications,
+        ramble.repository.ObjectTypes.modifiers,
+        ramble.repository.ObjectTypes.workflow_managers,
+        ramble.repository.ObjectTypes.package_managers,
+    ]
 
     for object_type in types_to_print:
         obj_path = ramble.repository.paths[object_type]
@@ -65,6 +54,20 @@ def collect_definitions():
             obj_repo = obj_path.repo_for_obj(obj_inst.name)
 
             obj_namespace = f"{obj_repo.full_namespace}.{obj_inst.name}"
+
+            for compiler_name in obj_inst.compilers:
+                used = False
+                for pkg_defs in obj_inst.software_specs.values():
+                    for pkg_def in pkg_defs:
+                        if (
+                            getattr(pkg_def, "compiler", "__rmb_no_compiler_attr__")
+                            == compiler_name
+                        ):
+                            used = True
+                if not used:
+                    if compiler_name not in unused_compilers:
+                        unused_compilers[compiler_name] = []
+                    unused_compilers[compiler_name].append(obj_namespace)
 
             for top_level_attr in top_level_attrs:
                 if hasattr(obj_inst, top_level_attr):
@@ -95,12 +98,12 @@ def collect_definitions():
 
 def print_summary():
     """Print a summary of all software definitions"""
-    color.cprint(section_title("Software Summary:"))
+    color.cprint(color.section_title("Software Summary:"))
     color.cprint("\n")
     for spec_name in specs:
-        color.cprint(nested_1(spec_headers[spec_name]) + ":")
+        color.cprint(color.nested_1(spec_headers[spec_name]) + ":")
         for spec_def in specs[spec_name]:
-            color.cprint(f'\t{nested_2("Spec:")} {spec_def.replace("@", "@@")}')
+            color.cprint(f'\t{color.nested_2("Spec:")} {spec_def}')
             color.cprint("\tIn object:")
             colify(specs[spec_name][spec_def], indent=16, output=sys.stdout)
         color.cprint("\n")
@@ -111,28 +114,40 @@ def count_conflicts():
     num_conflicts = 0
     for pkg_name in conflicts:
         num_conflicts += len(conflicts[pkg_name])
+    for object_names in unused_compilers.values():
+        num_conflicts += len(object_names)
     return num_conflicts
 
 
 def print_conflicts():
     """Print conflict information, if any exist"""
-    if len(conflicts) > 0:
-        color.cprint(section_title("Software Definition Conflicts:"))
-        for pkg_name in conflicts:
+    if conflicts or unused_compilers:
+        if conflicts:
+            color.cprint(color.section_title("Software Definition Conflicts:"))
+            for pkg_name in conflicts:
 
-            color.cprint(f'{nested_1("Package")}: {pkg_name}:')
-            color.cprint("\tDefined as:")
-            for attr in ["pkg_spec", "compiler_spec", "compiler"]:
-                if hasattr(definitions[pkg_name], attr):
-                    attr_def = getattr(definitions[pkg_name], attr)
-                    if attr_def:
-                        color.cprint(f'\t\t{attr} = {attr_def.replace("@", "@@")}')
-            color.cprint("\tIn objects:")
-            colify(used_by[pkg_name], indent=24, output=sys.stdout)
-            color.cprint("\tConflicts with objects:")
-            colify(conflicts[pkg_name], indent=24, output=sys.stdout)
+                color.cprint(f'{color.nested_1("Package")}: {pkg_name}:')
+                color.cprint("\tDefined as:")
+                for attr in ["pkg_spec", "compiler_spec", "compiler"]:
+                    if hasattr(definitions[pkg_name], attr):
+                        attr_def = getattr(definitions[pkg_name], attr)
+                        if attr_def:
+                            color.cprint(f"\t\t{attr} = {attr_def}")
+                color.cprint("\tIn objects:")
+                colify(used_by[pkg_name], indent=24, output=sys.stdout)
+                color.cprint("\tConflicts with objects:")
+                colify(conflicts[pkg_name], indent=24, output=sys.stdout)
+
+        if unused_compilers:
+            color.cprint(color.section_title("Unused Compilers:"))
+            for compiler_name, object_names in unused_compilers.items():
+                color.cprint(
+                    color.nested_1(f"    Compiler {compiler_name} is not used in packages:")
+                )
+                colify(object_names, indent=8, output=sys.stdout)
+                color.cprint("\n")
     else:
-        color.cprint(section_title("No Conflicts Detected"))
+        color.cprint(color.section_title("No Conflicts Detected"))
 
 
 def setup_parser(subparser):
@@ -165,5 +180,8 @@ def software_definitions(parser, args, unknown_args):
 
     if args.error_on_conflict:
         num_conflicts = count_conflicts()
-        color.cprint(f"{num_conflicts} conflicts detected.")
+        if num_conflicts == 1:
+            color.cprint(f"{num_conflicts} conflict detected.")
+        else:
+            color.cprint(f"{num_conflicts} conflicts detected.")
         sys.exit(num_conflicts)

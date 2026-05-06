@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -30,6 +30,7 @@ end
 # h and V flags don't require further output parsing.
 if ( "$_rmb_flags" =~ *h* || "$_rmb_flags" =~ *V* ) then
     \ramble $_rmb_flags $_rmb_args
+    set _rmb_rs = $status
     goto _rmb_end
 endif
 
@@ -72,10 +73,13 @@ case workspace:
                      "$_rmb_args" =~ "* --help*" ) then
                     # No args or args contain --sh, --csh, or -h/--help: just execute.
                     \ramble $_rmb_flags workspace $_rmb_args
+                    set _rmb_rs = $status
                 else
                     shift _rmb_args  # consume 'activate' or 'deactivate'
                     # Actual call to activate: source the output.
-                    eval `\ramble $_rmb_flags workspace activate --csh $_rmb_args`
+                    set _activate_cmd = `\ramble $_rmb_flags workspace activate --csh $_rmb_args`
+                    set _rmb_rs = $status
+                    eval "$_activate_cmd"
                 endif
                 breaksw
             case deactivate:
@@ -90,29 +94,37 @@ case workspace:
                      "$_rmb_args" =~ "* --csh*" ) then
                     # Args contain --sh or --csh: just execute.
                     \ramble $_rmb_flags workspace $_rmb_args
+                    set _rmb_rs = $status
                 else if ( "$_rmb_env_arg" != "" ) then
                     # Any other arguments are an error or -h/--help: just run help.
                     \ramble $_rmb_flags workspace deactivate -h
+                    set _rmb_rs = $status
                 else
                     # No args: source the output of the command.
-                    eval `\ramble $_rmb_flags workspace deactivate --csh`
+                    set _deactivate_cmd = `\ramble $_rmb_flags workspace deactivate --csh`
+                    set _rmb_rs = $status
+                    eval "$_deactivate_cmd"
                 endif
                 breaksw
             case create:
-                echo $_rmb_args
                 if ( "$_rmb_args" =~ *" -a"* || \
                      "$_rmb_args" =~ *" --activate"* ) then
                     # Args contain activate flag
-                    set _activate_cmd = `\ramble $_rmb_flags workspace $_rmb_args`
-                    eval $_activate_cmd
-                    set _ws = `echo $_activate_cmd | awk '{print $NF}'`
-                    echo "==> Created and activated workspace in $_ws"
+                    set _create_activate_cmd = `\ramble $_rmb_flags workspace $_rmb_args`
+                    set _rmb_rs = $status
+                    if ( $_rmb_rs == 0 ) then
+                        eval "$_create_activate_cmd"
+                        set _ws = `echo "$_create_activate_cmd" | awk '{print $NF}'`
+                        echo "==> Created and activated workspace in $_ws"
+                    endif
                 else
                     \ramble $_rmb_flags workspace $_rmb_args
+                    set _rmb_rs = $status
                 endif
                 breaksw
             default:
                 \ramble $_rmb_flags workspace $_rmb_args
+                set _rmb_rs = $status
                 breaksw
         endsw
     endif
@@ -120,9 +132,18 @@ case workspace:
 
 default:
     \ramble $_rmb_flags $_rmb_args
+    set _rmb_rs = $status
     breaksw
 endsw
 
 _rmb_end:
 unset _rmb_args _rmb_full_spec _rmb_sh_cmd _rmb_spec _rmb_subcommand _rmb_flags
 unset _rmb_arg _rmb_env_arg
+
+# The `endif` may swallow the subshell's exit status, so doing the eval at the very end.
+if ( $?_rmb_rs ) then
+    set _rmb_rs_eval="unset _rmb_rs _rmb_rs_eval; (exit $_rmb_rs)"
+else
+    set _rmb_rs_eval="unset _rmb_rs_eval; (exit 0)"
+endif
+eval "$_rmb_rs_eval"

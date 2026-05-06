@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,4 @@ when ``importlib`` is not completely usable.
 #       The import logic should be updated to match v0.18.0
 #       at some point in the future.
 
-try:
-    from .importlib_importer import load_source  # noqa
-except ImportError:
-    from .imp_importer import load_source  # noqa
+from .importlib_importer import load_source  # noqa

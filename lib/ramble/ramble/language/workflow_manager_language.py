@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -40,6 +40,7 @@ def workflow_manager_variable(
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
         when (list | None): List of when conditions to apply to directive
+
     """
 
     def _define_wm_variable(wm):
@@ -58,7 +59,7 @@ def workflow_manager_variable(
     return _define_wm_variable
 
 
-@workflow_manager_directive(dicts=())
+@workflow_manager_directive("class_families")
 def workflow_manager_family(*names: str, **kwargs):
     """Add a new family to this workflow manager
 
@@ -67,7 +68,7 @@ def workflow_manager_family(*names: str, **kwargs):
     """
 
     def _define_workflow_manager_family(wm):
-        families_from_base = getattr(wm, "families", [])
-        wm.families = list(sorted(set(families_from_base + list(names))))
+        for name in names:
+            wm.class_families[name] = True
 
     return _define_workflow_manager_family

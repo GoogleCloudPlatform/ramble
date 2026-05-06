@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -133,14 +133,8 @@ class NcclTests(ExecutableApplication):
         default="",
         description='How NCCL communicators should be split, if at all. "0x7" for rail-aligned, "0x0" for world-level.',
         workloads=all_workloads,
+        environment_variable_name="NCCL_TESTS_SPLIT_MASK",
         expandable=False,
-    )
-
-    environment_variable(
-        "NCCL_TESTS_SPLIT_MASK",
-        "{nccl_tests_split_mask}",
-        'How NCCL communicators should be split, if at all. "0x7" for rail-aligned, "0x0" for world-level.',
-        workloads=all_workloads,
     )
 
     # (output_name, units, group_name, regex)
@@ -176,13 +170,13 @@ class NcclTests(ExecutableApplication):
 
     figure_of_merit(
         "Avg. Bus Bandwidth",
-        fom_regex=r"\s*Avg bus bandwidth\s+:\s+(?P<bw>[0-9]+\.?[0-9]+)",
+        fom_regex=r".*Avg bus bandwidth\s+:\s+(?P<bw>[0-9]+\.?[0-9]+)",
         group_name="bw",
         units="GB/s",
     )
     figure_of_merit(
         "Out of bounds values",
-        fom_regex=r"\s*Out of bounds values\s*:\s+(?P<count>[0-9]+)",
+        fom_regex=r".*Out of bounds values\s*:\s+(?P<count>[0-9]+)",
         group_name="count",
         units="",
     )

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -78,7 +78,7 @@ def test_success_fom_globbing(
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config(
             "success_criteria", success_criteria_definitions, config_path, "basic", "test_wl"
@@ -97,6 +97,6 @@ def test_success_fom_globbing(
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert result in data

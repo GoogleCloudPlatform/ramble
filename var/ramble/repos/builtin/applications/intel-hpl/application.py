@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,16 +19,22 @@ class IntelHpl(HplBase):
 
     tags("intel-optimized")
 
+    version(
+        "2024.2.0",
+        "Version 2024.2.0 of intel-oneapi-mkl with HPL",
+        preferred=True,
+    )
+
     with when("package_manager_family=spack"):
         define_compiler("gcc13p2", pkg_spec="gcc@13.2.0")
         software_spec(
-            "imkl_2024p2",
-            pkg_spec="intel-oneapi-mkl@2024.2.0 threads=openmp",
+            "imkl_{application::intel-hpl::version}",
+            pkg_spec="intel-oneapi-mkl@{application::intel-hpl::version} threads=openmp",
             compiler="gcc13p2",
         )
         software_spec(
-            "impi2021p11",
-            pkg_spec="intel-oneapi-mpi@2021.11.0",
+            "impi2021p13",
+            pkg_spec="intel-oneapi-mpi@2021.13.1",
         )
 
         required_package("intel-oneapi-mkl")
@@ -37,9 +43,14 @@ class IntelHpl(HplBase):
     # - Prepare calling for the script runme_intel64_prv
     #   (We call this runner script instead of the underlying xhpl_intel64_dynamic
     #    since it sets up derived env var HPL_HOST_NODE for numa placement control.)
-    # - Link in the xhpl_intel64_dynamic binary to the running dir
+    # - Copy in the xhpl_intel64_dynamic binary to the running dir
     #   (This is needed due to runme_intel64_prv invoking it using "./")
     # - Account for newer directory layout from mkl 2024
+    stage_files(
+        name="stage-binary",
+        src="${hpl_bench_dir}/xhpl_intel64_dynamic",
+        dst="{experiment_run_dir}/.",
+    )
     executable(
         "prepare",
         template=[
@@ -48,7 +59,6 @@ hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack"
 if [ ! -d ${hpl_bench_dir} ]; then
     hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/share/mkl/benchmarks/mp_linpack"
 fi
-ln -sf ${hpl_bench_dir}/xhpl_intel64_dynamic {experiment_run_dir}/.
 hpl_run="${hpl_bench_dir}/runme_intel64_prv"
     """.strip()
         ],
@@ -63,8 +73,8 @@ hpl_run="${hpl_bench_dir}/runme_intel64_prv"
         use_mpi=True,
     )
 
-    workload("standard", executables=["prepare", "execute"])
-    workload("calculator", executables=["prepare", "execute"])
+    workload("standard", executables=["prepare", "stage-binary", "execute"])
+    workload("calculator", executables=["prepare", "stage-binary", "execute"])
 
     workload_group("standard", workloads=["standard"], mode="append")
     workload_group("calculator", workloads=["calculator"], mode="append")

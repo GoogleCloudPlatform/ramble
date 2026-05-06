@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,8 +8,6 @@
 
 from typing import Optional
 
-import ramble.language.language_base
-import ramble.language.language_helpers
 import ramble.language.shared_language
 
 
@@ -61,7 +59,7 @@ def package_manager_variable(
     return _define_package_manager_variable
 
 
-@package_manager_directive(dicts=())
+@package_manager_directive("class_families")
 def package_manager_family(*names: str, **kwargs):
     """Add a new family to this package manager
 
@@ -70,7 +68,7 @@ def package_manager_family(*names: str, **kwargs):
     """
 
     def _define_package_manager_family(pm):
-        families_from_base = getattr(pm, "families", [])
-        pm.families = list(sorted(set(families_from_base + list(names))))
+        for name in names:
+            pm.class_families[name] = True
 
     return _define_package_manager_family

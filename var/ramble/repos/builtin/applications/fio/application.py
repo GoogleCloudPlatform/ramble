@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -26,10 +26,15 @@ class Fio(ExecutableApplication):
 
     tags("io-benchmark", "storage-benchmark")
 
+    version("3.37", "Version 3.37 of fio", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc13", pkg_spec="gcc@13.1.0")
-
-        software_spec("fio", pkg_spec="fio@3.37 +libaio")
+        software_spec(
+            "fio-{application::fio::version}",
+            pkg_spec="fio@{application::fio::version} +libaio",
+            compiler="gcc13",
+        )
 
     executable(
         "run",

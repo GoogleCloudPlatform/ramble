@@ -1,6 +1,0 @@
-enable:
-  - tcl
-tcl:
-  all:
-    autoload: none
-    prerequisites: direct

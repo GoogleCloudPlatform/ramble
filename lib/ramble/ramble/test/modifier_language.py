@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,14 +7,18 @@
 # except according to those terms.
 """Perform tests of the Application class"""
 
+from typing import FrozenSet
+
 import deprecation
 import pytest
 
 import ramble.language.language_helpers
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError
 from ramble.modkit import *  # noqa
 
 mod_types = [ModifierBase, BasicModifier]  # noqa: F405
+
+_FS: FrozenSet[str] = frozenset()
 
 
 @deprecation.fail_if_not_removed
@@ -39,10 +43,10 @@ def test_modifier_type_features(mod_class):
 
 
 def add_mode(mod_inst, mode_num=1):
-    mode_name = "TestMode%s" % mode_num
+    mode_name = f"TestMode{mode_num}"
     mode_desc = "This is a test mode"
 
-    mod_inst.mode(mode_name, description=mode_desc)  # noqa: F405
+    mod_inst.mode(mode_name, description=mode_desc)
 
     mode_def = {"name": mode_name, "description": mode_desc}
 
@@ -99,47 +103,39 @@ def test_variable_modification_directive(mod_class):
 
     assert hasattr(mod_inst, "variable_modifications")
 
+    when_conditions = 0
     mod_count = 0
-    for mode_name in mod_inst.variable_modifications:
-        for var_name in mod_inst.variable_modifications[mode_name]:
-            for modification in mod_inst.variable_modifications[mode_name][var_name]:
+    for when_set in mod_inst.variable_modifications:
+        when_conditions += len(when_set)
+        for var_name in mod_inst.variable_modifications[when_set]:
+            for _ in mod_inst.variable_modifications[when_set][var_name]:
                 mod_count += 1
-    assert mod_count == 9  # Each call to add_variable_modification adds 3 modifications
+    assert mod_count == 9  # 3 calls * 3 modes per call = 9 modifications
+    assert when_conditions == 3  # 3 unique modes = 3 when sets, each of length 1
 
     for test_def in test_defs:
         var_name = test_def["name"]
-        mode_name = test_def["mode"]
 
-        assert mode_name in mod_inst.variable_modifications
-        assert var_name in mod_inst.variable_modifications[mode_name]
-        found_match = (
-            False if len(mod_inst.variable_modifications[mode_name][var_name]) > 0 else True
-        )
-        for modification in mod_inst.variable_modifications[mode_name][var_name]:
-            match = True
-            for attr in expected_attrs:
-                assert attr in modification
-                if test_def[attr] != modification[attr]:
-                    match = False
-            if match:
-                found_match = True
-        assert found_match
+        # Check all modes (single mode + list of modes)
+        modes_to_check = [test_def["mode"]] + test_def["modes"]
 
-        for mode_name in test_def["modes"]:
-            found_match = (
-                False if len(mod_inst.variable_modifications[mode_name][var_name]) > 0 else True
-            )
-            assert mode_name in mod_inst.variable_modifications
-            assert var_name in mod_inst.variable_modifications[mode_name]
-            for modification in mod_inst.variable_modifications[mode_name][var_name]:
-                match = True
-                for attr in expected_attrs:
-                    assert attr in modification
-                    if test_def[attr] != modification[attr]:
-                        match = False
-                if match:
-                    found_match = True
-            assert found_match
+        for mode_name in modes_to_check:
+            mode_when = f"{mod_inst.name}_mode={mode_name}"
+            found_mode_when_set = False
+            for when_set in mod_inst.variable_modifications:
+                if mode_when in when_set:
+                    found_mode_when_set = True
+                    assert var_name in mod_inst.variable_modifications[when_set]
+                    found_match = False
+                    for modification in mod_inst.variable_modifications[when_set][var_name]:
+                        match = True
+                        for attr in expected_attrs:
+                            if test_def[attr] != getattr(modification, attr):
+                                match = False
+                        if match:
+                            found_match = True
+                    assert found_match
+            assert found_mode_when_set
 
 
 @pytest.mark.parametrize("mod_class", mod_types)
@@ -159,14 +155,16 @@ def test_variable_modification_invalid_method(mod_class):
 
 
 @pytest.mark.parametrize("mod_class", mod_types)
-def test_variable_modification_missing_mode(mod_class):
-    var_mod_name = "missing_mode_variable"
-    var_mod_mod = "missing_mode_mod"
+def test_variable_modification_modeless(mod_class):
+    var_mod_name = "modeless_variable"
+    var_mod_mod = "modeless_mod"
     var_mod_method = "set"
 
-    with pytest.raises(DirectiveError, match="mode or modes to be defined"):
-        mod_inst = mod_class("/not/a/path")
-        mod_inst.variable_modification(var_mod_name, var_mod_mod, var_mod_method)
+    mod_inst = mod_class("/not/a/path")
+    mod_inst.variable_modification(var_mod_name, var_mod_mod, var_mod_method)
+
+    assert frozenset() in mod_inst.variable_modifications
+    assert var_mod_name in mod_inst.variable_modifications[frozenset()]
 
 
 def add_software_spec(mod_inst, spec_num=1):
@@ -292,8 +290,6 @@ def add_figure_of_merit_context(mod_inst, context_num=1):
 def test_figure_of_merit_context_directive(mod_class):
     test_defs = []
 
-    _FS = frozenset()
-
     mod_inst = mod_class("/not/a/path")
     test_defs.append(add_figure_of_merit_context(mod_inst).copy())
 
@@ -327,7 +323,7 @@ def add_figure_of_merit(mod_inst, context_num=1):
         "contexts": contexts.copy(),
     }
 
-    for context in contexts:
+    for _ in contexts:
         mod_inst.figure_of_merit(
             name,
             fom_regex=fom_regex,
@@ -408,7 +404,6 @@ def test_executable_modifier_directive(mod_class):
         mod_name = test_def
 
         assert mod_name in mod_inst.executable_modifiers[frozenset()]
-        assert mod_name == mod_inst.executable_modifiers[frozenset()][mod_name]
 
 
 def add_env_var_modification(mod_inst, env_var_mod_num=1):
@@ -434,17 +429,14 @@ def test_env_var_modification_directive(mod_class):
     assert hasattr(mod_inst, "env_var_modifications")
 
     for test_def in test_defs:
-        method = test_def["method"]
         mode = test_def["mode"]
+        name = test_def["name"]
+
         mode_when = frozenset([f"{mod_inst.name}_mode={mode}"])
 
-        assert method in mod_inst.env_var_modifications[mode_when]
-        if method == "set":
-            assert test_def["name"] in mod_inst.env_var_modifications[mode_when][method]
-            assert (
-                test_def["modification"]
-                == mod_inst.env_var_modifications[mode_when][method][test_def["name"]]
-            )
+        assert name in mod_inst.env_var_modifications[mode_when]
+        env_var_mod = mod_inst.env_var_modifications[mode_when][name]
+        assert test_def["modification"] == env_var_mod.set[name]
 
 
 def add_modifier_variable(mod_inst, mod_var_num=1):
@@ -469,8 +461,7 @@ def add_modifier_variable(mod_inst, mod_var_num=1):
 def test_modifier_variable_directive(mod_class):
     test_defs = []
 
-    mod_inst = mod_class("/not/a/path")
-    mod_inst.name = "mock-test-mod"
+    mod_inst = mod_class("/invalid/mock-test-mod/path.py")
     test_defs.append(add_modifier_variable(mod_inst))
 
     for test_def in test_defs:
@@ -479,7 +470,7 @@ def test_modifier_variable_directive(mod_class):
         for when_set, var_list in mod_inst.object_variables.items():
             for var in var_list:
                 if var.name == test_def["name"]:
-                    mode_variant = f"mock-test-mod_mode={test_def['mode']}"
+                    mode_variant = f"{mod_inst.name}_mode={test_def['mode']}"
                     assert mode_variant in when_set
                     assert test_def["description"] == var.description
                     assert test_def["default"] == var.default
@@ -499,15 +490,14 @@ def test_modifier_class_attributes(mod_class):
 
 
 @pytest.mark.parametrize("mod_class", mod_types)
-def test_require_condition_creates_when_list(mod_class):
-    mod_inst = mod_class("/not/a/path")
-    mod_inst.name = "test-mod"
+def test_merge_conditions_creates_when_list(mod_class):
+    mod_inst = mod_class("/invalid/test-mod/path.py")
     for i in range(4):
         mod_inst.mode(f"mode_{i}", description="mode")
 
-    when_list = ramble.language.language_helpers.require_condition(
+    when_lists = ramble.language.language_helpers.merge_conditions(
         mod_inst,
-        "test_require_condition",
+        "test_merge_conditions",
         "mode",
         "modes",
         mode="mode_0",
@@ -515,5 +505,24 @@ def test_require_condition_creates_when_list(mod_class):
         when=["test-mod_mode=mode_3"],
     )
 
-    for i in range(4):
-        assert f"test-mod_mode=mode_{i}" in when_list
+    expected_modes = ["mode_0", "mode_1", "mode_2"]
+    assert len(when_lists) == 3
+    for i, mode_name in enumerate(expected_modes):
+        assert f"{mod_inst.name}_mode={mode_name}" in when_lists[i]
+        assert "test-mod_mode=mode_3" in when_lists[i]
+
+
+def test_modifier_conflict_usage_error():
+    class BrokenModifier(BasicModifier):  # noqa: F405
+        name = "broken-modifier"
+
+    broken_mod = BrokenModifier("/not/a/path")
+
+    err_str = (
+        "modifier_conflict directive on modifier broken-modifier was given "
+        "an invalid value for the conflict_type argument."
+        "This argument needs to be an integer or string based on the MODIFIER_CONFLICT enum.\n"
+        "The provided value was 80"
+    )
+    with pytest.raises(DirectiveError, match=err_str):
+        broken_mod.modifier_conflict(80)

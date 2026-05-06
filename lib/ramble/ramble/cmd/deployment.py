@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,8 +19,6 @@ import ramble.pipeline
 import ramble.repository
 import ramble.stage
 import ramble.util.path
-import ramble.workspace
-import ramble.workspace.shell
 from ramble.main import RambleCommand
 from ramble.util.logger import logger
 
@@ -99,6 +97,7 @@ def deployment_pull_setup_parser(subparser):
     subparser.add_argument(
         "--deployment-path",
         "-p",
+        "-u",
         dest="deployment_path",
         help="Path to deployment that should be pulled",
         required=True,
@@ -201,14 +200,14 @@ def setup_parser(subparser):
             aliases = []
 
         # add commands to subcommands dict
-        function_name = sanitize_arg_name("deployment_%s" % name)
+        function_name = sanitize_arg_name(f"deployment_{name}")
 
         function = globals()[function_name]
         for alias in [name] + aliases:
             subcommand_functions[alias] = function
 
         # make a subparser and run the command's setup function on it
-        setup_parser_cmd_name = sanitize_arg_name("deployment_%s_setup_parser" % name)
+        setup_parser_cmd_name = sanitize_arg_name(f"deployment_{name}_setup_parser")
         setup_parser_cmd = globals()[setup_parser_cmd_name]
 
         subsubparser = sp.add_parser(

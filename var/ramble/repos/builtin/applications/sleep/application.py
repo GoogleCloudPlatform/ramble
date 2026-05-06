@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -98,6 +98,14 @@ class Sleep(ExecutableApplication):
         fom_regex=r".*?(?P<mins>[0-9]+):(?P<secs>[0-9]+)\.(?P<millisecs>[0-9]+)elapsed",
         group_name="millisecs",
         units="ms",
+    )
+
+    figure_of_merit(
+        "mode",
+        fom_regex=r"\s*(?P<mode>(Sleep|Wake)) for.*",
+        group_name="mode",
+        units="",
+        fom_type=FomType.INFO,
     )
 
     success_criteria("printed_sleep_time", mode="string", match=echo_regex)

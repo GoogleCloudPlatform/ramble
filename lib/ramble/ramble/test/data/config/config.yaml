@@ -1,11 +1,13 @@
 config:
     test_stage: ~/.ramble/test
+    overwrite_inventories: false
     spack:
       install:
-        flags: --reuse
+        flags: --fresh
       concretize:
-        flags: --reuse
+        flags: --fresh
       env_view:
         link_type: symlink
     include:
       - test_include: include.yaml
+    stage_method: 'cp'

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -16,6 +16,7 @@ from llnl.util.filesystem import *
 
 import ramble.language.package_manager_language
 import ramble.repository
+from ramble.error import PackageManagerError
 from ramble.language.package_manager_language import *
 from ramble.language.shared_language import *
 from ramble.software_environments import ExternalEnvironment
@@ -27,10 +28,7 @@ from ramble.util.command_runner import (
     RunnerError,
     ValidationFailedError,
 )
-
-# Rename logger to tty to preserve old behavior
 from ramble.util.logger import logger
-from ramble.util.logger import logger as tty
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
 PackageManagerBase = ramble.repository.get_base_class("package-manager-base")

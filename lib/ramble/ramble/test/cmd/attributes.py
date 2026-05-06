@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -30,6 +30,7 @@ attributes = RambleCommand("attributes")
         ["--tags", "--modifiers", "-a"],
         ["--tags", "--modifiers", "-a", "--by-attribute"],
         ["--tags", "--modifiers", "-a"],
+        ["--tags", "--by-attribute", "test-app"],
     ],
 )
 def test_attributes_runs(flags):
@@ -110,6 +111,8 @@ def untagged_mods():
     ],
 )
 def test_mock_attributes_list(
+    mutable_mock_base_apps_repo,
+    mock_base_applications,
     mutable_mock_apps_repo,
     mock_applications,
     mutable_mock_mods_repo,

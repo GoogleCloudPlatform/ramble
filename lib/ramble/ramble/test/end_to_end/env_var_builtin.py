@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -42,7 +42,7 @@ ramble:
                 n_nodes: 1
               env_vars:
                 set:
-                  MY_VAR: 'TEST'
+                  MY_VAR: 'TEST:'
         test_wl2:
           experiments:
             simple_test:
@@ -50,7 +50,7 @@ ramble:
                 n_nodes: 1
               env_vars:
                 set:
-                  MY_VAR: 'TEST'
+                  MY_VAR: 'TEST:'
         test_wl3:
           experiments:
             simple_test:
@@ -58,7 +58,7 @@ ramble:
                 n_nodes: 1
               env_vars:
                 set:
-                  MY_VAR: 'TEST'
+                  MY_VAR: 'TEST:'
   software:
     packages: {}
     environments: {}
@@ -66,7 +66,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -82,7 +82,7 @@ ramble:
         exp3_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl3", "simple_test")
         exp3_script = os.path.join(exp3_dir, "execute_experiment")
 
-        export_regex = re.compile(r"export MY_VAR=TEST")
+        export_regex = re.compile(r"export MY_VAR=TEST:")
         cmd1_regex = re.compile("bar >>")
         cmd2_regex = re.compile("baz >>")
         cmd3_regex = re.compile("foo >>")
@@ -91,7 +91,7 @@ ramble:
         with open(exp1_script) as f:
             cmd_found = False
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if not export_found and export_regex.search(line):
                     assert not cmd_found
                     export_found = True
@@ -103,7 +103,7 @@ ramble:
         with open(exp2_script) as f:
             cmd_found = False
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if not cmd_found and cmd2_regex.search(line):
                     assert not export_found
                     cmd_found = True
@@ -115,7 +115,7 @@ ramble:
         with open(exp3_script) as f:
             cmd_found = False
             export_found = False
-            for line in f.readlines():
+            for line in f:
                 if not export_found and export_regex.search(line):
                     assert not cmd_found
                     export_found = True
@@ -148,7 +148,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -163,7 +163,7 @@ ramble:
             assert "FROM_DIRECTIVE" in f.read()
 
 
-def test_object_env_var_order(
+def test_object_env_var_definitions(
     workspace_name,
     mutable_mock_apps_repo,
     mutable_mock_mods_repo,
@@ -207,29 +207,137 @@ def test_object_env_var_order(
         ws._re_read()
         workspace("setup", "--dry-run", global_args=global_args)
 
-        regex_order = [
+        regex_defs = [
             re.compile(r"export APP_ENV_VAR=APP_ENV_VAR_SET;"),
             re.compile(r"export PACKAGE_ENV_VAR=PKG_ENV_VAR_SET;"),
             re.compile(r"export WORKFLOW_ENV_VAR=WF_ENV_VAR_SET;"),
             re.compile(r"export MOD_ENV_VAR=MOD_ENV_VAR_SET;"),
         ]
 
-        found_order = [False for _ in regex_order]
-
-        found_idx = 0
+        found_defs = [False for _ in regex_defs]
 
         rendered_script = os.path.join(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "execute_experiment"
         )
 
         with open(rendered_script) as f:
-            for line in f.readlines():
-                cur_regex = regex_order[found_idx]
-                if cur_regex.search(line):
-                    found_order[found_idx] = True
-                    found_idx += 1
+            data = f.read()
+            for idx, regex in enumerate(regex_defs):
+                if regex.search(data):
+                    found_defs[idx] = True
 
-                if found_idx == len(found_order):
-                    break
+        assert all(found_defs)
 
-        assert all(found_order)
+
+def test_object_env_var_methods(
+    workspace_name,
+    mutable_mock_apps_repo,
+):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+
+        env_var_regexes = [
+            re.compile(r"export TEST_ENV=1;"),
+            re.compile(r"export TEST_APPEND_ENV=\"\${TEST_APPEND_ENV},3\";"),
+            re.compile(r"export TEST_PREPEND_ENV=\"4:\${TEST_PREPEND_ENV}\";"),
+        ]
+
+        found_vars = []
+
+        rendered_script = os.path.join(
+            ws.experiment_dir, "basic", "test_wl", "generated", "execute_experiment"
+        )
+
+        with open(rendered_script) as f:
+            for line in f:
+                for regex in env_var_regexes:
+                    if regex.search(line):
+                        found_vars.append(True)
+
+        assert len(found_vars) == len(env_var_regexes)
+
+
+def test_auto_env_vars(workspace_name, mock_applications, mock_modifiers):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            app_with_auto_env_var:
+              variables:
+                auto_env_var: 123
+            app_with_obj_env_var:
+              variants:
+                enable_auto_env_var: true
+        test_wl2:
+          experiments:
+            wl_no_match_auto_env_var:
+              variables:
+                auto_env_var: 123
+  modifiers:
+  - name: info
+"""
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+    ws._re_read()
+
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+    # Test1: workload variable generates env var export
+    script = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "app_with_auto_env_var", "execute_experiment"
+    )
+    with open(script) as f:
+        data = f.read()
+        assert 'export MY_AUTO_ENV_VAR="123";' in data
+        assert 'export MY_AUTO_ENV_VAR_WL_DEFAULTS="test_wl"' in data
+        assert 'export MY_AUTO_ENV_VAR_WG="def"' in data
+        assert "OBJ_AUTO_ENV_VAR" not in data
+
+    # Test2: modifier generates env var export
+    script = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "app_with_obj_env_var", "execute_experiment"
+    )
+    with open(script) as f:
+        data = f.read()
+        assert 'export OBJ_AUTO_ENV_VAR="abc";' in data
+
+    # Test3: no env-var export generated with unmatching workload
+    script = os.path.join(
+        ws.experiment_dir, "basic", "test_wl2", "wl_no_match_auto_env_var", "execute_experiment"
+    )
+    with open(script) as f:
+        data = f.read()
+        assert "MY_AUTO_ENV_VAR" not in data
+        assert "MY_AUTO_ENV_VAR_WL_DEFAULTS" not in data
+        assert "MY_AUTO_ENV_VAR_WG" not in data
+        assert "OBJ_AUTO_ENV_VAR" not in data

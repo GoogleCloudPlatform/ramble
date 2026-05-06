@@ -214,7 +214,7 @@ def test_default_concretize_flags(tmpdir, capsys, request):
         sr.concretize()
         captured = capsys.readouterr()
         assert "spack concretize" in captured.out
-        assert "with args: ['--reuse']" in captured.out
+        assert "with args: ['--fresh']" in captured.out
     except RunnerError as e:
         pytest.skip("%s" % e)
 
@@ -378,19 +378,23 @@ packages:
             "config:spack", {"global": {"flags": f"-C {config_path}"}}
         ):
             try:
+                pkg_spec = "gcc@12.1.0 +binutils"
+                compiler_spec = "gcc@12.1.0"
                 sr = SpackRunner(dry_run=True)
                 sr.create_env(os.getcwd())
                 sr.activate()
                 sr.add_include_file(packages_path)
                 sr.add_include_file(compilers_path)
                 sr.generate_env_file()
-                sr.install_compiler("gcc@12.1.0")
+                sr.install_compiler("gcc@12.1.0 +binutils", "gcc@12.1.0")
                 captured = capsys.readouterr()
 
                 assert (
-                    "gcc@12.1.0 is already an available compiler"
+                    f"{compiler_spec} is already an available compiler"
                     in captured.out
                 )
+
+                assert f"{pkg_spec}" not in captured.out
             except RunnerError as e:
                 pytest.skip("%s" % e)
 
@@ -563,11 +567,13 @@ compilers::
                 "config:spack", {"compiler_find": {attr: value}}
             ):
                 try:
+                    pkg_spec = "gcc@12.2.0 +binutils"
+                    compiler_spec = "gcc@12.2.0"
                     sr = SpackRunner(dry_run=True)
                     sr.create_env(os.getcwd())
                     sr.activate()
                     sr.add_include_file(compilers_path)
-                    sr.install_compiler("gcc@12.2.0")
+                    sr.install_compiler(pkg_spec, compiler_spec)
                     captured = capsys.readouterr()
 
                     assert expected_str in captured.out

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,7 +23,7 @@ def test_anti_match_criteria(mutable_config, mutable_mock_workspace_path, mock_a
     with ramble.workspace.create(ws_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config(
             "success_criteria",
@@ -47,7 +47,7 @@ def test_anti_match_criteria(mutable_config, mutable_mock_workspace_path, mock_a
         with open(result_path, "w") as f:
             f.write("1.2seconds\n")
         workspace("analyze", global_args=["-w", ws_name])
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             content = f.read()
             assert "Status = SUCCESS" in content
             assert "1.2" in content
@@ -55,6 +55,6 @@ def test_anti_match_criteria(mutable_config, mutable_mock_workspace_path, mock_a
         with open(result_path, "a") as f:
             f.write("Error: invalid result\n")
         workspace("analyze", global_args=["-w", ws_name])
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             content = f.read()
             assert "Status = FAILED" in content

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,11 +10,13 @@
 import hashlib
 import os
 import sys
+from typing import FrozenSet
 
 import pytest
 
 from llnl.util.filesystem import resolve_link_target_relative_to_the_link
 
+import ramble.caches
 import ramble.filters
 import ramble.mirror
 import ramble.pipeline
@@ -34,7 +36,7 @@ pytestmark = [
     ),
 ]
 
-_FS = frozenset()
+_FS: FrozenSet[str] = frozenset()
 
 
 class MockFetcher:
@@ -66,6 +68,15 @@ def test_mirror_cache_symlinks(tmpdir):
     )
     assert os.path.exists(link_target)
     assert os.path.normpath(link_target) == os.path.join(cache.root, reference.storage_path)
+
+
+def test_mirror_str_and_repr():
+    m = ramble.mirror.Mirror("http://fetch.com", "http://push.com", name="my_mirror")
+    assert str(m) == '[Mirror "my_mirror" (fetch: http://fetch.com, push: http://push.com)]'
+    assert (
+        repr(m)
+        == "Mirror(fetch_url='http://fetch.com', push_url='http://push.com', name='my_mirror')"
+    )
 
 
 # Create an archive for the test input, with the correct file name
@@ -143,7 +154,7 @@ ramble:
     with archive_dir.as_cwd():
         app_type = ramble.repository.ObjectTypes.applications
         app_class = ramble.repository.paths[app_type].get_obj_class(app_name)("test")
-        app_class.set_variables({"workload_name": "test"}, None)
+        app_class.set_variables_and_variants({"workload_name": "test"}, {}, None)
         create_archive(archive_dir, app_class)
 
         # Create workspace
@@ -151,7 +162,7 @@ ramble:
 
         with ramble.workspace.create(ws_name) as workspace:
             workspace.write()
-            config_path = os.path.join(workspace.config_dir, ramble.workspace.config_file_name)
+            config_path = os.path.join(workspace.config_dir, ramble.workspace.CONFIG_FILE_NAME)
             with open(config_path, "w+") as f:
                 f.write(test_config)
             workspace._re_read()

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,17 +7,11 @@
 # except according to those terms.
 
 
-import argparse
 import os
 import re
 
-import ruamel.yaml as yaml
-from ruamel.yaml.error import MarkedYAMLError
-
-from llnl.util.filesystem import join_path
 from llnl.util.lang import attr_setdefault
 
-import ramble.config
 import ramble.error
 import ramble.paths
 import ramble.workspace
@@ -25,7 +19,6 @@ from ramble.error import RambleCommandError
 from ramble.util.logger import logger
 
 import spack.extensions
-import spack.util.string
 
 # cmd has a submodule called "list" so preserve the python list module
 python_list = list
@@ -120,7 +113,7 @@ def get_module(cmd_name):
         try:
             module = spack.extensions.get_module(cmd_name)
         except AttributeError:
-            raise RambleCommandError("Command %s does not exist." % cmd_name)
+            raise RambleCommandError(f"Command {cmd_name} does not exist.") from None
 
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op
     attr_setdefault(module, DESCRIPTION, "")
@@ -146,43 +139,6 @@ def get_command(cmd_name):
     return getattr(get_module(cmd_name), pname)
 
 
-def elide_list(line_list, max_num=10):
-    """Takes a long list and limits it to a smaller number of elements,
-    replacing intervening elements with '...'.  For example::
-
-        elide_list([1,2,3,4,5,6], 4)
-
-    gives::
-
-        [1, 2, 3, '...', 6]
-    """
-    if len(line_list) > max_num:
-        return line_list[: max_num - 1] + ["..."] + line_list[-1:]
-    else:
-        return line_list
-
-
-def ramble_is_git_repo():
-    """Ensure that this instance of Ramble is a git clone."""
-    return is_git_repo(ramble.paths.prefix)
-
-
-def is_git_repo(path):
-    dotgit_path = join_path(path, ".git")
-    if os.path.isdir(dotgit_path):
-        # we are in a regular git repo
-        return True
-    if os.path.isfile(dotgit_path):
-        # we might be in a git worktree
-        try:
-            with open(dotgit_path, "rb") as f:
-                dotgit_content = yaml.load(f)
-            return os.path.isdir(dotgit_content.get("gitdir", dotgit_path))
-        except MarkedYAMLError:
-            pass
-    return False
-
-
 class PythonNameError(ramble.error.RambleError):
     """Exception class thrown for impermissible python names"""
 
@@ -197,18 +153,6 @@ class CommandNameError(ramble.error.RambleError):
     def __init__(self, name):
         self.name = name
         super().__init__(f"{name} is not a permissible Ramble command name.")
-
-
-########################################
-# argparse types for argument validation
-########################################
-def extant_file(f):
-    """
-    Argparse type for files that exist.
-    """
-    if not os.path.isfile(f):
-        raise argparse.ArgumentTypeError("%s does not exist" % f)
-    return f
 
 
 def require_active_workspace(cmd_name):
@@ -242,7 +186,7 @@ def find_workspace(args):
 
     Check for a workspace in this order:
         1. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` (arguments)
-        2. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+        2. via a path in the ramble.workspace.RAMBLE_WORKSPACE_VAR environment variable.
 
     If a workspace is found, read it in.  If not, return None.
 
@@ -266,13 +210,13 @@ def find_workspace(args):
 
         # if no argument, look for the environment variable
         if not ws:
-            ws = os.environ.get(ramble.workspace.ramble_workspace_var)
+            ws = os.environ.get(ramble.workspace.RAMBLE_WORKSPACE_VAR)
 
             # nothing was set; there's no active environment
             if not ws:
                 return None
             elif not ramble.workspace.is_workspace_dir(ws):
-                env_var = ramble.workspace.ramble_workspace_var
+                env_var = ramble.workspace.RAMBLE_WORKSPACE_VAR
                 raise ramble.workspace.RambleActiveWorkspaceError(
                     f"The environment variable {env_var} refers to an invalid ramble workspace."
                 )
@@ -290,7 +234,7 @@ def find_workspace_path(args):
 
     Check for a workspace in this order:
         1. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` (arguments)
-        2. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+        2. via a path in the ramble.workspace.RAMBLE_WORKSPACE_VAR environment variable.
 
     If a workspace is found, return it's path.  If not, return None.
 
@@ -314,15 +258,15 @@ def find_workspace_path(args):
 
         # if no argument, look for the environment variable
         if not ws:
-            ws = os.environ.get(ramble.workspace.ramble_workspace_var)
+            ws = os.environ.get(ramble.workspace.RAMBLE_WORKSPACE_VAR)
 
             # nothing was set; there's no active environment
             if not ws:
                 return None
 
-    # if we get here, env isn't the name of a spack environment; it has
-    # to be a path to an environment, or there is something wrong.
+    # if we get here, ws isn't the name of a ramble workspace; it has
+    # to be a path to a workspace, or there is something wrong.
     if ramble.workspace.is_workspace_dir(ws):
         return ws
 
-    raise ramble.workspace.RambleWorkspaceError("no workspace in %s" % ws)
+    raise ramble.workspace.RambleWorkspaceError(f"no workspace in {ws}")

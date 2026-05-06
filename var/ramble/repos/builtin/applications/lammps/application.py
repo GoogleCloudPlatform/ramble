@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,15 +20,76 @@ class Lammps(ExecutableApplication):
 
     tags("molecular-dynamics", "hpc-benchmark")
 
-    define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    define_compiler("gcc14", pkg_spec="gcc@14.2.0")
+
+    workload_group("all_workloads", workloads=[])
+    workload_group("standard_workloads", workloads=[])
+    workload_group("configured_workloads", workloads=[])
+    workload_group("intel_workloads", workloads=[])
+
+    workload_variable(
+        "intel_test_path",
+        default=os.path.join("{lammps-stage}", "src", "INTEL", "TEST"),
+        description="Path for Intel Test files",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "examples_path",
+        default=os.path.join("{lammps-stage}", "examples"),
+        description="Path for example files",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "input_path",
+        default=os.path.join("{intel_test_path}", "in.{workload_name}"),
+        description="Path to input file",
+        workload_group="intel_workloads",
+    )
+
+    workload_variable(
+        "input_stage",
+        default="stable_23Jun2022_update3",
+        description="Stage name of LAMMPS input archive",
+        workload_group="all_workloads",
+    )
+
+    workload_variable(
+        "input_path",
+        default=os.path.join("{intel_test_path}", "in.{workload_name}"),
+        description="Path to input file for workload",
+        workload_group="intel_workloads",
+    )
+
+    workload_variable(
+        "input_path",
+        default="{workload_input_dir}/in.{workload_name}.txt",
+        description="Path for the workload input file.",
+        workload_group="standard_workloads",
+    )
+
+    workload_variable(
+        "lammps_flags",
+        default="",
+        description="Additional execution flags for lammps",
+        workload_group="all_workloads",
+    )
+
+    version("20250722", "Version 20250722 of LAMMPS")
+    version("20220623.4", "Version 20220623.4 of LAMMPS", preferred=True)
 
     with when("package_manager_family=spack"):
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        software_spec(
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
 
         software_spec(
-            "lammps",
-            pkg_spec="lammps@20220623.4 +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
-            compiler="gcc9",
+            "lammps-{application::lammps::version}",
+            pkg_spec="lammps@{application::lammps::version} +opt+manybody+molecule+kspace+rigid+openmp+openmp-package+asphere+dpd-basic+dpd-meso+dpd-react+dpd-smooth",
+            compiler="gcc14",
         )
 
         required_package("lammps")
@@ -75,13 +136,24 @@ class Lammps(ExecutableApplication):
         target_dir="{application_input_dir}/lammps-input-stage",
         description="Stage of lammps source from release",
     )
-    executable(
-        "copy",
-        template=["cp {input_path} {experiment_run_dir}/input.txt"],
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{input_path}",
+        dst="{experiment_run_dir}/input.txt",
     )
     executable(
-        "set-size",
+        "configure-reaxff",
+        template=[
+            "sed -i -e 's/x index .*/x index {x}/g' -i input.txt",
+            "sed -i -e 's/y index .*/y index {y}/g' -i input.txt",
+            "sed -i -e 's/z index .*/z index {z}/g' -i input.txt",
+            "sed -i -e 's/y index .*/y index {timesteps}/g' -i input.txt",
+        ],
+        use_mpi=False,
+    )
+
+    executable(
+        "configure-size-scale",
         template=[
             "sed -i -e 's/xx equal .*/xx equal {xx}/g' -i input.txt",
             "sed -i -e 's/yy equal .*/yy equal {yy}/g' -i input.txt",
@@ -90,12 +162,25 @@ class Lammps(ExecutableApplication):
         use_mpi=False,
     )
     executable(
-        "set-timesteps",
-        template=["sed 's/run.*[0-9]+/run\t\t{timesteps}/g' -i input.txt"],
+        "configure-run-timesteps",
+        template=[
+            "sed 's/run.*[0-9]+/run\t\t{timesteps}/g' -i input.txt",
+        ],
+        use_mpi=False,
+    )
+
+    executable(
+        "configure-timestep-variables",
+        template=[
+            "sed 's/t index .*[0-9]+/t index {main_timesteps}/g' -i input.txt",
+            "sed 's/w index .*[0-9]+/t index {warmup_timesteps}/g' -i input.txt",
+            "sed 's/m index .*[0-9]+/t index {timestep_multiplier}/g' -i input.txt",
+        ],
         use_mpi=False,
     )
 
     exec_path = os.path.join("{lammps_path}", "bin", "lmp")
+
     executable(
         "execute",
         f"{exec_path}" + " -i input.txt {lammps_flags}",
@@ -112,83 +197,6 @@ class Lammps(ExecutableApplication):
         use_mpi=False,
     )
 
-    workload(
-        "lj",
-        executables=["copy", "set-size", "set-timesteps", "execute"],
-        input="leonard-jones",
-    )
-    workload(
-        "eam",
-        executables=["copy", "set-size", "set-timesteps", "execute"],
-        input="eam",
-    )
-    workload(
-        "chain",
-        executables=["copy", "set-timesteps", "set-data-path", "execute"],
-        inputs=["polymer-chain-melt", "lammps-stage"],
-    )
-    workload(
-        "chute",
-        executables=["copy", "set-timesteps", "execute"],
-        input="chute",
-    )
-    workload(
-        "rhodo",
-        executables=["copy", "set-timesteps", "set-data-path", "execute"],
-        inputs=["rhodo", "lammps-stage"],
-    )
-
-    workload_variable(
-        "xx",
-        default="20*$x",
-        description="Number of atoms in the x direction",
-        workloads=["lj", "eam"],
-    )
-    workload_variable(
-        "yy",
-        default="20*$y",
-        description="Number of atoms in the y direction",
-        workloads=["lj", "eam"],
-    )
-    workload_variable(
-        "zz",
-        default="20*$z",
-        description="Number of atoms in the z direction",
-        workloads=["lj", "eam"],
-    )
-    workload_variable(
-        "timesteps",
-        default="100",
-        description="Number of timesteps",
-        workloads=["lj", "eam", "chain", "chute", "rhodo"],
-    )
-
-    workload_variable(
-        "input_path",
-        default="{workload_input_dir}/in.{workload_name}.txt",
-        description="Path for the workload input file.",
-        workloads=["lj", "eam", "chain", "chute", "rhodo"],
-    )
-
-    workload_variable(
-        "lammps_flags",
-        default="",
-        description="Additional execution flags for lammps",
-        workloads=["lj", "eam", "chain", "chute", "rhodo"],
-    )
-
-    intel_wl_names = [
-        "airebo",
-        "dpd",
-        "eam",
-        "lc",
-        "lj",
-        "rhodo",
-        "sw",
-        "tersoff",
-        "water",
-    ]
-
     executable(
         "change-root",
         template=[
@@ -196,108 +204,548 @@ class Lammps(ExecutableApplication):
         ],
         use_mpi=False,
     )
-    intel_test_path = os.path.join("{lammps-stage}", "src", "INTEL", "TEST")
-    executable(
-        "copy-cube",
-        template=[
-            "cp "
-            + os.path.join(intel_test_path, "mW*.data")
-            + " {experiment_run_dir}"
-            + os.path.sep
-            + "."
-            "cp "
-            + os.path.join(intel_test_path, "mW.sw")
-            + " {experiment_run_dir}"
-            + os.path.sep
-            + "."
-        ],
-        use_mpi=False,
+
+    stage_files(
+        name="stage-cube",
+        src=os.path.join("{intel_test_path}", "mW*.data"),
+        dst="{experiment_run_dir}/.",
+    )
+    stage_files(
+        name="stage-cube-sw",
+        src=os.path.join("{intel_test_path}", "mW.sw"),
+        dst="{experiment_run_dir}/.",
     )
 
-    for wl_name in intel_wl_names:
-        workload_name = f"intel.{wl_name}"
-        if wl_name in ["water"]:
-            workload(
-                workload_name,
-                executables=["copy", "copy-cube", "change-root", "execute"],
-                inputs=["lammps-stage"],
-            )
-        elif wl_name in ["rhodo", "chain"]:
-            workload(
-                workload_name,
-                executables=[
-                    "copy",
-                    "set-data-path",
-                    "change-root",
-                    "execute",
-                ],
-                inputs=["lammps-stage"],
-            )
-        else:
-            workload(
-                workload_name,
-                executables=["copy", "change-root", "execute"],
-                inputs=["lammps-stage"],
-            )
-
-        workload_variable(
-            "input_path",
-            default=os.path.join(f"{intel_test_path}", f"in.{workload_name}"),
-            description=f"Path to input file for {workload_name} workload",
-            workloads=[workload_name],
-        )
-
-        workload_variable(
-            "lammps_flags",
-            default="",
-            description="Additional execution flags for lammps",
-            workloads=[workload_name],
-        )
-
-    intel_test_path = os.path.join(
-        "{lammps-stage}", "examples", "reaxff", "HNS"
+    stage_files(
+        name="stage-contents",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
     )
-    executable(
-        "copy-contents",
-        template=[
-            "cp {input_path}/* {experiment_run_dir}/.",
-            "cp {input_file} input.txt",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-input-file",
+        src="{input_file}",
+        dst="input.txt",
     )
 
     workload(
+        "lj",
+        executables=[
+            "stage-input",
+            "configure-size-scale",
+            "configure-run-timesteps",
+            "execute",
+        ],
+        input="leonard-jones",
+    )
+    with default_args(workloads=["lj"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("standard_workloads", mode="append")
+        workload_variable(
+            "timesteps",
+            default="100",
+            description="Number of timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="20*$z",
+            description="zz value",
+        )
+
+    workload(
+        "eam",
+        executables=[
+            "stage-input",
+            "configure-size-scale",
+            "configure-run-timesteps",
+            "execute",
+        ],
+        input="eam",
+    )
+    with default_args(workloads=["eam"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("standard_workloads", mode="append")
+        workload_variable(
+            "timesteps",
+            default="100",
+            description="Number of timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="20*$z",
+            description="zz value",
+        )
+
+    workload(
+        "chain",
+        executables=[
+            "stage-input",
+            "set-data-path",
+            "configure-run-timesteps",
+            "execute",
+        ],
+        inputs=["polymer-chain-melt", "lammps-stage"],
+    )
+    with default_args(workloads=["chain"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("standard_workloads", mode="append")
+        workload_variable(
+            "timesteps",
+            default="100",
+            description="Number of timesteps",
+        )
+
+    workload(
+        "chute",
+        executables=["stage-input", "configure-run-timesteps", "execute"],
+        input="chute",
+    )
+    with default_args(workloads=["chute"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("standard_workloads", mode="append")
+        workload_variable(
+            "timesteps",
+            default="100",
+            description="Number of timesteps",
+        )
+
+    workload(
+        "rhodo",
+        executables=["stage-input", "set-data-path", "execute"],
+        inputs=["rhodo", "lammps-stage"],
+    )
+    with default_args(workloads=["rhodo"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("standard_workloads", mode="append")
+        workload_variable(
+            "timesteps",
+            default="100",
+            description="Number of timesteps",
+        )
+
+    workload(
+        "intel.airebo",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-size-scale",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.airebo"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="550",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="17*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="16*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="2*$z",
+            description="zz value",
+        )
+
+    workload(
+        "intel.dpd",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-size-scale",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.dpd"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="4000",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="20*$z",
+            description="zz value",
+        )
+
+    workload(
+        "intel.eam",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-size-scale",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.eam"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="3100",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="20*$z",
+            description="zz value",
+        )
+
+    workload(
+        "intel.lc",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.lc"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="8400",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+
+    workload(
+        "intel.lj",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-size-scale",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.lj"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="7900",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="20*$z",
+            description="zz value",
+        )
+
+    workload(
+        "intel.rhodo",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.rhodo"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="520",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+
+    workload(
+        "intel.sw",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-size-scale",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.sw"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="6200",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="10*$z",
+            description="zz value",
+        )
+
+    workload(
+        "intel.tersoff",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-size-scale",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.tersoff"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="2420",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+        workload_variable(
+            "xx",
+            default="20*$x",
+            description="xx value",
+        )
+        workload_variable(
+            "yy",
+            default="20*$y",
+            description="yy value",
+        )
+        workload_variable(
+            "zz",
+            default="10*$z",
+            description="zz value",
+        )
+
+    workload(
+        "intel.water",
+        executables=[
+            "stage-input",
+            "change-root",
+            "configure-timestep-variables",
+            "execute",
+        ],
+        input="lammps-stage",
+    )
+    with default_args(workloads=["intel.water"]):
+        workload_group("all_workloads", mode="append")
+        workload_group("intel_workloads", mode="append")
+        workload_variable(
+            "warmup_timesteps",
+            default="10",
+            description="Number of warmup timesteps",
+        )
+        workload_variable(
+            "main_timesteps",
+            default="2600",
+            description="Number of main timesteps",
+        )
+        workload_variable(
+            "timestep_multiplier",
+            default="1",
+            description="Multiplier for main timesteps",
+        )
+
+    workload(
         "hns-reaxff",
-        executables=["copy-contents", "set-timesteps", "execute"],
+        executables=[
+            "stage-contents",
+            "stage-input-file",
+            "configure-reaxff",
+            "execute",
+        ],
         inputs=["lammps-stage"],
     )
+    with default_args(workloads=["hns-reaxff"]):
+        workload_group("all_workloads", mode="append")
 
-    workload_variable(
-        "input_stage",
-        default="stable_23Jun2022_update3",
-        description="Stage name of LAMMPS input archive",
-        workloads=["hns-reaxff"],
-    )
+        workload_variable(
+            "input_path",
+            default=os.path.join(
+                "{examples_path}", "reaxff", "HNS", "in.{workload_name}"
+            ),
+            description="Path to input file for workload",
+        )
 
-    workload_variable(
-        "input_file",
-        default="in.reaxc.hns",
-        description="hns-reaxff input file name",
-        workloads=["hns-reaxff"],
-    )
+        workload_variable(
+            "input_file",
+            default="in.reaxff.hns",
+            description="hns-reaxff input file name",
+        )
 
-    workload_variable(
-        "input_path",
-        default=os.path.join(f"{intel_test_path}"),
-        description="Path to input directory for hns-reaxff workload",
-        workloads=["hns-reaxff"],
-    )
-    workload_variable(
-        "lammps_flags",
-        default="",
-        description="Additional execution flags for lammps",
-        workloads=["hns-reaxff"],
-    )
+        workload_variable(
+            "timesteps",
+            default="100",
+            description="Number of timesteps",
+        )
+        workload_variable(
+            "x",
+            default="2",
+            description="x value",
+        )
+        workload_variable(
+            "y",
+            default="2",
+            description="y value",
+        )
+        workload_variable(
+            "z",
+            default="2",
+            description="z value",
+        )
 
     success_criteria(
         "walltime",
@@ -333,6 +781,14 @@ class Lammps(ExecutableApplication):
         group_name="tsps",
         units="timesteps/s",
         fom_type=FomType.THROUGHPUT,
+    )
+
+    figure_of_merit(
+        "Number of Atoms",
+        fom_regex=r"Loop.*with (?P<atoms>[0-9]+) atoms",
+        group_name="atoms",
+        units="",
+        fom_type=FomType.INFO,
     )
 
     for func_name in ["Pair", "Neigh", "Comm", "Output", "Modifier"]:

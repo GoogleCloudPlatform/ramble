@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,7 +11,10 @@ from ramble.appkit import *
 
 class Hp2p(ExecutableApplication):
     """
-    HP2P (Heavy Peer To Peer) benchmark is a test which performs MPI Point-to-Point non-blocking communications between all MPI processes. Its goal is to measure the bandwidths and the latencies in a situation where the network is busy. This benchmark can help to detect network problems like congestions or problems with switches or links.
+    HP2P (Heavy Peer To Peer) benchmark is a test which performs MPI Point-to-Point non-blocking
+    communications between all MPI processes. Its goal is to measure the bandwidths and the
+    latencies in a situation where the network is busy. This benchmark can help to detect network
+    problems like congestions or problems with switches or links.
     """
 
     name = "hp2p"
@@ -19,8 +22,13 @@ class Hp2p(ExecutableApplication):
     tags("mpi-benchmark", "network-benchmark")
     maintainers("rfbgo")
 
+    version("4.1", "Version 4.1 of HP2P", preferred=True)
+
     with when("package_manager_family=spack"):
-        software_spec("hp2p", pkg_spec="hp2p@4.1")
+        software_spec(
+            "hp2p-{application::hp2p::version}",
+            pkg_spec="hp2p@{application::hp2p::version}",
+        )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     executable(

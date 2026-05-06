@@ -25,14 +25,17 @@ config:
   report_dirs: ~/.ramble/reports
   include_phase_dependencies: false
   resolve_variables_in_subprocesses: false
+  stage_method: cp
   spack:
     install:
-      flags: --reuse
+      flags: --fresh
     concretize:
-      flags: --reuse
+      flags: --fresh
     buildcache:
       flags: ''
     env_create:
       flags: ''
     env_view:
       link_type: symlink
+  aliases:
+    zeppelin: data

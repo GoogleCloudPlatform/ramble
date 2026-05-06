@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -44,14 +44,16 @@ class Darshan(BasicModifier):
 
     archive_pattern("{darshan_log_path}/*")
 
+    version("3.4.6", "Version 3.4.6 of Darshan", preferred=True)
+
     with when("package_manager_family=spack"):
         software_spec(
-            "darshan-runtime",
-            pkg_spec="darshan-runtime@3.4.6 +mpi",
+            "darshan-runtime-{modifier_version}",
+            pkg_spec="darshan-runtime@{modifier_version} +mpi",
         )
         software_spec(
-            "darshan-util",
-            pkg_spec="darshan-util@3.4.6",
+            "darshan-util-{modifier_version}",
+            pkg_spec="darshan-util@{modifier_version}",
         )
 
         required_package("darshan-runtime")

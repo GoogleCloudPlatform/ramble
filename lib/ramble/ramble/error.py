@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,6 +8,7 @@
 
 import inspect
 import sys
+from typing import Optional, Tuple, Type
 
 from ramble.util.logger import logger
 
@@ -21,26 +22,26 @@ class RambleError(Exception):
     Subclasses can be found in the modules they have to do with.
     """
 
-    def __init__(self, message, long_message=None):
+    def __init__(self, message: str, long_message: Optional[str] = None) -> None:
         super().__init__()
-        self.message = message
-        self._long_message = long_message
+        self.message: str = message
+        self._long_message: Optional[str] = long_message
 
         # for exceptions raised from child build processes, we save the
         # traceback as a string and print it in the parent.
-        self.traceback = None
+        self.traceback: Optional[str] = None
 
         # we allow exceptions to print debug info via print_context()
         # before they are caught at the top level. If they *haven't*
         # printed context early, we do it by default when die() is
         # called, so we need to remember whether it's been called.
-        self.printed = False
+        self.printed: bool = False
 
     @property
-    def long_message(self):
+    def long_message(self) -> Optional[str]:
         return self._long_message
 
-    def print_context(self):
+    def print_context(self) -> None:
         """Print extended debug information about this exception.
 
         This is usually printed when the top-level Ramble error handler
@@ -70,24 +71,32 @@ class RambleError(Exception):
         sys.stderr.flush()
         self.printed = True
 
-    def die(self):
+    def die(self) -> None:
         self.print_context()
         sys.exit(1)
 
-    def __str__(self):
+    def __str__(self) -> str:
         msg = self.message
         if self._long_message:
-            msg += "\n    %s" % self._long_message
+            msg += f"\n    {self._long_message}"
         return msg
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         args = [repr(self.message), repr(self.long_message)]
         args = ",".join(args)
-        qualified_name = inspect.getmodule(self).__name__ + "." + type(self).__name__
+        module = inspect.getmodule(self)
+        if module:
+            qualified_name = f"{module.__name__}.{type(self).__name__}"
+        else:
+            qualified_name = type(self).__name__
         return qualified_name + "(" + args + ")"
 
-    def __reduce__(self):
+    def __reduce__(self) -> Tuple[Type["RambleError"], Tuple[str, Optional[str]]]:
         return type(self), (self.message, self.long_message)
+
+
+class DirectiveError(RambleError):
+    """This is raised when something is wrong with a language directive."""
 
 
 class SpecError(RambleError):
@@ -116,18 +125,6 @@ class FormattedExecutableError(ApplicationError):
     """
 
 
-class PhaseCycleDetectedError(ApplicationError):
-    """
-    Exception raised when a cycle is detected while ordering phases
-    """
-
-
-class InvalidPhaseError(ApplicationError):
-    """
-    Exception raised when a phase is used but not defined
-    """
-
-
 class ChainCycleDetectedError(ApplicationError):
     """
     Exception raised when a cycle is detected in a defined experiment chain
@@ -147,6 +144,12 @@ class ObjectValidationError(ApplicationError):
 class ModifierError(RambleError):
     """
     Exception that is raised by modifiers
+    """
+
+
+class ConflictingModifiersError(ModifierError):
+    """
+    Exception raised when two modifiers on the same experiment conflict
     """
 
 

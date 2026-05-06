@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,10 +8,6 @@
 import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.mirror
-import ramble.repository
-import ramble.spec
-import ramble.workspace
-from ramble.error import RambleError
 from ramble.util.logger import logger
 
 import spack.util.url as url_util
@@ -172,22 +168,6 @@ def mirror_list(args):
         return
 
     mirrors.display()
-
-
-def _read_specs_from_file(filename):
-    specs = []
-    with open(filename) as stream:
-        for i, string in enumerate(stream):
-            try:
-                s = ramble.Spec(string)
-                s.application
-                specs.append(s)
-            except RambleError as e:
-                logger.debug(e)
-                logger.die(
-                    "Parse error in %s, line %d:" % (filename, i + 1), ">>> " + string, str(e)
-                )
-    return specs
 
 
 def mirror_destroy(args):

@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -197,7 +197,7 @@ command proceeds too far, you should see the following error message:
 
 .. code-block:: console
 
-    ==> Error: Software spec intel-oneapi-vtune is not defined in environment wrfv4, but is required by the intel-aps modifier definition
+    ==> Error: Software spec intel-oneapi-vtune is not defined in environment wrf@4.2, but is required by the intel-aps modifier definition
 
 As mentioned earlier, this is because the ``intel-aps`` modifier requires
 additional software to function properly. In this case, it requires the
@@ -211,7 +211,7 @@ To remedy this issue, again edit your workspace configuration file using:
     $ ramble workspace edit
 
 And write a Spack package definition for ``intel-oneapi-vtune``. After the
-package is defined, add the package to the ``wrfv4`` environment. The resulting
+package is defined, add the package to the ``wrf@4.2`` environment. The resulting
 configuration file should look like the following:
 
 .. literalinclude:: ../../../../examples/tutorial_10_aps_final_config.yaml

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,6 +21,8 @@ class Minixyce(ExecutableApplication):
 
     tags("circuit-simulation", "mini-app")
 
+    version("1.0", description="Version 1.0 of miniXyce", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
@@ -31,8 +33,8 @@ class Minixyce(ExecutableApplication):
         )
 
         software_spec(
-            "minixyce",
-            pkg_spec="minixyce@1.0 +mpi",
+            "minixyce-{application::minixyce::version}",
+            pkg_spec="minixyce@{application::minixyce::version} +mpi",
             compiler="gcc12",
         )
 
@@ -44,12 +46,10 @@ class Minixyce(ExecutableApplication):
         use_mpi=True,
     )
 
-    executable(
-        "get_simple_network",
-        template=[
-            "cp {minixyce_path}/doc/tests/{workload_name}.net {experiment_run_dir}/{workload_name}.net"
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-network-file",
+        src="{minixyce_path}/doc/tests/{workload_name}.net",
+        dst="{experiment_run_dir}/{workload_name}.net",
     )
 
     executable(
@@ -86,7 +86,7 @@ class Minixyce(ExecutableApplication):
 
     cir_workloads = ["cir1", "cir2", "cir3", "cir4", "cir5"]
     for cir_workload in cir_workloads:
-        workload(cir_workload, executables=["get_simple_network", "execute"])
+        workload(cir_workload, executables=["stage-network-file", "execute"])
 
     rc_workloads = ["RC_ladder", "RLC_ladder", "RC_ladder2", "RLC_ladder2"]
     for workload_name in rc_workloads:

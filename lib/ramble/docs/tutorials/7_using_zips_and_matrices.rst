@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -150,7 +150,13 @@ should give the following error message:
 
 .. code-block:: console
 
-    ==> Error: Experiment wrfv4.CONUS_12km.scaling_1 is not unique.
+    ==> Warning: Two experiments are defined with the name wrf@4.2.CONUS_12km.scaling_1
+    ==> Warning: Variables unique to previously defined experiment:
+    ==> Warning:   - experiment_index
+    ==> Warning: Variable differences between experiment definitions:
+    ==> Warning:   - processes_per_node: {'previous': 16, 'new': 18}
+    ==> Warning:   - platform: {'previous': 'platform1', 'new': 'platform2'}
+    ==> Error: Experiment wrf@4.2.CONUS_12km.scaling_1 is not unique.
 
 This is because your experiment name template is not unique across the values
 of ``platform_config``. To remedy this issue, you can update the experiment

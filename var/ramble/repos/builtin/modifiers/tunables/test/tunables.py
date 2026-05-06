@@ -43,7 +43,7 @@ ramble:
     with ramble.workspace.create(ws_name) as ws:
         ws.write()
         config_path = os.path.join(
-            ws.config_dir, ramble.workspace.config_file_name
+            ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
         )
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -84,10 +84,12 @@ nodeset-0: fom:hugepage-size:    2048 kB
             assert "modifier::tunables::hugepage-size = 2048 kB" in content
             # Assert output for multi-value FOMs
             assert (
-                "modifier::tunables::smt-active = {'1': {'nodeset-0'}, '0': {'nodeset-1'}}"
+                "modifier::tunables::smt-active = {'1': nodeset-0, '0': nodeset-1}"
                 in content
             )
             assert (
-                "modifier::tunables::thp-enabled = {'always': {'nodeset-0'}, 'madvise': {'nodeset-1'}}"
+                "modifier::tunables::thp-enabled = {'always': nodeset-0, 'madvise': nodeset-1}"
                 in content
             )
+            # Assert FOMs that are not present don't get included (as None)
+            assert "modifier::tunables::numa-balancing" not in content

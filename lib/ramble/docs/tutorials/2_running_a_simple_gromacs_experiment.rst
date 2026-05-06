@@ -1,4 +1,4 @@
-.. Copyright 2022-2025 The Ramble Authors
+.. Copyright 2022-2026 The Ramble Authors
 
    Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
    https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -82,42 +82,54 @@ To determine a suggested software configuration, you can use:
 
 .. code-block:: console
 
-  $ ramble info --attrs software_specs,compilers -v gromacs
+  $ ramble info --attrs known_versions,software_specs,compilers -v gromacs
 
 With this command, you should see output similar to the following:
 
 .. code-block:: console
 
-  ##################
-  # software_specs #
-  ##################
-  intel-mpi:
-      pkg_spec: intel-oneapi-mpi@2021.13.1
+    ##################
+    # known_versions #
+    ##################
+    2025.3
+        Description: Version 2025.3 of Gromacs
+        Preferred: True
 
-      When:
-          package_manager_family=spack
+    2024.1
+        Description: Version 2024.1 of Gromacs
+        Preferred: False
 
-  gromacs:
-      pkg_spec: gromacs@2020.5
-      compiler: gcc9
+    ##################
+    # software_specs #
+    ##################
+    intel-mpi:
+        pkg_spec: intel-oneapi-mpi@2021.17.2
 
-      When:
-          package_manager_family=spack
+        When:
+            package_manager_family=spack
 
-  gromacs:
-      pkg_spec: GROMACS/2024.1-foss-2023b
+    gromacs-{application::gromacs::version}:
+        pkg_spec: gromacs@{application::gromacs::version}
+        compiler: gcc14
 
-      When:
-          package_manager_family=eessi
+        When:
+            package_manager_family=spack
 
-  #############
-  # compilers #
-  #############
-  gcc9:
-      pkg_spec: gcc@9.3.0
+    gromacs-2024.1:
+        pkg_spec: GROMACS/2024.1-foss-2023b
 
-      When:
-          package_manager_family=spack
+        When:
+            package_manager_family=eessi
+            application_version@2024.1
+
+    #############
+    # compilers #
+    #############
+    gcc14:
+        pkg_spec: gcc@14.2.0
+
+        When:
+            package_manager_family=spack
 
 
 This output does not represent the only possible configuration that works for

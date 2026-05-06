@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,34 +6,39 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import copy
 import datetime
 import os
 import re
 from enum import Enum
+from typing import Dict, List
 
 import llnl.util.filesystem as fs
 
 import ramble.config
+import ramble.expander
+import ramble.repository
 import ramble.util.path
 from ramble.keywords import keywords
 from ramble.util.file_util import create_symlink
-from ramble.util.foms import BetterDirection, FomType
+from ramble.util.foms import BetterDirection, FomType, SummaryFoms
 from ramble.util.logger import logger
+from ramble.util.module_utils import import_pandas
 
 import spack.util.spack_yaml as syaml
 
 try:
     import matplotlib.pyplot as plt
-    import pandas as pd
     from matplotlib.backends.backend_pdf import PdfPages
 except ModuleNotFoundError:
-    logger.die("matplotlib or pandas was not found. Ensure requirements.txt are installed.")
+    logger.die("matplotlib was not found. Ensure requirements.txt are installed.")
 
 
 class ReportVars(Enum):
+    APP_NAME = "application_name"
     BETTER_DIRECTION = "better_direction"
-    CONTEXT = "context"
+    CONTEXT_NAME = "context_name"
+    EXP_NAME = "experiment_name"
+    EXP_NS = "experiment_namespace"
     FOM_NAME = "fom_name"
     FOM_ORIGIN = "fom_origin"
     FOM_ORIGIN_TYPE = "fom_origin_type"
@@ -44,6 +49,8 @@ class ReportVars(Enum):
     IDEAL_PERF_VALUE = "ideal_perf_value"
     NORMALIZED_FOM_VALUE = "normalized_fom_value"
     SERIES = "series"
+    WL_NAME = "workload_name"
+    WL_NS = "workload_namespace"
 
 
 _FOM_DICT_MAPPING = {
@@ -54,11 +61,29 @@ _FOM_DICT_MAPPING = {
     "origin_type": ReportVars.FOM_ORIGIN_TYPE.value,
 }
 
+# Core experiment metadata extracted for every DataFrame
+_EXP_BASIC_VARS_MAPPING = {
+    "experiment_name": ReportVars.EXP_NAME.value,
+    "experiment_namespace": ReportVars.EXP_NS.value,
+    "application_name": ReportVars.APP_NAME.value,
+    "workload_name": ReportVars.WL_NAME.value,
+    "workload_namespace": ReportVars.WL_NS.value,
+}
+
+_ADDITIONAL_VARS = {
+    ReportVars.CONTEXT_NAME.value,
+}
+
 INVENTORY_FILENAME = "inventory.yaml"
+OBJECT_NAMES = {}
+for obj in ramble.repository.ObjectTypes:
+    singular = ramble.repository.type_definitions[obj]["singular"]
+    OBJECT_NAMES[singular] = obj.name
 
 
 def to_numeric_if_possible(series):
     """Try to convert a Pandas series to numeric, or return the series unchanged."""
+    pd = import_pandas()
     try:
         return pd.to_numeric(series)
     except (ValueError, TypeError):
@@ -81,18 +106,53 @@ def is_repeat_child(experiment):
         return False
 
 
-def prepare_data(results: dict, where_query) -> pd.DataFrame:
-    """Creates a Pandas DataFrame from the results dictionary to use for reports.
+def is_key_to_skip(key_name: str):
+    """Check if a results dict key should be skipped for indexing and analysis.
 
-    Transforms nested results dictionary into a flat dataframe. Each row equals
-    one FOM from one context of one experiment, with columns including
-    associated experiment variables (except paths and commands).
+    The purpose of this is to ignore non-variables and reduce clutter in the
+    results index. Some values in the results index, like paths and commands,
+    have limited utility for analysis or are derived from variables that are
+    available separately.
     """
+    keys_to_skip = {
+        keywords.batch_submit,
+        keywords.log_file,
+        "command",
+        "execute_experiment",
+        "experiment_hash",
+        "experiment_status",
+        "name",
+        "RAMBLE_STATUS",
+        "CONTEXTS",
+        "RAMBLE_VARIABLES",
+        "RAMBLE_RAW_VARIABLES",
+        "SOFTWARE",
+        "TAGS",
+        "VARIANTS",
+        "EXPERIMENT_CHAIN",
+        "SUCCESS_CRITERIA",
+    }
 
-    unnest_context = []
+    skip = False
+    if key_name in keys_to_skip:
+        skip = True
+        return skip
+    elif key_name.endswith(("dir", "path")):
+        skip = True
+    return skip
+
+
+def filter_exp_results(experiments: list):
+    """Filters a list of experiment results to remove failed experiments and
+    duplicate data.
+
+    When repeats are used, this removes individual repeats and returns only the
+    summary statistics.
+    """
+    filtered_exps = []
     skip_exps = []
-    # first unnest dictionaries
-    for exp in results["experiments"]:
+
+    for exp in experiments:
         if exp["name"] in skip_exps or is_repeat_child(exp):
             logger.debug(f"Skipping import of experiment {exp['name']}")
             continue
@@ -114,72 +174,214 @@ def prepare_data(results: dict, where_query) -> pd.DataFrame:
                         skip_exps.append(repeat_exp_name)
                     else:
                         skip_exps.append(exp_name + f".{n}")
+            filtered_exps.append(exp)
 
-            for context in exp["CONTEXTS"]:
-                for fom in context["foms"]:
-                    # Expand to one row/FOM/context w/ a copy of the experiment vars and metadata
-                    exp_copy = copy.deepcopy(exp)
+    return filtered_exps
 
-                    # Remove context dict and add the current FOM values
-                    exp_copy.pop("CONTEXTS")
-                    exp_copy[ReportVars.CONTEXT.value] = context["name"]
+
+def generate_result_index(experiments: list, all_vars=False, where_query=None):
+    """Creates an index from the results in the list of experiments
+
+    Index format is:
+    {
+        "applications": {
+            application_name: {
+                workload: {
+                    "Contexts": set(),
+                    "FOMs": set(),
+                    "Template Variables": set(),
+                }
+            }
+        }
+        "modifiers": {
+            modifier_name: {
+                "Contexts": set(),
+                "FOMs": set(),
+            }
+        (all other object types)
+    }
+    """
+    result_index: Dict[str, dict] = {}
+    for obj_name in OBJECT_NAMES.values():
+        result_index[obj_name] = {}
+
+    template_patterns: Dict[str, dict] = {}
+    # First unnest dictionaries
+    for exp in experiments:
+        if exp["application_name"] not in result_index["applications"]:
+            result_index["applications"][exp["application_name"]] = {}
+        app_dict = result_index["applications"][exp["application_name"]]
+
+        if exp["workload_name"] not in app_dict:
+            app_dict[exp["workload_name"]] = {
+                "Contexts": set(),
+                "FOMs": set(),
+                "Template Variables": set(),
+            }
+        if exp["application_name"] not in template_patterns:
+            template_patterns[exp["application_name"]] = {}
+        if exp["workload_name"] not in template_patterns[exp["application_name"]]:
+            template_patterns[exp["application_name"]][exp["workload_name"]] = set()
+
+        if all_vars:
+            if "All Variables" not in app_dict[exp["workload_name"]]:
+                app_dict[exp["workload_name"]]["All Variables"] = set()
+            for var_name in exp:
+                if is_key_to_skip(var_name):
+                    continue
+                app_dict[exp["workload_name"]]["All Variables"].add(var_name)
+
+            for var_name in exp["RAMBLE_VARIABLES"]:
+                if is_key_to_skip(var_name):
+                    continue
+                app_dict[exp["workload_name"]]["All Variables"].add(var_name)
+            app_dict[exp["workload_name"]]["All Variables"].add("context")
+
+        if "experiment_template_name" in exp["RAMBLE_RAW_VARIABLES"]:
+            template_patterns[exp["application_name"]][exp["workload_name"]].add(
+                exp["RAMBLE_RAW_VARIABLES"]["experiment_template_name"]
+            )
+
+        for context in exp["CONTEXTS"]:
+            if not context["foms"]:
+                continue
+            app_dict[exp["workload_name"]]["Contexts"].add(context["name"])
+            for fom in context["foms"]:
+                if fom["origin"] == exp["application_name"]:
+                    # If it's a repeat summary, add summary FOMs and stat names
+                    if fom["name"] == SummaryFoms.SUMMARY.value:
+                        summary_shortname = fom["origin_type"].split("::")[1]
+                        if SummaryFoms.SUMMARY.value not in app_dict[exp["workload_name"]]:
+                            app_dict[exp["workload_name"]][SummaryFoms.SUMMARY.value] = set()
+                        app_dict[exp["workload_name"]][SummaryFoms.SUMMARY.value].add(
+                            summary_shortname
+                        )
+                    else:
+                        if fom["origin_type"].startswith("summary::"):
+                            summary_shortname = fom["origin_type"].split("::")[1]
+                            if "FOM Summary Statistics" not in app_dict[exp["workload_name"]]:
+                                app_dict[exp["workload_name"]]["FOM Summary Statistics"] = set()
+                            app_dict[exp["workload_name"]]["FOM Summary Statistics"].add(
+                                summary_shortname
+                            )
+
+                        app_dict[exp["workload_name"]]["FOMs"].add(fom["name"])
+                else:
+                    # All other objects
+                    if fom["origin_type"] in OBJECT_NAMES:
+                        obj_dict = result_index[OBJECT_NAMES[fom["origin_type"]]]
+                        if fom["origin"] not in obj_dict:
+                            obj_dict[fom["origin"]] = {"FOMs": set()}
+                        obj_dict[fom["origin"]]["FOMs"].add(fom["name"])
+
+    # Extract template variables used to parameterize experiments
+    capture_group = r"(\w+)"
+    expansion_pattern = re.compile(rf"{ramble.expander.Expander.expansion_str(capture_group)}")
+
+    for app, wl_and_patterns in template_patterns.items():
+        for workload, patterns in wl_and_patterns.items():
+            expansion_strs = set()
+            if not patterns:
+                continue
+            for pattern in patterns:
+                expansion_strs.update(expansion_pattern.findall(pattern))
+            result_index["applications"][app][workload]["Template Variables"] = expansion_strs
+
+    return result_index
+
+
+def get_all_foms(result_index):
+    all_foms = set()
+    for obj_type, obj_type_dict in result_index.items():
+        if obj_type == "applications":
+            for app_dict in obj_type_dict.values():
+                for wl_dict in app_dict.values():
+                    all_foms.update(wl_dict["FOMs"])
+                    if SummaryFoms.SUMMARY.value in wl_dict:
+                        all_foms.update(wl_dict[SummaryFoms.SUMMARY.value])
+        else:
+            for obj_dict in obj_type_dict.values():
+                all_foms.update(obj_dict["FOMs"])
+
+    return all_foms
+
+
+def get_all_vars(result_index):
+    all_vars = set()
+    for app_dict in result_index["applications"].values():
+        for wl_dict in app_dict.values():
+            all_vars.update(wl_dict["All Variables"])
+
+    return all_vars
+
+
+def extract_data(experiments: List[dict], foms: List[str], variables: List[str], where_query=None):
+    """Extracts data from the experiments dicts and returns it as a Pandas DataFrame.
+
+    Args:
+        experiments: List of experiment dictionaries containing results to extract
+        foms: List of FOMs to extract from experiments
+        variables: List of variables to extract from experiments
+        where_query: Pandas query to constrain results
+
+    Returns:
+        Pandas DataFrame containing extracted data
+    """
+    extracted_data = []
+    for exp in experiments:
+        for context in exp["CONTEXTS"]:
+            for fom in context["foms"]:
+                # Create one DataFrame row per FOM per context per experiment
+                if fom["name"] in foms:
+                    exp_data = {
+                        ReportVars.CONTEXT_NAME.value: context["name"],
+                    }
+
+                    for name in _EXP_BASIC_VARS_MAPPING:
+                        if name in exp:
+                            exp_data[_EXP_BASIC_VARS_MAPPING[name]] = exp[name]
+
                     for name, val in fom.items():
-                        if name in _FOM_DICT_MAPPING.keys():
-                            exp_copy[_FOM_DICT_MAPPING[name]] = val
+                        if name in _FOM_DICT_MAPPING:
+                            exp_data[_FOM_DICT_MAPPING[name]] = val
                         elif name == "fom_type":
-                            exp_copy["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
-                            exp_copy[ReportVars.BETTER_DIRECTION.value] = BetterDirection.from_str(
+                            exp_data["fom_type"] = FomType.from_str(fom["fom_type"]["name"])
+                            exp_data[ReportVars.BETTER_DIRECTION.value] = BetterDirection.from_str(
                                 fom["fom_type"][ReportVars.BETTER_DIRECTION.value]
                             )
 
                         # older data exports may not have fom_type stored
-                        if "fom_type" not in exp_copy:
-                            exp_copy["fom_type"] = FomType.UNDEFINED
-                            exp_copy[ReportVars.BETTER_DIRECTION.value] = (
+                        if "fom_type" not in exp_data:
+                            exp_data["fom_type"] = FomType.UNDEFINED
+                            exp_data[ReportVars.BETTER_DIRECTION.value] = (
                                 BetterDirection.INDETERMINATE
                             )
 
-                    # Exclude vars that aren't needed for analysis, mainly paths and commands
-                    dir_regex = r"_dir$"
-                    path_regex = r"_path$"
-                    vars_to_ignore = [
-                        keywords.batch_submit,
-                        keywords.log_file,
-                        "command",
-                        "execute_experiment",
-                    ]
-                    for key, value in exp["RAMBLE_VARIABLES"].items():
-                        if key in vars_to_ignore:
-                            continue
-                        if re.search(dir_regex, key):
-                            continue
-                        if re.search(path_regex, key):
-                            continue
-                        exp_copy[key] = value
+                        if variables:
+                            for var in variables:
+                                if var in exp:
+                                    exp_data[var] = exp[var]
+                                elif var in exp["RAMBLE_VARIABLES"]:
+                                    exp_data[var] = exp["RAMBLE_VARIABLES"][var]
+                                elif var in _ADDITIONAL_VARS:
+                                    continue
+                                else:
+                                    logger.debug(f"{var} not found in the results data. Skipping.")
 
-                    for key, value in exp["RAMBLE_RAW_VARIABLES"].items():
-                        if key in vars_to_ignore:
-                            continue
-                        if re.search(dir_regex, key):
-                            continue
-                        if re.search(path_regex, key):
-                            continue
-                        exp_copy["RAW" + key] = value
+                    extracted_data.append(exp_data)
 
-                    unnest_context.append(exp_copy)
-
-    results_df = pd.DataFrame.from_dict(unnest_context)
+    pd = import_pandas()
+    extracted_df = pd.DataFrame.from_dict(extracted_data)
 
     # Apply where to down select
     if where_query:
         logger.info(f"Applying where query: {where_query}")
-        results_df = results_df.query(where_query)
+        extracted_df = extracted_df.query(where_query)
 
-    return results_df
+    return extracted_df
 
 
 class PlotFactory:
-
     def determine_plot_type(self, args):
         plot_types = [
             (args.strong_scaling, StrongScalingPlot),
@@ -192,7 +394,7 @@ class PlotFactory:
             if plot_type:
                 return (plot_type, plot_class)
 
-    def create_plot_generator(self, args, report_dir_path, results_df):
+    def create_plot_generator(self, args, report_dir_path, exp_results):
         normalize = args.normalize
         logx = args.logx
         logy = args.logy
@@ -205,7 +407,7 @@ class PlotFactory:
                 spec,
                 normalize,
                 report_dir_path,
-                results_df,
+                exp_results,
                 logx,
                 logy,
                 split_by,
@@ -216,14 +418,16 @@ class PlotFactory:
 
 
 class PlotGenerator:
-    def __init__(self, spec, normalize, report_dir_path, results_df, logx, logy, split_by):
+    def __init__(self, spec, normalize, report_dir_path, exp_results, logx, logy, split_by):
+        pd = import_pandas()
         self.normalize = normalize
         self.spec = spec
         self.report_dir_path = report_dir_path
         self.inventory = {"files": []}
         self.figsize = [12, 8]
 
-        self.results_df = results_df
+        self.exp_results = exp_results
+        self.result_index = generate_result_index(exp_results, all_vars=True)
         self.output_df = pd.DataFrame()
 
         self.logx = logx
@@ -259,15 +463,15 @@ class PlotGenerator:
         """When using summary statistics from repeats, adds columns fom_value_min and fom_value_max
         to the selected data.
         """
-        min_data.loc[:, scale_var] = to_numeric_if_possible(min_data[scale_var])
+        min_data[scale_var] = to_numeric_if_possible(min_data[scale_var])
         min_data = min_data.set_index(scale_var)
-        max_data.loc[:, scale_var] = to_numeric_if_possible(max_data[scale_var])
+        max_data[scale_var] = to_numeric_if_possible(max_data[scale_var])
         max_data = max_data.set_index(scale_var)
 
-        selected_data.loc[:, ReportVars.FOM_VALUE_MIN.value] = to_numeric_if_possible(
+        selected_data[ReportVars.FOM_VALUE_MIN.value] = to_numeric_if_possible(
             min_data[ReportVars.FOM_VALUE.value]
         )
-        selected_data.loc[:, ReportVars.FOM_VALUE_MAX.value] = to_numeric_if_possible(
+        selected_data[ReportVars.FOM_VALUE_MAX.value] = to_numeric_if_possible(
             max_data[ReportVars.FOM_VALUE.value]
         )
 
@@ -392,15 +596,17 @@ class PlotGenerator:
         chart_filename = f"strong-scaling_{perf_measure}_vs_{scale_var}_{series}.png"
         self.write(fig, chart_filename, pdf_report)
 
-    def validate_spec(self, chart_spec):
+    def validate_spec(self, chart_spec, result_index):
         """Validates that the FOMs and variables in the chart spec are in the results data."""
+        all_foms = get_all_foms(result_index)
+        all_vars = get_all_vars(result_index)
+
         for var in chart_spec:
-            if (
-                var not in self.results_df.columns
-                and var not in self.results_df.loc[:, ReportVars.FOM_NAME.value].values
-            ):
-                logger.debug(f"Available options: {self.results_df.loc[:, 'fom_name'].unique()}")
-                logger.die(f"{var} was not found in the results data.")
+            if var not in all_foms and var not in all_vars:
+                logger.die(
+                    f"{var} was not found in the results data. Use `ramble results index -v` "
+                    "to see available FOMs and variables."
+                )
 
     def write(self, fig, filename, pdf_report):
         filename = filename.replace(" ", "-")
@@ -414,12 +620,13 @@ class ScalingPlotGenerator(PlotGenerator):
     def generate_plot_data(self, pdf_report):
         """Creates a dataframe for plotting line charts with scaling var on x axis,
         and performance variable on y axis."""
-        self.validate_spec(self.spec)
+        pd = import_pandas()
+        self.validate_spec(self.spec, self.result_index)
 
         perf_measure, scale_var, *additional_vars = self.spec
 
         # FOMs are by row, so select only rows with the perf_measure FOM
-        results = self.results_df.query(f'fom_name == "{perf_measure}"').copy()
+        results = extract_data(self.exp_results, [perf_measure], [scale_var] + additional_vars)
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
         if len(results.loc[:, ReportVars.BETTER_DIRECTION.value].unique()) == 1:
@@ -445,10 +652,10 @@ class ScalingPlotGenerator(PlotGenerator):
                 'or fom_origin_type == "modifier" or fom_origin_type == "summary::mean")'
             ).copy()
 
-            series_results.loc[:, ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+            series_results[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
                 series_results[ReportVars.FOM_VALUE.value]
             )
-            series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+            series_results[scale_var] = to_numeric_if_possible(series_results[scale_var])
             series_results = series_results.set_index(scale_var)
 
             self.validate_data(series_results)
@@ -514,8 +721,8 @@ class ScalingPlotGenerator(PlotGenerator):
 
         return selected_data
 
-    def validate_spec(self, chart_spec):
-        super().validate_spec(chart_spec)
+    def validate_spec(self, chart_spec, result_index):
+        super().validate_spec(chart_spec, result_index)
         for chart_spec in self.spec:
             if len(chart_spec) < 2:
                 logger.die(
@@ -603,22 +810,24 @@ class FomPlot(PlotGenerator):
     plot_type = "foms"
 
     def generate_plot_data(self, pdf_report):
-        results = self.results_df
+        fom_list = get_all_foms(self.result_index)
+        results = extract_data(self.exp_results, fom_list, [])
+
         all_foms = results.loc[:, ReportVars.FOM_NAME.value].unique()
         for fom in all_foms:
             series_results = results.query(
                 f'fom_name == "{fom}" and (fom_origin_type == "application" or '
                 'fom_origin_type == "modifier" or fom_origin_type == "summary::mean" or '
-                'fom_origin_type == "summary::n_total_repeats")'
+                f'fom_origin_type == "summary::{SummaryFoms.N_TOTAL.value}")'
             ).copy()
 
-            scale_var = "simplified_experiment_namespace"
+            scale_var = "experiment_namespace"
 
-            series_results.loc[:, ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
+            series_results[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
                 series_results[ReportVars.FOM_VALUE.value]
             )
 
-            series_results.loc[:, scale_var] = to_numeric_if_possible(series_results[scale_var])
+            series_results[scale_var] = to_numeric_if_possible(series_results[scale_var])
 
             series_results = series_results.set_index(scale_var)
 
@@ -647,14 +856,13 @@ class FomPlot(PlotGenerator):
 
     # TODO: dry bar plot drawing
     def draw(self, perf_measure, scale_var, series, unit, pdf_report):
+        pd = import_pandas()
 
         self.output_df[ReportVars.FOM_VALUE.value] = to_numeric_if_possible(
             self.output_df[ReportVars.FOM_VALUE.value]
         )
 
-        from pandas.api.types import is_numeric_dtype
-
-        if not is_numeric_dtype(self.output_df[ReportVars.FOM_VALUE.value]):
+        if not pd.api.types.is_numeric_dtype(self.output_df[ReportVars.FOM_VALUE.value]):
             logger.warn(f"Skipping drawing of non numeric FOM: {perf_measure}")
             return
 
@@ -664,7 +872,7 @@ class FomPlot(PlotGenerator):
 
         # ax.set_label('Label via method')
         legend_text = perf_measure
-        if len(unit) > 0:
+        if unit:
             legend_text = f"{perf_measure} ({unit})"
 
         ax.legend([legend_text])
@@ -706,8 +914,10 @@ class ComparisonPlot(PlotGenerator):
         foms = []
         dimensions = []
 
+        all_foms = get_all_foms(self.result_index)
+
         for input_spec in self.spec:
-            if input_spec in self.results_df.loc[:, ReportVars.FOM_NAME.value].values:
+            if input_spec in all_foms:
                 foms.append(input_spec)
             else:
                 dimensions.append(input_spec)
@@ -715,10 +925,9 @@ class ComparisonPlot(PlotGenerator):
         if not dimensions:
             dimensions.append("experiment_name")
 
-        raw_results = self.results_df[
-            self.results_df.loc[:, ReportVars.FOM_NAME.value].isin(foms)
-        ].copy()
+        raw_results = extract_data(self.exp_results, foms, dimensions)
 
+        logger.debug(raw_results)
         raw_results.loc[:, "Figure of Merit"] = (
             raw_results.loc[:, ReportVars.FOM_NAME.value]
             + " ("
@@ -754,7 +963,7 @@ class ComparisonPlot(PlotGenerator):
 
 class MultiLinePlot(ScalingPlotGenerator):
     plot_type = "multi_line"
-    series_to_plot = []
+    series_to_plot: List[str] = []
 
     def default_better(self):
         return BetterDirection.HIGHER
@@ -852,7 +1061,7 @@ def get_reports_path():
     return report_path
 
 
-def make_report(results_df, ws_name, args):
+def make_report(experiments: list, ws_name, args):
     dt = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
     report_dir_root = get_reports_path()
 
@@ -862,7 +1071,7 @@ def make_report(results_df, ws_name, args):
     fs.mkdirp(report_dir_path)
 
     plot_factory = PlotFactory()
-    plot = plot_factory.create_plot_generator(args, report_dir_path, results_df)
+    plot = plot_factory.create_plot_generator(args, report_dir_path, experiments)
     plot_type = plot.plot_type
 
     pdf_filename = f"{report_name}.{plot_type}.pdf"

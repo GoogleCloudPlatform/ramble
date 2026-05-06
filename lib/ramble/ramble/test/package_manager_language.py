@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,11 +9,13 @@
 
 import pytest
 
-from ramble.pkgmankit import *  # noqa
+import ramble.repository
 
-pm_types = [
-    PackageManagerBase,  # noqa: F405
-]
+UserManagedPackageManager = ramble.repository.get_obj_class(
+    "user-managed", ramble.repository.ObjectTypes.package_managers
+)
+
+pm_types = [UserManagedPackageManager]
 
 
 @pytest.mark.parametrize("pm_class", pm_types)

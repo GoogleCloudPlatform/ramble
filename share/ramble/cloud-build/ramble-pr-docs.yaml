@@ -1,0 +1,68 @@
+# Copyright 2022-2026 The Ramble Authors
+#
+# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
+# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
+# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your
+# option. This file may not be copied, modified, or distributed
+# except according to those terms.
+
+tags:
+  # This is used for filtering builds related to a specific PR
+  - '$TRIGGER_NAME-$_PR_NUMBER'
+steps:
+  # Cancel older builds
+  - name: 'gcr.io/cloud-builders/gcloud'
+    entrypoint: 'bash'
+    args:
+      - '-c'
+      - 'share/ramble/cloud-build/cancel-older-builds.sh'
+    env:
+      - 'PR_NUMBER=$_PR_NUMBER'
+      - 'TRIGGER_NAME=$TRIGGER_NAME'
+      - 'BUILD_ID=$BUILD_ID'
+      - 'PROJECT_ID=$PROJECT_ID'
+  - name: gcr.io/cloud-builders/git
+    args:
+      - fetch
+      - '--unshallow'
+    id: ramble-clone
+  - name: us-central1-docker.pkg.dev/$PROJECT_ID/ramble-repo/ramble-${_BASE_IMG}-${_BASE_VER}-spack${_SPACK_REF}-python${_PYTHON_VER}:latest
+    args:
+      - '-c'
+      - |
+        set -e
+        cd /workspace
+
+        git branch develop origin/develop
+
+        . /opt/spack/share/spack/setup-env.sh
+
+        spack load py-pip ^python
+
+        pip install -r /workspace/requirements-pinned.txt
+
+        export SPACK_PYTHON=`which python3`
+
+        . /workspace/share/ramble/setup-env.sh
+
+        echo "Spack version is $(spack --version)"
+        echo "Python version is $(python3 --version)"
+
+        cd lib/ramble/docs
+
+        python -m pip install --upgrade --no-cache-dir pip setuptools
+        python -m pip install --upgrade --no-cache-dir sphinx
+        python -m pip install --exists-action=w --no-cache-dir -r requirements.txt
+        mkdir -p test_docs/html
+        python -m sphinx -T -W --keep-going -b html -d _build/doctrees -D language=en . test_docs/html
+        rm -r test_docs
+    id: ramble-docs-test
+    entrypoint: /bin/bash
+substitutions:
+  _SPACK_REF: v1.0.0
+  _PYTHON_VER: 3.13.5
+  _BASE_IMG: rockylinux
+  _BASE_VER: '8'
+timeout: 600s
+options:
+  machineType: N1_HIGHCPU_8

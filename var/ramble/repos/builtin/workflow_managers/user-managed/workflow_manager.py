@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -25,3 +25,19 @@ class UserManaged(WorkflowManagerBase):
 """,
         description="Banner to describe the workflow within execution templates",
     )
+
+    workflow_manager_variable(
+        name="mpi_command",
+        default="mpirun -n {n_ranks}",
+        description="mpirun prefix, mostly served as an overridable default",
+    )
+
+    workflow_manager_variable(
+        name="batch_submit",
+        default="{execute_experiment}",
+        description="batch_submit script, mostly served as an overridable default",
+    )
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -184,3 +184,7 @@ class GkeMpi(WorkflowManagerBase):
         if os.path.exists(launcher_log):
             log_file = expander.expand_var_name("log_file")
             shutil.copy2(launcher_log, log_file)
+
+    def get_status(self, workspace):
+        """Return status of a given job"""
+        return None

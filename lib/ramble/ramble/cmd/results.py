@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -9,9 +9,12 @@
 import json
 import os
 
+from llnl.util.tty.colify import colified
+
 import ramble.cmd
 import ramble.reports
 import ramble.uploader
+import ramble.util.colors as color
 from ramble.util.logger import logger
 
 import spack.util.spack_yaml as syaml
@@ -28,6 +31,19 @@ def setup_parser(subparser):
         "upload", help=results_upload.__doc__, description=results_upload.__doc__
     )
     upload_parser.add_argument("filename", help="path of file to upload")
+
+    index_parser = sp.add_parser(
+        "index", help=results_index.__doc__, description=results_index.__doc__
+    )
+    index_parser.add_argument(
+        "-v",
+        "--all-vars",
+        dest="all_vars",
+        action="store_true",
+        help="print all variable names",
+        required=False,
+    )
+    index_parser.add_argument("-f", "--file", help="path of results file")
 
     report_parser = sp.add_parser(
         "report", help=results_report.__doc__, description=results_report.__doc__
@@ -174,7 +190,7 @@ def _load_results(args):
         1. via ``ramble results report -f FILENAME``
         2. via ``ramble -w WRKSPC`` or ``ramble -D DIR`` or
         ``ramble results report --workspace WRKSPC``(arguments)
-        3. via a path in the ramble.workspace.ramble_workspace_var environment variable.
+        3. via a path in the ramble.workspace.RAMBLE_WORKSPACE_VAR environment variable.
     """
     results_dict = {}
 
@@ -209,21 +225,51 @@ def _load_results(args):
     return results_dict
 
 
+def _print_attr_dict(attr_dict: dict, n_indent=0):
+    for attr, values in attr_dict.items():
+        indentation = " " * n_indent
+        color.cprint(f"{indentation}{color.title_color(attr, n_indent)}:")
+        if isinstance(values, dict):
+            _print_attr_dict(values, n_indent + 4)
+        else:
+            color.cprint(colified(sorted(values), tty=True, indent=n_indent + 4))
+
+
+def results_index(args):
+    """List attributes in results including FOMs and template variables"""
+    results_dict = _load_results(args)
+    filtered_experiments = ramble.reports.filter_exp_results(results_dict["experiments"])
+    result_index = ramble.reports.generate_result_index(
+        filtered_experiments, all_vars=args.all_vars
+    )
+    for obj_name, obj_dict in result_index.items():
+        if obj_dict:
+            color.cprint(color.title_color(f'{obj_name.replace("_", " ").title()}:'))
+            if obj_name == "All Variables" and not args.all_vars:
+                continue
+            _print_attr_dict(obj_dict, n_indent=4)
+
+
 def results_report(args):
     """Create a report with charts from Ramble experiment results."""
     results_dict = _load_results(args)
 
-    ws_name = results_dict["workspace_name"]
-    if not ws_name:
+    if "workspace_name" in results_dict:
+        ws_name = results_dict["workspace_name"]
+    else:
         ws_name = "unknown_workspace"
 
     if args.workspace:
         ws_name = str(args.workspace)
 
-    results_df = ramble.reports.prepare_data(results_dict, args.where)
-    ramble.reports.make_report(results_df, ws_name, args)
+    filtered_experiments = ramble.reports.filter_exp_results(results_dict["experiments"])
+    ramble.reports.make_report(filtered_experiments, ws_name, args)
 
 
 def results(parser, args):
-    action = {"upload": results_upload, "report": results_report}
+    action = {
+        "upload": results_upload,
+        "index": results_index,
+        "report": results_report,
+    }
     action[args.results_command](args)

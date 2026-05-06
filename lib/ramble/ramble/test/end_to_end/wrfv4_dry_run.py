@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -47,7 +47,7 @@ ramble:
               - name: 'timing'
                 mode: 'string'
                 match: '.*Timing for main.*'
-                file: '{experiment_run_dir}/rsl.out.0000'
+                file: '{experiment_run_dir}/rsl.out.base'
               env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
@@ -122,14 +122,15 @@ compilers:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         license_path = os.path.join(ws1.config_dir, "licenses.yaml")
+
         compilers_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name, "compilers.yaml"
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME, "compilers.yaml"
         )
 
         aux_software_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
@@ -160,7 +161,7 @@ compilers:
         assert search_files_for_string(
             out_files,
             "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz",
-        )  # noqa
+        )
 
         # Test software directories
         software_dirs = ["wrfv4", "wrfv4-portable"]
@@ -258,21 +259,21 @@ compilers:
                 assert "spack env activate" in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.0000"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
 
             # Create files that match archive patterns
-            for i in range(0, 5):
-                new_name = "rsl.error.000%s" % i
-                new_file = os.path.join(exp_dir, new_name)
+            new_file = os.path.join(exp_dir, "rsl.error.base")
 
-                f = open(new_file, "w+")
-                f.close()
+            f = open(new_file, "w+")
+            f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
-        symlink_results_file = os.path.join(ws1.root, "results.latest.txt")
+        if not os.path.exists(ws1.results_dir):
+            os.makedirs(ws1.results_dir)
+        symlink_results_file = os.path.join(ws1.results_dir, "results.latest.txt")
         # Temporarily store some temp data in the "latest" result and check it
         # gets updated
         with open(tmp_results_file, "w+") as f:
@@ -281,9 +282,9 @@ compilers:
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        json_results_files = glob.glob(os.path.join(ws1.root, "results*.json"))
-        yaml_results_files = glob.glob(os.path.join(ws1.root, "results*.yaml"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
+        json_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.json"))
+        yaml_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.yaml"))
 
         # Match both the file and the symlink
         assert len(text_results_files) == 2
@@ -315,9 +316,8 @@ compilers:
             assert os.path.isdir(exp_dir)
             assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
-            assert os.path.exists(os.path.join(exp_dir, "rsl.out.0000"))
-            for i in range(0, 5):
-                assert os.path.exists(os.path.join(exp_dir, f"rsl.error.000{i}"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.out.base"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.error.base"))
 
 
 @pytest.mark.maybeslow
@@ -343,7 +343,7 @@ ramble:
               - name: 'timing'
                 mode: 'string'
                 match: '.*Timing for main.*'
-                file: '{experiment_run_dir}/rsl.out.0000'
+                file: '{experiment_run_dir}/rsl.out.base'
               env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
@@ -377,11 +377,11 @@ licenses:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         license_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
         aux_software_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
@@ -409,7 +409,7 @@ licenses:
         assert search_files_for_string(
             out_files,
             "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz",
-        )  # noqa
+        )
 
         expected_experiments = [
             "scaling_1_part1_wrfv4",
@@ -489,21 +489,21 @@ licenses:
                 assert os.path.join(exp_dir, f"{exp}.out") in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.0000"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
 
             # Create files that match archive patterns
-            for i in range(0, 5):
-                new_name = "rsl.error.000%s" % i
-                new_file = os.path.join(exp_dir, new_name)
+            new_file = os.path.join(exp_dir, "rsl.error.base")
 
-                f = open(new_file, "w+")
-                f.close()
+            f = open(new_file, "w+")
+            f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
-        symlink_results_file = os.path.join(ws1.root, "results.latest.txt")
+        if not os.path.exists(ws1.results_dir):
+            os.makedirs(ws1.results_dir)
+        symlink_results_file = os.path.join(ws1.results_dir, "results.latest.txt")
         # Temporarily store some temp data in the "latest" result and check it
         # gets updated
         with open(tmp_results_file, "w+") as f:
@@ -512,9 +512,9 @@ licenses:
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        text_results_files = glob.glob(os.path.join(ws1.root, "results*.txt"))
-        json_results_files = glob.glob(os.path.join(ws1.root, "results*.json"))
-        yaml_results_files = glob.glob(os.path.join(ws1.root, "results*.yaml"))
+        text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
+        json_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.json"))
+        yaml_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.yaml"))
 
         # Match both the file and the symlink
         assert len(text_results_files) == 2
@@ -544,6 +544,5 @@ licenses:
             assert os.path.isdir(exp_dir)
             assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
-            assert os.path.exists(os.path.join(exp_dir, "rsl.out.0000"))
-            for i in range(0, 5):
-                assert os.path.exists(os.path.join(exp_dir, f"rsl.error.000{i}"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.out.base"))
+            assert os.path.exists(os.path.join(exp_dir, "rsl.error.base"))

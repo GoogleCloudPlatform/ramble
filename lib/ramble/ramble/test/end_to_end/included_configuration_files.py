@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -60,7 +60,7 @@ applications:
             - name: 'timing'
               mode: 'string'
               match: '.*Timing for main.*'
-              file: '{experiment_run_dir}/rsl.out.0000'
+              file: '{experiment_run_dir}/rsl.out.base'
             env_vars:
               set:
                 OMP_NUM_THREADS: '{n_threads}'
@@ -112,7 +112,7 @@ software:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -138,7 +138,7 @@ software:
         assert search_files_for_string(
             out_files,
             "Would download https://www2.mmm.ucar.edu/wrf/users/benchmark/v422/v42_bench_conus12km.tar.gz",
-        )  # noqa
+        )
 
         # Test software directories
         software_dirs = ["wrfv4", "wrfv4-portable"]

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -14,6 +14,7 @@ import ramble.language.language_base
 import ramble.language.language_helpers
 import ramble.success_criteria
 import ramble.variants
+from ramble.definitions.versions import ObjectVersion
 from ramble.util.foms import FomType
 from ramble.util.logger import logger
 from ramble.util.spec_utils import SoftwareSpec
@@ -41,7 +42,6 @@ class SharedMeta(ramble.language.language_base.DirectiveMeta):
     _directives_to_be_executed = []
 
 
-# shared_directive = ramble.language.language_base.DirectiveMeta.directive
 shared_directive = SharedMeta.directive
 
 
@@ -98,13 +98,14 @@ def figure_of_merit_context(name, regex, output_format, when=None, **kwargs):
 @shared_directive("figures_of_merit")
 def figure_of_merit(
     name,
-    fom_regex,
-    group_name,
+    fom_regex=None,
+    group_name=None,
     log_file="{log_file}",
     units="",
     contexts=None,
     fom_type: FomType = FomType.UNDEFINED,
     when=None,
+    fom_map_key=None,
     **kwargs,
 ):
     """Adds a figure of merit to track for this object
@@ -122,9 +123,16 @@ def figure_of_merit(
                                    should exist in.
       fom_type (ramble.util.foms.FomType): The type of figure of merit
       when (list | None): List of when conditions to apply to directive
+      fom_map_key: If supplied, this is treated as an in-memory (as opposed to file-based)
+                   figure of merit, and its value is extracted using this key
     """
 
     def _execute_figure_of_merit(obj):
+        if fom_map_key is None:
+            if fom_regex is None or group_name is None:
+                raise ramble.language.language_base.DirectiveError(
+                    "`fom_regex` and `group_name` are required for defining file-based FOM"
+                )
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "figure_of_merit"
         )
@@ -146,6 +154,7 @@ def figure_of_merit(
             "fom_type": fom_type,
             "when": when_list,
             "origin_type": obj.origin_type if hasattr(obj, "origin_type") else "",
+            "fom_map_key": fom_map_key,
         }
 
     return _execute_figure_of_merit
@@ -153,7 +162,14 @@ def figure_of_merit(
 
 @shared_directive("compilers")
 def define_compiler(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
+    name,
+    pkg_spec,
+    compiler_spec=None,
+    compiler=None,
+    package_manager=None,
+    inject_if_missing=False,
+    when=None,
+    **kwargs,
 ):
     """Defines the compiler that will be used with this object
 
@@ -167,6 +183,8 @@ def define_compiler(
         compiler (str): Package name to use for compilation
         package_manager (str): Glob supported pattern to match package managers
                                this compiler applies to
+        inject_if_missing (bool): Whether the package should be defined if a
+                                  matching package is not already defined
         when (list | None): List of when conditions to apply to directive
     """
 
@@ -187,7 +205,12 @@ def define_compiler(
 
         obj.compilers[name].append(
             SoftwareSpec(
-                name, pkg_spec, compiler=compiler, compiler_spec=compiler_spec, when=when_list
+                name,
+                pkg_spec,
+                compiler=compiler,
+                compiler_spec=compiler_spec,
+                inject_if_missing=inject_if_missing,
+                when=when_list,
             )
         )
 
@@ -196,13 +219,19 @@ def define_compiler(
 
 @shared_directive("software_specs")
 def software_spec(
-    name, pkg_spec, compiler_spec=None, compiler=None, package_manager=None, when=None, **kwargs
+    name,
+    pkg_spec,
+    compiler_spec=None,
+    compiler=None,
+    package_manager=None,
+    inject_if_missing=False,
+    when=None,
+    **kwargs,
 ):
     """Defines a new software spec needed for this object.
 
-    Adds a new software spec (for spack to use) that this object
+    Adds a new software spec that this object
     needs to execute properly.
-    Only adds specs to object that use spack.
 
     Specs can be described as an mpi spec, which means they
     will depend on the MPI library within the resulting spack
@@ -216,6 +245,8 @@ def software_spec(
         compiler (str): Package name to use as compiler for compiling this package
         package_manager (str): Glob supported pattern to match package managers
                                this package applies to
+        inject_if_missing (bool): Whether the package should be added to experiment
+                                  environments automatically or not.
         when (list | None): List of when conditions to apply to directive
     """
 
@@ -237,7 +268,12 @@ def software_spec(
         # Define the spec
         obj.software_specs[name].append(
             SoftwareSpec(
-                name, pkg_spec, compiler=compiler, compiler_spec=compiler_spec, when=when_list
+                name,
+                pkg_spec,
+                compiler=compiler,
+                compiler_spec=compiler_spec,
+                inject_if_missing=inject_if_missing,
+                when=when_list,
             )
         )
 
@@ -509,12 +545,12 @@ def register_phase(name, pipeline=None, run_before=None, run_after=None, when=No
             when, obj, name, "register_phase"
         )
 
-        if pipeline not in obj._pipelines:
+        if pipeline not in obj.pipelines:
             raise ramble.language.language_base.DirectiveError(
                 "Directive register_phase was "
                 f'given an invalid pipeline "{pipeline}"\n'
                 "Available pipelines are: "
-                f" {obj._pipelines}"
+                f" {obj.pipelines}"
             )
 
         if not isinstance(run_before, list):
@@ -573,7 +609,7 @@ def maintainers(*names: str, **kwargs):
     def _execute_maintainer(obj):
         maintainers_from_base = getattr(obj, "maintainers", [])
         # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        obj.maintainers = list(sorted(set(maintainers_from_base + list(names))))
+        obj.maintainers = sorted(set(maintainers_from_base + list(names)))
 
     return _execute_maintainer
 
@@ -590,7 +626,7 @@ def tags(*values: str, **kwargs):
     def _execute_tag(obj):
         tags_from_base = getattr(obj, "tags", [])
         # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        obj.tags = list(sorted(set(tags_from_base + list(values))))
+        obj.tags = sorted(set(tags_from_base + list(values)))
 
     return _execute_tag
 
@@ -768,10 +804,12 @@ def variable(
     default,
     description: str,
     values: Optional[list] = None,
+    strict: bool = True,
     expandable: bool = True,
     track_used: bool = False,
     when=None,
     error_context="variable",
+    environment_variable_name: Optional[str] = None,
     **kwargs,
 ):
     """Define a variable for this modifier
@@ -781,15 +819,19 @@ def variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
+        strict (bool): If True (the default) and values is not None, the variable's value
+                       will be validated against the values list.
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
                            experiments.
         when (list | None): List of when conditions to apply to directive
+        environment_variable_name (str | None): If not None, an environment variable of this name
+                                                will be defined with the value of this variable.
     """
 
     def _define_variable(obj):
-        import ramble.workload
+        import ramble.definitions.variables
 
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, error_context
@@ -801,7 +843,7 @@ def variable(
             obj.object_variables[when_set] = []
 
         obj.object_variables[when_set].append(
-            ramble.workload.WorkloadVariable(
+            ramble.definitions.variables.Variable(
                 name,
                 default=default,
                 description=description,
@@ -811,6 +853,23 @@ def variable(
             )
         )
 
+        if strict and values is not None:
+            ramble.language.language_helpers.add_variable_validator(obj, name, values, when_list)
+
+        if environment_variable_name is not None:
+            if when_set not in obj.object_environment_variables:
+                obj.object_environment_variables[when_set] = []
+
+            obj.object_environment_variables[when_set].append(
+                ramble.definitions.variables.EnvironmentVariable(
+                    environment_variable_name,
+                    value=f"{{{name}}}",
+                    description=description,
+                    method="set",
+                    when=when_list,
+                )
+            )
+
     return _define_variable
 
 
@@ -819,6 +878,8 @@ def environment_variable(
     name,
     value,
     description,
+    method="set",
+    append_separator=",",
     workload=None,
     workloads=None,
     workload_group=None,
@@ -832,6 +893,8 @@ def environment_variable(
         name (str): Name of environment variable to define
         value (str): Value to set env-var to
         description (str): Description of the env-var
+        method (str): The method to use when defining the env-var.
+                      Can be "set", "append", or "prepend"
         workload (str): Name of app workload this env-var should be added to
         workloads (list(str)): List of app workload names this env-var should be
                                added to
@@ -841,12 +904,25 @@ def environment_variable(
     """
 
     def _execute_environment_variable(obj):
+        supported_methods = ["set", "append", "prepend"]
+        if method not in supported_methods:
+            raise ramble.language.language_base.DirectiveError(
+                "environment_variable directive given an invalid method of "
+                f"{method}. Supported methods are {str(supported_methods)}"
+            )
+
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "environment_variable"
         )
 
-        workload_env_var = ramble.workload.WorkloadEnvironmentVariable(
-            name, value=value, description=description, when=when_list, **kwargs
+        workload_env_var = ramble.definitions.variables.EnvironmentVariable(
+            name,
+            value=value,
+            description=description,
+            method=method,
+            append_separator=append_separator,
+            when=when_list,
+            **kwargs,
         )
 
         if workload or workloads or workload_group:
@@ -860,27 +936,49 @@ def environment_variable(
                 workload, workloads, obj.workloads, "workload", "workloads", "environment_variable"
             )
 
+            env_var_when_frozenset = frozenset(workload_env_var.when)
             for when_set, app_workloads in obj.workloads.items():
                 for wl_name in all_workloads:
                     if wl_name in app_workloads:
-                        obj.workloads[when_set][wl_name].add_environment_variable(
-                            workload_env_var.copy()
-                        )
+                        if ramble.language.language_helpers.are_when_compatible(
+                            when_set, env_var_when_frozenset
+                        ):
+                            obj.workloads[when_set][wl_name].add_environment_variable(
+                                workload_env_var.copy()
+                            )
 
             if workload_group is not None:
-                workload_group_list = obj.workload_groups[workload_group]
+                workload_group_inst = obj.workload_groups[workload_group]
 
                 if workload_group not in obj.workload_group_env_vars:
                     obj.workload_group_env_vars[workload_group] = []
 
                 obj.workload_group_env_vars[workload_group].append(workload_env_var.copy())
 
-                for when_set, app_workloads in obj.workloads.items():
-                    for wl_name in workload_group_list:
-                        if wl_name in app_workloads:
-                            obj.workloads[when_set][wl_name].add_environment_variable(
-                                workload_env_var.copy()
-                            )
+                # TODO: See if there's a way to clean this up. We can't evaluate 'when' here due to
+                # lack of expander, so this merges the 'when' of wl group with the 'when' of vars
+                # and env vars to be evaluated later. It adds each var or env var to all workloads
+                # that match the name, but the merged 'when' ensures they're only activated for the
+                # correct workload group conditions.
+                wl_group_when_map = collections.defaultdict(list)
+                for wl_group_when_set, wl_group_workloads in workload_group_inst.workloads.items():
+                    for wl_name in wl_group_workloads:
+                        wl_group_when_map[wl_name].append(wl_group_when_set)
+
+                for app_wl_name, wl_group_when_sets in wl_group_when_map.items():
+                    for wl_group_when_set in wl_group_when_sets:
+                        workload_env_var_copy = workload_env_var.copy()
+                        workload_env_var_copy.when.extend(wl_group_when_set)
+                        env_var_when_frozenset = frozenset(workload_env_var_copy.when)
+
+                        for when_set, app_workloads in obj.workloads.items():
+                            if app_wl_name in app_workloads:
+                                if ramble.language.language_helpers.are_when_compatible(
+                                    when_set, env_var_when_frozenset
+                                ):
+                                    obj.workloads[when_set][app_wl_name].add_environment_variable(
+                                        workload_env_var_copy
+                                    )
         else:
             when_set = frozenset(when_list)
             if when_set not in obj.object_environment_variables:
@@ -891,7 +989,7 @@ def environment_variable(
     return _execute_environment_variable
 
 
-@shared_directive(dicts=())
+@shared_directive("class_variants")
 def variant(
     name: str,
     default: Optional[Any] = None,
@@ -912,29 +1010,152 @@ def variant(
         """
         ramble.variants.validate_variant(name)
 
-        if obj.object_variants is None:
-            obj.object_variants = ramble.variants.VariantSet()
+        args_dict = {
+            "name": name,
+            "default": default,
+            "description": description,
+            "values": values,
+        }
+        args_dict.update(kwargs)
 
-        obj.object_variants.default_variant(
-            name, default=default, description=description, values=values
-        )
+        obj.class_variants[name] = args_dict
 
     return _define_variant
 
 
+@shared_directive("known_versions")
+def version(
+    number: str,
+    description: str = "",
+    preferred: bool = False,
+    **kwargs,
+):
+    """Define a new version in the input object
+
+    Args:
+        number: Version number (Python packaging version format)
+        description: Description of this version
+        preferred: Mark this version as preferred. Only one version can be preferred.
+    """
+
+    def _define_version(obj):
+        new_version = ObjectVersion(
+            version_number=number,
+            description=description,
+            origin_type=obj.origin_type,
+            preferred=preferred,
+            version_to_pep440=obj.version_to_pep440,
+            pep440_to_version=obj.pep440_to_version,
+        )
+
+        # Ensure only one version is marked as preferred
+        if new_version.preferred:
+            if not hasattr(obj, "preferred_version"):
+                obj.preferred_version = new_version
+            elif obj.preferred_version.version == new_version.version:
+                # Ignore identical preferred versions, which happens when app is subclassed
+                pass
+            else:
+                raise ramble.language.language_base.DirectiveError(
+                    f"Object {obj.name} already has a preferred version "
+                    f"({obj.preferred_version.version}). Only one version can be marked preferred."
+                )
+        obj.known_versions[number] = new_version
+
+    return _define_version
+
+
+@shared_directive(dicts=())
+def strict_versions(strict: bool = True, **kwargs):
+    """Directive to specify if the object has strict versioning.
+    If true, only known versions can be used in experiments.
+
+    Args:
+        strict (bool): Whether strict versioning is enabled.
+    """
+
+    def _execute_strict_versions(obj):
+        obj.enable_strict_versions = strict
+
+    return _execute_strict_versions
+
+
+@shared_directive("required_vars")
+def required_variable(
+    var: str,
+    results_level="variable",
+    description=None,
+    mode=None,
+    modes=None,
+    when=None,
+    **kwargs,
+):
+    """Mark a variable as being required by this modifier
+
+    Args:
+        var (str): Variable name to mark as required
+        results_level (str): 'variable' or 'key'. If 'key', variable is promoted to
+                             a key within JSON or YAML formatted results.
+        description (str | None): Description of the required variable.
+        mode (str | None): mode that the required check should be applied to. The
+                            default None means apply to all modes.
+        modes (list[str] | None): modes that the required check should be applied to. The
+                            default None means apply to all modes.
+        when (list | None): List of when conditions to apply the required check.
+    """
+
+    def _mark_required_var(obj):
+        if mode or modes:
+            if obj.origin_type and obj.origin_type == "modifier":
+                when_lists = ramble.language.language_helpers.merge_conditions(
+                    obj, "required_variable", "mode", "modes", mode=mode, modes=modes, when=when
+                )
+            else:
+                raise ramble.language.language_base.DirectiveError(
+                    f"A mode argument was provided for required variable {var} in object "
+                    f"{obj.name}. Mode arguments are only valid in a modifier definition."
+                )
+        else:
+            when_lists = [
+                ramble.language.language_helpers.build_when_list(
+                    when, obj, var, "required_variable"
+                )
+            ]
+
+        if results_level not in ["key", "variable"]:
+            raise ramble.language.language_base.DirectiveError(
+                "The results_level argument for required variable "
+                f"{var} is set to {results_level}.\n"
+                "Valid options are 'key' or 'variable'."
+            )
+
+        output_level = ramble.keywords.output_level.variable
+        if results_level == "key":
+            output_level = ramble.keywords.output_level.key
+
+        if var not in obj.required_vars:
+            obj.required_vars[var] = {
+                "type": ramble.keywords.key_type.required,
+                "level": output_level,
+                "description": description,
+                "when": [],
+            }
+
+        for when_list in when_lists:
+            obj.required_vars[var]["when"].append(when_list)
+
+    return _mark_required_var
+
+
 @contextlib.contextmanager
 def when(condition):
-    from ramble.language.language_base import DirectiveMeta
-
-    DirectiveMeta.push_to_context(condition)
+    ramble.language.language_base.DirectiveMeta.push_to_context(condition)
     yield
-    DirectiveMeta.pop_from_context()
+    ramble.language.language_base.DirectiveMeta.pop_from_context()
 
 
 @contextlib.contextmanager
 def default_args(**kwargs):
-    from ramble.language.language_base import DirectiveMeta
-
-    DirectiveMeta.push_default_args(kwargs)
+    ramble.language.language_base.DirectiveMeta.push_default_args(kwargs)
     yield
-    DirectiveMeta.pop_default_args()
+    ramble.language.language_base.DirectiveMeta.pop_default_args()

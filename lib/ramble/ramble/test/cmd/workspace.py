@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -17,34 +17,25 @@ import llnl.util.filesystem as fs
 import ramble.config
 import ramble.filters
 import ramble.pipeline
-import ramble.repository
 import ramble.workspace
 from ramble.error import RambleCommandError
-from ramble.main import RambleCommand
+from ramble.main import RambleCommand, main
 from ramble.namespace import namespace
 from ramble.test.dry_run_helpers import search_files_for_string
 
 import spack.util.spack_yaml as syaml
 
-ApplicationBase = ramble.repository.get_obj_class(
-    "application-base", object_type=ramble.repository.ObjectTypes.base_classes
-)
-
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
+    "mutable_config",
+    "mutable_mock_workspace_path",
+    "mutable_mock_apps_repo",
+    "workspace_deactivate",
 )
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 on = RambleCommand("on")
-
-
-@pytest.fixture()
-def workspace_deactivate():
-    yield
-    ramble.workspace._active_workspace = None
-    os.environ.pop("RAMBLE_WORKSPACE", None)
 
 
 def add_basic(ws):
@@ -116,23 +107,11 @@ def check_info_basic(output):
     assert "Software Stack" in output
 
 
-def check_info_zlib(output):
-    assert "zlib" in output
-    assert "ensure_installed" in output
-
-    assert "Application" in output
-    assert "Workload" in output
-    assert "Experiment" in output
-    assert "Software Stack" in output
-    assert "Template Package" in output
-    assert "Template Environment" in output
-
-
 def check_results(ws):
     fn = ws.dump_results(output_formats=["text", "json", "yaml"])
-    assert os.path.exists(os.path.join(ws.root, fn + ".txt"))
-    assert os.path.exists(os.path.join(ws.root, fn + ".json"))
-    assert os.path.exists(os.path.join(ws.root, fn + ".yaml"))
+    assert os.path.exists(os.path.join(ws.results_dir, fn + ".txt"))
+    assert os.path.exists(os.path.join(ws.results_dir, fn + ".json"))
+    assert os.path.exists(os.path.join(ws.results_dir, fn + ".yaml"))
 
 
 def test_workspace_create_links(mutable_mock_workspace_path, tmpdir):
@@ -156,6 +135,102 @@ def test_workspace_activate_fails(mutable_mock_workspace_path):
     workspace("create", "foo")
     out = workspace("activate", "foo")
     assert "To set up shell support" in out
+
+
+def test_workspace_activate_prompt(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    # Assert no prompt modification
+    output = workspace("activate", workspace_name, "--sh")
+    assert "PS1" not in output
+
+    # Assert prompt mod with --prompt
+    output = workspace("activate", workspace_name, "--sh", "--prompt")
+    assert "export RAMBLE_OLD_PS1=" in output
+    assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+
+    # Assert prompt mod with config value
+    with ramble.config.override("config:enable_workspace_prompt", True):
+        output = workspace("activate", workspace_name, "--sh")
+        assert "export RAMBLE_OLD_PS1=" in output
+        assert f'PS1="[{workspace_name}] ${{PS1}}";' in output
+
+
+def test_workspace_activate_by_name(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    output = workspace("activate", workspace_name, "--sh")
+    assert f"export RAMBLE_WORKSPACE={ws.root}" in output
+
+
+def test_workspace_activate_by_dir(tmpdir):
+    with tmpdir.as_cwd():
+        workspace("create", "-d", "foo")
+        output = workspace("activate", "--dir", "foo", "--sh")
+        ws_path = os.path.abspath("foo")
+        assert f"export RAMBLE_WORKSPACE={ws_path}" in output
+
+
+def test_workspace_activate_temp():
+    """Test `ramble workspace activate --temp`."""
+    # Test without prompt decoration
+    output = workspace("activate", "--temp", "--sh")
+
+    match = re.search(r"export RAMBLE_WORKSPACE=([^;]+)", output)
+    workspace_path = match.group(1)
+
+    assert os.path.isdir(workspace_path)
+    assert ramble.workspace.is_workspace_dir(workspace_path)
+
+
+def test_workspace_activate_non_existent():
+    output = workspace("activate", "non-existent-ws", "--sh", fail_on_error=False)
+    assert "No such workspace: 'non-existent-ws'" in output
+
+
+def test_workspace_activate_no_args():
+    output = workspace("activate", fail_on_error=False)
+    assert "ramble workspace activate requires a workspace name, directory, or --temp" in output
+
+
+def test_workspace_deactivate(workspace_name):
+    """Test `ramble workspace deactivate`."""
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    # Test deactivation of a workspace
+    ramble.workspace.activate(ws)
+    output = workspace("deactivate", "--sh")
+    assert "unset RAMBLE_WORKSPACE;" in output
+    ramble.workspace.deactivate()
+
+    # Test deactivation restores prompt
+    ramble.workspace.activate(ws)
+    os.environ["RAMBLE_OLD_PS1"] = "old_prompt"
+    output = workspace("deactivate", "--sh")
+    assert 'PS1="$RAMBLE_OLD_PS1";' in output
+    assert "unset RAMBLE_OLD_PS1;" in output
+    del os.environ["RAMBLE_OLD_PS1"]
+    ramble.workspace.deactivate()
+
+    # Test deactivation fails when no workspace is active
+    if ramble.workspace.RAMBLE_WORKSPACE_VAR in os.environ:
+        del os.environ[ramble.workspace.RAMBLE_WORKSPACE_VAR]
+    output = workspace("deactivate", "--sh", fail_on_error=False)
+    assert "No workspace is currently active." in output
+
+    # Test deactivation fails without shell args
+    output = workspace("deactivate", fail_on_error=False)
+    assert "To set up shell support" in output
+
+    # Test deactivation fails with ambiguous flags
+    ramble.workspace.activate(ws)
+    output = workspace(
+        "deactivate", "--sh", global_args=["-w", workspace_name], fail_on_error=False
+    )
+    assert "is ambiguous" in output
 
 
 def test_workspace_list(mutable_mock_workspace_path):
@@ -221,7 +296,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -281,7 +356,7 @@ config:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    ramble_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    ramble_config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     config_scope_path = os.path.join(ws1.config_dir, "config.yaml")
 
     with open(ramble_config_path, "w+") as f:
@@ -335,7 +410,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -389,7 +464,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -454,10 +529,9 @@ def test_workspace_info_complete(workspace_name):
         assert f"Phases for {pipeline}" in output
 
     assert "Variants:" in output
-    assert "package_manager: spack" in output
+    assert "package_manager=spack" in output
 
     assert "Variables from Workspace" in output
-    assert "mpi_command = mpirun -n {n_ranks} ==> mpirun -n 1" in output
     assert "Variables from Experiment" in output
     assert "n_ranks = 1 ==> 1" in output
 
@@ -598,20 +672,20 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
 
     ws1._re_read()
 
-    assert search_files_for_string([config_path], "packages: {}") is True
-    assert search_files_for_string([config_path], "pkg_spec: zlib") is False
+    assert search_files_for_string([config_path], "packages: {}")
+    assert not search_files_for_string([config_path], "pkg_spec: zlib")
 
     workspace("concretize", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([config_path], "packages: {}") is False
-    assert search_files_for_string([config_path], "pkg_spec: zlib") is True
+    assert not search_files_for_string([config_path], "packages: {}")
+    assert search_files_for_string([config_path], "pkg_spec: zlib")
 
 
 def test_concretize_nothing():
@@ -623,13 +697,13 @@ def test_concretize_nothing():
         add_basic(ws)
         check_basic(ws)
 
-        assert search_files_for_string([ws.config_file_path], "packages: {}") is True
-        assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
+        assert search_files_for_string([ws.config_file_path], "packages: {}")
+        assert not search_files_for_string([ws.config_file_path], "pkg_spec:")
 
         ws.concretize()
 
-        assert search_files_for_string([ws.config_file_path], "packages: {}") is True
-        assert search_files_for_string([ws.config_file_path], "pkg_spec:") is False
+        assert search_files_for_string([ws.config_file_path], "packages: {}")
+        assert not search_files_for_string([ws.config_file_path], "pkg_spec:")
 
 
 def test_concretize_concrete_config(workspace_name):
@@ -675,7 +749,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -732,7 +806,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -741,13 +815,13 @@ ramble:
 
     workspace("concretize", "-f", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([config_path], "zlib:") is True
-    assert search_files_for_string([config_path], "zlib-test") is True
+    assert search_files_for_string([config_path], "zlib:")
+    assert search_files_for_string([config_path], "zlib-test")
 
     workspace("concretize", "--simplify", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([config_path], "zlib:") is True
-    assert search_files_for_string([config_path], "zlib-test") is False
+    assert search_files_for_string([config_path], "zlib:")
+    assert not search_files_for_string([config_path], "zlib-test")
 
 
 def test_setup_command():
@@ -978,6 +1052,40 @@ def test_edit_override_gets_correct_path():
         assert output == config_path
 
 
+def test_edit_with_faulty_config(workspace_name, capsys):
+    """Tests that `ramble workspace edit` works with a faulty config."""
+    bad_config = """
+ramble # Missing colon!
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: 1
+    n_nodes: 1
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment: {}
+"""
+    try:
+        ws = ramble.workspace.create(workspace_name)
+        ws.write()
+
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+        with open(config_path, "w") as f:
+            f.write(bad_config)
+
+        argv = ["-w", workspace_name, "workspace", "edit", "-c", "-p"]
+        # Use main instead of RambleCommand, as this tests the error handling
+        # only in the former.
+        main(argv)
+        captured = capsys.readouterr()
+        assert config_path in captured.out
+    finally:
+        main(["-w", workspace_name, "workspace", "remove", "-y"])
+
+
 def test_dryrun_setup(workspace_name):
     test_config = """
 ramble:
@@ -1002,7 +1110,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1067,7 +1175,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1119,7 +1227,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1170,7 +1278,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1211,7 +1319,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1251,7 +1359,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1292,7 +1400,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1337,7 +1445,7 @@ ramble:
 
     def write_config(ws_path, config):
         with ramble.workspace.Workspace(ws_path) as ws:
-            config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+            config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
             with open(config_path, "w+") as f:
                 f.write(config)
             ws._re_read()
@@ -1401,7 +1509,7 @@ licenses:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     lic_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
     with open(config_path, "w+") as f:
@@ -1468,7 +1576,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            ApplicationBase.license_inc_name,
+            ramble.workspace.LICENSE_INC_NAME,
         )
     )
 
@@ -1504,7 +1612,7 @@ licenses:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     lic_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
     with open(config_path, "w+") as f:
@@ -1533,7 +1641,7 @@ licenses:
             "shared",
             "licenses",
             "basic",
-            ApplicationBase.license_inc_name,
+            ramble.workspace.LICENSE_INC_NAME,
         )
     )
 
@@ -1562,7 +1670,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1570,7 +1678,7 @@ ramble:
     # Create more temlates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
@@ -1587,7 +1695,7 @@ ramble:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
@@ -1635,7 +1743,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1643,7 +1751,7 @@ ramble:
     # Create more templates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
@@ -1660,7 +1768,7 @@ ramble:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
@@ -1714,7 +1822,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1722,7 +1830,7 @@ ramble:
     # Create more templates
     new_templates = []
     for i in range(0, 5):
-        new_template = os.path.join(ws1.config_dir, "test_template.%s" % i)
+        new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
         f.close()
@@ -1739,7 +1847,7 @@ ramble:
     # Create files that match archive pattern
     new_files = []
     for i in range(0, 5):
-        new_name = "archive_test.%s" % i
+        new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
@@ -1749,9 +1857,7 @@ ramble:
     remote_archive_path = os.path.join(ws1.root, "archive_backup")
     fs.mkdirp(remote_archive_path)
 
-    config(
-        "add", "config:archive_url:%s/" % remote_archive_path, global_args=["-w", workspace_name]
-    )
+    config("add", f"config:archive_url:{remote_archive_path}/", global_args=["-w", workspace_name])
 
     workspace("archive", "-t", global_args=["-w", workspace_name])
 
@@ -1795,7 +1901,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1843,7 +1949,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -1867,7 +1973,7 @@ def test_workspace_include(workspace_name):
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_file = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_file = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     inc_file = os.path.join(ws1.config_dir, "test_include.yaml")
 
     test_include = """
@@ -1942,7 +2048,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     template_path = os.path.join(ws1.config_dir, f"{tpl_name}.tpl")
 
     with open(config_path, "w+") as f:
@@ -2003,7 +2109,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -2064,7 +2170,7 @@ ramble:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path, "w+") as f:
         f.write(test_config)
@@ -2142,7 +2248,7 @@ software:
     ws1 = ramble.workspace.create(workspace_name)
     ws1.write()
 
-    ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+    ws_config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     app_config_path = os.path.join(ws1.config_dir, "applications.yaml")
     software_config_path = os.path.join(ws1.config_dir, "software.yaml")
 
@@ -2155,25 +2261,25 @@ software:
 
     ws1._re_read()
 
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True
-    assert search_files_for_string([ws_config_path], "unused-pkg") is True
-    assert search_files_for_string([ws_config_path], "unused-env") is True
-    assert search_files_for_string([ws_config_path], "unused_exp_template") is True
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs") is True
-    assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
-    assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib")
+    assert search_files_for_string([ws_config_path], "unused-pkg")
+    assert search_files_for_string([ws_config_path], "unused-env")
+    assert search_files_for_string([ws_config_path], "unused_exp_template")
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs")
+    assert not search_files_for_string([ws_config_path], "app_not_in_ws_config")
+    assert not search_files_for_string([ws_config_path], "pkg_not_in_ws_config")
 
     workspace("concretize", "--simplify", global_args=["-w", workspace_name])
 
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib") is True  # keep used pkg
-    assert search_files_for_string([ws_config_path], "unused-pkg") is False  # remove unused pkg
-    assert search_files_for_string([ws_config_path], "unused-env") is False  # remove unused env
+    assert search_files_for_string([ws_config_path], "pkg_spec: zlib")  # keep used pkg
+    assert not search_files_for_string([ws_config_path], "unused-pkg")  # remove unused pkg
+    assert not search_files_for_string([ws_config_path], "unused-env")  # remove unused env
     # remove unused experiment template and associated pkgs/envs
-    assert search_files_for_string([ws_config_path], "unused_exp_template") is False
-    assert search_files_for_string([ws_config_path], "pkg_spec: zlib-configs") is False
+    assert not search_files_for_string([ws_config_path], "unused_exp_template")
+    assert not search_files_for_string([ws_config_path], "pkg_spec: zlib-configs")
     # ensure apps/pkgs/envs are not merged into workspace config from other config files
-    assert search_files_for_string([ws_config_path], "app_not_in_ws_config") is False
-    assert search_files_for_string([ws_config_path], "pkg_not_in_ws_config") is False
+    assert not search_files_for_string([ws_config_path], "app_not_in_ws_config")
+    assert not search_files_for_string([ws_config_path], "pkg_not_in_ws_config")
 
 
 def write_variables_config_file(file_path, levels, value):
@@ -2809,6 +2915,9 @@ def test_workspace_config_squash(workspace_name, capsys):
   foo: bar
   n_ranks: 1
   test_var: test_value
+  test_multiline_str: |-
+    This is a multi-line
+    String in YAML
 """
 
     test_software_include = """software:
@@ -2837,12 +2946,36 @@ def test_workspace_config_squash(workspace_name, capsys):
             "zlib",
             "--wf",
             "ensure_installed",
+            "-e",
+            "zlib-repeats",
             "-v",
             "n_ranks=1",
             "-v",
             "n_nodes=1",
             "-p",
             "spack",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Add repeats for one set of experiments.
+        config(
+            "add",
+            "applications:zlib:workloads:ensure_installed:experiments:zlib-repeats:n_repeats:5",
             global_args=global_args,
         )
 
@@ -2876,6 +3009,7 @@ def test_workspace_config_squash(workspace_name, capsys):
         assert "test_var: test_value" in config_output
         assert "gcc" in config_output
         assert "pkg_spec: gcc@9.3.0" in config_output
+        assert "test_multiline_str: |-" in config_output
 
         with open(ws.config_file_path, "w+") as f:
             f.write(config_output)
@@ -2895,3 +3029,121 @@ def test_workspace_config_squash(workspace_name, capsys):
             data = f.read()
             assert "foo: bar" not in data
             assert "test_var: test_value" not in data
+
+
+def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
+    test_vars_include = """variables:
+  foo: bar
+  n_ranks: 1
+  test_var: test_value
+"""
+
+    test_software_include = """software:
+  packages:
+    gcc:
+      pkg_spec: gcc@9.3.0 target=x86_64
+  environments:
+    gcc:
+      packages:
+      - gcc
+"""
+
+    global_args = ["-w", workspace_name]
+
+    include_root = str(tmpdir)
+
+    with ramble.workspace.create(workspace_name) as ws:
+        with open(f"{os.path.join(include_root, 'variables.yaml')}", "w+") as f:
+            f.write(test_vars_include)
+
+        with open(f"{os.path.join(include_root, 'software.yaml')}", "w+") as f:
+            f.write(test_software_include)
+
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-e",
+            "zlib-repeats",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        workspace(
+            "manage",
+            "experiments",
+            "zlib",
+            "--wf",
+            "ensure_installed",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        # Add repeats for one set of experiments.
+        config(
+            "add",
+            "applications:zlib:workloads:ensure_installed:experiments:zlib-repeats:n_repeats:5",
+            global_args=global_args,
+        )
+
+        workspace("concretize", global_args=global_args)
+
+        workspace("manage", "includes", "--add", include_root, global_args=global_args)
+
+        config_output = config("get", "variables", global_args=global_args)
+
+        assert "foo: bar" in config_output
+
+        ws.write()
+
+        output = workspace("config", "--simplify-software", global_args=global_args)
+
+        assert "No changes were made to software configuration sections" in output
+
+        with open(ws.config_file_path) as f:
+            data = f.read()
+            assert "pkg_spec: gcc@9.3.0" not in data
+            assert "gcc" not in data
+
+        output = workspace("config", "--simplify-variables", global_args=global_args)
+
+        assert "No variables were changed" in output
+
+
+def test_workspace_experiment_logs(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+        workspace(
+            "manage",
+            "experiments",
+            "basic",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            global_args=global_args,
+        )
+
+        output = workspace("experiment-logs", global_args=global_args)
+
+        expected_output = os.sep.join(
+            ["experiments", "basic", "test_wl", "generated", "generated.out"]
+        )
+        assert expected_output in output

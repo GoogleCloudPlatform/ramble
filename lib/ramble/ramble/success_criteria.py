@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -19,7 +19,7 @@ class ScopedCriteriaList:
     based on which portion of a workspace they are defined in.
 
     Possible scopes are:
-     - application_definition
+     - object_definitions
      - application
      - workload
      - experiment
@@ -28,14 +28,12 @@ class ScopedCriteriaList:
     """
 
     _valid_scopes = [
-        "application_definition",
-        "modifier_definition",
+        "object_definitions",
         "experiment",
     ]
     _flush_scopes = {
         "experiment": ["experiment"],
-        "modifier_definition": ["modifier_definition"],
-        "application_definition": ["application_definition"],
+        "object_definitions": ["object_definitions"],
     }
 
     def __init__(self):
@@ -55,13 +53,15 @@ class ScopedCriteriaList:
                 f"Possible scopes are: {self._valid_scopes}"
             )
 
-    def add_criteria(self, scope, name, mode, *args, **kwargs):
+    def add_criteria(self, scope, name, mode, *args, owning_object=None, **kwargs):
         self.validate_scope(scope)
         exists = self.find_criteria(name)
         if exists:
             logger.die(f"Success criteria {name} is not unique.")
 
-        self.criteria[scope].append(SuccessCriteria(name, mode, *args, **kwargs))
+        self.criteria[scope].append(
+            SuccessCriteria(name, mode, *args, owning_object=owning_object, **kwargs)
+        )
 
     def flush_scope(self, scope):
         """Remove criteria within a scope, and lower level scopes
@@ -70,13 +70,13 @@ class ScopedCriteriaList:
         """
         self.validate_scope(scope)
 
-        for scope in self._flush_scopes[scope]:
-            logger.debug(f" Flushing scope: {scope}")
+        for s in self._flush_scopes[scope]:
+            logger.debug(f" Flushing scope: {s}")
             logger.debug("    It contained:")
-            for crit in self.criteria[scope]:
+            for crit in self.criteria[s]:
                 logger.debug(f"      {crit.name}")
-            del self.criteria[scope]
-            self.criteria[scope] = []
+            del self.criteria[s]
+            self.criteria[s] = []
 
     def passed(self):
         succeed = True
@@ -87,7 +87,8 @@ class ScopedCriteriaList:
 
     def all_criteria(self):
         for scope in self._valid_scopes:
-            yield from self.criteria[scope]
+            for criteria in self.criteria[scope]:
+                yield criteria, scope
 
     def find_criteria(self, name):
         for scope in self._valid_scopes:
@@ -117,6 +118,7 @@ class SuccessCriteria:
         fom_context="null",
         formula=None,
         anti_match=None,
+        owning_object=None,
     ):
         self.name = name
         if mode not in self._valid_modes:
@@ -131,6 +133,7 @@ class SuccessCriteria:
         self.fom_formula = None
         self.found = False
         self.anti_found = False
+        self.owner = owning_object
 
         if mode == "string":
             if match is None and anti_match is None:

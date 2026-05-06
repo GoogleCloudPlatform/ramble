@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -60,9 +60,11 @@ def test_gcsfetchstrategy_downloaded(tmpdir, _fetch_method):
 
 @pytest.mark.network
 @pytest.mark.parametrize("_fetch_method", ["curl", "urllib"])
-def test_gcsfetchstrategy_download(tmpdir, _fetch_method):
+def test_gcsfetchstrategy_download(tmpdir, _fetch_method, monkeypatch):
     """Ensure fetch of fie."""
-
+    # Remove this env var, otherwise for newer google-auth lib, it will try to invoke the mTLS path
+    # and fail if pyopenssl is not installed.
+    monkeypatch.delenv("CLOUDSDK_CONTEXT_AWARE_USE_CLIENT_CERTIFICATE", raising=False)
     google_api_core_exceptions = pytest.importorskip("google.api_core.exceptions")
     google_auth_exceptions = pytest.importorskip("google.auth.exceptions")
     try:
@@ -74,8 +76,8 @@ def test_gcsfetchstrategy_download(tmpdir, _fetch_method):
             with ramble.stage.InputStage(fetcher, name="test", path=testpath):
                 fetcher.fetch()
     except google_api_core_exceptions.Forbidden as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")
     except google_auth_exceptions.RefreshError as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")
     except google_auth_exceptions.DefaultCredentialsError as e:
-        pytest.skip("%s" % e)
+        pytest.skip(f"{e}")

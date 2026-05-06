@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,10 +12,12 @@
    :lines: 15-
 """
 
+from typing import Any, Dict
+
 import spack.schema.config
 
 #: Properties for inclusion in other schemas
-properties = {
+properties: Dict[str, Any] = {
     "config": {**spack.schema.config.properties["config"]},
 }
 
@@ -23,7 +25,7 @@ properties["config"]["shell"] = {"type": "string", "enum": ["sh", "bash", "csh",
 
 properties["config"]["spack"] = {
     "type": "object",
-    "default": {"install": {"flags": "--reuse"}, "concretize": {"flags": "--reuse"}},
+    "default": {"install": {"flags": "--fresh"}, "concretize": {"flags": "--fresh"}},
     "properties": {
         "global": {
             "type": "object",
@@ -34,13 +36,13 @@ properties["config"]["spack"] = {
         "install": {
             "type": "object",
             "default": {
-                "flags": "--reuse",
+                "flags": "--fresh",
                 "prefix": "",
             },
             "properties": {
                 "flags": {
                     "type": "string",
-                    "default": "--reuse",
+                    "default": "--fresh",
                 },
                 "prefix": {"type": "string", "default": ""},
             },
@@ -49,13 +51,13 @@ properties["config"]["spack"] = {
         "concretize": {
             "type": "object",
             "default": {
-                "flags": "--reuse",
+                "flags": "--fresh",
                 "prefix": "",
             },
             "properties": {
                 "flags": {
                     "type": "string",
-                    "default": "--reuse",
+                    "default": "--fresh",
                 },
                 "prefix": {"type": "string", "default": ""},
             },
@@ -165,7 +167,11 @@ properties["config"]["upload"] = {
     "properties": {
         "uri": {"type": "string", "default": ""},
         "push_failed": {"type": "boolean", "default": True},
-        "type": {"type": "string", "default": "BigQuery", "enum": ["BigQuery", "PrintOnly"]},
+        "type": {
+            "type": "string",
+            "default": "BigQuery",
+            "enum": ["BigQuery", "PrintOnly", "SQLite"],
+        },
     },
 }
 
@@ -177,9 +183,25 @@ properties["config"]["disable_progress_bar"] = {"type": "boolean", "default": Fa
 
 properties["config"]["disable_logger"] = {"type": "boolean", "default": False}
 
+properties["config"]["aggregate_warnings"] = {"type": "boolean", "default": False}
+
+properties["config"]["suppress_warnings"] = {"type": "boolean", "default": False}
+
 properties["config"]["n_repeats"] = {"type": "string", "default": "0"}
 
 properties["config"]["repeat_success_strict"] = {"type": "boolean", "default": True}
+
+properties["config"]["enable_workspace_prompt"] = {"type": "boolean", "default": False}
+
+properties["config"]["enable_strict_versions"] = {"type": "boolean", "default": True}
+
+properties["config"]["overwrite_inventories"] = {"type": "boolean", "default": False}
+
+properties["config"]["stage_method"] = {
+    "type": "string",
+    "enum": ["cp", "rsync", "symbolic_link", "hard_link"],
+    "default": "cp",
+}
 
 
 #: Full schema with metadata
@@ -192,7 +214,7 @@ schema = {
 }
 
 
-def update(data):
+def update(data: Dict[str, Any]) -> bool:
     """Update the data in place to remove deprecated properties.
 
     Args:
@@ -209,20 +231,20 @@ def update(data):
 
     # Convert `spack_flags` to `spack:command_flags`
 
-    spack_flags = data.get("spack_flags", None)
+    spack_flags = data.get("spack_flags")
     if isinstance(spack_flags, dict):
-        if data.get("spack", None) is None:
+        if data.get("spack") is None:
             data["spack"] = {"flags": {}}
 
-        global_args = spack_flags.get("global_args", None)
+        global_args = spack_flags.get("global_args")
         if global_args is not None:
             data["spack"]["global"] = {"flags": global_args}
 
-        install_flags = spack_flags.get("install", None)
+        install_flags = spack_flags.get("install")
         if install_flags is not None:
             data["spack"]["install"] = {"flags": install_flags}
 
-        concretize_flags = spack_flags.get("concretize", None)
+        concretize_flags = spack_flags.get("concretize")
         if concretize_flags is not None:
             data["spack"]["concretize"] = {"flags": concretize_flags}
 

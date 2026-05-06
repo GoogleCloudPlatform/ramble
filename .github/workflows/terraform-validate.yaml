@@ -1,0 +1,34 @@
+name: 'Terraform Validate'
+
+on:
+  pull_request:
+    paths:
+      - 'share/ramble/cloud-build/terraform/**'
+
+permissions:
+  contents: read
+
+jobs:
+  terraform:
+    name: 'Terraform Validate'
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: ./share/ramble/cloud-build/terraform/triggers
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v4
+      with:
+        terraform_version: "1.14.9"
+
+    - name: Terraform Init
+      # For validation only, do not try to access the GCS bucket
+      run: terraform init -backend=false
+
+    - name: Terraform Validate
+      run: terraform validate

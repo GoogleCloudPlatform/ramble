@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,15 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+from typing import FrozenSet
+
 from ramble.test.application import basic_exp_dict
 
-_FS = frozenset()
+_FS: FrozenSet[str] = frozenset()
 
 
 def test_basic_inheritance(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get("basic-inherited")
     exp_dict = basic_exp_dict()
-    app_inst.set_variables(exp_dict, None)
+    app_inst.set_variables_and_variants(exp_dict, {}, None)
     app_inst.define_variable("application_name", "basic-inherited")
 
     assert "foo" in app_inst.executables[_FS]
@@ -29,7 +31,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.workloads[_FS]["test_wl"].inputs == ["input"]
 
     app_inst.define_variable("workload_name", "test_wl")
-    exec_graph = app_inst._get_executable_graph("test_wl")
+    exec_graph = app_inst.get_executable_graph("test_wl")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
@@ -38,7 +40,7 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.workloads[_FS]["test_wl2"].inputs == ["input"]
 
     app_inst.define_variable("workload_name", "test_wl2")
-    exec_graph = app_inst._get_executable_graph("test_wl2")
+    exec_graph = app_inst.get_executable_graph("test_wl2")
     assert exec_graph.get_node("bar") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
@@ -47,14 +49,14 @@ def test_basic_inheritance(mutable_mock_apps_repo):
     assert app_inst.workloads[_FS]["test_wl3"].inputs == ["inherited_input"]
 
     app_inst.define_variable("workload_name", "test_wl3")
-    exec_graph = app_inst._get_executable_graph("test_wl3")
+    exec_graph = app_inst.get_executable_graph("test_wl3")
     assert exec_graph.get_node("foo") is not None
     assert exec_graph.get_node("builtin::env_vars") is not None
 
     assert "test_fom" in app_inst.figures_of_merit[_FS][_FS]
     fom_conf = app_inst.figures_of_merit[_FS][_FS]["test_fom"]
     assert fom_conf["log_file"] == "{log_file}"
-    assert fom_conf["regex"] == r"(?P<test>[0-9]+\.[0-9]+).*seconds.*"  # noqa: W605
+    assert fom_conf["regex"] == r"(?P<test>[0-9]+\.[0-9]+).*seconds.*"
     assert fom_conf["group_name"] == "test"
     assert fom_conf["units"] == "s"
 

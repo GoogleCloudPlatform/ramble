@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -21,8 +21,13 @@ class Orca(ExecutableApplication):
 
     tags("quantum-chemistry", "electronic-structure")
 
+    version("5.0.4", "Version 5.0.4 of ORCA", preferred=True)
+
     with when("package_manager_family=spack"):
-        software_spec("orca", pkg_spec="orca@5.0.4")
+        software_spec(
+            "orca-{application::orca::version}",
+            pkg_spec="orca@{application::orca::version}",
+        )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(
@@ -32,18 +37,17 @@ class Orca(ExecutableApplication):
         description="Input deck archive for ORCA",
     )
 
-    tmp_file_patt1 = os.path.join("{scratch_dir}", "*_Compound_*")
-    tmp_file_patt2 = os.path.join("{scratch_dir}", "*txt")
-    executable(
-        "clear_prior_checkpoints",
-        f"rm -f {tmp_file_patt1} {tmp_file_patt2}",
-        use_mpi=False,
+    cleanup(
+        name="clear_prior_checkpoints",
+        regex=r".*_Compound_.*|.*\.txt$",
+        directory="{scratch_dir}",
+        pre=True,
     )
 
-    executable(
-        "copy_input",
-        f"cp -R {os.path.join('{input_path}', '*')} {{scratch_dir}}",
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src=os.path.join("{input_path}", "*"),
+        dst="{scratch_dir}",
     )
 
     # The only way to configure total ranks launched is by changing the PAL nprocs keyword
@@ -66,8 +70,7 @@ class Orca(ExecutableApplication):
     workload(
         "standard",
         executables=[
-            "clear_prior_checkpoints",
-            "copy_input",
+            "stage-input",
             "configure_nprocs",
             "run_orca",
         ],

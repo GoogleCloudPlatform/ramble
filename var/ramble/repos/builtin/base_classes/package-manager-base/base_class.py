@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,30 +7,36 @@
 # except according to those terms.
 """Define base classes for package manager definitions"""
 
-import io
+import abc
 import os
-import re
-import textwrap
 from typing import List
 
+import ramble.definitions.families
+import ramble.repository
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase
+from ramble.software_environments import (
+    RambleSoftwareEnvironmentError,
+    TemplatePackage,
+)
+from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
 import spack.util.naming
 
+ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
-class PackageManagerBase(metaclass=PackageManagerMeta):
-    name = None
-    object_variants = None
+
+class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
+    origin_type = "package_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("package_manager_builtin", "{obj_name}", "{name}")
     )
     _language_classes = [PackageManagerMeta, SharedMeta]
-    _pipelines = [
+    pipelines = [
         "analyze",
         "archive",
         "mirror",
@@ -51,50 +57,51 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
     package_manager_class = "PackageManagerBase"
     requires_software_environment = True
 
-    #: Lists of strings which contains GitHub usernames of attributes.
-    #: Do not include @ here in order not to unnecessarily ping the users.
-    maintainers: List[str] = []
-    tags: List[str] = []
-    families: List[str] = []
-
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
-            self.object_variants = ramble.variants.VariantSet()
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
+
+        if getattr(self, "families", None) is None:
+            self.families = ramble.definitions.families.Families(
+                self.origin_type, list(self.class_families)
+            )
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
 
-        self._verbosity = "short"
-
-        self.runner = None
         self.app_inst = None
         self.keywords = None
+
+        self._allow_unprefixed_specs = True
 
         ramble.util.directives.define_directive_methods(self)
 
         self.object_variants.default_variant(
-            "package_manager",
+            self.origin_type,
             default=self.name,
             description="Name of package manager for an experiment",
         )
 
         for family in self.families:
             self.object_variants.multi_value_variant(
-                "package_manager_family",
+                self.families.family_type,
                 value=family,
             )
 
         self.output_prefix = self.name
 
-    def copy(self):
-        """Deep copy a package manager instance"""
-        new_copy = type(self)(self._file_path)
-        new_copy._verbosity = self._verbosity
+    @property
+    def runner(self):
+        # Turn `runner` into a property for delayed init
+        return None
 
-        return new_copy
+    @property
+    def allow_unprefixed_specs(self):
+        return self._allow_unprefixed_specs
 
     def package_manager_dir(self, workspace):
         """Get the path to the package manager's software environment directory
@@ -109,57 +116,19 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """
         return os.path.join(workspace.software_dir, self.name)
 
+    @property
     def environment_required(self):
         app_inst = self.app_inst
-        if hasattr(app_inst, "software_specs"):
-            for definitions in app_inst.software_specs.values():
-                for info in definitions:
-                    if self.app_inst.expander.satisfies(
-                        info.when, variant_set=self.object_variants
-                    ):
-                        return True
+        if not hasattr(app_inst, "software_specs"):
+            return False
 
-        return False
-
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-        all_vars = {}
-        for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for var in var_list:
-                all_vars[var.name] = var
-        return all_vars
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-        all_env_vars = {}
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for env_var in env_var_list:
-                all_env_vars[env_var.name] = env_var
-        return all_env_vars
+        return any(
+            self.app_inst.expander.satisfies(
+                info.when, variant_set=self.experiment_variants()
+            )
+            for definitions in app_inst.software_specs.values()
+            for info in definitions
+        )
 
     def get_spec_str(self, pkg, all_pkgs, compiler):
         """Return a spec string for the given pkg
@@ -175,6 +144,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """
         return pkg.spec
 
+    @property
     def spec_prefix(self):
         """Return this package manager's spec prefix
 
@@ -184,46 +154,12 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         prefix = self._spec_prefix or self.name
         return spack.util.naming.spack_module_to_python_module(prefix)
 
-    def __str__(self):
-        return self.name
-
-    def format_doc(self, **kwargs):
-        """Wrap doc string at 72 characters and format nicely"""
-        indent = kwargs.get("indent", 0)
-
-        if not self.__doc__:
-            return ""
-
-        doc = re.sub(r"\s+", " ", self.__doc__)
-        lines = textwrap.wrap(doc, 72)
-        results = io.StringIO()
-        for line in lines:
-            results.write((" " * indent) + line + "\n")
-        return results.getvalue()
-
-    def all_pipeline_phases(self, pipeline):
-        """Iterator over all phases within a specified pipeline
-
-        Iterate over all phases (and their graph nodes) within a pipeline.
-
-        Args:
-            pipeline (str): Name of pipeline to extract phases for
-
-        Yields:
-            phase_name (str): Name of phase
-            phase_note (ramble.util.graph.GraphNode): Object representing a
-                node in the phase graph
-        """
-        if pipeline in self.phase_definitions:
-            yield from self.phase_definitions[pipeline].items()
-
     def set_application(self, app_inst):
         """Add an internal reference to the application instance this package
         manager instance is attached to.
 
         Args:
-            app_inst (ramble.base_cls.builtin.ApplicationBase): The experiment this
-                package manager will act on.
+            app_inst: The experiment this package manager will act on.
         """
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
@@ -250,15 +186,20 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         )
 
         software_environments = workspace.software_environments
-        software_environments.render_environment(
+        software_env = software_environments.render_environment(
             app_context, self.app_inst.expander, self, require=False
         )
+        if software_env is not None:
+            software_environments.define_compiler_packages(
+                software_env, self.app_inst.expander
+            )
+
+        for _, contents in workspace.all_auxiliary_software_files():
+            self.app_inst.expander.expand_var(contents)
 
         return self.app_inst.expander._used_variables
 
-    def populate_inventory(
-        self, workspace, force_compute=False, require_exist=False
-    ):
+    def populate_inventory(self, workspace, force_compute=False) -> bool:
         """Stub class method for populating an experiment inventory.
         Specific package managers should implement this to convey inventory
         information to the workspace / experiment.
@@ -271,6 +212,137 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         """
 
         pass
+
+    def define_missing_packages(self, workspace):
+        """Injection of missing packages that are auto-injected by objects
+
+        This method will iterate over the objects in an experiment, and
+        inject any missing packages that are defined as `inject_if_missing`
+        from their software_spec directives.
+
+        Args:
+            workspace (Workspace): The workspace that contains the software environments
+        """
+
+        require_env = self.environment_required
+        software_envs = workspace.software_environments
+
+        # Inject any missing, but injected compilers
+        for _, obj in self.app_inst.objects():
+            for comps in obj.compilers.values():
+                for comp in comps:
+                    if (
+                        comp.inject_if_missing
+                        and comp.name not in software_envs._package_templates
+                        and self.satisfy_when(
+                            comp.when,
+                            variant_set=obj.experiment_variants(),
+                        )
+                    ):
+                        comp_template = TemplatePackage(
+                            comp.name, comp.to_dict()
+                        )
+                        software_envs._package_templates[comp.name] = (
+                            comp_template
+                        )
+
+        app_context = self.app_inst.expander.expand_var_name(
+            self.keywords.env_name
+        )
+        try:
+            software_env = software_envs.render_environment(
+                app_context, self.app_inst.expander, self, require=require_env
+            )
+
+            # If there is no environment required or defined, skip defining
+            # packages.
+            if not require_env and software_env is None:
+                return
+
+            env_packages = set()
+            for pkg_spec in software_envs.package_specs_for_environment(
+                software_env
+            ):
+                env_packages.add(self.package_name_from_spec(pkg_spec))
+
+            for _, obj in self.app_inst.objects():
+                required_compilers = set()
+                # Inject any specs that need to be injected.
+                for specs in obj.software_specs.values():
+                    for spec in specs:
+                        pkg_name = self.package_name_from_spec(spec.pkg_spec)
+
+                        if (
+                            spec.inject_if_missing
+                            and pkg_name not in env_packages
+                            and self.app_inst.expander.satisfies(
+                                spec.when,
+                                variant_set=obj.experiment_variants(),
+                            )
+                        ):
+                            env_packages.add(pkg_name)
+                            new_spec = spec.copy()
+                            software_envs.add_spec_to_environment(
+                                software_env,
+                                new_spec,
+                                self.app_inst.expander,
+                                self,
+                            )
+
+                            if new_spec.compiler is not None:
+                                required_compilers.add(new_spec.compiler)
+
+                # Inject any dependent compilers
+                pm_name = self.spec_prefix
+                compilers_to_define = required_compilers.copy()
+                for compiler in required_compilers:
+                    rendered_compiler = self.app_inst.expander.expand_var(
+                        compiler
+                    )
+                    if (
+                        compiler in software_envs._package_templates
+                        or rendered_compiler
+                        in software_envs._rendered_packages[pm_name]
+                    ):
+                        compilers_to_define.remove(compiler)
+
+                for compiler in compilers_to_define:
+                    rendered_compiler = self.app_inst.expander.expand_var(
+                        compiler
+                    )
+
+                    compiler_name = None
+                    if compiler in obj.compilers:
+                        compiler_name = compiler
+                    elif rendered_compiler in obj.compilers:
+                        compiler_name = rendered_compiler
+
+                    if compiler_name is None:
+                        logger.die(
+                            f"When injecting packages from {obj.origin_type} "
+                            f"{obj.name}, compiler {compiler} (rendered to "
+                            f"{rendered_compiler}) is not defined."
+                        )
+
+                    for compiler_spec in obj.compilers[compiler_name]:
+                        if self.app_inst.expander.satisfies(
+                            compiler_spec.when,
+                            variant_set=obj.experiment_variants(),
+                        ):
+                            compiler_template = TemplatePackage(
+                                compiler_name, compiler_spec.to_dict()
+                            )
+
+                            software_envs._package_templates[compiler_name] = (
+                                compiler_template
+                            )
+                            rendered_compiler = (
+                                compiler_template.render_package(
+                                    self.app_inst.expander, self
+                                )
+                            )
+        except RambleSoftwareEnvironmentError:
+            pass
 
     register_phase(
         "add_software_to_results",
@@ -285,8 +357,7 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
         Args:
             workspace (ramble.workspace.Workspace): Reference to the workspace
                 that is currently being acted on.
-            app_inst (ramble.base_cls.builtin.ApplicationBase): Reference to the
-                application instance that owns the results.
+            app_inst: Reference to the application instance that owns the results.
 
         """
         if app_inst.result is None:
@@ -303,17 +374,64 @@ class PackageManagerBase(metaclass=PackageManagerMeta):
             prov_cache[self.name][env_name] = pkg_list
         self.app_inst.result.software[self.output_prefix] = pkg_list
 
+    # Methods that need to be defined by every derived package manager
+    @abc.abstractmethod
     def get_package_list(self, workspace):
         """Method used by add_software_to_results phase to get software provenance info"""
-        del workspace
-        return []
 
+    @abc.abstractmethod
+    def package_name_from_spec(self, spec: str) -> str:
+        """Stub method for extracting a package name
+        from a spec object"""
+
+    @abc.abstractmethod
     def environment_load_commands(self) -> List[str]:
         """Stub method for acquiring the commands to load
         an experiment's execution environment"""
-        return []
 
+    @abc.abstractmethod
     def environment_unload_commands(self) -> List[str]:
         """Stub method for acquiring the commands to unload an
         experiment's execution environment"""
-        return []
+
+    def _extract_specs(
+        self, attr_name="software_specs", app_inst=None, prefixed=False
+    ):
+        specs = {}
+        for obj_type, obj in app_inst.objects():
+            include_modifier = None
+            if obj_type == ramble.repository.ObjectTypes.modifiers:
+                include_modifier = obj
+            spec_variants = self.experiment_variants(
+                include_modifier=include_modifier, allow_caching=False
+            )
+
+            software_dict = getattr(obj, attr_name, {})
+            for name, definitions in software_dict.items():
+                for info in definitions:
+                    if app_inst.expander.satisfies(
+                        info.when, variant_set=spec_variants
+                    ):
+                        if name not in specs:
+                            specs[name] = []
+
+                        new_info = info.copy()
+                        if prefixed:
+                            new_info.prefix = self._spec_prefix
+
+                        specs[name].append(new_info)
+        return specs
+
+    def get_experiment_specs(self, app_inst=None, prefixed=False):
+        if app_inst is None:
+            return {}
+        return self._extract_specs(
+            attr_name="software_specs", app_inst=app_inst, prefixed=prefixed
+        )
+
+    def get_experiment_compilers(self, app_inst=None, prefixed=False):
+        if app_inst is None:
+            return {}
+        return self._extract_specs(
+            attr_name="compilers", app_inst=app_inst, prefixed=prefixed
+        )

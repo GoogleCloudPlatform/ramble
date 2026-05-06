@@ -9,6 +9,7 @@
 import builtins
 import collections
 import io
+import json
 import os
 import os.path
 import pathlib
@@ -23,7 +24,10 @@ import ramble.config
 import ramble.paths
 import ramble.repository
 import ramble.stage
+import ramble.workspace
 from ramble.fetch_strategy import FetchError, FetchStrategyComposite, URLFetchStrategy
+from ramble.pkg_man.builtin.spack_lightweight import SpackRunner
+from ramble.util.command_runner import RunnerError
 from ramble.util.file_util import is_dry_run_path
 
 import spack.platforms
@@ -53,6 +57,44 @@ def pytest_addoption(parser):
         default=None,
         help="runs only tests under the given Ramble object repo path",
     )
+    group.addoption(
+        "--perf",
+        action="store_true",
+        default=False,
+        help="runs perf tests",
+    )
+
+
+def pytest_sessionstart(session):
+    session.perf_metrics = []
+
+
+# Extract execution time of perf tests
+@pytest.hookimpl(tryfirst=True, hookwrapper=True)
+def pytest_runtest_makereport(item, call):
+    outcome = yield
+    res = outcome.get_result()
+
+    if res.when == "call" and "perf" in item.keywords:
+        if hasattr(item, "benchmark_stats"):
+            duration = item.benchmark_stats.stats.median
+        else:
+            duration = res.duration
+
+        metric = {
+            "test_name": item.name,
+            "test_id": item.nodeid,
+            "duration": duration,
+            "outcome": res.outcome,
+        }
+        item.session.perf_metrics.append(metric)
+
+
+def pytest_sessionfinish(session, exitstatus):
+    if session.perf_metrics:
+        perf_file = os.path.join(ramble.paths.ramble_root, "perf_test_metrics.json")
+        with open(perf_file, "w") as f:
+            json.dump(session.perf_metrics, f, indent=2)
 
 
 def pytest_configure(config):
@@ -61,12 +103,23 @@ def pytest_configure(config):
         return
     path = pathlib.Path(repo_path)
     # Define testpaths
-    testpaths = [p for p in path.rglob("test") if p.is_dir()]
+    testpaths = [str(p) for p in path.rglob("test") if p.is_dir()]
     testpaths.append("setup_analyze.py")
     config.args = testpaths
 
 
 def pytest_collection_modifyitems(config, items):
+    if config.getoption("--perf"):
+        skip_non_perf = pytest.mark.skip(reason="skipped non-perf test [remove --perf to run]")
+        for item in items:
+            if "perf" not in item.keywords:
+                item.add_marker(skip_non_perf)
+    else:
+        skip_perf = pytest.mark.skip(reason="skipped perf test [use --perf to run]")
+        for item in items:
+            if "perf" in item.keywords:
+                item.add_marker(skip_perf)
+
     if not config.getoption("--fast"):
         # --fast not given, run all the tests
         return
@@ -81,6 +134,22 @@ def pytest_collection_modifyitems(config, items):
 #
 # These fixtures are applied to all tests
 #
+
+
+@pytest.fixture
+def ramble_benchmark(benchmark, request):
+    """A wrapper around pytest-benchmark that automatically exposes benchmark stats."""
+
+    def runner(*args, **kwargs):
+        if hasattr(request.node, "benchmark_stats"):
+            raise RuntimeError("ramble_benchmark can only be called at most once per test.")
+        result = benchmark(*args, **kwargs)
+        request.node.benchmark_stats = benchmark.stats
+        return result
+
+    return runner
+
+
 @pytest.fixture(scope="function", autouse=True)
 def no_chdir():
     """Ensure that no test changes Ramble's working directory.
@@ -147,28 +216,15 @@ def working_env():
 #
 # Test-specific fixtures
 #
-@pytest.fixture(scope="function")
-def mock_apps_repo_path():
-    obj_type = ramble.repository.ObjectTypes.applications
-    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
 
 
-@pytest.fixture(scope="function")
-def mock_mods_repo_path():
-    obj_type = ramble.repository.ObjectTypes.modifiers
-    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
-
-
-@pytest.fixture(scope="function")
-def mock_pkg_mans_repo_path():
-    obj_type = ramble.repository.ObjectTypes.package_managers
-    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
-
-
-@pytest.fixture(scope="function")
-def mock_wms_repo_path():
-    obj_type = ramble.repository.ObjectTypes.workflow_managers
-    yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+@pytest.fixture
+def ensure_spack_runner():
+    """Fixture to check for spack runner and skip if not found."""
+    try:
+        SpackRunner()
+    except RunnerError as e:
+        pytest.skip(f"Spack runner not found, skipping test: {e}")
 
 
 def _get_obj_repo_path(obj_type, extra_repo_path):
@@ -184,142 +240,81 @@ def _get_obj_repo_path(obj_type, extra_repo_path):
     yield ramble.repository.RepoPath(*repos, object_type=obj_type)
 
 
-@pytest.fixture(scope="function")
-def mutable_apps_repo_path(pytestconfig):
-    obj_type = ramble.repository.ObjectTypes.applications
-    extra_repo_path = pytestconfig.getoption("--repo-path")
-    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+# Helpers for creating dynamic fixtures
+def _create_mock_repo_path_fixture(obj_type):
+    @pytest.fixture(scope="function")
+    def _fixture():
+        yield ramble.repository.Repo(ramble.paths.mock_builtin_path, obj_type)
+
+    return _fixture
 
 
-@pytest.fixture(scope="function")
-def mutable_mods_repo_path(pytestconfig):
-    obj_type = ramble.repository.ObjectTypes.modifiers
-    extra_repo_path = pytestconfig.getoption("--repo-path")
-    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+def _create_mutable_repo_path_fixture(obj_type):
+    @pytest.fixture(scope="function")
+    def _fixture(pytestconfig):
+        extra_repo_path = pytestconfig.getoption("--repo-path")
+        yield from _get_obj_repo_path(obj_type, extra_repo_path)
+
+    return _fixture
 
 
-@pytest.fixture(scope="function")
-def mutable_pkg_mans_repo_path(pytestconfig):
-    obj_type = ramble.repository.ObjectTypes.package_managers
-    extra_repo_path = pytestconfig.getoption("--repo-path")
-    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+def _create_mock_obj_fixture(obj_type, repo_path_fixture_name):
+    @pytest.fixture(scope="function")
+    def _fixture(request):
+        repo_path = request.getfixturevalue(repo_path_fixture_name)
+        with ramble.repository.use_repositories(repo_path, object_type=obj_type) as mock_repo:
+            yield mock_repo
+
+    return _fixture
 
 
-@pytest.fixture(scope="function")
-def mutable_wms_repo_path(pytestconfig):
-    obj_type = ramble.repository.ObjectTypes.workflow_managers
-    extra_repo_path = pytestconfig.getoption("--repo-path")
-    yield from _get_obj_repo_path(obj_type, extra_repo_path)
+def _create_mutable_obj_fixture(obj_type, repo_path_fixture_name):
+    @pytest.fixture(scope="function")
+    def _fixture(request):
+        repo_path = request.getfixturevalue(repo_path_fixture_name)
+        with ramble.repository.use_repositories(repo_path, object_type=obj_type) as repo:
+            yield repo
+
+    return _fixture
 
 
-@pytest.fixture(scope="function")
-def mock_applications(mock_apps_repo_path):
-    """Use the 'builtin.mock' repository for applications instead of 'builtin'"""
-    obj_type = ramble.repository.ObjectTypes.applications
-    with ramble.repository.use_repositories(
-        mock_apps_repo_path, object_type=obj_type
-    ) as mock_apps_repo:
-        yield mock_apps_repo
+def _create_mutable_mock_repo_fixture(obj_type):
+    @pytest.fixture(scope="function")
+    def _fixture():
+        mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
+        with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
+            yield mock_repo_path
+
+    return _fixture
 
 
-@pytest.fixture(scope="function")
-def mock_modifiers(mock_mods_repo_path):
-    """Use the 'builtin.mock' repository for modifiersinstead of 'builtin'"""
-    obj_type = ramble.repository.ObjectTypes.modifiers
-    with ramble.repository.use_repositories(
-        mock_mods_repo_path, object_type=obj_type
-    ) as mock_mods_repo:
-        yield mock_mods_repo
+# Create dynamic fixtures for different object types
+for obj_type in ramble.repository.ObjectTypes:
+    if obj_type == ramble.repository.ObjectTypes.base_classes:
+        continue
 
+    abbrev = ramble.repository.type_definitions[obj_type]["abbrev"]
+    plural_abbrev = f"{abbrev}s"
 
-@pytest.fixture(scope="function")
-def mock_package_managers(mock_pkg_mans_repo_path):
-    """Use the 'builtin.mock' repository for package managers of 'builtin'"""
-    obj_type = ramble.repository.ObjectTypes.package_managers
-    with ramble.repository.use_repositories(
-        mock_pkg_mans_repo_path, object_type=obj_type
-    ) as mock_pkg_mans_repo:
-        yield mock_pkg_mans_repo
+    # mock_*_repo_path
+    mock_repo_path_name = f"mock_{plural_abbrev}_repo_path"
+    globals()[mock_repo_path_name] = _create_mock_repo_path_fixture(obj_type)
 
+    # mutable_*_repo_path
+    mutable_repo_path_name = f"mutable_{plural_abbrev}_repo_path"
+    globals()[mutable_repo_path_name] = _create_mutable_repo_path_fixture(obj_type)
 
-@pytest.fixture(scope="function")
-def mock_workflow_managers(mock_wms_repo_path):
-    """Use the 'builtin.mock' repository for package managers of 'builtin'"""
-    obj_type = ramble.repository.ObjectTypes.workflow_managers
-    with ramble.repository.use_repositories(mock_wms_repo_path, object_type=obj_type) as mock_repo:
-        yield mock_repo
+    # mock_*
+    mock_obj_name = f"mock_{obj_type.name}"
+    globals()[mock_obj_name] = _create_mock_obj_fixture(obj_type, mock_repo_path_name)
 
+    # mutable_*
+    mutable_obj_name = f"mutable_{obj_type.name}"
+    globals()[mutable_obj_name] = _create_mutable_obj_fixture(obj_type, mutable_repo_path_name)
 
-@pytest.fixture(scope="function")
-def mutable_applications(mutable_apps_repo_path):
-    obj_type = ramble.repository.ObjectTypes.applications
-    with ramble.repository.use_repositories(
-        mutable_apps_repo_path, object_type=obj_type
-    ) as apps_repo:
-        yield apps_repo
-
-
-@pytest.fixture(scope="function")
-def mutable_modifiers(mutable_mods_repo_path):
-    obj_type = ramble.repository.ObjectTypes.modifiers
-    with ramble.repository.use_repositories(
-        mutable_mods_repo_path, object_type=obj_type
-    ) as mods_repo:
-        yield mods_repo
-
-
-@pytest.fixture(scope="function")
-def mutable_package_managers(mutable_pkg_mans_repo_path):
-    obj_type = ramble.repository.ObjectTypes.package_managers
-    with ramble.repository.use_repositories(
-        mutable_pkg_mans_repo_path, object_type=obj_type
-    ) as pkg_mans_repo:
-        yield pkg_mans_repo
-
-
-@pytest.fixture(scope="function")
-def mutable_workflow_managers(mutable_wms_repo_path):
-    obj_type = ramble.repository.ObjectTypes.workflow_managers
-    with ramble.repository.use_repositories(
-        mutable_wms_repo_path, object_type=obj_type
-    ) as wms_repo:
-        yield wms_repo
-
-
-@pytest.fixture(scope="function")
-def mutable_mock_apps_repo(mock_apps_repo_path):
-    """Function-scoped mock applications, for tests that need to modify them."""
-    obj_type = ramble.repository.ObjectTypes.applications
-    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
-    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
-        yield mock_repo_path
-
-
-@pytest.fixture(scope="function")
-def mutable_mock_mods_repo(mock_mods_repo_path):
-    """Function-scoped mock modifiers, for tests that need to modify them."""
-    obj_type = ramble.repository.ObjectTypes.modifiers
-    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
-    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
-        yield mock_repo_path
-
-
-@pytest.fixture(scope="function")
-def mutable_mock_pkg_mans_repo(mock_pkg_mans_repo_path):
-    """Function-scoped mock package managers, for tests that need to modify them."""
-    obj_type = ramble.repository.ObjectTypes.package_managers
-    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
-    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
-        yield mock_repo_path
-
-
-@pytest.fixture(scope="function")
-def mutable_mock_wms_repo(mock_wms_repo_path):
-    """Function-scoped mock package managers, for tests that need to modify them."""
-    obj_type = ramble.repository.ObjectTypes.workflow_managers
-    mock_repo = ramble.repository.Repo(ramble.paths.mock_builtin_path, object_type=obj_type)
-    with ramble.repository.use_repositories(mock_repo, object_type=obj_type) as mock_repo_path:
-        yield mock_repo_path
+    # mutable_mock_*_repo
+    mutable_mock_repo_name = f"mutable_mock_{plural_abbrev}_repo"
+    globals()[mutable_mock_repo_name] = _create_mutable_mock_repo_fixture(obj_type)
 
 
 @pytest.fixture(scope="function")
@@ -567,6 +562,14 @@ def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
         yield mock_path
 
 
+@pytest.fixture()
+def workspace_deactivate():
+    """Deactivates any active workspace after a test."""
+    yield
+    ramble.workspace._active_workspace = None
+    os.environ.pop("RAMBLE_WORKSPACE", None)
+
+
 @pytest.fixture
 def no_path_access(monkeypatch):
     monkeypatch.setattr(os, "access", _can_access)
@@ -692,6 +695,28 @@ def mock_file_auto_create(monkeypatch):
         return builtin_open(path, *args, **kwargs)
 
     monkeypatch.setattr(builtins, "open", open_or_create_inmem)
+
+
+@pytest.fixture
+def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_workspace_path):
+    """Fixture to create a workspace with a specific configuration."""
+
+    def _create(config_str=None, name=None, activate=False):
+        ws_name = name or workspace_name
+        ws = ramble.workspace.create(ws_name)
+        ws.write()
+
+        if config_str:
+            config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+            with open(config_path, "w+") as f:
+                f.write(config_str)
+            ws._re_read()
+
+        if activate:
+            ramble.workspace.activate(ws)
+        return ws, ws_name
+
+    return _create
 
 
 def pytest_generate_tests(metafunc):

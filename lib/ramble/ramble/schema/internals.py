@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,7 +10,7 @@
 
 .. literalinclude:: _ramble_root/lib/ramble/ramble/schema/internals.py
    :lines: 12-
-"""  # noqa E501
+"""
 
 from llnl.util.lang import union_dicts
 
@@ -28,6 +28,7 @@ custom_executables_def = {
             "use_mpi": False,
             "redirect": "{log_file}",
             "variables": {},
+            "force": False,
             "output_capture": OUTPUT_CAPTURE.DEFAULT,
         },
         "properties": union_dicts(
@@ -35,6 +36,7 @@ custom_executables_def = {
                 "template": ramble.schema.types.array_or_scalar_of_strings_or_nums,
                 "use_mpi": {"type": "boolean"},
                 "redirect": ramble.schema.types.string_or_num,
+                "force": {"type": "boolean"},
             },
             ramble.schema.variables.properties,
         ),

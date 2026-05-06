@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -25,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_single_experiment_in_set(mutable_mock_workspace_path):
+def test_single_experiment_in_set():
     workspace("create", "test")
 
     assert "test" in workspace("list")
@@ -59,10 +59,10 @@ def test_single_experiment_in_set(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
 
 
-def test_vector_experiment_in_set(mutable_mock_workspace_path):
+def test_vector_experiment_in_set():
     workspace("create", "test")
 
     assert "test" in workspace("list")
@@ -92,17 +92,16 @@ def test_vector_experiment_in_set(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
 
 
-def test_vector_length_mismatch_errors(request, mutable_mock_workspace_path, capsys):
-    ws_name = request.node.name
-    workspace("create", ws_name)
+def test_vector_length_mismatch_errors(workspace_name, capsys):
+    workspace("create", workspace_name)
 
-    assert ws_name in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read(ws_name) as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -132,12 +131,12 @@ def test_vector_length_mismatch_errors(request, mutable_mock_workspace_path, cap
         assert "Variable n_nodes has length 2" in captured
 
 
-def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_nonunique_vector_errors(workspace_name, capsys):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -167,12 +166,12 @@ def test_nonunique_vector_errors(mutable_mock_workspace_path, capsys):
         assert "is not unique." in captured
 
 
-def test_zipped_vector_experiments(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_zipped_vector_experiments(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -201,16 +200,16 @@ def test_zipped_vector_experiments(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_16_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_16_4" in exp_set.experiments
 
 
-def test_matrix_experiments(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_matrix_experiments(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -236,16 +235,16 @@ def test_matrix_experiments(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
 
 
-def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_matrix_multiplication_experiments(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -275,20 +274,20 @@ def test_matrix_multiplication_experiments(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_16" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_24" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_12" in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_16" in exp_set.experiments
+        assert "basic.test_wl.series1_24" in exp_set.experiments
 
 
-def test_matrix_vector_experiments(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_matrix_vector_experiments(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -318,18 +317,18 @@ def test_matrix_vector_experiments(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_12" in exp_set.experiments
 
 
-def test_multi_matrix_experiments(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_multi_matrix_experiments(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -359,16 +358,16 @@ def test_multi_matrix_experiments(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_12_4" in exp_set.experiments
 
 
-def test_full_experiments_from_dict(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_full_experiments_from_dict(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         app_dict = {
@@ -398,20 +397,20 @@ def test_full_experiments_from_dict(mutable_mock_workspace_path):
         exp_set.set_workload_context(wlContext)
         exp_set.set_experiment_context(expContext)
 
-        assert "basic.test_wl.test_4_2_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.test_6_2_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.test_8_4_3" in exp_set.experiments.keys()
-        assert "basic.test_wl.test_12_4_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.test_4_2_1" in exp_set.experiments
+        assert "basic.test_wl.test_6_2_2" in exp_set.experiments
+        assert "basic.test_wl.test_8_4_3" in exp_set.experiments
+        assert "basic.test_wl.test_12_4_4" in exp_set.experiments
 
         assert exp_set._context[exp_set._contexts.workspace].context_name is not None
 
 
-def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_matrix_undefined_var_errors(workspace_name, capsys):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -447,12 +446,12 @@ def test_matrix_undefined_var_errors(mutable_mock_workspace_path, capsys):
         assert "variable or zip foo has not been defined yet." in captured
 
 
-def test_experiment_names_match(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_experiment_names_match(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -482,20 +481,19 @@ def test_experiment_names_match(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_12_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl.series1_12_4" in exp_set.experiments
 
         for exp, app, _ in exp_set.all_experiments():
             assert exp == app.expander.expand_var("{experiment_namespace}")
 
 
-def test_cross_experiment_variable_references(request, mutable_mock_workspace_path):
-    ws_name = request.node.name
-    workspace("create", ws_name)
+def test_cross_experiment_variable_references(workspace_name):
+    workspace("create", workspace_name)
 
-    assert ws_name in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read(ws_name) as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -549,19 +547,19 @@ def test_cross_experiment_variable_references(request, mutable_mock_workspace_pa
         exp_set.set_experiment_context(experiment2_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series2_4" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series2_4" in exp_set.experiments
 
         exp2_app = exp_set.experiments["basic.test_wl.series2_4"]
         assert exp2_app.expander.expand_var("{test_var}") == "success"
 
 
-def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_cross_experiment_missing_experiment_errors(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -605,12 +603,12 @@ def test_cross_experiment_missing_experiment_errors(mutable_mock_workspace_path)
             exp_set.set_experiment_context(experiment1_context)
 
 
-def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_n_ranks_correct_defaults(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -623,7 +621,7 @@ def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {"wl_var1": "1", "wl_var2": "2", "processes_per_node": "2"}
         experiment_context = ramble.context.Context()
         experiment_context.context_name = "series1_{n_ranks}"
@@ -635,16 +633,16 @@ def test_n_ranks_correct_defaults(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
+        assert "basic.test_wl2.series1_4" in exp_set.experiments
+        assert "basic.test_wl2.series1_6" in exp_set.experiments
 
 
-def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_n_nodes_correct_defaults(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -658,7 +656,7 @@ def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {"wl_var1": "1", "wl_var2": "2", "processes_per_node": "2"}
         experiment_context = ramble.context.Context()
         experiment_context.context_name = "series1_{n_ranks}_{n_nodes}"
@@ -673,16 +671,16 @@ def test_n_nodes_correct_defaults(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6_3" in exp_set.experiments.keys()
+        assert "basic.test_wl2.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl2.series1_6_3" in exp_set.experiments
 
 
-def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_processes_per_node_correct_defaults(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
         # Remove workspace vars, which default to a `processes_per_node = -1` definition.
         exp_set._context[exp_set._contexts.workspace].variables = {}
@@ -698,7 +696,7 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {
             "wl_var1": "1",
             "wl_var2": "2",
@@ -712,17 +710,17 @@ def test_processes_per_node_correct_defaults(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6_2" in exp_set.experiments.keys()
+        assert "basic.test_wl2.series1_4_2" in exp_set.experiments
+        assert "basic.test_wl2.series1_6_2" in exp_set.experiments
 
 
 @pytest.mark.parametrize("var", ["env_path"])
-def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var):
-    workspace("create", "test")
+def test_reserved_keywords_error_in_application(workspace_name, var):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -745,12 +743,12 @@ def test_reserved_keywords_error_in_application(mutable_mock_workspace_path, var
 
 
 @pytest.mark.parametrize("var", ["env_path"])
-def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var):
-    workspace("create", "test")
+def test_reserved_keywords_error_in_workload(workspace_name, var):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -777,12 +775,12 @@ def test_reserved_keywords_error_in_workload(mutable_mock_workspace_path, var):
 
 
 @pytest.mark.parametrize("var", ["env_path"])
-def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var):
-    workspace("create", "test")
+def test_reserved_keywords_error_in_experiment(workspace_name, var):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
         # Remove workspace vars, which default to a `processes_per_node = -1` definition.
         exp_set._context[exp_set._contexts.base].variables = {}
@@ -822,60 +820,50 @@ def test_reserved_keywords_error_in_experiment(mutable_mock_workspace_path, var)
         assert "is reserved by ramble" in captured
 
 
-@pytest.mark.parametrize("var", ["batch_submit", "mpi_command"])
-def test_missing_required_keyword_errors(mutable_mock_workspace_path, var, capsys):
-    workspace("create", "test")
+def test_missing_required_keyword_errors(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
-        for context in exp_set._contexts:
-            if exp_set._context[context].variables and var in exp_set._context[context].variables:
-                del exp_set._context[context].variables[var]
 
         application_context = ramble.context.Context()
         application_context.context_name = "basic"
         application_context.variables = {
             "app_var1": "1",
             "app_var2": "2",
-            "n_ranks": ["4", "6"],
         }
 
         workload_context = ramble.context.Context()
-        workload_context.context_name = "test_wl"
+        workload_context.context_name = "test_wl2"
         workload_context.variables = {
             "wl_var1": "1",
             "wl_var2": "2",
         }
         experiment_context = ramble.context.Context()
-        experiment_context.context_name = "series1_{n_ranks}_{processes_per_node}"
+        experiment_context.context_name = "series1"
         experiment_context.variables = {
             "exp_var1": "1",
             "exp_var2": "2",
-            "n_nodes": ["2", "3"],
             "batch_submit": "",
             "mpi_command": "",
         }
 
-        if var in experiment_context.variables.keys():
-            del experiment_context.variables[var]
-
         exp_set.set_application_context(application_context)
         exp_set.set_workload_context(workload_context)
-        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
+
+        match_str = r"Invalid number of required variables defined"
+        with pytest.raises(ramble.error.ObjectValidationError, match=match_str):
             exp_set.set_experiment_context(experiment_context)
-        captured = capsys.readouterr()
-        assert f'Required key "{var}" is not defined' in captured.err
-        assert "in basic.test_wl.series1_{n_ranks}_{processes_per_node}" in captured.err
 
 
-def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_chained_experiments_populate_new_experiments(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -932,12 +920,12 @@ def test_chained_experiments_populate_new_experiments(mutable_mock_workspace_pat
         assert "basic.test_wl.test1" in exp_set.experiments
 
 
-def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_chained_experiment_has_correct_directory(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -993,12 +981,12 @@ def test_chained_experiment_has_correct_directory(mutable_mock_workspace_path, c
         assert chained_inst.variables["experiment_run_dir"] == expected_dir
 
 
-def test_chained_cycle_errors(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_chained_cycle_errors(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1042,12 +1030,12 @@ def test_chained_cycle_errors(mutable_mock_workspace_path):
             exp_set.build_experiment_chains()
 
 
-def test_chained_invalid_order_errors(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_chained_invalid_order_errors(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1091,12 +1079,12 @@ def test_chained_invalid_order_errors(mutable_mock_workspace_path):
             exp_set.build_experiment_chains()
 
 
-def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers, capsys):
-    workspace("create", "test")
+def test_modifiers_set_correctly(workspace_name, mock_modifiers):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1105,6 +1093,7 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers, ca
             "app_var1": "1",
             "app_var2": "2",
             "processes_per_node": "1",
+            "modeless_required_var": "1",
             "mpi_command": "",
             "batch_submit": "",
         }
@@ -1141,15 +1130,15 @@ def test_modifiers_set_correctly(mutable_mock_workspace_path, mock_modifiers, ca
         for mod_def in app_inst.modifiers:
             assert mod_def["mode"] in expected_modifier_modes
             expected_modifier_modes.remove(mod_def["mode"])
-        assert len(expected_modifier_modes) == 0
+        assert not expected_modifier_modes
 
 
-def test_explicit_zips_work(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_explicit_zips_work(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1176,16 +1165,16 @@ def test_explicit_zips_work(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
 
 
-def test_explicit_zips_in_matrix(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_explicit_zips_in_matrix(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1217,20 +1206,20 @@ def test_explicit_zips_in_matrix(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_3" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_3" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_1" in exp_set.experiments
+        assert "basic.test_wl.series1_4_a" in exp_set.experiments
+        assert "basic.test_wl.series1_4_3" in exp_set.experiments
+        assert "basic.test_wl.series1_8_1" in exp_set.experiments
+        assert "basic.test_wl.series1_8_a" in exp_set.experiments
+        assert "basic.test_wl.series1_8_3" in exp_set.experiments
 
 
-def test_explicit_zips_unconsumed(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_explicit_zips_unconsumed(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1262,20 +1251,20 @@ def test_explicit_zips_unconsumed(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4_3" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_1" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_a" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8_3" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4_1" in exp_set.experiments
+        assert "basic.test_wl.series1_4_a" in exp_set.experiments
+        assert "basic.test_wl.series1_4_3" in exp_set.experiments
+        assert "basic.test_wl.series1_8_1" in exp_set.experiments
+        assert "basic.test_wl.series1_8_a" in exp_set.experiments
+        assert "basic.test_wl.series1_8_3" in exp_set.experiments
 
 
-def test_single_var_explicit_zip(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_single_var_explicit_zip(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1304,16 +1293,16 @@ def test_single_var_explicit_zip(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
 
 
-def test_zip_multi_use_var_errors(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_zip_multi_use_var_errors(workspace_name, capsys):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1346,12 +1335,12 @@ def test_zip_multi_use_var_errors(mutable_mock_workspace_path, capsys):
         assert "An undefined variable n_nodes is defined in zip test_zip2" in captured
 
 
-def test_zip_non_list_var_errors(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_zip_non_list_var_errors(workspace_name, capsys):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1383,12 +1372,12 @@ def test_zip_non_list_var_errors(mutable_mock_workspace_path, capsys):
         assert "Variable processes_per_node in zip test_zip does not refer to a vector" in captured
 
 
-def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
-    workspace("create", "test")
+def test_zip_variable_lengths_errors(workspace_name, capsys):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1424,12 +1413,12 @@ def test_zip_variable_lengths_errors(mutable_mock_workspace_path, capsys):
         assert "differs from the current max of 2" in captured
 
 
-def test_vector_experiment_with_explicit_excludes(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_vector_experiment_with_explicit_excludes(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1456,16 +1445,16 @@ def test_vector_experiment_with_explicit_excludes(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_8" not in exp_set.experiments
 
 
-def test_matrix_experiments_explicit_excludes(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_matrix_experiments_explicit_excludes(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1498,16 +1487,16 @@ def test_matrix_experiments_explicit_excludes(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" not in exp_set.experiments
 
 
-def test_vector_experiment_with_where_excludes(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_vector_experiment_with_where_excludes(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1538,19 +1527,63 @@ def test_vector_experiment_with_where_excludes(mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" not in exp_set.experiments
+        assert "basic.test_wl.series1_8" not in exp_set.experiments
+        assert "basic.test_wl.series1_10" in exp_set.experiments
 
 
-def test_vector_experiment_with_multi_where_excludes(mutable_mock_workspace_path):
-    workspace("create", "test")
+def test_vector_experiment_with_late_where_excludes(workspace_name):
+    workspace("create", workspace_name)
 
-    assert "test" in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read("test") as ws:
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "app_var1": "1",
+            "app_var2": "2",
+            "n_ranks": "{processes_per_node}*{n_nodes}",
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+        workload_context.variables = {"wl_var1": "1", "wl_var2": "2", "processes_per_node": "2"}
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "series1_{n_ranks}"
+        experiment_context.variables = {
+            "exp_var1": "1",
+            "exp_var2": "2",
+            "n_nodes": ["1", "2", "3", "4", "5"],
+        }
+        experiment_context.exclude = {"where": ["{my_base_var} == 0.0"]}
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+        exp_set.build_experiment_chains()
+
+        assert not exp_set.experiments
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" not in exp_set.experiments
+        assert "basic.test_wl.series1_6" not in exp_set.experiments
+        assert "basic.test_wl.series1_8" not in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
+
+
+def test_vector_experiment_with_multi_where_excludes(workspace_name):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1581,20 +1614,19 @@ def test_vector_experiment_with_multi_where_excludes(mutable_mock_workspace_path
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
-def test_unused_vector_no_error(request, mutable_mock_workspace_path):
-    ws_name = request.node.name
-    workspace("create", ws_name)
+def test_unused_vector_no_error(workspace_name):
+    workspace("create", workspace_name)
 
-    assert ws_name in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read(ws_name) as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1626,20 +1658,19 @@ def test_unused_vector_no_error(request, mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
-def test_unused_zip_no_error(request, mutable_mock_workspace_path):
-    ws_name = request.node.name
-    workspace("create", ws_name)
+def test_unused_zip_no_error(workspace_name):
+    workspace("create", workspace_name)
 
-    assert ws_name in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read(ws_name) as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         application_context = ramble.context.Context()
@@ -1675,20 +1706,19 @@ def test_unused_zip_no_error(request, mutable_mock_workspace_path):
         exp_set.set_experiment_context(experiment_context)
         exp_set.build_experiment_chains()
 
-        assert "basic.test_wl.series1_2" not in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_4" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_6" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_8" in exp_set.experiments.keys()
-        assert "basic.test_wl.series1_10" not in exp_set.experiments.keys()
+        assert "basic.test_wl.series1_2" not in exp_set.experiments
+        assert "basic.test_wl.series1_4" in exp_set.experiments
+        assert "basic.test_wl.series1_6" in exp_set.experiments
+        assert "basic.test_wl.series1_8" in exp_set.experiments
+        assert "basic.test_wl.series1_10" not in exp_set.experiments
 
 
-def test_unused_var_propagates_to_chain(request, mutable_mock_workspace_path):
-    ws_name = request.node.name
-    workspace("create", ws_name)
+def test_unused_var_propagates_to_chain(workspace_name):
+    workspace("create", workspace_name)
 
-    assert ws_name in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read(ws_name) as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         expanded_app_context = ramble.context.Context()
@@ -1756,13 +1786,12 @@ def test_unused_var_propagates_to_chain(request, mutable_mock_workspace_path):
         assert app_inst.variables["my_var"] == "5.0"
 
 
-def test_custom_executables_track_variables(request, mutable_mock_workspace_path):
-    ws_name = request.node.name
-    workspace("create", ws_name)
+def test_custom_executables_track_variables(workspace_name):
+    workspace("create", workspace_name)
 
-    assert ws_name in workspace("list")
+    assert workspace_name in workspace("list")
 
-    with ramble.workspace.read(ws_name) as ws:
+    with ramble.workspace.read(workspace_name) as ws:
         exp_set = ramble.experiment_set.ExperimentSet(ws)
 
         expanded_app_context = ramble.context.Context()
@@ -1828,3 +1857,149 @@ def test_custom_executables_track_variables(request, mutable_mock_workspace_path
         app_inst = exp_set.get_experiment("basic.test_wl.test1.chain.0.expanded_foms.test_wl.test")
 
         assert app_inst.variables["my_var"] == "5.0"
+
+
+def test_chained_experiments(workspace_name):
+    """Test that chained experiments are rendered correctly."""
+    ramble.workspace.create(workspace_name)
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+        app_context = ramble.context.Context()
+        app_context.context_name = "basic"
+        exp_set.set_application_context(app_context)
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+        exp_set.set_workload_context(workload_context)
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "test"
+        experiment_context.variables = {"n_ranks": "1", "processes_per_node": "1"}
+        rendered_instances = exp_set.render_chained_experiments(
+            "basic", "test_wl", experiment_context
+        )
+
+        assert len(rendered_instances) == 1
+        assert "test" in exp_set.chained_experiments
+        assert "basic.test_wl.test" not in exp_set.experiments
+
+
+def test_repeated_experiments(workspace_name):
+    """Test that repeated experiments are rendered correctly."""
+    ramble.workspace.create(workspace_name)
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+        app_context = ramble.context.Context()
+        app_context.context_name = "basic"
+        exp_set.set_application_context(app_context)
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+        exp_set.set_workload_context(workload_context)
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "test"
+        experiment_context.variables = {"n_ranks": "1", "processes_per_node": "1"}
+        experiment_context.n_repeats = 2
+        experiment_context.is_repeat_base = True
+        exp_set.set_experiment_context(experiment_context)
+
+        assert "basic.test_wl.test" in exp_set.experiments
+        assert "basic.test_wl.test.1" in exp_set.experiments
+        assert "basic.test_wl.test.2" in exp_set.experiments
+        assert "basic.test_wl.test.3" not in exp_set.experiments
+
+        base_exp = exp_set.experiments["basic.test_wl.test"]
+        repeat1_exp = exp_set.experiments["basic.test_wl.test.1"]
+
+        assert base_exp.repeats.is_repeat_base
+        assert base_exp.repeats.n_repeats == 2
+        assert repeat1_exp.repeats.repeat_index == 1
+
+
+def test_validation_in_render_repeat_experiments(workspace_name):
+    """Test that validation is called in _render_repeat_experiments."""
+    ramble.workspace.create(workspace_name)
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+        app_context = ramble.context.Context()
+        app_context.context_name = "basic"
+        exp_set.set_application_context(app_context)
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl2"
+        exp_set.set_workload_context(workload_context)
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "test"
+        experiment_context.n_repeats = 1
+        experiment_context.is_repeat_base = True
+
+        match_str = r"Invalid number of required variables defined"
+        with pytest.raises(ramble.error.ObjectValidationError, match=match_str):
+            exp_set.set_experiment_context(experiment_context)
+
+
+def test_modifiers_no_version_set_correctly(workspace_name, mock_modifiers):
+    workspace("create", workspace_name)
+
+    assert workspace_name in workspace("list")
+
+    with ramble.workspace.read(workspace_name) as ws:
+        exp_set = ramble.experiment_set.ExperimentSet(ws)
+
+        application_context = ramble.context.Context()
+        application_context.context_name = "basic"
+        application_context.variables = {
+            "app_var1": "1",
+            "app_var2": "2",
+            "processes_per_node": "1",
+            "mpi_command": "",
+            "batch_submit": "",
+        }
+        application_context.modifiers = [
+            {
+                "name": "test-mod-no-version",
+                "mode": "app-scope",
+                "on_executable": ["builtin::env_vars"],
+            }
+        ]
+
+        workload_context = ramble.context.Context()
+        workload_context.context_name = "test_wl"
+        workload_context.variables = {
+            "wl_var1": "1",
+            "wl_var2": "2",
+        }
+        workload_context.modifiers = [
+            {
+                "name": "test-mod-no-version",
+                "mode": "wl-scope",
+                "on_executable": ["builtin::env_vars"],
+            }
+        ]
+
+        experiment_context = ramble.context.Context()
+        experiment_context.context_name = "test1"
+        experiment_context.variables = {"n_ranks": "2"}
+        experiment_context.modifiers = [
+            {
+                "name": "test-mod-no-version",
+                "mode": "exp-scope",
+                "on_executable": ["builtin::env_vars"],
+            }
+        ]
+
+        exp_set.set_application_context(application_context)
+        exp_set.set_workload_context(workload_context)
+        exp_set.set_experiment_context(experiment_context)
+
+        assert "basic.test_wl.test1" in exp_set.experiments
+        app_inst = exp_set.experiments["basic.test_wl.test1"]
+        assert app_inst.modifiers is not None
+
+        expected_modifier_modes = {"app-scope", "wl-scope", "exp-scope"}
+        for mod_def in app_inst.modifiers:
+            assert mod_def["mode"] in expected_modifier_modes
+            expected_modifier_modes.remove(mod_def["mode"])
+        assert not expected_modifier_modes

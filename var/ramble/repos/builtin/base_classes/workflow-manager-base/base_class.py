@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,8 +7,10 @@
 # except according to those terms.
 """Define base classes for workflow manager definitions"""
 
-from typing import List
+import abc
+from typing import Collection, Iterator
 
+import ramble.definitions.families
 import ramble.util.class_attributes
 import ramble.util.directives
 import ramble.variants
@@ -20,23 +22,20 @@ from ramble.language.workflow_manager_language import (
 )
 from ramble.util.naming import NS_SEPARATOR
 
+ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
-class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
-    name = None
-    object_variants = None
+
+class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
     origin_type = "workflow_manager"
     _builtin_name = NS_SEPARATOR.join(
         ("workflow_manager_builtin", "{obj_name}", "{name}")
     )
     _language_classes = [WorkflowManagerMeta, SharedMeta]
-    _pipelines = [
+    pipelines = [
         "analyze",
         "setup",
         "execute",
     ]
-    maintainers: List[str] = []
-    tags: List[str] = []
-    families: List[str] = []
 
     workflow_manager_variable(
         "workflow_banner",
@@ -65,8 +64,14 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
     def __init__(self, file_path):
         super().__init__()
 
-        if self.object_variants is None:
-            self.object_variants = ramble.variants.VariantSet()
+        self.object_variants = ramble.variants.VariantSet()
+        for var_args in self.class_variants.values():
+            self.object_variants.default_variant(**var_args)
+
+        if getattr(self, "families", None) is None:
+            self.families = ramble.definitions.families.Families(
+                self.origin_type, list(self.class_families.keys())
+            )
 
         ramble.util.class_attributes.convert_class_attributes(self)
 
@@ -75,10 +80,16 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
         ramble.util.directives.define_directive_methods(self)
 
         self.object_variants.default_variant(
-            "workflow_manager",
+            self.origin_type,
             default=self.name,
             description="Name of workflow manager for an experiment",
         )
+
+        for family in self.families:
+            self.object_variants.multi_value_variant(
+                self.families.family_type,
+                value=family,
+            )
 
         self.app_inst = None
         self.runner = None
@@ -87,82 +98,30 @@ class WorkflowManagerBase(metaclass=WorkflowManagerMeta):
         """Set a reference to the associated app_inst"""
         self.app_inst = app_inst
 
+    @abc.abstractmethod
     def get_status(self, workspace):
         """Return status of a given job"""
-        return None
 
-    def conditional_expand(self, templates):
-        """Return a (potentially empty) list of expanded strings
+    def conditional_expand(self, templates: Collection[str]) -> Iterator[str]:
+        """Return a (potentially empty) iterator of expanded strings
 
         Args:
-            templates: A list of templates to expand.
+            templates: A collection (ordering not important) of templates to expand.
                 If the template cannot be fully expanded, it's skipped.
         Returns:
-            A list of expanded strings
+            An iterator of expanded strings
         """
         expander = self.app_inst.expander
-        expanded = []
-        for tpl in templates:
+        for tpl in sorted(set(templates)):
             try:
                 rendered = expander.expand_var(tpl, allow_passthrough=False)
                 if rendered:
-                    expanded.append(rendered)
+                    yield rendered
             except ExpanderError:
                 # Skip a particular entry if any of the vars are not defined
                 continue
-        return expanded
 
+    @property
     def template_render_vars(self):
         """Define variables to be used in template rendering"""
         return {}
-
-    def copy(self):
-        """Deep copy a workflow manager instance"""
-        new_copy = type(self)(self._file_path)
-
-        return new_copy
-
-    def __str__(self):
-        return self.name
-
-    def selected_variables(self):
-        """Extract all variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are variable names, values are variable instances
-        """
-
-        all_vars = {}
-        for when_key, var_list in self.object_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for var in var_list:
-                all_vars[var.name] = var
-        return all_vars
-
-    def selected_environment_variables(self):
-        """Extract all environment variables which would be included based
-        on the current variants.
-
-        Returns:
-            (dict) Keys are environment variable names, values are environment
-            variable instances
-        """
-
-        all_env_vars = {}
-        for (
-            when_key,
-            env_var_list,
-        ) in self.object_environment_variables.items():
-            if not self.app_inst.expander.satisfies(
-                when_key, self.app_inst.object_variants
-            ):
-                continue
-
-            for env_var in env_var_list:
-                all_env_vars[env_var.name] = env_var
-        return all_env_vars

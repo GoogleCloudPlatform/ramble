@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -41,13 +41,13 @@ ramble:
 """
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         with open(config_path, "w+") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
         workspace("analyze", "-p", global_args=["-D", ws.root])
-        result_file = os.path.join(ws.root, "results.latest.txt")
+        result_file = os.path.join(ws.results_dir, "results.latest.txt")
         with open(result_file) as f:
             assert "job-status = RUNNING" in f.read()

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,8 +12,7 @@ import pytest
 
 import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
-from ramble.error import InvalidModeError
-from ramble.language.language_base import DirectiveError
+from ramble.error import DirectiveError, InvalidModeError
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import SCOPES, dry_run_config
 
@@ -55,7 +54,7 @@ def test_gromacs_dry_run_mock_mods(
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 

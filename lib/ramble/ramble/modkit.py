@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,11 +23,9 @@ from ramble.util.command_runner import (
     RunnerError,
     ValidationFailedError,
 )
+from ramble.util.conflicts import MODIFIER_CONFLICT
 from ramble.util.file_util import get_file_path
-
-# Rename logger to tty to preserve old behavior
 from ramble.util.logger import logger
-from ramble.util.logger import logger as tty
 from ramble.util.output_capture import OUTPUT_CAPTURE
 
 ModifierBase = ramble.repository.get_base_class("modifier-base")

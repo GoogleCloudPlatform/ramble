@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -22,6 +22,8 @@ class Cloverleaf(ExecutableApplication):
 
     tags("cfd", "euler", "mini-app")
 
+    version("1.1", "Version 1.1 of CLOVERLEAF", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
@@ -31,8 +33,8 @@ class Cloverleaf(ExecutableApplication):
             compiler="gcc12",
         )
         software_spec(
-            "cloverleaf",
-            pkg_spec="cloverleaf@1.1 build=ref",
+            "cloverleaf-{application::cloverleaf::version}",
+            pkg_spec="cloverleaf@{application::cloverleaf::version} build=ref",
             compiler="gcc12",
         )
 
@@ -40,45 +42,42 @@ class Cloverleaf(ExecutableApplication):
 
     executable("execute", "clover_leaf", use_mpi=True)
 
-    executable(
-        "get_input",
-        template=[
-            "cp {cloverleaf_path}/doc/tests/clover_{workload_name}.in {experiment_run_dir}/clover.in"
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{cloverleaf_path}/doc/tests/clover_{workload_name}.in",
+        dst="{experiment_run_dir}/clover.in",
     )
 
-    executable(
-        "get_default_input",
-        template=[
-            "cp {cloverleaf_path}/doc/tests/clover.in {experiment_run_dir}/clover.in"
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-default-input",
+        src="{cloverleaf_path}/doc/tests/clover.in",
+        dst="{experiment_run_dir}/clover.in",
     )
 
-    workload("bm_short_c", executables=["get_input", "execute"])
-    workload("bm_short", executables=["get_input", "execute"])
-    workload("qa", executables=["get_input", "execute"])
-    workload("sodbig", executables=["get_input", "execute"])
-    workload("sodx", executables=["get_input", "execute"])
-    workload("sodxy", executables=["get_input", "execute"])
-    workload("sody", executables=["get_input", "execute"])
-    workload("clover", executables=["get_default_input", "execute"])
+    workload("bm_short_c", executables=["stage-input", "execute"])
+    workload("bm_short", executables=["stage-input", "execute"])
+    workload("qa", executables=["stage-input", "execute"])
+    workload("sodbig", executables=["stage-input", "execute"])
+    workload("sodx", executables=["stage-input", "execute"])
+    workload("sodxy", executables=["stage-input", "execute"])
+    workload("sody", executables=["stage-input", "execute"])
+    workload("clover", executables=["stage-default-input", "execute"])
 
     # 2 through 8K
     for k in range(1, 14):
-        workload("bm" + str(2**k), executables=["get_input", "execute"])
+        workload("bm" + str(2**k), executables=["stage-input", "execute"])
 
     # 2 through 8K
     for k in range(1, 14):
         workload(
-            "bm" + str(2**k) + "_short", executables=["get_input", "execute"]
+            "bm" + str(2**k) + "_short", executables=["stage-input", "execute"]
         )
 
     # 1 through 16K
     for k in range(15):
         workload(
-            "bm" + str(2**k) + "s_short", executables=["get_input", "execute"]
+            "bm" + str(2**k) + "s_short",
+            executables=["stage-input", "execute"],
         )
 
     log_str = os.path.join(

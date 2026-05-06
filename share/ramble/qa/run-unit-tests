@@ -1,5 +1,5 @@
 #!/bin/bash -e
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -47,9 +47,9 @@ if [ $? != 0 ]; then
     ERROR=1
 fi
 
-export UNIT_TEST_COVERAGE_ADDOPTS=""
+export UNIT_TEST_COVERAGE_PREFIX=""
 if [[ "$UNIT_TEST_COVERAGE" == "true" ]]; then
-  export UNIT_TEST_COVERAGE_ADDOPTS="--cov --cov-report= --cov-config=pyproject.toml"
+  export UNIT_TEST_COVERAGE_PREFIX="coverage run --rcfile=pyproject.toml"
 fi
 
 export PYTEST_ADDOPTS=""
@@ -65,17 +65,43 @@ fi
 #-----------------------------------------------------------
 
 if [[ "$LONG" == "true" ]]; then
-  $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS}
+  ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose
 else
-  $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose ${UNIT_TEST_COVERAGE_ADDOPTS} --fast
+  ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose --fast
 fi
 if [ $? != 0 ]; then
     ERROR=1
 fi
 
+if [[ "$UNIT_TEST_COVERAGE" == "true" ]]; then
+  coverage combine
+fi
+
 if [[ "$PUSH_CODECOV" ]]; then
-    echo "Processing codecov upload"
-    codecovcli upload-process
+  if [[ -z "$COMMIT_SHA" ]]; then
+    export COMMIT_SHA=`git -C $(dirname $0) log -n 1 --format="%H"`
+  fi
+
+  DEFAULT_BASE_BRANCH="develop"
+  TARGET_BRANCH=${BASE_BRANCH:-$DEFAULT_BASE_BRANCH}
+
+  echo "Comparing against base branch: origin/$TARGET_BRANCH"
+
+  # Calculate merge base against origin/$TARGET_BRANCH
+  MERGE_BASE_SHA=$(git merge-base HEAD "origin/$TARGET_BRANCH" || echo "")
+  
+  echo "Processing codecov upload for commit $COMMIT_SHA"
+
+  if [[ -n "$MERGE_BASE_SHA" ]]; then
+    echo "Picking PR base: $MERGE_BASE_SHA"
+    if [[ -n "$PR_NUMBER" ]]; then
+      codecovcli pr-base-picking --base-sha $MERGE_BASE_SHA --pr $PR_NUMBER --slug "GoogleCloudPlatform/ramble"
+    else
+      echo "Skipping pr-base-picking: PR_NUMBER not set"
+    fi
+  fi
+
+  codecovcli upload-process -C $COMMIT_SHA
 fi
 
 if [ $ERROR == 1 ]; then

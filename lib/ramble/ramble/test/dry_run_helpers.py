@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -51,6 +51,7 @@ def dry_run_config(
     ws_var_dict["processes_per_node"] = "16"
     ws_var_dict["n_ranks"] = "{processes_per_node}*{n_nodes}"
     ws_var_dict["n_threads"] = "1"
+    ws_var_dict["modeless_required_var"] = "1"
 
     app_dict = test_dict["applications"][app_name]
     app_dict["workloads"] = syaml.syaml_dict()

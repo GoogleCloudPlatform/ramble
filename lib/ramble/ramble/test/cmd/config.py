@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -150,8 +150,7 @@ env_vars:
     )
 
 
-# DEPRECATED: Remove `spack` when removed
-@pytest.mark.parametrize("section_key", ["spack", "software"])
+@pytest.mark.parametrize("section_key", ["software"])
 def test_merged_software_section(mock_low_high_config, section_key):
     low_path = mock_low_high_config.scopes["low"].path
     high_path = mock_low_high_config.scopes["high"].path
@@ -343,8 +342,7 @@ def test_config_get_gets_ramble_yaml(mutable_mock_workspace_path, mutable_mock_a
             "variables",
             "env_vars",
             "software",
-            "mpi_command",
-            "batch_submit",
+            "processes_per_node",
         ]
 
         for key in expected_keys:
@@ -759,7 +757,7 @@ def test_config_remove_from_workspace(mutable_empty_config, mutable_mock_workspa
     expected = ramble.workspace.Workspace._default_config_yaml()
     expected += """  config: {}
 """
-    for line in io.StringIO(expected).readlines():
+    for line in io.StringIO(expected):
         assert line in output
 
 
@@ -881,8 +879,33 @@ def section_args(section_name):
 
 def test_config_edit_file(mutable_config, config_section, mock_editor):
     import ramble.cmd.config
-    import ramble.util.editor
 
     args = section_args(config_section)
 
     assert ramble.cmd.config.config_edit(args)
+
+
+def test_command_alias(mutable_empty_config):
+    import io
+    from contextlib import redirect_stdout
+
+    from ramble import main
+
+    # Test alias 'l' -> 'list'
+    config("add", "config:aliases:l:list")
+    f = io.StringIO()
+    with redirect_stdout(f):
+        ret = main.main(argv=["l"])
+    assert ret == 0
+    output = f.getvalue()
+    assert "gromacs" in output
+
+    # Test that an alias cannot override a built-in command
+    config("add", "config:aliases:list:info")
+    # `list` should run `list`, not `info`
+    f = io.StringIO()
+    with redirect_stdout(f):
+        ret = main.main(argv=["list"])
+    output = f.getvalue()
+    assert ret == 0
+    assert "ramble info" not in output

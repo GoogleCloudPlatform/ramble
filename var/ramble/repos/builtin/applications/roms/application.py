@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -25,8 +25,13 @@ class Roms(ExecutableApplication):
     maintainers("rbfgo")
     tags("weather", "ocean-modeling", "climate-modeling")
 
+    version("4.1", "Version 4.1 of ROMS", preferred=True)
+
     with when("package_manager_family=spack"):
-        software_spec("roms", pkg_spec="roms@4.1")
+        software_spec(
+            "roms-{application::roms::version}",
+            pkg_spec="roms@{application::roms::version}",
+        )
         software_spec("openmpi412", pkg_spec="openmpi@4.1.2")
 
     input_file(
@@ -44,22 +49,21 @@ class Roms(ExecutableApplication):
 
     executable("execute", "romsM {input_deck}", use_mpi=True)
 
-    executable(
-        "copy_input", "cp {input_path} {experiment_run_dir}/.", use_mpi=False
+    stage_files(
+        name="stage-input",
+        src="{input_path}",
+        dst="{experiment_run_dir}/.",
     )
 
-    executable(
-        "copy_varinfo",
-        template=[
-            "mkdir -p {experiment_run_dir}/ROMS/External/",
-            "cp {varinfo} {experiment_run_dir}/ROMS/External/",
-        ],
-        use_mpi=False,
+    stage_files(
+        name="stage-varinfo",
+        src="{varinfo}",
+        dst="{experiment_run_dir}/ROMS/External/",
     )
 
     workload(
         "benchmark_1",
-        executables=["copy_input", "copy_varinfo", "execute"],
+        executables=["stage-input", "stage-varinfo", "execute"],
         inputs=["bm1", "varinfo"],
     )
 

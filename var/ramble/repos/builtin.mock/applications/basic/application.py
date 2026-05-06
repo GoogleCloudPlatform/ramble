@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -36,6 +36,8 @@ class Basic(ExecutableApplication):
     workload("working_wl", executable="echo")
     workload("template_wl", executable="template")
 
+    workload_group("test_wl_group", workloads=["test_wl"])
+
     workload_variable(
         "my_base_var",
         default="0.0",
@@ -47,8 +49,57 @@ class Basic(ExecutableApplication):
         "my_var", default="1.0", description="Example var", workload="test_wl"
     )
 
+    workload_variable(
+        "foo.bar", default="", description="Example var", workload="test_wl"
+    )
+
+    workload_variable(
+        "auto_env_var",
+        environment_variable_name="MY_AUTO_ENV_VAR",
+        default="",
+        workload="test_wl",
+    )
+
+    workload_variable(
+        "auto_env_var_wg",
+        environment_variable_name="MY_AUTO_ENV_VAR_WG",
+        default="def",
+        workload_group="test_wl_group",
+    )
+
+    workload_variable(
+        "auto_env_var_wl_defaults",
+        environment_variable_name="MY_AUTO_ENV_VAR_WL_DEFAULTS",
+        workload_defaults={
+            "test_wl": "test_wl",
+        },
+    )
+
+    workload_variable(
+        "object_precedence_var",
+        default="object_precedence_var from application",
+        description="Variable to exercise object precedence",
+        workloads=["*"],
+    )
+
     environment_variable(
         "TEST_ENV", value="1", description="test var", workload="test_wl"
+    )
+
+    environment_variable(
+        "TEST_APPEND_ENV",
+        method="append",
+        value="3",
+        description="test append var",
+        workload="test_wl",
+    )
+
+    environment_variable(
+        "TEST_PREPEND_ENV",
+        method="prepend",
+        value="4",
+        description="test prepend var",
+        workload="test_wl",
     )
 
     archive_pattern("{experiment_run_dir}/archive_test.*")

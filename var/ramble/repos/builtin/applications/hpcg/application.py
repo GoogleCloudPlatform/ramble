@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -26,15 +26,21 @@ class Hpcg(BaseHpcg):
 
     maintainers("douglasjacobsen")
 
-    with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    version("3.1", "Version 3.1 of HPCG", preferred=True)
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
         software_spec(
-            "hpcg",
-            pkg_spec="hpcg@3.1 +openmp",
-            compiler="gcc9",
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
+
+        software_spec(
+            "hpcg-{application::hpcg::version}",
+            pkg_spec="hpcg@{application::hpcg::version} +openmp",
+            compiler="gcc14",
         )
 
         required_package("hpcg")

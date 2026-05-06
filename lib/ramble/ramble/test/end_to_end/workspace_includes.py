@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -42,7 +42,7 @@ def test_workspace_add_includes(workspace_name):
 
     ws._re_read()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     with open(config_path) as f:
         data = f.read()
@@ -69,7 +69,7 @@ def test_workspace_remove_includes_index(workspace_name):
 
     ws._re_read()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     output = workspace("manage", "includes", "--list", global_args=global_args)
 
@@ -112,7 +112,7 @@ def test_workspace_remove_includes_pattern(workspace_name):
 
     ws._re_read()
 
-    config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
     output = workspace("manage", "includes", "--list", global_args=global_args)
 

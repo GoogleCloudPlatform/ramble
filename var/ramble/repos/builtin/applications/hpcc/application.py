@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -29,15 +29,21 @@ class Hpcc(ExecutableApplication):
 
     tags("hpc-benchmark", "dgemm")
 
-    with when("package_manager_family=spack"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
+    version("1.5.0", "Version 1.5.0 of HPCC", preferred=True)
 
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+    with when("package_manager_family=spack"):
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
 
         software_spec(
-            "hpcc",
-            pkg_spec="hpcc@1.5.0",
-            compiler="gcc9",
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
+
+        software_spec(
+            "hpcc-{application::hpcc::version}",
+            pkg_spec="hpcc@{application::hpcc::version}",
+            compiler="gcc14",
         )
 
         required_package("hpcc")
@@ -50,16 +56,16 @@ class Hpcc(ExecutableApplication):
         description="Input/Config file for HPCC benchmark",
     )
 
-    executable(
-        "copy-config",
-        template="cp -R {workload_input_dir}/* {experiment_run_dir}/.",
-        use_mpi=False,
+    stage_files(
+        name="stage-config",
+        src="{workload_input_dir}/*",
+        dst="{experiment_run_dir}/.",
     )
 
     executable("execute", "hpcc", use_mpi=True)
 
     workload(
-        "standard", executables=["copy-config", "execute"], input="hpccinf"
+        "standard", executables=["stage-config", "execute"], input="hpccinf"
     )
 
     workload_variable(

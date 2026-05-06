@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -12,6 +12,7 @@ import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.util.foms import SummaryFoms
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -48,7 +49,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -58,11 +59,11 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "FAILED" not in data
-            assert "summary::n_total_repeats = 2 repeats" in data
-            assert "summary::n_successful_repeats = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
 
         # Write mock output to fail one of the experiments
         result_path = os.path.join(
@@ -73,12 +74,12 @@ ramble:
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "SUCCESS" in data
             assert "FAILED" in data
-            assert "summary::n_total_repeats = 2 repeats" in data
-            assert "summary::n_successful_repeats = 1 repeats" in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value} = 1 repeats" in data
 
         # Write mock output to fail the second experiment
         result_path = os.path.join(
@@ -89,8 +90,8 @@ ramble:
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
             data = f.read()
             assert "SUCCESS" not in data
-            assert "summary::n_total_repeats" not in data
-            assert "summary::n_successful_repeats" not in data
+            assert f"summary::{SummaryFoms.N_TOTAL.value}" not in data
+            assert f"summary::{SummaryFoms.N_SUCCESS.value}" not in data

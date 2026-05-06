@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -61,9 +61,9 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
     with open(experiment_inventory) as f:
         data = sjson.load(f)
 
-    assert "application_definition" in data
-    assert data["application_definition"] != ""
-    assert data["application_definition"] is not None
+    assert "object_configuration" in data
+    assert data["object_configuration"] != []
+    assert data["object_configuration"] is not None
 
     # Test Attributes
     expected_attrs = {"variables", "modifiers", "env_vars", "internals", "chained_experiments"}
@@ -74,7 +74,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert attr["digest"] is not None
             expected_attrs.remove(attr["name"])
 
-    assert len(expected_attrs) == 0
+    assert not expected_attrs
 
     # Test Templates
     expected_templates = {"execute_experiment"}
@@ -85,7 +85,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert temp["digest"] is not None
             expected_templates.remove(temp["name"])
 
-    assert len(expected_templates) == 0
+    assert not expected_templates
 
     # Test software environments
     expected_envs = {"software/spack/gromacs"}
@@ -96,20 +96,29 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert env["digest"] is not None
             expected_envs.remove(env["name"])
 
-    assert len(expected_envs) == 0
+    assert not expected_envs
 
-    # Test package manager
-    expected_pkgmans = {"spack"}
-    assert "package_manager" in data
-    for pkgman in data["package_manager"]:
-        if pkgman["name"] in expected_pkgmans:
-            assert pkgman["digest"] != ""
-            assert pkgman["digest"] is not None
-            assert pkgman["version"] != ""
-            assert pkgman["version"] is not None
-            expected_pkgmans.remove(pkgman["name"])
+    # Test objects
+    expected_objects = {}
+    expected_objects["applications"] = {"gromacs"}
+    expected_objects["workflow_managers"] = {"user-managed"}
+    expected_objects["package_managers"] = {"spack", "spack-lightweight"}
+    expected_objects["base_classes"] = {
+        "executable-application",
+        "application-base",
+        "object-mixin",
+    }
+    for object_def in data["object_configuration"]:
+        if "object_type" in object_def:
+            obj_type = object_def["object_type"]
+            if obj_type in expected_objects:
+                if "name" in object_def and object_def["name"] in expected_objects[obj_type]:
+                    expected_objects[obj_type].remove(object_def["name"])
+                    assert object_def["digest"] != ""
+                    assert object_def["digest"] is not None
 
-    assert len(expected_pkgmans) == 0
+    for obj_set in expected_objects.values():
+        assert not obj_set
 
     # Test workspace inventory
     assert os.path.isfile(workspace_inventory)
@@ -127,7 +136,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert "contents" in exp
             expected_experiments.remove(exp["name"])
 
-    assert len(expected_experiments) == 0
+    assert not expected_experiments
 
     # Test versions
     expected_versions = {"ramble"}
@@ -138,4 +147,4 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
             assert ver["digest"] != ""
             assert ver["digest"] is not None
             expected_versions.remove(ver["name"])
-    assert len(expected_versions) == 0
+    assert not expected_versions

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -6,8 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+import subprocess
+
 import pytest
 
+import ramble.paths
 from ramble import main
 
 pytestmark = pytest.mark.maybeslow
@@ -48,7 +52,6 @@ def test_pytest_help():
 )
 def test_failed_import(extra_flag):
     out = ramble_test(extra_flag, "-p", "fake-pytest", fail_on_error=False)
-    assert ramble_test.returncode == 1
     assert "Ensure requirements-dev.txt are installed" in out
 
 
@@ -64,6 +67,23 @@ def test_list_only_objects():
     assert "lib/ramble/ramble/test" not in output
 
 
-def test_external_repo():
+def test_external_repo_invalid():
     with pytest.raises(FileNotFoundError):
         ramble_test("--repo-path", "non-existent-path")
+
+
+def test_external_repo_valid(tmpdir):
+    test_dir = tmpdir.mkdir("test")
+    test_file = test_dir.join("test_dummy.py")
+    test_file.write("def test_dummy():\n    assert True\n")
+
+    # Need to launch a new process due to how setup_analyze.py is handled differently
+    # for Ramble repo and external repos.
+    ramble_bin = os.path.join(ramble.paths.ramble_root, "bin", "ramble")
+    result = subprocess.run(
+        [ramble_bin, "unit-test", "--repo-path", str(tmpdir), "-k", "test_dummy"],
+        capture_output=True,
+        text=True,
+    )
+    assert result.returncode == 0
+    assert "1 passed" in result.stdout

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -77,14 +77,9 @@ class PyNemo2(BasePyNemo):
 
     workload_variable(
         "results_mount",
+        environment_variable_name="NEMO_CONTAINER_MOUNTS",
         default="{experiment_run_dir}:{experiment_run_dir}",
         description="Container mount for results data",
-        workload_group="pretraining",
-    )
-    environment_variable(
-        "NEMO_CONTAINER_MOUNTS",
-        value="{results_mount}",
-        description="All container mounts in an environment variable",
         workload_group="pretraining",
     )
     workload_variable(

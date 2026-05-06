@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 # 
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -26,7 +26,7 @@ ramble:
     - arch_name
     - eessi_arch_dir
   applications:
-    gromacs: # Application name
+    gromacs@2024.1: # Application name and version
       workloads:
         '{app_workloads}': # Workload name from application
           experiments:
@@ -45,9 +45,9 @@ ramble:
               - arch_conf
   software:
     packages:
-      gromacs:
+      gromacs-2024.1:
         pkg_spec: GROMACS/2024.1-foss-2023b
     environments:
-      gromacs:
+      gromacs@2024.1:
         packages:
-        - gromacs
+        - gromacs-2024.1

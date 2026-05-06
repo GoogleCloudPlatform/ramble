@@ -1,5 +1,5 @@
 #!/bin/sh
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -27,6 +27,7 @@ done
 echo "==> Error: ramble could not find a python interpreter!" >&2
 exit 1
 ":"""
+
 # Line above is a shell no-op, and ends a python multi-line comment.
 # The code above runs this file with our preferred python interpreter.
 

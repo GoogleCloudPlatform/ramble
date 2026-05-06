@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -45,7 +45,7 @@ def test_gromacs_dry_run_mock_spack_mod(
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
 
@@ -55,7 +55,7 @@ def test_gromacs_dry_run_mock_spack_mod(
         workspace("setup", "--dry-run", global_args=["-D", ws1.root])
         out_files = glob.glob(os.path.join(ws1.log_dir, "**", "*.out"), recursive=True)
 
-        expected_str = "with args: ['--reuse', 'mod_compiler@1.1 target=x86_64']"
+        expected_str = "with args: ['--fresh', 'mod_compiler@1.1 target=x86_64']"
 
         assert search_files_for_string(out_files, expected_str)
 

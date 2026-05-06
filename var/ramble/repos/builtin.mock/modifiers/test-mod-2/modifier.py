@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -28,4 +28,11 @@ class TestMod2(BasicModifier):
         "test-mod-2-append",
         method="append",
         modes=["test"],
+    )
+
+    modifier_variable(
+        "modeless_variable",
+        default="from_test_mod_2 defined",
+        environment_variable_name="MODELESS_ENV_VAR",
+        description="Test a modifier variable without a mode",
     )

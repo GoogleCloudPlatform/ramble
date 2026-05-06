@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -23,6 +23,8 @@ class Namd(ExecutableApplication):
 
     tags("molecular-dynamics", "hpc-benchmark", "charmpp")
 
+    version("2.14", description="Version 2.14 of NAMD", preferred=True)
+
     with when("package_manager_family=spack"):
         define_compiler("gcc12", pkg_spec="gcc@12.2.0")
 
@@ -38,8 +40,8 @@ class Namd(ExecutableApplication):
         )
 
         software_spec(
-            "namd",
-            pkg_spec="namd@2.14 interface=tcl",
+            "namd-{application::namd::version}",
+            pkg_spec="namd@{application::namd::version} interface=tcl",
             compiler="gcc12",
         )
 
@@ -108,10 +110,10 @@ class Namd(ExecutableApplication):
         description="Tcl forces (decalanin)",
     )
 
-    executable(
-        "copy_inputs",
-        "cp {input_path}/* {experiment_run_dir}/.",
-        use_mpi=False,
+    stage_files(
+        name="stage-input",
+        src="{input_path}/*",
+        dst="{experiment_run_dir}/.",
     )
     executable("execute", "namd2 {namd_flags} {input_file}", use_mpi=True)
 
@@ -131,25 +133,13 @@ class Namd(ExecutableApplication):
         ("decalanin", ["alanin.namd"]),
         ("tcl-forces", ["tclforces.namd"]),
     ]
+    all_benchmark_workloads = [wl[0] for wl in benchmark_workloads]
+
     for wl_def in benchmark_workloads:
         workload(
             wl_def[0],
-            executables=["copy_inputs", "execute"],
+            executables=["stage-input", "execute"],
             inputs=[wl_def[0]],
-        )
-
-        workload_variable(
-            "namd_flags",
-            default="+ppn {processes_per_node} +setcpuaffinity",
-            description="Flags for running NAMD",
-            workloads=[wl_def[0]],
-        )
-
-        workload_variable(
-            "input_path",
-            default=Expander.expansion_str(wl_def[0]),
-            description=f"Path to the {wl_def[0]} inputs",
-            workloads=[wl_def[0]],
         )
 
         workload_variable(
@@ -159,6 +149,31 @@ class Namd(ExecutableApplication):
             description="Input file for namd",
             workloads=[wl_def[0]],
         )
+
+    workload_group("all_benchmarks", workloads=all_benchmark_workloads)
+
+    workload_variable(
+        "namd_flags",
+        default="+ppn {processes_per_node} +setcpuaffinity",
+        description="Flags for running NAMD",
+        workload_group="all_benchmarks",
+    )
+
+    workload_variable(
+        "input_path",
+        description="Path to the workload inputs",
+        workload_defaults={
+            "stmv": "{stmv}",
+            "ApoA1": "{ApoA1}",
+            "ATPase": "{ATPase}",
+            "20STMV": "{20STMV}",
+            "tiny": "{tiny}",
+            "interactive_BPTI": "{interactive_BPTI}",
+            "ER-GRE": "{ER-GRE}",
+            "decalanin": "{decalanin}",
+            "tcl-forces": "{tcl-forces}",
+        },
+    )
 
     log_file_str = Expander.expansion_str(keywords.log_file)
 

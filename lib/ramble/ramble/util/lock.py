@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,11 +7,18 @@
 # except according to those terms.
 
 """Wrapper for ``llnl.util.lock`` allows locking to be enabled/disabled."""
+
 import os
 import stat
 
 import llnl.util.lock
-from llnl.util.lock import *  # noqa
+from llnl.util.lock import (
+    LockError,
+    LockTimeoutError,
+    LockUpgradeError,
+    ReadTransaction,
+    WriteTransaction,
+)
 
 import ramble.config
 import ramble.error
@@ -39,10 +46,6 @@ class Lock(llnl.util.lock.Lock):
         """Unlock call that always succeeds."""
         if self._enable:
             super()._unlock()
-
-    def _debug(self, *args):
-        if self._enable:
-            super()._debug(*args)
 
     def cleanup(self, *args):
         if self._enable:
@@ -79,3 +82,14 @@ def check_lock_safety(path):
                 "restrict permissions on {} or enable locks."
             ).format(path)
             raise ramble.error.RambleError(msg, long_msg)
+
+
+__all__ = [
+    "LockError",
+    "LockTimeoutError",
+    "LockUpgradeError",
+    "ReadTransaction",
+    "WriteTransaction",
+    "Lock",
+    "check_lock_safety",
+]

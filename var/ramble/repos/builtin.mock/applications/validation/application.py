@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -15,12 +15,61 @@ class Validation(ExecutableApplication):
     executable("foo", "bar")
 
     workload("test_validation", executable="foo")
+    workload("test_validation_workload_var", executable="foo")
+    workload(
+        "test_validation_workload_var_with_workload_defaults", executable="foo"
+    )
+    workload(
+        "test_validation_workload_var_with_workload_group", executable="foo"
+    )
 
     workload_variable(
         "validate_var",
         default="valid",
         description="A var",
         workload="test_validation",
+    )
+
+    workload_variable(
+        "loose_multi_choice_var",
+        default="choice-1",
+        description="A variable that can be set to a value outside the values list",
+        values=["choice1", "choice2", "choice3"],
+        strict=False,
+        workload="test_validation_workload_var",
+    )
+
+    workload_variable(
+        "multi_choice_var",
+        default="choice1",
+        description="A variable that can only be set to values from a predefined list",
+        values=["choice1", "choice2", "choice3"],
+        workload="test_validation_workload_var",
+    )
+
+    workload_variable(
+        "multi_choice_var2",
+        workload_defaults={
+            "test_validation": "choice1",
+            "test_validation_workload_var": "choice2",
+            "test_validation_workload_var_with_workload_defaults": "choice3",
+            "test_validation_workload_var_with_workload_group": "choice3",
+        },
+        description="A variable that can only be set to values from a predefined list",
+        values=["choice1", "choice2", "choice3"],
+    )
+
+    workload_group(
+        "target_workloads",
+        workloads=["test_validation_workload_var_with_workload_group"],
+    )
+
+    workload_variable(
+        "multi_choice_var3",
+        default="choice1",
+        description="A variable that can only be set to values from a predefined list",
+        values=["choice1", "choice2", "choice3"],
+        workload_group="target_workloads",
     )
 
     register_validator(
@@ -34,5 +83,14 @@ class Validation(ExecutableApplication):
         name="validate_var_check",
         predicate='re_search(r"^valid", {validate_var})',
         message="The validate_var is recommended to start with 'valid', but got '{validate_var}'",
+        fail_on_invalid=False,
+    )
+
+    # A validator with undefined vars.
+    # Checking it proceeds with the validation despite the passthrough exception.
+    register_validator(
+        name="validate_undefined_var_check",
+        predicate="{undefined_var} == 1",
+        message="This validator would never be valid",
         fail_on_invalid=False,
     )

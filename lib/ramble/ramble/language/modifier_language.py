@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,10 +8,11 @@
 
 from typing import Optional
 
-import ramble.language.language_base
+import ramble.definitions.requirements
 import ramble.language.language_helpers
 import ramble.language.shared_language
-from ramble.language.language_base import DirectiveError
+from ramble.definitions.variables import EnvironmentVariableModifications, VariableModification
+from ramble.error import DirectiveError
 
 
 class ModifierMeta(ramble.language.shared_language.SharedMeta):
@@ -75,7 +76,7 @@ def default_mode(name, **kwargs):
 
 @modifier_directive("variable_modifications")
 def variable_modification(
-    name, modification, method="set", mode=None, modes=None, separator=" ", **kwargs
+    name, modification, method="set", mode=None, modes=None, separator=" ", when=None, **kwargs
 ):
     """Define a new variable modification for a mode in this modifier.
 
@@ -89,6 +90,7 @@ def variable_modification(
         modes (str): List of modes to group this modification into
         separator (str): Optional separator to use when modifying with 'append' or
                          'prepend' methods.
+        when (list | None): List of when conditions this modification should apply in
 
     Supported values are 'append', 'prepend', and 'set':
         'append' will add the modification to the end of 'name'
@@ -104,30 +106,34 @@ def variable_modification(
                 f"  Valid methods are {str(supported_methods)}"
             )
 
-        all_modes = ramble.language.language_helpers.require_definition(
-            mode, modes, mod.modes, "mode", "modes", "variable_modification"
+        when_lists = ramble.language.language_helpers.merge_conditions(
+            mod, "variable_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
 
-        for mode_name in all_modes:
-            if mode_name not in mod.variable_modifications:
-                mod.variable_modifications[mode_name] = {}
+        for when_list in when_lists:
+            when_set = frozenset(when_list)
 
-            if name not in mod.variable_modifications[mode_name]:
-                mod.variable_modifications[mode_name][name] = []
+            if when_set not in mod.variable_modifications:
+                mod.variable_modifications[when_set] = {}
 
-            mod.variable_modifications[mode_name][name].append(
-                {
-                    "modification": modification,
-                    "method": method,
-                    "separator": separator,
-                }
+            if name not in mod.variable_modifications[when_set]:
+                mod.variable_modifications[when_set][name] = []
+
+            mod.variable_modifications[when_set][name].append(
+                VariableModification(
+                    name=name,
+                    modification=modification,
+                    method=method,
+                    separator=separator,
+                    when=when_list,
+                )
             )
 
     return _execute_variable_modification
 
 
 @modifier_directive("executable_modifiers")
-def executable_modifier(name, when=None, **kwargs):
+def executable_modifier(name, usage_filter=None, when=None, **kwargs):
     """Register an executable modifier
 
     Executable modifiers can modify various aspects of non-builtin application
@@ -162,6 +168,9 @@ def executable_modifier(name, when=None, **kwargs):
     Args:
         name (str): Name of executable modifier to use. Should be the name of a
                     class method.
+        usage_filter (str): Filters the application of this executable modifier.
+                            Modifiers can register filters to select how to apply this.
+                            Valid default options include: None, "once", "first_mpi", "all_mpi"
         when (list | None): List of when conditions this executable modifier should apply in
 
     Each executable modifier needs to return:
@@ -180,7 +189,10 @@ def executable_modifier(name, when=None, **kwargs):
         if when_set not in mod.executable_modifiers:
             mod.executable_modifiers[when_set] = {}
 
-        mod.executable_modifiers[when_set][name] = name
+        mod.executable_modifiers[when_set][name] = {
+            "usage_filter": usage_filter,
+            "when": when_list,
+        }
 
     return _executable_modifier
 
@@ -232,70 +244,32 @@ def env_var_modification(
                 "requires a value for the modification argument."
             )
 
-        when_list = ramble.language.language_helpers.require_condition(
+        when_lists = ramble.language.language_helpers.merge_conditions(
             mod, "env_var_modification", "mode", "modes", mode=mode, modes=modes, when=when
         )
-        when_set = frozenset(when_list)
 
-        if when_set not in mod.env_var_modifications:
-            mod.env_var_modifications[when_set] = {}
+        for when_list in when_lists:
+            when_set = frozenset(when_list)
 
-        # Set requires a dict, everything else requires a list.
-        if method == "set":
-            if method not in mod.env_var_modifications[when_set]:
-                mod.env_var_modifications[when_set][method] = {}
-            mod.env_var_modifications[when_set][method][name] = modification
-            return
+            if when_set not in mod.env_var_modifications:
+                mod.env_var_modifications[when_set] = {}
 
-        if method not in mod.env_var_modifications[when_set]:
-            mod.env_var_modifications[when_set][method] = []
-
-        # If unset, exit early
-        if method == "unset":
-            mod.env_var_modifications[when_set][method].append(name)
-            return
-
-        append_dict = {}
-        separator = ":"
-        if method == "append" and "separator" in kwargs:
-            separator = kwargs["separator"]
-
-        append_name = "paths"
-        if separator != ":":
-            append_name = "vars"
-            append_dict["var-separator"] = separator
-
-        append_dict[append_name] = {}
-        append_dict[append_name][name] = modification
-
-        mod.env_var_modifications[when_set][method].append(append_dict.copy())
+            if name not in mod.env_var_modifications[when_set]:
+                mod.env_var_modifications[when_set][name] = EnvironmentVariableModifications(
+                    name=name,
+                    modification=modification,
+                    method=method,
+                    when=when_list,
+                    **kwargs,
+                )
+            else:
+                mod.env_var_modifications[when_set][name].add_modification(
+                    modification=modification,
+                    method=method,
+                    **kwargs,
+                )
 
     return _env_var_modification
-
-
-@modifier_directive("required_vars")
-def required_variable(var: str, results_level="variable", modes=None, description=None, **kwargs):
-    """Mark a variable as being required by this modifier
-
-    Args:
-        var (str): Variable name to mark as required
-        results_level (str): 'variable' or 'key'. If 'key', variable is promoted to
-                             a key within JSON or YAML formatted results.
-        modes (list[str] | None): modes that the required check should be applied. The
-                            default None means apply to all modes.
-        description (str | None): Description of the required variable.
-    """
-
-    def _mark_required_var(mod):
-        mod.required_vars[var] = {
-            "type": ramble.keywords.key_type.required,
-            "level": ramble.keywords.output_level.variable,
-            # Extra prop that's only used for filtering
-            "modes": set(modes) if modes is not None else None,
-            "description": description,
-        }
-
-    return _mark_required_var
 
 
 @modifier_directive(dicts=())
@@ -318,8 +292,10 @@ def modifier_variable(
         default: Default value of variable definition
         description (str): Description of variable's purpose
         values (list): Optional list of suggested values for this variable
-        mode (str): Single mode this variable is used in
-        modes (list): List of modes this variable is used in
+        mode (str): Single mode this variable is used in, if no mode/modes are
+                    specified, will apply to all modes.
+        modes (list): List of modes this variable is used in, if no mode/modes are
+                      specified, will apply to all modes.
         expandable (bool): True if the variable should be expanded, False if not.
         track_used (bool): True if the variable should be tracked as used,
                            False if not. Can help with allowing lists without vectorizing
@@ -328,19 +304,11 @@ def modifier_variable(
     """
 
     def _define_modifier_variable(mod):
-        import ramble.workload
-
-        all_modes = ramble.language.language_helpers.merge_definitions(
-            mode, modes, mod.modes, "mode", "modes", "modifier_variable"
+        when_lists = ramble.language.language_helpers.merge_conditions(
+            mod, "modifier_variable", "mode", "modes", mode=mode, modes=modes, when=when
         )
 
-        base_when_list = ramble.language.language_helpers.build_when_list(
-            when, mod, name, "modifier_variable"
-        )
-
-        for mode_name in all_modes:
-            mode_variant = f"{mod.name}_mode={mode_name}"
-
+        for when_list in when_lists:
             ramble.language.shared_language.variable(
                 name,
                 default,
@@ -348,7 +316,7 @@ def modifier_variable(
                 values=values,
                 expandable=expandable,
                 track_used=track_used,
-                when=base_when_list + [mode_variant],
+                when=when_list,
                 error_context="modifier_variable",
                 **kwargs,
             )(mod)
@@ -360,9 +328,11 @@ def modifier_variable(
 def package_manager_requirement(
     command: str,
     validation_type: str,
-    modes: list,
+    mode: Optional[str] = None,
+    modes: Optional[list] = None,
     regex=None,
     package_manager: str = "*",
+    when=None,
     **kwargs,
 ):
     """Define a requirement when this modifier is used in an experiment with a
@@ -377,10 +347,12 @@ def package_manager_requirement(
         validation_type (str): Type of validation to perform on output of command.
                          Valid types are: 'empty', 'not_empty', 'contains_regex',
                          'does_not_contain_regex'
+        mode (str): Usage mode this requirement should apply to
         modes (list(str)): List of usage modes this requirement should apply to
         regex (str): Regular expression to use when validation_type is either 'contains_regex'
                or 'does_no_contain_regex'
         package_manager (str): Name of the package manager this requirement applies to
+        when (list | None): List of when conditions this requirement should apply to
     """
 
     def _new_package_manager_requirement(mod):
@@ -401,21 +373,82 @@ def package_manager_requirement(
                 f"{validation_type} but no regex is given"
             )
 
-        exp_modes = modes
-        if isinstance(exp_modes, list):
-            exp_modes = ramble.language.language_helpers.expand_patterns(exp_modes, mod.modes)
+        when_lists = ramble.language.language_helpers.merge_conditions(
+            mod, "package_manager_requirement", "mode", "modes", mode=mode, modes=modes, when=when
+        )
 
-        for mode in exp_modes:
-            if mode not in mod.package_manager_requirements:
-                mod.package_manager_requirements[mode] = []
+        for when_list in when_lists:
+            when_set = frozenset(when_list)
 
-            mod.package_manager_requirements[mode].append(
-                {
-                    "command": command,
-                    "validation_type": validation_type,
-                    "regex": regex,
-                    "package_manager": package_manager,
-                }
+            if when_set not in mod.package_manager_requirements:
+                mod.package_manager_requirements[when_set] = []
+
+            mod.package_manager_requirements[when_set].append(
+                ramble.definitions.requirements.PackageManagerRequirement(
+                    command=command,
+                    validation_type=validation_type,
+                    regex=regex,
+                    package_manager=package_manager,
+                    when=when_list,
+                )
             )
 
     return _new_package_manager_requirement
+
+
+@modifier_directive("modifier_conflicts")
+def modifier_conflict(
+    conflict_type,
+    when=None,
+    **kwargs,
+):
+    """Define a conflict with other modifiers on the same experiment.
+
+    Allowed values are defined in the MODIFIER_CONFLICT class in conflicts.py
+
+    Args:
+        conflict_type: Either a string or integer based on the options in
+                       ramble.util.conflicts.MODIFIER_CONFLICT
+    """
+
+    def _define_modifier_conflict(mod):
+        from ramble.util.conflicts import MODIFIER_CONFLICT
+
+        conflict_value = None
+        usage_error = False
+        if conflict_type is not None:
+            if isinstance(conflict_type, str):
+                if conflict_type not in MODIFIER_CONFLICT._member_names_:
+                    usage_error = True
+                else:
+                    conflict_value = MODIFIER_CONFLICT[conflict_type]
+            elif isinstance(conflict_type, int):
+                try:
+                    conflict_value = MODIFIER_CONFLICT(conflict_type)
+                except ValueError:
+                    usage_error = True
+            elif isinstance(conflict_type, MODIFIER_CONFLICT):
+                conflict_value = conflict_type
+            else:
+                usage_error = True
+
+        if usage_error:
+            raise DirectiveError(
+                f"modifier_conflict directive on modifier {mod.name} was given "
+                f"an invalid value for the conflict_type argument."
+                "This argument needs to be an integer or string based on the "
+                "MODIFIER_CONFLICT enum.\n"
+                f"The provided value was {conflict_type}"
+            )
+
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, mod, mod.name, "modifier_conflict"
+        )
+        when_set = frozenset(when_list)
+
+        if conflict_value is None and when_set in mod.modifier_conflicts:
+            del mod.modifier_conflicts[when_set]
+        else:
+            mod.modifier_conflicts[when_set] = conflict_value
+
+    return _define_modifier_conflict

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -269,6 +269,43 @@ class Hpl(ExecutableApplication):
         workload_group="calculator",
     )
 
+    workload_variable(
+        "NPFACTs",
+        default="1",
+        description="Number of PFACTs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "PFACTs",
+        default="1",
+        description="PFACT Values",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "N-NBMINs",
+        default="1",
+        description="Number of NBMINs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "NBMINs",
+        default="4",
+        description="NBMIN values",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "N-RFACTs",
+        default="1",
+        description="Number of RFACTs",
+        workload_group="calculator",
+    )
+    workload_variable(
+        "RFACTs",
+        default="1",
+        description="RFACT values",
+        workload_group="calculator",
+    )
+
     # FOMs:
     figure_of_merit(
         "Time",
@@ -401,7 +438,9 @@ class Hpl(ExecutableApplication):
             for when_key, var_list in self.get_workload(
                 "standard"
             ).variables.items():
-                if self.expander.satisfies(when_key, self.object_variants):
+                if self.expander.satisfies(
+                    when_key, self.experiment_variants()
+                ):
                     for var in var_list:
                         if var.name not in self.variables:
                             self.define_variable(var.name, var.default)

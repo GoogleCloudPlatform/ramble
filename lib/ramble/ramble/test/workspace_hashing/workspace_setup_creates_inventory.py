@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -53,7 +53,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -73,3 +73,28 @@ ramble:
                 ApplicationBase._inventory_file_name,
             )
         )
+
+
+def test_deterministic_workspace_hash(workspace_name):
+    global_args = ["-w", workspace_name]
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "hostname",
+            "--wf",
+            "local",
+            "--wm",
+            "slurm",
+            global_args=global_args,
+        )
+        ws._re_read()
+        workspace("setup", "--dry-run", global_args=global_args)
+        hash_file = os.path.join(ws.root, ramble.workspace.Workspace.hash_file_name)
+        with open(hash_file) as f:
+            hash = f.read().strip()
+        workspace("setup", "--dry-run", global_args=global_args)
+        with open(hash_file) as f:
+            new_hash = f.read().strip()
+
+        assert hash == new_hash

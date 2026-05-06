@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -46,7 +46,7 @@ def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, wor
 
     workspace("analyze", global_args=global_args)
 
-    with open(os.path.join(ws.root, "results.latest.txt")) as f:
+    with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
         data = f.read()
 
         assert "FAILED" not in data

@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -30,13 +30,21 @@ class IntelMpiBenchmarks(ExecutableApplication):
 
     tags("mpi-benchmark", "micro-benchmark", "communication-benchmark")
 
+    version("2019.6", "Version 2019.6 of Intel MPI Benchmarks", preferred=True)
+
     with when("package_manager_family"):
-        define_compiler("gcc9", pkg_spec="gcc@9.3.0")
-        software_spec("intel-mpi", pkg_spec="intel-oneapi-mpi@2021.13.1")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
+
         software_spec(
-            "intel-mpi-benchmarks",
-            pkg_spec="intel-mpi-benchmarks@2019.6",
-            compiler="gcc9",
+            "intel-mpi",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
+            compiler="gcc14",
+        )
+
+        software_spec(
+            "intel-mpi-benchmarks-{application::intel-mpi-benchmarks::version}",
+            pkg_spec="intel-mpi-benchmarks@{application::intel-mpi-benchmarks::version}",
+            compiler="gcc14",
         )
 
         required_package("intel-mpi-benchmarks")
@@ -56,8 +64,8 @@ class IntelMpiBenchmarks(ExecutableApplication):
     )
 
     executable(
-        "exchange",
-        "{install_path}/IMB-MPI1 Exchange -msglog {msglog_min}:{msglog_max} "
+        "transfer",
+        "{install_path}/IMB-MPI1 {transfer_type} -msglog {msglog_min}:{msglog_max} "
         "-iter {num_iterations} {additional_args}",
         use_mpi=True,
     )
@@ -65,11 +73,14 @@ class IntelMpiBenchmarks(ExecutableApplication):
     workload("pingpong", executable="pingpong")
     workload("multi-pingpong", executable="multi-pingpong")
     workload("collective", executable="collective")
-    workload("exchange", executable="exchange")
+    # TODO: should merge pingpong into this workload. For now keeping
+    # the pingpong workload to avoid invalidating existing benchmark
+    # configs.
+    workload("transfer", executable="transfer")
 
     workload_group(
         "mpi1",
-        workloads=["pingpong", "multi-pingpong", "collective", "exchange"],
+        workloads=["pingpong", "multi-pingpong", "collective", "transfer"],
     )
 
     workload_variable(
@@ -124,6 +135,19 @@ class IntelMpiBenchmarks(ExecutableApplication):
         ],
         description="Pingpong Algorithm to Use",
         workloads=["pingpong"],
+    )
+
+    workload_variable(
+        "transfer_type",
+        default="Exchange",
+        values=[
+            "Exchange",
+            "Sendrecv",
+            "Uniband",
+            "Biband",
+        ],
+        description="(Non-collective) Transfer pattern to benchmark",
+        workloads=["transfer"],
     )
 
     workload_variable(
@@ -233,6 +257,15 @@ class IntelMpiBenchmarks(ExecutableApplication):
         fom_regex=bw_regex,
         group_name="bw",
         units="Mbytes/sec",
+        contexts=["bw-bytes"],
+    )
+
+    figure_of_merit(
+        "Time avg",
+        log_file=log_str,
+        fom_regex=bw_regex,
+        group_name="t_avg",
+        units="usec",
         contexts=["bw-bytes"],
     )
 

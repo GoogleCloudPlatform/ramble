@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -24,14 +24,17 @@ in order to build it.  They need to define the following methods:
     * archive()
         Archive a source directory, e.g. for creating a mirror.
 """
+
 import copy
 import functools
+import itertools
 import os
 import os.path
 import re
 import shutil
 import sys
 import urllib.parse
+from typing import List, Optional
 
 import llnl.util.tty as tty
 from llnl.util.filesystem import (
@@ -53,7 +56,7 @@ import spack.util.url as url_util
 import spack.version
 from spack.util.compression import decompressor_for, extension
 from spack.util.executable import CommandNotFoundError, which
-from spack.version import Version, ver
+from spack.version import ver
 
 #: List of all fetch strategies, created by FetchStrategy metaclass.
 all_strategies = []
@@ -61,8 +64,8 @@ all_strategies = []
 CONTENT_TYPE_MISMATCH_WARNING_TEMPLATE = (
     "The contents of {subject} look like {content_type}.  Either the URL"
     " you are trying to use does not exist or you have an internet gateway"
-    " issue.  You can remove the bad archive using 'spack clean"
-    " <package>', then try again using the correct URL."
+    " issue. You can remove the bad archive using 'ramble clean',"
+    " then try again using the correct URL."
 )
 
 
@@ -104,12 +107,13 @@ class FetchStrategy:
     #: The URL attribute must be specified either at the package class
     #: level, or as a keyword argument to ``version()``.  It is used to
     #: distinguish fetchers for different versions in the package DSL.
-    url_attr = None
+    url_attr: Optional[str] = None
 
     #: Optional attributes can be used to distinguish fetchers when :
     #: classes have multiple ``url_attrs`` at the top-level.
     # optional attributes in version() args.
-    optional_attrs = []
+    optional_attrs: List[str] = []
+    url: Optional[str] = None
 
     def __init__(self, **kwargs):
         # The stage is initialized late, so that fetch strategies can be
@@ -274,7 +278,7 @@ class URLFetchStrategy(FetchStrategy):
         self.extra_options = kwargs.get("fetch_options", {})
         self._curl = None
 
-        self.extension = kwargs.get("extension", None)
+        self.extension = kwargs.get("extension")
 
         if not self.url:
             raise ValueError("URLFetchStrategy requires a url for fetching.")
@@ -303,7 +307,7 @@ class URLFetchStrategy(FetchStrategy):
     def candidate_urls(self):
         urls = []
 
-        for url in [self.url] + (self.mirrors or []):
+        for url in itertools.chain([self.url], self.mirrors or []):
             # This must be skipped on Windows due to URL encoding
             # of ':' characters on filepaths on Windows
             if sys.platform != "win32" and url.startswith("file://"):
@@ -356,11 +360,8 @@ class URLFetchStrategy(FetchStrategy):
             try:
                 url, _, response = ramble.util.web.read_from_url(url)
             except ramble.util.web.SpackWebError as werr:
-                msg = "Urllib fetch failed to verify url\
-                      {}\n with error {}".format(
-                    url, werr
-                )
-                raise FailedDownloadError(url, msg)
+                msg = f"Urllib fetch failed to verify url {url}\n with error {werr}"
+                raise FailedDownloadError(url, msg) from None
             return response.getcode() is None or response.getcode() == 200
 
     def _fetch_from_url(self, url):
@@ -400,7 +401,7 @@ class URLFetchStrategy(FetchStrategy):
             if save_file and os.path.exists(save_file):
                 os.remove(save_file)
             msg = f"urllib failed to fetch with error {e}"
-            raise FailedDownloadError(url, msg)
+            raise FailedDownloadError(url, msg) from None
 
         with open(save_file, "wb") as _open_file:
             shutil.copyfileobj(response, _open_file)
@@ -474,7 +475,7 @@ class URLFetchStrategy(FetchStrategy):
 
             if curl.returncode == 22:
                 # This is a 404.  Curl will print the error.
-                raise FailedDownloadError(url, "URL %s was not found!" % url)
+                raise FailedDownloadError(url, f"URL {url} was not found!")
 
             elif curl.returncode == 60:
                 # This is a certificate error.  Suggest spack -k
@@ -527,7 +528,7 @@ class URLFetchStrategy(FetchStrategy):
 
         if not self.archive_file:
             raise NoArchiveFileError(
-                "Couldn't find archive file", "Failed on expand() for URL %s" % self.url
+                "Couldn't find archive file", f"Failed on expand() for URL {self.url}"
             )
 
         if not self.extension:
@@ -541,7 +542,7 @@ class URLFetchStrategy(FetchStrategy):
 
         # Expand all tarballs in their own directory to contain
         # exploding tarballs.
-        tarball_container = os.path.join(self.stage.path, "spack-expanded-archive")
+        tarball_container = os.path.join(self.stage.path, "expanded-archive")
 
         # Below we assume that the command to decompress expand the
         # archive in the current working directory
@@ -611,7 +612,7 @@ class URLFetchStrategy(FetchStrategy):
         if not self.archive_file:
             raise NoArchiveFileError(
                 "Tried to reset URLFetchStrategy before fetching",
-                "Failed on reset() for URL %s" % self.url,
+                f"Failed on reset() for URL {self.url}",
             )
 
         # Remove everything but the archive from the stage
@@ -644,7 +645,7 @@ class CacheURLFetchStrategy(URLFetchStrategy):
 
         # check whether the cache file exists.
         if not os.path.isfile(path):
-            raise NoCacheError("No cache of %s" % path)
+            raise NoCacheError(f"No cache of {path}")
 
         # remove old symlink if one is there.
         filename = self.stage.save_filename
@@ -680,16 +681,21 @@ class VCSFetchStrategy(FetchStrategy):
 
     """
 
+    branch: Optional[str] = None
+    tag: Optional[str] = None
+    commit: Optional[str] = None
+    revision: Optional[str] = None
+
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
 
         # Set a URL based on the type of fetch strategy.
-        self.url = kwargs.get(self.url_attr, None)
+        self.url = kwargs.get(self.url_attr)
         if not self.url:
             raise ValueError(f"{self.__class__} requires {self.url_attr} argument.")
 
         for attr in self.optional_attrs:
-            setattr(self, attr, kwargs.get(attr, None))
+            setattr(self, attr, kwargs.get(attr))
 
     @_needs_stage
     def check(self):
@@ -706,12 +712,12 @@ class VCSFetchStrategy(FetchStrategy):
 
         tar = which("tar", required=True)
 
-        patterns = kwargs.get("exclude", None)
+        patterns = kwargs.get("exclude")
         if patterns is not None:
             if isinstance(patterns, str):
                 patterns = [patterns]
             for p in patterns:
-                tar.add_default_arg("--exclude=%s" % p)
+                tar.add_default_arg(f"--exclude={p}")
 
         with working_dir(self.stage.path):
             if self.stage.srcdir:
@@ -725,80 +731,10 @@ class VCSFetchStrategy(FetchStrategy):
                 tar("-czf", destination, os.path.basename(self.stage.source_path))
 
     def __str__(self):
-        return "VCS: %s" % self.url
+        return f"VCS: {self.url}"
 
     def __repr__(self):
         return f"{self.__class__}<{self.url}>"
-
-
-@fetcher
-class GoFetchStrategy(VCSFetchStrategy):
-    """Fetch strategy that employs the `go get` infrastructure.
-
-    Use like this in a package:
-
-       version('name',
-               go='github.com/monochromegane/the_platinum_searcher/...')
-
-    Go get does not natively support versions, they can be faked with git.
-
-    The fetched source will be moved to the standard stage sourcepath directory
-    during the expand step.
-    """
-
-    url_attr = "go"
-
-    def __init__(self, **kwargs):
-        # Discards the keywords in kwargs that may conflict with the next
-        # call to __init__
-        forwarded_args = copy.copy(kwargs)
-        forwarded_args.pop("name", None)
-        super().__init__(**forwarded_args)
-
-        self._go = None
-
-    @property
-    def go_version(self):
-        vstring = self.go("version", output=str).split(" ")[2]
-        return Version(vstring)
-
-    @property
-    def go(self):
-        if not self._go:
-            self._go = which("go", required=True)
-        return self._go
-
-    @_needs_stage
-    def fetch(self):
-        logger.debug(f"Getting go resource: {self.url}")
-
-        with working_dir(self.stage.path):
-            try:
-                os.mkdir("go")
-            except OSError:
-                pass
-            env = dict(os.environ)
-            env["GOPATH"] = os.path.join(os.getcwd(), "go")
-            self.go("get", "-v", "-d", self.url, env=env)
-
-    def archive(self, destination):
-        super().archive(destination, exclude=".git")
-
-    @_needs_stage
-    def expand(self):
-        logger.debug(f"Source fetched with {self.url_attr} is already expanded.")
-
-        # Move the directory to the well-known stage source path
-        repo_root = _ensure_one_stage_entry(self.stage.path)
-        shutil.move(repo_root, self.stage.source_path)
-
-    @_needs_stage
-    def reset(self):
-        with working_dir(self.stage.source_path):
-            self.go("clean")
-
-    def __str__(self):
-        return "[go] %s" % self.url
 
 
 @fetcher
@@ -834,6 +770,10 @@ class GitFetchStrategy(VCSFetchStrategy):
     ]
 
     git_version_re = r"git version (\S+)"
+
+    submodules: bool = False
+    submodules_delete: bool = False
+    get_full_repo: bool = False
 
     def __init__(self, **kwargs):
         # Discards the keywords in kwargs that may conflict with the next call
@@ -1169,7 +1109,7 @@ class CvsFetchStrategy(VCSFetchStrategy):
             self.cvs("update", "-C", ".")
 
     def __str__(self):
-        return "[cvs] %s" % self.url
+        return f"[cvs] {self.url}"
 
 
 @fetcher
@@ -1263,7 +1203,7 @@ class SvnFetchStrategy(VCSFetchStrategy):
             self.svn("revert", ".", "-R")
 
     def __str__(self):
-        return "[svn] %s" % self.url
+        return f"[svn] {self.url}"
 
 
 @fetcher
@@ -1338,7 +1278,7 @@ class HgFetchStrategy(VCSFetchStrategy):
 
         args = []
         if self.revision:
-            args.append("at revision %s" % self.revision)
+            args.append(f"at revision {self.revision}")
         logger.debug(f"Cloning mercurial repository: {self.url} {args}")
 
         args = ["clone"]
@@ -1376,7 +1316,7 @@ class HgFetchStrategy(VCSFetchStrategy):
             shutil.move(scrubbed, source_path)
 
     def __str__(self):
-        return "[hg] %s" % self.url
+        return f"[hg] {self.url}"
 
 
 @fetcher
@@ -1390,7 +1330,7 @@ class S3FetchStrategy(URLFetchStrategy):
             super().__init__(*args, **kwargs)
         except ValueError:
             if not kwargs.get("url"):
-                raise ValueError("S3FetchStrategy requires a url for fetching.")
+                raise ValueError("S3FetchStrategy requires a url for fetching.") from None
 
     @_needs_stage
     def fetch(self):
@@ -1435,7 +1375,7 @@ class GCSFetchStrategy(URLFetchStrategy):
             super().__init__(*args, **kwargs)
         except ValueError:
             if not kwargs.get("url"):
-                raise ValueError("GCSFetchStrategy requires a url for fetching.")
+                raise ValueError("GCSFetchStrategy requires a url for fetching.") from None
 
     @_needs_stage
     def fetch(self):
@@ -1478,16 +1418,6 @@ def stable_target(fetcher):
     if isinstance(fetcher, URLFetchStrategy) and fetcher.cachable:
         return True
     return False
-
-
-def from_url(url):
-    """Given a URL, find an appropriate fetch strategy for it.
-    Currently just gives you a URLFetchStrategy that uses curl.
-
-    TODO: make this return appropriate fetch strategies for other
-          types of URLs.
-    """
-    return URLFetchStrategy(url)
 
 
 def from_kwargs(**kwargs):
@@ -1575,7 +1505,7 @@ class FailedDownloadError(FetchError):
     """Raised when a download fails."""
 
     def __init__(self, url, msg=""):
-        super().__init__("Failed to fetch file from URL: %s" % url, msg)
+        super().__init__(f"Failed to fetch file from URL: {url}", msg)
         self.url = url
 
 
@@ -1587,23 +1517,11 @@ class NoDigestError(FetchError):
     """Raised after attempt to checksum when URL has no digest."""
 
 
-class ExtrapolationError(FetchError):
-    """Raised when we can't extrapolate a version for a package."""
-
-
-class FetcherConflict(FetchError):
-    """Raised for packages with invalid fetch attributes."""
-
-
 class InvalidArgsError(FetchError):
     """Raised when a version can't be deduced from a set of arguments."""
 
-    def __init__(self, pkg=None, version=None, **args):
+    def __init__(self, **args):
         msg = "Could not guess a fetch strategy"
-        if pkg:
-            msg += f" for {pkg}"
-            if version:
-                msg += f"@{version}"
         long_msg = f"with arguments: {args}"
         super().__init__(msg, long_msg)
 
@@ -1616,4 +1534,4 @@ class NoStageError(FetchError):
     """Raised when fetch operations are called before set_stage()."""
 
     def __init__(self, method):
-        super().__init__("Must call FetchStrategy.set_stage() before calling %s" % method.__name__)
+        super().__init__(f"Must call FetchStrategy.set_stage() before calling {method.__name__}")

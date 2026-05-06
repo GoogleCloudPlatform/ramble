@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -20,6 +20,7 @@ pytestmark = pytest.mark.usefixtures(
 
 config = RambleCommand("config")
 workspace = RambleCommand("workspace")
+on = RambleCommand("on")
 
 
 def test_default_arg_works(request):
@@ -259,6 +260,7 @@ ramble:
     mpi_command: ''
     batch_submit: 'batch_submit {{execute_experiment}}'
     processes_per_node: 1
+    modeless_required_var: 1
   applications:
     when-variants:
       workloads:
@@ -277,7 +279,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
         with open(config_path, "w+") as f:
             f.write(test_config)
@@ -288,3 +290,70 @@ ramble:
         with open(ws.config_file_path) as f:
             data = f.read()
             assert expected_spec in data
+
+
+def test_variant_info_works(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("concretize", global_args=global_args)
+        info_out = workspace("info", "--variants", global_args=global_args)
+
+        assert "application_name=when-variants" in info_out
+        assert "indirect_variant=test-value" in info_out
+
+
+@pytest.mark.parametrize("test_value", ["value1", "value2", "value3"])
+def test_variant_nesting_works(workspace_name, test_value):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        with open(os.path.join(ws.config_dir, "variants.yaml"), "w+") as f:
+            f.write(
+                f"""variants:
+  iterative_variant: {test_value}
+  iterative_variant2: {test_value}"""
+            )
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        exec_out = on("--executor='echo {leaf_value}'", global_args=global_args)
+
+        assert test_value in exec_out

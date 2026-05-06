@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -7,23 +7,25 @@
 # except according to those terms.
 
 from collections import defaultdict
+from typing import DefaultDict, Dict, List, Set
 
 import ramble.error
-import ramble.repository
-import ramble.util.colors as rucolor
+import ramble.util.colors as color
+from ramble.expander import Expander
 from ramble.namespace import namespace
 from ramble.util.logger import logger
-
-base_class_type = ramble.repository.ObjectTypes.base_classes
-PackageManagerBase = ramble.repository.get_obj_class(
-    "package-manager-base", object_type=base_class_type
-)
+from ramble.util.spec_utils import SoftwareSpec
 
 SUB_INDENT = 2
 
 
-def _get_spec(pkg_info: dict, spec_name: str, prefix: str, default=None) -> str:
-    return pkg_info.get(f"{prefix}_{spec_name}", pkg_info.get(spec_name, default))
+def _get_spec(
+    pkg_info: dict, spec_name: str, prefix: str, allow_unprefixed=True, default=None
+) -> str:
+    if allow_unprefixed:
+        return pkg_info.get(f"{prefix}_{spec_name}", pkg_info.get(spec_name, default))
+    else:
+        return pkg_info.get(f"{prefix}_{spec_name}", default)
 
 
 def _is_dict_empty(rendered: defaultdict):
@@ -54,6 +56,7 @@ class SoftwarePackage:
         self.pkg_info = pkg_info
         self._package_type = "Base"
         self._used = False
+        self.injected = False
 
     def mark_used(self):
         """Mark this package a used"""
@@ -71,7 +74,7 @@ class SoftwarePackage:
         """Return a spec string for this software package
 
         Args:
-            all_packages (dict, optional): Dictionary of all package definitions.
+            all_packages (dict | None): Dictionary of all package definitions.
                                  Used to look up compiler packages.
             compiler (bool): True of this package is used as a compiler for
                                 another package. False if this is just a primary package.
@@ -104,9 +107,13 @@ class SoftwarePackage:
             return ""
 
         indentation = " " * indent
-        color = rucolor.level_func(color_level)
+        color_func = color.level_func(color_level)
 
-        out_str = color(f"{indentation}{self._package_type} package: {self.name}\n")
+        injected_str = "" if not self.injected else " (injected by ramble)"
+
+        out_str = color_func(
+            f"{indentation}{self._package_type} package: {self.name} {injected_str}\n"
+        )
         return out_str
 
     def __str__(self):
@@ -143,7 +150,7 @@ class RenderedPackage(SoftwarePackage):
         self,
         name: str,
         pkg_info: dict,
-        package_manager: PackageManagerBase,
+        package_manager,
         spec: str,
         compiler: str = "",
         compiler_spec: str = "",
@@ -153,8 +160,7 @@ class RenderedPackage(SoftwarePackage):
         Args:
             name (str): Name of package
             pkg_info (dict): Package info containing specs for supported package managers
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                package manager tied to this package
+            package_manager: package manager tied to this package
             spec (str): Package spec (used to install / load package)
             compiler (optional str): Name of package definition to use as compiler
                                      for this package
@@ -210,11 +216,11 @@ class RenderedPackage(SoftwarePackage):
 
         indentation = " " * (indent + SUB_INDENT)
         out_str = super().info(indent, verbosity, color_level, only_used)
-        out_str += f'{indentation}Spec: {self.spec.replace("@", "@@")}\n'
+        out_str += f"{indentation}Spec: {self.spec}\n"
         if self.compiler:
             out_str += f"{indentation}Compiler: {self.compiler}\n"
         if self.compiler_spec:
-            out_str += f'{indentation}Compiler Spec: {self.compiler_spec.replace("@", "@@")}\n'
+            out_str += f"{indentation}Compiler Spec: {self.compiler_spec}\n"
         return out_str
 
     def __eq__(self, other):
@@ -223,6 +229,8 @@ class RenderedPackage(SoftwarePackage):
 
 class TemplatePackage(SoftwarePackage):
     """Class representing a template software package"""
+
+    _rendered_packages: DefaultDict[str, Dict[str, RenderedPackage]]
 
     def __init__(
         self,
@@ -277,10 +285,10 @@ class TemplatePackage(SoftwarePackage):
         out_str = ""
         pkg_man_indent = indent + SUB_INDENT
         indentation = " " * pkg_man_indent
-        color = rucolor.level_func(color_level + 1)
+        color_func = color.level_func(color_level + 1)
         for pkg_man, pkgs in self._rendered_packages.items():
             if pkgs:
-                out_str += color(f"{indentation}{pkg_man} packages:\n")
+                out_str += color_func(f"{indentation}{pkg_man} packages:\n")
 
             for pkg in pkgs.values():
                 out_str += pkg.info(
@@ -299,7 +307,7 @@ class TemplatePackage(SoftwarePackage):
             out_str = super().info(indent, verbosity, color_level, only_used=only_used) + out_str
         return out_str
 
-    def render_package(self, expander: object, package_manager: PackageManagerBase):
+    def render_package(self, expander: Expander, package_manager):
         """Render a SoftwarePackage from this TemplatePackage
 
         Args:
@@ -312,24 +320,32 @@ class TemplatePackage(SoftwarePackage):
         name = expander.expand_var(self.name, merge_used_stage=False)
         pm_name = package_manager.name
         pkg_info = self.pkg_info
-        pm_prefix = package_manager.spec_prefix()
+        pm_prefix = package_manager.spec_prefix
+        pm_allow_unprefixed = package_manager.allow_unprefixed_specs
 
-        raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix)
-        raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix)
-        raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix)
-
-        spec = expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec else None
+        raw_spec = _get_spec(pkg_info, "pkg_spec", pm_prefix, pm_allow_unprefixed)
+        raw_compiler = _get_spec(pkg_info, "compiler", pm_prefix, pm_allow_unprefixed)
+        raw_compiler_spec = _get_spec(pkg_info, "compiler_spec", pm_prefix, pm_allow_unprefixed)
+        spec = (
+            expander.expand_var(raw_spec, merge_used_stage=False) if raw_spec is not None else None
+        )
+        if not spec:
+            if pm_allow_unprefixed:
+                raise RambleSoftwareEnvironmentError(f"Package {name} is missing a valid spec")
+            else:
+                return None
         compiler = (
-            expander.expand_var(raw_compiler, merge_used_stage=False) if raw_compiler else None
+            expander.expand_var(raw_compiler, merge_used_stage=False)
+            if raw_compiler is not None
+            else None
         )
         compiler_spec = (
             expander.expand_var(raw_compiler_spec, merge_used_stage=False)
-            if raw_compiler_spec
+            if raw_compiler_spec is not None
             else None
         )
 
         new_pkg = RenderedPackage(name, pkg_info, package_manager, spec, compiler, compiler_spec)
-
         if new_pkg.name in self._rendered_packages[pm_name]:
             if new_pkg != self._rendered_packages[pm_name][name]:
                 new_info = new_pkg.info(only_used=False, color_level=-1).replace("@", "")
@@ -350,7 +366,7 @@ class TemplatePackage(SoftwarePackage):
         else:
             return new_pkg
 
-    def add_rendered_package(self, new_package: object, all_packages: dict, pm_name: str):
+    def add_rendered_package(self, new_package: RenderedPackage, all_packages: dict, pm_name: str):
         """Add a rendered package to this template's list of rendered packages
 
         Args:
@@ -372,12 +388,11 @@ class SoftwareEnvironment:
 
         Args:
             name (str): Name of the environment
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Package manager associated with the environment
+            package_manager: Package manager associated with the environment
         """
 
         self.name = name
-        self._packages = []
+        self._packages: List[SoftwarePackage] = []
         self._environment_type = "Base"
         self._used = False
 
@@ -415,8 +430,8 @@ class SoftwareEnvironment:
             return ""
 
         indentation = " " * indent
-        color = rucolor.level_func(color_level)
-        out_str = color(f"{indentation}{self._environment_type} environment: {self.name}\n")
+        color_func = color.level_func(color_level)
+        out_str = color_func(f"{indentation}{self._environment_type} environment: {self.name}\n")
 
         if self._packages:
             indentation = " " * (indent + SUB_INDENT)
@@ -424,7 +439,7 @@ class SoftwareEnvironment:
 
         for pkg in self._packages:
             if verbosity >= 1:
-                out_str += f'{indentation}- {pkg.name} = {pkg.spec_str().replace("@", "@@")}\n'
+                out_str += f"{indentation}- {pkg.name} = {pkg.spec_str()}\n"
             else:
                 out_str += f"{indentation}- {pkg.name}\n"
         return out_str
@@ -437,7 +452,7 @@ class SoftwareEnvironment:
         """
         return self.info(indent=0)
 
-    def add_package(self, package: object):
+    def add_package(self, package: "SoftwarePackage"):
         """Add a package definition to this environment
 
         Args:
@@ -454,14 +469,22 @@ class SoftwareEnvironment:
         Returns:
             (bool): True if environments are equivalent, False otherwise
         """
-        equal = self.name == other.name and len(self._packages) == len(other._packages)
-
-        if not equal:
+        if not self.name == other.name:
             return False
 
-        for self_pkg, other_pkg in zip(self._packages, other._packages):
-            if self_pkg != other_pkg:
-                return False
+        self_pkgs = {}
+        other_pkgs = {}
+
+        for self_pkg in self._packages:
+            if not self_pkg.injected:
+                self_pkgs[self_pkg.name] = self_pkg
+
+        for other_pkg in other._packages:
+            if not other_pkg.injected:
+                other_pkgs[other_pkg.name] = other_pkg
+
+        if self_pkgs != other_pkgs:
+            return False
 
         return True
 
@@ -478,7 +501,7 @@ class ExternalEnvironment(SoftwareEnvironment):
 class RenderedExternalEnvironment(ExternalEnvironment):
     """Class representing a rendered externally defined software environment"""
 
-    def __init__(self, name: str, name_or_path: str, package_manager: PackageManagerBase):
+    def __init__(self, name: str, name_or_path: str, package_manager):
         """Constructor for external software environment"""
         super().__init__(name, name_or_path)
         self.package_manager = package_manager
@@ -491,7 +514,7 @@ class RenderedExternalEnvironment(ExternalEnvironment):
 class RenderedEnvironment(SoftwareEnvironment):
     """Class representing an already rendered software environment"""
 
-    def __init__(self, name: str, package_manager: PackageManagerBase):
+    def __init__(self, name: str, package_manager):
         """Constructor for rendered software environment"""
         super().__init__(name)
         self.package_manager = package_manager
@@ -506,6 +529,9 @@ class RenderedEnvironment(SoftwareEnvironment):
 
 class TemplateEnvironment(SoftwareEnvironment):
     """Class representing a template software environment"""
+
+    _package_names: Set[str]
+    _rendered_environments: DefaultDict[str, Dict[str, "RenderedEnvironment"]]
 
     def __init__(self, name: str):
         """TemplateEnvironment constructor
@@ -586,18 +612,17 @@ class TemplateEnvironment(SoftwareEnvironment):
 
     def render_environment(
         self,
-        expander: object,
+        expander: Expander,
         all_package_templates: dict,
         all_packages: dict,
-        package_manager: PackageManagerBase,
+        package_manager,
     ):
         """Render a SoftwareEnvironment from this TemplateEnvironment
 
         Args:
             expander (ramble.expander.Expander): Expander object to use when rendering
             all_packages (dict): All package definitions
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Package manager the environment is rendered with
+            package_manager: Package manager the environment is rendered with
 
         Returns:
             (RenderedEnvironment) Reference to the rendered SoftwareEnvironment
@@ -607,39 +632,42 @@ class TemplateEnvironment(SoftwareEnvironment):
 
         new_env = RenderedEnvironment(name, package_manager)
 
+        # Stores a mapping from rendered package name to template.
+        # This helps with more efficient env package matching and
+        # allows only matched packages to be fully rendered.
+        name_to_template = {}
+        for pkg_template in all_package_templates.values():
+            rendered_name = expander.expand_var(pkg_template.name, merge_used_stage=False)
+            if rendered_name:
+                name_to_template[rendered_name] = pkg_template
+
         for env_pkg_template in self._package_names:
             rendered_env_pkg_name = expander.expand_var(env_pkg_template)
-
-            if rendered_env_pkg_name:
-                found = False
-                for template_pkg in all_package_templates.values():
-                    expander.flush_used_variable_stage()
-                    rendered_pkg = template_pkg.render_package(expander, package_manager)
-
-                    if rendered_env_pkg_name == rendered_pkg.name:
-                        found = True
-                        if rendered_pkg.spec is not None:
-                            expander.merge_used_variable_stage()
-
-                            if rendered_pkg.name in all_packages[pm_name]:
-                                if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
-                                    raise RambleSoftwareEnvironmentError(
-                                        f"Environment {name} defined multiple "
-                                        "times in inconsistent ways.\n"
-                                        f"Package with differences is {rendered_pkg.name}"
-                                    )
-                                rendered_pkg = all_packages[pm_name][rendered_pkg.name]
-                            else:
-                                all_packages[pm_name][rendered_pkg.name] = rendered_pkg
-
-                        template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
-                        new_env.add_package(rendered_pkg)
-
-                if not found:
-                    raise RambleSoftwareEnvironmentError(
-                        f"Environment template {self.name} references "
-                        f"undefined package {env_pkg_template} rendered to {rendered_env_pkg_name}"
-                    )
+            if not rendered_env_pkg_name:
+                continue
+            matching_template = name_to_template.get(rendered_env_pkg_name)
+            if matching_template is None:
+                raise RambleSoftwareEnvironmentError(
+                    f"Environment template {self.name} references "
+                    f"undefined package {env_pkg_template} rendered to {rendered_env_pkg_name}"
+                )
+            expander.flush_used_variable_stage()
+            rendered_pkg = matching_template.render_package(expander, package_manager)
+            if rendered_pkg is not None:
+                if rendered_pkg.spec is not None:
+                    expander.merge_used_variable_stage()
+                    if rendered_pkg.name in all_packages[pm_name]:
+                        if rendered_pkg != all_packages[pm_name][rendered_pkg.name]:
+                            raise RambleSoftwareEnvironmentError(
+                                f"Environment {name} defined multiple "
+                                "times in inconsistent ways.\n"
+                                f"Package with differences is {rendered_pkg.name}"
+                            )
+                        rendered_pkg = all_packages[pm_name][rendered_pkg.name]
+                    else:
+                        all_packages[pm_name][rendered_pkg.name] = rendered_pkg
+                matching_template.add_rendered_package(rendered_pkg, all_packages, pm_name)
+                new_env.add_package(rendered_pkg)
 
         return new_env
 
@@ -662,7 +690,10 @@ class TemplateEnvironment(SoftwareEnvironment):
             self._rendered_environments[pm_name][environment.name] = environment
             all_environments[pm_name][environment.name] = environment
             for template_pkg, rendered_pkg in zip(self._packages, environment._packages):
-                template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
+                if isinstance(rendered_pkg, RenderedPackage) and isinstance(
+                    template_pkg, TemplatePackage
+                ):
+                    template_pkg.add_rendered_package(rendered_pkg, all_packages, pm_name)
 
 
 class SoftwareEnvironments:
@@ -719,12 +750,11 @@ class SoftwareEnvironments:
         information about used packages and environments.
 
         Args:
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Reference to a package manager object
+            package_manager: Reference to a package manager object
             env_name (str): Name of the rendered environment to mark as used
         """
 
-        pm_name = package_manager.spec_prefix()
+        pm_name = package_manager.spec_prefix
         if pm_name in self._rendered_environments:
             if env_name in self._rendered_environments[pm_name]:
                 self._rendered_environments[pm_name][env_name].mark_used()
@@ -780,7 +810,7 @@ class SoftwareEnvironments:
                             new_env.add_package_name(package)
                     self._environment_templates[env_template] = new_env
 
-    def define_compiler_packages(self, environment: RenderedEnvironment, expander):
+    def define_compiler_packages(self, environment: RenderedEnvironment, expander: Expander):
         """Define packages for compilers in this environment
 
         If compilers referenced by (environment) are not defined, create
@@ -794,8 +824,18 @@ class SoftwareEnvironments:
         """
         pm_name = environment.package_manager_name
         for pkg in environment._packages:
-            if pkg.compiler:
+            if isinstance(pkg, RenderedPackage) and pkg.compiler:
                 cur_compiler = pkg.compiler
+                # Re-render compiler package to ensure variables are marked as used.
+                if cur_compiler in self._rendered_packages[pm_name]:
+                    for template_def in self._package_templates.values():
+                        if cur_compiler in template_def._rendered_packages[pm_name]:
+                            expander.flush_used_variable_stage()
+                            rendered_pkg = template_def.render_package(
+                                expander, environment.package_manager
+                            )
+                            expander.merge_used_variable_stage()
+
                 while cur_compiler and cur_compiler not in self._rendered_packages[pm_name]:
                     added = False
                     for template_name, template_def in self._package_templates.items():
@@ -803,10 +843,10 @@ class SoftwareEnvironments:
                         rendered_name = expander.expand_var(template_name, merge_used_stage=False)
 
                         if rendered_name == cur_compiler:
-                            expander.merge_used_variable_stage()
                             rendered_pkg = template_def.render_package(
                                 expander, environment.package_manager
                             )
+                            expander.merge_used_variable_stage()
 
                             if (
                                 cur_compiler in self._rendered_packages[pm_name]
@@ -824,6 +864,7 @@ class SoftwareEnvironments:
 
                             if rendered_pkg.compiler:
                                 cur_compiler = rendered_pkg.compiler
+
                     if not added:
                         raise RambleSoftwareEnvironmentError(
                             f"Compiler {pkg.compiler} used, but not "
@@ -831,7 +872,7 @@ class SoftwareEnvironments:
                             f"by package {pkg.name}"
                         )
 
-    def compiler_specs_for_environment(self, environment: object):
+    def compiler_specs_for_environment(self, environment: RenderedEnvironment):
         """Iterator over compiler specs for a given environment
 
         Assumes all compilers have been defined via
@@ -841,13 +882,14 @@ class SoftwareEnvironments:
             environment (SoftwareEnvironment): Environment to extract compiler specs for
 
         Yields:
-            (str) Spec string for each compiler
+            (str) Package spec string for each compiler
+            (str) Compiler spec string for each compiler
         """
 
         root_compilers = []
         pm_name = environment.package_manager_name
         for pkg in environment._packages:
-            if pkg.compiler:
+            if isinstance(pkg, RenderedPackage) and pkg.compiler:
                 if pkg.compiler not in self._rendered_packages[pm_name]:
                     raise RambleSoftwareEnvironmentError(
                         f"Compiler {pkg.compiler} used, but not "
@@ -861,19 +903,21 @@ class SoftwareEnvironments:
         for comp in root_compilers:
             comp_pkg = self._rendered_packages[pm_name][comp]
 
-            if comp_pkg.compiler:
+            if isinstance(comp_pkg, RenderedPackage) and comp_pkg.compiler:
                 cur_compiler = comp_pkg.compiler
 
                 while cur_compiler and cur_compiler not in dep_compilers:
                     dep_compilers.append(cur_compiler)
-                    if comp_pkg.compiler:
+                    if isinstance(comp_pkg, RenderedPackage) and comp_pkg.compiler:
                         cur_compiler = self._rendered_packages[pm_name][comp_pkg.compiler].name
 
         for comp in reversed(root_compilers + dep_compilers):
             comp_pkg = self._rendered_packages[pm_name][comp]
-            yield comp_pkg.spec_str(all_packages=self._rendered_packages, compiler=False)
+            yield comp_pkg.spec_str(
+                all_packages=self._rendered_packages, compiler=False
+            ), comp_pkg.spec_str(all_packages=self._rendered_packages, compiler=True)
 
-    def package_specs_for_environment(self, environment: object):
+    def package_specs_for_environment(self, environment: SoftwareEnvironment):
         """Iterator over package specs for a given environment
 
         Assumes all compilers have been defined via
@@ -888,6 +932,45 @@ class SoftwareEnvironments:
 
         for pkg in environment._packages:
             yield pkg.spec_str(all_packages=self._rendered_packages, compiler=False)
+
+    def add_spec_to_environment(
+        self,
+        environment: SoftwareEnvironment,
+        spec: SoftwareSpec,
+        expander: Expander,
+        package_manager,
+    ):
+        """Add a spec to a given environment
+
+        Creates a new template / rendered package (if needed) from the input spec,
+        and adds to the template and rendered environment as a package in the environment.
+
+        Args:
+            environment (SoftwareEnvironment): Rendered environment to add package to
+            spec (ramble.util.spec_utils.SoftwareSpec): Software spec to add to environment
+            expander (ramble.expander.Expander): Experiment's expander object,
+                                                 to render package / environment with
+            package_manager: Package manager from the experiment
+        """
+
+        pm_name = package_manager.spec_prefix
+
+        if spec.name not in self._package_templates:
+            template_package = TemplatePackage(spec.name, spec.to_dict())
+
+            self._package_templates[spec.name] = template_package
+
+        template_package = self._package_templates[spec.name]
+
+        rendered_package = template_package.render_package(expander, package_manager)
+        rendered_package.injected = True
+
+        if rendered_package.name not in self._rendered_packages:
+            template_package.add_rendered_package(
+                rendered_package, self._rendered_packages, pm_name
+            )
+
+        environment.add_package(rendered_package)
 
     def _check_environment(self, environment):
         """Check an environment for common issues
@@ -904,7 +987,7 @@ class SoftwareEnvironments:
         used_compilers = set()
         compiler_warnings = []
         for pkg in environment._packages:
-            if pkg.compiler and pkg.compiler in pkg_names:
+            if isinstance(pkg, RenderedPackage) and pkg.compiler and pkg.compiler in pkg_names:
                 compiler_warnings.append((pkg.name, pkg.compiler))
 
         logger.debug(f" Used compilers: {used_compilers}")
@@ -918,16 +1001,13 @@ class SoftwareEnvironments:
                 logger.warn(f"    Package: {pkg_name}, Compiler: {comp_name}")
             logger.warn("This might cause problems when installing the packages.")
 
-    def render_environment(
-        self, env_name: str, expander: object, package_manager: PackageManagerBase, require=True
-    ):
+    def render_environment(self, env_name: str, expander: Expander, package_manager, require=True):
         """Render an environment needed by an experiment
 
         Args:
             env_name (str): Name of environment needed by the experiment
             expander (ramble.expander.Expander): Expander object from the experiment
-            package_manager (ramble.repository.get_base_class("package-manager-base")):
-                Package manager the environment is rendered with
+            package_manager: Package manager the environment is rendered with
 
         Returns:
             (SoftwareEnvironment): Reference to software environment for
@@ -961,9 +1041,18 @@ class SoftwareEnvironments:
                 if rendered_env.name == env_name:
                     if env_name in self._rendered_environments[pm_name]:
                         if rendered_env != self._rendered_environments[pm_name][env_name]:
+                            error_string = f"Old environment: {env_name}\n"
+                            error_string += "  Packages:\n"
+                            for pkg in self._rendered_environments[pm_name][env_name]._packages:
+                                error_string += f"  - {pkg.name}\n"
+                            error_string += f"New environment: {rendered_env.name}\n"
+                            error_string += "  Packages:\n"
+                            for pkg in rendered_env._packages:
+                                error_string += f"  - {pkg.name}\n"
+
                             raise RambleSoftwareEnvironmentError(
                                 f"Environment {env_name} defined multiple times "
-                                "in inconsistent ways"
+                                "in inconsistent ways.\n" + error_string
                             )
                         rendered_env = self._rendered_environments[pm_name][env_name]
 

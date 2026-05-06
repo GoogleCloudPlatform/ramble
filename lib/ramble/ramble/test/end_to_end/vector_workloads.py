@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
@@ -19,7 +18,7 @@ pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_p
 workspace = RambleCommand("workspace")
 
 
-def test_vector_workloads(mutable_config, mutable_mock_workspace_path, workspace_name):
+def test_vector_workloads(make_workspace_from_config):
     test_config = """
 ramble:
   variables:
@@ -41,20 +40,13 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.config_file_name)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
-        ws._re_read()
-
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-
-        experiment_root = ws.experiment_dir
-        expected_workloads = ["parallel", "serial", "local"]
-        for workload in expected_workloads:
-            exp1_dir = os.path.join(experiment_root, "hostname", workload, "simple_test")
-            exp1_script = os.path.join(exp1_dir, "execute_experiment")
-            assert os.path.isfile(exp1_script)
+    experiment_root = ws.experiment_dir
+    expected_workloads = ["parallel", "serial", "local"]
+    for workload in expected_workloads:
+        exp1_dir = os.path.join(experiment_root, "hostname", workload, "simple_test")
+        exp1_script = os.path.join(exp1_dir, "execute_experiment")
+        assert os.path.isfile(exp1_script)

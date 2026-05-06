@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -11,7 +11,6 @@ import collections
 import contextlib
 import errno
 import functools
-import importlib
 import importlib.machinery
 import importlib.util
 import inspect
@@ -22,13 +21,8 @@ import stat
 import sys
 import traceback
 import types
-
-try:
-    from collections.abc import Mapping  # novm
-except ImportError:
-    from collections.abc import Mapping
-
 from enum import Enum
+from typing import Mapping
 
 import ruamel.yaml as yaml
 
@@ -278,7 +272,7 @@ def list_object_files(obj_inst, object_type):
 
 
 def all_object_names(object_type=default_type):
-    """Convenience wrapper around ``ramble.repository.all_object_names()``."""  # noqa: E501
+    """Convenience wrapper around ``ramble.repository.all_object_names()``."""
     return paths[object_type].all_object_names()
 
 
@@ -303,7 +297,7 @@ def set_path(repo, object_type=default_type):
     Overwrite ``path`` and register it as an importer in
     ``sys.meta_path`` if it is a ``Repo`` or ``RepoPath``.
     """
-    global paths
+    global paths  # noqa: F824
     paths[object_type] = repo
 
     # make the new repo_path an importer if needed
@@ -336,7 +330,7 @@ def use_repositories(*paths_and_repos, object_type=default_type):
     Returns:
         Corresponding RepoPath object
     """
-    global paths
+    global paths  # noqa: F824
 
     # Construct a temporary RepoPath object from
     temporary_repositories = RepoPath(*paths_and_repos, object_type=object_type)
@@ -361,7 +355,7 @@ def autospec(function):
     @functools.wraps(function)
     def converter(self, spec_like, *args, **kwargs):
         if not isinstance(spec_like, ramble.spec.Spec):
-            spec_like = ramble.spec.Spec(spec_like)
+            spec_like = ramble.spec.Spec(spec_like.partition("@")[0])
         return function(self, spec_like, *args, **kwargs)
 
     return converter
@@ -395,7 +389,7 @@ class FastObjectChecker(Mapping):
     """
 
     #: Global cache, reused by every instance
-    _paths_cache = {}
+    _paths_cache: Mapping[str, str] = {}
 
     def __init__(self, objects_path, object_file_name, object_type):
         # The path of the repository managed by this instance
@@ -426,6 +420,8 @@ class FastObjectChecker(Mapping):
         # Create a dictionary that will store the mapping between a
         # object name and its stat info
         cache = {}
+        if not os.path.isdir(self.objects_path):
+            return cache
         for obj_name in os.listdir(self.objects_path):
             # Skip non-directories in the object root.
             obj_dir = os.path.join(self.objects_path, obj_name)
@@ -634,7 +630,7 @@ class RepoIndex:
         """Get the index with the specified name, reindexing if needed."""
         indexer = self.indexers.get(name)
         if not indexer:
-            raise KeyError("no such index: %s" % name)
+            raise KeyError(f"no such index: {name}")
 
         if name not in self.indexes:
             self._build_all_indexes()
@@ -713,10 +709,10 @@ class RepoPath:
                 self.put_last(repo)
             except RepoError as e:
                 logger.warn(
-                    "Failed to initialize repository: '%s'." % repo,
+                    f"Failed to initialize repository: '{repo}'.",
                     e.message,
                     "To remove the bad repository, run this command:",
-                    "    ramble repo rm %s" % repo,
+                    f"    ramble repo rm {repo}",
                 )
 
     def put_first(self, repo):
@@ -837,7 +833,7 @@ class RepoPath:
             return sys.modules[fullname]
 
         if not self.by_namespace.is_prefix(fullname):
-            raise ImportError("No such ramble repo: %s" % fullname)
+            raise ImportError(f"No such ramble repo: {fullname}")
 
         module = ObjectNamespace(fullname)
         module.__loader__ = self
@@ -846,7 +842,15 @@ class RepoPath:
 
     def last_mtime(self):
         """Time a object file in this repo was last updated."""
-        return max(repo.last_mtime() for repo in self.repos)
+        # Filter out repos that don't have any mtime values before calling max
+        mtimes = []
+        for repo in self.repos:
+            try:
+                mtimes.append(repo.last_mtime())
+            except ValueError:
+                # This repo has no objects, so just skip it.
+                pass
+        return max(mtimes) if mtimes else 0
 
     def repo_for_obj(self, spec):
         """Given a spec, get the repository for its object."""
@@ -887,7 +891,7 @@ class RepoPath:
         return self.repo_for_obj(spec).get(spec)
 
     def get_obj_class(self, obj_name):
-        """Find a class for the spec's object and return the class object."""  # noqa: E501
+        """Find a class for the spec's object and return the class object."""
         return self.repo_for_obj(obj_name).get_obj_class(obj_name)
 
     @autospec
@@ -986,7 +990,7 @@ class Repo:
         config = self._read_config()
         check(
             "namespace" in config,
-            "%s must define a namespace." % os.path.join(root, self.config_name),
+            f"{os.path.join(root, self.config_name)} must define a namespace.",
         )
 
         self.namespace = config["namespace"]
@@ -1003,10 +1007,6 @@ class Repo:
         )
 
         self.objects_path = os.path.join(self.root, objects_dir)
-        check(
-            os.path.isdir(self.objects_path),
-            f"No directory '{objects_dir}' found in '{root}'",
-        )
 
         # Set up 'full_namespace' to include the super-namespace
         self.full_namespace = f"{self.base_namespace}.{self.namespace}"
@@ -1181,7 +1181,7 @@ class Repo:
             # handler by wrapping them
             if ramble.config.get("config:debug"):
                 sys.excepthook(*sys.exc_info())
-            raise FailedConstructorError(spec.fullname, *sys.exc_info())
+            raise FailedConstructorError(spec.fullname, *sys.exc_info()) from e
 
     @autospec
     def dump_provenance(self, spec, path):
@@ -1219,7 +1219,15 @@ class Repo:
     def dirname_for_object_name(self, obj_name):
         """Get the directory name for a particular object.  This is the
         directory that contains its object.py file."""
-        return os.path.join(self.objects_path, obj_name)
+        path_priorities = [
+            os.path.join(self.objects_path, obj_name),  # Default
+            os.path.join(self.objects_path, obj_name.replace("_", "-")),  # Hyphens
+            os.path.join(self.objects_path, obj_name.replace("-", "_")),  # Underscores
+        ]
+        for path in path_priorities:
+            if os.path.isdir(path):
+                return path
+        return path_priorities[0]
 
     def filename_for_object_name(self, obj_name):
         """Get the filename for the module we should load for a particular
@@ -1329,7 +1337,7 @@ class Repo:
                 # manually construct the error message in order to give the
                 # user the correct .py where the syntax error is
                 # located
-                raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}")
+                raise SyntaxError(f"invalid syntax in {file_path}, line {e.lineno}") from None
 
             module.__object__ = self.full_namespace
             module.__loader__ = self
@@ -1387,23 +1395,23 @@ def create_repo(
         namespace = os.path.basename(root)
 
     if not re.match(r"\w[\.\w-]*", namespace):
-        raise InvalidNamespaceError("'%s' is not a valid namespace." % namespace)
+        raise InvalidNamespaceError(f"'{namespace}' is not a valid namespace.")
 
     existed = False
     if os.path.exists(root):
         if os.path.isfile(root):
-            raise BadRepoError("File %s already exists and is not a directory" % root)
+            raise BadRepoError(f"File {root} already exists and is not a directory")
         elif os.path.isdir(root):
             if not os.access(root, os.R_OK | os.W_OK):
-                raise BadRepoError("Cannot create new repo in %s: cannot access directory." % root)
+                raise BadRepoError(f"Cannot create new repo in {root}: cannot access directory.")
             if os.listdir(root):
-                raise BadRepoError("Cannot create new repo in %s: directory is not empty." % root)
+                raise BadRepoError(f"Cannot create new repo in {root}: directory is not empty.")
         existed = True
 
     full_path = os.path.realpath(root)
     parent = os.path.dirname(full_path)
     if not os.access(parent, os.R_OK | os.W_OK):
-        raise BadRepoError("Cannot create repository in %s: can't access parent!" % root)
+        raise BadRepoError(f"Cannot create repository in {root}: can't access parent!")
 
     try:
         object_dirs = []
@@ -1447,9 +1455,7 @@ def create_repo(
         else:
             shutil.rmtree(root, ignore_errors=True)
 
-        raise BadRepoError(
-            "Failed to create new repository in %s." % root, f"Caused by {type(e)}: {e}"
-        )
+        raise BadRepoError(f"Failed to create new repository in {root}.") from e
 
     return full_path, namespace
 
@@ -1495,7 +1501,7 @@ class RepositoryNamespace(types.ModuleType):
             setattr(self, name, __import__(submodule))
         except ImportError:
             msg = "'{0}' object has no attribute {1}"
-            raise AttributeError(msg.format(type(self), name))
+            raise AttributeError(msg.format(type(self), name)) from None
         return getattr(self, name)
 
 
@@ -1532,11 +1538,9 @@ class RepoLoader(_PrependFileLoader):
         super().__init__(self.fullname, self.object_py, prepend=self._object_prepend)
 
     def is_package(self, fullname):
-        parent_dir = os.path.dirname(self.path)
-        # Use the presence of __init__.py to determine if load it as a package.
-        # TODO: since every Ramble object already has a containing directory,
-        # it might make sense to treat all of them as python packages.
-        return os.path.isfile(os.path.join(parent_dir, "__init__.py"))
+        # Since every Ramble object already has a containing directory,
+        # we can treat all of them as python packages.
+        return True
 
 
 class RepositoryNamespaceLoader:
@@ -1656,7 +1660,7 @@ class UnknownNamespaceError(UnknownEntityError):
     """Raised when we encounter an unknown namespace"""
 
     def __init__(self, namespace):
-        super().__init__("Unknown namespace: %s" % namespace)
+        super().__init__(f"Unknown namespace: {namespace}")
 
 
 class FailedConstructorError(RepoError):

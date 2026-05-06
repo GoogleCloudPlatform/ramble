@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -30,7 +30,6 @@ import ruamel
 import llnl.util.lang
 import llnl.util.tty as tty
 import llnl.util.tty.colify
-import llnl.util.tty.color as color
 from llnl.util.tty.log import log_output
 
 import ramble.cmd
@@ -38,6 +37,7 @@ import ramble.cmd.common.arguments
 import ramble.config
 import ramble.paths
 import ramble.repository
+import ramble.util.colors as color
 import ramble.util.version
 import ramble.workspace
 import ramble.workspace.shell
@@ -50,9 +50,6 @@ from spack.util.executable import CommandNotFoundError
 
 #: names of profile statistics
 stat_names = pstats.Stats.sort_arg_dict_default
-
-#: top-level aliases for Ramble commands
-aliases = {"rm": "remove"}
 
 #: help levels in order of detail (i.e., number of commands shown)
 levels = ["short", "long"]
@@ -158,7 +155,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
             level (str): 'short' or 'long' (more commands shown for long)
         """
         if level not in levels:
-            raise ValueError("level must be one of: %s" % levels)
+            raise ValueError(f"level must be one of: {levels}")
 
         # lazily add all commands to the parser when needed.
         add_all_commands(self)
@@ -182,7 +179,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         def add_subcommand_group(title, commands):
             """Add informational help group for a specific subcommand set."""
-            cmd_set = {c for c in commands}
+            cmd_set = set(commands)
 
             # make a dict of commands of interest
             cmds = {a.dest: a for a in self.actions if a.dest in cmd_set}
@@ -244,15 +241,12 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
         # epilog
         formatter.add_text(
-            """\
-{help}:
+            f"""{section_descriptions['help']}:
   ramble help --all       list all commands and options
   ramble help <command>   help on a specific command
   ramble help --spec      help on the application specification syntax
   ramble docs             open https://ramble.readthedocs.io/ in a browser
-""".format(
-                help=section_descriptions["help"]
-            )
+"""
         )
 
         # determine help from format above
@@ -332,6 +326,11 @@ class RambleArgumentParser(argparse.ArgumentParser):
 
 def make_argument_parser(**kwargs):
     """Create an basic argument parser without any subcommands added."""
+    if "color" in kwargs and sys.version_info < (3, 14):
+        # The color argument was only added since Python 3.14.
+        # See https://docs.python.org/3/library/argparse.html#color.
+        kwargs.pop("color")
+
     parser = RambleArgumentParser(
         formatter_class=RambleHelpFormatter,
         add_help=False,
@@ -400,6 +399,19 @@ def make_argument_parser(**kwargs):
         "--disable-logger",
         action="store_true",
         help="disable the ramble logger. All output will be printed to stdout.",
+    )
+    parser.add_argument(
+        "-A",
+        "--aggregate-warnings",
+        action="store_true",
+        help="aggregate warnings from the ramble logger to the end of "
+        + "execution. May lose context information",
+    )
+    parser.add_argument(
+        "-S",
+        "--suppress-warnings",
+        action="store_true",
+        help="suppress warnings from the ramble logger.",
     )
     parser.add_argument(
         "-P",
@@ -474,6 +486,11 @@ def make_argument_parser(**kwargs):
         action="store_true",
         help="use the builtin.mock repository instead of builtin",
     )
+    parser.add_argument(
+        "--overwrite-inventories",
+        action="store_true",
+        help="enables all workspace actions to overwrite experiment inventories",
+    )
 
     for obj in ramble.repository.ObjectTypes:
         objname = obj.name.replace("_", "-")
@@ -533,9 +550,6 @@ def make_argument_parser(**kwargs):
     parser.add_argument(
         "-V", "--version", action="store_true", help="show version number and exit"
     )
-    parser.add_argument(
-        "--print-shell-vars", action="store", help="print info needed by setup-env.[c]sh"
-    )
 
     return parser
 
@@ -580,7 +594,6 @@ def setup_main_options(args):
         spack.util.debug.register_interrupt_handler()
         ramble.config.set("config:debug", True, scope="command_line")
         spack.util.environment.tracing_enabled = True
-
     if args.timestamp:
         tty.set_timestamp(True)
 
@@ -599,8 +612,17 @@ def setup_main_options(args):
 
     logger.enabled = not ramble.config.get("config:disable_logger", False)
 
+    if args.aggregate_warnings:
+        ramble.config.set("config:aggregate_warnings", True, scope="command_line")
+
+    if args.suppress_warnings:
+        ramble.config.set("config:suppress_warnings", True, scope="command_line")
+
     if args.disable_progress_bar:
         ramble.config.set("config:disable_progress_bar", True, scope="command_line")
+
+    if args.overwrite_inventories:
+        ramble.config.set("config:overwrite_inventories", True, scope="command_line")
 
     objects_to_mock = set()
     if args.mock:
@@ -632,12 +654,16 @@ def setup_main_options(args):
 
 def _invoke_command(command, parser, args, unknown_args):
     """Run a ramble command *without* setting ramble global options."""
-    if ramble.cmd.common.arguments.allows_unknown_args(command):
-        return_val = command(parser, args, unknown_args)
-    else:
-        if unknown_args:
-            logger.die(f'unrecognized arguments: {" ".join(unknown_args)}')
-        return_val = command(parser, args)
+    try:
+        if ramble.cmd.common.arguments.allows_unknown_args(command):
+            return_val = command(parser, args, unknown_args)
+        else:
+            if unknown_args:
+                logger.die(f'unrecognized arguments: {" ".join(unknown_args)}')
+            return_val = command(parser, args)
+    except ramble.expander.WorkloadNotDefinedError as e:
+        logger.error(e)
+        return 1
 
     # Allow commands to return and error code if they want
     return 0 if return_val is None else return_val
@@ -720,8 +746,13 @@ class RambleCommand:
         if fail_on_error and self.returncode not in (None, 0):
             self._log_command_output(out)
             raise RambleCommandError(
-                "Command exited with code %d: %s(%s)"
-                % (self.returncode, self.command_name, ", ".join("'%s'" % a for a in argv))
+                "Command exited with code %d: %s(%s).\nCommand output:\n\n%s"
+                % (
+                    self.returncode,
+                    self.command_name,
+                    ", ".join("'%s'" % a for a in argv),
+                    out.getvalue(),
+                )
             )
 
         return out.getvalue()
@@ -730,7 +761,7 @@ class RambleCommand:
         if tty.is_verbose():
             fmt = self.command_name + ": {0}"
             for ln in out.getvalue().split("\n"):
-                if len(ln) > 0:
+                if ln:
                     logger.verbose(fmt.format(ln.replace("==> ", "")))
 
 
@@ -768,25 +799,44 @@ def _profile_wrapper(command, parser, args, unknown_args):
         stats.print_stats(*restrictions)
 
 
-def print_setup_info(*info):
-    """Print basic information needed by setup-env.[c]sh.
+def resolve_alias(cmd_name, cmd):
+    """Resolves aliases in the given command.
 
     Args:
-        info (list): list of things to print: comma-separated list
-            of 'csh', 'sh', or 'modules'
+        cmd_name: command name.
+        cmd: command line arguments.
 
-    This is in ``main.py`` to make it fast; the setup scripts need to
-    invoke ramble in login scripts, and it needs to be quick.
+    Returns:
+        new command name and arguments.
     """
-    shell = "csh" if "csh" in info else "sh"
+    all_commands = ramble.cmd.all_commands()
+    aliases = ramble.config.get("config:aliases")
 
-    def shell_set(var, value):
-        if shell == "sh":
-            print(f"{var}='{value}'")
-        elif shell == "csh":
-            print(f"set {var} = '{value}'")
+    if aliases:
+        for key, value in aliases.items():
+            if " " in key:
+                logger.warn(
+                    f"Alias '{key}' (mapping to '{value}') contains a space"
+                    ", which is not supported."
+                )
+            if key in all_commands:
+                logger.warn(
+                    f"Alias '{key}' (mapping to '{value}') attempts to override"
+                    " built-in command."
+                )
+
+    if cmd_name not in all_commands:
+        if aliases:
+            alias = aliases.get(cmd_name)
         else:
-            logger.die("shell must be sh or csh")
+            alias = None
+
+        if alias is not None:
+            alias_parts = shlex.split(alias)
+            cmd_name = alias_parts[0]
+            cmd = alias_parts + cmd[1:]
+
+    return cmd_name, cmd
 
 
 def _main(argv=None):
@@ -829,12 +879,12 @@ def _main(argv=None):
     # `ramble workspace activate that modify the user environment.
     recovered_vars = ("LD_LIBRARY_PATH", "DYLD_LIBRARY_PATH", "DYLD_FALLBACK_LIBRARY_PATH")
     for var in recovered_vars:
-        stored_var_name = "RAMBLE_%s" % var
+        stored_var_name = f"RAMBLE_{var}"
         if stored_var_name in os.environ:
             os.environ[var] = os.environ[stored_var_name]
 
     # Just print help and exit if run with no arguments at all
-    no_args = (len(sys.argv) == 1) if argv is None else (len(argv) == 0)
+    no_args = (len(sys.argv) == 1) if argv is None else (not argv)
     if no_args:
         parser.print_help()
         return 1
@@ -881,15 +931,12 @@ def _main(argv=None):
         except jsonschema.exceptions.ValidationError as e:
             e.print_context()
             workspace_format_error = e
-        except ruamel.yaml.parser.ParserError as e:
+        except (ruamel.yaml.parser.ParserError, ruamel.yaml.scanner.ScannerError) as e:
             workspace_format_error = e
 
     # ------------------------------------------------------------------------
     # Things that require configuration should go below here
     # ------------------------------------------------------------------------
-    if args.print_shell_vars:
-        print_setup_info(*args.print_shell_vars.split(","))
-        return 0
 
     # At this point we've considered all the options to ramble itself, so we
     # need a command or we're done.
@@ -899,27 +946,36 @@ def _main(argv=None):
 
     # Try to load the particular command the caller asked for.
     cmd_name = args.command[0]
-    cmd_name = aliases.get(cmd_name, cmd_name)
+    cmd_name, args.command = resolve_alias(cmd_name, args.command)
 
     # set up a bootstrap context, if asked.
     # bootstrap context needs to include parsing the command, b/c things
     # like `ConstraintAction` and `ConfigSetAction` happen at parse time.
     bootstrap_context = llnl.util.lang.nullcontext()
 
-    # TODO (dwj): Do we need this?
-    # if args.bootstrap:
-    #   # import spack.bootstrap as bootstrap  # avoid circular imports
-    #   # bootstrap_context = bootstrap.ensure_bootstrap_configuration()
-
     with bootstrap_context:
-        return finish_parse_and_run(parser, cmd_name, workspace_format_error)
+        suppress_warnings = ramble.config.get("config:suppress_warnings")
+        aggregate_warnings = suppress_warnings or ramble.config.get("config:aggregate_warnings")
+        logger.aggregate_warnings(on=aggregate_warnings)
+        err = finish_parse_and_run(parser, cmd_name, args, workspace_format_error)
+
+        if not suppress_warnings:
+            logger.all_warnings()
+        return err
 
 
-def finish_parse_and_run(parser, cmd_name, workspace_format_error):
+def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):
     """Finish parsing after we know the command to run."""
     # add the found command to the parser and re-run then re-parse
     command = parser.add_command(cmd_name)
-    args, unknown = parser.parse_known_args()
+    args, unknown = parser.parse_known_args(main_args.command)
+    # Copy global options that are accessed by subcommands
+    args.workspace_dir = main_args.workspace_dir
+    args.workspace = main_args.workspace
+    args.no_workspace = main_args.no_workspace
+    args.sorted_profile = main_args.sorted_profile
+    args.lines = main_args.lines
+    args.profile_restrictions = main_args.profile_restrictions
 
     # Now that we know what command this is and what its args are, determine
     # whether we can continue with a bad workspace and raise if not.
@@ -929,7 +985,7 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     if workspace_format_error:
         raise_error = False
         if cmd_name.strip() in edit_cmds:
-            subcommand = getattr(args, "%s_command" % cmd_name, None)
+            subcommand = getattr(args, f"{cmd_name}_command", None)
 
             if subcommand != "deactivate":
                 raise_error = True
@@ -948,9 +1004,9 @@ def finish_parse_and_run(parser, cmd_name, workspace_format_error):
     set_working_dir()
 
     # now we can actually execute the command.
-    if args.ramble_profile or args.sorted_profile:
+    if main_args.ramble_profile or main_args.sorted_profile:
         _profile_wrapper(command, parser, args, unknown)
-    elif args.pdb:
+    elif main_args.pdb:
         import pdb
 
         pdb.runctx("_invoke_command(command, parser, args, unknown)", globals(), locals())

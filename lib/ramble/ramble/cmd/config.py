@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -149,7 +149,7 @@ def config_get(args):
             with open(config_file) as f:
                 print(f.read())
         else:
-            logger.die(f"workspace has no {ramble.workspace.config_file_name} file")
+            logger.die(f"workspace has no {ramble.workspace.CONFIG_FILE_NAME} file")
 
     else:
         logger.die("`ramble config get` requires a section argument " "or an active workspace.")
@@ -166,7 +166,7 @@ def config_edit(args):
     With no arguments and an active workspace, edit the ramble.yaml for
     the active workspace.
     """
-    ramble_ws = os.environ.get(ramble.workspace.ramble_workspace_var)
+    ramble_ws = os.environ.get(ramble.workspace.RAMBLE_WORKSPACE_VAR)
     if ramble_ws and not args.scope:
         # Don't use the scope object for workspaces, as `config edit` can be called
         # for a malformed workspace. Use RAMBLE_WORKSPACE to find ramble.yaml.
@@ -252,7 +252,7 @@ def _can_update_config_file(scope_dir, cfg_file):
     return dir_ok and cfg_ok
 
 
-def config_update(args):
+def config_update(args) -> None:
     # Read the configuration files
     ramble.config.config.get_config(args.section, scope=args.scope)
     updates: List[ramble.config.ConfigScope] = list(

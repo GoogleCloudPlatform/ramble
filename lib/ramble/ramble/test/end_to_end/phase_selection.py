@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -57,7 +57,7 @@ ramble:
               - name: 'timing'
                 mode: 'string'
                 match: '.*Timing for main.*'
-                file: '{experiment_run_dir}/rsl.out.0000'
+                file: '{experiment_run_dir}/rsl.out.base'
               env_vars:
                 set:
                   OMP_NUM_THREADS: '{n_threads}'
@@ -113,11 +113,11 @@ licenses:
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()
 
-        config_path = os.path.join(ws1.config_dir, ramble.workspace.config_file_name)
+        config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         license_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
         aux_software_path = os.path.join(
-            ws1.config_dir, ramble.workspace.auxiliary_software_dir_name
+            ws1.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 

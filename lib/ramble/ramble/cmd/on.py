@@ -1,4 +1,4 @@
-# Copyright 2022-2025 The Ramble Authors
+# Copyright 2022-2026 The Ramble Authors
 #
 # Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
 # https://www.apache.org/licenses/LICENSE-2.0> or the MIT license
@@ -8,10 +8,8 @@
 
 import ramble.cmd.common.arguments as arguments
 import ramble.config
-import ramble.expander
 import ramble.filters
 import ramble.pipeline
-import ramble.workspace
 
 description = '"And now\'s the time, the time is now" (execute workspace experiments)'
 section = "workspaces"
