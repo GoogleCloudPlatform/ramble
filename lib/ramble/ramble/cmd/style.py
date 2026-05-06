@@ -570,6 +570,9 @@ def run_mypy(mypy_cmd, file_list, args):
 def run_ruff(ruff_cmd, file_list, args):
     # Even though Ruff hasn't reached v1 yet, it has been effective in catching
     # issues like unused imports that flake8 misses.
+    if not file_list:
+        print("No changed Python files to check.")
+        return 0
     if args.repo_path is not None:
         print("Skipping ruff for external repository.")
         return 0
