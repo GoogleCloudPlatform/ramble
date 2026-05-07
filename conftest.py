@@ -348,7 +348,7 @@ def configuration_dir(tmpdir_factory, linux_os):
     modules_root = tmpdir_factory.mktemp("share")
     tcl_root = modules_root.ensure("modules", dir=True)
     lmod_root = modules_root.ensure("lmod", dir=True)
-    content = config_yaml.read_text().format(solver, str(tcl_root), str(lmod_root))
+    content = config_yaml.read_text(encoding="utf-8").format(solver, str(tcl_root), str(lmod_root))
     t = tmpdir.join("site", "config.yaml")
     t.write(content)
     yield tmpdir

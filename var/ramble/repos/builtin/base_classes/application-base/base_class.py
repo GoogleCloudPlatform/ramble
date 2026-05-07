@@ -3361,7 +3361,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         if os.path.isfile(status_path):
             exp_lock = self.experiment_lock
-            with lk.ReadTransaction(exp_lock), open(status_path) as f:
+            with lk.ReadTransaction(exp_lock), open(
+                status_path, encoding="utf-8"
+            ) as f:
                 status_data = spack.util.spack_json.load(f)
                 self.set_status(
                     ExperimentStatus(
@@ -3419,7 +3421,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         if os.path.exists(exp_dir):
             exp_lock = self.experiment_lock
-            with lk.ReadTransaction(exp_lock), open(status_path, "w+") as f:
+            with lk.ReadTransaction(exp_lock), open(
+                status_path, "w+", encoding="utf-8"
+            ) as f:
                 spack.util.spack_json.dump(status_data, f)
 
     register_phase(
