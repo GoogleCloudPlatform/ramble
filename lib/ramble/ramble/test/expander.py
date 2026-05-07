@@ -174,7 +174,7 @@ def test_expansions(input, output, no_expand_vars, passes):
     expander = ramble.expander.Expander(expansion_vars, None, no_expand_vars=no_expand_vars)
 
     step_input = input
-    for _ in range(0, passes):
+    for _ in range(passes):
         step_input = expander.expand_var(step_input)
     final_output = step_input
 
@@ -236,7 +236,7 @@ def test_typed_expansions(input, output, no_expand_vars, passes):
     expander = ramble.expander.Expander(expansion_vars, None, no_expand_vars=no_expand_vars)
 
     step_input = input
-    for _ in range(0, passes):
+    for _ in range(passes):
         step_input = expander.expand_var(step_input, typed=True)
     final_output = step_input
 

@@ -211,8 +211,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             require_exist (bool): Whether to require environment hashes exist or not.
         """
 
-        pass
-
     def define_missing_packages(self, workspace):
         """Injection of missing packages that are auto-injected by objects
 

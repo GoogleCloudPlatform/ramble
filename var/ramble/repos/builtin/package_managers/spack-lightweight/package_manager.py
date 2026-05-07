@@ -159,7 +159,7 @@ class SpackLightweight(PackageManagerBase):
             )
 
         for config_dict in package_manager_config_dicts:
-            for _, config in config_dict.items():
+            for config in config_dict.values():
                 keep_config = app_inst.expander.satisfies(
                     config["when"], variant_set=self.experiment_variants()
                 )
@@ -377,7 +377,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     register_phase("push_to_spack_cache", pipeline="pushtocache", run_after=[])
 
@@ -423,7 +422,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     @PackageManagerBase.workspace_cache
     def get_version(self, workspace=None):
@@ -508,7 +506,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     register_builtin(
         "spack_source", required=True, depends_on=["builtin::env_vars"]
@@ -1028,7 +1025,7 @@ class SpackRunner(CommandRunner):
                 "Environment runner has no path configured"
             )
 
-        if self.active and self.env_key in self.spack.default_env.keys():
+        if self.active and self.env_key in self.spack.default_env:
             del self.spack.default_env[self.env_key]
             del self.installer.default_env[self.env_key]
             del self.concretizer.default_env[self.env_key]

@@ -34,4 +34,3 @@ class DisabledModifier(ModifierBase):
 
     def define_variable(self, var_name, var_value):
         """Given this modifier is disabled, never define variables in it"""
-        pass

@@ -17,7 +17,7 @@ from enum import Enum
 import py.path
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
+from llnl.util import tty
 
 import ramble.config
 import ramble.expander

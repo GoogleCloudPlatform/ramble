@@ -17,7 +17,6 @@ subcommands = [
 
 def data_create_db_setup_parser(subparser):
     """create the database"""
-    pass
 
 
 def data_create_db(args):

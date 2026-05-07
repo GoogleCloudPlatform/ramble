@@ -59,7 +59,7 @@ class TunedAdm(BasicModifier):
         profiles = set()
         with open(read_profile_path) as f:
 
-            for line in f.readlines():
+            for line in f:
                 if "active profile:" in line:
                     profiles.add(line.split(":")[-1].strip())
             profiles_str = ",".join(profiles)
