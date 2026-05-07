@@ -174,8 +174,7 @@ def first_existing(dictionary, keys):
     for k in keys:
         if k in dictionary:
             return k
-    else:
-        raise KeyError(f"None of {keys} is in dict!")
+    raise KeyError(f"None of {keys} is in dict!")
 
 
 class ConfigScope:
@@ -643,10 +642,10 @@ class Configuration:
             scopes = [self._validate_scope(scope)]
 
         merged_section = syaml.syaml_dict()
-        for scope in scopes:
+        for s in scopes:
             # read potentially cached data from the scope.
 
-            data = scope.get_section(section)
+            data = s.get_section(section)
 
             # Skip empty configs
             if not data or not isinstance(data, dict):
@@ -659,7 +658,7 @@ class Configuration:
             # thus read data and update it in memory if need be.
             changed = _update_in_memory(data, section)
             if changed:
-                self.format_updates[section].append(scope)
+                self.format_updates[section].append(s)
 
             merged_section = merge_yaml(merged_section, data)
 
@@ -1040,7 +1039,7 @@ def read_config_file(filename, schema=None):
         ) from None
 
     except MarkedYAMLError as e:
-        raise ConfigFileError(f"Error parsing yaml{str(e.context_mark)}: {e.problem}") from e
+        raise ConfigFileError(f"Error parsing yaml{e.context_mark!s}: {e.problem}") from e
 
     except OSError as e:
         raise ConfigFileError(f"Error reading configuration file {filename}") from e

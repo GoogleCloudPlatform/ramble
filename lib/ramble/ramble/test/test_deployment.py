@@ -49,7 +49,7 @@ class TestPushDeploymentPipeline(unittest.TestCase):
             deployment_name=self.deployment_name,
             create_tar=False,
         )
-        pipeline._deployment_files = lambda: []
+        pipeline._deployment_files = list
         pipeline._construct_experiment_hashes = lambda: False
         with mock.patch("ramble.expander.Expander.expand_var", return_value=self.deployment_name):
             pipeline._execute()

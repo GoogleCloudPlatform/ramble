@@ -153,7 +153,7 @@ def test_write_transaction_overwrite(cache):
     initial_content = "initial"
     new_content = "new"
 
-    with cache.write_transaction(key) as (orig, tmp):
+    with cache.write_transaction(key) as (_, tmp):
         tmp.write(initial_content)
 
     with cache.write_transaction(key) as (orig_file, tmp_file):
@@ -172,7 +172,7 @@ def test_write_transaction_exception(cache):
     tmp_path = path + ".tmp"
 
     with pytest.raises(ValueError, match="Test exception"):
-        with cache.write_transaction(key) as (orig, tmp):
+        with cache.write_transaction(key) as (_, tmp):
             tmp.write("some data")
             raise ValueError("Test exception")
 
@@ -186,7 +186,7 @@ def test_mtime(cache):
 
     assert cache.mtime(key) == 0
 
-    with cache.write_transaction(key) as (orig, tmp):
+    with cache.write_transaction(key) as (_, tmp):
         tmp.write("content")
     time.sleep(0.01)
 
@@ -194,7 +194,7 @@ def test_mtime(cache):
     assert mtime1 > 0
 
     time.sleep(0.1)
-    with cache.write_transaction(key) as (orig, tmp):
+    with cache.write_transaction(key) as (_, tmp):
         tmp.write("new content")
 
     mtime2 = cache.mtime(key)
@@ -207,7 +207,7 @@ def test_remove(cache):
     path = cache.cache_path(key)
     lock_path = cache._lock_path(key)
 
-    with cache.write_transaction(key) as (orig, tmp):
+    with cache.write_transaction(key) as (_, tmp):
         tmp.write("data")
 
     assert os.path.exists(path)
@@ -221,6 +221,5 @@ def test_remove(cache):
 
 def test_read_non_existent(cache):
     """Test reading a non-existent key."""
-    with pytest.raises(IOError):
-        with cache.read_transaction("non_existent_key"):
-            pass
+    with pytest.raises(IOError), cache.read_transaction("non_existent_key"):
+        pass

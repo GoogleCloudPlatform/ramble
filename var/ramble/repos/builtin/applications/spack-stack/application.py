@@ -229,8 +229,7 @@ class SpackStack(ExecutableApplication):
 
         logger.debug(f"Spack data: {spack_data}")
 
-        for spec in spack_data["spack"]["specs"]:
-            spec_list.append(spec)
+        spec_list.extend(spack_data["spack"]["specs"])
 
         self.package_manager.runner.set_env(self.expander.env_path)
         self.package_manager.runner.activate()

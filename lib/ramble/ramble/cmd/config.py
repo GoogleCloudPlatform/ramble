@@ -9,6 +9,7 @@
 import collections
 import os
 import shutil
+import sys
 from typing import List
 
 import llnl.util.filesystem as fs
@@ -108,7 +109,7 @@ def setup_parser(subparser):
 
 def _get_scope_and_section(args):
     """Extract config scope and section from arguments."""
-    logger.debug(f" Args = {str(args)}")
+    logger.debug(f" Args = {args!s}")
     scope = args.scope
     section = getattr(args, "section", None)
     path = getattr(args, "path", None)
@@ -207,7 +208,7 @@ def config_add(args):
     if not (args.file or args.path):
         logger.error("No changes requested. Specify a file or value.")
         setup_parser.add_parser.print_help()
-        exit(1)
+        sys.exit(1)
 
     scope, _ = _get_scope_and_section(args)
 

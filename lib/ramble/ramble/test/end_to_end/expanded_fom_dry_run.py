@@ -69,8 +69,9 @@ ramble:
 
         unit = "seconds"
         with open(fom_out_file, "w+") as f:
-            for expected in expected_expansions:
-                f.write(f"Collect FOM {expected} = 567.8 {unit}\n")
+            f.writelines(
+                f"Collect FOM {expected} = 567.8 {unit}\n" for expected in expected_expansions
+            )
 
         ws1._re_read()
         output = workspace("analyze", global_args=["-w", workspace_name])

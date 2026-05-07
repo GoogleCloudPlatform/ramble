@@ -92,10 +92,10 @@ def test_url_exists_file(tmpdir):
     # Test existing file
     p = tmpdir.join("exists.txt")
     p.write("content")
-    assert web.url_exists(f"file://{str(p)}")
+    assert web.url_exists(f"file://{p!s}")
 
     # Test non-existing file
-    assert not web.url_exists(f"file://{str(p)}/nonexistent.txt")
+    assert not web.url_exists(f"file://{p!s}/nonexistent.txt")
 
 
 def test_push_to_url_file(tmpdir):
@@ -105,14 +105,14 @@ def test_push_to_url_file(tmpdir):
     remote_file_path = remote_dir.join("remote.txt")
 
     # Test copy
-    web.push_to_url(str(local_file), f"file://{str(remote_file_path)}", keep_original=True)
+    web.push_to_url(str(local_file), f"file://{remote_file_path!s}", keep_original=True)
     assert local_file.exists()
     assert remote_file_path.exists()
     assert remote_file_path.read() == "some data"
     remote_file_path.remove()
 
     # Test move
-    web.push_to_url(str(local_file), f"file://{str(remote_file_path)}", keep_original=False)
+    web.push_to_url(str(local_file), f"file://{remote_file_path!s}", keep_original=False)
     assert not local_file.exists()
     assert remote_file_path.exists()
     assert remote_file_path.read() == "some data"
@@ -122,14 +122,14 @@ def test_remove_url_file(tmpdir):
     # Test remove file
     p = tmpdir.join("file.txt")
     p.write("content")
-    web.remove_url(f"file://{str(p)}")
+    web.remove_url(f"file://{p!s}")
     assert not p.exists()
 
     # Test remove directory recursively
     d = tmpdir.mkdir("dir")
     f = d.join("file.txt")
     f.write("content")
-    web.remove_url(f"file://{str(d)}", recursive=True)
+    web.remove_url(f"file://{d!s}", recursive=True)
     assert not d.exists()
 
 
@@ -144,11 +144,11 @@ def test_list_url_file(tmpdir):
     f3.write("content")
 
     # Test non-recursive
-    file_list = web.list_url(f"file://{str(d)}")
+    file_list = web.list_url(f"file://{d!s}")
     assert sorted(file_list) == ["file1.txt", "file2.txt"]
 
     # Test recursive
-    file_list = web.list_url(f"file://{str(d)}", recursive=True)
+    file_list = web.list_url(f"file://{d!s}", recursive=True)
     assert sorted(file_list) == ["file1.txt", "file2.txt", os.path.join("subdir", "file3.txt")]
 
 

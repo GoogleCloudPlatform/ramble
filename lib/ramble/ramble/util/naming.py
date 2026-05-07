@@ -15,16 +15,16 @@ import string
 import ramble.error
 
 __all__ = [
+    "NS_SEPARATOR",
+    "NamespaceTrie",
     "mod_to_class",
+    "possible_ramble_module_names",
     "ramble_module_to_python_module",
-    "valid_module_name",
+    "simplify_name",
     "valid_fully_qualified_module_name",
+    "valid_module_name",
     "validate_fully_qualified_module_name",
     "validate_module_name",
-    "possible_ramble_module_names",
-    "simplify_name",
-    "NamespaceTrie",
-    "NS_SEPARATOR",
 ]
 
 NS_SEPARATOR = "::"

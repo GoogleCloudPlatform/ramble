@@ -577,10 +577,8 @@ class SpackLightweight(PackageManagerBase):
         package manager class.
         """
         del workspace
-        pkg_list = []
         self.runner.activate()
-        for info in self.runner.package_provenance():
-            pkg_list.append(info)
+        pkg_list = list(self.runner.package_provenance())
         self.runner.deactivate()
         return pkg_list
 
@@ -982,8 +980,7 @@ class SpackRunner(CommandRunner):
                 f"{self.install_config_name}:flags"
             )
             if install_flags is not None:
-                for flag in shlex.split(install_flags):
-                    args.append(flag)
+                args.extend(shlex.split(install_flags))
 
             args.append(pkg_spec)
 

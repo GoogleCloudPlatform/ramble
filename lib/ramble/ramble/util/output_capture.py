@@ -13,7 +13,7 @@ class OUTPUT_CAPTURE(Enum):
     STDOUT = 0
     STDERR = 1
     ALL = 2
-    DEFAULT = 2
+    DEFAULT = 2  # noqa: PIE796
 
 
 class output_mapper:

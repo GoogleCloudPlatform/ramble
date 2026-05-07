@@ -177,12 +177,12 @@ extend-exclude = [
 ]
 
 [tool.ruff.lint]
-preview = false
-# B905 requires Python 3.9 or up.
-ignore = ["B905"]
+# Enable preview rules to allow for more comprehensive checks
+preview = true
+# Ignore a set of rules that either require newer Pythons, or are a bit too opinionated.
+ignore = ["D", "S", "I", "UP", "TRY", "SIM", "B905", "G010", "FURB188", "RUF012", "RUF100", "BLE001"]
 extend-select = ["B", "C4", "F401"]
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]
 "var/ramble/repos/**/*.py" = ["F403", "F405"]
-

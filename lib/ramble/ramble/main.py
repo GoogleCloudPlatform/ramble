@@ -188,8 +188,7 @@ class RambleArgumentParser(argparse.ArgumentParser):
             group = argparse._ArgumentGroup(self, title=title)
             for name in commands:
                 group._add_action(cmds[name])
-                if name in remaining:
-                    remaining.remove(name)
+                remaining.discard(name)
             add_group(group)
 
         # select only the options for the particular level we're showing.
@@ -1005,7 +1004,7 @@ def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):
     if main_args.ramble_profile or main_args.sorted_profile:
         _profile_wrapper(command, parser, args, unknown)
     elif main_args.pdb:
-        import pdb
+        import pdb  # noqa: T100
 
         pdb.runctx("_invoke_command(command, parser, args, unknown)", globals(), locals())
         return 0

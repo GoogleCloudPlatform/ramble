@@ -235,9 +235,13 @@ class Slurm(WorkflowManagerBase):
             ).strip()
             # sacct by default reports timestamp in local timezone
             # TODO: can use more convenient method with python 3.7+
-            job_end_time = datetime.datetime.strptime(
-                job_end_time_str, "%Y-%m-%dT%H:%M:%S"
-            ).timestamp()
+            job_end_time = (
+                datetime.datetime.strptime(
+                    job_end_time_str, "%Y-%m-%dT%H:%M:%S"
+                )
+                .astimezone()
+                .timestamp()
+            )
             duration = int(job_end_time - script_end_time)
         except (ProcessError, ValueError) as e:
             logger.warn(f"Failed to get job end time with error {e}")

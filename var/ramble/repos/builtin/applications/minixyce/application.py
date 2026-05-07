@@ -233,13 +233,10 @@ class Minixyce(ExecutableApplication):
         settings = ["t_start", "t_step", "t_stop", "tol", "k"]
 
         with open(input_path, "w+") as f:
-            for setting in settings:
-                f.write(
-                    setting
-                    + " = "
-                    + self.expander.expand_var_name(setting)
-                    + "\n"
-                )
+            f.writelines(
+                setting + " = " + self.expander.expand_var_name(setting) + "\n"
+                for setting in settings
+            )
 
     def _analyze_experiments(self, workspace, app_inst=None):
         import os
@@ -262,9 +259,11 @@ class Minixyce(ExecutableApplication):
                     values = line.split()
 
             with open(processed_output_path, "w+") as f:
-                for i, (name, value) in enumerate(
-                    zip(names[1:-2], values[1:-2])
-                ):
-                    f.write(f"{(i + 1)}: {name} = {value}\n")
+                f.writelines(
+                    f"{(i + 1)}: {name} = {value}\n"
+                    for i, (name, value) in enumerate(
+                        zip(names[1:-2], values[1:-2])
+                    )
+                )
 
         super()._analyze_experiments(workspace)

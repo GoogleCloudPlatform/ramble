@@ -825,9 +825,8 @@ class TestStage:
 
     def test_stage_constructor_no_fetcher(self):
         """Ensure Stage constructor with no URL or fetch strategy fails."""
-        with pytest.raises(ValueError):
-            with InputStage(None):
-                pass
+        with pytest.raises(ValueError), InputStage(None):
+            pass
 
     def test_stage_constructor_with_path(self, tmpdir):
         """Ensure Stage constructor with a path uses it."""

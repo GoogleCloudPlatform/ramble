@@ -68,14 +68,13 @@ class SpackMod(BasicModifier):
                 inject_if_missing=True,
             )
 
-        with when("~missing_compiler"):
-            with when("+implicit_compiler"):
-                software_spec(
-                    "missing_mod_package",
-                    pkg_spec="missing_package@1.1",
-                    compiler="mod_compiler",
-                    inject_if_missing=True,
-                )
+        with when("~missing_compiler"), when("+implicit_compiler"):
+            software_spec(
+                "missing_mod_package",
+                pkg_spec="missing_package@1.1",
+                compiler="mod_compiler",
+                inject_if_missing=True,
+            )
 
             # with when("~implicit_compiler"):
             #    software_spec(

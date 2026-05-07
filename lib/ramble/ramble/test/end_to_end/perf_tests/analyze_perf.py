@@ -45,8 +45,7 @@ def test_analyze_large_file(workspace_name, ramble_benchmark):
     out_file = os.path.join(ws.experiment_dir, "sleep", "rand_sleep", "generated", "generated.out")
     with open(out_file, "w") as f:
         # Write 1 million lines to simulate a large output file
-        for _ in range(1_000):
-            f.write("no match\n" * 1_000)
+        f.writelines("no match\n" * 1_000 for _ in range(1_000))
         f.write("Sleep for 10 seconds\n")
 
     cache_file = os.path.join(

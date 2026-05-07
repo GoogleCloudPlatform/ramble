@@ -372,14 +372,12 @@ def are_when_compatible(when_set1, when_set2):
         return False
 
     for name in v1:
-        if name in v2:
-            if v1[name] != v2[name]:
-                return False
+        if name in v2 and v1[name] != v2[name]:
+            return False
 
     for name in ver1:
-        if name in ver2:
-            if ver1[name] != ver2[name]:
-                return False
+        if name in ver2 and ver1[name] != ver2[name]:
+            return False
     return True
 
 

@@ -15,7 +15,6 @@ import os.path
 import pathlib
 import shutil
 
-import py
 import pytest
 
 from llnl.util.filesystem import remove_linked_tree
@@ -337,19 +336,19 @@ def configuration_dir(tmpdir_factory, linux_os):
 
     # <test_path>/data/config has mock config yaml files in it
     # copy these to the site config.
-    test_config = py.path.local(ramble.paths.test_path).join("data", "config")
-    test_config.copy(tmpdir.join("site"))
+    test_config = pathlib.Path(ramble.paths.test_path) / "data" / "config"
+    shutil.copytree(test_config, pathlib.Path(str(tmpdir)) / "site")
 
     # Create temporary 'defaults', 'site' and 'user' folders
     tmpdir.ensure("user", dir=True)
 
     # Slightly modify config.yaml
     solver = os.environ.get("SPACK_TEST_SOLVER", "original")
-    config_yaml = test_config.join("config.yaml")
+    config_yaml = test_config / "config.yaml"
     modules_root = tmpdir_factory.mktemp("share")
     tcl_root = modules_root.ensure("modules", dir=True)
     lmod_root = modules_root.ensure("lmod", dir=True)
-    content = "".join(config_yaml.read()).format(solver, str(tcl_root), str(lmod_root))
+    content = config_yaml.read_text().format(solver, str(tcl_root), str(lmod_root))
     t = tmpdir.join("site", "config.yaml")
     t.write(content)
     yield tmpdir
@@ -447,7 +446,7 @@ class MockLayout:
         self.root = root
 
     def path_for_spec(self, spec):
-        return "/".join([self.root, spec.name])
+        return f"{self.root}/{spec.name}"
 
     def check_installed(self, spec):
         return True
@@ -686,7 +685,7 @@ def mock_file_auto_create(monkeypatch):
 
     def open_or_create_inmem(path, *args, **kwargs):
         if not os.path.exists(path) and is_dry_run_path(path):
-            if path.endswith(".yaml") or path.endswith(".yml"):
+            if path.endswith((".yaml", ".yml")):
                 content = "{}"
             else:
                 content = ""

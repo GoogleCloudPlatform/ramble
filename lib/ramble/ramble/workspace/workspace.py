@@ -1266,8 +1266,7 @@ ramble:
 
         exp_matrix = []
         if matrix:
-            for part in matrix.split(","):
-                exp_matrix.append(part)
+            exp_matrix.extend(matrix.split(","))
 
         # Unpack all workload names from `when` sets
         all_workload_names = set()
@@ -1284,23 +1283,22 @@ ramble:
                     break
 
             # Don't add this experiment if it already exists in the workspace
-            if add_workload:
-                if application in apps_dict:
-                    subdict = apps_dict[application]
-                    if namespace.workload in subdict:
-                        subdict = subdict[namespace.workload]
-                        if workload in subdict:
-                            subdict = subdict[workload]
-                            if namespace.experiment in subdict:
-                                subdict = subdict[namespace.experiment]
-                                if experiment_name in subdict:
-                                    exp_name = f"{application}.{workload}.{experiment_name}"
-                                    if not overwrite:
-                                        logger.warn(
-                                            f"Experiment {exp_name} is defined already. "
-                                            + "To overwrite, use '--overwrite'"
-                                        )
-                                    add_workload = overwrite
+            if add_workload and application in apps_dict:
+                subdict = apps_dict[application]
+                if namespace.workload in subdict:
+                    subdict = subdict[namespace.workload]
+                    if workload in subdict:
+                        subdict = subdict[workload]
+                        if namespace.experiment in subdict:
+                            subdict = subdict[namespace.experiment]
+                            if experiment_name in subdict:
+                                exp_name = f"{application}.{workload}.{experiment_name}"
+                                if not overwrite:
+                                    logger.warn(
+                                        f"Experiment {exp_name} is defined already. "
+                                        + "To overwrite, use '--overwrite'"
+                                    )
+                                add_workload = overwrite
 
             if add_workload:
                 workload_names.append(workload)
@@ -1410,13 +1408,11 @@ ramble:
             if var_def_dict:
                 vars_dict.update(var_def_dict)
 
-            if exp_zips:
-                if namespace.zips not in exp_dict:
-                    exp_dict[namespace.zips] = exp_zips.copy()
+            if exp_zips and namespace.zips not in exp_dict:
+                exp_dict[namespace.zips] = exp_zips.copy()
 
-            if exp_matrix:
-                if namespace.matrix not in exp_dict:
-                    exp_dict[namespace.matrix] = exp_matrix.copy()
+            if exp_matrix and namespace.matrix not in exp_dict:
+                exp_dict[namespace.matrix] = exp_matrix.copy()
 
         if edited and not self.dry_run:
             ramble.config.config.update_config(
@@ -1489,8 +1485,8 @@ ramble:
                         and comp in packages_dict
                         and info.conflict_dict(packages_dict[comp])
                     ):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[comp])}")
+                        logger.debug(f"  Spec 1: {info!s}")
+                        logger.debug(f"  Spec 2: {packages_dict[comp]!s}")
                         raise RambleConflictingDefinitionError(
                             f"Compiler {comp} would be defined " "in multiple conflicting ways"
                         )
@@ -1521,8 +1517,8 @@ ramble:
                         and spec_name in packages_dict
                         and info.conflict_dict(packages_dict[spec_name])
                     ):
-                        logger.debug(f"  Spec 1: {str(info)}")
-                        logger.debug(f"  Spec 2: {str(packages_dict[spec_name])}")
+                        logger.debug(f"  Spec 1: {info!s}")
+                        logger.debug(f"  Spec 2: {packages_dict[spec_name]!s}")
                         raise RambleConflictingDefinitionError(
                             f"Package {spec_name} would be defined in multiple " "conflicting ways"
                         )
@@ -1563,8 +1559,6 @@ ramble:
         ramble.config.config.update_config(
             namespace.software, full_software_dict, scope=self.ws_file_config_scope_name()
         )
-
-        return
 
     def default_results(self):
         res = {}
@@ -1730,10 +1724,11 @@ ramble:
 
                                 for fom_name, fom_val_list in fom_summary.items():
                                     f.write(f"    {fom_name}:\n")
-                                    for fom_val in fom_val_list:
-                                        f.write(f"      {fom_val.strip()}\n")
+                                    f.writelines(
+                                        f"      {fom_val.strip()}\n" for fom_val in fom_val_list
+                                    )
 
-                            if software_key in exp and exp[software_key]:
+                            if exp.get(software_key):
                                 self.write_software_info(f, exp)
 
                         else:
@@ -1749,13 +1744,12 @@ ramble:
                                     output = f"{name} = {fom['value']} {fom['units']}"
                                     f.write(f"    {output.strip()}\n")
 
-                            if software_key in exp and exp[software_key]:
+                            if exp.get(software_key):
                                 self.write_software_info(f, exp)
 
                         if exp["VARIANTS"]:
                             f.write("  Experiment variants:\n")
-                            for variant in exp["VARIANTS"]:
-                                f.write(f"  - {variant}\n")
+                            f.writelines(f"  - {variant}\n" for variant in exp["VARIANTS"])
 
                         if exp["SUCCESS_CRITERIA"]:
                             f.write("  Success criteria summary:\n")
@@ -2040,7 +2034,7 @@ ramble:
         return None
 
     def date_string(self):
-        now = datetime.datetime.now()
+        now = datetime.datetime.now().astimezone()
         return now.strftime("%Y-%m-%d_%H.%M.%S")
 
     def read_file_content(self, file_path):

@@ -18,7 +18,7 @@ import stat
 import string
 import time
 from html import escape
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 import llnl.util.filesystem as fs
 from llnl.util.tty import color
@@ -604,7 +604,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
 
     def non_reserved_variables(
-        self, workspace, remove_keys: set = None
+        self, workspace, remove_keys: Optional[set] = None
     ) -> Dict[str, str]:
         """Replicate this instances variables, and remove any reserved variables from the dict.
         Additionally, remove any variables in the remove_keys set.
@@ -916,13 +916,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if namespace.executables in self.internals:
             header = rucolor.nested_4("Executable Order")
             color.cprint(
-                f"{indent}{header}: {str(self.internals[namespace.executables])}"
+                f"{indent}{header}: {self.internals[namespace.executables]!s}"
             )
 
         if namespace.executable_injection in self.internals:
             header = rucolor.nested_4("Executable Injection")
             color.cprint(
-                f"{indent}{header}: {str(self.internals[namespace.executable_injection])}"
+                f"{indent}{header}: {self.internals[namespace.executable_injection]!s}"
             )
 
     def print_chain_order(self, indent=""):
@@ -1011,7 +1011,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         "Cycle detected in experiment chain:\n"
                         + f"    Primary experiment {parent_namespace}\n"
                         + f"    Chained expeirment name: {exp_name}\n"
-                        + f"    Chain definition: {str(exp)}"
+                        + f"    Chain definition: {exp!s}"
                     )
                 chain_stack.append((exp_name, exp.copy()))
 
@@ -1029,7 +1029,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 raise InvalidChainError(
                     "Invalid experiment chain defined:\n"
                     + f"    Primary experiment {parent_namespace}\n"
-                    + f"    Chain definition: {str(exp)}\n"
+                    + f"    Chain definition: {exp!s}\n"
                     + '    "name" keyword must be defined'
                 )
 
@@ -1044,16 +1044,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     raise InvalidChainError(
                         "Invalid experiment chain defined:\n"
                         + f"    Primary experiment {parent_namespace}\n"
-                        + f"    Chain definition: {str(exp)}\n"
+                        + f"    Chain definition: {exp!s}\n"
                         + '    Optional keyword "order" must '
-                        + f"be one of {str(possible_orders)}\n"
+                        + f"be one of {possible_orders!s}\n"
                     )
 
             if "command" not in cur_exp_def:
                 raise InvalidChainError(
                     "Invalid experiment chain defined:\n"
                     + f"    Primary experiment {parent_namespace}\n"
-                    + f"    Chain definition: {str(exp)}\n"
+                    + f"    Chain definition: {exp!s}\n"
                     + '    "command" keyword must be defined'
                 )
 
@@ -1062,7 +1062,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     raise InvalidChainError(
                         "Invalid experiment chain defined:\n"
                         + f"    Primary experiment {parent_namespace}\n"
-                        + f"    Chain definition: {str(exp)}\n"
+                        + f"    Chain definition: {exp!s}\n"
                         + '    Optional keyword "variables" '
                         + "must be a dictionary"
                     )
@@ -1169,7 +1169,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         + "    Chained expeirment name: "
                                         + f"{cur_exp_name}\n"
                                         + "    Chain definition: "
-                                        + f"{str(cur_exp_def)}"
+                                        + f"{cur_exp_def!s}"
                                     )
 
                                 chain_stack.append((exp_name, exp))
@@ -3188,8 +3188,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Could push this into the language features in the future
         fom_sources = [self]
-        for mod in self._modifier_instances:
-            fom_sources.append(mod)
+        fom_sources.extend(self._modifier_instances)
         if self.workflow_manager is not None:
             fom_sources.append(self.workflow_manager)
 
@@ -3362,14 +3361,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         if os.path.isfile(status_path):
             exp_lock = self.experiment_lock
-            with lk.ReadTransaction(exp_lock):
-                with open(status_path) as f:
-                    status_data = spack.util.spack_json.load(f)
-                    self.set_status(
-                        ExperimentStatus(
-                            status_data[self.keywords.experiment_status]
-                        )
+            with lk.ReadTransaction(exp_lock), open(status_path) as f:
+                status_data = spack.util.spack_json.load(f)
+                self.set_status(
+                    ExperimentStatus(
+                        status_data[self.keywords.experiment_status]
                     )
+                )
         else:
             self.set_status(ExperimentStatus.UNKNOWN)
 
@@ -3421,9 +3419,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         if os.path.exists(exp_dir):
             exp_lock = self.experiment_lock
-            with lk.ReadTransaction(exp_lock):
-                with open(status_path, "w+") as f:
-                    spack.util.spack_json.dump(status_data, f)
+            with lk.ReadTransaction(exp_lock), open(status_path, "w+") as f:
+                spack.util.spack_json.dump(status_data, f)
 
     register_phase(
         "write_results_cache",
@@ -3523,15 +3520,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             license_conf = ramble.config.config.get_config(
                 "licenses", scope=scope
             )
-            if license_conf:
-                if self.name in license_conf:
-                    app_licenses = license_conf[self.name]
-                    if app_licenses:
-                        # Append logic to source file which contains the exports
-                        shell = ramble.config.get("config:shell")
-                        license_set.add(
-                            f"{source_str(shell)} {{license_input_dir}}/{LICENSE_INC_NAME}"
-                        )
+            if license_conf and self.name in license_conf:
+                app_licenses = license_conf[self.name]
+                if app_licenses:
+                    # Append logic to source file which contains the exports
+                    shell = ramble.config.get("config:shell")
+                    license_set.add(
+                        f"{source_str(shell)} {{license_input_dir}}/{LICENSE_INC_NAME}"
+                    )
 
         command.extend(license_set)
 

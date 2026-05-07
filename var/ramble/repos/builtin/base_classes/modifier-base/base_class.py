@@ -326,7 +326,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         indentation = " " * indent
         out_str = f"{indentation}Name: {self.name}\n"
         if include_version:
-            out_str += f"{indentation}Version: {str(self.selected_version)}\n"
+            out_str += f"{indentation}Version: {self.selected_version!s}\n"
         if index is not None:
             out_str += f"{indentation}Index: {index}\n"
         if include_mode:

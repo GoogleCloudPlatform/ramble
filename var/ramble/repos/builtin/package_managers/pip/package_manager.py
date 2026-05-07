@@ -265,9 +265,7 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        pkg_list = []
-        for info in self.runner.package_provenance():
-            pkg_list.append(info)
+        pkg_list = list(self.runner.package_provenance())
         return pkg_list
 
     def environment_load_commands(self):

@@ -337,9 +337,9 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
                         ReportVars.CONTEXT_NAME.value: context["name"],
                     }
 
-                    for name in _EXP_BASIC_VARS_MAPPING:
+                    for name, mapping_val in _EXP_BASIC_VARS_MAPPING.items():
                         if name in exp:
-                            exp_data[_EXP_BASIC_VARS_MAPPING[name]] = exp[name]
+                            exp_data[mapping_val] = exp[name]
 
                     for name, val in fom.items():
                         if name in _FOM_DICT_MAPPING:
@@ -723,8 +723,8 @@ class ScalingPlotGenerator(PlotGenerator):
 
     def validate_spec(self, chart_spec, result_index):
         super().validate_spec(chart_spec, result_index)
-        for chart_spec in self.spec:
-            if len(chart_spec) < 2:
+        for spec_item in self.spec:
+            if len(spec_item) < 2:
                 logger.die(
                     "Scaling plot requires two arguments: " "performance metric and scaling metric"
                 )
@@ -1062,7 +1062,7 @@ def get_reports_path():
 
 
 def make_report(experiments: list, ws_name, args):
-    dt = datetime.datetime.now().strftime("%Y-%m-%d_%H.%M.%S")
+    dt = datetime.datetime.now().astimezone().strftime("%Y-%m-%d_%H.%M.%S")
     report_dir_root = get_reports_path()
 
     report_base = f"{ws_name}"

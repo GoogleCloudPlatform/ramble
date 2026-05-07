@@ -239,10 +239,7 @@ def determine_node_type(experiment, contexts):
     """
     for context in contexts:
         for fom in context["foms"]:
-            if "machine-type" in fom["name"]:
-                experiment.node_type = fom["value"]
-                continue
-            elif "Model name" in fom["name"]:
+            if "machine-type" in fom["name"] or "Model name" in fom["name"]:
                 experiment.node_type = fom["value"]
                 continue
 
@@ -524,7 +521,7 @@ class BigQueryUploader(Uploader):
                 query_job = client.query(query)
                 results = query_job.result()
                 if results.total_rows > 0:
-                    upstream_version = list(results)[0].value
+                    upstream_version = next(iter(results)).value
                     if upstream_version != str(table_def["version"]):
                         logger.warn(
                             f"Upstream DB schema version for table {table_def['table']} "
@@ -568,8 +565,7 @@ class BigQueryUploader(Uploader):
         approx_request_size = sys.getsizeof(json.dumps(data))
         approx_num_batches = math.ceil(approx_request_size / approx_max_request)
         rows_per_batch = math.floor(data_len / approx_num_batches)
-        if rows_per_batch <= 1:
-            rows_per_batch = 1
+        rows_per_batch = max(1, rows_per_batch)
 
         logger.debug(f"Size: {sys.getsizeof(json.dumps(data))}B")
         logger.debug(f"Length in rows: {data_len}")
@@ -578,8 +574,7 @@ class BigQueryUploader(Uploader):
 
         for i in range(0, data_len, rows_per_batch):
             end = i + rows_per_batch
-            if end > data_len:
-                end = data_len
+            end = min(end, data_len)
             logger.debug(f"Uploading rows {i} to {end}")
             table_name = table_id.split(".")[-1]
             table_def = next((t for t in self.schema if t["table"] == table_name), None)

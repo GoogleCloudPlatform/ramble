@@ -128,11 +128,10 @@ def figure_of_merit(
     """
 
     def _execute_figure_of_merit(obj):
-        if fom_map_key is None:
-            if fom_regex is None or group_name is None:
-                raise ramble.language.language_base.DirectiveError(
-                    "`fom_regex` and `group_name` are required for defining file-based FOM"
-                )
+        if fom_map_key is None and (fom_regex is None or group_name is None):
+            raise ramble.language.language_base.DirectiveError(
+                "`fom_regex` and `group_name` are required for defining file-based FOM"
+            )
         when_list = ramble.language.language_helpers.build_when_list(
             when, obj, name, "figure_of_merit"
         )
@@ -496,7 +495,7 @@ def register_builtin(
             raise ramble.language.language_base.DirectiveError(
                 f"Object {obj.name} defines builtin {name} with an invalid "
                 f"injection method of {injection_method}.\n"
-                f"Valid methods are {str(supported_injection_methods)}"
+                f"Valid methods are {supported_injection_methods!s}"
             )
 
         builtin_name = obj._builtin_name.format(obj_name=obj.name, name=name)
@@ -908,7 +907,7 @@ def environment_variable(
         if method not in supported_methods:
             raise ramble.language.language_base.DirectiveError(
                 "environment_variable directive given an invalid method of "
-                f"{method}. Supported methods are {str(supported_methods)}"
+                f"{method}. Supported methods are {supported_methods!s}"
             )
 
         when_list = ramble.language.language_helpers.build_when_list(

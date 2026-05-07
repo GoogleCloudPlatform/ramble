@@ -19,7 +19,7 @@ import urllib.parse
 
 import ramble.paths
 
-__all__ = ["substitute_config_variables", "substitute_path_variables", "canonicalize_path"]
+__all__ = ["canonicalize_path", "substitute_config_variables", "substitute_path_variables"]
 
 # Substitutions to perform
 replacements = {

@@ -56,9 +56,7 @@ class PackageManagerRequirement:
                 attr_val = getattr(self, print_attr, None)
 
                 if attr_val:
-                    out_str += (
-                        f"{indentation}    {color.nested_1(print_attr)}: " f"{str(attr_val)}\n"
-                    )
+                    out_str += f"{indentation}    {color.nested_1(print_attr)}: " f"{attr_val!s}\n"
         else:
             out_str = f"{indentation}{self.when}"
 

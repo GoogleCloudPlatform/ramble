@@ -41,7 +41,7 @@ def _is_string(url):
 
 def _display_mirror_entry(size, name, url, type_=None):
     if type_:
-        type_ = "".join((" (", type_, ")"))
+        type_ = f" ({type_})"
     else:
         type_ = ""
 
@@ -122,7 +122,7 @@ class Mirror:
             (
                 "Mirror(",
                 ", ".join(
-                    f"{k}={repr(v)}"
+                    f"{k}={v!r}"
                     for k, v in (
                         ("fetch_url", self._fetch_url),
                         ("push_url", self._push_url),

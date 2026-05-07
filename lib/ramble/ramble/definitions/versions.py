@@ -120,7 +120,7 @@ class ObjectVersion:
                     the version
         """
         # Convert the variant syntax to a python packaging specifier set
-        variant_name, value = variant.split("@")
+        _, value = variant.split("@")
 
         satisfied = False
         if value:

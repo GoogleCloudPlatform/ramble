@@ -192,7 +192,7 @@ class TestURLFetchStrategy:
 
     def test_fetch_curl_no_verify_ssl(self, fetcher, mock_curl, mock_config, mock_tty):
         """Test that -k is passed to curl when verify_ssl is false."""
-        mock_config_get, config = mock_config
+        _, config = mock_config
         config["config:verify_ssl"] = False
 
         mock_curl.return_value = "HTTP/1.1 200 OK"
@@ -200,7 +200,7 @@ class TestURLFetchStrategy:
         fetcher._fetch_curl("http://example.com/foo.tar.gz")
 
         mock_curl.assert_called_once()
-        args, kwargs = mock_curl.call_args
+        args, _ = mock_curl.call_args
         assert "-k" in args
 
 

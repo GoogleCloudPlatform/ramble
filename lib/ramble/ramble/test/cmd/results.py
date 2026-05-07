@@ -6,28 +6,29 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import py
+import pathlib
+
 import pytest
 
 import ramble.cmd.results
 import ramble.paths
 
-INPUT_DATA = py.path.local(ramble.paths.test_path).join("data", "results_upload")
+INPUT_DATA = pathlib.Path(ramble.paths.test_path) / "data" / "results_upload"
 
 
 @pytest.mark.parametrize(
     "filename,expected_output",
     [
         (
-            py.path.local(INPUT_DATA).join("test1_empty_experiments.json"),
+            str(INPUT_DATA / "test1_empty_experiments.json"),
             "Does not contain valid data to import.",
         ),
         (
-            py.path.local(INPUT_DATA).join("test2_not_json.txt.json"),
+            str(INPUT_DATA / "test2_not_json.txt.json"),
             "Invalid JSON formatting.",
         ),
         (
-            py.path.local(INPUT_DATA).join("test3_malformed_json.json"),
+            str(INPUT_DATA / "test3_malformed_json.json"),
             "Invalid JSON formatting",
         ),
     ],

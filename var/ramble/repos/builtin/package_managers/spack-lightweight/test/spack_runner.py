@@ -562,42 +562,40 @@ compilers::
         config_path = os.getcwd()
         with ramble.config.override(
             "config:spack", {"global": {"flags": f"-C {config_path}"}}
+        ), ramble.config.override(
+            "config:spack", {"compiler_find": {attr: value}}
         ):
-            with ramble.config.override(
-                "config:spack", {"compiler_find": {attr: value}}
-            ):
-                try:
-                    pkg_spec = "gcc@12.2.0 +binutils"
-                    compiler_spec = "gcc@12.2.0"
-                    sr = SpackRunner(dry_run=True)
-                    sr.create_env(os.getcwd())
-                    sr.activate()
-                    sr.add_include_file(compilers_path)
-                    sr.install_compiler(pkg_spec, compiler_spec)
-                    captured = capsys.readouterr()
+            try:
+                pkg_spec = "gcc@12.2.0 +binutils"
+                compiler_spec = "gcc@12.2.0"
+                sr = SpackRunner(dry_run=True)
+                sr.create_env(os.getcwd())
+                sr.activate()
+                sr.add_include_file(compilers_path)
+                sr.install_compiler(pkg_spec, compiler_spec)
+                captured = capsys.readouterr()
 
-                    assert expected_str in captured.out
-                except RunnerError as e:
-                    pytest.skip("%s" % e)
+                assert expected_str in captured.out
+            except RunnerError as e:
+                pytest.skip("%s" % e)
 
 
 def test_env_create_no_view(tmpdir, request):
 
     import os
 
-    with tmpdir.as_cwd():
-        with ramble.config.override(
-            "config:spack", {"env_create": {"flags": "--without-view"}}
-        ):
-            try:
-                sr = SpackRunner()
-                sr.create_env(os.getcwd())
+    with tmpdir.as_cwd(), ramble.config.override(
+        "config:spack", {"env_create": {"flags": "--without-view"}}
+    ):
+        try:
+            sr = SpackRunner()
+            sr.create_env(os.getcwd())
 
-                assert not os.path.exists(
-                    os.path.join(os.getcwd(), ".spack-env", "view")
-                )
-            except RunnerError as e:
-                pytest.skip("%s" % e)
+            assert not os.path.exists(
+                os.path.join(os.getcwd(), ".spack-env", "view")
+            )
+        except RunnerError as e:
+            pytest.skip("%s" % e)
 
 
 def test_multiword_args(tmpdir, capsys, request):

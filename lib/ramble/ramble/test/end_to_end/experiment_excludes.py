@@ -266,8 +266,10 @@ compilers:
 
             # Create fake figures of merit.
             with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
-                for i in range(1, 6):
-                    f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
+                f.writelines(
+                    f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n"
+                    for i in range(1, 6)
+                )
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
 
             # Create files that match archive patterns

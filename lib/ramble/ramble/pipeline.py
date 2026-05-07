@@ -14,8 +14,6 @@ import shutil
 import stat
 from enum import Enum
 
-import py.path
-
 import llnl.util.filesystem as fs
 from llnl.util import tty
 
@@ -437,7 +435,7 @@ class ArchivePipeline(Pipeline):
             tar_extension = ".tar.gz"
             tar = which("tar", required=True)
             tar_path = self.archive_name + tar_extension
-            with py.path.local(self.workspace.archive_dir).as_cwd():
+            with fs.working_dir(self.workspace.archive_dir):
                 tar("-czf", tar_path, self.archive_name)
 
             archive_url = (
@@ -752,7 +750,7 @@ class PushDeploymentPipeline(Pipeline):
         )
         if self.create_tar:
             tar = which("tar", required=True)
-            with py.path.local(self.workspace.deployments_dir).as_cwd():
+            with fs.working_dir(self.workspace.deployments_dir):
                 tar("-czf", tar_path, self.deployment_name)
 
         if self.upload_url:

@@ -86,13 +86,13 @@ def test_data_preparation(request, mock_applications):
             formatted_data = ramble.uploader.format_data(ws.results)
             uri = "not_used_in_test"
             (
-                exp_table_id,
-                exps_to_insert,
-                fom_table_id,
-                foms_to_insert,
-                metadata_table_id,
-                metadata_to_insert,
-                software_table_id,
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
+                _,
                 software_to_insert,
             ) = ramble.uploader._prepare_data(formatted_data, uri)
 
@@ -211,14 +211,14 @@ def test_experiment_metadata_preparation(mock_results_with_metadata, mutable_con
         assert formatted_data.metadata == mock_results_with_metadata["metadata"]
 
         (
-            exp_table_id,
-            exps_to_insert,
-            fom_table_id,
-            foms_to_insert,
-            metadata_table_id,
+            _,
+            _,
+            _,
+            _,
+            _,
             metadata_to_insert,
-            software_table_id,
-            software_to_insert,
+            _,
+            _,
         ) = _prepare_data(formatted_data, uri)
 
         assert len(metadata_to_insert) == 2  # 2 metadata items * 1 experiment
@@ -347,12 +347,12 @@ def test_sqlite_uploader_chunked_upload_errors(tmpdir, mock_results_with_metadat
         (
             exp_table_id,
             exps_to_insert,
-            fom_table_id,
-            foms_to_insert,
-            metadata_table_id,
-            metadata_to_insert,
-            software_table_id,
-            software_to_insert,
+            _,
+            _,
+            _,
+            _,
+            _,
+            _,
         ) = ramble.uploader._prepare_data(formatted_data, uri)
 
         # Trigger issue during upload insert by injecting bad data format that breaks SQLite schema

@@ -209,7 +209,7 @@ def url_exists(url):
         except s3.ClientError as err:
             if err.response["Error"]["Code"] == "NoSuchKey":
                 return False
-            raise err
+            raise
 
     elif url.scheme == "gs":
         gcs = gcs_util.GCSBlob(url)
@@ -455,7 +455,7 @@ def spider(root_urls, depth=0, concurrency=32):
         except Exception as e:
             # Other types of errors are completely ignored,
             # except in debug mode
-            logger.debug(f"Error in _spider: {type(e)}:{str(e)}", traceback.format_exc())
+            logger.debug(f"Error in _spider: {type(e)}:{e!s}", traceback.format_exc())
 
         finally:
             logger.debug(f"SPIDER: [url={url}]")

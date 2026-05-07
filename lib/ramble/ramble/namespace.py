@@ -49,8 +49,6 @@ class namespace:
     external_env = "external_env"
 
     # v2 configs
-    packages = "packages"
-    environments = "environments"
     pkg_spec = "pkg_spec"
     compiler_spec = "compiler_spec"
     compiler = "compiler"

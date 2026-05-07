@@ -13,4 +13,4 @@ ramble_version_info = (0, 6, 0)
 #: String containing Ramble version joined with .'s
 ramble_version = ".".join(str(v) for v in ramble_version_info)
 
-__all__ = ["ramble_version_info", "ramble_version"]
+__all__ = ["ramble_version", "ramble_version_info"]

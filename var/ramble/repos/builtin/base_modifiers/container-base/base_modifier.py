@@ -165,12 +165,14 @@ class ContainerBase(BasicModifier):
         ):
             add_mod = True
             for when_set, var_mod_dict in self.variable_modifications.items():
-                if self.expander.satisfies(
-                    when_set, self.experiment_variants()
+                if (
+                    self.expander.satisfies(
+                        when_set, self.experiment_variants()
+                    )
+                    and "container_mounts" in var_mod_dict
                 ):
-                    if "container_mounts" in var_mod_dict:
-                        add_mod = False
-                        break
+                    add_mod = False
+                    break
             if add_mod:
                 self.variable_modification(
                     "container_mounts",

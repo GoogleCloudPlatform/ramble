@@ -20,23 +20,23 @@ from llnl.util.tty.color import (
 
 __all__ = [
     "ColorParseError",
+    "auto_escape",
     "cescape",
     "cextra",
     "clen",
-    "get_color_when",
-    "set_color_when",
-    "auto_escape",
     "colorize",
+    "config_title",
     "cprint",
     "cwrite",
     "escape_str",
+    "get_color_when",
     "level_func",
-    "config_title",
-    "section_title",
     "nested_1",
     "nested_2",
     "nested_3",
     "nested_4",
+    "section_title",
+    "set_color_when",
     "title_color",
 ]
 
@@ -71,9 +71,7 @@ def auto_escape(s):
         else:
             # Heuristic: If it looks like a version separator (preceded by alnum or -_)
             # and is not a braced color code or special escape, escape it.
-            if part in ["@@", "@."]:
-                new_parts.append(part)
-            elif "{" in part:
+            if part in ["@@", "@."] or "{" in part:
                 new_parts.append(part)
             elif (
                 i > 0 and parts[i - 1] and (parts[i - 1][-1].isalnum() or parts[i - 1][-1] in "-_")

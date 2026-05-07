@@ -1441,8 +1441,6 @@ ramble:
     environments: {}
 """
 
-    import py
-
     def write_config(ws_path, config):
         with ramble.workspace.Workspace(ws_path) as ws:
             config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
@@ -1456,8 +1454,8 @@ ramble:
 
     workspace_flags = ["-D", ws_path]
 
-    config_path = py.path.local(os.path.join(ws_path, "configs"))
-    with config_path.as_cwd():
+    config_path = os.path.join(ws_path, "configs")
+    with fs.working_dir(config_path):
         write_config(ws_path, test_config)
 
         with ramble.workspace.Workspace(ws_path) as ws:
@@ -2285,8 +2283,7 @@ software:
 def write_variables_config_file(file_path, levels, value):
     with open(file_path, "w+") as f:
         f.write("variables:\n")
-        for i in range(levels):
-            f.write(f"  scope{i}: {value}\n")
+        f.writelines(f"  scope{i}: {value}\n" for i in range(levels))
 
 
 def test_workspace_config_precedence(workspace_name, tmpdir):

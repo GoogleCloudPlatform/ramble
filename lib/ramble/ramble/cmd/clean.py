@@ -81,7 +81,7 @@ def remove_python_caches():
     for directory in [lib_path, var_path]:
         for root, dirs, files in os.walk(directory):
             for f in files:
-                if f.endswith(".pyc") or f.endswith(".pyo"):
+                if f.endswith((".pyc", ".pyo")):
                     fname = os.path.join(root, f)
                     logger.debug(f"Removing {fname}")
                     os.remove(fname)

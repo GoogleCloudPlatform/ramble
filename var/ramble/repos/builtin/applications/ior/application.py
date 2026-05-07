@@ -150,7 +150,7 @@ class Ior(ExecutableApplication):
     # access    bw(MiB/s)  IOPS       Latency(s)  block(KiB) xfer(KiB)  open(s)    wr/rd(s)   close(s)   total(s)   iter
     # ------    ---------  ----       ----------  ---------- ---------  --------   --------   --------   --------   ----
     # write     560.70     2316.04    0.013670    16384      1024.00    0.002069   0.221067   0.693182   0.913139   0
-    metrics = [
+    iter_metrics = [
         "bw",
         "IOPS",
         "latency",
@@ -168,7 +168,7 @@ class Ior(ExecutableApplication):
 
     with when("+ior_include_iter_foms"):
         iter_regex = ""
-        for metric in metrics:
+        for metric in iter_metrics:
             iter_regex += r"\s+(?P<" + metric + r">[0-9]+(?:\.[0-9]+)?)"
         iter_regex += r"\s*$"
 
@@ -180,7 +180,7 @@ class Ior(ExecutableApplication):
         )
 
         # Capture Per Iteration Data
-        for metric, unit in zip(metrics, units):
+        for metric, unit in zip(iter_metrics, units):
             fom_regex = r"\w+" + iter_regex
             figure_of_merit(
                 metric,
@@ -195,7 +195,7 @@ class Ior(ExecutableApplication):
     # Operation   Max(MiB)   Min(MiB)  Mean(MiB)     StdDev   Max(OPs)   Min(OPs)  Mean(OPs)     StdDev    Mean(s) Stonewall(s) Stonewall(MiB) Test# #Tasks tPN reps fPP reord reordoff reordrand seed segcnt   blksiz    xsize aggs(MiB)   API RefNum
     # write         612.90     560.70     596.63      14.15     612.90     560.70     596.63      14.15    0.85865         NA            NA     0      2   2   10   0     0        1         0    0     16 16777216  1048576     512.0 POSIX      0
     # Make a tuple of (metric_name, unit, type) to make building the regex easier
-    metrics = [
+    summary_metrics = [
         # ('Operation', '', 'str'),
         ("bw_Max", "MiB", "float"),
         ("bw_Min", "MiB", "float"),
@@ -234,7 +234,7 @@ class Ior(ExecutableApplication):
     ]
 
     summary_regex = "(?P<Operation>(read|write))"
-    for metric_name, _, variant in metrics:
+    for metric_name, _, variant in summary_metrics:
         if "str" in variant:
             summary_regex += r"\s+(?P<" + metric_name + r">\w+)"
         elif "int" in variant:
@@ -248,7 +248,7 @@ class Ior(ExecutableApplication):
         "summary", regex=summary_regex, output_format="{Operation}"
     )
 
-    for metric, unit, _ in metrics:
+    for metric, unit, _ in summary_metrics:
         figure_of_merit(
             metric,
             log_file=log_str,

@@ -16,11 +16,10 @@ class ValueConflictImpossible(ExecutableApplication):
 
     workload("wl1", executable="base_exec")
 
-    with when("v=1"):
-        with when("+v"):
-            workload_variable(
-                "var1",
-                default="val1",
-                description="impossible var",
-                workload="wl1",
-            )
+    with when("v=1"), when("+v"):
+        workload_variable(
+            "var1",
+            default="val1",
+            description="impossible var",
+            workload="wl1",
+        )

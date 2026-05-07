@@ -39,7 +39,7 @@ def name_only(objs, out, object_type):
 
 def rows_for_ncols(elts, ncols):
     """Print out rows in a table with ncols of elts laid out vertically."""
-    clen = int(math.ceil(len(elts) / ncols))
+    clen = math.ceil(len(elts) / ncols)
     for r in range(clen):
         row = []
         for c in range(ncols):

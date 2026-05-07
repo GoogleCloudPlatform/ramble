@@ -951,7 +951,7 @@ class Expander:
 
         """
         # Fast path for things that are likely paths
-        if in_str.startswith("/") or in_str.startswith("./"):
+        if in_str.startswith(("/", "./")):
             return in_str
 
         # Heuristic: if no math operators/keywords, it's probably a string. Skip parsing.
@@ -989,7 +989,7 @@ class Expander:
                     logger.debug(f'   Math input is: "{in_str}"')
                     logger.debug(e)
                 except RambleSyntaxError as e:
-                    raise RambleSyntaxError(f'{str(e)} in "{in_str}"') from None
+                    raise RambleSyntaxError(f'{e!s} in "{in_str}"') from None
                 except SyntaxError as e:
                     logger.debug(f"ast.parse hit the following syntax error on input: {in_str}")
                     logger.debug(e)

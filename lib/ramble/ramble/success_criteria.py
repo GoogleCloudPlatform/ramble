@@ -228,11 +228,10 @@ class SuccessCriteria:
 
     def anti_matched(self, test=None):
         logger.debug(f"Testing anti-criterion {self.name} mode = {self.mode}")
-        if self.mode == "string":
-            if self.anti_match is not None:
-                anti_match_obj = self.anti_match.match(test)
-                if anti_match_obj:
-                    return True
+        if self.mode == "string" and self.anti_match is not None:
+            anti_match_obj = self.anti_match.match(test)
+            if anti_match_obj:
+                return True
         return False
 
     def mark_found(self):

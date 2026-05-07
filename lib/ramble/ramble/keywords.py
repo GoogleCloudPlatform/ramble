@@ -235,8 +235,7 @@ class Keywords:
                 required_set.add(key)
 
         for definition in definitions:
-            if definition in required_set:
-                required_set.remove(definition)
+            required_set.discard(definition)
 
         if required_set:
             if warn_validation:

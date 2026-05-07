@@ -61,7 +61,7 @@ def default_mode(name, **kwargs):
         if name not in mod.modes:
             raise DirectiveError(
                 f"default_mode directive given an invalid mode for modifier "
-                f"{mod.name}. Valid modes are {str(list(mod.modes.keys()))}"
+                f"{mod.name}. Valid modes are {list(mod.modes.keys())!s}"
             )
 
         if name == "disabled":
@@ -103,7 +103,7 @@ def variable_modification(
         if method not in supported_methods:
             raise DirectiveError(
                 "variable_modification directive given an invalid method.\n"
-                f"  Valid methods are {str(supported_methods)}"
+                f"  Valid methods are {supported_methods!s}"
             )
 
         when_lists = ramble.language.language_helpers.merge_conditions(
@@ -235,7 +235,7 @@ def env_var_modification(
         if method not in supported_methods:
             raise DirectiveError(
                 "env_var_modification directive given an invalid method of "
-                f"{method}. Supported methods are {str(supported_methods)}"
+                f"{method}. Supported methods are {supported_methods!s}"
             )
 
         if method != "unset" and not modification:

@@ -356,11 +356,11 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
             # If the attribute is not a dict or list of dict, print using the existing format rules
             else:
                 if hasattr(next(iter(internal_attr)), "as_str"):
-                    for obj in internal_attr:
-                        if pattern and not fnmatch.fnmatch(obj.name, pattern):
+                    for item in internal_attr:
+                        if pattern and not fnmatch.fnmatch(item.name, pattern):
                             continue
 
-                        color.cprint(obj.as_str(verbose=True))
+                        color.cprint(item.as_str(verbose=True))
                 else:
                     to_print = fnmatch.filter(map(str, internal_attr), pattern)
                     if format == supported_formats.lists:

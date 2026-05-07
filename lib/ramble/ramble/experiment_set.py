@@ -532,9 +532,8 @@ class ExperimentSet:
                     excluded_experiments.add(exclude_exp_name)
 
         exclude_where = []
-        if final_context.exclude:
-            if namespace.where in final_context.exclude:
-                exclude_where = final_context.exclude[namespace.where]
+        if final_context.exclude and namespace.where in final_context.exclude:
+            exclude_where = final_context.exclude[namespace.where]
 
         tracking_group = ramble.renderer.RenderGroup("experiment", "create")
         tracking_group.variables = final_context.variables
@@ -803,9 +802,8 @@ class ExperimentSet:
             if not active:
                 continue
 
-            if filters.tags:
-                if not inst.has_tags(filters.tags):
-                    active = False
+            if filters.tags and not inst.has_tags(filters.tags):
+                active = False
 
             if active and inst.is_actionable():
                 filtered_list.append((exp, inst, idx))

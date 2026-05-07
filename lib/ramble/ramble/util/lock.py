@@ -85,11 +85,11 @@ def check_lock_safety(path):
 
 
 __all__ = [
+    "Lock",
     "LockError",
     "LockTimeoutError",
     "LockUpgradeError",
     "ReadTransaction",
     "WriteTransaction",
-    "Lock",
     "check_lock_safety",
 ]
