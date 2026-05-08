@@ -512,7 +512,8 @@ def stage_files(
     files that are not managed by the `input_file` directive.
 
     The staging method is controlled by the `stage_method` configuration
-    option, which can be set to 'cp', 'rsync', 'symbolic_link', or 'hard_link'.
+    option, which can be set to 'cp', 'rsync', 'symbolic_link', 'hard_link',
+    or 'install' (for files only).
 
     Args:
         src (str | None): The source path of the file or directory.
@@ -522,17 +523,19 @@ def stage_files(
                                                of src, dest locations to stage.
         name (str | None): The name of the executable. Defaults to 'stage-files'.
         method (str): The method to use for this stage. Can be one of:
-                      "user-defined", "cp", "rsync", "symbolic_link", "hard_link"
+                      "user-defined", "cp", "rsync", "symbolic_link",
+                      "hard_link", "install"
         when (list | None): List of when conditions to apply to this directive.
     """
 
-    valid_methods = ["user-defined", "cp", "rsync", "symbolic_link", "hard_link"]
+    valid_methods = ["user-defined", "cp", "rsync", "symbolic_link", "hard_link", "install"]
 
     method_map = {
         "cp": "cp -Lr",
         "rsync": "rsync -Lr",
         "symbolic_link": "ln -sf",
         "hard_link": "ln -f",
+        "install": "install -m 755",
     }
 
     def _execute_stage_files(app):
