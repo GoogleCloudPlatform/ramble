@@ -148,6 +148,12 @@ class Info(PackageManagerBase):
         fail_on_invalid=False,
     )
 
+    conflict(
+        "turn_on_required_directives=True",
+        when="variant_name=variant_default",
+        msg="turn_on_required_directives conflicts with variant_default",
+    )
+
     # Package manager language
     package_manager_variable(
         "pm_var_name",

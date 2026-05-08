@@ -437,6 +437,94 @@ def test_register_validator_when(workspace_name, validator_value, fails):
 
 
 @pytest.mark.parametrize(
+    "zlib_type,validation,fails",
+    [
+        ("preferred", True, True),
+        ("preferred", False, False),
+        ("testing", True, False),
+    ],
+)
+def test_conflicts_when(workspace_name, zlib_type, validation, fails):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=2",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:zlib_type:{zlib_type}", global_args=global_args)
+        config("add", f"variants:validation:{validation}", global_args=global_args)
+
+        ws._re_read()
+
+        failed = False
+        try:
+            workspace("setup", global_args=global_args)
+        except ObjectValidationError as e:
+            if "Conflict detected" in str(e):
+                failed = True
+
+        assert failed == fails
+
+
+@pytest.mark.parametrize(
+    "version,validation,fails",
+    [
+        ("2.0", True, True),
+        ("2.0", False, False),
+        ("1.0", True, False),
+    ],
+)
+def test_conflicts_version_when(workspace_name, version, validation, fails):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            f"when-variants@{version}",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=2",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:zlib_type:testing", global_args=global_args)
+        config("add", f"variants:validation:{validation}", global_args=global_args)
+
+        ws._re_read()
+
+        failed = False
+        try:
+            workspace("setup", global_args=global_args)
+        except ObjectValidationError as e:
+            if "Conflict detected" in str(e):
+                failed = True
+
+        assert failed == fails
+
+
+@pytest.mark.parametrize(
     "inc_value,type_value",
     [
         (True, "preferred"),

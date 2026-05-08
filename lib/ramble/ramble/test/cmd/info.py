@@ -161,6 +161,11 @@ def _get_shared_outputs():
             "validator_name",
             ["{n_nodes} == 1", "Give me a node, Vasili. One node only, please"],
         ),
+        (
+            "conflicts",
+            "turn_on_required_directives=True",
+            ["turn_on_required_directives conflicts with variant_default"],
+        ),
         ("object_variables", "obj_var_name", ["default_obj_val", "An obj var"]),
         ("required_vars", "required_var_name", ["A required var", "type.required"]),
     ]

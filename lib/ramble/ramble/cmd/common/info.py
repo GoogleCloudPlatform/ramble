@@ -38,6 +38,7 @@ obj_attribute_map = {
     "target_shells": "shell_support_pattern",
     "templates": None,
     "validators": None,
+    "conflicts": None,
     "object_variables": None,
     "object_environment_variables": None,
     "command_variables": None,
@@ -311,6 +312,33 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
                 _print_verbose_dict_attr(fom_dict, pattern=pattern, indentation=indentation)
 
 
+def _print_conflicts(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
+    """Print conflicts defined on the object"""
+    internal_attr_name = _map_attr_name(attr)
+    internal_attr = getattr(obj, internal_attr_name)
+    print_attribute_header(attr, verbose)
+
+    indentation = " " * 4
+
+    if not verbose:
+        to_print = sorted({conflict["conflict_spec"] for conflict in internal_attr})
+        _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
+    else:
+        for conflict in internal_attr:
+            conflict_spec = conflict["conflict_spec"]
+            if pattern and not fnmatch.fnmatch(conflict_spec, pattern):
+                continue
+            color_spec = color.section_title(conflict_spec)
+            color.cprint(f"{color_spec}:")
+            if conflict["when"]:
+                color_when = color.nested_1("when")
+                color.cprint(f"{indentation}{color_when}: {', '.join(conflict['when'])}")
+            if conflict["message"]:
+                color_msg = color.nested_1("message")
+                color.cprint(f"{indentation}{color_msg}: {conflict['message']}")
+            color.cprint("")
+
+
 def print_single_attribute(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
     """Handle printing a single attribute
 
@@ -324,6 +352,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         return
     elif attr == "figures_of_merit":
         _print_figures_of_merit(obj, attr, verbose, pattern, format=format)
+        return
+    elif attr == "conflicts":
+        _print_conflicts(obj, attr, verbose, pattern, format=format)
         return
     elif isinstance(internal_attr, dict):
         internal_attr = _unpack_when_set_if_needed(internal_attr)
