@@ -2211,15 +2211,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "RAMBLE_STATUS",
         ]
 
+        remove_prefixes = set()
         for _, obj in self.objects():
             remove_variables.append(f"{obj.origin_type}_version")
             remove_variables.append(f"{obj.origin_type}::{obj.name}::version")
+            remove_prefixes.add(f"{obj.origin_type}::variant::")
 
         # Remove some variables that don't affect the experiment, and change
         # frequently (or are actually output variables)
         for var in remove_variables:
             if var in variables:
                 del variables[var]
+
+        # Remove variant variables (but not the variant definitions themselves)
+        if remove_prefixes:
+            prefixes = tuple(remove_prefixes)
+            for var in list(variables.keys()):
+                if var.startswith(prefixes):
+                    del variables[var]
 
         # Remove the workspace path from variable definitions before hashing
         for var in variables:
