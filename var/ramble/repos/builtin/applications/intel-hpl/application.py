@@ -6,12 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import os
+
 from ramble.appkit import *
 from ramble.base_app.builtin.hpl import Hpl as HplBase
+from ramble.base_app.builtin.intel_mkl_benchmarks import (
+    IntelMklBenchmarks as IntelMklBenchmarksBase,
+)
 
 
-class IntelHpl(HplBase):
-    """Define HPL application using Intel MKL optimized binary from intel-oneapi-mpi package"""
+class IntelHpl(HplBase, IntelMklBenchmarksBase):
+    """Define HPL application using Intel MKL optimized binary from intel-oneapi-mkl package"""
 
     name = "intel-hpl"
 
@@ -19,65 +24,83 @@ class IntelHpl(HplBase):
 
     tags("intel-optimized")
 
-    version(
-        "2024.2.0",
-        "Version 2024.2.0 of intel-oneapi-mkl with HPL",
-        preferred=True,
-    )
-
     with when("package_manager_family=spack"):
-        define_compiler("gcc13p2", pkg_spec="gcc@13.2.0")
+        define_compiler("gcc14", pkg_spec="gcc@14.2.0")
+
         software_spec(
             "imkl_{application::intel-hpl::version}",
             pkg_spec="intel-oneapi-mkl@{application::intel-hpl::version} threads=openmp",
-            compiler="gcc13p2",
+            compiler="gcc14",
         )
         software_spec(
-            "impi2021p13",
-            pkg_spec="intel-oneapi-mpi@2021.13.1",
+            "impi2021p17",
+            pkg_spec="intel-oneapi-mpi@2021.17.2",
         )
 
         required_package("intel-oneapi-mkl")
 
-    # This step does a few things:
-    # - Prepare calling for the script runme_intel64_prv
-    #   (We call this runner script instead of the underlying xhpl_intel64_dynamic
-    #    since it sets up derived env var HPL_HOST_NODE for numa placement control.)
-    # - Copy in the xhpl_intel64_dynamic binary to the running dir
-    #   (This is needed due to runme_intel64_prv invoking it using "./")
-    # - Account for newer directory layout from mkl 2024
+    #  We call the runme_intel64_prv script instead of the underlying xhpl_intel64_dynamic
+    #  since it sets up derived env var HPL_HOST_NODE for numa placement control.
+    #  We copy in the xhpl_intel64_dynamic binary to the running dir
+    #  because runme_intel64_prv invokes it using "./"
     stage_files(
         name="stage-binary",
-        src="${hpl_bench_dir}/xhpl_intel64_dynamic",
-        dst="{experiment_run_dir}/.",
+        src=os.path.join("{hpl_bench_dir}", "xhpl_intel64_dynamic"),
+        dst=os.path.join("{experiment_run_dir}", "."),
+        method="cp",
     )
-    executable(
-        "prepare",
-        template=[
-            r"""
-hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/benchmarks/mp_linpack"
-if [ ! -d ${hpl_bench_dir} ]; then
-    hpl_bench_dir="{intel-oneapi-mkl_path}/mkl/latest/share/mkl/benchmarks/mp_linpack"
-fi
-hpl_run="${hpl_bench_dir}/runme_intel64_prv"
-    """.strip()
-        ],
-        mpi=False,
-        redirect="",
-        output_capture="",
+
+    stage_files(
+        name="stage-runme",
+        src=os.path.join("{hpl_bench_dir}", "runme_intel64_prv.txt"),
+        dst=os.path.join("{experiment_run_dir}", "runme_intel64_prv"),
+        method="install",
     )
 
     executable(
         "execute",
-        "${hpl_run}",
+        "{hpl_run_script}",
         use_mpi=True,
     )
 
-    workload("standard", executables=["prepare", "stage-binary", "execute"])
-    workload("calculator", executables=["prepare", "stage-binary", "execute"])
+    # At 2025.0.1, the runme_intel64_prv script was changed to .txt format
+    # (runme_intel64_dynamic was changed to .txt at 2025.1.0)
+    with when("application_version@:2025.0.0"):
+        workload("standard", executables=["stage-binary", "execute"])
+        workload("calculator", executables=["stage-binary", "execute"])
+
+        workload_variable(
+            "hpl_run_script",
+            default=os.path.join("{hpl_bench_dir}", "runme_intel64_prv"),
+            description="Path to the HPL run script.",
+            workloads=["*"],
+        )
+
+    with when("application_version@2025.0.1:"):
+        workload(
+            "standard", executables=["stage-binary", "stage-runme", "execute"]
+        )
+        workload(
+            "calculator",
+            executables=["stage-binary", "stage-runme", "execute"],
+        )
+
+        workload_variable(
+            "hpl_run_script",
+            default=os.path.join("{experiment_run_dir}", "runme_intel64_prv"),
+            description="Path to the HPL run script.",
+            workloads=["*"],
+        )
 
     workload_group("standard", workloads=["standard"], mode="append")
     workload_group("calculator", workloads=["calculator"], mode="append")
+
+    workload_variable(
+        "hpl_bench_dir",
+        default=os.path.join("{mkl_benchmark_path}", "mp_linpack"),
+        description="Path to Intel HPL benchmarks directory",
+        workloads=["*"],
+    )
 
     environment_variable(
         "MPI_PROC_NUM",
