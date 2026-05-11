@@ -113,35 +113,33 @@ class Wrfv4(ExecutableApplication):
         output_capture=OUTPUT_CAPTURE.ALL,
     )
 
-    executable(
-        "fix_12km",
-        template=[
-            "sed -i -e 's/ start_hour.*/ start_hour                          = 23,/g' namelist.input",
-            "sed -i -e 's/ restart .*/ restart                             = .true.,/g' namelist.input",
-        ],
-        use_mpi=False,
-        output_capture=OUTPUT_CAPTURE.ALL,
+    edit_file(
+        "fix_12km_start_hour",
+        file_path="namelist.input",
+        match=r" start_hour.*",
+        replace=" start_hour                          = 23,",
     )
 
-    executable(
+    edit_file(
+        "fix_12km_restart",
+        file_path="namelist.input",
+        match=r" restart .*",
+        replace=" restart                             = .true.,",
+    )
+
+    edit_file(
         "define_nproc_x",
-        template=[
-            "awk '/e_sn.*=/ {print $0 RS \" nproc_x                            = {nproc_x},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
-            "mv {experiment_run_dir}/temp_namelist.input {experiment_run_dir}/namelist.input",
-        ],
-        redirect="",
-        output_capture="",
+        file_path="namelist.input",
+        match=r"(e_sn.*=.*)",
+        replace=r"\g<1>\n nproc_x                            = {nproc_x},",
         when="+wrf_explicit_x",
     )
 
-    executable(
+    edit_file(
         "define_nproc_y",
-        template=[
-            "awk '/e_sn.*=/ {print $0 RS \" nproc_y                            = {nproc_y},\"} !/e_sn.*=/ {print $0}' namelist.input > {experiment_run_dir}/temp_namelist.input",
-            "mv {experiment_run_dir}/temp_namelist.input {experiment_run_dir}/namelist.input",
-        ],
-        redirect="",
-        output_capture="",
+        file_path="namelist.input",
+        match=r"(e_sn.*=.*)",
+        replace=r"\g<1>\n nproc_y                            = {nproc_y},",
         when="+wrf_explicit_y",
     )
 
@@ -196,7 +194,8 @@ class Wrfv4(ExecutableApplication):
             "cleanup",
             "define_nproc_y",
             "define_nproc_x",
-            "fix_12km",
+            "fix_12km_start_hour",
+            "fix_12km_restart",
             "execute",
             "copy-logs",
             "post-exec-clean",

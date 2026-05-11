@@ -529,8 +529,15 @@ class Workspace:
             if not os.path.exists(section["filename"]):
                 return
 
+        was_active = _active_workspace == self
+        if was_active:
+            deactivate_config_scope(self)
+
         self.clear()
         self._read()
+
+        if was_active:
+            prepare_config_scope(self)
 
     def _read(self):
         # Create the workspace config section
@@ -761,6 +768,8 @@ ramble:
             fs.mkdirp(self.path)
             fs.mkdirp(self.config_dir)
             fs.mkdirp(self.auxiliary_software_dir)
+            fs.mkdirp(self.shared_dir)
+            fs.mkdirp(self.shared_utilities_dir)
             fs.mkdirp(self.log_dir)
             fs.mkdirp(self.experiment_dir)
 
@@ -783,6 +792,10 @@ ramble:
 
             self.write_templates()
 
+            self.write_utilities()
+
+            self.write_auxiliary_software_files()
+
             self.write_metadata()
 
     def write_config(self, section, force=False):
@@ -802,8 +815,31 @@ ramble:
 
         for name, conf in self._templates.items():
             template_path = self.template_path(name)
-            with open(template_path, "w+") as f:
+            with open(template_path, "w+", encoding="utf-8") as f:
                 f.write(conf["contents"])
+
+    def write_utilities(self):
+        """Write workspace utilities out to the shared directory"""
+        import ramble.util.file_editor
+
+        if ramble.config.get("config:generate_file_editing_scripts", True):
+            fs.mkdirp(self.shared_utilities_dir)
+
+            # Write to base shared utilities directory
+            base_script_content = ramble.util.file_editor.get_file_editor_script()
+            base_script_path = os.path.join(
+                self.shared_utilities_dir, ramble.util.file_editor.HELPER_SCRIPT_NAME
+            )
+            with open(base_script_path, "w+", encoding="utf-8") as f:
+                f.write(base_script_content)
+
+    def write_auxiliary_software_files(self):
+        """Write all auxiliary software files out to workspace"""
+
+        for name, contents in self._auxiliary_software_files.items():
+            aux_path = os.path.join(self.auxiliary_software_dir, name)
+            with open(aux_path, "w+", encoding="utf-8") as f:
+                f.write(contents)
 
     def update_metadata(self, key, value):
         """Set the metadata key value
@@ -2132,6 +2168,11 @@ ramble:
         return os.path.join(self.config_dir, AUXILIARY_SOFTWARE_DIR_NAME)
 
     @property
+    def shared_utilities_dir(self):
+        """Path to the Ramble shared utilities directory"""
+        return os.path.join(self.shared_dir, "utilities")
+
+    @property
     def config_file_path(self):
         """Path to the configuration file directory"""
         return os.path.join(self.config_dir, CONFIG_FILE_NAME)
@@ -2176,7 +2217,7 @@ ramble:
         yield from self._templates.items()
 
     def all_auxiliary_software_files(self):
-        """Iterator over each file in $workspace/configs/auxiliary_software_files"""
+        """Iterator over each auxiliary software file"""
         yield from self._auxiliary_software_files.items()
 
     @classmethod

@@ -265,6 +265,85 @@ def test_executable_directive(app_class):
 
 
 @pytest.mark.parametrize("app_class", app_types)
+def test_edit_file_directive(app_class):
+    import shlex
+
+    app_inst = app_class("/not/a/path")
+    app_inst.edit_file(
+        "edit_test",
+        file_path="/path/to/test.txt",
+        match="match_str",
+        replace="replace_str",
+        append="append_str",
+        prepend="prepend_str",
+        fail_on_error=True,
+    )
+
+    assert hasattr(app_inst, "executables")
+    assert "edit_test" in app_inst.executables[_FS]
+
+    exe_obj = app_inst.executables[_FS]["edit_test"]
+    assert exe_obj.name == "edit_test"
+    template_str = exe_obj.template[0]
+
+    assert "python" in template_str
+    assert "_ramble_file_editor.py" in template_str
+    assert "--mode regex" in template_str
+    assert f"--file {shlex.quote('/path/to/test.txt')}" in template_str
+    assert f"--match {shlex.quote('match_str')}" in template_str
+    assert f"--replace {shlex.quote('replace_str')}" in template_str
+    assert f"--append {shlex.quote('append_str')}" in template_str
+    assert f"--prepend {shlex.quote('prepend_str')}" in template_str
+    assert "|| true" not in template_str
+
+    app_inst.edit_file(
+        "edit_test_fail",
+        file_path="/path/to/test.txt",
+        match="match_str",
+        replace="replace_str",
+        fail_on_error=False,
+    )
+    exe_obj2 = app_inst.executables[_FS]["edit_test_fail"]
+    assert "|| true" in exe_obj2.template[0]
+
+
+@pytest.mark.parametrize("app_class", app_types)
+def test_patch_file_directive(app_class):
+    import shlex
+
+    app_inst = app_class("/not/a/path")
+    app_inst.patch_file(
+        "patch_test",
+        file_path="/path/to/test.txt",
+        patch_file="/path/to/patch.patch",
+        fail_on_error=True,
+    )
+
+    assert hasattr(app_inst, "executables")
+    assert "patch_test" in app_inst.executables[_FS]
+
+    exe_obj = app_inst.executables[_FS]["patch_test"]
+    assert exe_obj.name == "patch_test"
+    template_str = exe_obj.template[0]
+
+    assert "python" in template_str
+    assert "_ramble_file_editor.py" in template_str
+    assert "--mode patch" in template_str
+    assert f"--file {shlex.quote('/path/to/test.txt')}" in template_str
+    assert f"--patch-file {shlex.quote('/path/to/patch.patch')}" in template_str
+    assert "|| true" not in template_str
+
+    app_inst.patch_file(
+        "patch_test_fail",
+        file_path="/path/to/test.txt",
+        patch_file="/path/to/patch.patch",
+        fail_on_error=False,
+    )
+    exe_obj2 = app_inst.executables[_FS]["patch_test_fail"]
+    assert "|| true" in exe_obj2.template[0]
+
+
+@pytest.mark.parametrize("app_class", app_types)
 def test_figure_of_merit_directive(app_class):
     test_defs = {}
 

@@ -237,9 +237,21 @@ compilers:
                 assert "unset TEST_VAR" in data
 
                 # Test the expected portions of the execution command exist
-                assert "sed -i -e 's/ start_hour.*/ start_hour" in data
-                assert "sed -i -e 's/ restart .*/ restart" in data
+                expected_editor = '_ramble_file_editor.py" --mode regex --file namelist.input'
+                expected_fix_hour = (
+                    expected_editor
+                    + " --match ' start_hour.*' --replace"
+                    + " ' start_hour                          = 23,'"
+                )
+                expected_fix_restart = (
+                    expected_editor
+                    + " --match ' restart .*' --replace"
+                    + " ' restart                             = .true.,'"
+                )
+                assert expected_fix_hour in data
+                assert expected_fix_restart in data
                 assert "mpirun" in data
+
                 assert "wrf.exe" in data
 
                 # Test the run script has a reference to the experiment log file
@@ -254,9 +266,21 @@ compilers:
                 assert "unset TEST_VAR" in data
 
                 # Test the expected portions of the execution command exist
-                assert "sed -i -e 's/ start_hour.*/ start_hour" in data
-                assert "sed -i -e 's/ restart .*/ restart" in data
+                expected_editor = '_ramble_file_editor.py" --mode regex --file namelist.input'
+                expected_fix_hour = (
+                    expected_editor
+                    + " --match ' start_hour.*' --replace"
+                    + " ' start_hour                          = 23,'"
+                )
+                expected_fix_restart = (
+                    expected_editor
+                    + " --match ' restart .*' --replace"
+                    + " ' restart                             = .true.,'"
+                )
+                assert expected_fix_hour in data
+                assert expected_fix_restart in data
                 assert "mpirun" in data
+
                 assert "wrf.exe" in data
 
                 # Test the run script has a reference to the experiment log file

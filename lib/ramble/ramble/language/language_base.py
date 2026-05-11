@@ -147,13 +147,30 @@ class DirectiveMeta(abc.ABCMeta):
         if valid_module:
             # Ensure the presence of the dictionaries associated
             # with the directives
-            for d, t in DirectiveMeta._directive_init_values.items():
+            # We use type(cls) to get the metaclass, and iterate its MRO to
+            # collect all init values and directive attributes.
+            all_init_values = {}
+            all_directive_names = set()
+            all_directive_functions = {}
+            all_directive_classes = {}
+
+            for base_meta in reversed(type(cls).__mro__):
+                if hasattr(base_meta, "_directive_init_values"):
+                    all_init_values.update(base_meta._directive_init_values)
+                if hasattr(base_meta, "_directive_names"):
+                    all_directive_names |= base_meta._directive_names
+                if hasattr(base_meta, "_directive_functions"):
+                    all_directive_functions.update(base_meta._directive_functions)
+                if hasattr(base_meta, "_directive_classes"):
+                    all_directive_classes.update(base_meta._directive_classes)
+
+            for d, t in all_init_values.items():
                 setattr(cls, d, copy.deepcopy(t))
 
             directive_attrs = {
-                "_directive_functions": {},
-                "_directive_classes": {},
-                "_directive_names": DirectiveMeta._directive_names.copy(),
+                "_directive_functions": all_directive_functions,
+                "_directive_classes": all_directive_classes,
+                "_directive_names": all_directive_names | DirectiveMeta._directive_names.copy(),
             }
 
             for attr, val in directive_attrs.items():
@@ -236,9 +253,9 @@ class DirectiveMeta(abc.ABCMeta):
 
         # Add the dictionary names if not already there
         dicts_set = set(dicts)
-        DirectiveMeta._directive_names |= dicts_set
+        cls._directive_names |= dicts_set
         for attr_name in dicts_set:
-            DirectiveMeta._directive_init_values[attr_name] = init_value
+            cls._directive_init_values[attr_name] = init_value
 
         # This decorator just returns the directive functions
         def _decorator(decorated_function):
@@ -336,8 +353,8 @@ class DirectiveMeta(abc.ABCMeta):
                 # that we can nest directives
                 return result
 
-            DirectiveMeta._directive_classes[decorated_function.__name__] = cls
-            DirectiveMeta._directive_functions[decorated_function.__name__] = decorated_function
+            cls._directive_classes[decorated_function.__name__] = cls
+            cls._directive_functions[decorated_function.__name__] = decorated_function
 
             return _wrapper
 

@@ -517,7 +517,46 @@ class SetupPipeline(Pipeline):
 
     def _prepare(self):
         super()._prepare()
-        experiment_file = open(self.workspace.all_experiments_path, "w+")
+
+        # Ensure workspace utilities are written before execution scripts are built
+        if hasattr(self.workspace, "write_utilities"):
+            self.workspace.write_utilities()
+
+        # Write custom edit functions to each experiment's run directory
+        import llnl.util.filesystem as fs
+
+        import ramble.util.file_editor
+
+        for _, app_inst, _ in self._experiment_set.filtered_experiments(self.filters):
+            custom_functions = []
+            if hasattr(app_inst, "custom_edit_functions"):
+                for func_source in app_inst.custom_edit_functions.values():
+                    if func_source not in custom_functions:
+                        custom_functions.append(func_source)
+
+            if custom_functions:
+                exp_run_dir = app_inst.expander.experiment_run_dir
+                fs.mkdirp(os.path.join(exp_run_dir, "utilities"))
+                script_path = os.path.join(
+                    exp_run_dir, "utilities", ramble.util.file_editor.CUSTOM_EDIT_FUNCTIONS_NAME
+                )
+                # Ensure the module has the required imports
+                copyright_header = (
+                    "# Copyright 2022-2026 The Ramble Authors\n"
+                    "#\n"
+                    "# Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or\n"
+                    "# https://www.apache.org/licenses/LICENSE-2.0> or the MIT license\n"
+                    "# <LICENSE-MIT or https://opensource.org/licenses/MIT>, at your\n"
+                    "# option. This file may not be copied, modified, or distributed\n"
+                    "# except according to those terms.\n\n"
+                )
+                module_content = (
+                    copyright_header + "import re\nimport os\n\n" + "\n\n".join(custom_functions)
+                )
+                with open(script_path, "w+", encoding="utf-8") as f:
+                    f.write(module_content)
+
+        experiment_file = open(self.workspace.all_experiments_path, "w+", encoding="utf-8")
         shell = ramble.config.get("config:shell")
         shell_path = os.path.join("/bin/", shell)
         experiment_file.write(f"#!{shell_path}\n")

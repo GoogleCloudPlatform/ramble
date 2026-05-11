@@ -531,7 +531,7 @@ def mock_directive_bundle():
     return MockBundle()
 
 
-@pytest.fixture
+@pytest.fixture(autouse=True)
 def clear_directive_functions():
     """Clear all overridden directive functions for subsequent tests."""
     yield
@@ -539,7 +539,9 @@ def clear_directive_functions():
     # Make sure any directive functions overridden by tests are cleared before
     # proceeding with subsequent tests that may depend on the original
     # functions.
-    ramble.directives.DirectiveMeta._directives_to_be_executed = []
+    import ramble.language.language_base
+
+    ramble.language.language_base.DirectiveMeta._directives_to_be_executed = []
 
 
 @pytest.fixture
