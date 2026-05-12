@@ -10,7 +10,6 @@ import pytest
 
 import ramble.main
 
-
 pytestmark = pytest.mark.usefixtures("mutable_config", "workspace_deactivate")
 
 
@@ -28,4 +27,3 @@ def test_command_argument_before_command_is_rejected(capsys):
     captured = capsys.readouterr()
     assert ret == 1
     assert "unrecognized arguments: --dry-run" in captured.err
-
