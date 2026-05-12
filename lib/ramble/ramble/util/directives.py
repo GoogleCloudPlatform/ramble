@@ -8,21 +8,16 @@
 
 
 def define_directive_methods_on_class(cls):
-    """Create class methods that execute directives on the class.
+    """Create methods that execute directives on the class.
 
     Wrap each directive, and inject it into this class as a method.
     """
     if not hasattr(cls, "_directive_classes") or not hasattr(cls, "_directive_functions"):
         return
 
+    lang_classes = getattr(cls, "_language_classes", [])
     for directive, directive_class in cls._directive_classes.items():
-        is_valid_lang = False
-        if hasattr(cls, "_language_classes"):
-            for lang_class in cls._language_classes:
-                if directive_class is lang_class:
-                    is_valid_lang = True
-
-        if not hasattr(cls, directive) and is_valid_lang:
+        if directive_class in lang_classes and not hasattr(cls, directive):
             setattr(cls, directive, wrap_named_directive_class_level(directive))
 
 
