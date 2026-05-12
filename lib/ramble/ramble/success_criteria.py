@@ -153,6 +153,7 @@ class SuccessCriteria:
                 self.pre_filter = get_literal_from_regex(match)
             else:
                 self.anti_match = re.compile(anti_match)
+                self.pre_filter = get_literal_from_regex(anti_match)
             self.file = file
 
         elif mode == "fom_comparison":
@@ -235,6 +236,8 @@ class SuccessCriteria:
         logger.debug(f"Testing anti-criterion {self.name} mode = {self.mode}")
         if self.mode == "string":
             if self.anti_match is not None:
+                if self.pre_filter and self.pre_filter not in test:
+                    return False
                 anti_match_obj = self.anti_match.match(test)
                 if anti_match_obj:
                     return True
