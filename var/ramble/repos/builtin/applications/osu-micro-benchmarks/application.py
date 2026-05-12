@@ -238,7 +238,7 @@ class OsuMicroBenchmarks(ExecutableApplication):
 
         compiled = re.compile(regex)
 
-        for grp_name, _ in compiled.groupindex.items():
+        for grp_name in compiled.groupindex:
             if grp_name in self.group_mapping:
                 self.figure_of_merit(
                     self.group_mapping[grp_name]["name"],
@@ -258,7 +258,7 @@ class OsuMicroBenchmarks(ExecutableApplication):
         log_file = self.expander.expand_var_name("log_file")
         if os.path.isfile(log_file):
             with open(log_file) as f:
-                for line in f.readlines():
+                for line in f:
                     for test_fom_type in self.fom_types:
                         if self.fom_regex_headers[test_fom_type].match(line):
                             fom_type = test_fom_type

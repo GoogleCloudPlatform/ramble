@@ -28,8 +28,8 @@ import jsonschema
 import ruamel
 
 import llnl.util.lang
-import llnl.util.tty as tty
 import llnl.util.tty.colify
+from llnl.util import tty
 from llnl.util.tty.log import log_output
 
 import ramble.cmd
@@ -713,7 +713,7 @@ class RambleCommand:
         self.returncode = None
         self.error = None
 
-        prepend = kwargs["global_args"] if "global_args" in kwargs else []
+        prepend = kwargs.get("global_args", [])
 
         args, unknown = self.parser.parse_known_args(prepend + [self.command_name] + list(argv))
 

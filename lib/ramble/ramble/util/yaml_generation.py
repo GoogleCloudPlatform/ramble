@@ -25,7 +25,7 @@ Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 from typing import Any, Dict, Union
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 from ramble.util.logger import logger
 

@@ -176,7 +176,6 @@ class CommandRunner:
             if not allow_failure:
                 logger.error(e)
                 error = True
-            pass
         self.elapsed_time = time.time() - start_time
 
         if error:

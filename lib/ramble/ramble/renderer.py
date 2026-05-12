@@ -260,7 +260,7 @@ class Renderer:
 
             elif var in defined_zips:
                 zip_len = defined_zips[var]["length"]
-                idx_vector = list(range(0, zip_len))
+                idx_vector = list(range(zip_len))
 
                 matrix_size = matrix_size * zip_len
                 vectors.append(idx_vector)
@@ -402,7 +402,7 @@ class Renderer:
 
             # Iterate over the vector length, and set the value in the
             # object dict to the index value.
-            for i in range(0, max_vector_size):
+            for i in range(max_vector_size):
                 obj_vars = {}
                 for var, val in vector_vars.items():
                     if len(val) > i:

@@ -11,9 +11,9 @@ import fnmatch
 
 from llnl.util.tty.colify import colified
 
-import ramble.cmd.common.arguments as arguments
 import ramble.repository
 import ramble.util.colors as color
+from ramble.cmd.common import arguments
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 

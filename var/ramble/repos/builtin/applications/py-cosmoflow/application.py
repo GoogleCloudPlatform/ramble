@@ -8,7 +8,7 @@
 
 import os
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 import ramble.util.yaml_generation
 from ramble.appkit import *
@@ -341,7 +341,7 @@ class PyCosmoflow(ExecutableApplication):
                         self.expander.expansion_str(var_name)
                     )
                 elif isinstance(var_val, list):
-                    for i in range(0, len(var_val)):
+                    for i in range(len(var_val)):
                         var_val[i] = self.expander.expand_var(
                             var_val[i], typed=True
                         )

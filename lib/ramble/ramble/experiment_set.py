@@ -365,7 +365,7 @@ class ExperimentSet:
         # TODO: Exploit the relationship between base and repeated experiments,
         # to save up redundant works.
         # For instance, caching may be enabled for expanders across these experiments.
-        for n in range(0, repeats.n_repeats + 1):
+        for n in range(repeats.n_repeats + 1):
             cur_repeats = ramble.repeats.Repeats()
             if repeats.is_repeat_base:
                 if n == 0:
@@ -655,7 +655,6 @@ class ExperimentSet:
                         raise RambleVariableDefinitionError(
                             f"In experiment {final_exp_namespace}: {e}"
                         ) from None
-                    pass
 
             workload_names.add(app_inst.expander.workload_name)
 
