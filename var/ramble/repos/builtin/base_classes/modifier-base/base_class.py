@@ -77,8 +77,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             self._mod_prefix_builtin + f"{self.name}{NS_SEPARATOR}"
         )
 
-        ramble.util.directives.define_directive_methods(self)
-
     def copy(self):
         """Deep copy a modifier instance"""
         new_copy = super().copy()

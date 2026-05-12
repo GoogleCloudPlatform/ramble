@@ -21,6 +21,7 @@ import llnl.util.lang
 
 import ramble.language.language_helpers
 from ramble.error import DirectiveError
+from ramble.util import directives
 from ramble.util.logger import logger
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
@@ -173,6 +174,8 @@ class DirectiveMeta(abc.ABCMeta):
             # Ignore any directives executed *within* top-level
             # directives by clearing out the queue they're appended to
             DirectiveMeta._directives_to_be_executed = []
+
+            directives.define_directive_methods_on_class(cls)
 
         super().__init__(name, bases, attr_dict)
 
