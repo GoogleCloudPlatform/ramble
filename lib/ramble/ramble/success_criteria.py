@@ -9,6 +9,7 @@
 import fnmatch
 import re
 
+from ramble.util.foms import get_literal_from_regex
 from ramble.util.logger import logger
 
 
@@ -134,6 +135,7 @@ class SuccessCriteria:
         self.found = False
         self.anti_found = False
         self.owner = owning_object
+        self.pre_filter = ""
 
         if mode == "string":
             if match is None and anti_match is None:
@@ -148,8 +150,10 @@ class SuccessCriteria:
                 )
             if match is not None:
                 self.match = re.compile(match)
+                self.pre_filter = get_literal_from_regex(match)
             else:
                 self.anti_match = re.compile(anti_match)
+                self.pre_filter = get_literal_from_regex(anti_match)
             self.file = file
 
         elif mode == "fom_comparison":
@@ -166,6 +170,8 @@ class SuccessCriteria:
         logger.debug(f"Testing criteria {self.name} mode = {self.mode}")
         if self.mode == "string":
             if self.match is not None:
+                if self.pre_filter and self.pre_filter not in test:
+                    return False
                 match_obj = self.match.match(test)
                 if match_obj:
                     return True
@@ -230,6 +236,8 @@ class SuccessCriteria:
         logger.debug(f"Testing anti-criterion {self.name} mode = {self.mode}")
         if self.mode == "string":
             if self.anti_match is not None:
+                if self.pre_filter and self.pre_filter not in test:
+                    return False
                 anti_match_obj = self.anti_match.match(test)
                 if anti_match_obj:
                     return True
