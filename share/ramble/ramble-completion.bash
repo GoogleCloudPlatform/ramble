@@ -696,7 +696,7 @@ _ramble_workspace_experiment_logs() {
 }
 
 _ramble_workspace_list() {
-    RAMBLE_COMPREPLY="-h --help --parent-dir"
+    RAMBLE_COMPREPLY="-h --help --parent-dir --merged"
 }
 
 _ramble_workspace_remove() {

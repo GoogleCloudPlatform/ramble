@@ -657,18 +657,29 @@ def test_workspace_list_parent_dir(tmpdir, mutable_mock_workspace_path):
             workspace("create", "--parent-dir", wsdir1, "test1")
             workspace("create", "--parent-dir", wsdir2, "test2")
 
-            # List all
+            # List all (default grouped by section)
             out = workspace("list")
+            assert f"Workspaces from dir: {wsdir1}" in out
+            assert f"Workspaces from dir: {wsdir2}" in out
+            assert "test1" in out
+            assert "test2" in out
+
+            # List merged version
+            out = workspace("list", "--merged")
+            assert f"Workspaces from dir: {wsdir1}" not in out
+            assert f"Workspaces from dir: {wsdir2}" not in out
             assert "test1" in out
             assert "test2" in out
 
             # List only ws1
             out = workspace("list", "--parent-dir", wsdir1)
+            assert f"Workspaces from dir: {wsdir1}" in out
             assert "test1" in out
             assert "test2" not in out
 
             # List only ws2
             out = workspace("list", "--parent-dir", wsdir2)
+            assert f"Workspaces from dir: {wsdir2}" in out
             assert "test1" not in out
             assert "test2" in out
 
