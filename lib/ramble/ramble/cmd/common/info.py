@@ -183,6 +183,7 @@ def _unpack_when_set_if_needed(internal_attr: dict):
 
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
     to_print = fnmatch.filter(map(str, internal_attr), pattern)
+    to_print = list(dict.fromkeys(to_print))
     if format == supported_formats.lists:
         color.cprint(f"    {list(to_print)}")
     elif format == supported_formats.text:
