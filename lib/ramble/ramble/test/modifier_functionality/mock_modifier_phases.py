@@ -12,10 +12,10 @@ import re
 
 import pytest
 
-import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import SCOPES, dry_run_config, search_files_for_string
+from ramble.test.modifier_functionality import modifier_helpers
 
 workspace = RambleCommand("workspace")
 

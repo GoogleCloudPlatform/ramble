@@ -11,7 +11,7 @@ import os
 
 import pytest
 
-import llnl.util.tty as tty
+from llnl.util import tty
 
 import ramble.workspace
 from ramble.main import RambleCommand

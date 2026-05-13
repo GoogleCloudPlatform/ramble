@@ -10,11 +10,11 @@ import glob
 import json
 import os
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
-import ramble.util.stats as stats
 from ramble.appkit import *
 from ramble.expander import Expander
+from ramble.util import stats
 
 from spack.util.path import canonicalize_path
 
@@ -339,7 +339,7 @@ class Maxtext(ExecutableApplication):
                         self.expander.expansion_str(var_name)
                     )
                 elif isinstance(var_val, list):
-                    for i in range(0, len(var_val)):
+                    for i in range(len(var_val)):
                         var_val[i] = self.expander.expand_var(
                             var_val[i], typed=True
                         )
@@ -437,7 +437,7 @@ class Maxtext(ExecutableApplication):
                 if current_step not in aggregated_metrics:
                     aggregated_metrics[current_step] = {}
 
-                for metric in expected_metrics.keys():
+                for metric in expected_metrics:
                     if metric not in aggregated_metrics[current_step]:
                         aggregated_metrics[current_step][metric] = [
                             line_dict[metric]

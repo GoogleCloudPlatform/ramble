@@ -18,8 +18,8 @@ from collections import defaultdict
 from typing import Optional, Set
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
-import llnl.util.tty.log as log
+from llnl.util import tty
+from llnl.util.tty import log
 
 import ramble.config
 import ramble.context
@@ -549,7 +549,7 @@ class Workspace:
         """Reinitialize the workspace object if it has been written (this
         may not be true if the workspace was just created in this running
         instance of ramble)."""
-        for _, section in self.config_sections.items():
+        for section in self.config_sections.values():
             if not os.path.exists(section["filename"]):
                 return
 
@@ -1196,7 +1196,7 @@ ramble:
                 clear (bool): Whether to clear previous comments or not
                 start_char (str): Character to begin the comment with
             """
-            import ruamel.yaml as yaml
+            from ruamel import yaml
 
             key_comment = base.ca.items.setdefault(key, [None, [], None, None])
 
@@ -1226,7 +1226,7 @@ ramble:
 
             return base
 
-        import ruamel.yaml as yaml
+        from ruamel import yaml
 
         edited = False
 
@@ -1245,7 +1245,6 @@ ramble:
                 # we still want to allow adding the experiment to the config.
                 # Full validation will happen during concretization/setup.
                 logger.debug(f"Version initialization failed for {application}: {e}")
-                pass
         elif hasattr(app_inst, "preferred_version"):
             try:
                 app_inst.set_version(version=app_inst.preferred_version, description=application)
@@ -1254,7 +1253,6 @@ ramble:
                 # If version validation fails, we still want to allow adding the experiment.
                 # Full validation will happen during concretization/setup.
                 logger.debug(f"Version initialization failed for {application}: {e}")
-                pass
 
         app_inst.variables = {}
         app_inst.expander = ramble.expander.Expander({}, None)
@@ -1300,7 +1298,7 @@ ramble:
 
         # Unpack all workload names from `when` sets
         all_workload_names = set()
-        for _, workloads in app_inst.workloads.items():
+        for workloads in app_inst.workloads.values():
             for workload in workloads:
                 all_workload_names.add(workload)
 
@@ -1355,7 +1353,6 @@ ramble:
                 # Workload may not be defined for the active 'when' conditions.
                 # Skip MPI requirement checks for now as full validation occurs later.
                 logger.debug(f"Skipping MPI requirement check for workload {workload_name}: {e}")
-                pass
             if workload_name not in workloads_dict:
                 workloads_dict[workload_name] = syaml.syaml_dict()
                 workloads_dict[workload_name][namespace.experiment] = syaml.syaml_dict()
@@ -2289,7 +2286,7 @@ ramble:
         """
         mod_list = []
         base_section = self._get_scope_section("workspace")
-        ws_mods = base_section[namespace.modifiers] if namespace.modifiers in base_section else []
+        ws_mods = base_section.get(namespace.modifiers, [])
 
         # Add workspace modifiers
         for mod in ws_mods:

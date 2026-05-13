@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import pytest
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 import ramble.expander
 import ramble.util.yaml_generation

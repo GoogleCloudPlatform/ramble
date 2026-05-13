@@ -191,7 +191,7 @@ class Wrfv3(ExecutableApplication):
             count = 0
             for out_file in file_list:
                 with open(out_file) as f:
-                    for line in f.readlines():
+                    for line in f:
                         m = timing_regex.match(line)
                         if m:
                             time = float(m.group("main_time"))

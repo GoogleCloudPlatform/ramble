@@ -108,7 +108,6 @@ class ObjectVersion:
     def evaluate_conflicts(self, variant):
         """Error if this version conflicts with a variant that is used"""
         # TODO(dapomeroy): Implement logic to allow conflicts to be defined
-        pass
 
     def satisfies(self, variant):
         """Determine if an experiment's variant satisfies this version

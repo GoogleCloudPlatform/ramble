@@ -8,7 +8,7 @@
 
 import os
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 from ramble.experiment_result import ExperimentStatus
 from ramble.util import shell_utils

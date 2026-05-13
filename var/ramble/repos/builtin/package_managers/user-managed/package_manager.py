@@ -62,7 +62,7 @@ class UserManaged(PackageManagerBase):
             package_objects = app_inst.objects()
 
         for _, obj in package_objects:
-            for pkgname in obj.required_packages.keys():
+            for pkgname in obj.required_packages:
                 app_inst.keywords.update_keys(
                     {
                         f"{pkgname}_path": {

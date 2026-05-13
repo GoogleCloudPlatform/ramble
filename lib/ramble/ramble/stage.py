@@ -33,8 +33,8 @@ from ramble.util.logger import logger
 
 import spack.config
 import spack.util.path as sup
-import spack.util.pattern as pattern
 import spack.util.url as url_util
+from spack.util import pattern
 from spack.util.crypto import bit_length, prefix_bits
 
 # The well-known stage source subdirectory name.
@@ -46,9 +46,6 @@ def create_stage_root(path):
     assert path.startswith(os.path.sep) and len(path.strip()) > 1
 
     err_msg = "Cannot create stage root {0}: Access to {1} is denied"
-
-    # TODO: (dwjacobsen) Remove when owner_uid is removed below
-    # user_uid = os.getuid()
 
     # Obtain lists of ancestor and descendant paths of the $user node, if any.
     group_paths, user_node, user_paths = partition_path(path, getpass.getuser())
@@ -95,11 +92,6 @@ def create_stage_root(path):
                 raise OSError(errno.EACCES, err_msg.format(path, p))
         else:
             p_stat = os.stat(p)
-
-        # TODO: (dwjacobsen) Remove at some point
-        # if user_uid != p_stat.st_uid:
-        #     tty.warn("Expected user {0} to own {1}, but it is owned by {2}"
-        #              .format(user_uid, p, owner_uid))
 
     input_subdir = os.path.join(path, _input_subdir)
     # When staging into a user-specified directory we need to ensure the

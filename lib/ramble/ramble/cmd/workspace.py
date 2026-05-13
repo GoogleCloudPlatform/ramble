@@ -14,11 +14,10 @@ import tempfile
 from collections import defaultdict
 from typing import Callable, Dict
 
-import llnl.util.tty as tty
+from llnl.util import tty
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
-import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.expander
 import ramble.filters
@@ -27,11 +26,12 @@ import ramble.software_environments
 import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
+from ramble.cmd.common import arguments
 from ramble.namespace import namespace
 from ramble.util.logger import logger
 
 import spack.util.environment
-import spack.util.string as string
+from spack.util import string
 from spack.util.editor import editor
 
 description = "manage experiment workspaces"

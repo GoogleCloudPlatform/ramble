@@ -1618,7 +1618,7 @@ licenses:
 
     # Create more templates, and test files to archive
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1639,7 +1639,7 @@ licenses:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -1662,7 +1662,7 @@ licenses:
         assert os.path.exists(archived_path)
 
     # Check for archive pattern files
-    for i in range(0, 5):
+    for i in range(5):
         archived_path = os.path.join(ws1.latest_archive_path, f"test_pattern.{i}")
         assert os.path.isfile(archived_path)
         with open(archived_path) as f:
@@ -1721,7 +1721,7 @@ licenses:
 
     # Create more templates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1775,7 +1775,7 @@ ramble:
 
     # Create more temlates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1792,7 +1792,7 @@ ramble:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -1848,7 +1848,7 @@ ramble:
 
     # Create more templates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1865,7 +1865,7 @@ ramble:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -1927,7 +1927,7 @@ ramble:
 
     # Create more templates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1944,7 +1944,7 @@ ramble:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -2383,7 +2383,7 @@ software:
 def write_variables_config_file(file_path, levels, value):
     with open(file_path, "w+") as f:
         f.write("variables:\n")
-        for i in range(0, levels):
+        for i in range(levels):
             f.write(f"  scope{i}: {value}\n")
 
 

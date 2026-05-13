@@ -9,8 +9,8 @@
 from contextlib import contextmanager
 from pathlib import Path
 
-import llnl.util.tty as tty
 import llnl.util.tty.log
+from llnl.util import tty
 
 import ramble.util.colors as color
 
@@ -65,6 +65,32 @@ class Logger:
         if self.enabled:
             last_log = self.log_stack.pop()
             last_log[1].close()
+
+    @contextmanager
+    def add_log_context(self, path):
+        """Context manager to add and remove a log file
+
+        Ensures that the log is removed from the stack even if an exception occurs.
+        If inner add_log/remove_log calls disrupt the stack order, it ensures
+        it only removes the log it added.
+        """
+        initial_len = len(self.log_stack)
+        added_log = None
+        try:
+            self.add_log(path)
+            if len(self.log_stack) > initial_len:
+                added_log = self.log_stack[-1]
+            yield
+        finally:
+            if added_log:
+                if len(self.log_stack) > initial_len:
+                    if self.log_stack[-1] == added_log:
+                        self.remove_log()
+                    else:
+                        tty.warn(
+                            f"Cannot remove log {added_log[0]} as it is no longer the active log. "
+                            f"The log stack was modified within the `add_log_context` block."
+                        )
 
     def active_log(self):
         """Return the path for the active log

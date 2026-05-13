@@ -11,9 +11,9 @@ import fnmatch
 
 from llnl.util.tty.colify import colified
 
-import ramble.cmd.common.arguments as arguments
 import ramble.repository
 import ramble.util.colors as color
+from ramble.cmd.common import arguments
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 
@@ -168,12 +168,15 @@ def _unpack_when_set_if_needed(internal_attr: dict):
             # unpack to a list of dicts so dicts with same keys don't overwrite
             unpacked_dict = []
             for inner_dict in internal_attr.values():
-                unpacked_dict.append(inner_dict)
+                if inner_dict not in unpacked_dict:
+                    unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
             for inner_list in internal_attr.values():
-                unpacked_list.extend(inner_list)
+                for item in inner_list:
+                    if item not in unpacked_list:
+                        unpacked_list.append(item)
             return unpacked_list
         else:
             return internal_attr[first_key]
@@ -336,7 +339,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         # Otherwise, print it as a raw string.
         if isinstance(to_print, list):
             if internal_attr and isinstance(next(iter(internal_attr)), dict):
-                to_print = [key for attr_dict in internal_attr for key in attr_dict]
+                to_print = list(
+                    dict.fromkeys(key for attr_dict in internal_attr for key in attr_dict)
+                )
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {to_print}\n")

@@ -205,7 +205,7 @@ def rst_index(out):
     sections = index["long"]
 
     dmax = max(len(section_descriptions.get(s, s)) for s in sections) + 2
-    cmax = max(len(c) for _, c in sections.items()) + 60
+    cmax = max(len(c) for c in sections.values()) + 60
 
     row = f"{'=' * dmax}  {'=' * cmax}\n"
     line = "%%-%ds  %%s\n" % dmax

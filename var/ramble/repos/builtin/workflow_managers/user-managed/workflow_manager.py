@@ -40,4 +40,4 @@ class UserManaged(WorkflowManagerBase):
 
     def get_status(self, workspace):
         """Return status of a given job"""
-        return None
+        return

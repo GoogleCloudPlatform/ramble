@@ -42,7 +42,7 @@ import sys
 from contextlib import contextmanager
 from typing import Any, Dict, List
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 from ruamel.yaml.error import MarkedYAMLError
 
 import llnl.util.lang
@@ -1230,7 +1230,7 @@ def default_list_scope():
 
     Commands that list configuration list *all* scopes (merged) by default.
     """
-    return None
+    return
 
 
 def _update_in_memory(data, section):

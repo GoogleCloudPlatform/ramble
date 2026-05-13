@@ -8,6 +8,7 @@
 
 
 import argparse
+import glob
 import os
 import re
 import shutil
@@ -18,6 +19,7 @@ from llnl.util.filesystem import mkdirp, working_dir
 
 import ramble.paths
 from ramble import repository
+from ramble.util.logger import logger
 
 from spack.util.executable import ProcessError, which
 
@@ -125,7 +127,7 @@ pattern_exemptions = {
 }
 
 # Tools run in the given order
-tool_names = ["isort", "black", "flake8", "mypy"]
+tool_names = ["isort", "black", "flake8", "mypy", "ruff"]
 
 tools = {}
 
@@ -140,7 +142,7 @@ class tool:
         return fun
 
 
-def changed_files(base=None, untracked=True, all_files=False):
+def changed_files(base=None, untracked=True, all_files=False, root=ramble.paths.prefix):
     """Get list of changed files in the Ramble repository."""
 
     git = which("git", required=True)
@@ -169,23 +171,36 @@ def changed_files(base=None, untracked=True, all_files=False):
     excludes = [os.path.realpath(f) for f in exclude_directories]
     changed = set()
 
-    for arg_list in git_args:
-        files = git(*arg_list, output=str, error=str).split("\n")
+    with working_dir(root):
+        try:
+            git("rev-parse", "--is-inside-work-tree", output=str, error=str)
+        except ProcessError:
+            # if not a git repo, return all python files
+            for f in glob.glob(os.path.join(root, "**", "*.py"), recursive=True):
+                if not any(os.path.realpath(f).startswith(e) for e in excludes):
+                    changed.add(os.path.relpath(f, root))
+            return sorted(changed)
 
-        for f in files:
-            # Ignore non-Python files
-            if not (f.endswith(".py") or f == "bin/ramble"):
+        for arg_list in git_args:
+            try:
+                files = git(*(arg_list + ["--", "."]), output=str, error=str).split("\n")
+            except ProcessError:
                 continue
 
-            # Ignore files in the exclude locations
-            if any(os.path.realpath(f).startswith(e) for e in excludes):
-                continue
+            for f in files:
+                # Ignore non-Python files
+                if not (f.endswith(".py") or f == "bin/ramble"):
+                    continue
 
-            # Exclude non-existent files
-            if not os.path.exists(f):
-                continue
+                # Ignore files in the exclude locations if in Ramble repo
+                if any(os.path.realpath(f).startswith(e) for e in excludes):
+                    continue
 
-            changed.add(f)
+                # Exclude non-existent files
+                if not os.path.exists(f):
+                    continue
+
+                changed.add(f)
 
     return sorted(changed)
 
@@ -252,6 +267,12 @@ def setup_parser(subparser):
         action="append",
         help=f"specify tools to skip (choose from {','.join(tool_names)})",
     )
+    subparser.add_argument(
+        "--repo-path",
+        action="store",
+        default=None,
+        help="apply style checks and fixes to the given repository",
+    )
     subparser.add_argument("files", nargs=argparse.REMAINDER, help="specific files to check")
 
 
@@ -274,15 +295,14 @@ def print_tool_result(tool, returncode):
 
 
 def print_output(output, args):
+    root = args.repo_path if args.repo_path is not None else ramble.paths.prefix
     if args.root_relative:
         # print results relative to repo root.
         print(output)
     else:
         # print results relative to current working directory
         def cwd_relative(path):
-            return "{}: [".format(
-                os.path.relpath(os.path.join(ramble.paths.prefix, path.group(1)), os.getcwd())
-            )
+            return f"{os.path.relpath(os.path.join(root, path.group(1)), os.getcwd())}: ["
 
         for line in output.split("\n"):
             print(re.sub(r"^(.*): \[", cwd_relative, line))
@@ -368,8 +388,10 @@ def filter_file(source, dest, output=False):
                     sys.stdout.write(line)
 
 
-def _split_file_list(file_list):
+def _split_file_list(file_list, args):
     """Return a tuple of (primary_files, obj_files)"""
+    if args.repo_path is not None:
+        return [], file_list
     return [f for f in file_list if not is_object(f)], [f for f in file_list if is_object(f)]
 
 
@@ -381,21 +403,22 @@ def run_flake8(flake8_cmd, file_list, args):
         print_tool_header("flake8", file_list)
 
         # run flake8 on the temporary tree, once for core, once for objects
-        primary_file_list, object_file_list = _split_file_list(file_list)
+        root = args.repo_path if args.repo_path is not None else ramble.paths.prefix
+        primary_file_list, object_file_list = _split_file_list(file_list, args)
 
         # filter files into a temporary directory with exemptions added.
         # TODO: DRY this duplication
         primary_dest_dir = os.path.join(temp, "primary")
         mkdirp(primary_dest_dir)
         for filename in primary_file_list:
-            src_path = os.path.join(ramble.paths.prefix, filename)
+            src_path = os.path.join(root, filename)
             dest_path = os.path.join(primary_dest_dir, filename)
             filter_file(src_path, dest_path, args.output)
 
         object_dest_dir = os.path.join(temp, "object")
         mkdirp(object_dest_dir)
         for filename in object_file_list:
-            src_path = os.path.join(ramble.paths.prefix, filename)
+            src_path = os.path.join(root, filename)
             dest_path = os.path.join(object_dest_dir, filename)
             filter_file(src_path, dest_path, args.output)
 
@@ -405,7 +428,8 @@ def run_flake8(flake8_cmd, file_list, args):
         # TODO: make these repeated blocks a function?
         if primary_file_list:
             # Copy flake8 file so the paths will be relative to the new location
-            f = ".flake8"
+            f_name = ".flake8"
+            f = os.path.join(ramble.paths.prefix, f_name)
             shutil.copy(f, primary_dest_dir)
             qa_dir = os.path.join(primary_dest_dir, "share", "ramble", "qa")
             os.makedirs(qa_dir, exist_ok=True)
@@ -414,7 +438,7 @@ def run_flake8(flake8_cmd, file_list, args):
                 output += flake8_cmd(
                     "--format",
                     "pylint",
-                    f"--config={f}",
+                    f"--config={f_name}",
                     ".",
                     fail_on_error=False,
                     output=str,
@@ -422,14 +446,15 @@ def run_flake8(flake8_cmd, file_list, args):
                 returncode |= flake8_cmd.returncode
 
         if object_file_list:
-            f = ".flake8_objects"
+            f_name = ".flake8_objects"
+            f = os.path.join(ramble.paths.prefix, f_name)
             shutil.copy(f, object_dest_dir)
 
             with working_dir(object_dest_dir):
                 output += flake8_cmd(
                     "--format",
                     "pylint",
-                    f"--config={f}",
+                    f"--config={f_name}",
                     ".",
                     fail_on_error=False,
                     output=str,
@@ -467,7 +492,7 @@ def run_black(black_cmd, file_list, args):
     common_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         common_args += ("--check", "--diff")
-    primary_files, obj_files = _split_file_list(file_list)
+    primary_files, obj_files = _split_file_list(file_list, args)
     output = ""
     returncode = 0
 
@@ -480,7 +505,11 @@ def run_black(black_cmd, file_list, args):
 
     if obj_files:
         output += black_cmd(
-            *(common_args + ("--config", "pyproject_objects.toml") + tuple(obj_files)),
+            *(
+                common_args
+                + ("--config", os.path.join(ramble.paths.prefix, "pyproject_objects.toml"))
+                + tuple(obj_files)
+            ),
             fail_on_error=False,
             output=str,
             error=str,
@@ -499,7 +528,7 @@ def run_isort(isort_cmd, file_list, args):
         isort_args += ("--check", "--diff")
     output = ""
     returncode = 0
-    primary_files, obj_files = _split_file_list(file_list)
+    primary_files, obj_files = _split_file_list(file_list, args)
     if primary_files:
         output += isort_cmd(
             *(isort_args + tuple(primary_files)), fail_on_error=False, output=str, error=str
@@ -521,6 +550,9 @@ def run_isort(isort_cmd, file_list, args):
 @tool("mypy")
 def run_mypy(mypy_cmd, file_list, args):
     del file_list
+    if args.repo_path is not None:
+        print("Skipping mypy for external repository.")
+        return 0
     print_tool_header("mypy", [])
 
     config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
@@ -531,6 +563,34 @@ def run_mypy(mypy_cmd, file_list, args):
 
     print_output(output, args)
     print_tool_result("mypy", returncode)
+    return returncode
+
+
+@tool("ruff")
+def run_ruff(ruff_cmd, file_list, args):
+    # Even though Ruff hasn't reached v1 yet, it has been effective in catching
+    # issues like unused imports that flake8 misses.
+    if not file_list:
+        print("No changed Python files to check.")
+        return 0
+    if args.repo_path is not None:
+        print("Skipping ruff for external repository.")
+        return 0
+
+    config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
+    ruff_args = ["check", "--config", config_file, "--force-exclude"]
+
+    if args.fix:
+        ruff_args.append("--fix")
+
+    print_tool_header("ruff", file_list)
+    ruff_args.extend(file_list)
+
+    output = ruff_cmd(*ruff_args, fail_on_error=False, output=str, error=str)
+    returncode = ruff_cmd.returncode
+
+    print_output(output, args)
+    print_tool_result("ruff", returncode)
     return returncode
 
 
@@ -545,12 +605,20 @@ def validate_toolset(arg_value):
 
 def style(parser, args):
     file_list = args.files
+    root = args.repo_path if args.repo_path is not None else ramble.paths.prefix
+
+    if args.repo_path is not None:
+        try:
+            repository.Repo(args.repo_path)
+        except repository.BadRepoError as e:
+            logger.die(f"'{args.repo_path}' is not a valid Ramble repository: {e}")
+
     if file_list:
 
-        def prefix_relative(path):
-            return os.path.relpath(os.path.abspath(os.path.realpath(path)), ramble.paths.prefix)
+        def root_relative(path):
+            return os.path.relpath(os.path.abspath(os.path.realpath(path)), root)
 
-        file_list = [prefix_relative(p) for p in file_list]
+        file_list = [root_relative(p) for p in file_list]
 
     # process --tool and --skip arguments
     selected = set(tool_names)
@@ -567,7 +635,7 @@ def style(parser, args):
 
     returncode = 0
 
-    with working_dir(ramble.paths.prefix):
+    with working_dir(root):
         arg_flags = []
         # First, try with the original flags
         arg_flags.append([args.base, args.untracked, args.all])
@@ -580,7 +648,7 @@ def style(parser, args):
         while not file_list:
             try:
                 base, untracked, list_all = arg_flags.pop(0)
-                file_list = changed_files(base, untracked, list_all)
+                file_list = changed_files(base, untracked, list_all, root=root)
                 break
             except ProcessError as e:
                 file_list = None

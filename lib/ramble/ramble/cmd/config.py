@@ -12,7 +12,7 @@ import shutil
 from typing import List
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
+from llnl.util import tty
 
 import ramble.cmd.common.arguments
 import ramble.config

@@ -36,6 +36,7 @@ locals {
     "requirements.txt",
     "requirements-dev.txt",
     "requirements-pinned.txt",
-    "pyproject.toml"
+    "pyproject.toml",
+    "pyproject_objects.toml"
   ]
 }

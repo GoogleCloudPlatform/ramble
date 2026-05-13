@@ -14,8 +14,8 @@ import sys
 
 from llnl.util.tty.colify import colify
 
-import ramble.cmd.common.arguments as arguments
 import ramble.repository
+from ramble.cmd.common import arguments
 from ramble.util import object_utils
 from ramble.util.logger import logger
 

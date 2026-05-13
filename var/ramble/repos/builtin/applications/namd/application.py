@@ -403,7 +403,7 @@ class Namd(ExecutableApplication):
 
         if os.path.isfile(log_path):
             with open(log_path) as f:
-                for line in f.readlines():
+                for line in f:
                     match = ns_regex.match(line)
                     if match:
                         dpns = float(match.group("days_per_ns"))

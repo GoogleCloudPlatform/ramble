@@ -156,7 +156,7 @@ class GcpMetadata(BasicModifier):
         file_name = os.path.join(exp_run_dir, "gcp-metadata.id.log")
         if os.path.isfile(file_name):
             with open(file_name) as f:
-                for cur_id in f.readlines():
+                for cur_id in f:
                     cur_id = cur_id.split(":")[-1].strip()
                     if cur_id.isnumeric():
                         ids.add(cur_id)
@@ -202,7 +202,7 @@ class GcpMetadata(BasicModifier):
         all_hosts = set()
 
         with open(log_path) as f:
-            for raw_host in f.readlines():
+            for raw_host in f:
                 physical_host = raw_host[1:].strip()
                 logger.debug(f"  Host line: {physical_host}")
                 all_hosts.add(physical_host)

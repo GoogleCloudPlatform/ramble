@@ -245,14 +245,14 @@ This workflow details how to create a workspace, configure it for a single exper
 
 Ramble uses `pytest` for its unit tests. Tests **must** be run using the `ramble unit-test` wrapper command, not by invoking `pytest` directly, as the wrapper handles necessary test environment setup.
 
-*   **Running all tests:**
-    ```bash
-    ramble unit-test
-    ```
-
-*   **Running tests in parallel:** To speed up the test suite, you can run tests in parallel across all available CPU cores:
+*   **Running all tests in parallel:** The `-n auto` option enables parallel test execution:
     ```bash
     ramble unit-test -n auto
+    ```
+
+*   **Running all tests serially:** For troubleshooting or if `pytest-xdist` is unavailable:
+    ```bash
+    ramble unit-test
     ```
 
 *   **Passing Pytest Arguments:** You can pass any `pytest` arguments to the command. For example, to only run tests with "gromacs" in their name:
@@ -268,7 +268,7 @@ Using `-k` is particularly useful for running only newly added tests.
 
 ## Running Style Checks
 
-Ramble uses `isort`, `black`, `flake8`, and `mypy` to enforce a consistent code style and type safety. You can check and fix style issues using the `ramble style` command.
+Ramble uses `isort`, `black`, `flake8`, `mypy`, and `ruff` to enforce a consistent code style and type safety. You can check and fix style issues using the `ramble style` command.
 
 *   **Checking for Style Errors:** To check for any style violations in the files you've changed in your current branch:
     ```bash

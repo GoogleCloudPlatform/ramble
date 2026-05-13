@@ -36,7 +36,7 @@ def test_name_modifier_conflict(mutable_mock_workspace_path, mock_modifiers, wor
 
     define_experiments(global_args)
 
-    for _ in range(0, 2):
+    for _ in range(2):
         workspace(
             "manage",
             "modifiers",
@@ -59,7 +59,7 @@ def test_name_mode_modifier_conflict(mutable_mock_workspace_path, mock_modifiers
 
     define_experiments(global_args)
 
-    for _ in range(0, 2):
+    for _ in range(2):
         workspace(
             "manage",
             "modifiers",
@@ -84,7 +84,7 @@ def test_name_executables_modifier_conflict(
 
     define_experiments(global_args)
 
-    for _ in range(0, 2):
+    for _ in range(2):
         workspace(
             "manage",
             "modifiers",
@@ -111,7 +111,7 @@ def test_name_mode_executables_modifier_conflict(
 
     define_experiments(global_args)
 
-    for _ in range(0, 2):
+    for _ in range(2):
         workspace(
             "manage",
             "modifiers",
