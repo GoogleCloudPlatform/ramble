@@ -39,7 +39,7 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util.conversions import list_str_to_list
+from ramble.util.conversions import list_str_to_list, strip_quotes
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
 
@@ -1238,6 +1238,8 @@ ramble:
             if m:
                 key = definition[0 : m.start()]
                 value = list_str_to_list(definition[m.end() :])
+                if isinstance(value, str):
+                    value = strip_quotes(value)
                 var_def_dict[key] = value
             else:
                 logger.die(
