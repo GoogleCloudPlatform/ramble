@@ -207,9 +207,10 @@ class EnvironmentVariable:
         indentation = " " * n_indent
 
         if verbose:
-            print_attrs = ["Description", "Value", "Method", "When"]
+            print_attrs = ["Description", "Value", "Method"]
             if self.method == "append":
                 print_attrs.append("Separator")
+            print_attrs.append("When")
             out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
             for name in print_attrs:
                 attr_name = name.lower()
