@@ -327,6 +327,19 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         # Otherwise, we print the attribute's value directly.
         if isinstance(internal_attr, dict):
             to_print = list(internal_attr.keys())
+        elif hasattr(internal_attr, "default_variants"):
+            to_print = []
+            for variant in internal_attr.default_variants.values():
+                to_print.append(variant)
+            for variant_set in internal_attr.multi_value_variants.values():
+                for variant in variant_set:
+                    to_print.append(variant)
+            for variant in internal_attr.experiment_variants.values():
+                to_print.append(variant)
+            for variant in internal_attr.version_variants.values():
+                to_print.append(variant)
+        elif hasattr(internal_attr, "family_type"):
+            to_print = [f"{internal_attr.family_type}={family}" for family in internal_attr]
         else:
             to_print = internal_attr
 
@@ -334,8 +347,15 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         #     if it's a list of dicts, convert the keys like above and print
         #     otherwise filter it and print using the format specification
         # Otherwise, print it as a raw string.
-        if isinstance(to_print, list):
-            if internal_attr and isinstance(next(iter(internal_attr)), dict):
+        if isinstance(to_print, (list, set, tuple)) or (
+            hasattr(to_print, "__iter__") and not isinstance(to_print, str)
+        ):
+            to_print = list(to_print)
+            if (
+                internal_attr
+                and isinstance(internal_attr, list)
+                and isinstance(next(iter(internal_attr), None), dict)
+            ):
                 to_print = [key for attr_dict in internal_attr for key in attr_dict]
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
@@ -343,21 +363,23 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     else:
         if isinstance(internal_attr, dict):
             _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
-        elif isinstance(internal_attr, list):
+        elif isinstance(internal_attr, (list, set, tuple)):
+            internal_list = list(internal_attr)
             # If it's a list of dicts, print each
-            if isinstance(next(iter(internal_attr)), dict):
-                for attr_dict in internal_attr:
+            if internal_list and isinstance(internal_list[0], dict):
+                for attr_dict in internal_list:
                     _print_verbose_dict_attr(attr_dict, pattern=pattern, indentation=indentation)
             # If the attribute is not a dict or list of dict, print using the existing format rules
-            else:
-                if hasattr(next(iter(internal_attr)), "as_str"):
-                    for obj in internal_attr:
-                        if pattern and not fnmatch.fnmatch(obj.name, pattern):
+            elif internal_list:
+                if hasattr(internal_list[0], "as_str"):
+                    for obj in internal_list:
+                        name_str = getattr(obj, "name", str(obj))
+                        if pattern and not fnmatch.fnmatch(name_str, pattern):
                             continue
 
                         color.cprint(obj.as_str(verbose=True))
                 else:
-                    to_print = fnmatch.filter(map(str, internal_attr), pattern)
+                    to_print = fnmatch.filter(map(str, internal_list), pattern)
                     if format == supported_formats.lists:
                         color.cprint(f"    {list(to_print)}")
                     elif format == supported_formats.text:

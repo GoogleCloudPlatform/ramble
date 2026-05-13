@@ -251,9 +251,9 @@ def _get_modifier_outputs():
         ),
         (
             "package_manager_requirements",
-            "",
+            "list not-a-package",
             ["not_empty", "info_mode=another-mode"],
-        ),  # TODO: Fix this test once info is fixed
+        ),
     ]
 
     out = _get_shared_outputs()
@@ -284,7 +284,11 @@ def _get_package_manager_outputs():
         ("builtins", "package_manager_builtin::info::builtin_name", "builtin_name"),
         ("registered_phases", "setup", "after_make_experiments"),
         ("object_variables", "pm_var_name", ["default_pm_var_val", "A PM variable"]),
-        # TODO: add package_manager_family once fixed
+        (
+            "families",
+            "package_manager_family=info-package-manager",
+            "package_manager_family=info-package-manager",
+        ),
     ]
 
     out = _get_shared_outputs()
@@ -319,7 +323,11 @@ def _get_workflow_manager_outputs():
                 "Hostfile command to apply",
             ],
         ),
-        # TODO: add workflow_manager_family once fixed
+        (
+            "families",
+            "workflow_manager_family=info-workflow-manager",
+            "workflow_manager_family=info-workflow-manager",
+        ),
     ]
 
     out = _get_shared_outputs()
