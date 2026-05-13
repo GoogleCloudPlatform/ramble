@@ -869,7 +869,7 @@ def _main(argv=None):
     # them, which reduces startup latency.
     parser = make_argument_parser()
     parser.add_argument("command", nargs=argparse.REMAINDER)
-    args, _ = parser.parse_known_args(argv)
+    args, unknown = parser.parse_known_args(argv)
 
     # Recover stored LD_LIBRARY_PATH variables from ramble shell function
     # This is necessary because MacOS System Integrity Protection clears
@@ -897,6 +897,8 @@ def _main(argv=None):
     elif args.help:
         sys.stdout.write(parser.format_help(level=args.help))
         return 0
+    elif unknown:
+        logger.die(f'unrecognized arguments: {" ".join(unknown)}')
 
     # ------------------------------------------------------------------------
     # This part of the `main()` sets up Ramble's configuration.
