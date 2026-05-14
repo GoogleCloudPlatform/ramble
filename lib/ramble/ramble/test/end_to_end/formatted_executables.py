@@ -157,6 +157,8 @@ modifiers:
         "n_nodes=1",
         "-v",
         "n_ranks=1",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

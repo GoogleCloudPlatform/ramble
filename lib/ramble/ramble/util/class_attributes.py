@@ -21,5 +21,9 @@ def convert_class_attributes(obj):
         var_set = vars(obj)
         for attr in obj._directive_names:
             if attr in dir_set and attr not in var_set:
-                inst_val = getattr(obj, attr).copy()
+                val = getattr(obj, attr)
+                if hasattr(val, "copy"):
+                    inst_val = val.copy()
+                else:
+                    inst_val = val
                 setattr(obj, attr, inst_val)

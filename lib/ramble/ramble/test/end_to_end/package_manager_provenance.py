@@ -28,7 +28,16 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
     global_args = ["-w", workspace_name]
 
     pm = "spack"
-    workspace("manage", "experiments", "zlib", "-p", pm, global_args=global_args)
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "-p",
+        pm,
+        "--default-variable-value",
+        "1",
+        global_args=global_args,
+    )
 
     # FIXME: This is a good candidate for a fixure if other tests need this pattern
     # Write spack config to avoid doing a real install
@@ -105,7 +114,16 @@ def test_usermanged_package_manager_provenance_zlib(mock_applications, workspace
 
     global_args = ["-w", workspace_name]
 
-    workspace("manage", "experiments", "zlib", "-p", "user-managed", global_args=global_args)
+    workspace(
+        "manage",
+        "experiments",
+        "zlib",
+        "-p",
+        "user-managed",
+        "--default-variable-value",
+        "1",
+        global_args=global_args,
+    )
 
     # Add Software
     workspace(

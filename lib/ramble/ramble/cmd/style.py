@@ -90,23 +90,35 @@ pattern_exemptions = {
     },
     # exemptions applied only to modifier.py files.
     rf"modifier.py|{base_class_file}$": {
-        # Allow 'from ramble.modkit import *' in applications,
+        # Allow 'from ramble.modkit import *' in modifiers,
         # but no other wildcards
         "F403": [r"^from ramble.modkit import \*$"],
         **common_object_exemptions,
     },
     # exemptions applied only to package_manager.py files.
     rf"package_manager.py|{base_class_file}$": {
-        # Allow 'from ramble.modkit import *' in applications,
+        # Allow 'from ramble.pkgmankit import *' in package_managers,
         # but no other wildcards
         "F403": [r"^from ramble.pkgmankit import \*$"],
         **common_object_exemptions,
     },
     # exemptions applied only to workflow_manager.py files.
     rf"workflow_manager.py|{base_class_file}$": {
-        # Allow 'from ramble.modkit import *' in workflow_managers,
+        # Allow 'from ramble.wmkit import *' in workflow_managers,
         # but no other wildcards
         "F403": [r"^from ramble.wmkit import \*$"],
+        **common_object_exemptions,
+    },
+    rf"platform.py|{base_class_file}$": {
+        # Allow 'from ramble.platkit import *' in platforms,
+        # but no other wildcards
+        "F403": [r"^from ramble.platkit import \*$"],
+        **common_object_exemptions,
+    },
+    rf"system.py|{base_class_file}$": {
+        # Allow 'from ramble.syskit import *' in systems,
+        # but no other wildcards
+        "F403": [r"^from ramble.syskit import \*$"],
         **common_object_exemptions,
     },
     # exemptions applied to all files.

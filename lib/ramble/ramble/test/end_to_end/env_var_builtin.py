@@ -189,6 +189,8 @@ def test_object_env_var_definitions(
             "when-package-manager",
             "--wm",
             "when-workflow-manager",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -248,6 +250,8 @@ def test_object_env_var_methods(
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -283,6 +287,7 @@ ramble:
     batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: 1
     n_nodes: 1
+    info-app-dep_path: /not/a/path
   applications:
     basic:
       workloads:

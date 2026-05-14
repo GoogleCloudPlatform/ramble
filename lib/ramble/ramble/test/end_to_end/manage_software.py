@@ -33,6 +33,8 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=["-w", workspace_name],
         )
         workspace("concretize", global_args=["-w", workspace_name])

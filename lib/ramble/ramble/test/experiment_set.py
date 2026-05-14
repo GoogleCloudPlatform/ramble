@@ -1875,8 +1875,8 @@ def test_chained_experiments(workspace_name):
         experiment_context = ramble.context.Context()
         experiment_context.context_name = "test"
         experiment_context.variables = {"n_ranks": "1", "processes_per_node": "1"}
-        rendered_instances = exp_set.render_chained_experiments(
-            "basic", "test_wl", experiment_context
+        rendered_instances = exp_set.render_experiment_set(
+            "basic", "test_wl", experiment_context, chained=True
         )
 
         assert len(rendered_instances) == 1

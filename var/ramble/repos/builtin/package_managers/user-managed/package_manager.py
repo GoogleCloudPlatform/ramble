@@ -42,27 +42,15 @@ class UserManaged(PackageManagerBase):
     def package_name_from_spec(self, spec):
         return spec
 
-    register_phase(
-        "define_requirements",
-        pipeline="setup",
-        run_before=["get_inputs"],
-    )
-
-    def _define_requirements(self, workspace, app_inst=None):
+    def set_required_variables(self, app_inst=None):
         """Define requirements for user managed software stack
 
         Extracts all required packages from experiments and modifiers, then
         creates required variables to convey the installation locations to
         Ramble.
         """
-
-        if app_inst is None:
-            package_objects = [(None, self)]
-        else:
-            package_objects = app_inst.objects()
-
-        for _, obj in package_objects:
-            for pkgname in obj.required_packages:
+        for _, obj in app_inst.objects():
+            for pkgname in obj.required_packages.keys():
                 app_inst.keywords.update_keys(
                     {
                         f"{pkgname}_path": {
@@ -71,8 +59,6 @@ class UserManaged(PackageManagerBase):
                         }
                     }
                 )
-
-        app_inst.validate_experiment()
 
     def get_package_list(self, workspace):
         """Augment the owning experiment's results with software stack information

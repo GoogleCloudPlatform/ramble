@@ -57,6 +57,10 @@ namespaces = [
     "ramble.package_manager",
     "ramble.wm",
     "ramble.workflow_manager",
+    "ramble.sys",
+    "ramble.system",
+    "ramble.plat",
+    "ramble.platform",
     "ramble.base_cls",
     "ramble.modifier",
 ]

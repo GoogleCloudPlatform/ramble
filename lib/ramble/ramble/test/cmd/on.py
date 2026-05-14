@@ -108,6 +108,8 @@ def test_on_executor_in_run_dir(workspace_name):
         "batch_submit={execute_experiment}",
         "-v",
         "my_var=10",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

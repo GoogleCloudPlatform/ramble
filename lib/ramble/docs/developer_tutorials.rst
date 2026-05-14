@@ -21,3 +21,4 @@ started writing various objects in Ramble.
 
    dev_guides/1_basic_application_definition_tutorial
    dev_guides/2_hpl_application_definition_tutorial
+   dev_guides/system_and_platform_definition_tutorial

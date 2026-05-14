@@ -47,6 +47,8 @@ def test_many_experiments(workspace_name, ramble_benchmark):
         "var3=[1,2,3,4,5,6,7,8,9,10]",
         "-m",
         "n_nodes,var1,var2,var3",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

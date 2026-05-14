@@ -47,6 +47,8 @@ def test_default_arg_works(request):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -90,6 +92,8 @@ def test_default_variant_value_works_with_when(request):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -123,6 +127,8 @@ def test_changed_variant_value_works_with_when(request):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -158,6 +164,8 @@ def test_invalid_variant_value_errors(request):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -189,6 +197,8 @@ def test_boolean_variants(request):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -224,6 +234,8 @@ def test_non_matched_variants_are_ignored(request):
             "processes_per_node=1",
             "-p",
             "pip",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -316,6 +328,8 @@ def test_variant_info_works(request):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -354,6 +368,8 @@ def test_variant_nesting_works(workspace_name, test_value):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

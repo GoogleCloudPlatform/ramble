@@ -40,6 +40,7 @@ obj_attribute_map = {
     "validators": None,
     "object_variables": None,
     "object_environment_variables": None,
+    "command_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -55,8 +56,15 @@ obj_attribute_map = {
     "env_var_modifications": None,
     "required_vars": None,
     "package_manager_requirements": None,
-    # Package / workflow manager specific:
+    # Package / workflow manager / system/ platform specific:
     "families": None,
+    # System specific:
+    "default_package_manager": "system_default_package_manager",
+    "default_workflow_manager": "system_default_workflow_manager",
+    "available_platforms": "system_available_platforms",
+    "platform_variable_maps": None,
+    "variable_defaults": None,
+    "auxiliary_software_files": None,
 }
 
 

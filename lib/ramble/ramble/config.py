@@ -55,6 +55,8 @@ import ramble.schema.base_application_repos
 import ramble.schema.base_class_repos
 import ramble.schema.base_modifier_repos
 import ramble.schema.base_package_manager_repos
+import ramble.schema.base_platform_repos
+import ramble.schema.base_system_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
@@ -65,11 +67,13 @@ import ramble.schema.mirrors
 import ramble.schema.modifier_repos
 import ramble.schema.modifiers
 import ramble.schema.package_manager_repos
+import ramble.schema.platform_repos
 
 # Objects
 import ramble.schema.repos
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.system_repos
 import ramble.schema.tables
 import ramble.schema.variables
 import ramble.schema.variants
@@ -104,12 +108,16 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "repos": ramble.schema.repos.schema,
     "modifier_repos": ramble.schema.modifier_repos.schema,
     "package_manager_repos": ramble.schema.package_manager_repos.schema,
+    "system_repos": ramble.schema.system_repos.schema,
+    "platform_repos": ramble.schema.platform_repos.schema,
     "workflow_manager_repos": ramble.schema.workflow_manager_repos.schema,
     "base_application_repos": ramble.schema.base_application_repos.schema,
     "base_class_repos": ramble.schema.base_class_repos.schema,
     "base_modifier_repos": ramble.schema.base_modifier_repos.schema,
     "base_package_manager_repos": ramble.schema.base_package_manager_repos.schema,
     "base_workflow_manager_repos": ramble.schema.base_workflow_manager_repos.schema,
+    "base_system_repos": ramble.schema.base_system_repos.schema,
+    "base_platform_repos": ramble.schema.base_platform_repos.schema,
 }
 
 # Same as above, but including keys for workspaces

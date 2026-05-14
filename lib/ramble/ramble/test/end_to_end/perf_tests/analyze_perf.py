@@ -38,6 +38,8 @@ def test_analyze_large_file(workspace_name, ramble_benchmark):
         "processes_per_node=1",
         "-v",
         "batch_submit={execute_experiment}",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()

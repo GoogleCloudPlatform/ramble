@@ -34,18 +34,18 @@ example of controlling this
   variants:
     package_manager: <package_manager_name>
 
-The default package manager is `null` which disables the use of any package
-manager in the generated experiments. The value of the package manager used can
-be a reference to a variable, and will be expanded following Ramble's
-:ref:`variable definitions <variable-dictionaries>` logic.
+The default package manager is `user-managed` which tells Ramble the user will
+manage installing their own software, and providing Ramble with paths to the
+installations. The value of the package manager variant used can be a reference
+to a variable, and will be expanded following Ramble's :ref:`variable
+definitions <variable-dictionaries>` logic.
 
 --------------------------
 Supported Package Managers
 --------------------------
 
-Currently supported package managers in Ramble include:
+Some of the currently supported package managers in Ramble include:
 
- * None / null
  * environment-modules
  * eessi
  * pip
@@ -53,17 +53,6 @@ Currently supported package managers in Ramble include:
  * spack-lightweight
  * spack-pip
  * user-managed
-
-^^^^^^^^^^^^^^^^^^^^
-None Package Manager
-^^^^^^^^^^^^^^^^^^^^
-
-Setting the package manager config option to ``None`` or ``null`` disables the
-use of a package manager within the experiments. In this case, experiments are
-expected to define the paths to their own executables, and installation of
-these executables should be provided outside of Ramble (i.e. manual
-installation).
-
 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Environment Modules Package Manager

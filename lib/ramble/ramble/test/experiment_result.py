@@ -39,6 +39,7 @@ def test_experiment_result_to_dict(mutable_mock_apps_repo):
         {"workload_name": "test_wl", "experiment_status": "placeholder", "test_var": "my_var"},
         {},
         None,
+        None,
     )
     basic_app_inst.set_status("UNKNOWN")
     exp_res = ExperimentResult(basic_app_inst)

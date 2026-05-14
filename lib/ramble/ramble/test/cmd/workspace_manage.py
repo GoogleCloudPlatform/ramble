@@ -39,6 +39,8 @@ def test_manage_variable_multiple_equals(workspace_name, tmpdir):
         "test_list_var=[ val1 = val2, val3=val4]",
         "-v",
         "test_other_var = test1=test2=test3",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
@@ -67,11 +69,13 @@ def test_manage_experiments_no_overwrite_wm_vars(workspace_name):
     workspace(
         "manage",
         "experiments",
-        "hostname",
+        "gromacs",
         "--wf",
-        "parallel",
+        "water_bare",
         "--wm",
         "user-managed",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     with open(ws.config_file_path) as f:

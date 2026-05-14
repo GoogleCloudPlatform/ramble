@@ -392,6 +392,8 @@ ramble:
               template: true
               variables:
                 n_nodes: '2'
+                processes_per_node: '5'
+                n_ranks: '10'
         test_wl2:
           experiments:
             test_experiment:
@@ -401,6 +403,8 @@ ramble:
                 command: '{execute_experiment}'
               variables:
                 n_nodes: '2'
+                processes_per_node: '5'
+                n_ranks: '10'
 
   software:
     packages: {}
@@ -501,6 +505,8 @@ def test_workspace_info_complete(workspace_name):
         "n_nodes=1",
         "-v",
         "n_ranks=1",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     workspace("concretize", global_args=global_args)
@@ -2309,6 +2315,8 @@ def test_workspace_config_precedence(workspace_name, tmpdir):
         "n_ranks=1",
         "-v",
         "scope0=experiment",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
@@ -2359,6 +2367,8 @@ def test_workspace_info_software(workspace_name):
         "env_name=pip-env",
         "-p",
         "pip",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
@@ -2378,15 +2388,29 @@ def test_workspace_info_software(workspace_name):
         "env_name=spack-env",
         "-p",
         "spack",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
     workspace(
-        "manage", "software", "--pkg", "pkg1", "--spec", "pip-pkg@1.2.3", global_args=global_args
+        "manage",
+        "software",
+        "--pkg",
+        "pkg1",
+        "--spec",
+        "pip-pkg@1.2.3",
+        global_args=global_args,
     )
 
     workspace(
-        "manage", "software", "--pkg", "pkg2", "--spec", "spack-pkg@1.2.3", global_args=global_args
+        "manage",
+        "software",
+        "--pkg",
+        "pkg2",
+        "--spec",
+        "spack-pkg@1.2.3",
+        global_args=global_args,
     )
 
     workspace(
@@ -2470,23 +2494,25 @@ def test_workspace_no_empty_workloads(workspace_name):
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        workspace(
-            "manage",
-            "experiments",
-            "basic",
-            "--wf",
-            "nothing*",
-            "-v",
-            "n_nodes=1",
-            "-v",
-            "n_ranks=1",
-            global_args=global_args,
-        )
+        with pytest.raises(RambleCommandError):
+            workspace(
+                "manage",
+                "experiments",
+                "basic",
+                "--wf",
+                "nothing*",
+                "-v",
+                "n_nodes=1",
+                "-v",
+                "n_ranks=1",
+                "--default-variable-value",
+                "1",
+                global_args=global_args,
+            )
 
         with open(ws.config_file_path) as f:
             data = f.read()
             assert "basic:" not in data
-            assert "workloads: {}" not in data
 
 
 def test_no_inherit_active_workspace_variants(request):
@@ -2532,6 +2558,8 @@ def test_manage_single_modifiers(workspace_name, mod_scope, mod_conf):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2602,6 +2630,8 @@ def test_manage_modifier_index_remove(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2645,6 +2675,8 @@ def test_manage_modifier_no_modifiers(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2691,6 +2723,8 @@ def test_manage_modifier_remove_scope_globs(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2779,6 +2813,8 @@ def test_manage_modifier_name_globs(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2867,6 +2903,8 @@ def test_manage_modifier_add_invalid_scope_errors(workspace_name, action, scope,
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2901,6 +2939,8 @@ def test_manage_modifier_remove_invalid_scope_errors(workspace_name, action, sco
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2954,6 +2994,8 @@ def test_workspace_config_squash(workspace_name, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2969,6 +3011,8 @@ def test_workspace_config_squash(workspace_name, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -3074,6 +3118,8 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -3089,6 +3135,8 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -3138,6 +3186,8 @@ def test_workspace_experiment_logs(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
