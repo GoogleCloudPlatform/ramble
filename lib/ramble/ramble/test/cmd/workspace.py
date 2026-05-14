@@ -196,7 +196,7 @@ def test_workspace_activate_no_args():
     assert "ramble workspace activate requires a workspace name, directory, or --temp" in output
 
 
-def test_workspace_deactivate(workspace_name):
+def test_workspace_deactivate(workspace_name, working_env):
     """Test `ramble workspace deactivate`."""
     ws = ramble.workspace.create(workspace_name)
     ws.write()
