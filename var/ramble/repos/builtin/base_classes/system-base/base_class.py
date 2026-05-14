@@ -77,8 +77,6 @@ class SystemBase(ObjectMixin, metaclass=SystemMeta):
 
         self._file_path = file_path
 
-        ramble.util.directives.define_directive_methods(self)
-
         self.object_variants.default_variant(
             self.origin_type,
             default=self.name,
