@@ -11,9 +11,9 @@ import fnmatch
 
 from llnl.util.tty.colify import colified
 
-import ramble.cmd.common.arguments as arguments
 import ramble.repository
 import ramble.util.colors as color
+from ramble.cmd.common import arguments
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 
@@ -40,6 +40,7 @@ obj_attribute_map = {
     "validators": None,
     "object_variables": None,
     "object_environment_variables": None,
+    "command_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -55,8 +56,15 @@ obj_attribute_map = {
     "env_var_modifications": None,
     "required_vars": None,
     "package_manager_requirements": None,
-    # Package / workflow manager specific:
+    # Package / workflow manager / system/ platform specific:
     "families": None,
+    # System specific:
+    "default_package_manager": "system_default_package_manager",
+    "default_workflow_manager": "system_default_workflow_manager",
+    "available_platforms": "system_available_platforms",
+    "platform_variable_maps": None,
+    "variable_defaults": None,
+    "auxiliary_software_files": None,
 }
 
 
@@ -168,12 +176,15 @@ def _unpack_when_set_if_needed(internal_attr: dict):
             # unpack to a list of dicts so dicts with same keys don't overwrite
             unpacked_dict = []
             for inner_dict in internal_attr.values():
-                unpacked_dict.append(inner_dict)
+                if inner_dict not in unpacked_dict:
+                    unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
             for inner_list in internal_attr.values():
-                unpacked_list.extend(inner_list)
+                for item in inner_list:
+                    if item not in unpacked_list:
+                        unpacked_list.append(item)
             return unpacked_list
         else:
             return internal_attr[first_key]
@@ -183,6 +194,7 @@ def _unpack_when_set_if_needed(internal_attr: dict):
 
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
     to_print = fnmatch.filter(map(str, internal_attr), pattern)
+    to_print = list(dict.fromkeys(to_print))
     if format == supported_formats.lists:
         color.cprint(f"    {list(to_print)}")
     elif format == supported_formats.text:
@@ -336,7 +348,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         # Otherwise, print it as a raw string.
         if isinstance(to_print, list):
             if internal_attr and isinstance(next(iter(internal_attr)), dict):
-                to_print = [key for attr_dict in internal_attr for key in attr_dict]
+                to_print = list(
+                    dict.fromkeys(key for attr_dict in internal_attr for key in attr_dict)
+                )
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {to_print}\n")

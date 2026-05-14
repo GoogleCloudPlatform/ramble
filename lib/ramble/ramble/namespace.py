@@ -64,6 +64,8 @@ class namespace:
     # For variants
     package_manager = "package_manager"
     workflow_manager = "workflow_manager"
+    system = "system"
+    platform = "platform"
     version = "version"
 
     metadata = "metadata"

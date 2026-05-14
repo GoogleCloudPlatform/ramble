@@ -138,6 +138,7 @@ def test_workspace_activate_fails(mutable_mock_workspace_path):
 
 
 def test_workspace_activate_prompt(workspace_name):
+    ramble.workspace.deactivate()
     ws = ramble.workspace.create(workspace_name)
     ws.write()
 
@@ -195,7 +196,7 @@ def test_workspace_activate_no_args():
     assert "ramble workspace activate requires a workspace name, directory, or --temp" in output
 
 
-def test_workspace_deactivate(workspace_name):
+def test_workspace_deactivate(workspace_name, working_env):
     """Test `ramble workspace deactivate`."""
     ws = ramble.workspace.create(workspace_name)
     ws.write()
@@ -392,6 +393,8 @@ ramble:
               template: true
               variables:
                 n_nodes: '2'
+                processes_per_node: '5'
+                n_ranks: '10'
         test_wl2:
           experiments:
             test_experiment:
@@ -401,6 +404,8 @@ ramble:
                 command: '{execute_experiment}'
               variables:
                 n_nodes: '2'
+                processes_per_node: '5'
+                n_ranks: '10'
 
   software:
     packages: {}
@@ -501,6 +506,8 @@ def test_workspace_info_complete(workspace_name):
         "n_nodes=1",
         "-v",
         "n_ranks=1",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     workspace("concretize", global_args=global_args)
@@ -613,6 +620,114 @@ def test_workspace_dirs(tmpdir, mutable_mock_workspace_path):
             out = workspace("list")
         assert "test2" in out
         assert "test1" not in out
+
+
+def test_workspace_create_parent_dir(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        os.makedirs(wsdir1)
+        os.makedirs(wsdir2)
+
+        with ramble.config.override("config:workspace_dirs", [wsdir1, wsdir2]):
+            # Create in default (wsdir1)
+            workspace("create", "test_default")
+            assert os.path.exists(os.path.join(wsdir1, "test_default"))
+
+            # Create in wsdir2 using --parent-dir
+            workspace("create", "--parent-dir", wsdir2, "test_specific")
+            assert os.path.exists(os.path.join(wsdir2, "test_specific"))
+
+            # Verify both are listed
+            out = workspace("list")
+            assert "test_default" in out
+            assert "test_specific" in out
+
+        # Test validation of parent-dir
+        with ramble.config.override("config:workspace_dirs", [wsdir1]):
+            with pytest.raises(
+                ramble.workspace.RambleWorkspaceError,
+                match="is not in configured workspace_dirs",
+            ):
+                ramble.workspace.create("test_fail", parent_dir=wsdir2)
+
+
+def test_workspace_list_parent_dir(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        os.makedirs(wsdir1)
+        os.makedirs(wsdir2)
+
+        with ramble.config.override("config:workspace_dirs", [wsdir1, wsdir2]):
+            workspace("create", "--parent-dir", wsdir1, "test1")
+            workspace("create", "--parent-dir", wsdir2, "test2")
+
+            # List all (default grouped by section)
+            out = workspace("list")
+            assert f"Workspaces from dir: {wsdir1}" in out
+            assert f"Workspaces from dir: {wsdir2}" in out
+            assert "test1" in out
+            assert "test2" in out
+
+            # List merged version
+            out = workspace("list", "--merged")
+            assert f"Workspaces from dir: {wsdir1}" not in out
+            assert f"Workspaces from dir: {wsdir2}" not in out
+            assert "test1" in out
+            assert "test2" in out
+
+            # List only ws1
+            out = workspace("list", "--parent-dir", wsdir1)
+            assert f"Workspaces from dir: {wsdir1}" in out
+            assert "test1" in out
+            assert "test2" not in out
+
+            # List only ws2
+            out = workspace("list", "--parent-dir", wsdir2)
+            assert f"Workspaces from dir: {wsdir2}" in out
+            assert "test1" not in out
+            assert "test2" in out
+
+        # Test validation of parent-dir in list
+        with ramble.config.override("config:workspace_dirs", [wsdir1]):
+            with pytest.raises(
+                ramble.workspace.RambleWorkspaceError,
+                match="is not in configured workspace_dirs",
+            ):
+                ramble.workspace.all_workspace_names(parent_dir=wsdir2)
+
+
+def test_workspace_activate_parent_dir(tmpdir, mutable_mock_workspace_path):
+    with tmpdir.as_cwd():
+        wsdir1 = os.path.join(os.getcwd(), "ws1")
+        wsdir2 = os.path.join(os.getcwd(), "ws2")
+        os.makedirs(wsdir1)
+        os.makedirs(wsdir2)
+
+        with ramble.config.override("config:workspace_dirs", [wsdir1, wsdir2]):
+            workspace("create", "--parent-dir", wsdir1, "test1")
+            workspace("create", "--parent-dir", wsdir2, "test1")
+
+            # Activate without parent-dir (should pick first one, wsdir1)
+            out = workspace("activate", "test1", "--sh")
+            assert wsdir1 in out
+
+            # Activate with parent-dir wsdir1
+            out = workspace("activate", "test1", "--parent-dir", wsdir1, "--sh")
+            assert wsdir1 in out
+
+            # Activate with parent-dir wsdir2
+            out = workspace("activate", "test1", "--parent-dir", wsdir2, "--sh")
+            assert wsdir2 in out
+
+        # Test validation of parent-dir in activate (via exists)
+        with ramble.config.override("config:workspace_dirs", [wsdir1]):
+            with pytest.raises(
+                ramble.workspace.RambleWorkspaceError,
+                match="is not in configured workspace_dirs",
+            ):
+                ramble.workspace.exists("test1", parent_dir=wsdir2)
 
 
 def test_remove_workspace():
@@ -1520,7 +1635,7 @@ licenses:
 
     # Create more templates, and test files to archive
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1541,7 +1656,7 @@ licenses:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -1564,7 +1679,7 @@ licenses:
         assert os.path.exists(archived_path)
 
     # Check for archive pattern files
-    for i in range(0, 5):
+    for i in range(5):
         archived_path = os.path.join(ws1.latest_archive_path, f"test_pattern.{i}")
         assert os.path.isfile(archived_path)
         with open(archived_path) as f:
@@ -1623,7 +1738,7 @@ licenses:
 
     # Create more templates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1677,7 +1792,7 @@ ramble:
 
     # Create more temlates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1694,7 +1809,7 @@ ramble:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -1750,7 +1865,7 @@ ramble:
 
     # Create more templates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1767,7 +1882,7 @@ ramble:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -1829,7 +1944,7 @@ ramble:
 
     # Create more templates
     new_templates = []
-    for i in range(0, 5):
+    for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
         f = open(new_template, "w+")
@@ -1846,7 +1961,7 @@ ramble:
 
     # Create files that match archive pattern
     new_files = []
-    for i in range(0, 5):
+    for i in range(5):
         new_name = f"archive_test.{i}"
         new_file = os.path.join(experiment_dir, new_name)
 
@@ -2285,7 +2400,7 @@ software:
 def write_variables_config_file(file_path, levels, value):
     with open(file_path, "w+") as f:
         f.write("variables:\n")
-        for i in range(0, levels):
+        for i in range(levels):
             f.write(f"  scope{i}: {value}\n")
 
 
@@ -2309,6 +2424,8 @@ def test_workspace_config_precedence(workspace_name, tmpdir):
         "n_ranks=1",
         "-v",
         "scope0=experiment",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
@@ -2359,6 +2476,8 @@ def test_workspace_info_software(workspace_name):
         "env_name=pip-env",
         "-p",
         "pip",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
@@ -2378,15 +2497,29 @@ def test_workspace_info_software(workspace_name):
         "env_name=spack-env",
         "-p",
         "spack",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
     workspace(
-        "manage", "software", "--pkg", "pkg1", "--spec", "pip-pkg@1.2.3", global_args=global_args
+        "manage",
+        "software",
+        "--pkg",
+        "pkg1",
+        "--spec",
+        "pip-pkg@1.2.3",
+        global_args=global_args,
     )
 
     workspace(
-        "manage", "software", "--pkg", "pkg2", "--spec", "spack-pkg@1.2.3", global_args=global_args
+        "manage",
+        "software",
+        "--pkg",
+        "pkg2",
+        "--spec",
+        "spack-pkg@1.2.3",
+        global_args=global_args,
     )
 
     workspace(
@@ -2470,23 +2603,25 @@ def test_workspace_no_empty_workloads(workspace_name):
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        workspace(
-            "manage",
-            "experiments",
-            "basic",
-            "--wf",
-            "nothing*",
-            "-v",
-            "n_nodes=1",
-            "-v",
-            "n_ranks=1",
-            global_args=global_args,
-        )
+        with pytest.raises(RambleCommandError):
+            workspace(
+                "manage",
+                "experiments",
+                "basic",
+                "--wf",
+                "nothing*",
+                "-v",
+                "n_nodes=1",
+                "-v",
+                "n_ranks=1",
+                "--default-variable-value",
+                "1",
+                global_args=global_args,
+            )
 
         with open(ws.config_file_path) as f:
             data = f.read()
             assert "basic:" not in data
-            assert "workloads: {}" not in data
 
 
 def test_no_inherit_active_workspace_variants(request):
@@ -2532,6 +2667,8 @@ def test_manage_single_modifiers(workspace_name, mod_scope, mod_conf):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2602,6 +2739,8 @@ def test_manage_modifier_index_remove(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2645,6 +2784,8 @@ def test_manage_modifier_no_modifiers(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2691,6 +2832,8 @@ def test_manage_modifier_remove_scope_globs(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2779,6 +2922,8 @@ def test_manage_modifier_name_globs(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2867,6 +3012,8 @@ def test_manage_modifier_add_invalid_scope_errors(workspace_name, action, scope,
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2901,6 +3048,8 @@ def test_manage_modifier_remove_invalid_scope_errors(workspace_name, action, sco
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2954,6 +3103,8 @@ def test_workspace_config_squash(workspace_name, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -2969,6 +3120,8 @@ def test_workspace_config_squash(workspace_name, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -3074,6 +3227,8 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -3089,6 +3244,8 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
             "n_nodes=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -3138,6 +3295,8 @@ def test_workspace_experiment_logs(workspace_name):
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

@@ -869,7 +869,7 @@ class Expander:
                 reqs = list(reqs)
 
             for req in reqs:
-                if "@" in req:
+                if "@" in req and "=" not in req and "+" not in req and "~" not in req:
                     variant_name, _ = req.split("@")
                     version = variant_set.version(variant_name)
                     if hasattr(version, "satisfies"):

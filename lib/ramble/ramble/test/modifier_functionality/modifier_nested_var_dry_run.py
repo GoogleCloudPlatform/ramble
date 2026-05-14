@@ -37,6 +37,8 @@ def test_nested_modifier_var(
             "modeless_required_var=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

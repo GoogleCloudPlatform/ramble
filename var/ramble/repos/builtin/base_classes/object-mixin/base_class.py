@@ -96,6 +96,10 @@ class ObjectMixin:
             return ObjectTypes.workflow_managers
         elif self.origin_type == "modifier":
             return ObjectTypes.modifiers
+        elif self.origin_type == "system":
+            return ObjectTypes.systems
+        elif self.origin_type == "platform":
+            return ObjectTypes.platforms
         return None
 
     def satisfy_when(self, when_key, variant_set=None):
@@ -157,6 +161,10 @@ class ObjectMixin:
         self.object_variants.version_variant(
             f"{self.origin_type}_version", self.selected_version
         )
+
+    def set_required_variables(self, app_inst=None):
+        """Stub that allows objects to update required variables"""
+        pass
 
     @staticmethod
     def version_to_pep440(version_str):

@@ -33,6 +33,8 @@ def test_modeless_modifier_variables(
             "n_ranks=1",
             "-v",
             "modeless_required_var=val",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

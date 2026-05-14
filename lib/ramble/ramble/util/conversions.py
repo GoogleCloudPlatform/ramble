@@ -25,11 +25,20 @@ def list_str_to_list(in_str: str) -> Union[str, list]:
     temp = in_str.replace("[", "").replace("]", "")
     out_value = []
     for part in temp.split(","):
-        if part[0] == " ":
-            out_value.append(part[1:])
-        else:
-            out_value.append(part)
+        out_value.append(strip_quotes(part))
     return out_value
+
+
+def strip_quotes(in_str: str) -> str:
+    """Remove quotes from a string if present."""
+    # Strip whitespace
+    in_str = in_str.strip()
+    if len(in_str) >= 2:
+        if (in_str.startswith("'") and in_str.endswith("'")) or (
+            in_str.startswith('"') and in_str.endswith('"')
+        ):
+            return in_str[1:-1]
+    return in_str
 
 
 def canonical_none(maybe_none: Any) -> Optional[Any]:

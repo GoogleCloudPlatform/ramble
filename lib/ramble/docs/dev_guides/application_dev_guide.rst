@@ -330,7 +330,7 @@ Ramble allows objects to be defined with multiple versions, and then to use
 :ref:`conditional logic<application-dev-conditional-logic>` to set other
 directives based on the version. The ``version`` directive 
 (:py:meth:`ramble.language.shared_language.version`) is used to set a version,
- and ``when`` conditions can be described using the following syntax:
+and ``when`` conditions can be described using the following syntax:
 
 * ``application_version@<version_number>`` Apply to only a specific version.
 * ``application_version@:<version_number>`` Apply to a range up to and including
@@ -420,6 +420,57 @@ In this case, the variable ``gpu_flag`` will be defined, and will have
 a value of ``-g`` or an empty string, depending on the value of the
 ``gpu`` variant.
 
+Variants as Expansion Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Additionally, variants can be used as an expansion variable with the syntax
+``{{object_type}::variant::{variant_name}}``. For example, a variant named ``openmp``
+defined within an application can be expanded from 
+``{application::variant::openmp}``.
+
+Boolean variants will evaluate as follows:
+
+* ``+<variant_name>`` if the variant value is True.
+* ``~<variant_name>`` if the variant value is False.
+
+For example, if the ``openmp`` variant is set to ``True``, it will evaluate to
+``+openmp``. If it is set to ``False``, it will evaluate to ``~openmp``.
+
+Multi-value variants evaluate to a ``key=<value>...`` format. For example, to add
+support for GROMACS's `build_type` variant in Ramble, it could be defined as:
+
+.. code-block:: python
+
+    variant(
+        "build_type",
+        default="Release",
+        description="The build type to build",
+        values=[
+            "Debug",
+            "Release",
+            "RelWithDebInfo",
+            "MinSizeRel",
+            "Reference",
+            "RelWithAssert",
+            "Profile",
+        ],
+    )
+
+These variants can then be used to parameterize a software spec:
+
+.. code-block:: python
+
+    with when("package_manager_family=spack"):
+        software_spec(
+            "gromacs-{application::gromacs::version}-{application::variant::openmp}-{application::variant::build_type}",
+            pkg_spec="gromacs@{application::gromacs::version} {application::variant::openmp} {application::variant::build_type}",
+        )
+
+Which might evaluate to:
+
+.. code-block:: console
+
+    gromacs@2026.1 +openmp build_type=Release
 
 ^^^^^^^^^^^^^^^^^^^^
 License Names

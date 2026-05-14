@@ -10,16 +10,17 @@ import contextlib
 import copy
 import datetime
 import fnmatch
-import itertools
 import os
 import re
 import shutil
 from collections import defaultdict
 from typing import Optional, Set
 
+from ruamel import yaml
+
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
-import llnl.util.tty.log as log
+from llnl.util import tty
+from llnl.util.tty import log
 
 import ramble.config
 import ramble.context
@@ -39,7 +40,7 @@ import ramble.util.path
 import ramble.util.version
 from ramble.mirror import MirrorStats
 from ramble.namespace import namespace
-from ramble.util.conversions import list_str_to_list
+from ramble.util.conversions import list_str_to_list, strip_quotes
 from ramble.util.logger import logger
 from ramble.util.path import substitute_path_variables
 
@@ -193,24 +194,30 @@ def deactivate_config_scope(workspace):
         ramble.config.config.remove_scope(scope.name)
 
 
-def all_workspace_names():
+def all_workspace_names(parent_dir=None):
     """List the names of workspaces that currently exist."""
-    # just return empty if the workspace path does not exist.  A read-only
-    # operation like list should not try to create a directory.
-    wspath = get_workspace_path()
-    if not os.path.exists(wspath):
-        return []
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Directory '{parent_dir}' is not in configured workspace_dirs"
+            )
+        wspaths = [canonical_parent]
+    else:
+        wspaths = get_workspace_path()
 
-    candidates = sorted(os.listdir(wspath))
-    names = []
-    for candidate in candidates:
-        configured = True
-        yaml_path = os.path.join(_root(candidate), WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
-        if not os.path.exists(yaml_path):
-            configured = False
-        if valid_workspace_name(candidate) and configured:
-            names.append(candidate)
-    return names
+    names = set()
+    for wspath in wspaths:
+        if not os.path.exists(wspath):
+            continue
+
+        candidates = os.listdir(wspath)
+        for candidate in candidates:
+            cand_root = os.path.join(wspath, candidate)
+            if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
+                names.add(candidate)
+    return sorted(names)
 
 
 def active_workspace():
@@ -225,27 +232,45 @@ def get_workspace_path():
         # command above should have worked, so if it doesn't, error out:
         logger.die("No config:workspace_dirs setting found in configuration!")
 
-    wspath = ramble.util.path.canonicalize_path(str(path_in_config))
-    return wspath
+    if isinstance(path_in_config, str):
+        paths = [path_in_config]
+    else:
+        paths = path_in_config
+
+    return [ramble.util.path.canonicalize_path(str(p)) for p in paths]
 
 
-def _root(name):
+def _root(name, parent_dir=None):
     """Non-validating version of root(), to be used internally."""
-    wspath = get_workspace_path()
-    return os.path.join(wspath, name)
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Directory '{parent_dir}' is not in configured workspace_dirs"
+            )
+        wspaths = [canonical_parent]
+    else:
+        wspaths = get_workspace_path()
+
+    for wspath in wspaths:
+        cand_root = os.path.join(wspath, name)
+        if is_workspace_dir(cand_root):
+            return cand_root
+    return os.path.join(wspaths[0], name)
 
 
-def root(name):
+def root(name, parent_dir=None):
     """Get the root directory for a workspace by name."""
     validate_workspace_name(name)
-    return _root(name)
+    return _root(name, parent_dir=parent_dir)
 
 
-def exists(name):
+def exists(name, parent_dir=None):
     """Whether a workspace with this name exists or not."""
     if not valid_workspace_name(name):
         return False
-    return os.path.isdir(root(name))
+    return os.path.isdir(root(name, parent_dir=parent_dir))
 
 
 def active(name):
@@ -312,12 +337,15 @@ def is_workspace_dir(path):
     return ret_val
 
 
-def create(name, read_default_template=True):
+def create(name, read_default_template=True, parent_dir=None):
     """Create a named workspace in Ramble"""
     validate_workspace_name(name)
-    if exists(name):
+    if exists(name, parent_dir=parent_dir):
         raise RambleWorkspaceError(f"'{name}': workspace already exists")
-    return Workspace(root(name), read_default_template=read_default_template)
+
+    ws_root = root(name, parent_dir=parent_dir)
+
+    return Workspace(ws_root, read_default_template=read_default_template)
 
 
 def config_dict(yaml_data):
@@ -382,29 +410,6 @@ def get_workspace(args, cmd_name, required=False):
             "or use:",
             f"    ramble -w WRKSPC {cmd_name} ...",
         )
-
-
-def _get_all_obj_var_names(obj, obj_type):
-    """Return a set of all variables names defined in the given object."""
-    if obj is None:
-        if obj_type == ramble.repository.ObjectTypes.package_managers:
-            variant_name = namespace.package_manager
-        elif obj_type == ramble.repository.ObjectTypes.workflow_managers:
-            variant_name = namespace.workflow_manager
-        else:
-            raise ValueError("Only package manager and workflow manager types are supported")
-        variants_dict = ramble.config.get(namespace.variants)
-        obj_name = variants_dict.get(variant_name)
-        if obj_name is None:
-            return set()
-    else:
-        obj_name = obj
-    try:
-        obj_inst = ramble.repository.get(obj_name, object_type=obj_type)
-    except ramble.repository.UnknownObjectError:
-        return set()
-    vars = list(itertools.chain.from_iterable(obj_inst.object_variables.values()))
-    return {var.name for var in vars}
 
 
 class Workspace:
@@ -522,7 +527,7 @@ class Workspace:
         """Reinitialize the workspace object if it has been written (this
         may not be true if the workspace was just created in this running
         instance of ramble)."""
-        for _, section in self.config_sections.items():
+        for section in self.config_sections.values():
             if not os.path.exists(section["filename"]):
                 return
 
@@ -626,10 +631,10 @@ cd "{experiment_run_dir}"
         # Construct string for default variants
         variant_string = ""
 
-        # Set default workflow_manager to the user-managed one,
+        # Set default system to the user-managed one,
         # which provides defaults for required variables such as
         # batch_submit and mpi_command.
-        all_variants = {"workflow_manager": "user-managed"}
+        all_variants = {"system": "user-managed"}
         for scope in ramble.config.scopes():
             if namespace.workspace not in scope:
                 variant_dict = ramble.config.get(namespace.variants, scope=scope)
@@ -1113,8 +1118,10 @@ ramble:
         workload_name_variable,
         workload_filters,
         include_default_variables,
+        default_variable_value,
         variable_filters,
         variable_definitions,
+        variant_definitions,
         experiment_name,
         package_manager=None,
         workflow_manager=None,
@@ -1135,9 +1142,12 @@ ramble:
             workload_filters (list(str)): List of filters to downselect workloads with
             include_default_variables (bool): Whether to include default variables in the
                                               resulting config or not
+            default_variable_value (str): Default value to set undefined variables to
             variable_filters (list(str)): List of filters to downselect variables with
             variable_definitions (list(str)): List of variable definitions to use
                                               within generated experiments
+            variant_definitions (list(str)): List of variant definitions to use
+                                             within generated experiments
             experiment_name (str): The name of the experiments to add
             package_manager (str): Name of package manager to use for the generated experiments
             workflow_manager (str): Name of workflow manager to use for the generated experiments
@@ -1169,8 +1179,6 @@ ramble:
                 clear (bool): Whether to clear previous comments or not
                 start_char (str): Character to begin the comment with
             """
-            import ruamel.yaml as yaml
-
             key_comment = base.ca.items.setdefault(key, [None, [], None, None])
 
             if clear:
@@ -1199,7 +1207,24 @@ ramble:
 
             return base
 
-        import ruamel.yaml as yaml
+        def process_definitions(definitions, def_type="variable"):
+            def_dict = {}
+            def_regex = re.compile(r"\s*=\s*")
+            for definition in definitions:
+                m = def_regex.search(definition)
+
+                if m:
+                    key = definition[0 : m.start()]
+                    value = list_str_to_list(definition[m.end() :])
+                    if isinstance(value, str):
+                        value = strip_quotes(value)
+                    def_dict[key] = value
+                else:
+                    logger.die(
+                        f"Invalid {def_type} definition provided: {definition}. "
+                        + "Accepted form is 'key=value'"
+                    )
+            return def_dict
 
         edited = False
 
@@ -1207,45 +1232,22 @@ ramble:
         apps_dict = self.get_applications().copy()
 
         app_inst = ramble.repository.get(application)
-        # Set version manually as in set_variables_and_variants
-        _, _, maybe_version = application.partition("@")
-        if maybe_version and "{" not in maybe_version:
-            try:
-                app_inst.set_version(version_number=maybe_version, description=application)
-                app_inst.validate_version()
-            except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
-                # If version validation fails (e.g. unknown version in strict mode),
-                # we still want to allow adding the experiment to the config.
-                # Full validation will happen during concretization/setup.
-                logger.debug(f"Version initialization failed for {application}: {e}")
-                pass
-        elif hasattr(app_inst, "preferred_version"):
-            try:
-                app_inst.set_version(version=app_inst.preferred_version, description=application)
-                app_inst.validate_version()
-            except (ramble.error.RambleError, ramble.error.ObjectValidationError) as e:
-                # If version validation fails, we still want to allow adding the experiment.
-                # Full validation will happen during concretization/setup.
-                logger.debug(f"Version initialization failed for {application}: {e}")
-                pass
+
+        exp_context = ramble.context.Context()
+        exp_context.context_name = experiment_name
 
         app_inst.variables = {}
         app_inst.expander = ramble.expander.Expander({}, None)
 
-        var_def_dict = {}
-        def_regex = re.compile(r"\s*=\s*")
-        for definition in variable_definitions:
-            m = def_regex.search(definition)
+        exp_context.variables = process_definitions(variable_definitions, def_type="variable")
+        exp_context.variants = process_definitions(variant_definitions, def_type="variant")
 
-            if m:
-                key = definition[0 : m.start()]
-                value = list_str_to_list(definition[m.end() :])
-                var_def_dict[key] = value
-            else:
-                logger.die(
-                    f"Invalid variable definition provided: {definition}. "
-                    + "Accepted form is 'key=value'"
-                )
+        # TODO: Deprecate / remove in favor of explicit variant definitions
+        if package_manager:
+            exp_context.variants["package_manager"] = package_manager
+
+        if workflow_manager:
+            exp_context.variants["workflow_manager"] = workflow_manager
 
         if application not in apps_dict:
             apps_dict[application] = syaml.syaml_dict()
@@ -1253,27 +1255,25 @@ ramble:
 
         workloads_dict = apps_dict[application][namespace.workload]
 
-        exp_zips = {}
+        def_regex = re.compile(r"\s*=\s*")
         for zip_def in zips:
             m = def_regex.match(zip_def)
             if m:
                 key = m.group("key")
                 value = list_str_to_list(m.group("value"))
-                exp_zips[key] = value
+                exp_context.zips[key] = value
             else:
                 logger.die(
                     f"Invalid zip definition provided: {zip_def}. "
                     + "Accepted form is 'zipname=[var1,var2,var3]'"
                 )
 
-        exp_matrix = []
         if matrix:
-            for part in matrix.split(","):
-                exp_matrix.append(part)
+            exp_context.matrices.append(list(matrix.split(",")))
 
         # Unpack all workload names from `when` sets
         all_workload_names = set()
-        for _, workloads in app_inst.workloads.items():
+        for workloads in app_inst.workloads.values():
             for workload in workloads:
                 all_workload_names.add(workload)
 
@@ -1307,45 +1307,49 @@ ramble:
             if add_workload:
                 workload_names.append(workload)
 
+        if not workload_names:
+            logger.die(f"No workloads match filter '{wl_filter}' in application {application}")
+
         if workload_name_variable:
-            var_def_dict[workload_name_variable] = workload_names.copy()
+            exp_context.variables[workload_name_variable] = workload_names.copy()
             workload_names = [ramble.expander.Expander.expansion_str(workload_name_variable)]
 
-        obj_var_names = _get_all_obj_var_names(
-            workflow_manager, obj_type=ramble.repository.ObjectTypes.package_managers
-        ) | _get_all_obj_var_names(
-            workflow_manager, obj_type=ramble.repository.ObjectTypes.workflow_managers
-        )
-
+        missing_vars = set()
+        self.software_environments = ramble.software_environments.SoftwareEnvironments(self)
+        is_dry_run = self.dry_run
+        self.dry_run = True
         for workload_name in workload_names:
             edited = True
-            app_inst.expander._workload_name = None
-            app_inst.define_variable(app_inst.keywords.workload_name, workload_name)
-            try:
-                if app_inst.is_mpi_required(workload_name):
-                    app_inst.require_mpi_variables()
-            except (ramble.expander.WorkloadNotDefinedError, ramble.error.RambleError) as e:
-                # Workload may not be defined for the active 'when' conditions.
-                # Skip MPI requirement checks for now as full validation occurs later.
-                logger.debug(f"Skipping MPI requirement check for workload {workload_name}: {e}")
-                pass
+            exp_set = ramble.experiment_set.ExperimentSet(self)
+            exp_list = exp_set.render_experiment_set(
+                app_inst.name,
+                workload_name,
+                exp_context,
+                warn_validation=False,
+                die_on_validate_error=False,
+            )
+
+            for exp_inst in exp_list:
+                missing_exp_vars = {
+                    var
+                    for var in exp_inst.keywords.all_required_keys()
+                    if var not in exp_inst.variables
+                }
+                missing_exp_vars = missing_exp_vars | exp_inst.missing_mpi_variables
+                missing_vars = missing_vars | missing_exp_vars
+
             if workload_name not in workloads_dict:
-                workloads_dict[workload_name] = syaml.syaml_dict()
-                workloads_dict[workload_name][namespace.experiment] = syaml.syaml_dict()
+                workloads_dict[workload_name] = {namespace.experiment: {}}
 
             exps_dict = workloads_dict[workload_name][namespace.experiment]
             exps_dict[experiment_name] = syaml.syaml_dict()
             exp_dict = exps_dict[experiment_name]
 
-            if package_manager is not None or workflow_manager is not None:
+            if exp_context.variants:
                 exp_dict[namespace.variants] = syaml.syaml_dict()
                 variants_dict = exp_dict[namespace.variants]
-
-                if package_manager is not None:
-                    variants_dict[namespace.package_manager] = package_manager
-
-                if workflow_manager is not None:
-                    variants_dict[namespace.workflow_manager] = workflow_manager
+                for name, val in exp_context.variants.items():
+                    variants_dict[name] = val
 
             if namespace.variables not in exp_dict:
                 exp_dict[namespace.variables] = yaml.comments.CommentedMap()
@@ -1353,20 +1357,14 @@ ramble:
             vars_dict = exp_dict[namespace.variables]
 
             # Ensure required variables are defined
-            for key in app_inst.keywords.all_required_keys():
-                # Do not define missing required variables that are defined in
-                # the associated package and workflow managers.
-                # TODO: should include consideration for when clause, right now
-                # the `selected_variables` property cannot be used due to no associated
-                # expander at this stage.
-                if key not in workspace_vars and key not in obj_var_names:
-                    vars_dict[key] = ""
+            for key in sorted(missing_vars):
+                if key not in workspace_vars and key not in exp_context.variables:
+                    vars_dict[key] = default_variable_value
 
             # Only extract variable defaults if requested.
             # This is mutually exclusive with workload_name_variable
             if include_default_variables:
-                # At this point we should only have a valid workload name
-                workload = app_inst.workloads[workload_name]
+                workload = exp_inst.get_workloads()
                 if workload.variables:
                     first_var = True
                     for var in workload.variables.values():
@@ -1410,17 +1408,18 @@ ramble:
                         env_vars_dict[env_var.name] = env_var.value
 
             # Add any variables that are defined to the variables dict
-            if var_def_dict:
-                vars_dict.update(var_def_dict)
+            if exp_context.variables:
+                vars_dict.update(exp_context.variables)
 
-            if exp_zips:
+            if exp_context.zips:
                 if namespace.zips not in exp_dict:
-                    exp_dict[namespace.zips] = exp_zips.copy()
+                    exp_dict[namespace.zips] = exp_context.zips.copy()
 
-            if exp_matrix:
+            if exp_context.matrices:
                 if namespace.matrix not in exp_dict:
-                    exp_dict[namespace.matrix] = exp_matrix.copy()
+                    exp_dict[namespace.matrix] = exp_context.matrices.copy()[0]
 
+        self.dry_run = is_dry_run
         if edited and not self.dry_run:
             ramble.config.config.update_config(
                 namespace.application, apps_dict, scope=self.ws_file_config_scope_name()
@@ -1465,7 +1464,7 @@ ramble:
         force_prefix = False
         pkgman_prefixes = set()
         for _, app_inst, _ in experiment_set.all_experiments():
-            app_inst.build_modifier_instances()
+            app_inst.build_modifier_instances(self)
             app_inst.define_variables_for_template_path(self)
             if app_inst.package_manager is not None:
                 pkgman_prefixes.add(app_inst.package_manager.spec_prefix)
@@ -1474,7 +1473,7 @@ ramble:
         force_prefix = force_prefix or len(pkgman_prefixes) > 1
 
         for _, app_inst, _ in experiment_set.all_experiments():
-            app_inst.build_modifier_instances()
+            app_inst.build_modifier_instances(self)
             app_inst.define_variables_for_template_path(self)
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
@@ -2062,8 +2061,8 @@ ramble:
     @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
-        wspath = get_workspace_path()
-        return self.path.startswith(wspath)
+        wspaths = get_workspace_path()
+        return any(self.path.startswith(wspath) for wspath in wspaths)
 
     @property
     def name(self):
@@ -2262,7 +2261,7 @@ ramble:
         """
         mod_list = []
         base_section = self._get_scope_section("workspace")
-        ws_mods = base_section[namespace.modifiers] if namespace.modifiers in base_section else []
+        ws_mods = base_section.get(namespace.modifiers, [])
 
         # Add workspace modifiers
         for mod in ws_mods:

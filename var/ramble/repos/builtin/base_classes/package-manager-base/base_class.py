@@ -9,6 +9,7 @@
 
 import abc
 import os
+import tempfile
 from typing import List
 
 import ramble.definitions.families
@@ -186,16 +187,17 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         )
 
         software_environments = workspace.software_environments
-        software_env = software_environments.render_environment(
-            app_context, self.app_inst.expander, self, require=False
-        )
-        if software_env is not None:
-            software_environments.define_compiler_packages(
-                software_env, self.app_inst.expander
+        if software_environments is not None:
+            software_env = software_environments.render_environment(
+                app_context, self.app_inst.expander, self, require=False
             )
+            if software_env is not None:
+                software_environments.define_compiler_packages(
+                    software_env, self.app_inst.expander
+                )
 
-        for _, contents in workspace.all_auxiliary_software_files():
-            self.app_inst.expander.expand_var(contents)
+            for _, contents in workspace.all_auxiliary_software_files():
+                self.app_inst.expander.expand_var(contents)
 
         return self.app_inst.expander._used_variables
 
@@ -211,8 +213,6 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             require_exist (bool): Whether to require environment hashes exist or not.
         """
 
-        pass
-
     def define_missing_packages(self, workspace):
         """Injection of missing packages that are auto-injected by objects
 
@@ -226,6 +226,9 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
 
         require_env = self.environment_required
         software_envs = workspace.software_environments
+
+        if not software_envs:
+            return
 
         # Inject any missing, but injected compilers
         for _, obj in self.app_inst.objects():
@@ -343,6 +346,144 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
                             )
         except RambleSoftwareEnvironmentError:
             pass
+
+    def merge_software_file(self, existing_file: str, new_file: str):
+        """Stub to for package managers to implement merging of software files
+
+        Args:
+            existing_file: Path to existing file to merge into
+            new_file: Path to new file to merge
+        """
+        logger.warn(
+            f"When trying to merge into {existing_file} "
+            f"merge_software_file is not implemented in {self.origin_type} {self.name}"
+        )
+
+    def render_object_auxiliary_software_files(
+        self, workspace, app_inst=None, stage_path=None
+    ):
+        """Render auxiliary software files from system objects
+
+        Uses package manager implemented `merge_software_file` method to handle conflicts.
+        """
+        if app_inst is None:
+            return
+
+        env_path = stage_path if stage_path else app_inst.expander.env_path
+
+        for obj_type, obj in app_inst.objects():
+            include_modifier = None
+            if obj_type == ramble.repository.ObjectTypes.modifiers:
+                include_modifier = obj
+
+            obj_variants = self.experiment_variants(
+                include_modifier=include_modifier, allow_caching=False
+            )
+
+            aux_files = getattr(obj, "auxiliary_software_files", {})
+            for when_set, files_info in aux_files.items():
+                if app_inst.expander.satisfies(
+                    when_set, variant_set=obj_variants
+                ):
+                    for name, file_info in files_info.items():
+                        src_path = app_inst.expander.expand_var(
+                            file_info["src_path"]
+                        )
+                        dest_path = app_inst.expander.expand_var(
+                            file_info["dest_path"]
+                        )
+                        file_info["consumed"] = True
+
+                        if not os.path.isabs(src_path):
+                            # Find source file relative to the system object
+                            object_paths = [
+                                e[1]
+                                for e in ramble.repository.list_object_files(
+                                    obj, obj_type
+                                )
+                            ]
+                            for obj_path in object_paths:
+                                test_path = os.path.join(
+                                    os.path.dirname(obj_path), src_path
+                                )
+                                if os.path.isfile(test_path):
+                                    src_path = test_path
+                                    break
+
+                        logger.msg(
+                            f"Rendering auxiliary software file {name} to {dest_path}"
+                        )
+                        content = workspace.read_file_content(src_path)
+                        rendered = app_inst.expander.expand_var(content)
+
+                        if not os.path.isabs(dest_path):
+                            dest_path = os.path.join(env_path, dest_path)
+
+                        os.makedirs(os.path.dirname(dest_path), exist_ok=True)
+
+                        # Python 3.12 and newer can pass `delete=False` for debugging
+                        with tempfile.TemporaryDirectory() as tmpdir:
+                            dest_name = os.path.basename(dest_path)
+                            temp_path = os.path.join(str(tmpdir), dest_name)
+                            with open(temp_path, "w+") as f:
+                                f.write(rendered)
+                            self.merge_software_file(dest_path, temp_path)
+
+        # Write auxiliary software files into created spack env.
+        for name, contents in workspace.all_auxiliary_software_files():
+            aux_file_path = app_inst.expander.expand_var(
+                os.path.join(
+                    env_path,
+                    f"{name}",
+                )
+            )
+
+            rendered = app_inst.expander.expand_var(contents)
+            with tempfile.TemporaryDirectory() as tmpdir:
+                dest_name = os.path.basename(aux_file_path)
+                temp_path = os.path.join(str(tmpdir), dest_name)
+                with open(temp_path, "w+") as f:
+                    f.write(rendered)
+                self.merge_software_file(aux_file_path, str(temp_path))
+
+    register_phase(
+        "check_auxiliary_software_files",
+        pipeline="setup",
+        run_after=["make_experiments"],
+    )
+
+    def _check_auxiliary_software_files(self, workspace, app_inst=None):
+        """Ensure all registered auxiliary software files are consumed.
+
+        Prints warnings on any auxiliary software file that was not consumed to
+        help users / developers know if a package manager handled files
+        correctly.
+        """
+        if app_inst is None:
+            return
+
+        for obj_type, obj in app_inst.objects():
+            include_modifier = None
+            if obj_type == ramble.repository.ObjectTypes.modifiers:
+                include_modifier = obj
+
+            obj_variants = self.experiment_variants(
+                include_modifier=include_modifier,
+                allow_caching=False,
+                app_inst=app_inst,
+            )
+
+            aux_files = getattr(obj, "auxiliary_software_files", {})
+            for when_set, files_info in aux_files.items():
+                if app_inst.expander.satisfies(
+                    when_set, variant_set=obj_variants
+                ):
+                    for name, file_info in files_info.items():
+                        if not file_info["consumed"]:
+                            logger.warn(
+                                f"Package manager {self.name} did not consume auxiliary software file\n"
+                                f"{name} from {obj.origin_type} {obj.name}"
+                            )
 
     register_phase(
         "add_software_to_results",

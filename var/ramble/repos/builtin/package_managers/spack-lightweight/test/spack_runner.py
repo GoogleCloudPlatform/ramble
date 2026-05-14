@@ -89,7 +89,8 @@ def test_env_concretize_skips_already_concretized_envs(
         sr.add_spec("intel-oneapi-mpi")
 
         # Generate an initial env file
-        sr.generate_env_file()
+        stage_env_path = sr.create_stage_env()
+        sr.migrate_stage_env(stage_env_path, env_path)
 
         time.sleep(0.5)
 
@@ -98,16 +99,12 @@ def test_env_concretize_skips_already_concretized_envs(
             f.write("")
 
         # Mock regenerating an env file, after the lock was created.
-        sr.generate_env_file()
+        sr.migrate_stage_env(stage_env_path, env_path)
 
         sr.concretize()
 
         output = capsys.readouterr()
-        assert f"Environment {env_path} will not be regenerated" in output.out
-        assert (
-            f"Environment {env_path} is already concretized. Skipping concretize..."
-            in output.out
-        )
+        assert "is already concretized. Skipping concretize..." in output.out
 
         sr.deactivate()
 
@@ -124,7 +121,8 @@ def test_env_install(tmpdir, capsys, request):
         sr.create_env(env_path)
         sr.activate()
         sr.add_spec("zlib")
-        sr.generate_env_file()
+        stage_env_path = sr.create_stage_env()
+        sr.migrate_stage_env(stage_env_path, env_path)
         sr.concretize()
         sr.install()
 
@@ -153,12 +151,16 @@ def test_env_configs_apply(tmpdir, capsys, request):
         sr.activate()
         sr.add_spec("zlib")
         sr.add_config("config:debug:true")
-        sr.generate_env_file()
+        stage_env_path = sr.create_stage_env()
+        sr.apply_configs(stage_path=stage_env_path)
 
         captured = capsys.readouterr()
         assert (
-            "with args: ['config', 'add', 'config:debug:true']" in captured.out
+            f"with args: ['-D', '{stage_env_path}', 'config', 'add', 'config:debug:true']"
+            in captured.out
         )
+
+        sr.migrate_stage_env(stage_env_path, env_path)
 
         sr.deactivate()
 
@@ -187,7 +189,9 @@ def test_env_view_link_types(tmpdir, request, link_type, mutable_config):
             sr.create_env(env_path)
             sr.activate()
             sr.add_spec("zlib")
-            sr.generate_env_file()
+            stage_env_path = sr.create_stage_env()
+            sr.apply_configs(stage_path=stage_env_path)
+            sr.migrate_stage_env(stage_env_path, env_path)
 
             sr.deactivate()
 
@@ -311,7 +315,9 @@ def test_env_include(tmpdir, capsys, request):
         bad_include_path = "/path/to/include/junk.yaml"
         sr.add_include_file(good_include_path)
         sr.add_include_file(bad_include_path)
-        sr.generate_env_file()
+        stage_env_path = sr.create_stage_env()
+        sr.migrate_stage_env(stage_env_path, env_path)
+
         sr.concretize()
 
         with open(os.path.join(env_path, "spack.yaml")) as f:
@@ -329,24 +335,26 @@ def test_new_compiler_installs(tmpdir, capsys, request):
     with tmpdir.as_cwd():
         # compilers.yaml is written to support older spack versions.
         # The compiler information was changed to exist in the packages.yaml file around v1.0.0
-        compilers_config = """
+        tmpdir_bin = os.path.join(os.getcwd(), "bin")
+        env_path = os.path.join(os.getcwd(), "test_env")
+        os.mkdir(env_path)
+        os.mkdir(tmpdir_bin)
+        compilers_config = f"""
 compilers::
 - compiler:
     spec: gcc@12.1.0
     paths:
-      cc: tmpdir_path/gcc
-      cxx: tmpdir_path/g++
-      f77: tmpdir_path/gfortran
-      fc: tmpdir_path/gfortran
-    flags: {}
+      cc: {tmpdir_bin}/gcc
+      cxx: {tmpdir_bin}/g++
+      f77: {tmpdir_bin}/gfortran
+      fc: {tmpdir_bin}/gfortran
+    flags: {{}}
     operating_system: 'ramble'
     target: 'x86_64'
     modules: []
-    environment: {}
+    environment: {{}}
     extra_rpaths: []
-""".replace(
-            "tmpdir_path", os.path.join(os.getcwd(), "bin")
-        )
+"""
 
         packages_config = f"""
 packages:
@@ -356,16 +364,14 @@ packages:
       prefix: {os.getcwd()}
       extra_attributes:
         compilers:
-          c: /tmpdir_path/gcc
-          cxx: /tmpdir_path/g++
-          fortran: /tmpdir_path/gfortran
+          c: {tmpdir_bin}/gcc
+          cxx: {tmpdir_bin}/g++
+          fortran: {tmpdir_bin}/gfortran
     buildable: false
 """
 
-        os.mkdir(os.path.join(os.getcwd(), "bin"))
-
-        packages_path = os.path.join(os.getcwd(), "packages.yaml")
-        compilers_path = os.path.join(os.getcwd(), "compilers.yaml")
+        packages_path = os.path.join(tmpdir, "packages.yaml")
+        compilers_path = os.path.join(tmpdir, "compilers.yaml")
         # Write spack_configs
         with open(packages_path, "w+") as f:
             f.write(packages_config)
@@ -373,7 +379,7 @@ packages:
         with open(compilers_path, "w+") as f:
             f.write(compilers_config)
 
-        config_path = os.getcwd()
+        config_path = tmpdir
         with ramble.config.override(
             "config:spack", {"global": {"flags": f"-C {config_path}"}}
         ):
@@ -381,11 +387,12 @@ packages:
                 pkg_spec = "gcc@12.1.0 +binutils"
                 compiler_spec = "gcc@12.1.0"
                 sr = SpackRunner(dry_run=True)
-                sr.create_env(os.getcwd())
+                sr.create_env(env_path)
                 sr.activate()
                 sr.add_include_file(packages_path)
                 sr.add_include_file(compilers_path)
-                sr.generate_env_file()
+                stage_env_path = sr.create_stage_env()
+                sr.migrate_stage_env(stage_env_path, env_path)
                 sr.install_compiler("gcc@12.1.0 +binutils", "gcc@12.1.0")
                 captured = capsys.readouterr()
 
@@ -498,7 +505,10 @@ spack:
             sr.create_env(os.path.join(generated_env))
             sr.activate()
             sr.add_config("config:debug:true")
-            sr.copy_from_external_env(os.getcwd())
+            stage_env_path = sr.create_stage_env()
+            sr.copy_from_external_env(os.getcwd(), stage_path=stage_env_path)
+            sr.apply_configs(stage_path=stage_env_path)
+            sr.migrate_stage_env(stage_env_path, generated_env)
 
             assert os.path.exists(os.path.join(generated_env, "spack.yaml"))
 

@@ -33,6 +33,9 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    workspace
    workspace_config
    package_managers
+   workflow_managers
+   systems
+   platforms
    success_criteria
    results
    mirror_config

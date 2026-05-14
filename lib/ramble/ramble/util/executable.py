@@ -139,6 +139,28 @@ class CommandExecutable:
 
         return self_str
 
+    def __eq__(self, cmp) -> bool:
+        attrs = [
+            "name",
+            "mpi",
+            "redirect",
+            "output_capture",
+            "run_in_background",
+            "variables",
+            "allow_extension",
+            "template",
+        ]
+
+        if cmp is None:
+            return False
+
+        for attr in attrs:
+            self_val = getattr(self, attr, None)
+            cmp_val = getattr(cmp, attr, None)
+            if self_val != cmp_val:
+                return False
+        return True
+
 
 class CommandExecutableError(ramble.error.RambleError):
     """Class for errors when using command executable classes"""

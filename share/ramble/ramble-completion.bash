@@ -266,7 +266,7 @@ complete -o bashdefault -o default -F _bash_completion_ramble ramble
 _ramble() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -A --aggregate-warnings -S --suppress-warnings -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo --resolve-variables-in-subprocesses -k --insecure -l --enable-locks -L --disable-locks -m --mock --overwrite-inventories --mock-applications --mock-modifiers --mock-package-managers --mock-workflow-managers --mock-base-classes --mock-base-applications --mock-base-modifiers --mock-base-package-managers --mock-base-workflow-managers -p --profile --sorted-profile --lines --profile-restrictions -v --verbose --stacktrace -V --version"
+        RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -A --aggregate-warnings -S --suppress-warnings -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo --resolve-variables-in-subprocesses -k --insecure -l --enable-locks -L --disable-locks -m --mock --overwrite-inventories --mock-applications --mock-modifiers --mock-package-managers --mock-workflow-managers --mock-systems --mock-platforms --mock-base-classes --mock-base-applications --mock-base-modifiers --mock-base-package-managers --mock-base-workflow-managers --mock-base-systems --mock-base-platforms -p --profile --sorted-profile --lines --profile-restrictions -v --verbose --stacktrace -V --version"
     else
         RAMBLE_COMPREPLY="attributes clean commands config data debug deployment docs edit help info license list mirror on python repo results software-definitions style unit-test workspace"
     fi
@@ -275,7 +275,7 @@ _ramble() {
 _ramble_attributes() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --package_managers --workflow_managers --base_classes --base_applications --base_modifiers --base_package_managers --base_workflow_managers --maintainers --tags"
+        RAMBLE_COMPREPLY="-h --help --defined --undefined -a --all --by-attribute --applications --modifiers --package_managers --workflow_managers --systems --platforms --base_classes --base_applications --base_modifiers --base_package_managers --base_workflow_managers --base_systems --base_platforms --maintainers --tags"
     else
         RAMBLE_COMREPLY=""
     fi
@@ -631,7 +631,7 @@ _ramble_workspace() {
 _ramble_workspace_activate() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir"
+        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir --parent-dir"
     else
         _workspaces
     fi
@@ -648,7 +648,7 @@ _ramble_workspace_deactivate() {
 _ramble_workspace_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir -a --activate"
+        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir --parent-dir -a --activate"
     else
         RAMBLE_COMREPLY=""
     fi
@@ -696,7 +696,7 @@ _ramble_workspace_experiment_logs() {
 }
 
 _ramble_workspace_list() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help --parent-dir --merged"
 }
 
 _ramble_workspace_remove() {
@@ -711,7 +711,7 @@ _ramble_workspace_remove() {
 _ramble_workspace_generate_config() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --workload-filter --wf --variable-filter --vf --variable-definition -v --experiment-name -e --package-manager -p --workflow-manager --wm --dry-run --print --overwrite --include-default-variables -i --workload-name-variable -w --zip -z --matrix -m"
+        RAMBLE_COMPREPLY="-h --help --workload-filter --wf --variable-filter --vf --variable-definition -v --variant-definition -V --experiment-name -e --package-manager -p --workflow-manager --wm --dry-run --print --overwrite --include-default-variables -i --workload-name-variable -w --zip -z --matrix -m --default-variable-value"
     else
         _all_applications
     fi
@@ -729,7 +729,7 @@ _ramble_workspace_manage() {
 _ramble_workspace_manage_experiments() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --workload-filter --wf --variable-filter --vf --variable-definition -v --experiment-name -e --package-manager -p --workflow-manager --wm --dry-run --print --overwrite --include-default-variables -i --workload-name-variable -w --zip -z --matrix -m"
+        RAMBLE_COMPREPLY="-h --help --workload-filter --wf --variable-filter --vf --variable-definition -v --variant-definition -V --experiment-name -e --package-manager -p --workflow-manager --wm --dry-run --print --overwrite --include-default-variables -i --workload-name-variable -w --zip -z --matrix -m --default-variable-value"
     else
         _all_applications
     fi

@@ -348,7 +348,6 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         This can be used to define things like n_ranks and have it influence
         the name of the resulting experiment.
         """
-        pass
 
     def modded_variables(self, app, extra_vars=None):
         mods = {}
@@ -575,7 +574,7 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
             (Any) Artifact inventory for this modifier
         """
 
-        return None
+        return
 
     def _prepare_analysis(self, workspace):
         """Hook to perform analysis that a modifier defines.
@@ -583,4 +582,3 @@ class ModifierBase(ObjectMixin, metaclass=ModifierMeta):
         This function allows modifier definitions to inject their own
         processing to output files, before FOMs are extracted.
         """
-        pass

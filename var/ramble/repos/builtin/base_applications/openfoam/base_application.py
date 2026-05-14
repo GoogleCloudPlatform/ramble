@@ -480,7 +480,7 @@ class Openfoam(ExecutableApplication):
             exec_times = []
             exec_regex = re.compile(self.simple_foam_exec_regex)
             with open(sf_log) as f:
-                for line in f.readlines():
+                for line in f:
                     m = exec_regex.match(line)
                     if m:
                         exec_times.append(float(m.group("foam_time")))
@@ -492,7 +492,7 @@ class Openfoam(ExecutableApplication):
             # Drop first time, to avoid init time
             if len(exec_times) > 1:
                 timestep_times = []
-                for i in range(0, len(exec_times) - 1):
+                for i in range(len(exec_times) - 1):
                     timestep_times.append(exec_times[i + 1] - exec_times[i])
 
                 # Compute statistics from other times

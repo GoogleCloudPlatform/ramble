@@ -32,6 +32,8 @@ def test_object_import_separate_python_source(workspace_name):
         "n_nodes=1",
         "-v",
         "processes_per_node=1",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

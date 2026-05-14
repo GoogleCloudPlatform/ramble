@@ -66,6 +66,8 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path, workspace
             "n_ranks=1",
             "-v",
             "n_nodes=1",
+            "--default-variable-value",
+            "1",
             "-p",
             "spack",
             global_args=["-w", workspace_name],

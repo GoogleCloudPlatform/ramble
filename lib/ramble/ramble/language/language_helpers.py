@@ -223,7 +223,7 @@ def expand_patterns(merged_types: list, multiple_pattern_match: Union[list, dict
             and isinstance(multiple_pattern_match, dict)
             and isinstance(next(iter(multiple_pattern_match)), frozenset)
         ):
-            for _, pattern_list in multiple_pattern_match.items():
+            for pattern_list in multiple_pattern_match.values():
                 matched_inputs = fnmatch.filter(pattern_list, input)
                 if matched_inputs:
                     expanded = True

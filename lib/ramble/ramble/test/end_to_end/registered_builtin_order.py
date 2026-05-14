@@ -39,6 +39,8 @@ def test_registered_builtin_order(workspace_name):
         "mpi_command='mpirun -n {n_ranks}'",
         "-p",
         "spack",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

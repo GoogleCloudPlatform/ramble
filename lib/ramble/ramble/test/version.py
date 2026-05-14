@@ -72,6 +72,8 @@ def test_application_version_variant_when(workspace_name, version, expected_zlib
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -105,6 +107,8 @@ def test_strict_versions_config(workspace_name, capsys):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -141,6 +145,8 @@ def test_strict_versions_directive(workspace_name):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -170,6 +176,8 @@ def test_versions_inherited_from_base_app(workspace_name):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -188,6 +196,8 @@ def test_versions_inherited_from_base_app(workspace_name):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -217,6 +227,8 @@ def test_non_pep440_version_number(workspace_name):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -269,6 +281,8 @@ def test_non_pep440_application_version_variant_when(workspace_name, version, ex
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -306,6 +320,8 @@ def test_version_variable_expansion_info(workspace_name):
             "custom_var='val_{version}'",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -327,8 +343,8 @@ def test_version_variable_expansion_info(workspace_name):
         output_v = workspace("info", "-vv", global_args=global_args)
         assert "versions@1.0.test_wl.generated" in output_v
         assert "versions@2.0a1.test_wl.generated" in output_v
-        assert "custom_var = 'val_{version}' ==> val_1.0" in output_v
-        assert "custom_var = 'val_{version}' ==> val_2.0a1" in output_v
+        assert "custom_var = val_{version} ==> val_1.0" in output_v
+        assert "custom_var = val_{version} ==> val_2.0a1" in output_v
         assert "zlib-exact = zlib@1.2.14" in output_v
         assert "zlib-greater = zlib@1.2.13" in output_v
 
@@ -357,6 +373,8 @@ def test_repeat_modifier_versions_error(workspace_name):
         "n_nodes=1",
         "-v",
         "processes_per_node=1",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 
@@ -409,6 +427,10 @@ def test_multi_modifier_versions(workspace_name):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "-v",
+            "info-app-dep_path=/not/a/path",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -455,25 +477,27 @@ def test_define_version_variables_errors(workspace_name):
     global_args = ["-w", workspace_name, "--overwrite-inventories"]
 
     ramble.workspace.create(workspace_name)
-    workspace(
-        "manage",
-        "experiments",
-        "versions@0.9",
-        "--wf",
-        "test_wl",
-        "-v",
-        "n_ranks=1",
-        "-v",
-        "n_nodes=1",
-        "-v",
-        "processes_per_node=1",
-        "-v",
-        "application::versions::version=foo",
-        global_args=global_args,
-    )
 
     err_str = (
         'Keyword "application::versions::version" has been defined, but is reserved by ramble'
     )
+
     with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError, match=err_str):
-        workspace("info", global_args=global_args)
+        workspace(
+            "manage",
+            "experiments",
+            "versions@0.9",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-v",
+            "application::versions::version=foo",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )

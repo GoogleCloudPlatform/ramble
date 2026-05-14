@@ -14,11 +14,12 @@ import tempfile
 from collections import defaultdict
 from typing import Callable, Dict
 
-import llnl.util.tty as tty
+import deprecation
+
+from llnl.util import tty
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
-import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.expander
 import ramble.filters
@@ -27,16 +28,29 @@ import ramble.software_environments
 import ramble.util.colors as color
 import ramble.workspace
 import ramble.workspace.shell
+from ramble import ramble_version
+from ramble.cmd.common import arguments
 from ramble.namespace import namespace
 from ramble.util.logger import logger
 
 import spack.util.environment
-import spack.util.string as string
+from spack.util import string
 from spack.util.editor import editor
 
 description = "manage experiment workspaces"
 section = "workspaces"
 level = "short"
+
+
+@deprecation.deprecated(
+    deprecated_in="0.6.0",
+    removed_in="0.7.0",
+    current_version=ramble_version,
+    details="Use the -V option instead",
+)
+def _deprecated_manage_experiments_arguments():
+    pass
+
 
 subcommands = [
     "activate",
@@ -118,6 +132,11 @@ def workspace_activate_setup_parser(subparser):
         default=None,
         help="name of workspace to activate",
     )
+    subparser.add_argument(
+        "--parent-dir",
+        metavar="dir",
+        help="parent directory for the named workspace to activate",
+    )
 
 
 def create_temp_workspace_directory():
@@ -148,8 +167,10 @@ def workspace_activate(args):
         ramble.workspace.Workspace(workspace).write()
 
     # Named workspace
-    elif ramble.workspace.exists(workspace_name_or_dir) and not args.dir:
-        workspace_path = ramble.workspace.root(workspace_name_or_dir)
+    elif (
+        ramble.workspace.exists(workspace_name_or_dir, parent_dir=args.parent_dir) and not args.dir
+    ):
+        workspace_path = ramble.workspace.root(workspace_name_or_dir, parent_dir=args.parent_dir)
         short_name = workspace_name_or_dir
 
     # Workspace directory
@@ -265,6 +286,11 @@ def workspace_create_setup_parser(subparser):
         help="external directory to link as inputs directory in workspace",
     )
     subparser.add_argument(
+        "--parent-dir",
+        metavar="dir",
+        help="parent directory for the new named workspace (must be in workspace_dirs)",
+    )
+    subparser.add_argument(
         "-a",
         "--activate",
         action="store_true",
@@ -281,6 +307,7 @@ def workspace_create(args):
         software_dir=args.software_dir,
         inputs_dir=args.inputs_dir,
         activate=args.activate,
+        parent_dir=args.parent_dir,
     )
 
 
@@ -292,6 +319,7 @@ def _workspace_create(
     software_dir=None,
     inputs_dir=None,
     activate=False,
+    parent_dir=None,
 ):
     """Create a new workspace
 
@@ -331,7 +359,7 @@ def _workspace_create(
 
     else:
         workspace = ramble.workspace.create(
-            name_or_path, read_default_template=read_default_template
+            name_or_path, read_default_template=read_default_template, parent_dir=parent_dir
         )
 
         workspace.read_default_template = read_default_template
@@ -909,7 +937,7 @@ def workspace_info(args):
                     for pipeline in app_inst.pipelines:
                         if pipeline not in all_pipelines:
                             all_pipelines[pipeline] = set()
-                        for phase in app_inst.get_pipeline_phases(pipeline):
+                        for phase in app_inst.get_pipeline_phases(pipeline, ws):
                             all_pipelines[pipeline].add(phase)
 
                     experiment_index = app_inst.expander.expand_var_name(
@@ -991,26 +1019,68 @@ def workspace_info(args):
 
 def workspace_list_setup_parser(subparser):
     """list available workspaces"""
-    pass
+    subparser.add_argument(
+        "--parent-dir",
+        metavar="dir",
+        help="filter workspaces by parent directory",
+    )
+    subparser.add_argument(
+        "--merged",
+        action="store_true",
+        help="list a merged set of workspaces across all parent directories",
+    )
 
 
 def workspace_list(args):
-    names = ramble.workspace.all_workspace_names()
+    if args.merged:
+        names = ramble.workspace.all_workspace_names(parent_dir=args.parent_dir)
 
-    color_names = []
-    for name in names:
-        if ramble.workspace.active(name):
-            name = color.colorize(f"@*g{{{name}}}")
-        color_names.append(name)
+        color_names = []
+        for name in names:
+            if ramble.workspace.active(name):
+                name = color.colorize(f"@*g{{{name}}}")
+            color_names.append(name)
 
-    # say how many there are if writing to a tty
-    if sys.stdout.isatty():
-        if not names:
-            logger.msg("No workspaces")
+        # say how many there are if writing to a tty
+        if sys.stdout.isatty():
+            if not names:
+                logger.msg("No workspaces")
+            else:
+                logger.msg(f"{len(names)} workspaces")
+
+        colify(color_names, indent=4)
+    else:
+        if args.parent_dir:
+            wspaths = ramble.workspace.get_workspace_path()
+            canonical_parent = ramble.util.path.canonicalize_path(args.parent_dir)
+            if canonical_parent not in wspaths:
+                raise ramble.workspace.RambleWorkspaceError(
+                    f"Directory '{args.parent_dir}' is not in configured workspace_dirs"
+                )
+            wspaths = [canonical_parent]
         else:
-            logger.msg(f"{len(names)} workspaces")
+            wspaths = ramble.workspace.get_workspace_path()
 
-    colify(color_names, indent=4)
+        for i, wspath in enumerate(wspaths):
+            if i > 0:
+                color.cprint("")
+            color.cprint(color.section_title("Workspaces from dir:") + " " + wspath)
+            names = ramble.workspace.all_workspace_names(parent_dir=wspath)
+
+            color_names = []
+            for name in names:
+                if ramble.workspace.active(name):
+                    name = color.colorize(f"@*g{{{name}}}")
+                color_names.append(name)
+
+            # say how many there are if writing to a tty
+            if sys.stdout.isatty():
+                if not names:
+                    logger.msg("No workspaces")
+                else:
+                    logger.msg(f"{len(names)} workspaces")
+
+            colify(color_names, indent=4)
 
 
 def workspace_edit_setup_parser(subparser):
@@ -1268,6 +1338,15 @@ def workspace_manage_experiments_setup_parser(subparser):
     )
 
     subparser.add_argument(
+        "--variant-definition",
+        "-V",
+        dest="variant_definitions",
+        action="append",
+        help="variant definition to set in the generated experiments. "
+        + "Given in the form name=value",
+    )
+
+    subparser.add_argument(
         "--experiment-name",
         "-e",
         dest="experiment_name",
@@ -1275,20 +1354,22 @@ def workspace_manage_experiments_setup_parser(subparser):
         help="name of generated experiment",
     )
 
+    # TODO: remove in 0.7.0
     subparser.add_argument(
         "--package-manager",
         "-p",
         dest="package_manager",
         default=None,
-        help="name of (optional) package manager to use within the experiment scope",
+        help="(DEPRECATED) name of (optional) package manager to use within the experiment scope",
     )
 
+    # TODO: remove in 0.7.0
     subparser.add_argument(
         "--workflow-manager",
         "--wm",
         dest="workflow_manager",
         default=None,
-        help="name of (optional) workflow manager to use within the experiment scope",
+        help="(DEPRECATED) name of (optional) workflow manager to use within the experiment scope",
     )
 
     subparser.add_argument(
@@ -1338,9 +1419,20 @@ def workspace_manage_experiments_setup_parser(subparser):
         help="comma delimited list of variable names to matrix in the experiments",
     )
 
+    subparser.add_argument(
+        "--default-variable-value",
+        default="",
+        help="default value for any required, but undefined, variable. Default is '' "
+        "which is likely to cause validation errors",
+    )
+
 
 def workspace_manage_experiments(args):
     """Perform experiment management"""
+
+    if args.package_manager or args.workflow_manager:
+        _deprecated_manage_experiments_arguments()
+
     ws = ramble.cmd.find_workspace(args)
 
     if ws is None:
@@ -1364,6 +1456,8 @@ def workspace_manage_experiments(args):
     if args.variable_definitions:
         variable_definitions = args.variable_definitions
 
+    variant_definitions = args.variant_definitions if args.variant_definitions else []
+
     zips = []
     if args.zips:
         zips = args.zips
@@ -1377,8 +1471,10 @@ def workspace_manage_experiments(args):
         args.workload_name_variable,
         workload_filters,
         args.include_default_variables,
+        args.default_variable_value,
         variable_filters,
         variable_definitions,
+        variant_definitions,
         args.experiment_name,
         args.package_manager,
         args.workflow_manager,

@@ -18,6 +18,8 @@ reserved_variants = {
     "modifier",
     "package_manager",
     "package_manager_prefix",
+    "system",
+    "platform",
     "version",
     "workflow_manager",
 }
@@ -190,6 +192,15 @@ class VariantSet:
             name: Name of variant
             value: The value the variant should take.
         """
+        default_var = None
+        if name in self.default_variants:
+            default_var = self.default_variants[name]
+
+        # If the default value is a boolean, convert the experiment value to a boolean
+        if default_var and isinstance(default_var.default, bool):
+            if isinstance(value, str):
+                value = value.lower() == "true"
+
         if name in reserved_variants:
             self._define_variant(
                 name,
@@ -344,9 +355,10 @@ class VariantSet:
         out_set = set()
 
         for name, variant in self.experiment_variants.items():
-            if name in self.default_variants:
+            if name in self.default_variants or name in reserved_variants:
                 if (
-                    name not in reserved_variants
+                    name in self.default_variants
+                    and name not in reserved_variants
                     and self.default_variants[name].values
                     and variant.default not in self.default_variants[name].values
                 ):
@@ -391,16 +403,20 @@ class Variant:
         self.default = default
         self.description = description
         self.values = values
-        if isinstance(self.default, bool):
-            prefix = "+" if self.default else "~"
-            self._definition = f"{prefix}{self.name}"
-        else:
-            self._definition = f"{self.name}={str(self.default)}"
+        self._definition = self.format_value(self.default)
 
     def copy(self):
         return Variant(
             name=self.name, default=self.default, description=self.description, values=self.values
         )
+
+    def format_value(self, value: Any) -> str:
+        """Format a value for this variant into Spack-like syntax"""
+        if isinstance(self.default, bool):
+            prefix = "+" if value else "~"
+            return f"{prefix}{self.name}"
+        else:
+            return f"{self.name}={value}"
 
     def as_definition(self) -> str:
         """Build a definition for this variant

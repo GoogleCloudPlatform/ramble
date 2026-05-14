@@ -33,6 +33,8 @@ def test_modifier_repeat_env_var(
             "n_ranks=1",
             "-v",
             "modeless_required_var=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

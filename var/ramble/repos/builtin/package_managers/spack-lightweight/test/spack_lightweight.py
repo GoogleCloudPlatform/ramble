@@ -111,11 +111,11 @@ def test_spack_auxiliary_files(request):
     workspace("concretize", global_args=["-w", ws_name])
 
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
-    rendered_package_path = os.path.join(
-        ws.software_dir, "spack-lightweight", "gromacs", "packages.yaml"
+    spack_config = os.path.join(
+        ws.software_dir, "spack-lightweight", "gromacs", "spack.yaml"
     )
 
-    with open(rendered_package_path) as f:
+    with open(spack_config) as f:
         data = f.read()
         assert "opt_target" not in data
         assert "x86_64" in data

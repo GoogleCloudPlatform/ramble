@@ -50,6 +50,7 @@ def build_variant_set():
         "test_variant": "defined",
         "package_manager": "spack",
         "workflow_manager": "slurm",
+        "compiler": "gcc@14.2.0",
     }
 
     multi_value_variants = [
@@ -174,7 +175,7 @@ def test_expansions(input, output, no_expand_vars, passes):
     expander = ramble.expander.Expander(expansion_vars, None, no_expand_vars=no_expand_vars)
 
     step_input = input
-    for _ in range(0, passes):
+    for _ in range(passes):
         step_input = expander.expand_var(step_input)
     final_output = step_input
 
@@ -236,7 +237,7 @@ def test_typed_expansions(input, output, no_expand_vars, passes):
     expander = ramble.expander.Expander(expansion_vars, None, no_expand_vars=no_expand_vars)
 
     step_input = input
-    for _ in range(0, passes):
+    for _ in range(passes):
         step_input = expander.expand_var(step_input, typed=True)
     final_output = step_input
 
@@ -281,6 +282,7 @@ def test_expansion_namespaces():
         (["test_variant=undefined", "package_manager=spack"], False),
         (["test_variant=undefined", "package_manager=spack", "workflow_manager=slurm"], False),
         (["test_variant=defined", "package_manager=spack", "workflow_manager=slurm"], True),
+        (["compiler=gcc@14.2.0"], True),
     ],
 )
 def test_satisfies_works(input_list, output):

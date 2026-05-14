@@ -268,7 +268,7 @@ Using `-k` is particularly useful for running only newly added tests.
 
 ## Running Style Checks
 
-Ramble uses `isort`, `black`, `flake8`, and `mypy` to enforce a consistent code style and type safety. You can check and fix style issues using the `ramble style` command.
+Ramble uses `isort`, `black`, `flake8`, `mypy`, and `ruff` to enforce a consistent code style and type safety. You can check and fix style issues using the `ramble style` command.
 
 *   **Checking for Style Errors:** To check for any style violations in the files you've changed in your current branch:
     ```bash

@@ -41,6 +41,8 @@ def test_cleanup_directive(mock_applications, workspace_name):
         "batch_submit={execute_experiment}",
         "-v",
         "file_to_check=myfile.txt",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()

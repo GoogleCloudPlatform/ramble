@@ -1,3 +1,2 @@
 variants:
-  package_manager: user-managed
-  workflow_manager: user-managed
+  system: user-managed

@@ -144,7 +144,11 @@ class ExperimentSet:
         self._set_context(self._contexts.workload, workload_context)
 
     def set_experiment_context(
-        self, experiment_context, die_on_validate_error=True, chained=False
+        self,
+        experiment_context,
+        warn_validation=True,
+        die_on_validate_error=True,
+        chained=False,
     ) -> list:
         """Set up current experiment context"""
 
@@ -156,7 +160,9 @@ class ExperimentSet:
 
         self._set_context(self._contexts.experiment, experiment_context)
         return self._ingest_experiments(
-            die_on_validate_error=die_on_validate_error, chained=chained
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+            chained=chained,
         )
 
     @property
@@ -218,10 +224,10 @@ class ExperimentSet:
         # Setup the application instance
         app_inst = ramble.repository.get(final_app_spec)
         variables[self.keywords.application_name] = app_inst.name
-        app_inst.set_variables_and_variants(variables, context.variants, self)
+        app_inst.set_variables_and_variants(variables, context.variants, self._workspace, self)
         app_inst.validate_version()
         app_inst.set_active_workload()
-        app_inst.set_modifiers(context.modifiers)
+        app_inst.set_modifiers(context.modifiers, self._workspace)
         app_inst.set_required_variables()
         app_inst.set_internals(context.internals)
         app_inst.set_chained_experiments(context.chained_experiments)
@@ -365,7 +371,7 @@ class ExperimentSet:
         # TODO: Exploit the relationship between base and repeated experiments,
         # to save up redundant works.
         # For instance, caching may be enabled for expanders across these experiments.
-        for n in range(0, repeats.n_repeats + 1):
+        for n in range(repeats.n_repeats + 1):
             cur_repeats = ramble.repeats.Repeats()
             if repeats.is_repeat_base:
                 if n == 0:
@@ -400,8 +406,16 @@ class ExperimentSet:
                     processed_experiments.append((app_inst, final_exp_namespace, n == 0))
         return processed_experiments
 
-    def render_chained_experiments(self, app_name, workload_name, experiment_context) -> list:
-        """Render a set of experiments into the chained experiment set.
+    def render_experiment_set(
+        self,
+        app_name,
+        workload_name,
+        experiment_context,
+        warn_validation=True,
+        die_on_validate_error=True,
+        chained=False,
+    ) -> list:
+        """Render a set of experiments for a specific application and workload
 
         This method will render a new set of experiments for a given app (input
         with app_name) and workload (input with workload_name, but could be
@@ -409,11 +423,11 @@ class ExperimentSet:
         experiment, and will process any vectors and matrices to create
         multiple experiments.
 
-        These are added to this experiment set's chained_experiments list,
-        rather than the base experiments list. Upon completion, all rendered
-        experiment instances are returned in a list, to allow further
-        processing. For example, if one wants to render chained experiments
-        from the child experiment.
+        If `chained=True` these are added to this experiment set's
+        chained_experiments list, rather than the base experiments list. Upon
+        completion, all rendered experiment instances are returned in a list,
+        to allow further processing. For example, if one wants to render
+        chained experiments from the child experiment.
 
         Args:
             app_name (str): Name of application to render experiments for
@@ -421,6 +435,9 @@ class ExperimentSet:
                                  experiments for
             experiment_context (ramble.context.Context): Context object for the
                                                          set of experiments to render
+            warn_validation (bool): Whether validation warnings should print or not
+            die_on_validate_error (bool): Whether validation errors should be fatal or not
+            chained (bool): Whether the experiments are chained experiments or not
 
         Returns:
             (list): List of application instances from the rendered set of experiments
@@ -432,15 +449,24 @@ class ExperimentSet:
         wl_context.context_name = workload_name
         self.set_application_context(app_context)
         self.set_workload_context(wl_context)
-        return self.set_experiment_context(experiment_context, chained=True)
+        return self.set_experiment_context(
+            experiment_context,
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+            chained=chained,
+        )
 
-    def _ingest_experiments(self, die_on_validate_error=True, chained=False) -> list:
+    def _ingest_experiments(
+        self, warn_validation=True, die_on_validate_error=True, chained=False
+    ) -> list:
         """Ingest experiments based on the current context.
 
         Merge all contexts, and render individual experiments. Track these
         experiments within this experiment set.
 
         Args:
+            warn_validation (bool): Whether rendering should print
+                                    validation warnings or not
             die_on_validated_error (bool): Whether rendering should kill
                                            execution when validation errors are
                                            encountered or not
@@ -648,14 +674,14 @@ class ExperimentSet:
             if is_base_experiment:
                 try:
                     app_inst.validate_experiment(
-                        warn_validation=True, die_on_validate_error=die_on_validate_error
+                        warn_validation=warn_validation,
+                        die_on_validate_error=die_on_validate_error,
                     )
                 except ramble.keywords.RambleKeywordError as e:
                     if die_on_validate_error:
                         raise RambleVariableDefinitionError(
                             f"In experiment {final_exp_namespace}: {e}"
                         ) from None
-                    pass
 
             workload_names.add(app_inst.expander.workload_name)
 

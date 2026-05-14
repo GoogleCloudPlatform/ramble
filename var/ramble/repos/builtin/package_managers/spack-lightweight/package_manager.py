@@ -7,10 +7,12 @@
 # except according to those terms.
 
 import os
+import pathlib
 import re
 import shlex
 import shutil
 import sys
+import tempfile
 
 import llnl.util.filesystem as fs
 
@@ -120,6 +122,35 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             logger.die(e)
 
+    def merge_software_file(self, existing_file: str, new_file: str):
+        """Merge a software file into an existing file
+
+        If the files will be YAML files, uses Spack's config commands to handle
+        merging. If they are not, new file always overwrites existing file.
+
+        Args:
+            existing_file: Path to existing file to merge into
+            new_file: Path to stage file that will be merged
+        """
+        file_name = os.path.basename(new_file)
+        file_name_parts = os.path.splitext(file_name)
+        added = False
+        if file_name_parts[-1] == ".yaml":
+            try:
+                self.runner.add_config_file(new_file)
+                added = True
+            except SystemExit:
+                added = False
+
+        if not added:
+            if os.path.isfile(existing_file):
+                logger.warn(
+                    "Auxiliary software file is overwriting an existing file.\n"
+                    f"   Existing file: {existing_file}\n"
+                    f"   New file: {new_file}\n"
+                )
+            shutil.copyfile(new_file, existing_file)
+
     register_phase("software_create_env", pipeline="setup")
     register_phase("software_create_env", pipeline="pushdeployment")
 
@@ -159,7 +190,7 @@ class SpackLightweight(PackageManagerBase):
             )
 
         for config_dict in package_manager_config_dicts:
-            for _, config in config_dict.items():
+            for config in config_dict.values():
                 keep_config = app_inst.expander.satisfies(
                     config["when"], variant_set=self.experiment_variants()
                 )
@@ -173,20 +204,6 @@ class SpackLightweight(PackageManagerBase):
             )
             self.runner.activate()
 
-            # Write auxiliary software files into created spack env.
-            for name, contents in workspace.all_auxiliary_software_files():
-                aux_file_path = app_inst.expander.expand_var(
-                    os.path.join(
-                        app_inst.expander.expansion_str(
-                            self.keywords.env_path
-                        ),
-                        f"{name}",
-                    )
-                )
-                self.runner.add_include_file(aux_file_path)
-                with open(aux_file_path, "w+") as f:
-                    f.write(app_inst.expander.expand_var(contents))
-
             env_context = app_inst.expander.expand_var_name(
                 self.keywords.env_name
             )
@@ -195,10 +212,12 @@ class SpackLightweight(PackageManagerBase):
             software_env = software_envs.render_environment(
                 env_context, app_inst.expander, self, require=require_env
             )
+            stage_env_path = None
             if software_env is not None:
                 if isinstance(software_env, ExternalEnvironment):
+                    stage_env_path = self.runner.create_stage_env()
                     self.runner.copy_from_external_env(
-                        software_env.external_env
+                        software_env.external_env, stage_env_path
                     )
                 else:
                     for (
@@ -208,43 +227,55 @@ class SpackLightweight(PackageManagerBase):
                     ):
                         self.runner.add_spec(pkg_spec)
 
-                    self.runner.generate_env_file()
-
-                added_packages = set(self.runner.added_packages())
-                for pkg, conf in app_inst.required_packages.items():
-                    if (
-                        app_inst.expander.satisfies(
-                            conf["when"],
-                            variant_set=self.experiment_variants(),
-                        )
-                        and pkg not in added_packages
-                    ):
-                        logger.die(
-                            f"Software spec {pkg} is not defined "
-                            f"in environment {env_context}, but is "
-                            f"required by the {self.name} application "
-                            "definition"
-                        )
-
-                for mod_inst in app_inst._modifier_instances:
-                    for pkg, conf in mod_inst.required_packages.items():
+                    added_packages = set(self.runner.added_packages())
+                    for pkg, conf in app_inst.required_packages.items():
                         if (
                             app_inst.expander.satisfies(
                                 conf["when"],
-                                variant_set=self.experiment_variants(
-                                    include_modifier=mod_inst
-                                ),
+                                variant_set=self.experiment_variants(),
                             )
                             and pkg not in added_packages
                         ):
                             logger.die(
                                 f"Software spec {pkg} is not defined "
                                 f"in environment {env_context}, but is "
-                                f"required by the {mod_inst.name} modifier "
+                                f"required by the {self.name} application "
                                 "definition"
                             )
 
-                self.runner.deactivate()
+                    for mod_inst in app_inst._modifier_instances:
+                        for pkg, conf in mod_inst.required_packages.items():
+                            if (
+                                app_inst.expander.satisfies(
+                                    conf["when"],
+                                    variant_set=self.experiment_variants(
+                                        include_modifier=mod_inst
+                                    ),
+                                )
+                                and pkg not in added_packages
+                            ):
+                                logger.die(
+                                    f"Software spec {pkg} is not defined "
+                                    f"in environment {env_context}, but is "
+                                    f"required by the {mod_inst.name} modifier "
+                                    "definition"
+                                )
+
+                    stage_env_path = self.runner.create_stage_env()
+
+            if stage_env_path:
+                self.runner.apply_configs(stage_path=stage_env_path)
+
+            self.render_object_auxiliary_software_files(
+                workspace, app_inst, stage_path=stage_env_path
+            )
+
+            self.runner.migrate_stage_env(
+                stage_env_path,
+                app_inst.expander.expand_var_name(self.keywords.env_path),
+            )
+
+            self.runner.deactivate()
 
         except RunnerError as e:
             logger.die(e)
@@ -377,7 +408,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     register_phase("push_to_spack_cache", pipeline="pushtocache", run_after=[])
 
@@ -423,7 +453,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     @PackageManagerBase.workspace_cache
     def get_version(self, workspace=None):
@@ -508,7 +537,6 @@ class SpackLightweight(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     register_builtin(
         "spack_source", required=True, depends_on=["builtin::env_vars"]
@@ -1028,7 +1056,7 @@ class SpackRunner(CommandRunner):
                 "Environment runner has no path configured"
             )
 
-        if self.active and self.env_key in self.spack.default_env.keys():
+        if self.active and self.env_key in self.spack.default_env:
             del self.spack.default_env[self.env_key]
             del self.installer.default_env[self.env_key]
             del self.concretizer.default_env[self.env_key]
@@ -1062,14 +1090,9 @@ class SpackRunner(CommandRunner):
         """
         self._check_active()
 
-        args = ["find"]
-
         pkg_names = []
 
-        all_packages = self._run_command(
-            self.spack, args, return_output=True
-        ).split("\n")
-        for pkg in all_packages:
+        for pkg in self.env_contents:
             match = package_name_regex.match(pkg)
             if match:
                 pkg_names.append(match.group("package_name"))
@@ -1088,17 +1111,20 @@ class SpackRunner(CommandRunner):
         if file_name in self._allowed_config_files:
             self.includes.append(include_file)
 
-    def apply_configs(self):
+    def apply_configs(self, stage_path=None):
         """
         Add all defined configs to the environment
         """
 
-        if self.configs_applied:
+        if not self.configs:
             return
 
-        self._check_active()
+        if not stage_path:
+            self._check_active()
 
-        config_args = ["config", "add"]
+        env_path = stage_path if stage_path else self.env_path
+
+        config_args = ["-D", env_path, "config", "add"]
 
         for config in self.configs:
             args = config_args.copy()
@@ -1106,9 +1132,22 @@ class SpackRunner(CommandRunner):
 
             self._run_command(self.spack, args)
 
-        self.configs_applied = True
+    def add_config_file(self, config_path, stage_path=None):
 
-    def copy_from_external_env(self, env_name_or_path):
+        if not stage_path:
+            self._check_active()
+
+        env_path = self.env_path if not stage_path else stage_path
+
+        args = ["-D", env_path, "config", "add", "-f", config_path]
+
+        output = self._run_command(
+            self.spack, args, allow_failure=True, return_output=True
+        )
+
+        return output
+
+    def copy_from_external_env(self, env_name_or_path, stage_path=None):
         """
         Copy an external spack environment file into the generated environment.
 
@@ -1122,7 +1161,9 @@ class SpackRunner(CommandRunner):
          - env_name_or_path: Name or path to existing spack environment
         """
 
-        self._check_active()
+        if not stage_path:
+            self._check_active()
+        env_path = self.env_path if not stage_path else stage_path
 
         named_location_args = ["location", "-e", env_name_or_path]
 
@@ -1144,9 +1185,7 @@ class SpackRunner(CommandRunner):
         lock_file = os.path.join(path, "spack.lock")
         if os.path.exists(lock_file):
             found_lock = True
-            shutil.copyfile(
-                lock_file, os.path.join(self.env_path, "spack.lock")
-            )
+            shutil.copyfile(lock_file, os.path.join(env_path, "spack.lock"))
 
         conf_file = os.path.join(path, "spack.yaml")
         if not os.path.exists(conf_file):
@@ -1155,9 +1194,6 @@ class SpackRunner(CommandRunner):
             )
 
         shutil.copyfile(conf_file, os.path.join(self.env_path, "spack.yaml"))
-
-        if self.configs:
-            self.apply_configs()
 
         self.concretized = found_lock
 
@@ -1185,65 +1221,87 @@ class SpackRunner(CommandRunner):
 
         return env_file
 
-    def generate_env_file(self):
-        """
-        Generate a spack environment file
+    def create_stage_env(self):
+        """Create a staging environment
+
+        This method creates a temporary environment, where we can configure it
+        properly before deciding if it has changed relative to an existing
+        environment.
         """
         self._check_active()
 
         env_file = self._env_file_dict()
 
-        spack_env_file = os.path.join(self.env_path, "spack.yaml")
-        spack_lock_file = os.path.join(self.env_path, "spack.lock")
+        # Generate a temp environment, so we can diff the environments
+        tmpdir = tempfile.mkdtemp()
+        tmp_path = str(tmpdir)
+        self.create_env(tmp_path)
+        tmp_env_file = os.path.join(tmp_path, "spack.yaml")
 
-        # Check that a spack.yaml and spack.lock file exist already
-        if os.path.exists(spack_env_file) and os.path.exists(spack_lock_file):
-            existing_env_mtime = os.path.getmtime(spack_env_file)
-            existing_lock_mtime = os.path.getmtime(spack_lock_file)
+        with open(tmp_env_file, "w+") as f:
+            syaml.dump_config(env_file, default_flow_style=False, stream=f)
 
-            # If the lock file was last modified after the yaml file...
-            if existing_lock_mtime > existing_env_mtime:
-                env_data = syaml.load_config(
-                    syaml.dump_config(env_file, default_flow_style=False)
-                )
-                with open(spack_env_file) as f:
-                    existing_data = syaml.load_config(f)
-                    # Prune the compiler block for diffing purpose
-                    if (
-                        "spack" in existing_data
-                        and "compilers" in existing_data["spack"]
-                    ):
-                        del existing_data["spack"]["compilers"]
-                gen_env_hash = ramble.util.hashing.hash_json(env_data)
-                existing_env_hash = ramble.util.hashing.hash_json(
-                    existing_data
-                )
+        return tmp_path
 
-                # If the yaml hash matches the new generated data hash...
-                if gen_env_hash == existing_env_hash:
-                    self.concretized = True
-                    logger.msg(
-                        f"Environment {self.env_path} will not be regenerated."
-                    )
-                    return
+    def migrate_stage_env(self, stage_env_path: str, ws_env_path: str):
+        """Determine if a stage env should be kept by checking it against an existing env.
+        If it is kept, replace the existing env with it.
 
-            if not self.concretized:
-                logger.verbose(
-                    f"Removing invalid spack lock file {spack_lock_file}"
-                )
-                fs.force_remove(spack_lock_file)
+        Args:
+            stage_env_path (str): Path for the environment stage
+            ws_env_path (str): Path for environment in workspace
 
-        spack_hash = self.inventory_hash()
+        Returns:
+            (bool): Whether the env was migrated or not
+        """
+        migrate = False
 
-        # Write spack.yaml to environment before concretizing, and its hash
-        with open(os.path.join(self.env_path, "spack.yaml"), "w+") as f:
-            syaml.dump_config(env_file, f, default_flow_style=False)
+        if not ws_env_path or not stage_env_path:
+            return False
 
-        with open(os.path.join(self.env_path, "ramble.hash"), "w+") as f:
-            f.write(spack_hash)
+        stage_files = pathlib.Path(stage_env_path).glob("*.yaml")
+        self.env_path = ws_env_path
+        for file in stage_files:
+            env_file = pathlib.Path(
+                str(file).replace(str(stage_env_path), str(self.env_path))
+            )
+            if os.path.isfile(env_file):
+                new_hash = ramble.util.hashing.hash_file(file)
+                old_hash = ramble.util.hashing.hash_file(env_file)
+                if new_hash != old_hash:
+                    migrate = True
+            else:
+                migrate = True
 
-        if self.configs:
-            self.apply_configs()
+            if migrate:
+                break
+
+        if migrate:
+            logger.debug(
+                f"Content for environment has changed. Regenerating {self.env_path}"
+            )
+            self.deactivate()
+            self.create_env(path=ws_env_path)
+            self.activate()
+            shutil.rmtree(self.env_path, ignore_errors=True)
+            shutil.copytree(str(stage_env_path), str(self.env_path))
+
+            spack_hash = self.inventory_hash()
+
+            with open(os.path.join(self.env_path, "ramble.hash"), "w+") as f:
+                f.write(spack_hash)
+        else:
+            spack_lock_file = os.path.join(self.env_path, "spack.lock")
+
+            if os.path.isfile(spack_lock_file):
+                self.concretized = True
+
+            logger.debug(
+                f"Content for environment {self.env_path} has not changed. "
+                "Skipping regeneration"
+            )
+
+        return migrate
 
     def concretize(self):
         """
