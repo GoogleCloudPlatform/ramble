@@ -62,17 +62,32 @@ class Perf(BasicModifier):
         modes=["stat", "record"],
     )
 
-    modifier_variable(
+    variant(
         "use_sudo",
-        default="True",
+        default=True,
+        values=[True, False],
         description="Use 'sudo' when executing the 'perf' command",
+    )
+
+    modifier_variable(
+        "sudo_prefix",
+        default="sudo ",
+        description="Prefix for running commands with sudo",
         modes=["stat", "record"],
+        when=["+use_sudo"],
+    )
+
+    modifier_variable(
+        "sudo_prefix",
+        default="",
+        description="Prefix for running commands with sudo",
+        modes=["stat", "record"],
+        when=["~use_sudo"],
     )
 
     executable_modifier("apply_perf")
 
     def apply_perf(self, exe_name, exe, app_inst=None):
-        assert False, "apply_perf was called"
         pre_cmds = []
         post_cmds = []
 
@@ -96,32 +111,12 @@ class Perf(BasicModifier):
             + ".out"
         )
 
-        use_sudo_expanded = self.expander.expand_var_name(
-            "use_sudo", typed=True
-        )
-        import pprint
-
-        raise ValueError(
-            f"DEBUG_INFO:\nmodifier name: {self.name}\nexpander variables:\n{pprint.pformat(self.expander._variables)}\nuse_sudo_expanded: {use_sudo_expanded} (type: {type(use_sudo_expanded)})"
-        )
-        if isinstance(use_sudo_expanded, bool):
-            use_sudo = use_sudo_expanded
-        else:
-            use_sudo = str(use_sudo_expanded).lower() in (
-                "true",
-                "1",
-                "yes",
-                "on",
-            )
-
-        sudo_prefix = "sudo " if use_sudo else ""
-
         pre_cmds.append(
             CommandExecutable(
                 f"start-perf-{exe_name}",
                 template=[
                     f'perf_log="{log_path}"',
-                    f'{sudo_prefix}{perf_cmd} > "$perf_log" 2>&1 &',
+                    f'{{sudo_prefix}}{perf_cmd} > "$perf_log" 2>&1 &',
                     f"perf_pid={last_pid_str}",
                 ],
                 mpi=False,
@@ -134,9 +129,9 @@ class Perf(BasicModifier):
             CommandExecutable(
                 f"stop-perf-{exe_name}",
                 template=[
-                    f'{sudo_prefix}kill -INT "$perf_pid"',
+                    '{sudo_prefix}kill -INT "$perf_pid"',
                     "sleep 2",
-                    f'if ps -p "$perf_pid" > /dev/null; then {sudo_prefix}kill -9 "$perf_pid"; fi',
+                    'if ps -p "$perf_pid" > /dev/null; then {sudo_prefix}kill -9 "$perf_pid"; fi',
                 ],
                 mpi=False,
                 redirect="",
