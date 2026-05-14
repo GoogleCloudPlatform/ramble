@@ -194,24 +194,30 @@ def deactivate_config_scope(workspace):
         ramble.config.config.remove_scope(scope.name)
 
 
-def all_workspace_names():
+def all_workspace_names(parent_dir=None):
     """List the names of workspaces that currently exist."""
-    # just return empty if the workspace path does not exist.  A read-only
-    # operation like list should not try to create a directory.
-    wspath = get_workspace_path()
-    if not os.path.exists(wspath):
-        return []
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Directory '{parent_dir}' is not in configured workspace_dirs"
+            )
+        wspaths = [canonical_parent]
+    else:
+        wspaths = get_workspace_path()
 
-    candidates = sorted(os.listdir(wspath))
-    names = []
-    for candidate in candidates:
-        configured = True
-        yaml_path = os.path.join(_root(candidate), WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
-        if not os.path.exists(yaml_path):
-            configured = False
-        if valid_workspace_name(candidate) and configured:
-            names.append(candidate)
-    return names
+    names = set()
+    for wspath in wspaths:
+        if not os.path.exists(wspath):
+            continue
+
+        candidates = os.listdir(wspath)
+        for candidate in candidates:
+            cand_root = os.path.join(wspath, candidate)
+            if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
+                names.add(candidate)
+    return sorted(names)
 
 
 def active_workspace():
@@ -226,27 +232,45 @@ def get_workspace_path():
         # command above should have worked, so if it doesn't, error out:
         logger.die("No config:workspace_dirs setting found in configuration!")
 
-    wspath = ramble.util.path.canonicalize_path(str(path_in_config))
-    return wspath
+    if isinstance(path_in_config, str):
+        paths = [path_in_config]
+    else:
+        paths = path_in_config
+
+    return [ramble.util.path.canonicalize_path(str(p)) for p in paths]
 
 
-def _root(name):
+def _root(name, parent_dir=None):
     """Non-validating version of root(), to be used internally."""
-    wspath = get_workspace_path()
-    return os.path.join(wspath, name)
+    if parent_dir:
+        wspaths = get_workspace_path()
+        canonical_parent = ramble.util.path.canonicalize_path(parent_dir)
+        if canonical_parent not in wspaths:
+            raise RambleWorkspaceError(
+                f"Directory '{parent_dir}' is not in configured workspace_dirs"
+            )
+        wspaths = [canonical_parent]
+    else:
+        wspaths = get_workspace_path()
+
+    for wspath in wspaths:
+        cand_root = os.path.join(wspath, name)
+        if is_workspace_dir(cand_root):
+            return cand_root
+    return os.path.join(wspaths[0], name)
 
 
-def root(name):
+def root(name, parent_dir=None):
     """Get the root directory for a workspace by name."""
     validate_workspace_name(name)
-    return _root(name)
+    return _root(name, parent_dir=parent_dir)
 
 
-def exists(name):
+def exists(name, parent_dir=None):
     """Whether a workspace with this name exists or not."""
     if not valid_workspace_name(name):
         return False
-    return os.path.isdir(root(name))
+    return os.path.isdir(root(name, parent_dir=parent_dir))
 
 
 def active(name):
@@ -313,12 +337,15 @@ def is_workspace_dir(path):
     return ret_val
 
 
-def create(name, read_default_template=True):
+def create(name, read_default_template=True, parent_dir=None):
     """Create a named workspace in Ramble"""
     validate_workspace_name(name)
-    if exists(name):
+    if exists(name, parent_dir=parent_dir):
         raise RambleWorkspaceError(f"'{name}': workspace already exists")
-    return Workspace(root(name), read_default_template=read_default_template)
+
+    ws_root = root(name, parent_dir=parent_dir)
+
+    return Workspace(ws_root, read_default_template=read_default_template)
 
 
 def config_dict(yaml_data):
@@ -2034,8 +2061,8 @@ ramble:
     @property
     def internal(self):
         """Whether this workspace is managed by Ramble."""
-        wspath = get_workspace_path()
-        return self.path.startswith(wspath)
+        wspaths = get_workspace_path()
+        return any(self.path.startswith(wspath) for wspath in wspaths)
 
     @property
     def name(self):

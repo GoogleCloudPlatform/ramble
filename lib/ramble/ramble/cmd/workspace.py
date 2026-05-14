@@ -132,6 +132,11 @@ def workspace_activate_setup_parser(subparser):
         default=None,
         help="name of workspace to activate",
     )
+    subparser.add_argument(
+        "--parent-dir",
+        metavar="dir",
+        help="parent directory for the named workspace to activate",
+    )
 
 
 def create_temp_workspace_directory():
@@ -162,8 +167,10 @@ def workspace_activate(args):
         ramble.workspace.Workspace(workspace).write()
 
     # Named workspace
-    elif ramble.workspace.exists(workspace_name_or_dir) and not args.dir:
-        workspace_path = ramble.workspace.root(workspace_name_or_dir)
+    elif (
+        ramble.workspace.exists(workspace_name_or_dir, parent_dir=args.parent_dir) and not args.dir
+    ):
+        workspace_path = ramble.workspace.root(workspace_name_or_dir, parent_dir=args.parent_dir)
         short_name = workspace_name_or_dir
 
     # Workspace directory
@@ -279,6 +286,11 @@ def workspace_create_setup_parser(subparser):
         help="external directory to link as inputs directory in workspace",
     )
     subparser.add_argument(
+        "--parent-dir",
+        metavar="dir",
+        help="parent directory for the new named workspace (must be in workspace_dirs)",
+    )
+    subparser.add_argument(
         "-a",
         "--activate",
         action="store_true",
@@ -295,6 +307,7 @@ def workspace_create(args):
         software_dir=args.software_dir,
         inputs_dir=args.inputs_dir,
         activate=args.activate,
+        parent_dir=args.parent_dir,
     )
 
 
@@ -306,6 +319,7 @@ def _workspace_create(
     software_dir=None,
     inputs_dir=None,
     activate=False,
+    parent_dir=None,
 ):
     """Create a new workspace
 
@@ -345,7 +359,7 @@ def _workspace_create(
 
     else:
         workspace = ramble.workspace.create(
-            name_or_path, read_default_template=read_default_template
+            name_or_path, read_default_template=read_default_template, parent_dir=parent_dir
         )
 
         workspace.read_default_template = read_default_template
@@ -1005,25 +1019,68 @@ def workspace_info(args):
 
 def workspace_list_setup_parser(subparser):
     """list available workspaces"""
+    subparser.add_argument(
+        "--parent-dir",
+        metavar="dir",
+        help="filter workspaces by parent directory",
+    )
+    subparser.add_argument(
+        "--merged",
+        action="store_true",
+        help="list a merged set of workspaces across all parent directories",
+    )
 
 
 def workspace_list(args):
-    names = ramble.workspace.all_workspace_names()
+    if args.merged:
+        names = ramble.workspace.all_workspace_names(parent_dir=args.parent_dir)
 
-    color_names = []
-    for name in names:
-        if ramble.workspace.active(name):
-            name = color.colorize(f"@*g{{{name}}}")
-        color_names.append(name)
+        color_names = []
+        for name in names:
+            if ramble.workspace.active(name):
+                name = color.colorize(f"@*g{{{name}}}")
+            color_names.append(name)
 
-    # say how many there are if writing to a tty
-    if sys.stdout.isatty():
-        if not names:
-            logger.msg("No workspaces")
+        # say how many there are if writing to a tty
+        if sys.stdout.isatty():
+            if not names:
+                logger.msg("No workspaces")
+            else:
+                logger.msg(f"{len(names)} workspaces")
+
+        colify(color_names, indent=4)
+    else:
+        if args.parent_dir:
+            wspaths = ramble.workspace.get_workspace_path()
+            canonical_parent = ramble.util.path.canonicalize_path(args.parent_dir)
+            if canonical_parent not in wspaths:
+                raise ramble.workspace.RambleWorkspaceError(
+                    f"Directory '{args.parent_dir}' is not in configured workspace_dirs"
+                )
+            wspaths = [canonical_parent]
         else:
-            logger.msg(f"{len(names)} workspaces")
+            wspaths = ramble.workspace.get_workspace_path()
 
-    colify(color_names, indent=4)
+        for i, wspath in enumerate(wspaths):
+            if i > 0:
+                color.cprint("")
+            color.cprint(color.section_title("Workspaces from dir:") + " " + wspath)
+            names = ramble.workspace.all_workspace_names(parent_dir=wspath)
+
+            color_names = []
+            for name in names:
+                if ramble.workspace.active(name):
+                    name = color.colorize(f"@*g{{{name}}}")
+                color_names.append(name)
+
+            # say how many there are if writing to a tty
+            if sys.stdout.isatty():
+                if not names:
+                    logger.msg("No workspaces")
+                else:
+                    logger.msg(f"{len(names)} workspaces")
+
+            colify(color_names, indent=4)
 
 
 def workspace_edit_setup_parser(subparser):
