@@ -18,6 +18,7 @@ from ramble.test.dry_run_helpers import search_files_for_string
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
     "mutable_mock_workspace_path",
+    "workspace_deactivate",
 )
 
 workspace = RambleCommand("workspace")
