@@ -44,11 +44,11 @@ def test_info_version_impossible(mock_applications):
     wl1_part = parts[1]
     wl2_part = parts[2]
 
-    assert "When: @1.0" in wl1_part
+    assert "When: application_version@1.0" in wl1_part
     assert "var1" in wl1_part
     assert "var2" not in wl1_part
 
-    assert "When: @2.0" in wl2_part
+    assert "When: application_version@2.0" in wl2_part
     assert "var2" in wl2_part
     assert "var1" not in wl2_part
 

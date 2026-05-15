@@ -19,14 +19,14 @@ class VersionsMod(BasicModifier):
     version("2.0", "versionsmod 2.0", preferred=True)
     version("1.0", "versionsmod 1.0", preferred=False)
 
-    with when("modifier_version=1.0"):
+    with when("modifier_version@1.0"):
         environment_variable(
             "MOD_ENV_VAR",
             value="MOD_ENV_VAR_SET_1.0",
             description="Test environment variable",
         )
 
-    with when("modifier_version=2.0"):
+    with when("@2.0"):
         environment_variable(
             "MOD_ENV_VAR",
             value="MOD_ENV_VAR_SET_2.0",

@@ -307,6 +307,13 @@ def build_when_list(
                     "string or list."
                 )
         when_list.extend(when_arg)
+
+        # Enable '@{version}' syntax in `when` clauses
+        if hasattr(obj, "origin_type") and obj.origin_type:
+            for i, w in enumerate(when_list):
+                if w.startswith("@"):
+                    when_list[i] = f"{obj.origin_type}_version{w}"
+
     return when_list
 
 
