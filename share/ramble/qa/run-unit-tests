@@ -87,11 +87,15 @@ if [[ "$PUSH_CODECOV" ]]; then
 
   echo "Comparing against base branch: origin/$TARGET_BRANCH"
 
-  # Calculate merge base against origin/$TARGET_BRANCH
-  MERGE_BASE_SHA=$(git merge-base HEAD "origin/$TARGET_BRANCH" || echo "")
+  # Calculate merge base between the PR commit and origin/$TARGET_BRANCH
+  MERGE_BASE_SHA=$(git merge-base "$COMMIT_SHA" "origin/$TARGET_BRANCH" || echo "")
   
   echo "Processing codecov upload for commit $COMMIT_SHA"
 
+  UPLOAD_ARGS="-C $COMMIT_SHA"
+  if [[ -n "$PR_NUMBER" ]]; then
+    UPLOAD_ARGS="$UPLOAD_ARGS --pr $PR_NUMBER"
+  fi
   if [[ -n "$MERGE_BASE_SHA" ]]; then
     echo "Picking PR base: $MERGE_BASE_SHA"
     if [[ -n "$PR_NUMBER" ]]; then
@@ -100,8 +104,7 @@ if [[ "$PUSH_CODECOV" ]]; then
       echo "Skipping pr-base-picking: PR_NUMBER not set"
     fi
   fi
-
-  codecovcli upload-process -C $COMMIT_SHA
+  codecovcli upload-process $UPLOAD_ARGS
 fi
 
 if [ $ERROR == 1 ]; then
