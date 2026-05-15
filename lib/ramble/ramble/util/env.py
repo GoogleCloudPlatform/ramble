@@ -51,14 +51,14 @@ def _get_env_append_commands(var_conf, expander, var_set, shell="sh"):
         if "var-separator" in append_group:
             sep = append_group["var-separator"]
 
-        for group in append_funcs:
+        for group, func in append_funcs.items():
             if group in append_group:
                 for var, val in append_group[group].items():
                     expanded_var = expander.expand_var(var)
                     if expanded_var not in var_set:
                         env_mods.set(expanded_var, "${%s}" % expanded_var)
                         var_set.add(expanded_var)
-                    append_funcs[group](expanded_var, val, sep=sep)  # type: ignore[operator]
+                    func(expanded_var, val, sep=sep)  # type: ignore[operator]
 
     env_cmds_arr = env_mods.shell_modifications(shell=shell, explicit=True)
 
@@ -75,8 +75,8 @@ def _get_env_prepend_commands(var_conf, expander, var_set, shell="sh"):
     var_set_orig = var_set.copy()
 
     for prepend_group in var_conf:
-        for group in prepend_group:
-            for var, val in prepend_group[group].items():
+        for group, group_vars in prepend_group.items():
+            for var, val in group_vars.items():
                 expanded_var = expander.expand_var(var)
                 if expanded_var not in var_set:
                     env_mods.set(expanded_var, "${%s}" % expanded_var)
