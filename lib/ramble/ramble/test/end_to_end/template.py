@@ -21,7 +21,7 @@ pytestmark = pytest.mark.usefixtures(
 workspace = RambleCommand("workspace")
 
 
-def test_template(workspace_name):
+def test_template(make_workspace_from_config):
     test_config = """
 ramble:
   variables:
@@ -38,14 +38,9 @@ ramble:
                 n_nodes: 1
                 hello_name: santa
 """
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
     run_dir = os.path.join(ws.experiment_dir, "template/test_template/test/")
     script_path = os.path.join(run_dir, "bar.sh")
     assert os.path.isfile(script_path)
@@ -70,7 +65,7 @@ ramble:
     assert os.path.isfile(script4_path)
 
     # Test template archival
-    workspace("archive", global_args=["-w", workspace_name])
+    workspace("archive", global_args=["-w", ws_name])
     exp_archive_path = os.path.join(
         ws.latest_archive_path, "experiments", "template", "test_template", "test"
     )
@@ -79,7 +74,7 @@ ramble:
     assert "script.sh" in files
 
 
-def test_template_inherited(workspace_name):
+def test_template_inherited(make_workspace_from_config):
     test_config = """
 ramble:
   variables:
@@ -94,14 +89,9 @@ ramble:
           experiments:
             test: {}
 """
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
     run_dir = os.path.join(ws.experiment_dir, "template-inherited/test_template/test/")
     script_path = os.path.join(run_dir, "bar.sh")
     assert os.path.isfile(script_path)
@@ -117,7 +107,9 @@ ramble:
     assert os.path.isfile(script_path)
 
 
-def test_executable_templates_no_trailing_spaces(mutable_mock_apps_repo, workspace_name):
+def test_executable_templates_no_trailing_spaces(
+    mutable_mock_apps_repo, make_workspace_from_config
+):
     test_config = """
 ramble:
   variables:
@@ -136,14 +128,9 @@ ramble:
     packages: {}
     environments: {}
 """
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
     run_dir = os.path.join(ws.experiment_dir, "basic/template_wl/test/")
     execute_path = os.path.join(run_dir, "execute_experiment")
 
@@ -153,7 +140,7 @@ ramble:
         assert "EOF " not in content
 
 
-def test_template_wrong_extension(mutable_mock_apps_repo, workspace_name):
+def test_template_wrong_extension(mutable_mock_apps_repo, make_workspace_from_config):
     template_src_name = "template_wrong_extension.sh"
     ext = ramble.workspace.TEMPLATE_EXTENSION
     test_config = f"""
@@ -171,12 +158,7 @@ ramble:
           experiments:
             test: {{}}
 """
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config)
 
     # Create a template file without the correct extension
     open(os.path.join(ws.config_dir, template_src_name), "w")
@@ -185,11 +167,11 @@ ramble:
         ApplicationError,
         match=f"Template file .*template_wrong_extension.sh{ext} does not exist",
     ):
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+        workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
     # It should pick up the correctly named template
     open(os.path.join(ws.config_dir, template_src_name + ext), "w")
-    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
     assert os.path.isfile(
         os.path.join(ws.experiment_dir, f"template/test_template/test/{template_src_name}")
     )
