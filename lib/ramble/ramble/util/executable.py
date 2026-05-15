@@ -75,6 +75,7 @@ class CommandExecutable:
         output_capture: OUTPUT_CAPTURE = OUTPUT_CAPTURE.DEFAULT,
         run_in_background: bool = False,
         allow_extension: bool = False,
+        when: Optional[List[str]] = None,
         **kwargs: Any,
     ):
         """Create a CommandExecutable instance
@@ -110,6 +111,7 @@ class CommandExecutable:
         self.run_in_background = run_in_background
         self.variables = variables.copy()
         self.allow_extension = allow_extension
+        self.when = when.copy() if when else []
 
     def copy(self) -> "CommandExecutable":
         """Replicate a CommandExecutable instance"""
@@ -121,6 +123,7 @@ class CommandExecutable:
             variables=self.variables,
             output_capture=self.output_capture,
             run_in_background=self.run_in_background,
+            when=self.when,
         )
         return new_inst
 
@@ -128,7 +131,7 @@ class CommandExecutable:
         """String representation of CommandExecutable instance"""
 
         color_name = ramble.util.colors.section_title(self.name)
-        attrs = ["mpi", "variables", "redirect", "output_capture", "run_in_background"]
+        attrs = ["mpi", "variables", "redirect", "output_capture", "run_in_background", "when"]
         self_str = f"{color_name}:\n"
         self_str += f"    {ramble.util.colors.nested_1('template')}:\n"
         for temp in self.template:
@@ -149,6 +152,7 @@ class CommandExecutable:
             "variables",
             "allow_extension",
             "template",
+            "when",
         ]
 
         if cmp is None:

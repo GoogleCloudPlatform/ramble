@@ -251,9 +251,9 @@ def _get_modifier_outputs():
         ),
         (
             "package_manager_requirements",
-            "",
+            "list not-a-package",
             ["not_empty", "info_mode=another-mode"],
-        ),  # TODO: Fix this test once info is fixed
+        ),
     ]
 
     out = _get_shared_outputs()

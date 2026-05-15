@@ -152,9 +152,9 @@ def figure_of_merit(
             "units": units,
             "contexts": context_list,
             "fom_type": fom_type,
-            "when": when_list,
             "origin_type": obj.origin_type if hasattr(obj, "origin_type") else "",
             "fom_map_key": fom_map_key,
+            "when": when_list,
         }
 
     return _execute_figure_of_merit
@@ -753,6 +753,7 @@ def formatted_executable(
             "indentation": indentation,
             "join_separator": join_separator,
             "commands": commands.copy(),
+            "when": when_list,
         }
 
     return _define_formatted_executable
@@ -793,6 +794,7 @@ def register_validator(
             "predicate": predicate,
             "message": message,
             "fail_on_invalid": fail_on_invalid,
+            "when": when_list,
         }
 
     return _define_validator
@@ -849,6 +851,7 @@ def variable(
                 description=description,
                 values=values,
                 expandable=expandable,
+                when=when_list,
                 **kwargs,
             )
         )
@@ -1211,7 +1214,7 @@ def command_variable(
                 description=description,
                 expandable=expandable,
                 track_used=track_used,
-                when=when_key,
+                when=when_list,
             )
         )
 

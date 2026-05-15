@@ -12,6 +12,14 @@ import ramble.util.colors as color
 class PackageManagerRequirement:
     """Class representing a package manager requirement for a modifier"""
 
+    print_attr_map = [
+        ("command", "Command"),
+        ("validation_type", "Validation Type"),
+        ("package_manager", "Package Manager"),
+        ("regex", "Regex"),
+        ("when", "When"),
+    ]
+
     def __init__(
         self, command: str, validation_type: str, regex: str, package_manager: str, when: list
     ):
@@ -49,17 +57,17 @@ class PackageManagerRequirement:
         indentation = " " * n_indent
 
         if verbose:
-            print_attrs = ["command", "validation_type", "package_manager", "regex"]
-
-            out_str = f"{indentation}{color.section_title('When:')} {self.when}\n"
-            for print_attr in print_attrs:
-                attr_val = getattr(self, print_attr, None)
+            out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
+            for attr_name, print_name in self.print_attr_map:
+                attr_val = getattr(self, attr_name, None)
 
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {color.nested_1(print_attr)}: " f"{str(attr_val)}\n"
+                        f"{indentation}    "
+                        f"{color.title_color(print_name, n_indent=n_indent + 4)}: "
+                        f"{str(attr_val)}\n"
                     )
         else:
-            out_str = f"{indentation}{self.when}"
+            out_str = f"{indentation}{self.name}"
 
         return out_str
