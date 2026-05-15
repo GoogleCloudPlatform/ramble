@@ -797,7 +797,7 @@ class SoftwareEnvironments:
 
         if namespace.environments in self._software_dict:
             for env_template, env_info in self._software_dict[namespace.environments].items():
-                if namespace.external_env in env_info and env_info[namespace.external_env]:
+                if env_info.get(namespace.external_env):
                     # External environments are stored in a separate template dict, such that it
                     # still goes through the rendering to concretize on the package_manager used.
                     new_env = ExternalEnvironment(env_template, env_info[namespace.external_env])

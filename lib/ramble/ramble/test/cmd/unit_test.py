@@ -84,6 +84,7 @@ def test_external_repo_valid(tmpdir):
         [ramble_bin, "unit-test", "--repo-path", str(tmpdir), "-k", "test_dummy"],
         capture_output=True,
         text=True,
+        check=False,
     )
     assert result.returncode == 0
     assert "1 passed" in result.stdout

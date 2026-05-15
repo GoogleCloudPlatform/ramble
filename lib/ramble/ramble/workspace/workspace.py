@@ -1735,7 +1735,7 @@ ramble:
                                     for fom_val in fom_val_list:
                                         f.write(f"      {fom_val.strip()}\n")
 
-                            if software_key in exp and exp[software_key]:
+                            if exp.get(software_key):
                                 self.write_software_info(f, exp)
 
                         else:
@@ -1751,7 +1751,7 @@ ramble:
                                     output = f"{name} = {fom['value']} {fom['units']}"
                                     f.write(f"    {output.strip()}\n")
 
-                            if software_key in exp and exp[software_key]:
+                            if exp.get(software_key):
                                 self.write_software_info(f, exp)
 
                         if exp["VARIANTS"]:
