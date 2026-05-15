@@ -512,6 +512,26 @@ Validators can be registered to ensure certain conditions are met during
 experiment setup. The ``register_validator`` directive
 (:py:meth:`ramble.language.shared_language.register_validator`) is used for this.
 
+^^^^^^^^^^^^^^^^^^^^
+Conflicts
+^^^^^^^^^^^^^^^^^^^^
+
+Conflicts can be registered to ensure invalid variant combinations or
+unsupported configurations are prevented during experiment setup. The
+``conflict`` directive (:py:meth:`ramble.language.shared_language.conflict`) is
+used for this.
+
+.. code-block:: python
+
+    with when("+validation"):
+        conflict(
+            "zlib_type=preferred", msg="Validation requires non-preferred zlib"
+        )
+        conflict(
+            "application_version@2.0:",
+            msg="Validation does not support version 2.0 or higher",
+        )
+
 
 .. _application-dev-conditional-logic:
 
