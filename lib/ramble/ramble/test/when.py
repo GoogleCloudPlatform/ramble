@@ -1832,3 +1832,95 @@ def test_obj_required_key_when(
 
         for exp in data["experiments"]:
             assert f"test_{obj}_required_key" in exp
+
+
+@pytest.mark.parametrize(
+    "variant_name",
+    [
+        "bad_spec",
+        "bad_when",
+    ],
+)
+def test_object_conflicts_expander_errors(workspace_name, variant_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:{variant_name}:True", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+
+def test_object_conflicts_no_msg(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:nomsg:True", global_args=global_args)
+
+        ws._re_read()
+        with pytest.raises(
+            ObjectValidationError,
+            match=r"Conflict detected in 'object-conflicts': '\+nomsg' is active when \+nomsg",
+        ):
+            workspace("setup", global_args=global_args)
+
+
+def test_object_conflicts_warn_only(workspace_name):
+    from unittest.mock import patch
+
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:nomsg:True", global_args=global_args)
+
+        ws._re_read()
+        with patch("ramble.util.logger.logger.warn") as mock_warn:
+            ws.build_experiment_set(die_on_validate_error=False)
+            mock_warn.assert_any_call(
+                "Conflict detected in 'object-conflicts': '+nomsg' is active when +nomsg"
+            )
