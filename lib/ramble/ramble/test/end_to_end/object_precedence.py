@@ -12,14 +12,11 @@ import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.util.command_runner import RunnerError
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
     "mutable_mock_workspace_path",
-    "mutable_mock_apps_repo",
-    "mutable_mock_mods_repo",
-    "mutable_mock_pkg_mans_repo",
-    "mutable_mock_wms_repo",
 )
 
 workspace = RambleCommand("workspace")
@@ -35,7 +32,16 @@ workspace = RambleCommand("workspace")
         ),
     ],
 )
-def test_object_precedence_variables(workspace_name, test_args, disabled_value, enabled_value):
+def test_object_precedence_variables(
+    workspace_name,
+    test_args,
+    disabled_value,
+    enabled_value,
+    mutable_mock_apps_repo,
+    mutable_mock_mods_repo,
+    mutable_mock_pkg_mans_repo,
+    mutable_mock_wms_repo,
+):
     global_args = ["-w", workspace_name]
 
     ws = ramble.workspace.create(workspace_name)
@@ -80,3 +86,47 @@ def test_object_precedence_variables(workspace_name, test_args, disabled_value, 
 
     with open(test_file) as f:
         assert enabled_value in f.read()
+
+
+def test_object_precedence_ordering(
+    workspace_name, mock_applications, mock_platforms, mock_systems
+):
+    ws = ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+    workspace(
+        "manage",
+        "experiments",
+        "basic",
+        "--wf",
+        "test_wl2",
+        "-v",
+        "n_ranks={processes_per_node}*{n_nodes}",
+        "-v",
+        "n_nodes=1",
+        "-v",
+        "processes_per_node={max_cores_per_node}",
+        "-V",
+        "system=spack-slurm-sys",
+        global_args=global_args,
+    )
+
+    ws._re_read()
+    ws.dry_run = True
+
+    try:
+        workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+        exec_file = os.path.join(
+            ws.experiment_dir, "basic", "test_wl2", "generated", "slurm_experiment_sbatch"
+        )
+        assert os.path.isfile(exec_file)
+        with open(exec_file) as f:
+            data = f.read()
+            # Verify mpi_command from workflow manager is not set
+            assert "srun" not in data
+            # Verify mpi_command from system is set, since that
+            # is higher precedence than workflow managers.
+            assert "mpirun" in data
+            assert "-t sys-variant1-foo" in data
+    except RunnerError as e:
+        pytest.skip(str(e))
