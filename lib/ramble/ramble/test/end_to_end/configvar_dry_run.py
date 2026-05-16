@@ -14,7 +14,9 @@ import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
-pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
+pytestmark = pytest.mark.usefixtures(
+    "mutable_config", "mutable_mock_workspace_path", "workspace_deactivate"
+)
 
 workspace = RambleCommand("workspace")
 

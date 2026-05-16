@@ -114,7 +114,7 @@ def _get_scope_and_section(args):
     path = getattr(args, "path", None)
 
     # w/no args and an active workspace, point to workspace config
-    if not section:
+    if not scope and not section:
         ws = ramble.workspace.active_workspace()
         if ws:
             scope = ws.ws_file_config_scope_name()

@@ -43,6 +43,8 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         "processes_per_node={max_cores_per_node}",
         "-V",
         "system=spack-slurm-sys",
+        "-V",
+        "system-variant1=bar",
         global_args=global_args,
     )
 
@@ -82,7 +84,6 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
             assert "SBATCH" in data
             # Ensure cores_per_node=4 propagated, and srun is used from slurm
             assert "srun -n 4" in data
-
         # Verify command variables were "defined"
         log_file = os.path.join(ws.log_dir, "setup.latest", "gromacs.lignocellulose.generated.out")
         expected = (

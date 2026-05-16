@@ -914,7 +914,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             to_remove.add(when_key)
                             variable_dict = getattr(obj, variable_set_attr, {})
                             if when_key in variable_dict:
-                                for var in variable_dict[when_key]:
+                                for var in reversed(variable_dict[when_key]):
                                     if var.name not in original_variables:
                                         if (
                                             var.name not in to_define
@@ -4074,7 +4074,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if attr_name:
                 attr_val = getattr(self, attr_name, None)
                 if attr_val and isinstance(attr_val, list):
-                    for attr_inst in attr_val:
+                    for attr_inst in reversed(attr_val):
                         yield from _yield_registered(attr_inst)
                 elif attr_val:
                     yield from _yield_registered(attr_val)
