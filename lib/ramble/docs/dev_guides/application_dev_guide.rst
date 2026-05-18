@@ -340,6 +340,10 @@ and ``when`` conditions can be described using the following syntax:
 * ``application_version@<start_number>:<end_number>`` Apply to a range of
   versions, inclusive of specified versions.
 
+Ramble also allows the shorthand ``@<version_spec>`` syntax, where Ramble will
+automatically prefix it with the origin type of the object containing the
+directive (e.g., ``application_version`` or ``modifier_version``).
+
 Ramble relies on `Python packaging.version`_ to calculate whether a version
 satisfies ``when`` criteria. In some cases, it may be necessary to adjust the
 format of version numbers to conform with `PEP 440 version specifiers`_. For

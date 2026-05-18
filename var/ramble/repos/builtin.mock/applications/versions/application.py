@@ -25,6 +25,14 @@ class Versions(VersionsBase):
             description="Variable to print for testing",
         )
 
+        environment_variable(
+            "APP_ENV_VAR",
+            value="APP_ENV_VAR_SET",
+            description="Test app environment variable",
+            workload="test_wl",
+            when=["@:0.9"],
+        )
+
     version("2.0a1", description="Versions 2.0 alpha", preferred=False)
     version("1.0", description="Versions 1.0", preferred=True)
     version("0.9", description="Versions 0.9", preferred=False)
@@ -41,7 +49,7 @@ class Versions(VersionsBase):
         with when("application_version@0.9:1.0"):
             software_spec("zlib-range", pkg_spec="zlib@1.2.12")
 
-        with when("application_version@:0.9"):
+        with when("@:0.9"):
             software_spec("zlib-less", pkg_spec="zlib@1.2.11")
 
         required_package("zlib")
