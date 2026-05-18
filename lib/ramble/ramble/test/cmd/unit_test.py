@@ -88,3 +88,9 @@ def test_external_repo_valid(tmpdir):
     )
     assert result.returncode == 0
     assert "1 passed" in result.stdout
+
+
+@pytest.mark.parametrize("flag", ["--perf", "--fast"])
+def test_flags_accepted(flag):
+    output = ramble_test(flag, "--list")
+    assert "ramble/test/cmd/unit_test.py" in output
