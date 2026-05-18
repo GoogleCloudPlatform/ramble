@@ -177,9 +177,10 @@ def deactivate():
 
     logger.debug(f"Deactivated workspace '{_active_workspace.root}'")
 
-    deactivate_config_scope(_active_workspace)
-
-    _active_workspace = None
+    try:
+        deactivate_config_scope(_active_workspace)
+    finally:
+        _active_workspace = None
 
 
 def prepare_config_scope(workspace):
