@@ -25,7 +25,6 @@ workspace = RambleCommand("workspace")
     [
         ("1.0 seconds\nExperiment status: SUCCESS", "SUCCESS"),
         ("1.0 seconds\nExperiment status: FAILED", "FAILED"),
-        ("1.0 seconds\nExperiment status: FAILED", "FAILED"),
     ],
 )
 @pytest.mark.parametrize(

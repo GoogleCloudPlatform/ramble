@@ -179,7 +179,7 @@ class ExperimentResult:
 
         # Remove app_inst to prevent pickle issues
         app_inst = self._app_inst
-        delattr(self, "_app_inst")
+        del self._app_inst
 
         obj_dict = copy.deepcopy(self.__dict__)
 

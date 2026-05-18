@@ -50,7 +50,7 @@ class UserManaged(PackageManagerBase):
         Ramble.
         """
         for _, obj in app_inst.objects():
-            for pkgname in obj.required_packages.keys():
+            for pkgname in obj.required_packages:
                 app_inst.keywords.update_keys(
                     {
                         f"{pkgname}_path": {

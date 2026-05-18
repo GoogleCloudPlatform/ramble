@@ -21,4 +21,3 @@ class MODIFIER_CONFLICT(Enum):
 
     # Conflict on name, mode, and overlapping executables
     name_mode_executables = 3
-    name_executables_mode = 3
