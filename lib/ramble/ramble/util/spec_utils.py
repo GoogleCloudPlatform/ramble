@@ -81,9 +81,8 @@ class SoftwareSpec:
         for key, val in self_dict.items():
             output += f"{indentation}{color.nested_1(key)}: {val}\n"
         if self.when:
-            output += color.nested_2(f"\n{indentation}When:\n")
-            for condition in self.when:
-                output += f"{indentation}    {condition}\n"
+            color_when = color.nested_1("when")
+            output += f"{indentation}{color_when}: {self.when}\n"
         return output
 
     def __str__(self):

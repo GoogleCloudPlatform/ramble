@@ -22,6 +22,7 @@ class Variable:
         ("description", "Description"),
         ("default", "Default"),
         ("values", "Suggested Values"),
+        ("when", "When"),
     ]
 
     def __init__(
@@ -101,6 +102,7 @@ class CommandVariable(Variable):
         ("description", "Description"),
         ("command", "Command"),
         ("dry_run_value", "Dry Run Value"),
+        ("when", "When"),
     ]
 
     def __init__(
@@ -196,6 +198,13 @@ class CommandVariable(Variable):
 class VariableModification:
     """Class representing a variable modification"""
 
+    print_attr_map = [
+        ("modification", "Modification"),
+        ("method", "Method"),
+        ("separator", "Separator"),
+        ("when", "When"),
+    ]
+
     def __init__(
         self,
         name: str,
@@ -244,19 +253,14 @@ class VariableModification:
         """
         indentation = " " * n_indent
 
-        print_attrs = ["Modification", "Method", "Separator", "When"]
-
         out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
-        for print_attr in print_attrs:
-            name = print_attr
-            attr_name = print_attr.lower()
-
+        for attr_name, print_name in self.print_attr_map:
             attr_val = getattr(self, attr_name, None)
             if attr_val:
-                if print_attr == "Separator":
+                if print_name == "Separator":
                     attr_val = f"'{attr_val}'"
                 out_str += (
-                    f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
+                    f"{indentation}    {color.title_color(print_name, n_indent=n_indent + 4)}: "
                     f"{str(attr_val)}\n"
                 )
         return out_str
@@ -267,6 +271,14 @@ class VariableModification:
 
 class EnvironmentVariable:
     """Class representing an environment variable"""
+
+    print_attr_map = [
+        ("description", "Description"),
+        ("value", "Value"),
+        ("method", "Method"),
+        ("separator", "Separator"),
+        ("when", "When"),
+    ]
 
     def __init__(
         self,
@@ -313,16 +325,15 @@ class EnvironmentVariable:
         indentation = " " * n_indent
 
         if verbose:
-            print_attrs = ["Description", "Value", "Method"]
-            if self.method == "append":
-                print_attrs.append("Separator")
             out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
-            for name in print_attrs:
-                attr_name = name.lower()
+            for attr_name, print_name in self.print_attr_map:
+                if print_name == "Separator" and self.method != "append":
+                    continue
                 attr_val = getattr(self, attr_name, None)
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
+                        f"{indentation}    "
+                        f"{color.title_color(print_name, n_indent=n_indent + 4)}: "
                         f"{str(attr_val)}\n"
                     )
         else:

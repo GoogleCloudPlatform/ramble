@@ -186,7 +186,9 @@ def executable(name, template, when=None, **kwargs):
         if when_set not in app.executables:
             app.executables[when_set] = {}
 
-        app.executables[when_set][name] = CommandExecutable(name=name, template=template, **kwargs)
+        app.executables[when_set][name] = CommandExecutable(
+            name=name, template=template, when=when_list, **kwargs
+        )
 
     return _execute_executable
 
@@ -596,7 +598,7 @@ def stage_files(
                 template.append(f"{stage_cmd} {pair_src} {pair_dst}")
 
         app.executables[when_set][exec_name] = CommandExecutable(
-            name=exec_name, template=template, allow_extension=True, **kwargs
+            name=exec_name, template=template, allow_extension=True, when=when_list, **kwargs
         )
 
     return _execute_stage_files
