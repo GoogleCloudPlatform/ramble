@@ -12,7 +12,6 @@ import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
-from ramble.util.command_runner import RunnerError
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
@@ -113,20 +112,17 @@ def test_object_precedence_ordering(
     ws._re_read()
     ws.dry_run = True
 
-    try:
-        workspace("setup", "--dry-run", global_args=["-D", ws.root])
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
-        exec_file = os.path.join(
-            ws.experiment_dir, "basic", "test_wl2", "generated", "slurm_experiment_sbatch"
-        )
-        assert os.path.isfile(exec_file)
-        with open(exec_file) as f:
-            data = f.read()
-            # Verify mpi_command from workflow manager is not set
-            assert "srun" not in data
-            # Verify mpi_command from system is set, since that
-            # is higher precedence than workflow managers.
-            assert "mpirun" in data
-            assert "-t sys-variant1-foo" in data
-    except RunnerError as e:
-        pytest.skip(str(e))
+    exec_file = os.path.join(
+        ws.experiment_dir, "basic", "test_wl2", "generated", "slurm_experiment_sbatch"
+    )
+    assert os.path.isfile(exec_file)
+    with open(exec_file) as f:
+        data = f.read()
+        # Verify mpi_command from workflow manager is not set
+        assert "srun" not in data
+        # Verify mpi_command from system is set, since that
+        # is higher precedence than workflow managers.
+        assert "mpirun" in data
+        assert "-t sys-variant1-foo" in data

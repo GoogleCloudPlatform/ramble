@@ -835,13 +835,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for i, (_, obj) in enumerate(self.objects()):
             obj_precedence[obj] = i
 
-        app_precedence = len(obj_precedence)
+        default_value_precedence = len(obj_precedence)
 
         # Process the application variables that are missing
         for var, val in self.selected_variables.items():
             if var not in self.variables:
                 self.define_variable(var, val.default)
-                var_precedence[var] = app_precedence
+                var_precedence[var] = default_value_precedence
 
         # Define object version and variant variables
         # Also, extract a merged set of when_keys from objects that are not
