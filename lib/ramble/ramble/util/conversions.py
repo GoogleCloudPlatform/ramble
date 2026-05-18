@@ -23,9 +23,7 @@ def list_str_to_list(in_str: str) -> Union[str, list]:
         return in_str
 
     temp = in_str.replace("[", "").replace("]", "")
-    out_value = []
-    for part in temp.split(","):
-        out_value.append(strip_quotes(part))
+    out_value = [strip_quotes(part) for part in temp.split(",")]
     return out_value
 
 

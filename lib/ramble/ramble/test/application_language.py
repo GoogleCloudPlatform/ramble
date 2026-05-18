@@ -291,7 +291,8 @@ def test_figure_of_merit_directive_required_args():
         units="s",
         fom_map_key="test_fom_map_key",
     )
-    foms = list(list(app_inst.figures_of_merit.values())[0].values())[0]
+    first_fom_group = next(iter(app_inst.figures_of_merit.values()))
+    foms = next(iter(first_fom_group.values()))
     assert len(foms) == 1
     assert foms["test_inmem_fom"]["fom_map_key"] == "test_fom_map_key"
 

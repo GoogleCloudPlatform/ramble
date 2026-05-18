@@ -15,7 +15,6 @@ from typing import List
 import ramble.definitions.families
 import ramble.repository
 import ramble.util.class_attributes
-import ramble.util.directives
 import ramble.variants
 from ramble.language.package_manager_language import PackageManagerMeta
 from ramble.language.shared_language import SharedMeta, register_phase

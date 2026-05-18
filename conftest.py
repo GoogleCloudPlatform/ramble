@@ -822,12 +822,11 @@ def pytest_generate_tests(metafunc):
 
         config_cmd = RambleCommand("config")
 
-        all_sections = []
         config_sections = config_cmd("list").split(" ")
 
-        for section_str in config_sections:
-            if section_str != "":
-                all_sections.append(section_str.strip())
+        all_sections = [
+            section_str.strip() for section_str in config_sections if section_str != ""
+        ]
 
         metafunc.parametrize("config_section", all_sections)
 

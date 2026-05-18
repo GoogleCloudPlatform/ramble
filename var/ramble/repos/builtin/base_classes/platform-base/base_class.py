@@ -9,7 +9,6 @@
 
 import ramble.definitions.families
 import ramble.util.class_attributes
-import ramble.util.directives
 import ramble.variants
 from ramble.language.platform_language import PlatformMeta
 from ramble.language.shared_language import (

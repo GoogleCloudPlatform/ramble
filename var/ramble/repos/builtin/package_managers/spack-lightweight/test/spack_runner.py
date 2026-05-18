@@ -265,9 +265,7 @@ def test_default_install_flags(tmpdir, capsys, request):
 
         install_flags = ramble.config.config.get("config:spack:install:flags")
         expected_str = "with args: ["
-        str_args = []
-        for flag in install_flags.split():
-            str_args.append(f"'{flag}'")
+        str_args = [f"'{flag}'" for flag in install_flags.split()]
         expected_str += ",".join(str_args) + "]"
 
         assert "spack install" in captured.out

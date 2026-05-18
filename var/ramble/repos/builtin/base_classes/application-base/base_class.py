@@ -35,7 +35,6 @@ import ramble.stage
 import ramble.success_criteria
 import ramble.util.class_attributes
 import ramble.util.colors as rucolor
-import ramble.util.directives
 import ramble.util.env
 import ramble.util.executable
 import ramble.util.hashing
@@ -2088,9 +2087,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         objs_to_extract = [self, self.workflow_manager, self.package_manager]
 
-        for obj in objs_to_extract + self._modifier_instances:
-            if obj and hasattr(obj, "formatted_executables"):
-                formatted_exec_groups.append(obj.formatted_executables)
+        formatted_exec_groups.extend(
+            obj.formatted_executables
+            for obj in objs_to_extract + self._modifier_instances
+            if obj and hasattr(obj, "formatted_executables")
+        )
 
         all_execs = {}
 
@@ -2151,8 +2152,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     command, replace_escaped_braces=False
                 )
 
-                for out_line in expanded.split("\n"):
-                    formatted_lines.append(indentation + prefix + out_line)
+                formatted_lines.extend(
+                    indentation + prefix + out_line
+                    for out_line in expanded.split("\n")
+                )
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
@@ -2986,12 +2989,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     fom_match = fom_conf["regex"].match(line)
 
                                 if fom_match:
-                                    fom_vars = {}
-                                    for (
-                                        k,
-                                        v,
-                                    ) in fom_match.groupdict().items():
-                                        fom_vars[k] = v
+                                    fom_vars = fom_match.groupdict()
                                     if (
                                         fom_conf["fom_name_expanded"]
                                         is not None
@@ -3349,10 +3347,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_values = fom_contents["fom_values"]
 
                 if fom_contents["fom_is_numeric"]:
-                    calcs = []
 
-                    for statistic in ramble.util.stats.all_stats:
-                        calcs.append(statistic.report(fom_values, fom_units))
+                    calcs = [
+                        statistic.report(fom_values, fom_units)
+                        for statistic in ramble.util.stats.all_stats
+                    ]
 
                     for calc in calcs:
                         if calc[0] == ramble.util.stats.NA:
@@ -3489,8 +3488,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Could push this into the language features in the future
         fom_sources = [self]
-        for mod in self._modifier_instances:
-            fom_sources.append(mod)
+        fom_sources.extend(self._modifier_instances)
         if self.workflow_manager is not None:
             fom_sources.append(self.workflow_manager)
 
@@ -3503,8 +3501,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if self.expander.satisfies(
                     when_fs, variant_set=self.experiment_variants()
                 ):
-                    for context, context_def in source_context_defs.items():
-                        all_contexts[context] = context_def
+                    all_contexts.update(source_context_defs)
             extra_vars = (
                 source.modded_variables(self)
                 if source.origin_type == "modifier"
@@ -3843,9 +3840,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     conf, self.expander, set(), shell=shell
                 )
 
-                for cmd in env_cmds:
-                    if cmd:
-                        command.append(cmd)
+                command.extend(cmd for cmd in env_cmds if cmd)
 
         for mod_inst in self._modifier_instances:
             for env_var_mod in mod_inst.all_env_var_modifications():
@@ -3858,9 +3853,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             set(),
                             shell=shell,
                         )
-                        for cmd in env_cmds:
-                            if cmd:
-                                command.append(cmd)
+                        command.extend(cmd for cmd in env_cmds if cmd)
 
         return command
 

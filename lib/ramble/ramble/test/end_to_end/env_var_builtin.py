@@ -258,9 +258,7 @@ def test_object_env_var_methods(
 
         with open(rendered_script) as f:
             for line in f:
-                for regex in env_var_regexes:
-                    if regex.search(line):
-                        found_vars.append(True)
+                found_vars.extend(True for regex in env_var_regexes if regex.search(line))
 
         assert len(found_vars) == len(env_var_regexes)
 

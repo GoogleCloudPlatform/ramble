@@ -80,9 +80,7 @@ def setup_info_parser(subparser):
 
     arguments.add_common_arguments(subparser, ["obj_type"])
 
-    available_formats = []
-    for format in supported_formats:
-        available_formats.append(format.name)
+    available_formats = [format.name for format in supported_formats]
 
     subparser.add_argument(
         "--format",

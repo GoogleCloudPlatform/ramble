@@ -297,12 +297,11 @@ def licenses_file(path):
 
 def all_config_files(path):
     """Returns path to all yaml files in workspace config directory"""
-    config_files = []
 
     config_path = os.path.join(path, WORKSPACE_CONFIG_PATH)
-    for f in os.listdir(config_path):
-        if f.endswith(".yaml"):
-            config_files.append(os.path.join(config_path, f))
+    config_files = [
+        os.path.join(config_path, f) for f in os.listdir(config_path) if f.endswith(".yaml")
+    ]
 
     return config_files
 
@@ -321,9 +320,7 @@ def all_template_paths(path):
 
     config_path = os.path.join(path, WORKSPACE_CONFIG_PATH)
     for root, _, files in os.walk(config_path):
-        for f in files:
-            if f.endswith(TEMPLATE_EXTENSION):
-                templates.append(os.path.join(root, f))
+        templates.extend(os.path.join(root, f) for f in files if f.endswith(TEMPLATE_EXTENSION))
 
     return templates
 
@@ -639,9 +636,8 @@ cd "{experiment_run_dir}"
         for scope in ramble.config.scopes():
             if namespace.workspace not in scope:
                 variant_dict = ramble.config.get(namespace.variants, scope=scope)
-
-                for var, val in variant_dict.items():
-                    all_variants[var] = val
+                if variant_dict:
+                    all_variants.update(variant_dict)
 
         variant_defs = []
         for var, val in all_variants.items():
@@ -2260,29 +2256,26 @@ ramble:
         Returns:
             (list): List of tuples, of the form (scope, modifier_definition)
         """
-        mod_list = []
         base_section = self._get_scope_section("workspace")
         ws_mods = base_section.get(namespace.modifiers, [])
 
         # Add workspace modifiers
-        for mod in ws_mods:
-            mod_list.append(("workspace", mod))
+        mod_list = [("workspace", mod) for mod in ws_mods]
 
         # Define scoped modifiers
         for workloads, application_context in self.all_applications():
             app_context = f"{application_context.context_name}"
-            for mod in application_context.modifiers:
-                mod_list.append((f"{app_context}", mod))
+            mod_list.extend((f"{app_context}", mod) for mod in application_context.modifiers)
 
             for experiments, workload_context in self.all_workloads(workloads):
                 wl_context = f"{app_context}:{workload_context.context_name}"
-                for mod in workload_context.modifiers:
-                    mod_list.append((f"{wl_context}", mod))
+                mod_list.extend((f"{wl_context}", mod) for mod in workload_context.modifiers)
 
                 for _, experiment_context in self.all_experiments(experiments):
                     exp_context = f"{wl_context}:{experiment_context.context_name}"
-                    for mod in experiment_context.modifiers:
-                        mod_list.append((f"{exp_context}", mod))
+                    mod_list.extend(
+                        (f"{exp_context}", mod) for mod in experiment_context.modifiers
+                    )
 
         return mod_list
 
@@ -2775,10 +2768,11 @@ def _filter_results(results, summary_only, fom_origin_types=None):
         if fom_origin_types:
             filtered_contexts = []
             for context in r.get("CONTEXTS", []):
-                filtered_foms = []
-                for fom in context.get("foms", []):
-                    if fom.get("origin_type") in fom_origin_types:
-                        filtered_foms.append(fom)
+                filtered_foms = [
+                    fom
+                    for fom in context.get("foms", [])
+                    if fom.get("origin_type") in fom_origin_types
+                ]
                 if filtered_foms:
                     context["foms"] = filtered_foms
                     filtered_contexts.append(context)

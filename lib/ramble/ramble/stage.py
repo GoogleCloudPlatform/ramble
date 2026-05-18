@@ -101,21 +101,26 @@ def create_stage_root(path):
         mkdirp(input_subdir, mode=stat.S_IRWXU)
 
 
+def _try_create_stage_root(path):
+    try:
+        # Ensure the user has access, creating the directory if necessary.
+        if os.path.exists(path):
+            if can_access(path):
+                return True
+        else:
+            # Now create the stage root with the proper group/perms.
+            create_stage_root(path)
+            return True
+    except OSError as e:
+        logger.debug(f"OSError while checking stage path {path}: {e}")
+    return False
+
+
 def _first_accessible_path(paths):
     """Find the first path that is accessible, creating it if necessary."""
     for path in paths:
-        try:
-            # Ensure the user has access, creating the directory if necessary.
-            if os.path.exists(path):
-                if can_access(path):
-                    return path
-            else:
-                # Now create the stage root with the proper group/perms.
-                create_stage_root(path)
-                return path
-
-        except OSError as e:
-            logger.debug(f"OSError while checking stage path {path}: {e}")
+        if _try_create_stage_root(path):
+            return path
 
     return None
 
@@ -393,8 +398,9 @@ class InputStage:
             # the root, so we add a '/' if it is not present.
             mirror_urls = []
             for mirror in ramble.mirror.MirrorCollection().values():
-                for rel_path in self.mirror_paths:
-                    mirror_urls.append(url_util.join(mirror.fetch_url, rel_path))
+                mirror_urls.extend(
+                    url_util.join(mirror.fetch_url, rel_path) for rel_path in self.mirror_paths
+                )
 
             # If this archive is normally fetched from a tarball URL,
             # then use the same digest.  `spack mirror` ensures that

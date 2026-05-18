@@ -985,10 +985,11 @@ class SoftwareEnvironments:
             pkg_names.add(pkg.name)
 
         used_compilers = set()
-        compiler_warnings = []
-        for pkg in environment._packages:
-            if isinstance(pkg, RenderedPackage) and pkg.compiler and pkg.compiler in pkg_names:
-                compiler_warnings.append((pkg.name, pkg.compiler))
+        compiler_warnings = [
+            (pkg.name, pkg.compiler)
+            for pkg in environment._packages
+            if isinstance(pkg, RenderedPackage) and pkg.compiler and pkg.compiler in pkg_names
+        ]
 
         logger.debug(f" Used compilers: {used_compilers}")
         logger.debug(f" Compiler warnings: {compiler_warnings}")
