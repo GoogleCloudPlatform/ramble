@@ -235,8 +235,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.result = ExperimentResult(self)
 
-        ramble.util.directives.define_directive_methods(self)
-
     @property
     def experiment_lock(self):
         """Create a lock for the experiment directory, and return it"""
