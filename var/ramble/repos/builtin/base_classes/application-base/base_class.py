@@ -821,11 +821,25 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
 
-        default_variables = {}
+        # Track which precedence level defined each variable.
+        # -1: YAML (highest)
+        # 0-N: Objects in self.objects() order
+        # N+1: Application (lowest)
+        original_variables = self.variables.copy()
+        var_precedence = dict.fromkeys(original_variables, -1)
+
+        # Map objects to their precedence order
+        obj_precedence = {}
+        for i, (_, obj) in enumerate(self.objects()):
+            obj_precedence[obj] = i
+
+        default_value_precedence = len(obj_precedence)
+
         # Process the application variables that are missing
         for var, val in self.selected_variables.items():
             if var not in self.variables:
-                default_variables[var] = val.default
+                self.define_variable(var, val.default)
+                var_precedence[var] = default_value_precedence
 
         # Define object version and variant variables
         # Also, extract a merged set of when_keys from objects that are not
@@ -833,14 +847,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Also, define object version variables
         object_when_map = {"object_variables": {}, "command_variables": {}}
         for obj_type, obj in self.objects():
+            prec = obj_precedence[obj]
             # TODO: Remove the {origin_type}_version variable when we can
             self.define_variable(
                 f"{obj.origin_type}_version", str(obj.selected_version)
             )
+            var_precedence[f"{obj.origin_type}_version"] = prec
             self.define_variable(
                 f"{obj.origin_type}::{obj.name}::version",
                 str(obj.selected_version),
             )
+            var_precedence[f"{obj.origin_type}::{obj.name}::version"] = prec
 
             # Define variant variables for Spack-like syntax expansion
             for (
@@ -851,12 +868,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     f"{obj.origin_type}::variant::{name}",
                     variant.as_definition(),
                 )
+                var_precedence[f"{obj.origin_type}::variant::{name}"] = prec
 
             for name, variant in obj.object_variants.default_variants.items():
                 if name not in obj.object_variants.experiment_variants:
                     self.define_variable(
                         f"{obj.origin_type}::variant::{name}",
                         variant.as_definition(),
+                    )
+                    var_precedence[f"{obj.origin_type}::variant::{name}"] = (
+                        prec
                     )
 
             if obj_type != ramble.repository.ObjectTypes.applications:
@@ -867,7 +888,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     for when_key, var_list in variable_set.items():
                         keep = False
                         for var in var_list:
-                            if var.name not in self.variables:
+                            if var.name not in original_variables:
                                 keep = True
 
                         if keep:
@@ -882,24 +903,37 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             while True:
                 to_define = {}
                 changed_definitions = False
+
                 for obj, when_keys in when_map.items():
                     to_remove = set()
+                    obj_prec = obj_precedence[obj]
                     for when_key in when_keys:
                         if obj.satisfy_when(when_key):
                             to_remove.add(when_key)
                             variable_dict = getattr(obj, variable_set_attr, {})
                             if when_key in variable_dict:
-                                for var in variable_dict[when_key]:
-                                    if var.name not in self.variables:
-                                        if isinstance(var, CommandVariable):
-                                            to_define[var.name] = (
-                                                var.extract_value(
-                                                    workspace, self
+                                for var in reversed(variable_dict[when_key]):
+                                    if var.name not in original_variables:
+                                        if (
+                                            var.name not in to_define
+                                            and obj_prec
+                                            < var_precedence.get(var.name, 999)
+                                        ):
+                                            if isinstance(
+                                                var, CommandVariable
+                                            ):
+                                                to_define[var.name] = (
+                                                    var.extract_value(
+                                                        workspace, self
+                                                    )
                                                 )
-                                            )
-                                        else:
-                                            to_define[var.name] = var.default
-                                        changed_definitions = True
+                                            else:
+                                                to_define[var.name] = (
+                                                    var.default
+                                                )
+
+                                            var_precedence[var.name] = obj_prec
+                                            changed_definitions = True
 
                     # Remove any satisfied when_keys, as we won't need to check
                     # them (since their variables have already been defined).
@@ -910,9 +944,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     break
 
                 for var, val in to_define.items():
-                    default_variables[var] = val
-
-                for var, val in default_variables.items():
                     self.define_variable(var, val)
 
     def set_internals(self, internals):
@@ -4041,7 +4072,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if attr_name:
                 attr_val = getattr(self, attr_name, None)
                 if attr_val and isinstance(attr_val, list):
-                    for attr_inst in attr_val:
+                    for attr_inst in reversed(attr_val):
                         yield from _yield_registered(attr_inst)
                 elif attr_val:
                     yield from _yield_registered(attr_val)

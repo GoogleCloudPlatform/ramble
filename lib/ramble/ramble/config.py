@@ -445,7 +445,8 @@ def _config_mutator(method):
 
     @functools.wraps(method)
     def _method(self, *args, **kwargs):
-        self._get_config_memoized.cache.clear()
+        if hasattr(self, "_get_config_cache"):
+            self._get_config_cache.clear()
         return method(self, *args, **kwargs)
 
     return _method
@@ -639,10 +640,16 @@ class Configuration:
            }
 
         """
-        return self._get_config_memoized(section, scope)
+        if not hasattr(self, "_get_config_cache"):
+            self._get_config_cache = {}
 
-    @llnl.util.lang.memoized
-    def _get_config_memoized(self, section, scope):
+        key = (section, scope)
+        if key not in self._get_config_cache:
+            self._get_config_cache[key] = self._get_config_no_memo(section, scope)
+
+        return self._get_config_cache[key]
+
+    def _get_config_no_memo(self, section, scope):
         _validate_section_name(section)
 
         if scope is None:

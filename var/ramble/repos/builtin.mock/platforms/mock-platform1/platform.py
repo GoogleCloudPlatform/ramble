@@ -41,3 +41,9 @@ class MockPlatform1(PlatformBase):
         description="Memory per node in GB",
         default="20",
     )
+
+    variable(
+        "system_variant1",
+        default="foo",
+        description="Variable to determine variant value",
+    )

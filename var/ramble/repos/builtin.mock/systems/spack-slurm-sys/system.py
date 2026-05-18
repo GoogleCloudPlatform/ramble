@@ -20,6 +20,14 @@ class SpackSlurmSys(SystemBase):
 
     available_platforms(["mock-platform1"])
 
+    required_variable("system_variant1")
+
+    variant(
+        "system-variant1",
+        default="{system_variant1}",
+        values=["foo", "bar", "baz"],
+    )
+
     with when("package_manager_family=spack"):
         auxiliary_software_file(
             "spack_packages",
@@ -39,4 +47,11 @@ class SpackSlurmSys(SystemBase):
             variable_definitions={
                 "slurm_partition": "mock-partition",
             }
+        )
+
+    with when("system-variant1=foo"):
+        variable(
+            "mpi_command",
+            default="mpirun -n {n_ranks} -t sys-variant1-foo",
+            description="Override mpi_command",
         )
