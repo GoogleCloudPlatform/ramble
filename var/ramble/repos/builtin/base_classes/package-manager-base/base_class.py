@@ -161,6 +161,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         """
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
+        self.clear_variant_cache()
 
     def build_used_variables(self):
         """Build a set of all used variables

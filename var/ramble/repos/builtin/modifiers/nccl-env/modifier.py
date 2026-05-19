@@ -524,7 +524,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_nvb_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Disable intra-node communication through NVLink via an intermediate GPU.",
         modes=["standard"],
     )
@@ -532,7 +532,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_pxn_disable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Disable inter-node communication using a non-local NIC, using NVLink and an intermediate GPU.",
         modes=["standard"],
     )
@@ -547,7 +547,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_runtime_connect",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Dynamically connect peers during runtime instead of init stage.",
         modes=["standard"],
     )
@@ -555,7 +555,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_local_register",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enable user local buffer registration when users explicitly call ncclCommRegister.",
         modes=["standard"],
     )
@@ -563,7 +563,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_set_stack_size",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Set CUDA kernel stack size to the maximum stack size amongst all NCCL kernels.",
         modes=["standard"],
     )
@@ -571,7 +571,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_graph_mixing_support",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Controls support for multiple outstanding NCCL calls.",
         modes=["standard"],
     )
@@ -579,7 +579,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_dmabuf_enable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enable GPU Direct RDMA buffer registration using the Linux dma-buf subsystem.",
         modes=["standard"],
     )
@@ -601,7 +601,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_alloc_p2p_net_ll_buffers",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Instructs communicators to allocated dedicated LL buffers for all P2P network connections.",
         modes=["standard"],
     )
@@ -609,7 +609,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_comm_blocking",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Controls whether NCCL calls are allowed to block or not.",
         modes=["standard"],
     )
@@ -617,7 +617,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_cga_cluster_size",
         default="",
-        values=["0", "1", "2", "3", "4", "5", "6", "7", "8"],
+        values=["", "0", "1", "2", "3", "4", "5", "6", "7", "8"],
         description="Set CUDA Cooperative Group Array cluster size.",
         modes=["standard"],
     )
@@ -646,7 +646,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_merge_nics",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enable NCCL to combine dual-port IB NICs into a single logical network device.",
         modes=["standard"],
     )
@@ -654,7 +654,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_ib_merge_vfs",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enable NCCL to combine virtual functions into a single physical network device.",
         modes=["standard"],
     )
@@ -662,7 +662,7 @@ class NcclEnv(BasicModifier):
     modifier_variable(
         "nccl_mnnvl_enable",
         default="",
-        values=["0", "1"],
+        values=["", "0", "1"],
         description="Enable NCCL to use Multi-Node NVLink when available.",
         modes=["standard"],
     )

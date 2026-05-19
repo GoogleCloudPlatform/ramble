@@ -912,7 +912,9 @@ def workspace_info(args):
                     if not active:
                         continue
 
-                    if app_inst.package_manager is not None:
+                    if (
+                        args.software or args.all_software
+                    ) and app_inst.package_manager is not None:
                         software_environments.render_environment(
                             app_inst.expander.expand_var("{env_name}"),
                             app_inst.expander,
@@ -934,11 +936,12 @@ def workspace_info(args):
                         print_header = False
 
                     # Aggregate pipeline phases
-                    for pipeline in app_inst.pipelines:
-                        if pipeline not in all_pipelines:
-                            all_pipelines[pipeline] = set()
-                        for phase in app_inst.get_pipeline_phases(pipeline):
-                            all_pipelines[pipeline].add(phase)
+                    if args.phases:
+                        for pipeline in app_inst.pipelines:
+                            if pipeline not in all_pipelines:
+                                all_pipelines[pipeline] = set()
+                            for phase in app_inst.get_pipeline_phases(pipeline):
+                                all_pipelines[pipeline].add(phase)
 
                     experiment_index = app_inst.expander.expand_var_name(
                         app_inst.keywords.experiment_index

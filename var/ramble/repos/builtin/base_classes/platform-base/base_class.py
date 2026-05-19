@@ -123,3 +123,4 @@ class PlatformBase(ObjectMixin, metaclass=PlatformMeta):
     def set_application(self, app_inst):
         """Set the application instance for this platform"""
         self.app_inst = app_inst
+        self.clear_variant_cache()

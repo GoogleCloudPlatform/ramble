@@ -42,6 +42,7 @@ class SpackPip(PackageManagerBase):
         self.pip_mgr._allow_unprefixed_specs = False
 
     def set_application(self, app_inst):
+        super().set_application(app_inst)
         self.spack_mgr.set_application(app_inst)
         self.pip_mgr.set_application(app_inst)
 

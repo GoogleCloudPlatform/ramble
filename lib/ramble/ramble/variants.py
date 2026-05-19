@@ -71,20 +71,13 @@ class VariantSet:
     def copy(self):
         new_set = VariantSet()
 
-        set_attrs = ["default_variants", "experiment_variants"]
+        set_attrs = ["default_variants", "experiment_variants", "version_variants"]
         for set_attr in set_attrs:
             src_attr_set = getattr(self, set_attr)
-            dest_attr_set = getattr(new_set, set_attr)
-            for name, variant in src_attr_set.items():
-                dest_attr_set[name] = variant.copy()
+            setattr(new_set, set_attr, src_attr_set.copy())
 
         for name, var_list in self.multi_value_variants.items():
-            new_set.multi_value_variants[name] = set()
-            for variant in var_list:
-                new_set.multi_value_variants[name].add(variant.copy())
-
-        for name, variant in self.version_variants.items():
-            new_set.version_variants[name] = variant.copy()
+            new_set.multi_value_variants[name] = var_list.copy()
 
         return new_set
 

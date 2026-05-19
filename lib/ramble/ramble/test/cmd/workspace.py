@@ -489,6 +489,59 @@ ramble:
     assert "zlib.ensure_installed.test_experiment" not in output
 
 
+def test_workspace_info_phases(workspace_name):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+    batch_submit: 'batch_submit {execute_experiment}'
+    processes_per_node: '5'
+    n_ranks: '{processes_per_node}*{n_nodes}'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+        test_wl2:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+    zlib:
+      workloads:
+        ensure_installed:
+          experiments:
+            test_experiment:
+              variables:
+                n_nodes: '2'
+"""
+
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+
+    ws1._re_read()
+
+    output = workspace("info", "--phases", global_args=["-w", workspace_name])
+
+    assert "basic" in output
+    assert "test_wl" in output
+    assert "test_wl2" in output
+    assert "Application" in output
+    assert "Workload" in output
+    assert "Experiment" in output
+
+    assert "Phases for analyze pipeline:" in output
+    assert "analyze_experiments" in output
+
+
 def test_workspace_info_complete(workspace_name):
     global_args = ["-w", workspace_name]
     ws = ramble.workspace.create(workspace_name)
@@ -517,6 +570,9 @@ def test_workspace_info_complete(workspace_name):
     output = workspace(
         "info",
         "-vv",
+        "--phases",
+        "--variants",
+        "--all-software",
         global_args=["-w", workspace_name],
     )
 
@@ -2545,6 +2601,10 @@ def test_workspace_info_software(workspace_name):
     output = workspace("info", "--software", global_args=global_args)
     assert "pip-pkg" in output
     assert "spack-pkg" in output
+
+    output_all = workspace("info", "--all-software", global_args=global_args)
+    assert "pip-pkg" in output_all
+    assert "spack-pkg" in output_all
     assert "pip-test" in output
     assert "spack-test" in output
 

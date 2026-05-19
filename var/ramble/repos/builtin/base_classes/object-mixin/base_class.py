@@ -161,6 +161,7 @@ class ObjectMixin:
         self.object_variants.version_variant(
             f"{self.origin_type}_version", self.selected_version
         )
+        self.clear_variant_cache()
 
     def set_required_variables(self, app_inst=None):
         """Stub that allows objects to update required variables"""
@@ -178,6 +179,14 @@ class ObjectMixin:
     def pep440_to_version(version_str):
         """Converts PEP 440 compliant version number to object version number"""
         return version_str
+
+    def clear_variant_cache(self):
+        """Clear the cached variant set for this object."""
+        if hasattr(self, "_variant_cache"):
+            self._variant_cache.clear()
+        app_inst = self._get_app_inst()
+        if app_inst is not self and hasattr(app_inst, "clear_variant_cache"):
+            app_inst.clear_variant_cache()
 
     def experiment_variants(
         self, include_modifier=None, allow_caching=True, app_inst=None
