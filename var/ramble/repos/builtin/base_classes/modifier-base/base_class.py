@@ -12,7 +12,6 @@ import re
 
 import ramble.repository
 import ramble.util.class_attributes
-import ramble.util.directives
 import ramble.variants
 from ramble.error import (
     ConflictingModifiersError,
