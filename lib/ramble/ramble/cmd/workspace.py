@@ -969,7 +969,7 @@ def workspace_info(args):
 
                     if args.executables:
                         color.cprint(color.nested_4("        Executables: "))
-                        app_inst.define_variables_for_template_path(ws)
+                        app_inst.define_variables_for_template_path()
                         exec_graph = app_inst.get_executable_graph(app_inst.expander.workload_name)
                         for executable in exec_graph.walk():
                             color.cprint(f"          {executable.key}")

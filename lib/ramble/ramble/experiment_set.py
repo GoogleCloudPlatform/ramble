@@ -327,7 +327,7 @@ class ExperimentSet:
         for name, value in self._workspace.workspace_paths().items():
             app_inst.define_variable(name, value)
 
-        app_inst.define_variables_for_template_path(self._workspace)
+        app_inst.define_variables_for_template_path()
 
         experiment_namespace = app_inst.expander.experiment_namespace
         app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
@@ -738,7 +738,7 @@ class ExperimentSet:
 
         for experiment in base_experiments:
             instance = self.experiments[experiment]
-            instance.create_experiment_chain(self._workspace)
+            instance.create_experiment_chain()
 
     def all_experiment_tags(self):
         """Aggregate all tags from experiments in this experiment set

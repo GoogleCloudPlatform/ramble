@@ -534,7 +534,16 @@ ramble:
     executable_application_instance._define_formatted_executables()
 
     test_answer = "/workspace/experiments/bar/test_wl2/baz/execute_experiment"
-    executable_application_instance.define_variables_for_template_path(ws1)
+    executable_application_instance.workspace = ws1
+    executable_application_instance.define_variables_for_template_path()
+    assert executable_application_instance.variables["execute_experiment"] == test_answer
+
+    # Also test
+    executable_application_instance.variables.clear()
+    executable_application_instance.set_variables_and_variants(expansion_vars, {}, ws1, None)
+    executable_application_instance._define_commands(exec_graph)
+    executable_application_instance._define_formatted_executables()
+    executable_application_instance.define_variables_for_template_path()
     assert executable_application_instance.variables["execute_experiment"] == test_answer
 
 
@@ -632,6 +641,57 @@ def test_undefined_executable_dies(mutable_mock_apps_repo, capsys):
     assert "Executable undefined_exec is not defined." in captured.err
 
 
+def test_application_methods_with_default_workspace(mutable_mock_apps_repo, workspace_name):
+    """Verify ApplicationBase methods fallback to self.workspace when workspace=None"""
+    ws1 = ramble.workspace.create(workspace_name)
+    ws1.write()
+
+    executable_application_instance = mutable_mock_apps_repo.get("basic")
+    expansion_vars = basic_exp_dict()
+
+    test_wl2 = ramble.workload.Workload("test_wl2", executables=["foo"], inputs=["input"])
+    executable_application_instance.workloads[_FS] = {"test_wl2": test_wl2}
+    executable_application_instance.internals = {}
+    executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
+    executable_application_instance.chain_prepend = []
+    from ramble.success_criteria import ScopedCriteriaList
+
+    executable_application_instance.success_list = ScopedCriteriaList()
+
+    # Call set_variables_and_variants passing ws1
+    executable_application_instance.set_variables_and_variants(expansion_vars, {}, ws1, None)
+
+    # Test define_missing_variables
+    executable_application_instance.define_missing_variables()
+
+    # Test set_modifiers with default workspace=None
+    executable_application_instance.set_modifiers(None)
+
+    # Test get_pipeline_phases with default workspace=None
+    phases = executable_application_instance.get_pipeline_phases("analyze")
+    assert isinstance(list(phases), list)
+
+    # Test build_used_variables with default workspace=None
+    used_vars = executable_application_instance.build_used_variables()
+    assert isinstance(used_vars, set)
+
+    # Test print_phase_times
+    executable_application_instance.print_phase_times("analyze")
+
+    # Test create_experiment_chain
+    executable_application_instance.create_experiment_chain()
+
+    # Test build_modifier_instances
+    executable_application_instance.build_modifier_instances()
+
+    # Test object_inventory
+    inventory = executable_application_instance.object_inventory()
+    assert isinstance(inventory, list)
+
+    # Test define_variables_for_template_path
+    executable_application_instance.define_variables_for_template_path()
+
+
 class TestApplicationBase(unittest.TestCase):
     def test_non_reserved_variables(self):
         obj_type = ramble.repository.ObjectTypes.base_classes
@@ -666,9 +726,10 @@ class TestApplicationBase(unittest.TestCase):
             # Mock the workspace
             mock_workspace = Mock()
             mock_workspace.all_templates.return_value = []
+            app_base.workspace = mock_workspace
 
             # Call the method to be tested
-            non_reserved = app_base.non_reserved_variables(mock_workspace)
+            non_reserved = app_base.non_reserved_variables()
 
             # Assert the result
             self.assertIn("regular_variable", non_reserved)
