@@ -9,23 +9,19 @@
 """Test that the Stage class works correctly."""
 
 import collections
-import errno
-import getpass
 import os
 import shutil
-import stat
 from enum import IntEnum
 
 import pytest
 
-from llnl.util.filesystem import mkdirp, partition_path, touch, working_dir
+from llnl.util.filesystem import mkdirp, touch, working_dir
 
 import ramble.stage
 from ramble.stage import InputStage, ResourceStage, StageComposite
 
 import spack.util.executable
 from spack.resource import Resource
-from spack.util.path import canonicalize_path
 
 # The following values are used for common fetch and stage mocking fixtures:
 _archive_base = "test-files"
@@ -74,13 +70,6 @@ _include_extra = StageInclude.extra
 #         _extra_fn       test_extra file (contains _extra_contents)
 #     _archive_fn         archive_url = file:///path/to/_archive_fn
 #
-
-
-@pytest.fixture
-def clear_stage_root(monkeypatch):
-    """Ensure ramble.stage._stage_root is not set at test start."""
-    monkeypatch.setattr(ramble.stage, "_stage_root", None)
-    yield
 
 
 def check_expand_archive(stage, stage_name, expected_file_list):
@@ -177,7 +166,7 @@ def check_setup(stage, stage_name, archive):
 #       the `mock_stage` path in `mock_stage_archive`) per discussions in
 #       #12857.  See also #13065.
 @pytest.fixture
-def tmp_build_stage_dir(tmpdir, clear_stage_root):
+def tmp_build_stage_dir(tmpdir):
     """Use a temporary test directory for the stage root."""
     test_path = str(tmpdir.join("stage"))
     yield tmpdir, test_path
@@ -345,40 +334,6 @@ def search_fn():
             return []
 
     return _Mock()
-
-
-def check_stage_dir_perms(prefix, path):
-    """Check the stage directory perms to ensure match expectations."""
-    # Ensure the path's subdirectories -- to `$user` -- have their parent's
-    # perms while those from `$user` on are owned and restricted to the
-    # user.
-    assert path.startswith(prefix)
-
-    user = getpass.getuser()
-    prefix_status = os.stat(prefix)
-    uid = os.getuid()
-
-    # Obtain lists of ancestor and descendant paths of the $user node, if any.
-    #
-    # Skip processing prefix ancestors since no guarantee they will be in the
-    # required group (e.g. $TEMPDIR on HPC machines).
-    skip = prefix if prefix.endswith(os.sep) else prefix + os.sep
-    group_paths, user_node, user_paths = partition_path(path.replace(skip, ""), user)
-
-    for p in group_paths:
-        p_status = os.stat(os.path.join(prefix, p))
-        assert p_status.st_gid == prefix_status.st_gid
-        assert p_status.st_mode == prefix_status.st_mode
-
-    # Add the path ending with the $user node to the user paths to ensure paths
-    # from $user (on down) meet the ownership and permission requirements.
-    if user_node:
-        user_paths.insert(0, user_node)
-
-    for p in user_paths:
-        p_status = os.stat(os.path.join(prefix, p))
-        assert uid == p_status.st_uid
-        assert p_status.st_mode & stat.S_IRWXU == stat.S_IRWXU
 
 
 class TestStage:
@@ -698,131 +653,6 @@ class TestStage:
         assert not os.path.exists(source_path)
 
     @pytest.mark.skipif(os.getuid() == 0, reason="user is root")
-    def test_first_accessible_path(self, tmpdir):
-        """Test _first_accessible_path names."""
-        ramble_dir = tmpdir.join("paths")
-        name = str(ramble_dir)
-        files = [os.path.join(os.path.sep, "no", "such", "path"), name]
-
-        # Ensure the tmpdir path is returned since the user should have access
-        path = ramble.stage._first_accessible_path(files)
-        assert path == name
-        assert os.path.isdir(path)
-        check_stage_dir_perms(str(tmpdir), path)
-
-        # Ensure an existing path is returned
-        ramble_subdir = ramble_dir.join("existing").ensure(dir=True)
-        subdir = str(ramble_subdir)
-        path = ramble.stage._first_accessible_path([subdir])
-        assert path == subdir
-
-        # Ensure a path with a `$user` node has the right permissions
-        # for its subdirectories.
-        user = getpass.getuser()
-        user_dir = ramble_dir.join(user, "has", "paths")
-        user_path = str(user_dir)
-        path = ramble.stage._first_accessible_path([user_path])
-        assert path == user_path
-        check_stage_dir_perms(str(tmpdir), path)
-
-        # Cleanup
-        shutil.rmtree(str(name))
-
-    def test_create_stage_root(self, tmpdir, no_path_access):
-        """Test _create_stage_root permissions."""
-        test_dir = tmpdir.join("path")
-        test_path = str(test_dir)
-
-        try:
-            if getpass.getuser() in str(test_path).split(os.sep):
-                # Simply ensure directory created if tmpdir includes user
-                ramble.stage.create_stage_root(test_path)
-                assert os.path.exists(test_path)
-
-                p_stat = os.stat(test_path)
-                assert p_stat.st_mode & stat.S_IRWXU == stat.S_IRWXU
-            else:
-                # Ensure an OS Error is raised on created, non-user directory
-                with pytest.raises(OSError) as exc_info:
-                    ramble.stage.create_stage_root(test_path)
-
-                assert exc_info.value.errno == errno.EACCES
-        finally:
-            try:
-                shutil.rmtree(test_path)
-            except OSError:
-                pass
-
-    @pytest.mark.nomockstage
-    def test_create_stage_root_bad_uid(self, tmpdir, monkeypatch):
-        """
-        Test the code path that uses an existing user path -- whether `$user`
-        in `$tempdir` or not -- and triggers the generation of the UID
-        mismatch warning.
-
-        This situation can happen with some `config:build_stage` settings
-        for teams using a common service account for installing software.
-        """
-        orig_stat = os.stat
-
-        class MinStat:
-            st_mode = -1
-            st_uid = -1
-
-        def _stat(path):
-            p_stat = orig_stat(path)
-
-            fake_stat = MinStat()
-            fake_stat.st_mode = p_stat.st_mode
-            return fake_stat
-
-        user_dir = tmpdir.join(getpass.getuser())
-        user_dir.ensure(dir=True)
-        user_path = str(user_dir)
-
-        with monkeypatch.context() as m:
-            m.setattr(os, "stat", _stat)
-            ramble.stage.create_stage_root(user_path)
-
-            # The following check depends on the patched os.stat as a poor
-            # substitute for confirming the generated warnings.
-            assert os.stat(user_path).st_uid != os.getuid()
-
-    def test_resolve_paths(self):
-        """Test _resolve_paths."""
-        assert ramble.stage._resolve_paths([]) == []
-
-        # resolved path without user appends user
-        paths = [os.path.join(os.path.sep, "a", "b", "c")]
-        user = getpass.getuser()
-        can_paths = [os.path.join(paths[0], user)]
-        assert ramble.stage._resolve_paths(paths) == can_paths
-
-        # resolved path with node including user does not append user
-        paths = [os.path.join(os.path.sep, f"spack-{user}", "stage")]
-        assert ramble.stage._resolve_paths(paths) == paths
-
-        tempdir = "$tempdir"
-        can_tempdir = canonicalize_path(tempdir)
-        user = getpass.getuser()
-        temp_has_user = user in can_tempdir.split(os.sep)
-        paths = [
-            os.path.join(tempdir, "stage"),
-            os.path.join(tempdir, "$user"),
-            os.path.join(tempdir, "$user", "$user"),
-            os.path.join(tempdir, "$user", "stage", "$user"),
-        ]
-
-        res_paths = [canonicalize_path(p) for p in paths]
-        if temp_has_user:
-            res_paths[1] = can_tempdir
-            res_paths[2] = os.path.join(can_tempdir, user)
-            res_paths[3] = os.path.join(can_tempdir, "stage", user)
-        else:
-            res_paths[0] = os.path.join(res_paths[0], user)
-
-        assert ramble.stage._resolve_paths(paths) == res_paths
-
     def test_stage_constructor_no_fetcher(self):
         """Ensure Stage constructor with no URL or fetch strategy fails."""
         with pytest.raises(ValueError):
