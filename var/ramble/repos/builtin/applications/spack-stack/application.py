@@ -174,10 +174,8 @@ class SpackStack(ExecutableApplication):
             )
             self.expander.flush_used_variable_stage()
             cmds.extend(
-                [
-                    f"spack external find --not-buildable {pkg}"
-                    for pkg in external_packages
-                ]
+                f"spack external find --not-buildable {pkg}"
+                for pkg in external_packages
             )
         return cmds
 

@@ -3348,10 +3348,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                 if fom_contents["fom_is_numeric"]:
 
-                    calcs = [
+                    calcs = (
                         statistic.report(fom_values, fom_units)
                         for statistic in ramble.util.stats.all_stats
-                    ]
+                    )
 
                     for calc in calcs:
                         if calc[0] == ramble.util.stats.NA:
