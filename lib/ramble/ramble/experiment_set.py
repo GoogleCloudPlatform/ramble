@@ -758,12 +758,12 @@ class ExperimentSet:
         count = 1
 
         for exp, inst in self.experiments.items():
-            if inst.is_actionable():
+            if inst.is_actionable:
                 yield exp, inst, count
                 count += 1
 
         for exp, inst in self.chained_experiments.items():
-            if inst.is_actionable():
+            if inst.is_actionable:
                 yield exp, inst, count
                 count += 1
 
@@ -834,7 +834,7 @@ class ExperimentSet:
                 if not inst.has_tags(filters.tags):
                     active = False
 
-            if active and inst.is_actionable():
+            if active and inst.is_actionable:
                 filtered_list.append((exp, inst, idx))
 
         self._filtered_experiments_cache[cache_key] = filtered_list

@@ -285,6 +285,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return new_clone
 
+    @property
     def is_actionable(self):
         """Determine if an experiment should be actioned in pipelines
 
