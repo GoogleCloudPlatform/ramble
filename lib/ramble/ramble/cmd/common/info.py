@@ -316,6 +316,8 @@ def _print_conflicts(obj, attr, verbose=False, pattern="*", format=supported_for
     """Print conflicts defined on the object"""
     internal_attr_name = _map_attr_name(attr)
     internal_attr = getattr(obj, internal_attr_name)
+    if isinstance(internal_attr, dict) and internal_attr:
+        internal_attr = _unpack_when_set_if_needed(internal_attr)
     print_attribute_header(attr, verbose)
 
     indentation = " " * 4

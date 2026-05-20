@@ -414,3 +414,26 @@ def test_info_object_name_formats(mutable_mock_apps_repo):
     assert "basic_underscores" in output
     output = info("basic-underscores")
     assert "basic_underscores" in output
+
+
+def test_info_conflicts_pattern(mutable_mock_apps_repo):
+    # When pattern matches, conflict should be printed
+    out = info(
+        "--type",
+        "applications",
+        "-v",
+        "--attrs",
+        "conflicts",
+        "-p",
+        "*turn_on_required_directives*",
+        "info",
+    )
+    assert "turn_on_required_directives=True" in out
+    assert "turn_on_required_directives conflicts with variant_default" in out
+
+    # When pattern does not match, conflict should not be printed
+    out = info(
+        "--type", "applications", "-v", "--attrs", "conflicts", "-p", "*not_matching*", "info"
+    )
+    assert "turn_on_required_directives=True" not in out
+    assert "turn_on_required_directives conflicts with variant_default" not in out

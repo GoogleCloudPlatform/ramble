@@ -798,7 +798,7 @@ def register_validator(
     return _define_validator
 
 
-@shared_directive("conflicts", init_value=[])
+@shared_directive("conflicts")
 def conflict(
     conflict_spec: str,
     when: Optional[Union[str, List[str]]] = None,
@@ -818,11 +818,15 @@ def conflict(
             when, obj, conflict_spec, "conflicts"
         )
 
-        obj.conflicts.append(
+        when_key = frozenset(when_list)
+        if when_key not in obj.conflicts:
+            obj.conflicts[when_key] = []
+
+        obj.conflicts[when_key].append(
             {
                 "conflict_spec": conflict_spec,
-                "when": when_list,
                 "message": msg,
+                "when": when_list,
             }
         )
 
