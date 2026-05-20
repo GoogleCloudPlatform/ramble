@@ -12,7 +12,6 @@ from typing import Collection, Iterator
 
 import ramble.definitions.families
 import ramble.util.class_attributes
-import ramble.util.directives
 import ramble.variants
 from ramble.expander import ExpanderError
 from ramble.language.shared_language import SharedMeta

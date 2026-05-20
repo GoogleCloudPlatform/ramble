@@ -180,7 +180,7 @@ extend-exclude = [
 preview = true
 explicit-preview-rules = true
 # B905 requires Python 3.9 or up.
-ignore = ["B905"]
+ignore = ["B905", "PERF203"]
 select = [
     "E4", "E7", "E9", "F", "B", "C4",
     # Enable some useful preview rules
@@ -193,6 +193,10 @@ select = [
     "RUF019", # unnecessary-key-check
     "PLC0206",# dict-index-missing-items
     "SIM118", # in-dict-keys
+    "PERF",
+    "RUF015", # unnecessary-iterable-allocation
+    "FURB192",# sorted-min-max
+    "FURB118",# reimplemented-operator
 ]
 
 [tool.ruff.lint.per-file-ignores]

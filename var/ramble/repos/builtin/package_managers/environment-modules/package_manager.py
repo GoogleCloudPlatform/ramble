@@ -69,10 +69,12 @@ class EnvironmentModules(PackageManagerBase):
             load_content = []
 
             if software_env is not None:
-                for spec in software_envs.package_specs_for_environment(
-                    software_env
-                ):
-                    load_content.append(f"module load {spec}")
+                load_content.extend(
+                    f"module load {spec}"
+                    for spec in software_envs.package_specs_for_environment(
+                        software_env
+                    )
+                )
 
             self._load_string = "\n".join(load_content)
 

@@ -173,8 +173,10 @@ class SpackStack(ExecutableApplication):
                 "external_packages", merge_used_stage=False, typed=True
             )
             self.expander.flush_used_variable_stage()
-            for pkg in external_packages:
-                cmds.append(f"spack external find --not-buildable {pkg}")
+            cmds.extend(
+                f"spack external find --not-buildable {pkg}"
+                for pkg in external_packages
+            )
         return cmds
 
     register_builtin("remove_packages", required=False)
@@ -229,8 +231,7 @@ class SpackStack(ExecutableApplication):
 
         logger.debug(f"Spack data: {spack_data}")
 
-        for spec in spack_data["spack"]["specs"]:
-            spec_list.append(spec)
+        spec_list.extend(spack_data["spack"]["specs"])
 
         self.package_manager.runner.set_env(self.expander.env_path)
         self.package_manager.runner.activate()

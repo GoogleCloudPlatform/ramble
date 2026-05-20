@@ -214,9 +214,7 @@ class Workload:
         """
         named_vars = []
         for var_list in self.variables.values():
-            for var in var_list:
-                if var.name == name:
-                    named_vars.append(var)
+            named_vars.extend(var for var in var_list if var.name == name)
         return named_vars
 
 
