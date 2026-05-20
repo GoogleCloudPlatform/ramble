@@ -120,7 +120,8 @@ Both ``fom_name`` and ``fom_context`` support
 
 When using the globbing functionality, all contexts that match the
 ``fom_context`` argument are searched. Within each context, all FOMs that match
-``fom_name`` are tested with ``formula``.
+``fom_name`` are tested with ``formula``. The success criteria will only pass
+if **all** matched figures of merit satisfy the formula.
 
 The ``formula`` attribute can access any variables defined within an
 experiment. Additionally, an extra ``value`` variable is defined, which takes

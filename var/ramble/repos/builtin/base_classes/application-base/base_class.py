@@ -2831,11 +2831,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         application specific processing of the output.
         """
 
-    def extract_inmem_foms(self, inmem_fom_defs, fom_values):
+    def extract_inmem_foms(
+        self, inmem_fom_defs, fom_values, context_metadata=None
+    ):
         """Extract in-memory FOMs"""
         for context, foms in inmem_fom_defs.items():
-            if context not in fom_values:
-                fom_values[context] = {}
+            context_key = context
+            if context_metadata is not None:
+                if isinstance(context, str):
+                    context_key = (context, context, frozenset())
+                    if context_key not in context_metadata:
+                        context_metadata[context_key] = {
+                            "name": context,
+                            "def_name": context,
+                            "vars": {},
+                        }
+
+            if context_key not in fom_values:
+                fom_values[context_key] = {}
             foms = inmem_fom_defs[context]["foms"]
             for fom in foms:
                 fom_conf = inmem_fom_defs[context]["foms"][fom]
@@ -2851,7 +2864,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if fom_value is None:
                     continue
                 expanded_fom_value = self.expander.expand_var(fom_value)
-                fom_values[context][fom_name] = {
+                fom_values[context_key][fom_name] = {
                     "value": expanded_fom_value,
                     "units": fom_conf["units_expanded"],
                     "origin": fom_conf["origin"],
@@ -2921,6 +2934,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         exp_lock = self.experiment_lock
 
         fom_values = {}
+        context_metadata = {}
+        null_key = (_NULL_CONTEXT, _NULL_CONTEXT, frozenset())
+        context_metadata[null_key] = {
+            "name": _NULL_CONTEXT,
+            "def_name": _NULL_CONTEXT,
+            "vars": {},
+        }
+
         # Iterate over files. We already know they exist
         with lk.ReadTransaction(exp_lock):
             for file, file_conf in files.items():
@@ -2976,10 +2997,22 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         f" Context match {context} -- {context_name}"
                                     )
 
-                                    active_contexts[context] = context_name
+                                    context_vars = context_match.groupdict()
+                                    context_key = (
+                                        context_name,
+                                        context,
+                                        frozenset(context_vars.items()),
+                                    )
 
-                                    if context_name not in fom_values:
-                                        fom_values[context_name] = {}
+                                    active_contexts[context] = context_key
+
+                                    if context_key not in fom_values:
+                                        fom_values[context_key] = {}
+                                        context_metadata[context_key] = {
+                                            "name": context_name,
+                                            "def_name": context,
+                                            "vars": context_vars,
+                                        }
 
                             for fom in foms:
                                 fom_conf = f_defs[context]["foms"][fom]
@@ -3013,16 +3046,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         # if a FOM has contexts, check if each is active
                                         if fom_conf["contexts"]:
                                             for _ in fom_conf["contexts"]:
-                                                context_name = (
-                                                    active_contexts.get(
-                                                        context, _NULL_CONTEXT
-                                                    )
+                                                context_key = (
+                                                    active_contexts[context]
+                                                    if context
+                                                    in active_contexts
+                                                    else null_key
                                                 )
                                                 fom_contexts.append(
-                                                    context_name
+                                                    context_key
                                                 )
                                         else:
-                                            fom_contexts.append(_NULL_CONTEXT)
+                                            fom_contexts.append(null_key)
 
                                         for fom_context in fom_contexts:
                                             if fom_context not in fom_values:
@@ -3057,7 +3091,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     "fom_type"
                                                 ],
                                             }
-        self.extract_inmem_foms(inmem_defs, fom_values)
+        self.extract_inmem_foms(inmem_defs, fom_values, context_metadata)
 
         # Test all non-file based success criteria
         for criteria_obj, _ in criteria_list.all_criteria():
@@ -3094,7 +3128,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 status = wm_status
 
         self.set_status(status)
-
         self.result.finalize(workspace)
 
         for criteria_obj, criteria_scope in criteria_list.all_criteria():
@@ -3111,11 +3144,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             else:
                 self.result.success_criteria[criteria_name] = "FAILED"
 
-        for context, fom_map in fom_values.items():
+        for context_key, fom_map in fom_values.items():
+            metadata = context_metadata[context_key]
             context_map = {
-                "name": context,
+                "name": metadata["name"],
                 "foms": [],
-                "display_name": _get_context_display_name(context),
+                "display_name": _get_context_display_name(metadata["name"]),
+                "context_def_name": metadata["def_name"],
+                "context_vars": metadata["vars"],
             }
 
             for fom_name, fom in fom_map.items():
@@ -3123,7 +3159,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_copy["name"] = fom_name
                 context_map["foms"].append(fom_copy)
 
-            if context == _NULL_CONTEXT:
+            if metadata["name"] == _NULL_CONTEXT:
                 self.result.contexts.insert(0, context_map)
             else:
                 self.result.contexts.append(context_map)
