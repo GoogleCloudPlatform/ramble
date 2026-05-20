@@ -517,7 +517,7 @@ def test_non_reserved_variables(app_class):
     workspace = MockWorkspace()
 
     # Mock _object_templates
-    app_inst._object_templates = lambda ws: [("template2", {"var_name": "tpl_var_name"})]
+    app_inst._object_templates = lambda ws: [("template2", [{"var_name": "tpl_var_name"}])]
 
     # Test without remove_keys
     non_reserved = app_inst.non_reserved_variables(workspace)
