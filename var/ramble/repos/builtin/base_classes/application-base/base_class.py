@@ -2223,7 +2223,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Define variables for all workspace and object template paths"""
         if self._template_paths_defined:
             return
-        self._template_paths_defined = True
 
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
@@ -2251,6 +2250,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.variables.update(render_vars)
                 for name in render_vars:
                     self.keywords.update_keys({name: var_attr})
+
+        self._template_paths_defined = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
