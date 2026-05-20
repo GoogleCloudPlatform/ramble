@@ -62,6 +62,7 @@ class SoftwarePackage:
         """Mark this package a used"""
         self._used = True
 
+    @property
     def is_used(self):
         """Return if this package is used or not
 
@@ -103,7 +104,7 @@ class SoftwarePackage:
         """
 
         # Don't print if it is unused and we are only interested in used packages
-        if only_used and not self.is_used():
+        if only_used and not self.is_used:
             return ""
 
         indentation = " " * indent
@@ -211,7 +212,7 @@ class RenderedPackage(SoftwarePackage):
         """
 
         # Don't print if it is unused and we are only interested in used packages
-        if only_used and not self.is_used():
+        if only_used and not self.is_used:
             return ""
 
         indentation = " " * (indent + SUB_INDENT)
@@ -248,6 +249,7 @@ class TemplatePackage(SoftwarePackage):
         self._rendered_packages = defaultdict(dict)
         self._package_type = "Template"
 
+    @property
     def is_used(self):
         """Determine if template package is used
 
@@ -259,7 +261,7 @@ class TemplatePackage(SoftwarePackage):
         """
         for pkgs in self._rendered_packages.values():
             for pkg in pkgs.values():
-                if pkg.is_used():
+                if pkg.is_used:
                     return True
         return False
 
@@ -279,7 +281,7 @@ class TemplatePackage(SoftwarePackage):
         """
 
         # Don't print if it is unused and we are only interested in used packages
-        if only_used and not self.is_used():
+        if only_used and not self.is_used:
             return ""
 
         out_str = ""
@@ -396,6 +398,7 @@ class SoftwareEnvironment:
         self._environment_type = "Base"
         self._used = False
 
+    @property
     def is_used(self):
         """Determine if environment is used or not
 
@@ -426,7 +429,7 @@ class SoftwareEnvironment:
         """
 
         # Don't print if it is unused and we are only interested in used packages
-        if only_used and not self.is_used():
+        if only_used and not self.is_used:
             return ""
 
         indentation = " " * indent
@@ -544,6 +547,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         self._rendered_environments = defaultdict(dict)
         self._environment_type = "Template"
 
+    @property
     def is_used(self):
         """Determine if TemplateEnvironment is used or not
 
@@ -552,7 +556,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         """
         for envs in self._rendered_environments.values():
             for env in envs.values():
-                if env.is_used():
+                if env.is_used:
                     return True
         return False
 
@@ -575,7 +579,7 @@ class TemplateEnvironment(SoftwareEnvironment):
         """
 
         # Don't print if it is unused and we are only interested in used packages
-        if only_used and not self.is_used():
+        if only_used and not self.is_used:
             return ""
 
         out_str = ""

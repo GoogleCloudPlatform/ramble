@@ -384,3 +384,41 @@ def test_compiler_in_environment_warns(request, mutable_mock_workspace_path, cap
 
         assert "Environment basic contains packages and their compilers" in captured.err
         assert "Package: basic, Compiler: test_comp" in captured.err
+
+
+def test_is_used_property(request, mutable_mock_workspace_path):
+    ws_name = request.node.name
+    workspace("create", ws_name)
+
+    with ramble.workspace.read(ws_name) as ws:
+        software_dict = ws.get_software_dict()
+        software_dict["packages"] = {}
+        software_dict["packages"]["basic"] = {"pkg_spec": "basic@1.1"}
+        software_dict["environments"] = {"basic": {"packages": ["basic"]}}
+
+        software_environments = ramble.software_environments.SoftwareEnvironments(ws)
+        env_template = software_environments._environment_templates["basic"]
+        pkg_template = software_environments._package_templates["basic"]
+
+        # Verify initial state (not used)
+        assert env_template.is_used is False
+        assert pkg_template.is_used is False
+
+        # Render environment
+        variables = {}
+        env_expander = ramble.expander.Expander(variables, None)
+        rendered_env = software_environments.render_environment(
+            "basic", env_expander, _get_package_manager()
+        )
+        rendered_pkg = rendered_env._packages[0]
+
+        # Verify rendered packages/envs are initially not used
+        assert rendered_env.is_used is False
+        assert rendered_pkg.is_used is False
+
+        # Mark environment as used and verify propagation
+        software_environments.use_environment(_get_package_manager(), "basic")
+        assert rendered_env.is_used is True
+        assert rendered_pkg.is_used is True
+        assert env_template.is_used is True
+        assert pkg_template.is_used is True
