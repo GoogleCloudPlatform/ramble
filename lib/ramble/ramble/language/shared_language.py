@@ -800,6 +800,41 @@ def register_validator(
     return _define_validator
 
 
+@shared_directive("conflicts")
+def conflict(
+    conflict_spec: str,
+    when: Optional[Union[str, List[str]]] = None,
+    msg: Optional[str] = None,
+    **kwargs,
+):
+    """Defines a conflict for this object.
+
+    Args:
+        conflict_spec: The trigger condition (e.g., `+variant`, `compiler=gcc`)
+        when: Optional conditional under which the conflict occurs
+        msg: Optional custom error/warning message
+    """
+
+    def _execute_conflicts(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, conflict_spec, "conflicts"
+        )
+
+        when_key = frozenset(when_list)
+        if when_key not in obj.conflicts:
+            obj.conflicts[when_key] = []
+
+        obj.conflicts[when_key].append(
+            {
+                "conflict_spec": conflict_spec,
+                "message": msg,
+                "when": when_list,
+            }
+        )
+
+    return _execute_conflicts
+
+
 @shared_directive("object_variables")
 def variable(
     name: str,

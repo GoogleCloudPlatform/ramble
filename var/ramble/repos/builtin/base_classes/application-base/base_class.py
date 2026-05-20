@@ -1568,6 +1568,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             warn_validation=warn_validation,
             die_on_validate_error=die_on_validate_error,
         )
+        self._check_object_conflicts(
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+        )
 
     def _check_object_validators(
         self, warn_validation=True, die_on_validate_error=True
@@ -1600,6 +1604,60 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             raise ObjectValidationError(err_msg)
                         elif warn_validation:
                             logger.warn(err_msg)
+
+    def _check_object_conflicts(
+        self, warn_validation=True, die_on_validate_error=True
+    ):
+        expander = self.expander
+        for _, obj in self.objects():
+            if not hasattr(obj, "conflicts") or not obj.conflicts:
+                continue
+
+            for when_set, conflict_list in obj.conflicts.items():
+                experiment_variants = obj.experiment_variants()
+                try:
+                    when_active = expander.satisfies(
+                        when_set, variant_set=experiment_variants
+                    )
+                except ramble.expander.ExpanderError:
+                    when_active = False
+
+                if not when_active:
+                    continue
+
+                for conflict in conflict_list:
+                    conflict_spec = conflict["conflict_spec"]
+                    msg = conflict["message"]
+
+                    try:
+                        conflict_active = expander.satisfies(
+                            conflict_spec, variant_set=experiment_variants
+                        )
+                    except ramble.expander.ExpanderError:
+                        conflict_active = False
+
+                    if not conflict_active:
+                        continue
+
+                    # If BOTH are satisfied, it is a conflict!
+                    if msg:
+                        err_msg = (
+                            f"Conflict detected in '{obj.name}': "
+                            f"{expander.expand_var(msg)}"
+                        )
+                    else:
+                        when_str = (
+                            f" when {', '.join(when_set)}" if when_set else ""
+                        )
+                        err_msg = (
+                            f"Conflict detected in '{obj.name}': "
+                            f"'{conflict_spec}' is active{when_str}"
+                        )
+
+                    if die_on_validate_error:
+                        raise ObjectValidationError(err_msg)
+                    elif warn_validation:
+                        logger.warn(err_msg)
 
     def _generate_cleanup_cmd(self, key):
         commands = []
