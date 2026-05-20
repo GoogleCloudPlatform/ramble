@@ -100,6 +100,10 @@ class AmdUprof(BasicModifier):
         "generate_uprof_report", required=True, injection_method="append"
     )
 
+    register_builtin(
+        "generate_uprof_report", required=True, injection_method="append"
+    )
+
     def setup_uprof_results_dir(self):
         return ["rm -rf {uprof_results_dir} {uprof_report_file}"]
 
