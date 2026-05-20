@@ -353,7 +353,7 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
             to_print = list(to_print)
             if (
                 internal_attr
-                and isinstance(internal_attr, list)
+                and isinstance(internal_attr, (list, set, tuple))
                 and isinstance(next(iter(internal_attr), None), dict)
             ):
                 to_print = [key for attr_dict in internal_attr for key in attr_dict]
