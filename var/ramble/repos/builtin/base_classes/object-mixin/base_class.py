@@ -126,10 +126,10 @@ class ObjectMixin:
 
         if current_ver:
             for known_version in self.known_versions.values():
-                if current_ver.get_version() == known_version.get_version():
+                if current_ver.version == known_version.version:
                     return
             raise ObjectValidationError(
-                f"The current version {current_ver.get_version()} is not defined in the "
+                f"The current version {current_ver.version} is not defined in the "
                 f"{self.origin_type}.py. You must select from defined versions. Set "
                 "config:enable_strict_versions:false to disable strict version checking."
             )
