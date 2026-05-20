@@ -363,7 +363,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
     else:
         if isinstance(internal_attr, dict):
             _print_verbose_dict_attr(internal_attr, pattern=pattern, indentation=indentation)
-        elif isinstance(internal_attr, (list, set, tuple)):
+        elif isinstance(internal_attr, (list, set, tuple)) or (
+            hasattr(internal_attr, "__iter__") and not isinstance(internal_attr, str)
+        ):
             internal_list = list(internal_attr)
             # If it's a list of dicts, print each
             if internal_list and isinstance(internal_list[0], dict):
