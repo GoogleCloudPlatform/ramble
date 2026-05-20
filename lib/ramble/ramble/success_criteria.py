@@ -197,7 +197,7 @@ class SuccessCriteria:
 
             fom_context_glob = app_inst.expander.expand_var(self.fom_context)
             matching_keys = []
-            for k in fom_values.keys():
+            for k in fom_values:
                 name = k[0] if isinstance(k, tuple) else k
                 if fnmatch.fnmatch(name, fom_context_glob):
                     matching_keys.append(k)
