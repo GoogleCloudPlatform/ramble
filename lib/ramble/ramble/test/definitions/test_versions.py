@@ -65,6 +65,10 @@ class TestObjectVersion:
         # Test new version_num property
         assert obj_ver.version_num == "1.2.3"
 
+        # Test lazy initialization of version_num
+        obj_ver_lazy = ObjectVersion(version=obj_ver.version)
+        assert obj_ver_lazy.version_num == "1.2.3"
+
         # Test deprecated get_version method triggers warning
         with pytest.deprecated_call():
             assert str(obj_ver.get_version()) == "1.2.3"
