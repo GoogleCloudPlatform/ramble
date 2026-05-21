@@ -7,6 +7,7 @@
 # except according to those terms.
 
 # Need this because of ramble.util.string
+import fnmatch
 import io
 import itertools
 import re
@@ -23,6 +24,7 @@ __all__ = [
     "validate_module_name",
     "possible_ramble_module_names",
     "simplify_name",
+    "match_pattern",
     "NamespaceTrie",
     "NS_SEPARATOR",
 ]
@@ -267,3 +269,49 @@ class NamespaceTrie:
         stream = io.StringIO()
         self._str_helper(stream)
         return stream.getvalue()
+
+
+def match_pattern(pattern, string):
+    """Match a string against a pattern (regex or glob)
+
+    Args:
+        pattern (str): pattern to match against
+        string (str): string to match
+
+    Returns:
+        (tuple): (bool: matched, dict: captured groups)
+    """
+    if pattern is None:
+        return True, {}
+
+    # If the pattern contains characters that strongly suggest a regex,
+    # try regex matching first.
+    # Common regex-only characters: (, ), [, ], ^, $, |
+    # Note: * and ? are common to both. . is also common but more regex-y.
+    is_regex = any(c in pattern for c in "()[]^$|") or "(?P<" in pattern
+
+    if is_regex:
+        try:
+            regex = re.compile(pattern)
+            match = regex.fullmatch(string)
+            if match:
+                return True, match.groupdict()
+            return False, {}
+        except re.error:
+            pass
+
+    # Try globbing
+    if fnmatch.fnmatch(string, pattern):
+        return True, {}
+
+    # Final attempt: try as regex even if it didn't look like one
+    if not is_regex:
+        try:
+            regex = re.compile(pattern)
+            match = regex.fullmatch(string)
+            if match:
+                return True, match.groupdict()
+        except re.error:
+            pass
+
+    return False, {}

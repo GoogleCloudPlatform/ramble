@@ -87,33 +87,33 @@ def collect_definitions():
                                 else:
                                     used_by[pkg_name].append(obj_namespace)
 
-                            for spec_name in specs:
+                            for spec_name, spec_dict in specs.items():
                                 if hasattr(pkg_def, spec_name):
                                     spec_def = getattr(pkg_def, spec_name)
                                     if spec_def:
-                                        if spec_def not in specs[spec_name]:
-                                            specs[spec_name][spec_def] = []
-                                        specs[spec_name][spec_def].append(obj_namespace)
+                                        if spec_def not in spec_dict:
+                                            spec_dict[spec_def] = []
+                                        spec_dict[spec_def].append(obj_namespace)
 
 
 def print_summary():
     """Print a summary of all software definitions"""
     color.cprint(color.section_title("Software Summary:"))
     color.cprint("\n")
-    for spec_name in specs:
+    for spec_name, spec_dict in specs.items():
         color.cprint(color.nested_1(spec_headers[spec_name]) + ":")
-        for spec_def in specs[spec_name]:
+        for spec_def in spec_dict:
             color.cprint(f'\t{color.nested_2("Spec:")} {spec_def}')
             color.cprint("\tIn object:")
-            colify(specs[spec_name][spec_def], indent=16, output=sys.stdout)
+            colify(spec_dict[spec_def], indent=16, output=sys.stdout)
         color.cprint("\n")
 
 
 def count_conflicts():
     """Iterate over conflicts and count how many were detected"""
     num_conflicts = 0
-    for pkg_name in conflicts:
-        num_conflicts += len(conflicts[pkg_name])
+    for pkg_conflicts in conflicts.values():
+        num_conflicts += len(pkg_conflicts)
     for object_names in unused_compilers.values():
         num_conflicts += len(object_names)
     return num_conflicts
@@ -124,7 +124,7 @@ def print_conflicts():
     if conflicts or unused_compilers:
         if conflicts:
             color.cprint(color.section_title("Software Definition Conflicts:"))
-            for pkg_name in conflicts:
+            for pkg_name, pkg_conflicts in conflicts.items():
 
                 color.cprint(f'{color.nested_1("Package")}: {pkg_name}:')
                 color.cprint("\tDefined as:")
@@ -136,7 +136,7 @@ def print_conflicts():
                 color.cprint("\tIn objects:")
                 colify(used_by[pkg_name], indent=24, output=sys.stdout)
                 color.cprint("\tConflicts with objects:")
-                colify(conflicts[pkg_name], indent=24, output=sys.stdout)
+                colify(pkg_conflicts, indent=24, output=sys.stdout)
 
         if unused_compilers:
             color.cprint(color.section_title("Unused Compilers:"))

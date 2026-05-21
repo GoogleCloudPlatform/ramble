@@ -56,6 +56,25 @@ def setup_parser(subparser):
         dest="repo_path",
         help="run tests under the given object repo root (used for testing external object repo)",
     )
+    subparser.add_argument(
+        "--perf",
+        action="store_true",
+        default=False,
+        help="run only performance tests",
+    )
+    speed = subparser.add_mutually_exclusive_group()
+    speed.add_argument(
+        "--fast",
+        action="store_true",
+        default=False,
+        help="run only fast tests (skip slow tests)",
+    )
+    speed.add_argument(
+        "--slow",
+        action="store_true",
+        default=False,
+        help="run only slow tests (skip fast tests)",
+    )
 
     # extra ramble arguments to list tests
     list_group = subparser.add_argument_group("listing tests")
@@ -186,6 +205,12 @@ def add_back_pytest_args(args, unknown_args):
         result += ["--ignore-glob", "lib/ramble/ramble/test/*"]
     elif args.repo_path:
         result += ["--repo-path", args.repo_path]
+    if args.perf:
+        result += ["--perf"]
+    if args.fast:
+        result += ["--fast"]
+    if args.slow:
+        result += ["--slow"]
     result += unknown_args or []
     result += args.pytest_args or []
     if args.expression:

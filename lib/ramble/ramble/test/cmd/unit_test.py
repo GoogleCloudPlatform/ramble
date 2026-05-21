@@ -84,6 +84,18 @@ def test_external_repo_valid(tmpdir):
         [ramble_bin, "unit-test", "--repo-path", str(tmpdir), "-k", "test_dummy"],
         capture_output=True,
         text=True,
+        check=False,
     )
     assert result.returncode == 0
     assert "1 passed" in result.stdout
+
+
+@pytest.mark.parametrize("flag", ["--perf", "--fast"])
+def test_flags_accepted(flag):
+    output = ramble_test(flag, "--list")
+    assert "ramble/test/cmd/unit_test.py" in output
+
+
+def test_slow_flag():
+    output = ramble_test("--slow", "--list")
+    assert "test_slow_flag" not in output

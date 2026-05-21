@@ -63,6 +63,8 @@ default_keys = {
     "n_nodes": {"type": key_type.optional, "level": output_level.key},
     "processes_per_node": {"type": key_type.optional, "level": output_level.key},
     "n_threads": {"type": key_type.optional, "level": output_level.key},
+    "n_accelerators": {"type": key_type.optional, "level": output_level.key},
+    "accelerators_per_node": {"type": key_type.optional, "level": output_level.key},
     "batch_submit": {"type": key_type.required, "level": output_level.variable},
     "mpi_command": {"type": key_type.required, "level": output_level.variable},
     "workload_template_name": {"type": key_type.reserved, "level": output_level.key},
@@ -165,6 +167,7 @@ class Keywords:
             object_type = type_definition["singular"]
             self.reserved_patterns.add(re.compile(rf"{object_type}::\S+::version"))
             self.reserved_patterns.add(re.compile(rf"{object_type}_version"))
+            self.reserved_patterns.add(re.compile(rf"{object_type}::variant::\S+"))
 
     def copy(self):
         new_inst = type(self)()

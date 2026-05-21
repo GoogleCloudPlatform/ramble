@@ -86,6 +86,8 @@ def test_deterministic_workspace_hash(workspace_name):
             "local",
             "--wm",
             "slurm",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
         ws._re_read()

@@ -11,9 +11,9 @@ import fnmatch
 
 from llnl.util.tty.colify import colified
 
-import ramble.cmd.common.arguments as arguments
 import ramble.repository
 import ramble.util.colors as color
+from ramble.cmd.common import arguments
 from ramble.definitions.variables import Variable
 from ramble.util.logger import logger
 
@@ -38,8 +38,10 @@ obj_attribute_map = {
     "target_shells": "shell_support_pattern",
     "templates": None,
     "validators": None,
+    "conflicts": None,
     "object_variables": None,
     "object_environment_variables": None,
+    "command_variables": None,
     # Application specific:
     "workloads": None,
     "workload_groups": None,
@@ -55,8 +57,15 @@ obj_attribute_map = {
     "env_var_modifications": None,
     "required_vars": None,
     "package_manager_requirements": None,
-    # Package / workflow manager specific:
+    # Package / workflow manager / system/ platform specific:
     "families": None,
+    # System specific:
+    "default_package_manager": "system_default_package_manager",
+    "default_workflow_manager": "system_default_workflow_manager",
+    "available_platforms": "system_available_platforms",
+    "platform_variable_maps": None,
+    "variable_defaults": None,
+    "auxiliary_software_files": None,
 }
 
 
@@ -72,9 +81,7 @@ def setup_info_parser(subparser):
 
     arguments.add_common_arguments(subparser, ["obj_type"])
 
-    available_formats = []
-    for format in supported_formats:
-        available_formats.append(format.name)
+    available_formats = [format.name for format in supported_formats]
 
     subparser.add_argument(
         "--format",
@@ -168,12 +175,15 @@ def _unpack_when_set_if_needed(internal_attr: dict):
             # unpack to a list of dicts so dicts with same keys don't overwrite
             unpacked_dict = []
             for inner_dict in internal_attr.values():
-                unpacked_dict.append(inner_dict)
+                if inner_dict not in unpacked_dict:
+                    unpacked_dict.append(inner_dict)
             return unpacked_dict
         elif isinstance(first_val, list):
             unpacked_list = []
             for inner_list in internal_attr.values():
-                unpacked_list.extend(inner_list)
+                for item in inner_list:
+                    if item not in unpacked_list:
+                        unpacked_list.append(item)
             return unpacked_list
         else:
             return internal_attr[first_key]
@@ -183,6 +193,7 @@ def _unpack_when_set_if_needed(internal_attr: dict):
 
 def _print_nonverbose_list_attr(internal_attr, pattern="*", format=supported_formats.text):
     to_print = fnmatch.filter(map(str, internal_attr), pattern)
+    to_print = list(dict.fromkeys(to_print))
     if format == supported_formats.lists:
         color.cprint(f"    {list(to_print)}")
     elif format == supported_formats.text:
@@ -299,6 +310,35 @@ def _print_figures_of_merit(obj, attr, verbose=False, pattern="*", format=suppor
                 _print_verbose_dict_attr(fom_dict, pattern=pattern, indentation=indentation)
 
 
+def _print_conflicts(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
+    """Print conflicts defined on the object"""
+    internal_attr_name = _map_attr_name(attr)
+    internal_attr = getattr(obj, internal_attr_name)
+    if isinstance(internal_attr, dict) and internal_attr:
+        internal_attr = _unpack_when_set_if_needed(internal_attr)
+    print_attribute_header(attr, verbose)
+
+    indentation = " " * 4
+
+    if not verbose:
+        to_print = sorted({conflict["conflict_spec"] for conflict in internal_attr})
+        _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
+    else:
+        for conflict in internal_attr:
+            conflict_spec = conflict["conflict_spec"]
+            if pattern and not fnmatch.fnmatch(conflict_spec, pattern):
+                continue
+            color_spec = color.section_title(conflict_spec)
+            color.cprint(f"{color_spec}:")
+            if conflict["when"]:
+                color_when = color.nested_1("when")
+                color.cprint(f"{indentation}{color_when}: {', '.join(conflict['when'])}")
+            if conflict["message"]:
+                color_msg = color.nested_1("message")
+                color.cprint(f"{indentation}{color_msg}: {conflict['message']}")
+            color.cprint("")
+
+
 def print_single_attribute(obj, attr, verbose=False, pattern="*", format=supported_formats.text):
     """Handle printing a single attribute
 
@@ -312,6 +352,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
         return
     elif attr == "figures_of_merit":
         _print_figures_of_merit(obj, attr, verbose, pattern, format=format)
+        return
+    elif attr == "conflicts":
+        _print_conflicts(obj, attr, verbose, pattern, format=format)
         return
     elif isinstance(internal_attr, dict):
         internal_attr = _unpack_when_set_if_needed(internal_attr)
@@ -356,7 +399,9 @@ def print_single_attribute(obj, attr, verbose=False, pattern="*", format=support
                 and isinstance(internal_attr, (list, set, tuple))
                 and isinstance(next(iter(internal_attr), None), dict)
             ):
-                to_print = [key for attr_dict in internal_attr for key in attr_dict]
+                to_print = list(
+                    dict.fromkeys(key for attr_dict in internal_attr for key in attr_dict)
+                )
             _print_nonverbose_list_attr(to_print, pattern=pattern, format=format)
         else:
             color.cprint(f"    {to_print}\n")

@@ -12,6 +12,7 @@ import os
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
 from ramble.util.module_utils import import_pandas
+from ramble.util.naming import match_pattern
 
 
 class ResultsColumn:
@@ -36,7 +37,10 @@ class ResultsColumn:
         """
         # Extract column attributes
         for attr in self._column_attrs:
-            setattr(self, attr, str(conf_dict[attr]) if attr in conf_dict else None)
+            val = conf_dict.get(attr)
+            if val is not None:
+                val = str(val)
+            setattr(self, attr, val)
 
         if self.expression and self.figure_of_merit:
             logger.die(
@@ -52,6 +56,10 @@ class ResultsColumn:
         self.where = []
         if self._where_name in conf_dict:
             self.where.extend(conf_dict[self._where_name])
+
+        # Internal attributes for context columns
+        self._context_def_name = conf_dict.get("_context_def_name")
+        self._context_vars = conf_dict.get("_context_vars")
 
     def col_name(self, app_inst):
         """Expand this columns name based on the current experiment
@@ -101,20 +109,72 @@ class ResultsColumn:
 
             results = app_inst.result
             for context in results.contexts:
-                if context_name is None or context_name == context["name"]:
-                    for fom in context["foms"]:
-                        if fom["name"] == fom_name:
-                            keep = True
-                            if origin_type and origin_type != fom["origin_type"]:
-                                keep = False
+                if (context_name is None or context_name == context["name"]) and (
+                    self._context_def_name is None
+                    or self._context_def_name == context.get("context_def_name")
+                ):
+                    match_vars = True
+                    if self._context_vars is not None:
+                        # Ensure all original context vars match.
+                        # Regex groups in self._context_vars don't need to match
+                        # because they aren't in context.get('context_vars')
+                        c_vars = context.get("context_vars", {})
+                        for k, v in c_vars.items():
+                            if self._context_vars.get(k) != v:
+                                match_vars = False
+                                break
 
-                            if keep:
-                                if value is not None:
-                                    logger.warn(
-                                        "Non-unique values found " f"for column {self.name}"
-                                    )
-                                value = fom["value"]
+                    if match_vars:
+                        for fom in context["foms"]:
+                            if fom["name"] == fom_name:
+                                keep = True
+                                if origin_type and origin_type != fom["origin_type"]:
+                                    keep = False
+
+                                if keep:
+                                    if value is not None:
+                                        logger.warn(
+                                            "Non-unique values found " f"for column {self.name}"
+                                        )
+                                    value = fom["value"]
         return value
+
+
+class ResultsAutoColumn:
+    """Class representing a template for auto-generated columns"""
+
+    _where_name = "where"
+    _sort_by_name = "sort_by"
+    _column_attrs = [
+        "name",
+        "context_name",
+        "figure_of_merit",
+        "figure_of_merit_origin_type",
+    ]
+
+    def __init__(self, conf_dict):
+        """Construct an auto column from a configuration dict
+
+        Args:
+            conf_dict (dict): dictionary structured like the autocolumn schema
+        """
+        # Extract column attributes
+        for attr in self._column_attrs:
+            val = conf_dict.get(attr)
+            if val is not None:
+                val = str(val)
+            setattr(self, attr, val)
+
+        self.where = []
+        if self._where_name in conf_dict:
+            self.where.extend(conf_dict[self._where_name])
+
+        self.sort_by = []
+        if self._sort_by_name in conf_dict:
+            if isinstance(conf_dict[self._sort_by_name], list):
+                self.sort_by.extend(conf_dict[self._sort_by_name])
+            else:
+                self.sort_by.append(conf_dict[self._sort_by_name])
 
 
 class ResultsTable:
@@ -125,7 +185,9 @@ class ResultsTable:
     _group_by_name = "group_by"
     _sort_by_name = "sort_by"
     _columns_name = "columns"
+    _autocolumns_name = "autocolumns"
     _where_name = "where"
+    _transpose_name = "transpose"
 
     def __init__(self, conf_dict):
         """Constructor for a single table
@@ -158,11 +220,23 @@ class ResultsTable:
         if self._where_name in conf_dict:
             self.where.extend(conf_dict[self._where_name])
 
+        self.transpose = False
+        if self._transpose_name in conf_dict:
+            self.transpose = conf_dict[self._transpose_name]
+
         # Build table columns
         self.columns = []
         if self._columns_name in conf_dict:
             for column_config in conf_dict[self._columns_name]:
                 self.columns.append(ResultsColumn(column_config))
+
+        # Build table auto columns
+        self.autocolumns = []
+        if self._autocolumns_name in conf_dict:
+            for column_config in conf_dict[self._autocolumns_name]:
+                self.autocolumns.append(ResultsAutoColumn(column_config))
+
+        self.generated_columns = {}
 
     def render(self, app_inst):
         new_table = copy.deepcopy(self)
@@ -220,10 +294,118 @@ class ResultsTable:
         Args:
             app_inst: Instance of an application class to extract data from
         """
+
+        # Perform discovery for auto columns
+        manual_col_names = {c.col_name(app_inst) for c in self.columns}
+        for autocol_template in self.autocolumns:
+            action_column = True
+            for expression in autocol_template.where:
+                if not app_inst.expander.evaluate_predicate(expression):
+                    action_column = False
+
+            if not action_column:
+                continue
+
+            for context in app_inst.result.contexts:
+                # Try matching against context_def_name first (the type of context)
+                matched_ctx, ctx_groups = match_pattern(
+                    autocol_template.context_name, context.get("context_def_name", "")
+                )
+
+                # If no match, try matching against the instance name (the output name)
+                if not matched_ctx:
+                    matched_ctx, ctx_groups = match_pattern(
+                        autocol_template.context_name, context.get("name", "")
+                    )
+
+                if matched_ctx:
+                    context_vars = context.get("context_vars", {}).copy()
+                    context_vars.update(ctx_groups)
+
+                    for fom in context["foms"]:
+                        matched_fom, fom_groups = match_pattern(
+                            autocol_template.figure_of_merit, fom["name"]
+                        )
+                        if matched_fom:
+                            temp_vars = context_vars.copy()
+                            temp_vars.update(fom_groups)
+                            temp_vars["fom_name"] = fom["name"]
+                            temp_vars["context_name"] = context.get("name")
+
+                            col_name = app_inst.expander.expand_var(
+                                autocol_template.name, extra_vars=temp_vars
+                            )
+
+                            if (
+                                col_name not in manual_col_names
+                                and col_name not in self.generated_columns
+                            ):
+                                combined_vars = context.get("context_vars", {}).copy()
+                                combined_vars.update(ctx_groups)
+                                combined_vars.update(fom_groups)
+                                combined_vars["context_name"] = context.get("name")
+                                conf_dict = {
+                                    "name": col_name,
+                                    "figure_of_merit": fom["name"],
+                                    "figure_of_merit_context": context["name"],
+                                    "figure_of_merit_origin_type": (
+                                        autocol_template.figure_of_merit_origin_type
+                                    ),
+                                    "where": autocol_template.where,
+                                    "_context_def_name": context.get("context_def_name"),
+                                    "_context_vars": combined_vars,
+                                }
+                                col_obj = ResultsColumn(conf_dict)
+                                col_obj._template = autocol_template
+                                self.generated_columns[col_name] = col_obj
+
         column_values = {}
         remaining_columns = set(self._data.keys())
 
-        for column in self.columns:
+        # Combine manual and generated columns
+        all_columns = self.columns.copy()
+
+        # Group generated columns by template to apply variable-based sorting if specified
+        for autocol_template in self.autocolumns:
+            template_cols = [
+                col
+                for col in self.generated_columns.values()
+                if getattr(col, "_template", None) is autocol_template
+            ]
+
+            if autocol_template.sort_by:
+
+                def sort_key(col, template=autocol_template):
+                    key = []
+                    for var in template.sort_by:
+                        val = col._context_vars.get(var) if col._context_vars else None
+                        try:
+                            val = float(val) if val is not None else float("-inf")
+                        except (ValueError, TypeError):
+                            val = str(val) if val is not None else ""
+                        # Use a tuple of (type_flag, value) to prevent comparison errors
+                        # between strings and floats in Python 3
+                        type_flag = 0 if isinstance(val, (int, float)) else 1
+                        key.append((type_flag, val))
+                    return tuple(key)
+
+                template_cols.sort(key=sort_key)
+
+            all_columns.extend(template_cols)
+
+        # Re-order self._data to ensure columns appear in the correct sorted order
+        new_data = {}
+        for column in all_columns:
+            col_name = column.col_name(app_inst)
+            if col_name in self._data:
+                new_data[col_name] = self._data[col_name]
+
+        for k, v in self._data.items():
+            if k not in new_data:
+                new_data[k] = v
+        self._data = new_data
+
+        for column in all_columns:
             col_value = column.extract_value(app_inst, extra_vars=column_values)
 
             if col_value is None:
@@ -256,9 +438,16 @@ class ResultsTable:
             except ValueError:
                 pass
 
+        if self.transpose:
+            self._df = self._df.transpose()
+            # If transposed, the original columns become the index,
+            # and rows become columns.
+            # We might want to reset the index if we want it as a column,
+            # but usually transpose in CSV means just flipping it.
+
     def _group_dataframe(self):
         """Apply any grouping to this pandas dataframe"""
-        if self.group_by:
+        if self.group_by and not self.transpose:
             try:
                 grouped_df = self._df.groupby(*self.group_by, as_index=False)
 
@@ -269,7 +458,7 @@ class ResultsTable:
 
     def _sort_dataframe(self):
         """Apply any sorting to this pandas dataframe"""
-        if self.sort_by:
+        if self.sort_by and not self.transpose:
             try:
                 self._df = self._df.sort_values(by=self.sort_by)
             except KeyError:
@@ -292,7 +481,8 @@ class ResultsTable:
         latestname = self.name + inner_delim + "latest" + inner_delim + extension
         file_path = os.path.join(directory, filename)
         latest_path = os.path.join(directory, latestname)
-        self._df.to_csv(file_path, index=False)
+        # If transposed, we might want the index to be written as the first column
+        self._df.to_csv(file_path, index=self.transpose)
 
         create_symlink(file_path, latest_path)
         return file_path, latest_path

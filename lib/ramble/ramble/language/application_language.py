@@ -186,7 +186,9 @@ def executable(name, template, when=None, **kwargs):
         if when_set not in app.executables:
             app.executables[when_set] = {}
 
-        app.executables[when_set][name] = CommandExecutable(name=name, template=template, **kwargs)
+        app.executables[when_set][name] = CommandExecutable(
+            name=name, template=template, when=when_list, **kwargs
+        )
 
     return _execute_executable
 
@@ -512,7 +514,8 @@ def stage_files(
     files that are not managed by the `input_file` directive.
 
     The staging method is controlled by the `stage_method` configuration
-    option, which can be set to 'cp', 'rsync', 'symbolic_link', or 'hard_link'.
+    option, which can be set to 'cp', 'rsync', 'symbolic_link', 'hard_link',
+    or 'install' (for files only).
 
     Args:
         src (str | None): The source path of the file or directory.
@@ -522,17 +525,19 @@ def stage_files(
                                                of src, dest locations to stage.
         name (str | None): The name of the executable. Defaults to 'stage-files'.
         method (str): The method to use for this stage. Can be one of:
-                      "user-defined", "cp", "rsync", "symbolic_link", "hard_link"
+                      "user-defined", "cp", "rsync", "symbolic_link",
+                      "hard_link", "install"
         when (list | None): List of when conditions to apply to this directive.
     """
 
-    valid_methods = ["user-defined", "cp", "rsync", "symbolic_link", "hard_link"]
+    valid_methods = ["user-defined", "cp", "rsync", "symbolic_link", "hard_link", "install"]
 
     method_map = {
         "cp": "cp -Lr",
         "rsync": "rsync -Lr",
         "symbolic_link": "ln -sf",
         "hard_link": "ln -f",
+        "install": "install -m 755",
     }
 
     def _execute_stage_files(app):
@@ -593,7 +598,7 @@ def stage_files(
                 template.append(f"{stage_cmd} {pair_src} {pair_dst}")
 
         app.executables[when_set][exec_name] = CommandExecutable(
-            name=exec_name, template=template, allow_extension=True, **kwargs
+            name=exec_name, template=template, allow_extension=True, when=when_list, **kwargs
         )
 
     return _execute_stage_files

@@ -96,6 +96,10 @@ class ObjectMixin:
             return ObjectTypes.workflow_managers
         elif self.origin_type == "modifier":
             return ObjectTypes.modifiers
+        elif self.origin_type == "system":
+            return ObjectTypes.systems
+        elif self.origin_type == "platform":
+            return ObjectTypes.platforms
         return None
 
     def satisfy_when(self, when_key, variant_set=None):
@@ -122,10 +126,10 @@ class ObjectMixin:
 
         if current_ver:
             for known_version in self.known_versions.values():
-                if current_ver.get_version() == known_version.get_version():
+                if current_ver.version == known_version.version:
                     return
             raise ObjectValidationError(
-                f"The current version {current_ver.get_version()} is not defined in the "
+                f"The current version {current_ver.version} is not defined in the "
                 f"{self.origin_type}.py. You must select from defined versions. Set "
                 "config:enable_strict_versions:false to disable strict version checking."
             )
@@ -157,6 +161,10 @@ class ObjectMixin:
         self.object_variants.version_variant(
             f"{self.origin_type}_version", self.selected_version
         )
+
+    def set_required_variables(self, app_inst=None):
+        """Stub that allows objects to update required variables"""
+        pass
 
     @staticmethod
     def version_to_pep440(version_str):

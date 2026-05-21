@@ -8,7 +8,6 @@
 
 
 import errno
-import getpass
 import hashlib
 import os
 import stat
@@ -20,7 +19,6 @@ from llnl.util.filesystem import (
     install,
     install_tree,
     mkdirp,
-    partition_path,
     remove_linked_tree,
 )
 
@@ -32,124 +30,12 @@ import ramble.util.lock
 from ramble.util.logger import logger
 
 import spack.config
-import spack.util.path as sup
-import spack.util.pattern as pattern
 import spack.util.url as url_util
+from spack.util import pattern
 from spack.util.crypto import bit_length, prefix_bits
 
 # The well-known stage source subdirectory name.
 _input_subdir = "input"
-
-
-def create_stage_root(path):
-    """Create the stage root directory and ensure appropriate access perms."""
-    assert path.startswith(os.path.sep) and len(path.strip()) > 1
-
-    err_msg = "Cannot create stage root {0}: Access to {1} is denied"
-
-    # Obtain lists of ancestor and descendant paths of the $user node, if any.
-    group_paths, user_node, user_paths = partition_path(path, getpass.getuser())
-
-    for p in group_paths:
-        if not os.path.exists(p):
-            # Ensure access controls of subdirs created above `$user` inherit
-            # from the parent and share the group.
-            par_stat = os.stat(os.path.dirname(p))
-            mkdirp(p, group=par_stat.st_gid, mode=par_stat.st_mode)
-
-            p_stat = os.stat(p)
-            if par_stat.st_gid != p_stat.st_gid:
-                logger.warn(
-                    f"Expected {p} to have group " f"{par_stat.st_gid}, but it is {p_stat.st_gid}"
-                )
-
-            if par_stat.st_mode & p_stat.st_mode != par_stat.st_mode:
-                logger.warn(
-                    f"Expected {p} to support mode "
-                    f"{par_stat.st_mode}, but it is {p_stat.st_mode}"
-                )
-
-            if not can_access(p):
-                raise OSError(errno.EACCES, err_msg.format(path, p))
-
-    # Add the path ending with the $user node to the user paths to ensure paths
-    # from $user (on down) meet the ownership and permission requirements.
-    if user_node:
-        user_paths.insert(0, user_node)
-
-    for p in user_paths:
-        # Ensure access controls of subdirs from `$user` on down are
-        # restricted to the user.
-        if not os.path.exists(p):
-            mkdirp(p, mode=stat.S_IRWXU)
-
-            p_stat = os.stat(p)
-            if p_stat.st_mode & stat.S_IRWXU != stat.S_IRWXU:
-                logger.error(
-                    f"Expected {p} to support mode " f"{stat.S_IRWXU}, but it is {p_stat.st_mode}"
-                )
-
-                raise OSError(errno.EACCES, err_msg.format(path, p))
-        else:
-            p_stat = os.stat(p)
-
-    input_subdir = os.path.join(path, _input_subdir)
-    # When staging into a user-specified directory we need to ensure the
-    # `input` subdirectory exists, as we can't rely on it being created
-    # automatically by ramble.
-    if not os.path.isdir(input_subdir):
-        mkdirp(input_subdir, mode=stat.S_IRWXU)
-
-
-def _first_accessible_path(paths):
-    """Find the first path that is accessible, creating it if necessary."""
-    for path in paths:
-        try:
-            # Ensure the user has access, creating the directory if necessary.
-            if os.path.exists(path):
-                if can_access(path):
-                    return path
-            else:
-                # Now create the stage root with the proper group/perms.
-                create_stage_root(path)
-                return path
-
-        except OSError as e:
-            logger.debug(f"OSError while checking stage path {path}: {e}")
-
-    return None
-
-
-def _resolve_paths(candidates):
-    """
-    Resolve candidate paths and make user-related adjustments.
-
-    Adjustments involve removing extra $user from $tempdir if $tempdir includes
-    $user and appending $user if it is not present in the path.
-    """
-    temp_path = sup.canonicalize_path("$tempdir")
-    user = getpass.getuser()
-    tmp_has_usr = user in temp_path.split(os.path.sep)
-
-    paths = []
-    for path in candidates:
-        # Remove the extra `$user` node from a `$tempdir/$user` entry for
-        # hosts that automatically append `$user` to `$tempdir`.
-        if path.startswith(os.path.join("$tempdir", "$user")) and tmp_has_usr:
-            path = path.replace("/$user", "", 1)
-
-        # Ensure the path is unique per user.
-        can_path = sup.canonicalize_path(path)
-        if user not in can_path:
-            can_path = os.path.join(can_path, user)
-
-        paths.append(can_path)
-
-    return paths
-
-
-# Cached stage path root
-_stage_root = None
 
 
 class InputStage:
@@ -393,8 +279,9 @@ class InputStage:
             # the root, so we add a '/' if it is not present.
             mirror_urls = []
             for mirror in ramble.mirror.MirrorCollection().values():
-                for rel_path in self.mirror_paths:
-                    mirror_urls.append(url_util.join(mirror.fetch_url, rel_path))
+                mirror_urls.extend(
+                    url_util.join(mirror.fetch_url, rel_path) for rel_path in self.mirror_paths
+                )
 
             # If this archive is normally fetched from a tarball URL,
             # then use the same digest.  `spack mirror` ensures that

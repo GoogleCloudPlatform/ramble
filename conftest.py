@@ -53,6 +53,12 @@ def pytest_addoption(parser):
         help='runs only "fast" unit tests, instead of the whole suite',
     )
     group.addoption(
+        "--slow",
+        action="store_true",
+        default=False,
+        help='runs only "slow" unit tests, instead of the whole suite',
+    )
+    group.addoption(
         "--repo-path",
         default=None,
         help="runs only tests under the given Ramble object repo path",
@@ -120,15 +126,23 @@ def pytest_collection_modifyitems(config, items):
             if "perf" in item.keywords:
                 item.add_marker(skip_perf)
 
-    if not config.getoption("--fast"):
-        # --fast not given, run all the tests
-        return
-
     slow_tests = ["db", "network", "maybeslow", "long"]
-    skip_as_slow = pytest.mark.skip(reason="skipped slow test [--fast command line option given]")
-    for item in items:
-        if any(x in item.keywords for x in slow_tests):
-            item.add_marker(skip_as_slow)
+
+    if config.getoption("--fast"):
+        skip_as_slow = pytest.mark.skip(
+            reason="skipped slow test [--fast command line option given]"
+        )
+        for item in items:
+            if any(x in item.keywords for x in slow_tests):
+                item.add_marker(skip_as_slow)
+
+    if config.getoption("--slow"):
+        skip_as_fast = pytest.mark.skip(
+            reason="skipped fast test [--slow command line option given]"
+        )
+        for item in items:
+            if not any(x in item.keywords for x in slow_tests):
+                item.add_marker(skip_as_fast)
 
 
 #
@@ -565,8 +579,9 @@ def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
 @pytest.fixture()
 def workspace_deactivate():
     """Deactivates any active workspace after a test."""
+    ramble.workspace.deactivate()
     yield
-    ramble.workspace._active_workspace = None
+    ramble.workspace.deactivate()
     os.environ.pop("RAMBLE_WORKSPACE", None)
 
 
@@ -821,12 +836,11 @@ def pytest_generate_tests(metafunc):
 
         config_cmd = RambleCommand("config")
 
-        all_sections = []
         config_sections = config_cmd("list").split(" ")
 
-        for section_str in config_sections:
-            if section_str != "":
-                all_sections.append(section_str.strip())
+        all_sections = [
+            section_str.strip() for section_str in config_sections if section_str != ""
+        ]
 
         metafunc.parametrize("config_section", all_sections)
 

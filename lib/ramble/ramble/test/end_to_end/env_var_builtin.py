@@ -21,7 +21,7 @@ config = RambleCommand("config")
 workspace = RambleCommand("workspace")
 
 
-def test_env_var_builtin(mock_applications, workspace_name):
+def test_env_var_builtin(mock_applications, make_workspace_from_config):
     test_config = """
 ramble:
   config:
@@ -63,68 +63,61 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
-        ws._re_read()
+    experiment_root = ws.experiment_dir
+    exp1_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
+    exp1_script = os.path.join(exp1_dir, "execute_experiment")
+    exp2_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl2", "simple_test")
+    exp2_script = os.path.join(exp2_dir, "execute_experiment")
+    exp3_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl3", "simple_test")
+    exp3_script = os.path.join(exp3_dir, "execute_experiment")
 
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    export_regex = re.compile(r"export MY_VAR=TEST:")
+    cmd1_regex = re.compile("bar >>")
+    cmd2_regex = re.compile("baz >>")
+    cmd3_regex = re.compile("foo >>")
 
-        experiment_root = ws.experiment_dir
-        exp1_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
-        exp1_script = os.path.join(exp1_dir, "execute_experiment")
-        exp2_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl2", "simple_test")
-        exp2_script = os.path.join(exp2_dir, "execute_experiment")
-        exp3_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl3", "simple_test")
-        exp3_script = os.path.join(exp3_dir, "execute_experiment")
+    # Assert experiment 1 has exports before commands
+    with open(exp1_script) as f:
+        cmd_found = False
+        export_found = False
+        for line in f:
+            if not export_found and export_regex.search(line):
+                assert not cmd_found
+                export_found = True
+            if export_found and cmd1_regex.search(line):
+                cmd_found = True
+        assert cmd_found and export_found
 
-        export_regex = re.compile(r"export MY_VAR=TEST:")
-        cmd1_regex = re.compile("bar >>")
-        cmd2_regex = re.compile("baz >>")
-        cmd3_regex = re.compile("foo >>")
+    # Assert experiment 2 has commands before exports
+    with open(exp2_script) as f:
+        cmd_found = False
+        export_found = False
+        for line in f:
+            if not cmd_found and cmd2_regex.search(line):
+                assert not export_found
+                cmd_found = True
+            if cmd_found and export_regex.search(line):
+                export_found = True
+        assert cmd_found and export_found
 
-        # Assert experiment 1 has exports before commands
-        with open(exp1_script) as f:
-            cmd_found = False
-            export_found = False
-            for line in f:
-                if not export_found and export_regex.search(line):
-                    assert not cmd_found
-                    export_found = True
-                if export_found and cmd1_regex.search(line):
-                    cmd_found = True
-            assert cmd_found and export_found
-
-        # Assert experiment 2 has commands before exports
-        with open(exp2_script) as f:
-            cmd_found = False
-            export_found = False
-            for line in f:
-                if not cmd_found and cmd2_regex.search(line):
-                    assert not export_found
-                    cmd_found = True
-                if cmd_found and export_regex.search(line):
-                    export_found = True
-            assert cmd_found and export_found
-
-        # Assert experiment 3 has exports before commands
-        with open(exp3_script) as f:
-            cmd_found = False
-            export_found = False
-            for line in f:
-                if not export_found and export_regex.search(line):
-                    assert not cmd_found
-                    export_found = True
-                if export_found and cmd3_regex.search(line):
-                    cmd_found = True
-            assert cmd_found and export_found
+    # Assert experiment 3 has exports before commands
+    with open(exp3_script) as f:
+        cmd_found = False
+        export_found = False
+        for line in f:
+            if not export_found and export_regex.search(line):
+                assert not cmd_found
+                export_found = True
+            if export_found and cmd3_regex.search(line):
+                cmd_found = True
+        assert cmd_found and export_found
 
 
-def test_env_var_from_app_only(mock_applications, workspace_name):
+def test_env_var_from_app_only(mock_applications, make_workspace_from_config):
     test_config = """
 ramble:
   variables:
@@ -145,22 +138,15 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
-        with open(config_path, "w+") as f:
-            f.write(test_config)
-        ws._re_read()
+    experiment_root = ws.experiment_dir
+    exp1_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
 
-        workspace("setup", "--dry-run", global_args=["-w", workspace_name])
-
-        experiment_root = ws.experiment_dir
-        exp1_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
-
-        with open(os.path.join(exp1_dir, "execute_experiment")) as f:
-            assert "FROM_DIRECTIVE" in f.read()
+    with open(os.path.join(exp1_dir, "execute_experiment")) as f:
+        assert "FROM_DIRECTIVE" in f.read()
 
 
 def test_object_env_var_definitions(
@@ -189,6 +175,8 @@ def test_object_env_var_definitions(
             "when-package-manager",
             "--wm",
             "when-workflow-manager",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -248,6 +236,8 @@ def test_object_env_var_methods(
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -268,14 +258,12 @@ def test_object_env_var_methods(
 
         with open(rendered_script) as f:
             for line in f:
-                for regex in env_var_regexes:
-                    if regex.search(line):
-                        found_vars.append(True)
+                found_vars.extend(True for regex in env_var_regexes if regex.search(line))
 
         assert len(found_vars) == len(env_var_regexes)
 
 
-def test_auto_env_vars(workspace_name, mock_applications, mock_modifiers):
+def test_auto_env_vars(make_workspace_from_config, mock_applications, mock_modifiers):
     test_config = """
 ramble:
   variables:
@@ -283,6 +271,7 @@ ramble:
     batch_submit: 'batch_submit {execute_experiment}'
     processes_per_node: 1
     n_nodes: 1
+    info-app-dep_path: /not/a/path
   applications:
     basic:
       workloads:
@@ -302,15 +291,9 @@ ramble:
   modifiers:
   - name: info
 """
-    ws = ramble.workspace.create(workspace_name)
-    ws.write()
-    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    ws, ws_name = make_workspace_from_config(test_config)
 
-    with open(config_path, "w+") as f:
-        f.write(test_config)
-    ws._re_read()
-
-    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+    workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
     # Test1: workload variable generates env var export
     script = os.path.join(

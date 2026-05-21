@@ -10,10 +10,10 @@ import os
 
 import pytest
 
-import ramble.test.modifier_functionality.modifier_helpers as modifier_helpers
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import SCOPES, dry_run_config
+from ramble.test.modifier_functionality import modifier_helpers
 
 workspace = RambleCommand("workspace")
 
@@ -61,10 +61,8 @@ def test_gromacs_multi_modifier_dry_run(
     script_tests = []
     for answer in answers:
         sw_test, script_test = answer()
-        for sw in sw_test:
-            software_tests.append(sw)
-        for script in script_test:
-            script_tests.append(script)
+        software_tests.extend(sw_test)
+        script_tests.extend(script_test)
 
     with ramble.workspace.create(workspace_name) as ws1:
         ws1.write()

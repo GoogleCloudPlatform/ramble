@@ -12,7 +12,6 @@ from typing import Collection, Iterator
 
 import ramble.definitions.families
 import ramble.util.class_attributes
-import ramble.util.directives
 import ramble.variants
 from ramble.expander import ExpanderError
 from ramble.language.shared_language import SharedMeta
@@ -76,8 +75,6 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
         ramble.util.class_attributes.convert_class_attributes(self)
 
         self._file_path = file_path
-
-        ramble.util.directives.define_directive_methods(self)
 
         self.object_variants.default_variant(
             self.origin_type,

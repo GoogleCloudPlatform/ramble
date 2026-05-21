@@ -71,7 +71,7 @@ def test_app_features(mutable_mock_apps_repo, app):
 def test_basic_app(mutable_mock_apps_repo):
     basic_inst = mutable_mock_apps_repo.get("basic")
     exp_dict = basic_exp_dict()
-    basic_inst.set_variables_and_variants(exp_dict, {}, None)
+    basic_inst.set_variables_and_variants(exp_dict, {}, None, None)
     basic_inst.define_variable("application_name", "basic")
 
     assert "test_wl" in basic_inst.workloads[_FS]
@@ -160,7 +160,7 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
         }
     }
 
-    src_inst.set_variables_and_variants(defined_variables, {}, None)
+    src_inst.set_variables_and_variants(defined_variables, {}, None, None)
     src_inst.set_env_variable_sets(defined_env_vars)
     src_inst.set_internals(defined_internals)
 
@@ -217,7 +217,7 @@ def test_application_copy_is_deep(app_name, wl_name, mutable_mock_apps_repo):
 def test_required_builtins(mutable_mock_apps_repo, app):
     app_inst = mutable_mock_apps_repo.get(app)
     exp_dict = basic_exp_dict()
-    app_inst.set_variables_and_variants(exp_dict, {}, None)
+    app_inst.set_variables_and_variants(exp_dict, {}, None, None)
     app_inst.define_variable("application_name", app)
 
     required_builtins = []
@@ -235,7 +235,7 @@ def test_required_builtins(mutable_mock_apps_repo, app):
 def test_register_builtin_app(mutable_mock_apps_repo):
     app_inst = mutable_mock_apps_repo.get("register-builtin")
     exp_dict = basic_exp_dict()
-    app_inst.set_variables_and_variants(exp_dict, {}, None)
+    app_inst.set_variables_and_variants(exp_dict, {}, None, None)
     app_inst.define_variable("application_name", "register-builtin")
 
     required_builtins = []
@@ -434,7 +434,7 @@ def test_set_variables_and_variants(mutable_mock_apps_repo):
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
 
     executable_application_instance.set_variables_and_variants(
-        expansion_vars, experiment_variants, None
+        expansion_vars, experiment_variants, None, None
     )
 
     assert executable_application_instance.variables["n_ranks"] == "1"
@@ -459,7 +459,7 @@ def test_define_commands(mutable_mock_apps_repo):
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.set_variables_and_variants(expansion_vars, {}, None)
+    executable_application_instance.set_variables_and_variants(expansion_vars, {}, None, None)
 
     exec_graph = executable_application_instance.get_executable_graph("test_wl2")
 
@@ -525,7 +525,7 @@ ramble:
     executable_application_instance.internals = {}
 
     executable_application_instance.inputs[_FS] = {"input": {"target_dir": "."}}
-    executable_application_instance.set_variables_and_variants(expansion_vars, {}, None)
+    executable_application_instance.set_variables_and_variants(expansion_vars, {}, None, None)
 
     exec_graph = executable_application_instance.get_executable_graph("test_wl2")
 

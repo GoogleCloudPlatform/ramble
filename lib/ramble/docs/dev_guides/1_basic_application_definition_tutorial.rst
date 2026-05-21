@@ -12,7 +12,7 @@
 1) Writing a basic application definition
 =====================================================
 
-This tutorial will provide a introduction to writing an application definition
+This tutorial will provide an introduction to writing an application definition
 in Ramble. In this tutorial, you will create and test an application definition
 file to run the ``hostname`` linux utility as your application.
 
@@ -33,61 +33,7 @@ To install Ramble, see the :doc:`../getting_started` guide.
 
 **NOTE**: This tutorial does not require a package manager to be installed or configured.
 
-Ramble Repositories
-===================
-
-Before writing our application definition, we will create a repository to house
-the application definition. Repositories in Ramble can house any object type,
-and are not limited to only application definition.
-
-The ``ramble repo`` command is used to manage object repositories in Ramble. To
-create a new repository, execute the following:
-
-.. code-block:: console
-
-    $ ramble repo create tutorial-repo
-
-This will create a new directory named ``tutorial-repo`` in your current
-directory. Inside, directories will exist for each of the object types. These
-will include things like ``applications`` and ``package_managers``. Resulting
-object paths in this repo would look like:
-
-.. code-block:: console
-
-    tutorial-repo/applications/hostname/application.py
-
-You can also create a repository without object subdirectories using:
-
-.. code-block:: console
-
-    $ ramble repo create tutorial-repo -d ""
-
-In this case, the resulting structure looks like:
-
-.. code-block:: console
-
-    tutorial-repo/hostname/application.py
-
-This latter layout allows objects with the same name but different types to
-coexist in the same directory.
-
-The remaining commands in this tutorial will assume your repository layout
-matches the first example, but you can feel free to use either layout. Just map
-any paths to the correct layout.
-
-Once your repository is created, you can register it with Ramble by issuing the
-following command:
-
-.. code-block:: console
-
-    $ ramble repo add tutorial-repo
-
-**NOTE**: Ramble comes with a default ``builtin`` repository. Adding new
-repositories gives them a higher precedence to other existing repositories.
-Ramble uses this precedence ordering to decide which object definition is used
-when multiple exist with the same name. Each repository has a namespace, and
-these namespaces can be used to refer to specific instances of each object
-definition.
+.. include:: shared/repository_create.rst
 
 Hostname Application Definition
 ===============================
@@ -451,6 +397,7 @@ some file in the experiment directory. We will use the following definition to
 track whatever the output from the experiment is as the possible hostname:
 
 .. code-block:: python
+
     figure_of_merit(
       "possible hostname",
       fom_regex=r"(?P<hostname>\S+)",
@@ -562,6 +509,7 @@ To begin with, delete the tutorial workspace, and recreate it using:
   $ ramble workspace deactivate
   $ rm -rf tutorial-workspace
   $ ramble workspace create -d tutorial-workspace -a
+
 Now, we can add an experiment to exercise the local workload using:
 
 .. code-block:: console

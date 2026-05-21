@@ -187,7 +187,6 @@ class Pip(PackageManagerBase):
         except RunnerError as e:
             if self.environment_required:
                 logger.die(e)
-            pass
 
     register_phase(
         "define_package_paths",
@@ -266,10 +265,7 @@ class Pip(PackageManagerBase):
         self.runner.set_dry_run(workspace.dry_run)
         self.runner.configure_env(env_path)
 
-        pkg_list = []
-        for info in self.runner.package_provenance():
-            pkg_list.append(info)
-        return pkg_list
+        return list(self.runner.package_provenance())
 
     def environment_load_commands(self):
         self.runner.configure_env(self.app_inst.expander.env_path)
@@ -308,12 +304,12 @@ class PipSoftwareInfo(ramble.software_info.SoftwareInfo):
         """
 
         if not in_str:
-            return None
+            return
 
         parts = in_str.replace("\n", "").split("==")
 
         if len(parts) <= 1:
-            return None
+            return
 
         self.version = parts[1]
 

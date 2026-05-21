@@ -337,9 +337,9 @@ def extract_data(experiments: List[dict], foms: List[str], variables: List[str],
                         ReportVars.CONTEXT_NAME.value: context["name"],
                     }
 
-                    for name in _EXP_BASIC_VARS_MAPPING:
+                    for name, report_var in _EXP_BASIC_VARS_MAPPING.items():
                         if name in exp:
-                            exp_data[_EXP_BASIC_VARS_MAPPING[name]] = exp[name]
+                            exp_data[report_var] = exp[name]
 
                     for name, val in fom.items():
                         if name in _FOM_DICT_MAPPING:

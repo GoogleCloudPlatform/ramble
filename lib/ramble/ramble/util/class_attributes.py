@@ -17,9 +17,12 @@ def convert_class_attributes(obj):
     """
 
     if hasattr(obj, "_directive_names"):
-        dir_set = dir(obj)
         var_set = vars(obj)
         for attr in obj._directive_names:
-            if attr in dir_set and attr not in var_set:
-                inst_val = getattr(obj, attr).copy()
+            if attr not in var_set and hasattr(obj, attr):
+                val = getattr(obj, attr)
+                if hasattr(val, "copy"):
+                    inst_val = val.copy()
+                else:
+                    inst_val = val
                 setattr(obj, attr, inst_val)

@@ -174,8 +174,9 @@ compilers:
             spack_file = os.path.join(software_path, "spack.yaml")
             assert os.path.exists(spack_file)
             for file in aux_software_files:
-                file_path = os.path.join(software_path, file)
-                assert os.path.exists(file_path)
+                if not file.endswith(".yaml"):
+                    file_path = os.path.join(software_path, file)
+                    assert os.path.exists(file_path)
 
         expected_experiments = [
             "scaling_1_part1_wrfv4",

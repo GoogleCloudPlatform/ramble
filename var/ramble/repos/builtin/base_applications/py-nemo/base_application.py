@@ -342,7 +342,7 @@ class PyNemo(ExecutableApplication):
                 )
 
             with open(processed_log) as f:
-                for line in f.readlines():
+                for line in f:
                     m = final_regex.match(line)
 
                     if m:

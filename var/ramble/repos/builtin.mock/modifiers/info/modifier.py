@@ -148,6 +148,12 @@ class Info(BasicModifier):
         fail_on_invalid=False,
     )
 
+    conflict(
+        "turn_on_required_directives=True",
+        when="variant_name=variant_default",
+        msg="turn_on_required_directives conflicts with variant_default",
+    )
+
     # Modifier language directives
     mode("info-mode", "Info mode")
     mode("another-mode", "Another mode")

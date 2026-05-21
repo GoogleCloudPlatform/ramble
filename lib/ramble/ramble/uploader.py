@@ -90,7 +90,6 @@ class Uploader:
             raise ValueError(f"{self.__class__} requires {uri} argument.")
         if not data:
             raise ValueError(f"{self.__class__} requires %{data} argument.")
-        pass
 
     def chunked_upload(self, table_id, data, uri=None):
         """Abstract method for chunked uploads. Must be implemented by subclasses."""
@@ -525,7 +524,7 @@ class BigQueryUploader(Uploader):
                 query_job = client.query(query)
                 results = query_job.result()
                 if results.total_rows > 0:
-                    upstream_version = list(results)[0].value
+                    upstream_version = next(iter(results)).value
                     if upstream_version != str(table_def["version"]):
                         logger.warn(
                             f"Upstream DB schema version for table {table_def['table']} "

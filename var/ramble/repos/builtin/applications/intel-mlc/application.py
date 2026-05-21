@@ -183,9 +183,7 @@ class IntelMlc(ExecutableApplication):
                 f"Error creating compact threads. {n_threads} requested, but max thread id is {max_thread}"
             )
 
-        threads = []
-        for i in range(0, n_threads):
-            threads.append(str(i))
+        threads = [str(i) for i in range(n_threads)]
         return threads
 
     def _spread_thread_indices(self, n_threads, max_thread, spread_divisions):
@@ -197,7 +195,7 @@ class IntelMlc(ExecutableApplication):
         threads = []
         cur_indices = []
         numa_index = 0
-        for _ in range(0, spread_divisions):
+        for _ in range(spread_divisions):
             cur_indices.append(numa_index)
             numa_index += max_thread // spread_divisions
 

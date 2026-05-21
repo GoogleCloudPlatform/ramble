@@ -168,8 +168,6 @@ module = [
 ]
 check_untyped_defs = true
 
-# TODO: Add ruff into `ramble style` once it reaches v1.
-# For now, the ruff check can be invoked manually with `ruff check`.
 [tool.ruff]
 extend-include = ["bin/ramble"]
 extend-exclude = [
@@ -180,9 +178,26 @@ extend-exclude = [
 
 [tool.ruff.lint]
 preview = true
+explicit-preview-rules = true
 # B905 requires Python 3.9 or up.
-ignore = ["B905"]
-extend-select = ["B", "C4", "F401"]
+ignore = ["B905", "PERF203"]
+select = [
+    "E4", "E7", "E9", "F", "B", "C4",
+    # Enable some useful preview rules
+    "B043",   # del-attr-with-constant
+    "PLW1510",# subprocess-run-without-check
+    "PIE794", # duplicate-class-field-definition
+    "PIE796", # non-unique-enums
+    "PT014",  # pytest-duplicate-parametrize-test-cases
+    "T100",   # debugger
+    "RUF019", # unnecessary-key-check
+    "PLC0206",# dict-index-missing-items
+    "SIM118", # in-dict-keys
+    "PERF",
+    "RUF015", # unnecessary-iterable-allocation
+    "FURB192",# sorted-min-max
+    "FURB118",# reimplemented-operator
+]
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]

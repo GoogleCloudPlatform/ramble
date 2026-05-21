@@ -34,7 +34,15 @@ def test_workspace_dollar_paths(workspace_name):
         path_args.append(f"test_{name}=${name}/unit_test")
 
     workspace(
-        "manage", "experiments", "hostname", "--wf", "local", *path_args, global_args=global_args
+        "manage",
+        "experiments",
+        "hostname",
+        "--wf",
+        "local",
+        "--default-variable-value",
+        "1",
+        *path_args,
+        global_args=global_args,
     )
 
     with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "a") as f:

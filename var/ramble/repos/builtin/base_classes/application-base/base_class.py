@@ -21,7 +21,7 @@ from html import escape
 from typing import Dict, List
 
 import llnl.util.filesystem as fs
-import llnl.util.tty.color as color
+from llnl.util.tty import color
 
 import ramble.config
 import ramble.expander
@@ -35,7 +35,6 @@ import ramble.stage
 import ramble.success_criteria
 import ramble.util.class_attributes
 import ramble.util.colors as rucolor
-import ramble.util.directives
 import ramble.util.env
 import ramble.util.executable
 import ramble.util.hashing
@@ -43,6 +42,7 @@ import ramble.util.lock as lk
 import ramble.util.path
 import ramble.util.stats
 import ramble.variants
+from ramble.definitions.variables import CommandVariable
 from ramble.error import (
     ApplicationError,
     ChainCycleDetectedError,
@@ -152,6 +152,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     archive_pattern("{experiment_run_dir}/" + ExperimentResult.cache_file_name)
 
+    mpi_definitions = {
+        ramble.keywords.keywords.n_ranks: "int({processes_per_node}*{n_nodes})",
+        ramble.keywords.keywords.processes_per_node: "int({n_ranks}/{n_nodes})",
+        ramble.keywords.keywords.n_nodes: "int({n_ranks}/{processes_per_node})",
+    }
+
     def __init__(self, file_path):
         super().__init__()
 
@@ -171,12 +177,15 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._active_workload = None
         self.no_expand_vars = None
         self.experiment_set = None
+        self.workspace = None
         self.internals = {}
         self.is_template = False
         self.generated_experiments = []
         self.repeats = ramble.repeats.Repeats()
         self._command_list = []
         self._command_list_without_logs = []
+        self._missing_command_variables = {}
+        self.missing_mpi_variables = set()
         self.chained_experiments = None
         self.chain_order = []
         self.chain_prepend = []
@@ -196,9 +205,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._exp_lock = None
         self._input_lock = None
         self._software_lock = None
-        self._experiment_graph = None
         # A dict storing fom values, currently it only stores inmem FOMs
         self._fom_map = {}
+        self._template_paths_defined = False
 
         # Ensure we always have the application name, and this is never empty
         self._file_path = file_path
@@ -221,10 +230,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.license_file = ""
 
         self.workflow_manager = None
+        self.system = None
+        self.platform = None
 
         self.result = ExperimentResult(self)
-
-        ramble.util.directives.define_directive_methods(self)
 
     @property
     def experiment_lock(self):
@@ -254,7 +263,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         clone_variables = {} if not self.variables else self.variables
         clone_variants = {} if not self.variants else self.variants
         new_clone.set_variables_and_variants(
-            clone_variables, clone_variants, self.experiment_set
+            clone_variables,
+            clone_variants,
+            self.workspace,
+            self.experiment_set,
         )
         if self._env_variable_sets:
             new_clone.set_env_variable_sets(self._env_variable_sets.copy())
@@ -395,8 +407,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_package_manager(self):
         pkgman = conversions.canonical_none(
-            self.experiment_variants(allow_caching=False).value(
-                namespace.package_manager
+            self.expander.expand_var(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.package_manager
+                )
             )
         )
 
@@ -437,10 +451,130 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         }
                     )
 
+    def _set_system(self):
+        sys_var = conversions.canonical_none(
+            self.experiment_variants(allow_caching=False).value(
+                namespace.system
+            )
+        )
+
+        if sys_var is None:
+            sys_var = "user-managed"
+
+        if sys_var is not None:
+            sys_name, _, maybe_sys_ver = sys_var.partition("@")
+
+            try:
+                sys_type = ramble.repository.ObjectTypes.systems
+                self.system = ramble.repository.get(sys_name, sys_type).copy()
+                self.system.set_application(self)
+                if maybe_sys_ver:
+                    self.system.set_version(
+                        version_number=maybe_sys_ver,
+                        description=f"{sys_name} {maybe_sys_ver}",
+                    )
+            except ramble.repository.UnknownObjectError:
+                logger.die(
+                    f"{sys_name} is not a valid system. "
+                    "Valid systems can be listed via:\n"
+                    "\tramble list --type systems"
+                )
+
+            for variant in ["platform", "package_manager", "workflow_manager"]:
+                if (
+                    self.experiment_variants(allow_caching=False).value(
+                        variant
+                    )
+                    is None
+                ):
+                    default_value = getattr(
+                        self.system, f"system_default_{variant}", None
+                    )
+                    if default_value:
+                        self.experiment_variants(
+                            allow_caching=False
+                        ).default_variant(
+                            variant,
+                            default=default_value,
+                            description=f"{variant} selection variant",
+                        )
+
+    def _set_platform(self):
+        plat_var = conversions.canonical_none(
+            self.expander.expand_var(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.platform
+                )
+            )
+        )
+
+        if plat_var is None:
+            plat_var = self.system.system_default_platform
+
+        if plat_var is None:
+            plat_var = "user-managed"
+
+        if plat_var is not None:
+            plat_name, _, maybe_plat_ver = plat_var.partition("@")
+
+            if self.system and self.system.system_available_platforms:
+                if plat_name not in self.system.system_available_platforms:
+                    logger.die(
+                        f"Platform {plat_name} is not available in system {self.system.name}. "
+                        f"Available platforms are: {', '.join(self.system.system_available_platforms)}"
+                    )
+
+            try:
+                plat_type = ramble.repository.ObjectTypes.platforms
+                self.platform = ramble.repository.get(
+                    plat_name, plat_type
+                ).copy()
+                self.platform.set_application(self)
+                if maybe_plat_ver:
+                    self.platform.set_version(
+                        version_number=maybe_plat_ver,
+                        description=f"{plat_name} {maybe_plat_ver}",
+                    )
+            except ramble.repository.UnknownObjectError:
+                logger.die(
+                    f"{plat_name} is not a valid platform. "
+                    "Valid platforms can be listed via:\n"
+                    "\tramble list --type platforms"
+                )
+
+    def _apply_system_and_platform_variables(self):
+        """Apply variables from system and platform objects"""
+
+        if self.system:
+            # Apply platform_variable_maps
+            plat_name = conversions.canonical_none(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.platform
+                )
+            )
+
+            if plat_name:
+                for (
+                    var_name,
+                    var_map,
+                ) in self.system.platform_variable_maps.items():
+                    if plat_name in var_map:
+                        if var_name not in self.variables:
+                            self.define_variable(var_name, var_map[plat_name])
+
+            # Apply variable_defaults
+            for when_key, var_defs in self.system.variable_defaults.items():
+                if self.system.satisfy_when(when_key):
+                    for var_name, var_val in var_defs.items():
+                        if var_name not in self.variables:
+                            self.define_variable(var_name, var_val)
+
     def _set_workflow_manager(self):
         workflow = conversions.canonical_none(
-            self.experiment_variants(allow_caching=False).value(
-                namespace.workflow_manager
+            self.expander.expand_var(
+                self.experiment_variants(allow_caching=False).value(
+                    namespace.workflow_manager
+                )
             )
         )
 
@@ -524,7 +658,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self._env_variable_sets = env_variable_sets.copy()
 
-    def set_variables_and_variants(self, variables, variants, experiment_set):
+    def set_variables_and_variants(
+        self, variables, variants, workspace, experiment_set
+    ):
         """Set internal reference to variables and variants
 
         Also, create an application specific expander class.
@@ -534,6 +670,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                              experiment.
             variants (dict): Dictionary of variant controls for this
                              experiment.
+            workspace: Reference to workspace object
             experiment_set: Reference to experiment set, for expanding
                             referenced variables.
         """
@@ -541,6 +678,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.variables = variables.copy()
         self.variants = variants.copy()
         self.experiment_set = experiment_set
+        self.workspace = workspace
         self.expander = ramble.expander.Expander(
             self.variables, self.experiment_set
         )
@@ -565,8 +703,44 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.object_variants.experiment_variant(name, expanded_value)
 
         # Set up remaining variants
+        self._set_system()
+
+        # Apply defaults from system and platform
+        if self.system:
+            if (
+                self.system.default_platform
+                and namespace.platform not in self.variants
+            ):
+                self.object_variants.experiment_variant(
+                    namespace.platform, self.system.system_default_platform
+                )
+
+            if (
+                self.system.default_package_manager
+                and namespace.package_manager not in self.variants
+            ):
+                self.object_variants.experiment_variant(
+                    namespace.package_manager,
+                    self.system.system_default_package_manager,
+                )
+
+            if (
+                self.system.default_workflow_manager
+                and namespace.workflow_manager not in self.variants
+            ):
+                self.object_variants.experiment_variant(
+                    namespace.workflow_manager,
+                    self.system.system_default_workflow_manager,
+                )
+
+        self._set_platform()
         self._set_package_manager()
         self._set_workflow_manager()
+
+        self._apply_system_and_platform_variables()
+
+        for _, obj in self.objects():
+            self.keywords.update_keys(obj.required_variables)
 
         base_chain = self.__class__.__mro__
         for cls in base_chain:
@@ -595,7 +769,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
 
-        self.define_missing_variables()
+        self.define_missing_variables(workspace)
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
         if experiment_set and experiment_set._workspace:
@@ -629,87 +803,149 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for template_name, _ in workspace.all_templates():
             cleaned_variables.pop(template_name, None)
 
-        for _, tpl_config in self._object_templates(workspace):
-            cleaned_variables.pop(tpl_config["var_name"], None)
+        for _, tpl_configs in self._object_templates(workspace):
+            for tpl_config in tpl_configs:
+                cleaned_variables.pop(tpl_config["var_name"], None)
 
         return cleaned_variables
 
-    def define_missing_variables(self):
+    def register_missing_command_variable(self, var):
+        """Register a missing command variable, so we can report it later in
+        the correct log file.
+
+        Args:
+            var: Instance of a CommandVariable
+        """
+        self._missing_command_variables[var.name] = var
+
+    def define_missing_variables(self, workspace):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
 
-        default_variables = {}
+        # Track which precedence level defined each variable.
+        # -1: YAML (highest)
+        # 0-N: Objects in self.objects() order
+        # N+1: Application (lowest)
+        original_variables = self.variables.copy()
+        var_precedence = dict.fromkeys(original_variables, -1)
+
+        # Map objects to their precedence order
+        obj_precedence = {}
+        for i, (_, obj) in enumerate(self.objects()):
+            obj_precedence[obj] = i
+
+        default_value_precedence = len(obj_precedence)
+
         # Process the application variables that are missing
         for var, val in self.selected_variables.items():
             if var not in self.variables:
-                default_variables[var] = val.default
+                self.define_variable(var, val.default)
+                var_precedence[var] = default_value_precedence
 
-        # TODO: Remove the {origin_type}_version variable when we can
-        self.define_variable(
-            f"{self.origin_type}_version", str(self.selected_version)
-        )
-        self.define_variable(
-            f"{self.origin_type}::{self.name}::version",
-            str(self.selected_version),
-        )
-
-        # Extract a merged set of when_keys from objects that are not
+        # Define object version and variant variables
+        # Also, extract a merged set of when_keys from objects that are not
         # applications.
         # Also, define object version variables
-        object_when_map = {}
-        for _, obj in self.objects(
-            exclude_types=[ramble.repository.ObjectTypes.applications]
-        ):
-            object_when_map[obj] = []
-
+        object_when_map = {"object_variables": {}, "command_variables": {}}
+        for obj_type, obj in self.objects():
+            prec = obj_precedence[obj]
             # TODO: Remove the {origin_type}_version variable when we can
             self.define_variable(
                 f"{obj.origin_type}_version", str(obj.selected_version)
             )
+            var_precedence[f"{obj.origin_type}_version"] = prec
             self.define_variable(
                 f"{obj.origin_type}::{obj.name}::version",
                 str(obj.selected_version),
             )
+            var_precedence[f"{obj.origin_type}::{obj.name}::version"] = prec
 
-            for when_key, var_list in obj.object_variables.items():
-                keep = False
-                for var in var_list:
-                    if var.name not in self.variables:
-                        keep = True
+            # Define variant variables for Spack-like syntax expansion
+            for (
+                name,
+                variant,
+            ) in obj.object_variants.experiment_variants.items():
+                self.define_variable(
+                    f"{obj.origin_type}::variant::{name}",
+                    variant.as_definition(),
+                )
+                var_precedence[f"{obj.origin_type}::variant::{name}"] = prec
 
-                if keep:
-                    object_when_map[obj].append(when_key)
+            for name, variant in obj.object_variants.default_variants.items():
+                if name not in obj.object_variants.experiment_variants:
+                    self.define_variable(
+                        f"{obj.origin_type}::variant::{name}",
+                        variant.as_definition(),
+                    )
+                    var_precedence[f"{obj.origin_type}::variant::{name}"] = (
+                        prec
+                    )
 
-            if not object_when_map[obj]:
-                object_when_map.pop(obj, None)
+            if obj_type != ramble.repository.ObjectTypes.applications:
+                # variable_sets = [obj.object_variables, obj.command_variables]
+                for variable_set_attr, when_map in object_when_map.items():
+                    when_map[obj] = []
+                    variable_set = getattr(obj, variable_set_attr, {})
+                    for when_key, var_list in variable_set.items():
+                        keep = False
+                        for var in var_list:
+                            if var.name not in original_variables:
+                                keep = True
 
-        while True:
-            to_define = {}
-            changed_definitions = False
-            # Process any missing variables from other objects
-            for obj, when_keys in object_when_map.items():
-                to_remove = set()
-                for when_key in when_keys:
-                    if obj.satisfy_when(when_key):
-                        to_remove.add(when_key)
-                        for var in obj.object_variables[when_key]:
-                            if var.name not in self.variables:
-                                to_define[var.name] = var.default
-                                changed_definitions = True
+                        if keep:
+                            when_map[obj].append(when_key)
 
-                # Remove any satisfied when_keys, as we won't need to check
-                # them (since their variables have already been defined).
-                for when_key in to_remove:
-                    when_keys.remove(when_key)
+                    if not when_map[obj]:
+                        when_map.pop(obj, None)
 
-            if not changed_definitions:
-                break
+        # Process any missing variables from other objects
+        # Handle object_variables before handling command_variables
+        for variable_set_attr, when_map in object_when_map.items():
+            while True:
+                to_define = {}
+                changed_definitions = False
 
-            for var, val in to_define.items():
-                default_variables[var] = val
+                for obj, when_keys in when_map.items():
+                    to_remove = set()
+                    obj_prec = obj_precedence[obj]
+                    for when_key in when_keys:
+                        if obj.satisfy_when(when_key):
+                            to_remove.add(when_key)
+                            variable_dict = getattr(obj, variable_set_attr, {})
+                            if when_key in variable_dict:
+                                for var in reversed(variable_dict[when_key]):
+                                    if var.name not in original_variables:
+                                        if (
+                                            var.name not in to_define
+                                            and obj_prec
+                                            < var_precedence.get(var.name, 999)
+                                        ):
+                                            if isinstance(
+                                                var, CommandVariable
+                                            ):
+                                                to_define[var.name] = (
+                                                    var.extract_value(
+                                                        workspace, self
+                                                    )
+                                                )
+                                            else:
+                                                to_define[var.name] = (
+                                                    var.default
+                                                )
 
-        for var, val in default_variables.items():
-            self.define_variable(var, val)
+                                            var_precedence[var.name] = obj_prec
+                                            changed_definitions = True
+
+                    # Remove any satisfied when_keys, as we won't need to check
+                    # them (since their variables have already been defined).
+                    for when_key in to_remove:
+                        when_keys.remove(when_key)
+
+                if not changed_definitions:
+                    break
+
+                for var, val in to_define.items():
+                    self.define_variable(var, val)
 
     def set_internals(self, internals):
         """Set internal reference to application internals"""
@@ -726,11 +962,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if chained_experiments:
             self.chained_experiments = chained_experiments.copy()
 
-    def set_modifiers(self, modifiers):
+    def set_modifiers(self, modifiers, workspace):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
-            self.build_modifier_instances()
+            self.build_modifier_instances(workspace)
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -772,11 +1008,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             os.path.join(logs_dir, self.expander.experiment_namespace) + ".out"
         )
 
-    def get_pipeline_phases(self, pipeline, phase_filters=None):
+    def get_pipeline_phases(self, pipeline, workspace, phase_filters=None):
         if phase_filters is None:
             phase_filters = ["*"]
 
-        self.build_modifier_instances()
+        self.build_modifier_instances(workspace)
         self.build_phase_order()
 
         if pipeline not in self.pipelines:
@@ -839,7 +1075,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Returns:
             (set): All variable names used by this experiment.
         """
-        self.build_modifier_instances()
+        self.build_modifier_instances(workspace)
         self.define_variables_for_template_path(workspace)
 
         backup_variables = self.variables.copy()
@@ -850,7 +1086,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ########################
         # Define extra variables
         ########################
-        self.define_missing_variables()
+        self.define_missing_variables(workspace)
 
         ##########################################
         # Expand used variables to track all usage
@@ -962,18 +1198,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         phase_func(workspace, app_inst=self)
         self._phase_times[phase] = time.time() - start_time
 
-    def print_phase_times(self, pipeline, phase_filters=None):
+    def print_phase_times(self, pipeline, workspace, phase_filters=None):
         """Print phase execution times by pipeline phase order
 
         Args:
             pipeline (str): Name of pipeline to print timing information for
+            workspace: Reference to workspace object
             phase_filters (list(str) | None): Filters to limit phases to print
         """
         logger.msg("Phase timing statistics:")
         if phase_filters is None:
             phase_filters = ["*"]
         for phase in self.get_pipeline_phases(
-            pipeline, phase_filters=phase_filters
+            pipeline, workspace, phase_filters=phase_filters
         ):
             # Set default time to 0.0 s, to prevent KeyError from skipped phases
             if phase not in self._phase_times:
@@ -1199,7 +1436,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for mod_inst in self._modifier_instances:
             mod_inst.define_variable(var_name, var_value)
 
-    def build_modifier_instances(self):
+    def build_modifier_instances(self, workspace):
         """Built a map of modifier names to modifier instances needed for this
         application instance
         """
@@ -1257,7 +1494,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 mod_inst.expander.add_no_expand_var(var)
 
         # Define any missing modifier variables
-        self.define_missing_variables()
+        self.define_missing_variables(workspace)
 
     @property
     def inventory_file(self):
@@ -1297,6 +1534,31 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     def validate_experiment(
         self, warn_validation=True, die_on_validate_error=True
     ):
+
+        mpi_required = self.is_mpi_required(self.expander.workload_name)
+
+        mpi_vars_defined = self.defined_mpi_vars()
+
+        if mpi_required and len(mpi_vars_defined) < 2:
+            mpi_keys = (
+                "Two or more of the following are required to be defined.\n"
+            )
+            for var in self.mpi_definitions:
+                mpi_keys += f"  - {var}\n"
+
+            defined_keys = (
+                f"Experiment {self.expander.experiment_namespace} only has:\n"
+            )
+            for var in mpi_vars_defined:
+                defined_keys += f"  - {var}\n"
+
+            if die_on_validate_error:
+                raise ramble.error.ObjectValidationError(
+                    "Invalid number of required variables defined.\n"
+                    + mpi_keys
+                    + defined_keys
+                )
+
         # Validate the new modifiers variables exist
         # (note: the base ramble variables are checked earlier too)
         self.keywords.check_required_keys(
@@ -1304,9 +1566,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             warn_validation=warn_validation,
             die_on_validate_error=die_on_validate_error,
         )
-        self._check_object_validators()
+        self._check_object_validators(
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+        )
+        self._check_object_conflicts(
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+        )
 
-    def _check_object_validators(self):
+    def _check_object_validators(
+        self, warn_validation=True, die_on_validate_error=True
+    ):
         expander = self.expander
         for _, obj in self.objects():
             for when_set, validator_defs in obj.validators.items():
@@ -1328,10 +1599,67 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             f"Validator '{name}' (defined in '{obj.name}') "
                             f"fails with message: '{msg}'"
                         )
-                        if validator["fail_on_invalid"]:
+                        if (
+                            die_on_validate_error
+                            and validator["fail_on_invalid"]
+                        ):
                             raise ObjectValidationError(err_msg)
-                        else:
+                        elif warn_validation:
                             logger.warn(err_msg)
+
+    def _check_object_conflicts(
+        self, warn_validation=True, die_on_validate_error=True
+    ):
+        expander = self.expander
+        for _, obj in self.objects():
+            if not hasattr(obj, "conflicts") or not obj.conflicts:
+                continue
+
+            for when_set, conflict_list in obj.conflicts.items():
+                experiment_variants = obj.experiment_variants()
+                try:
+                    when_active = expander.satisfies(
+                        when_set, variant_set=experiment_variants
+                    )
+                except ramble.expander.ExpanderError:
+                    when_active = False
+
+                if not when_active:
+                    continue
+
+                for conflict in conflict_list:
+                    conflict_spec = conflict["conflict_spec"]
+                    msg = conflict["message"]
+
+                    try:
+                        conflict_active = expander.satisfies(
+                            conflict_spec, variant_set=experiment_variants
+                        )
+                    except ramble.expander.ExpanderError:
+                        conflict_active = False
+
+                    if not conflict_active:
+                        continue
+
+                    # If BOTH are satisfied, it is a conflict!
+                    if msg:
+                        err_msg = (
+                            f"Conflict detected in '{obj.name}': "
+                            f"{expander.expand_var(msg)}"
+                        )
+                    else:
+                        when_str = (
+                            f" when {', '.join(when_set)}" if when_set else ""
+                        )
+                        err_msg = (
+                            f"Conflict detected in '{obj.name}': "
+                            f"'{conflict_spec}' is active{when_str}"
+                        )
+
+                    if die_on_validate_error:
+                        raise ObjectValidationError(err_msg)
+                    elif warn_validation:
+                        logger.warn(err_msg)
 
     def _generate_cleanup_cmd(self, key):
         commands = []
@@ -1404,9 +1732,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for name, conf in self.internals[
                 namespace.custom_executables
             ].items():
+                custom_exec = ramble.util.executable.CommandExecutable(
+                    name=name, **conf
+                )
+                existing_exec = self.custom_executables.get(name, None)
+
+                if custom_exec == existing_exec:
+                    continue
+
                 filtered_executabls, _ = (
                     self._get_filtered_and_full_executables()
                 )
+
                 if (
                     name in filtered_executabls
                     or name in self.custom_executables
@@ -1421,9 +1758,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         "defined"
                     )
 
-                self.custom_executables[name] = (
-                    ramble.util.executable.CommandExecutable(name=name, **conf)
-                )
+                self.custom_executables[name] = custom_exec
 
     def get_executable_graph(self, workload_name):
         """Construct and return an executable graph
@@ -1727,6 +2062,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             n_nodes = self.expander.expand_var_name(
                                 self.keywords.n_nodes
                             )
+                            n_nodes = 1 if "{n_nodes}" else n_nodes
                             n_nodes = 1 if not n_nodes else int(n_nodes)
                             if not raw_mpi_cmd and n_nodes > 1:
                                 logger.warn(
@@ -1811,9 +2147,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         objs_to_extract = [self, self.workflow_manager, self.package_manager]
 
-        for obj in objs_to_extract + self._modifier_instances:
-            if obj and hasattr(obj, "formatted_executables"):
-                formatted_exec_groups.append(obj.formatted_executables)
+        formatted_exec_groups.extend(
+            obj.formatted_executables
+            for obj in objs_to_extract + self._modifier_instances
+            if obj and hasattr(obj, "formatted_executables")
+        )
 
         all_execs = {}
 
@@ -1874,13 +2212,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     command, replace_escaped_braces=False
                 )
 
-                for out_line in expanded.split("\n"):
-                    formatted_lines.append(indentation + prefix + out_line)
+                formatted_lines.extend(
+                    indentation + prefix + out_line
+                    for out_line in expanded.split("\n")
+                )
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
     def define_variables_for_template_path(self, workspace):
         """Define variables for all workspace and object template paths"""
+        if self._template_paths_defined:
+            return
+
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var("{experiment_run_dir}"),
@@ -1892,20 +2235,23 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "type": ramble.keywords.key_type.reserved,
             "level": ramble.keywords.output_level.variable,
         }
-        for obj, tpl_config in self._object_templates(workspace):
-            var_name = tpl_config["var_name"]
-            if var_name is not None:
-                if var_name in self.variables:
-                    old_var = f"_old_{var_name}"
-                    self.variables[old_var] = self.variables[var_name]
-                    self.keywords.update_keys({old_var: var_attr})
-                self.variables[var_name] = tpl_config["dest_path"]
-                self.keywords.update_keys({var_name: var_attr})
+        for obj, tpl_configs in self._object_templates(workspace):
+            for tpl_config in tpl_configs:
+                var_name = tpl_config["var_name"]
+                if var_name is not None:
+                    if var_name in self.variables:
+                        old_var = f"_old_{var_name}"
+                        self.variables[old_var] = self.variables[var_name]
+                        self.keywords.update_keys({old_var: var_attr})
+                    self.variables[var_name] = tpl_config["dest_path"]
+                    self.keywords.update_keys({var_name: var_attr})
             if hasattr(obj, "template_render_vars"):
                 render_vars = obj.template_render_vars
                 self.variables.update(render_vars)
                 for name in render_vars:
                     self.keywords.update_keys({name: var_attr})
+
+        self._template_paths_defined = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
@@ -1934,8 +2280,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if workload
             else self.get_all_workloads()
         )
-        for workload in workloads:
-            for input_file in workload.inputs:
+        for wl in workloads:
+            for input_file in wl.inputs:
                 inputs_found = 0
                 active_inputs = 0
                 input_conf = {}
@@ -1948,7 +2294,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                 if not inputs_found:
                     logger.die(
-                        f"Workload {workload.name} references a non-existent input file "
+                        f"Workload {wl.name} references a non-existent input file "
                         f"{input_file}.\n"
                         f"Make sure this input file is defined before using it in a workload."
                     )
@@ -1977,7 +2323,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                 file_name = file_name.replace(f".{fetcher.extension}", "")
 
-                namespace = f"{self.name}.{workload.name}"
+                namespace = f"{self.name}.{wl.name}"
 
                 inputs[file_name] = {
                     "fetcher": fetcher,
@@ -2154,6 +2500,16 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         exp_lock = self.experiment_lock
 
+        # Report missing command variables
+        if self._missing_command_variables:
+            logger.msg("Missing Command Variable Summary:")
+            dry_run_str = " (dry-run)" if workspace.dry_run else ""
+            for name, var in self._missing_command_variables.items():
+                command = self.expander.expand_var(var.command)
+                logger.msg(
+                    f"- {name} = {self.variables[name]}{dry_run_str} from '{command}'"
+                )
+
         self._set_input_path()
         self._define_commands(success_list=self.success_list)
         self._define_formatted_executables()
@@ -2205,15 +2561,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "RAMBLE_STATUS",
         ]
 
+        remove_prefixes = set()
         for _, obj in self.objects():
             remove_variables.append(f"{obj.origin_type}_version")
             remove_variables.append(f"{obj.origin_type}::{obj.name}::version")
+            remove_prefixes.add(f"{obj.origin_type}::variant::")
 
         # Remove some variables that don't affect the experiment, and change
         # frequently (or are actually output variables)
         for var in remove_variables:
             if var in variables:
                 del variables[var]
+
+        # Remove variant variables (but not the variant definitions themselves)
+        if remove_prefixes:
+            prefixes = tuple(remove_prefixes)
+            for var in list(variables.keys()):
+                if var.startswith(prefixes):
+                    del variables[var]
 
         # Remove the workspace path from variable definitions before hashing
         for var in variables:
@@ -2400,7 +2765,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f"Mismatch on experiment hash for experiment {self.expander.experiment_namespace}.\n"
                 f"  Hash from experiment directory: {existing_hash}\n"
                 f"  Hash computed current config: {self.experiment_hash}\n"
-                "To overwrite the experiment hash, use the global --overwrite-inventories option"
+                "Hashes change as a result of changes to the workspace YAML configuration file, or "
+                "any object in an experiment's hierarchy.\n"
+                "Hashes are compared to ensure experiments that are set up match the expected "
+                "contents from these sources.\n"
+                "Hashes can be overwritten if you are sure this is safe, and what you want."
+                "To overwrite the experiment hash, use the global --overwrite-inventories option."
             )
 
         self.variables[self.keywords.experiment_hash] = self.experiment_hash
@@ -2476,10 +2846,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     shutil.copy(src, archive_experiment_dir)
 
             # Copy all rendered templates generated by `register_template`
-            for _, tpl_config in self._object_templates(workspace):
-                src_path = tpl_config["dest_path"]
-                if os.path.exists(src_path):
-                    shutil.copy(src_path, archive_experiment_dir)
+            for _, tpl_configs in self._object_templates(workspace):
+                for tpl_config in tpl_configs:
+                    src_path = tpl_config["dest_path"]
+                    if os.path.exists(src_path):
+                        shutil.copy(src_path, archive_experiment_dir)
 
             # Copy all figure of merit files
             criteria_list = self.success_list
@@ -2526,13 +2897,25 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         This function can be overridden at the application level to perform
         application specific processing of the output.
         """
-        pass
 
-    def extract_inmem_foms(self, inmem_fom_defs, fom_values):
+    def extract_inmem_foms(
+        self, inmem_fom_defs, fom_values, context_metadata=None
+    ):
         """Extract in-memory FOMs"""
         for context, foms in inmem_fom_defs.items():
-            if context not in fom_values:
-                fom_values[context] = {}
+            context_key = context
+            if context_metadata is not None:
+                if isinstance(context, str):
+                    context_key = (context, context, frozenset())
+                    if context_key not in context_metadata:
+                        context_metadata[context_key] = {
+                            "name": context,
+                            "def_name": context,
+                            "vars": {},
+                        }
+
+            if context_key not in fom_values:
+                fom_values[context_key] = {}
             foms = inmem_fom_defs[context]["foms"]
             for fom in foms:
                 fom_conf = inmem_fom_defs[context]["foms"][fom]
@@ -2548,7 +2931,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if fom_value is None:
                     continue
                 expanded_fom_value = self.expander.expand_var(fom_value)
-                fom_values[context][fom_name] = {
+                fom_values[context_key][fom_name] = {
                     "value": expanded_fom_value,
                     "units": fom_conf["units_expanded"],
                     "origin": fom_conf["origin"],
@@ -2618,6 +3001,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         exp_lock = self.experiment_lock
 
         fom_values = {}
+        context_metadata = {}
+        null_key = (_NULL_CONTEXT, _NULL_CONTEXT, frozenset())
+        context_metadata[null_key] = {
+            "name": _NULL_CONTEXT,
+            "def_name": _NULL_CONTEXT,
+            "vars": {},
+        }
+
         # Iterate over files. We already know they exist
         with lk.ReadTransaction(exp_lock):
             for file, file_conf in files.items():
@@ -2651,7 +3042,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
                         # Iterate over contexts and add matched contexts to active_contexts
                         for context, foms in file_conf["contexts"].items():
-                            if not context == _NULL_CONTEXT:
+                            if context != _NULL_CONTEXT:
                                 context_conf = f_defs[context]["definition"]
                                 if (
                                     context_conf.get("pre_filter", "")
@@ -2673,10 +3064,22 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         f" Context match {context} -- {context_name}"
                                     )
 
-                                    active_contexts[context] = context_name
+                                    context_vars = context_match.groupdict()
+                                    context_key = (
+                                        context_name,
+                                        context,
+                                        frozenset(context_vars.items()),
+                                    )
 
-                                    if context_name not in fom_values:
-                                        fom_values[context_name] = {}
+                                    active_contexts[context] = context_key
+
+                                    if context_key not in fom_values:
+                                        fom_values[context_key] = {}
+                                        context_metadata[context_key] = {
+                                            "name": context_name,
+                                            "def_name": context,
+                                            "vars": context_vars,
+                                        }
 
                             for fom in foms:
                                 fom_conf = f_defs[context]["foms"][fom]
@@ -2686,12 +3089,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     fom_match = fom_conf["regex"].match(line)
 
                                 if fom_match:
-                                    fom_vars = {}
-                                    for (
-                                        k,
-                                        v,
-                                    ) in fom_match.groupdict().items():
-                                        fom_vars[k] = v
+                                    fom_vars = fom_match.groupdict()
                                     if (
                                         fom_conf["fom_name_expanded"]
                                         is not None
@@ -2715,17 +3113,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         # if a FOM has contexts, check if each is active
                                         if fom_conf["contexts"]:
                                             for _ in fom_conf["contexts"]:
-                                                context_name = (
+                                                context_key = (
                                                     active_contexts[context]
                                                     if context
                                                     in active_contexts
-                                                    else _NULL_CONTEXT
+                                                    else null_key
                                                 )
                                                 fom_contexts.append(
-                                                    context_name
+                                                    context_key
                                                 )
                                         else:
-                                            fom_contexts.append(_NULL_CONTEXT)
+                                            fom_contexts.append(null_key)
 
                                         for fom_context in fom_contexts:
                                             if fom_context not in fom_values:
@@ -2760,7 +3158,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     "fom_type"
                                                 ],
                                             }
-        self.extract_inmem_foms(inmem_defs, fom_values)
+        self.extract_inmem_foms(inmem_defs, fom_values, context_metadata)
 
         # Test all non-file based success criteria
         for criteria_obj, _ in criteria_list.all_criteria():
@@ -2797,7 +3195,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 status = wm_status
 
         self.set_status(status)
-
         self.result.finalize(workspace)
 
         for criteria_obj, criteria_scope in criteria_list.all_criteria():
@@ -2814,11 +3211,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             else:
                 self.result.success_criteria[criteria_name] = "FAILED"
 
-        for context, fom_map in fom_values.items():
+        for context_key, fom_map in fom_values.items():
+            metadata = context_metadata[context_key]
             context_map = {
-                "name": context,
+                "name": metadata["name"],
                 "foms": [],
-                "display_name": _get_context_display_name(context),
+                "display_name": _get_context_display_name(metadata["name"]),
+                "context_def_name": metadata["def_name"],
+                "context_vars": metadata["vars"],
             }
 
             for fom_name, fom in fom_map.items():
@@ -2826,7 +3226,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_copy["name"] = fom_name
                 context_map["foms"].append(fom_copy)
 
-            if context == _NULL_CONTEXT:
+            if metadata["name"] == _NULL_CONTEXT:
                 self.result.contexts.insert(0, context_map)
             else:
                 self.result.contexts.append(context_map)
@@ -3050,10 +3450,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_values = fom_contents["fom_values"]
 
                 if fom_contents["fom_is_numeric"]:
-                    calcs = []
 
-                    for statistic in ramble.util.stats.all_stats:
-                        calcs.append(statistic.report(fom_values, fom_units))
+                    calcs = (
+                        statistic.report(fom_values, fom_units)
+                        for statistic in ramble.util.stats.all_stats
+                    )
 
                     for calc in calcs:
                         if calc[0] == ramble.util.stats.NA:
@@ -3190,8 +3591,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Could push this into the language features in the future
         fom_sources = [self]
-        for mod in self._modifier_instances:
-            fom_sources.append(mod)
+        fom_sources.extend(self._modifier_instances)
         if self.workflow_manager is not None:
             fom_sources.append(self.workflow_manager)
 
@@ -3204,8 +3604,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if self.expander.satisfies(
                     when_fs, variant_set=self.experiment_variants()
                 ):
-                    for context, context_def in source_context_defs.items():
-                        all_contexts[context] = context_def
+                    all_contexts.update(source_context_defs)
             extra_vars = (
                 source.modded_variables(self)
                 if source.origin_type == "modifier"
@@ -3544,9 +3943,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     conf, self.expander, set(), shell=shell
                 )
 
-                for cmd in env_cmds:
-                    if cmd:
-                        command.append(cmd)
+                command.extend(cmd for cmd in env_cmds if cmd)
 
         for mod_inst in self._modifier_instances:
             for env_var_mod in mod_inst.all_env_var_modifications():
@@ -3559,9 +3956,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             set(),
                             shell=shell,
                         )
-                        for cmd in env_cmds:
-                            if cmd:
-                                command.append(cmd)
+                        command.extend(cmd for cmd in env_cmds if cmd)
 
         return command
 
@@ -3630,42 +4025,45 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if not os.path.isabs(dest_path):
                 dest_path = os.path.join(run_dir, dest_path)
 
-            return (
-                obj,
-                {**tpl_config, "src_path": src_path, "dest_path": dest_path},
-            )
+            return {**tpl_config, "src_path": src_path, "dest_path": dest_path}
 
         for obj_type, obj in self.objects():
+            obj_tpls = []
             for when_set, tpl in obj.templates.items():
                 if not self.expander.satisfies(
                     when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
-                for tpl_conf in tpl.values():
-                    yield _get_template_config(
-                        obj, tpl_conf, obj_type=obj_type
-                    )
+                obj_tpls.extend(
+                    _get_template_config(obj, tpl_conf, obj_type=obj_type)
+                    for tpl_conf in tpl.values()
+                )
+            if obj_tpls:
+                yield obj, obj_tpls
 
     def _render_object_templates(self, extra_vars_origin, workspace):
-        for obj, tpl_config in self._object_templates(workspace):
-            extra_vars = extra_vars_origin.copy()
-            src_path = tpl_config["src_path"]
-            content = workspace.read_file_content(src_path)
-            extra_vars_dict = tpl_config.get("extra_vars")
-            if extra_vars_dict is not None:
-                extra_vars.update(extra_vars_dict)
-            extra_vars_func_name = tpl_config.get("extra_vars_func_name")
-            if extra_vars_func_name is not None:
-                extra_vars_func = getattr(obj, extra_vars_func_name)
-                extra_vars.update(extra_vars_func())
-            rendered = self.expander.expand_var(content, extra_vars=extra_vars)
-            out_path = tpl_config["dest_path"]
-            perm = tpl_config.get("content_perm", _DEFAULT_CONTENT_PERM)
-            with open(out_path, "w+") as f_out:
-                f_out.write(rendered)
-                f_out.write("\n")
-            os.chmod(out_path, perm)
+        for obj, tpl_configs in self._object_templates(workspace):
+            for tpl_config in tpl_configs:
+                extra_vars = extra_vars_origin.copy()
+                src_path = tpl_config["src_path"]
+                content = workspace.read_file_content(src_path)
+                extra_vars_dict = tpl_config.get("extra_vars")
+                if extra_vars_dict is not None:
+                    extra_vars.update(extra_vars_dict)
+                extra_vars_func_name = tpl_config.get("extra_vars_func_name")
+                if extra_vars_func_name is not None:
+                    extra_vars_func = getattr(obj, extra_vars_func_name)
+                    extra_vars.update(extra_vars_func())
+                rendered = self.expander.expand_var(
+                    content, extra_vars=extra_vars
+                )
+                out_path = tpl_config["dest_path"]
+                perm = tpl_config.get("content_perm", _DEFAULT_CONTENT_PERM)
+                with open(out_path, "w+") as f_out:
+                    f_out.write(rendered)
+                    f_out.write("\n")
+                os.chmod(out_path, perm)
 
     def objects(self, exclude_types=None, yield_all=False):
         """Return a tuple for each object instance associated with the app_inst.
@@ -3760,18 +4158,25 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             f"Failed to instantiate base class {cls.__name__}: {e}"
                         )
 
-        # Yield for self
-        yield from _yield_registered(self)
+        object_precedence_order = [
+            "_modifier_instances",
+            "system",
+            "platform",
+            "workflow_manager",
+            "package_manager",
+            None,
+        ]
 
-        # Yield for package manager
-        yield from _yield_registered(self.package_manager)
-
-        # Yield for workflow manager
-        yield from _yield_registered(self.workflow_manager)
-
-        # Yield for modifiers
-        for mod_inst in self._modifier_instances:
-            yield from _yield_registered(mod_inst)
+        for attr_name in object_precedence_order:
+            if attr_name:
+                attr_val = getattr(self, attr_name, None)
+                if attr_val and isinstance(attr_val, list):
+                    for attr_inst in reversed(attr_val):
+                        yield from _yield_registered(attr_inst)
+                elif attr_val:
+                    yield from _yield_registered(attr_val)
+            else:
+                yield from _yield_registered(self)
 
     def require_mpi_variables(self):
         self.keywords.update_keys(
@@ -3804,53 +4209,59 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     return True
         return False
 
-    def set_required_variables(self):
+    def defined_mpi_vars(self):
+        mpi_vars_defined = set()
+
+        for mpi_var in self.mpi_definitions:
+            if mpi_var in self.variables:
+                mpi_vars_defined.add(mpi_var)
+
+        return mpi_vars_defined
+
+    def set_required_variables(self, app_inst=None):
         """Set required variables from all objects"""
 
         def define_mpi_vars():
             mpi_required = self.is_mpi_required(self.expander.workload_name)
 
-            mpi_vars_defined = set()
+            mpi_vars_defined = self.defined_mpi_vars()
+            mpi_vars_to_define = set()
 
-            mpi_vars = {
-                self.keywords.n_ranks: "int({processes_per_node}*{n_nodes})",
-                self.keywords.processes_per_node: "int({n_ranks}/{n_nodes})",
-                self.keywords.n_nodes: "int({n_ranks}/{processes_per_node})",
-            }
+            for mpi_var in self.mpi_definitions:
+                if mpi_var not in mpi_vars_defined:
+                    mpi_vars_to_define.add(mpi_var)
 
-            for mpi_var in mpi_vars:
-                if mpi_var in self.variables:
-                    mpi_vars_defined.add(mpi_var)
-
-            if mpi_required and len(mpi_vars_defined) < 2:
-                mpi_keys = "Two or more of the following are required to be defined.\n"
-                for var in mpi_vars:
-                    mpi_keys += f"  - {var}\n"
-
-                defined_keys = f"Experiment {self.expander.experiment_namespace} only has:\n"
-                for var in mpi_vars_defined:
-                    defined_keys += f"  - {var}\n"
-                raise ramble.error.ObjectValidationError(
-                    "Invalid number of required variables defined.\n"
-                    + mpi_keys
-                    + defined_keys
-                )
-
-            for mpi_var in mpi_vars_defined:
-                del mpi_vars[mpi_var]
-
-            for var_name, formula in mpi_vars.items():
+            for var_name in mpi_vars_to_define:
+                formula = self.mpi_definitions[var_name]
+                value = None
                 # If two variables are defined, use the formula to compute the missing ones.
                 if len(mpi_vars_defined) >= 2:
                     value = self.expander.expand_var(
                         formula, allow_passthrough=False
                     )
-                # If there is not enough information to use the formulas, set missing vars to 0
-                else:
+                # If there is not enough information to use the formulas, or they are not required.
+                # Set missing vars to 0
+                elif not mpi_required:
                     value = 0
-                self.define_variable(var_name, value)
+
+                if value is not None:
+                    self.missing_mpi_variables.add(var_name)
+                    self.define_variable(var_name, value)
+
+            if mpi_required:
+                required_dict = {
+                    "type": ramble.keywords.key_type.required,
+                    "level": ramble.keywords.output_level.key,
+                }
+                for var_name in self.mpi_definitions:
+                    self.keywords.update_keys({var_name: required_dict})
 
         define_mpi_vars()
+
+        if self.keywords.accelerators_per_node not in self.variables:
+            self.define_variable(self.keywords.accelerators_per_node, 0)
+        if self.keywords.n_accelerators not in self.variables:
+            self.define_variable(self.keywords.n_accelerators, 0)
 
         if self.keywords.n_threads not in self.variables:
             self.define_variable(self.keywords.n_threads, 1)
@@ -3858,6 +4269,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for _, obj in self.objects():
             logger.debug(f"Setting required variables for {obj.name}")
             self.keywords.update_keys(obj.required_variables)
+            if obj is not self and hasattr(obj, "set_required_variables"):
+                obj.set_required_variables(self)
 
     def _format_docs_details(self, out):
         if self.workloads:

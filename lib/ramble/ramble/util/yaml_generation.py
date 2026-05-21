@@ -25,7 +25,7 @@ Would translate to `foo.bar.baz = 1.0` in Ramble syntax.
 
 from typing import Any, Dict, Union
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 from ramble.util.logger import logger
 
@@ -63,8 +63,8 @@ def all_config_options(config_data: Dict):
 
     all_configs = set()
     option_parts = []
-    for top_level in config_data:
-        option_parts.append((top_level, config_data[top_level]))
+    for top_level, val in config_data.items():
+        option_parts.append((top_level, val))
 
     while option_parts:
         cur_part = option_parts.pop(0)

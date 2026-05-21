@@ -132,6 +132,12 @@ class Info(WorkflowManagerBase):
         fail_on_invalid=False,
     )
 
+    conflict(
+        "turn_on_required_directives=True",
+        when="variant_name=variant_default",
+        msg="turn_on_required_directives conflicts with variant_default",
+    )
+
     # Workflow manager language
     workflow_manager_variable(
         "wm_var_name",
@@ -143,4 +149,4 @@ class Info(WorkflowManagerBase):
 
     def get_status(self, workspace):
         """Return status of a given job"""
-        return None
+        return

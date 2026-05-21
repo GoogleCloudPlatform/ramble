@@ -8,10 +8,12 @@
 
 from typing import Callable, Optional
 
+import deprecation
 from packaging.specifiers import SpecifierSet
 from packaging.version import InvalidVersion, Version
 
 import ramble.util.colors as color
+from ramble import ramble_version
 from ramble.language.language_base import DirectiveError
 
 
@@ -62,7 +64,7 @@ class ObjectVersion:
     def copy(self):
         """Construct a copy of self and return it"""
         return ObjectVersion(
-            version_number=self.get_version_num(),
+            version_number=self.version_num,
             version=Version(str(self.version)),
             description=self.description,
             origin_type=self.origin_type,
@@ -72,7 +74,7 @@ class ObjectVersion:
         )
 
     def __str__(self):
-        return self.get_version_num()
+        return self.version_num
 
     def __eq__(self, other):
         return str(self) == str(other)
@@ -94,21 +96,37 @@ class ObjectVersion:
 
         return out_str
 
-    def get_version(self):
-        """Returns the packaging.version.Version representation of this version"""
-        return self.version
-
-    def get_version_num(self):
+    @property
+    def version_num(self):
         """Returns the version number of this version"""
         if not self.version_number:
             self.version_number = self.pep440_to_version(str(self.version))
 
         return self.version_number
 
+    @deprecation.deprecated(
+        deprecated_in="0.6.0",
+        removed_in="0.7.0",
+        current_version=ramble_version,
+        details="Access the .version attribute directly instead",
+    )
+    def get_version(self):
+        """Returns the packaging.version.Version representation of this version"""
+        return self.version
+
+    @deprecation.deprecated(
+        deprecated_in="0.6.0",
+        removed_in="0.7.0",
+        current_version=ramble_version,
+        details="Use the .version_num property instead",
+    )
+    def get_version_num(self):
+        """Returns the version number of this version"""
+        return self.version_num
+
     def evaluate_conflicts(self, variant):
         """Error if this version conflicts with a variant that is used"""
         # TODO(dapomeroy): Implement logic to allow conflicts to be defined
-        pass
 
     def satisfies(self, variant):
         """Determine if an experiment's variant satisfies this version

@@ -36,6 +36,8 @@ def test_relative_fom_log_works(mutable_config, mutable_mock_workspace_path, wor
         "n_ranks=1",
         "-v",
         "batch_submit={execute_experiment}",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()

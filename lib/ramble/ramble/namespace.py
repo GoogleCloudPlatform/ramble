@@ -49,8 +49,6 @@ class namespace:
     external_env = "external_env"
 
     # v2 configs
-    packages = "packages"
-    environments = "environments"
     pkg_spec = "pkg_spec"
     compiler_spec = "compiler_spec"
     compiler = "compiler"
@@ -64,6 +62,8 @@ class namespace:
     # For variants
     package_manager = "package_manager"
     workflow_manager = "workflow_manager"
+    system = "system"
+    platform = "platform"
     version = "version"
 
     metadata = "metadata"

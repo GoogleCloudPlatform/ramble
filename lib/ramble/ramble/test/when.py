@@ -44,6 +44,8 @@ def test_register_phase_when(workspace_name):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -85,6 +87,8 @@ test inheritance 12.0
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -147,6 +151,8 @@ test inheritance 12.0
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -210,6 +216,8 @@ test inheritance 12.0
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -267,6 +275,8 @@ test inheritance 12.0
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -331,6 +341,8 @@ test inheritance 12.0
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -401,6 +413,8 @@ def test_register_validator_when(workspace_name, validator_value, fails):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -420,6 +434,94 @@ def test_register_validator_when(workspace_name, validator_value, fails):
             assert not failed
         else:
             assert failed
+
+
+@pytest.mark.parametrize(
+    "zlib_type,validation,fails",
+    [
+        ("preferred", True, True),
+        ("preferred", False, False),
+        ("testing", True, False),
+    ],
+)
+def test_conflicts_when(workspace_name, zlib_type, validation, fails):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=2",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:zlib_type:{zlib_type}", global_args=global_args)
+        config("add", f"variants:validation:{validation}", global_args=global_args)
+
+        ws._re_read()
+
+        failed = False
+        try:
+            workspace("setup", global_args=global_args)
+        except ObjectValidationError as e:
+            if "Conflict detected" in str(e):
+                failed = True
+
+        assert failed == fails
+
+
+@pytest.mark.parametrize(
+    "version,validation,fails",
+    [
+        ("2.0", True, True),
+        ("2.0", False, False),
+        ("1.0", True, False),
+    ],
+)
+def test_conflicts_version_when(workspace_name, version, validation, fails):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            f"when-variants@{version}",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=2",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:zlib_type:testing", global_args=global_args)
+        config("add", f"variants:validation:{validation}", global_args=global_args)
+
+        ws._re_read()
+
+        failed = False
+        try:
+            workspace("setup", global_args=global_args)
+        except ObjectValidationError as e:
+            if "Conflict detected" in str(e):
+                failed = True
+
+        assert failed == fails
 
 
 @pytest.mark.parametrize(
@@ -449,6 +551,8 @@ def test_formatted_exec_when(workspace_name, inc_value, type_value):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -501,6 +605,8 @@ def test_variable_when_workload_constraint(workspace_name, workload_name):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -553,6 +659,8 @@ def test_variable_when(workspace_name, inc_value, type_value):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -605,6 +713,8 @@ def test_package_manager_variable_when(workspace_name, inc_value, mutable_mock_p
             "processes_per_node=1",
             "-p",
             "when-package-manager",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -656,6 +766,8 @@ def test_workflow_manager_variable_when(workspace_name, inc_value, mutable_mock_
             "processes_per_node=1",
             "--wm",
             "when-workflow-manager",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -706,6 +818,8 @@ def test_modifier_variable_when(workspace_name, inc_value, mutable_mock_mods_rep
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -760,6 +874,8 @@ test inheritance 12.0
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -816,6 +932,8 @@ echo "test template for {experiment_name}"
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -871,6 +989,8 @@ def test_register_builtin_when(workspace_name, include_builtin, builtin_found):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -922,6 +1042,8 @@ def test_executable_when(workspace_name, exec_variant_on, exec_ver2_found, skipp
             "processes_per_node=1",
             "-v",
             f"test_variable={test_var}",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -969,6 +1091,8 @@ def test_executable_errors_when_overlapping_conditions(workspace_name):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1005,6 +1129,8 @@ def test_input_when(workspace_name, input_when, expected_input_file):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1054,6 +1180,8 @@ def test_workload_definition_when(workspace_name, wl_def_when, expected_exec):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1080,6 +1208,8 @@ def test_workload_errors_when_not_enabled(workspace_name):
     global_args = ["-w", workspace_name]
 
     with ramble.workspace.create(workspace_name) as ws:
+        config("add", "variants:workload_enabled_when:true", global_args=global_args)
+
         workspace(
             "manage",
             "experiments",
@@ -1092,6 +1222,8 @@ def test_workload_errors_when_not_enabled(workspace_name):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1142,6 +1274,8 @@ def test_workload_errors_when_overlapping_conditions(workspace_name):
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1199,6 +1333,8 @@ def test_workload_group_when(
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1216,6 +1352,8 @@ def test_workload_group_when(
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1293,6 +1431,8 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
             "when-package-manager",
             "--wm",
             "when-workflow-manager",
+            "--default-variable-value",
+            "1",
         ]
 
         if obj == "app":
@@ -1361,6 +1501,8 @@ def test_env_var_modification_when(workspace_name, env_var_mod_when, expected_ex
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1417,6 +1559,8 @@ def test_executable_modification_when(workspace_name, exec_mod_when, expected_ex
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1476,6 +1620,8 @@ def test_variable_modification_when(workspace_name, var_mod_when, modifier_mode,
             "n_nodes=1",
             "-v",
             "processes_per_node=1",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1528,6 +1674,8 @@ def test_package_manager_requirement_when(workspace_name):
             "processes_per_node=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -1574,9 +1722,10 @@ def test_obj_required_var_when(
             "when-package-manager",
             "--wm",
             "when-workflow-manager",
+            "--default-variable-value",
+            "1",
         ]
 
-        config("add", f"variants:{obj}_required_variable:true", global_args=global_args)
         if obj == "mod":
             mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
             with open(mod_config_path, "w+") as f:
@@ -1589,6 +1738,7 @@ def test_obj_required_var_when(
             config("add", "variants:package_manager_included:true", global_args=global_args)
 
         workspace("manage", "experiments", *args, global_args=global_args)
+        config("add", f"variants:{obj}_required_variable:true", global_args=global_args)
 
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
             workspace("setup", "--dry-run", global_args=global_args)
@@ -1633,9 +1783,10 @@ def test_obj_required_key_when(
             "when-package-manager",
             "--wm",
             "when-workflow-manager",
+            "--default-variable-value",
+            "1",
         ]
 
-        config("add", f"variants:{obj}_required_key:true", global_args=global_args)
         if obj == "mod":
             mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
             with open(mod_config_path, "w+") as f:
@@ -1648,6 +1799,7 @@ def test_obj_required_key_when(
             config("add", "variants:package_manager_included:true", global_args=global_args)
 
         workspace("manage", "experiments", *args, global_args=global_args)
+        config("add", f"variants:{obj}_required_key:true", global_args=global_args)
 
         with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError):
             workspace("setup", "--dry-run", global_args=global_args)
@@ -1680,3 +1832,95 @@ def test_obj_required_key_when(
 
         for exp in data["experiments"]:
             assert f"test_{obj}_required_key" in exp
+
+
+@pytest.mark.parametrize(
+    "variant_name",
+    [
+        "bad_spec",
+        "bad_when",
+    ],
+)
+def test_object_conflicts_expander_errors(workspace_name, variant_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:{variant_name}:True", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+
+def test_object_conflicts_no_msg(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:nomsg:True", global_args=global_args)
+
+        ws._re_read()
+        with pytest.raises(
+            ObjectValidationError,
+            match=r"Conflict detected in 'object-conflicts': '\+nomsg' is active when \+nomsg",
+        ):
+            workspace("setup", global_args=global_args)
+
+
+def test_object_conflicts_warn_only(workspace_name):
+    from unittest.mock import patch
+
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:nomsg:True", global_args=global_args)
+
+        ws._re_read()
+        with patch("ramble.util.logger.logger.warn") as mock_warn:
+            ws.build_experiment_set(die_on_validate_error=False)
+            mock_warn.assert_any_call(
+                "Conflict detected in 'object-conflicts': '+nomsg' is active when +nomsg"
+            )

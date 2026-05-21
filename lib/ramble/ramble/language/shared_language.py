@@ -152,9 +152,9 @@ def figure_of_merit(
             "units": units,
             "contexts": context_list,
             "fom_type": fom_type,
-            "when": when_list,
             "origin_type": obj.origin_type if hasattr(obj, "origin_type") else "",
             "fom_map_key": fom_map_key,
+            "when": when_list,
         }
 
     return _execute_figure_of_merit
@@ -753,6 +753,7 @@ def formatted_executable(
             "indentation": indentation,
             "join_separator": join_separator,
             "commands": commands.copy(),
+            "when": when_list,
         }
 
     return _define_formatted_executable
@@ -793,9 +794,45 @@ def register_validator(
             "predicate": predicate,
             "message": message,
             "fail_on_invalid": fail_on_invalid,
+            "when": when_list,
         }
 
     return _define_validator
+
+
+@shared_directive("conflicts")
+def conflict(
+    conflict_spec: str,
+    when: Optional[Union[str, List[str]]] = None,
+    msg: Optional[str] = None,
+    **kwargs,
+):
+    """Defines a conflict for this object.
+
+    Args:
+        conflict_spec: The trigger condition (e.g., `+variant`, `compiler=gcc`)
+        when: Optional conditional under which the conflict occurs
+        msg: Optional custom error/warning message
+    """
+
+    def _execute_conflicts(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, conflict_spec, "conflicts"
+        )
+
+        when_key = frozenset(when_list)
+        if when_key not in obj.conflicts:
+            obj.conflicts[when_key] = []
+
+        obj.conflicts[when_key].append(
+            {
+                "conflict_spec": conflict_spec,
+                "message": msg,
+                "when": when_list,
+            }
+        )
+
+    return _execute_conflicts
 
 
 @shared_directive("object_variables")
@@ -849,6 +886,7 @@ def variable(
                 description=description,
                 values=values,
                 expandable=expandable,
+                when=when_list,
                 **kwargs,
             )
         )
@@ -1145,6 +1183,77 @@ def required_variable(
             obj.required_vars[var]["when"].append(when_list)
 
     return _mark_required_var
+
+
+@shared_directive("auxiliary_software_files")
+def auxiliary_software_file(name, src_path, dest_path, when=None, **kwargs):
+    """Defines an auxiliary software file
+
+    Args:
+      name (str): Name of the auxiliary file
+      src_path (str): Source path of the auxiliary file
+      dest_path (str): Destination path of the auxiliary file
+    """
+
+    def _execute_auxiliary_software_file(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "auxiliary_software_files"
+        )
+
+        when_key = frozenset(when_list)
+        if when_key not in obj.auxiliary_software_files:
+            obj.auxiliary_software_files[when_key] = {}
+        obj.auxiliary_software_files[when_key][name] = {
+            "src_path": src_path,
+            "dest_path": dest_path,
+            "consumed": False,
+        }
+
+    return _execute_auxiliary_software_file
+
+
+@shared_directive("command_variables")
+def command_variable(
+    name,
+    command,
+    dry_run_value,
+    description="",
+    expandable=True,
+    track_used=True,
+    when=None,
+    **kwargs,
+):
+    """Defines an variable, backed by a command
+
+    Args:
+      name (str): Name of the variable
+      command (str): Command to execute to get the variable value
+      dry_run_value (str): Value to use when part of a dry-run
+      description (str): Description of variable
+    """
+
+    def _execute_command_variable(obj):
+        when_list = ramble.language.language_helpers.build_when_list(
+            when, obj, name, "command_variable"
+        )
+
+        when_key = frozenset(when_list)
+        if when_key not in obj.command_variables:
+            obj.command_variables[when_key] = []
+
+        obj.command_variables[when_key].append(
+            ramble.definitions.variables.CommandVariable(
+                name=name,
+                command=command,
+                dry_run_value=dry_run_value,
+                description=description,
+                expandable=expandable,
+                track_used=track_used,
+                when=when_list,
+            )
+        )
+
+    return _execute_command_variable
 
 
 @contextlib.contextmanager

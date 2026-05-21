@@ -7,56 +7,27 @@
 # except according to those terms.
 
 
-def define_directive_methods(obj_inst):
-    """Create class methods that execute directives
+def define_directive_methods_on_class(cls):
+    """Create methods that execute directives on the class.
 
-    Wrap each directive, and inject it into this class instance as a class
-    method.
-
-    This allows: `self.<directive_name>(<directive_args>)` to be called. As in::
-
-        self.archive_pattern('*.log')
-
-    Which can be called within `def __init__(self, file_path)` instead of
-    having to call `archive_pattern()` at the class definition level.
-
-    This function requires the object instance to have internal attributes:
-
-    - `_directive_classes` - Dictionary mapping a directive to the class the
-      directive is defined for
-    - `_directive_functions` - Dictionary mapping a directive to the decorated function
-      that defines the directive
-    - `_language_classes` - A list of classes that language features should be "imported" from
-
-    Both `_directive_classes` and `_directive_functions` are defined for all
-    classes that use the DirectiveMeta meta-class.
-
-    The `_language_classes` attribute is defined in ApplicationBase and ModifierBase.
+    Wrap each directive, and inject it into this class as a method.
     """
-    if not hasattr(obj_inst, "_directive_classes") or not hasattr(
-        obj_inst, "_directive_functions"
-    ):
+    if not hasattr(cls, "_directive_classes") or not hasattr(cls, "_directive_functions"):
         return
 
-    for directive, directive_class in obj_inst._directive_classes.items():
-        is_valid_lang = False
-        if hasattr(obj_inst, "_language_classes"):
-            for lang_class in obj_inst._language_classes:
-                if directive_class is lang_class:
-                    is_valid_lang = True
-
-        if not hasattr(obj_inst, directive) and is_valid_lang:
-            setattr(obj_inst, directive, wrap_named_directive(obj_inst, directive))
+    lang_classes = getattr(cls, "_language_classes", [])
+    for directive, directive_class in cls._directive_classes.items():
+        if directive_class in lang_classes and not hasattr(cls, directive):
+            setattr(cls, directive, wrap_named_directive_class_level(directive))
 
 
-def wrap_named_directive(obj_inst, name):
-    """Wrap a directive to simplify execution
+def wrap_named_directive_class_level(name):
+    """Wrap a directive to simplify execution at the class level
 
-    Create a wrapper method that executes a directive, to inject the
-    `(self)` argument to simplify use of directives as class methods
+    Create a bound-like method that executes a directive on the instance
     """
 
-    def _execute_directive(*args, directive_name=name, **kwargs):
-        obj_inst._directive_functions[directive_name](*args, **kwargs)(obj_inst)
+    def _execute_directive(self, *args, directive_name=name, **kwargs):
+        self._directive_functions[directive_name](*args, **kwargs)(self)
 
     return _execute_directive

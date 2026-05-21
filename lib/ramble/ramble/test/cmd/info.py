@@ -161,6 +161,11 @@ def _get_shared_outputs():
             "validator_name",
             ["{n_nodes} == 1", "Give me a node, Vasili. One node only, please"],
         ),
+        (
+            "conflicts",
+            "turn_on_required_directives=True",
+            ["turn_on_required_directives conflicts with variant_default"],
+        ),
         ("object_variables", "obj_var_name", ["default_obj_val", "An obj var"]),
         ("required_vars", "required_var_name", ["A required var", "type.required"]),
     ]
@@ -417,3 +422,26 @@ def test_info_object_name_formats(mutable_mock_apps_repo):
     assert "basic_underscores" in output
     output = info("basic-underscores")
     assert "basic_underscores" in output
+
+
+def test_info_conflicts_pattern(mutable_mock_apps_repo):
+    # When pattern matches, conflict should be printed
+    out = info(
+        "--type",
+        "applications",
+        "-v",
+        "--attrs",
+        "conflicts",
+        "-p",
+        "*turn_on_required_directives*",
+        "info",
+    )
+    assert "turn_on_required_directives=True" in out
+    assert "turn_on_required_directives conflicts with variant_default" in out
+
+    # When pattern does not match, conflict should not be printed
+    out = info(
+        "--type", "applications", "-v", "--attrs", "conflicts", "-p", "*not_matching*", "info"
+    )
+    assert "turn_on_required_directives=True" not in out
+    assert "turn_on_required_directives conflicts with variant_default" not in out

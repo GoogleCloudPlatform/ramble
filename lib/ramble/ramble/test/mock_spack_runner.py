@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+import tempfile
 
 
 class MockPackageInfo:
@@ -88,17 +89,30 @@ class MockSpackRunner:
     def configure_env(self, env_path):
         pass
 
+    def add_config_file(self, config_file):
+        pass
+
     def inventory_hash(self):
         return "dummy_hash"
 
     def package_definitions(self):
         return []
 
+    def create_stage_env(self):
+        tmp_path = tempfile.mkdtemp()
+        return tmp_path
+
+    def migrate_stage_env(self, stage_env_path: str, ws_env_path: str):
+        pass
+
     def create_env(self, env_path):
         if not os.path.exists(env_path):
             os.makedirs(env_path)
 
     def add_config(self, config):
+        pass
+
+    def apply_configs(self, stage_path=None):
         pass
 
     def add_include_file(self, path):

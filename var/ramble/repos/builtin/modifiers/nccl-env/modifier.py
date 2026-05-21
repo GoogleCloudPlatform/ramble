@@ -705,9 +705,7 @@ class NcclEnv(BasicModifier):
         for action, conf in env_var_dict.items():
             env_cmds, _ = action_funcs[action](conf, set(), shell=shell)
 
-            for cmd in env_cmds:
-                if cmd:
-                    env_var_cmds.append(cmd)
+            env_var_cmds.extend(cmd for cmd in env_cmds if cmd)
 
         pre_cmds.append(
             ramble.util.executable.CommandExecutable(

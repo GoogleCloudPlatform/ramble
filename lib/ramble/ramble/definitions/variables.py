@@ -7,13 +7,23 @@
 # except according to those terms.
 
 import copy
+import shlex
+import subprocess
 from typing import Any, Dict, List, Optional, Set
 
 import ramble.util.colors as color
+from ramble.util.logger import logger
 
 
 class Variable:
     """Class representing a variable definition"""
+
+    print_attr_map = [
+        ("description", "Description"),
+        ("default", "Default"),
+        ("values", "Suggested Values"),
+        ("when", "When"),
+    ]
 
     def __init__(
         self,
@@ -41,7 +51,12 @@ class Variable:
         self.name = name
         self.default = default
         self.description = description
-        self.values = values.copy() if isinstance(values, list) else [values]
+        if not values:
+            self.values = None
+        elif isinstance(values, list):
+            self.values = values.copy()
+        else:
+            self.values = [values]
         self.expandable = expandable
         self.track_used = track_used
         self.when = when.copy() if when else []
@@ -63,19 +78,13 @@ class Variable:
         indentation = " " * n_indent
 
         if verbose:
-            print_attrs = ["Description", "Default", "Values"]
-
             out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
-            for print_attr in print_attrs:
-                name = print_attr
-                if print_attr == "Values":
-                    name = "Suggested Values"
-                attr_name = print_attr.lower()
-
+            for attr_name, print_name in self.print_attr_map:
                 attr_val = getattr(self, attr_name, None)
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
+                        f"{indentation}    "
+                        f"{color.title_color(print_name, n_indent=n_indent + 4)}: "
                         f"{str(attr_val)}\n"
                     )
         else:
@@ -87,8 +96,114 @@ class Variable:
         return copy.deepcopy(self)
 
 
+class CommandVariable(Variable):
+
+    print_attr_map = [
+        ("description", "Description"),
+        ("command", "Command"),
+        ("dry_run_value", "Dry Run Value"),
+        ("when", "When"),
+    ]
+
+    def __init__(
+        self,
+        name: str,
+        command: str,
+        dry_run_value: str,
+        description: Optional[str] = None,
+        expandable: bool = True,
+        track_used: bool = True,
+        when=None,
+        **kwargs,
+    ):
+        """Constructor for a new command variable
+
+        Args:
+            name (str): Name of variable
+            command (str): Command to define variable value
+            dry_run_value (str): Value to use when in a dry-run
+            description (str): Description of variable
+            expandable (bool): True if variable can be expanded, False otherwise
+            track_used (bool): True if variable should be considered used,
+                               False to ignore it for vectorizing experiments
+            when (list | None): List of when conditions to apply to directive
+        """
+        super().__init__(
+            name=name,
+            description=description,
+            dry_run_value=dry_run_value,
+            expandable=expandable,
+            track_used=track_used,
+            when=when,
+            **kwargs,
+        )
+        self.command = command
+        self.dry_run_value = dry_run_value
+
+    def extract_value(self, workspace, app_inst):
+        app_inst.register_missing_command_variable(self)
+        expanded_command = app_inst.expander.expand_var(self.command)
+
+        if workspace and expanded_command in workspace.object_command_cache:
+            return workspace.object_command_cache[expanded_command]
+
+        logger.debug("Will evaluate command variable:")
+        logger.debug(f"  Name: {self.name}")
+        logger.debug(f"  Command: {expanded_command}")
+
+        result = self.dry_run_value
+
+        if not workspace.dry_run:
+            split_command = shlex.split(expanded_command)
+            cur_command = ""
+            command_chains = []
+            command_ps = []
+            for cmd_part in split_command:
+                if cmd_part == "|":
+                    command_chains.append(cur_command)
+                    cur_command = ""
+                else:
+                    cur_command += f" {cmd_part}"
+
+            if cur_command and cur_command != " ":
+                command_chains.append(cur_command)
+
+            try:
+                while command_chains:
+                    cur_command = command_chains.pop(0)
+                    if command_ps:
+                        new_p = subprocess.Popen(
+                            shlex.split(cur_command),
+                            stdin=command_ps[-1].stdout,
+                            stdout=subprocess.PIPE,
+                        )
+                    else:
+                        new_p = subprocess.Popen(shlex.split(cur_command), stdout=subprocess.PIPE)
+                    command_ps.append(new_p)
+
+                for idx in range(len(command_ps) - 1):
+                    command_ps[idx].stdout.close()
+
+                result = command_ps[-1].communicate()[0].decode("utf-8").strip()
+            except FileNotFoundError:
+                pass
+
+        logger.debug(f"  Result: {result}")
+
+        workspace.object_command_cache[expanded_command] = result
+
+        return result
+
+
 class VariableModification:
     """Class representing a variable modification"""
+
+    print_attr_map = [
+        ("modification", "Modification"),
+        ("method", "Method"),
+        ("separator", "Separator"),
+        ("when", "When"),
+    ]
 
     def __init__(
         self,
@@ -138,19 +253,14 @@ class VariableModification:
         """
         indentation = " " * n_indent
 
-        print_attrs = ["Modification", "Method", "Separator", "When"]
-
         out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
-        for print_attr in print_attrs:
-            name = print_attr
-            attr_name = print_attr.lower()
-
+        for attr_name, print_name in self.print_attr_map:
             attr_val = getattr(self, attr_name, None)
             if attr_val:
-                if print_attr == "Separator":
+                if print_name == "Separator":
                     attr_val = f"'{attr_val}'"
                 out_str += (
-                    f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
+                    f"{indentation}    {color.title_color(print_name, n_indent=n_indent + 4)}: "
                     f"{str(attr_val)}\n"
                 )
         return out_str
@@ -161,6 +271,14 @@ class VariableModification:
 
 class EnvironmentVariable:
     """Class representing an environment variable"""
+
+    print_attr_map = [
+        ("description", "Description"),
+        ("value", "Value"),
+        ("method", "Method"),
+        ("separator", "Separator"),
+        ("when", "When"),
+    ]
 
     def __init__(
         self,
@@ -207,16 +325,15 @@ class EnvironmentVariable:
         indentation = " " * n_indent
 
         if verbose:
-            print_attrs = ["Description", "Value", "Method"]
-            if self.method == "append":
-                print_attrs.append("Separator")
             out_str = color.title_color(f"{indentation}{self.name}:\n", n_indent)
-            for name in print_attrs:
-                attr_name = name.lower()
+            for attr_name, print_name in self.print_attr_map:
+                if print_name == "Separator" and self.method != "append":
+                    continue
                 attr_val = getattr(self, attr_name, None)
                 if attr_val:
                     out_str += (
-                        f"{indentation}    {color.title_color(name, n_indent=n_indent + 4)}: "
+                        f"{indentation}    "
+                        f"{color.title_color(print_name, n_indent=n_indent + 4)}: "
                         f"{str(attr_val)}\n"
                     )
         else:

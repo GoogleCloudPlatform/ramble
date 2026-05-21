@@ -12,7 +12,7 @@ import shutil
 from typing import List
 
 import llnl.util.filesystem as fs
-import llnl.util.tty as tty
+from llnl.util import tty
 
 import ramble.cmd.common.arguments
 import ramble.config
@@ -114,7 +114,7 @@ def _get_scope_and_section(args):
     path = getattr(args, "path", None)
 
     # w/no args and an active workspace, point to workspace config
-    if not section:
+    if not scope and not section:
         ws = ramble.workspace.active_workspace()
         if ws:
             scope = ws.ws_file_config_scope_name()

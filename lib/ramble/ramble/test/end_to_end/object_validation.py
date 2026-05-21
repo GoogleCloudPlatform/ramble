@@ -35,6 +35,8 @@ def test_object_validation(workspace_name):
         "batch_submit={execute_experiment}",
         "--wf",
         "test_validation",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -55,6 +57,8 @@ def test_object_validation(workspace_name):
         "--wf",
         "test_validation",
         "--overwrite",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -76,6 +80,8 @@ def test_object_validation(workspace_name):
         "--wf",
         "test_validation",
         "--overwrite",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -104,6 +110,8 @@ def test_variable_validation_workload(workspace_name):
         "multi_choice_var=invalid",
         "--wf",
         "test_validation_workload_var",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -128,6 +136,8 @@ def test_variable_validation_workload(workspace_name):
         "--wf",
         "test_validation_workload_var",
         "--overwrite",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -153,6 +163,8 @@ def test_variable_validation_workload_defaults(workspace_name):
         "multi_choice_var2=choice0",
         "--wf",
         "test_validation_workload_var_with_workload_defaults",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -181,6 +193,8 @@ def test_variable_validation_workload_group(workspace_name):
         "multi_choice_var3=choice0",
         "--wf",
         "test_validation_workload_var_with_workload_group",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()
@@ -211,6 +225,8 @@ def test_object_variable_validation(workspace_name, mutable_mock_pkg_mans_repo):
         "test_validation",
         "-p",
         "info",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
     ws._re_read()

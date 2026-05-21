@@ -11,7 +11,6 @@ import os
 import llnl.util.filesystem as fs
 
 import ramble.cmd
-import ramble.cmd.common.arguments as arguments
 import ramble.config
 import ramble.fetch_strategy
 import ramble.filters
@@ -19,6 +18,7 @@ import ramble.pipeline
 import ramble.repository
 import ramble.stage
 import ramble.util.path
+from ramble.cmd.common import arguments
 from ramble.main import RambleCommand
 from ramble.util.logger import logger
 

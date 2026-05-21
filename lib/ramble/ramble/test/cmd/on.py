@@ -18,7 +18,10 @@ from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures(
-    "mutable_config", "mutable_mock_workspace_path", "mutable_mock_apps_repo"
+    "mutable_config",
+    "mutable_mock_workspace_path",
+    "mutable_mock_apps_repo",
+    "workspace_deactivate",
 )
 
 workspace = RambleCommand("workspace")
@@ -108,6 +111,8 @@ def test_on_executor_in_run_dir(workspace_name):
         "batch_submit={execute_experiment}",
         "-v",
         "my_var=10",
+        "--default-variable-value",
+        "1",
         global_args=global_args,
     )
 

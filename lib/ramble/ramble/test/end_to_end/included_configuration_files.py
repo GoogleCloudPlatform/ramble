@@ -32,23 +32,23 @@ ramble:
   - $workspace_root/test_configs
   variants:
     package_manager: spack
+    validate_platform: false
+    validate_system: false
   applications: {}
   software:
     packages: {}
     environments: {}
 """
-    test_variables = """
-variables:
-    mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
-    batch_submit: 'batch_submit {execute_experiment}'
-    partition: ['part1', 'part2']
-    processes_per_node: ['16', '36']
-    n_ranks: '{processes_per_node}*{n_nodes}'
-    n_threads: '1'
+    test_variables = """variables:
+  mpi_command: 'mpirun -n {n_ranks} -ppn {processes_per_node}'
+  batch_submit: 'batch_submit {execute_experiment}'
+  partition: ['part1', 'part2']
+  processes_per_node: ['16', '36']
+  n_ranks: '{processes_per_node}*{n_nodes}'
+  n_threads: '1'
 """
 
-    test_applications = """
-applications:
+    test_applications = """applications:
   wrfv4:
     variables:
       env_name: ['wrfv4', 'wrfv4-portable']
@@ -83,8 +83,7 @@ applications:
             - env_name
 """
 
-    test_software = """
-software:
+    test_software = """software:
   packages:
     gcc:
       pkg_spec: gcc@8.5.0

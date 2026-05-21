@@ -12,6 +12,8 @@ from ramble.appkit import *
 class WhenVariants(ExecutableApplication):
     name = "when-variants"
 
+    version("1.0", default=True)
+
     executable(
         "test_exec",
         template=[
@@ -28,6 +30,9 @@ class WhenVariants(ExecutableApplication):
 
     workload("test_wl", executable="test_exec")
     workload("test_unset_wl", executable="test_exec")
+
+    version("2.0", description="Version 2.0 of when-variants")
+    version("1.0", description="Version 1.0 of when-variants", preferred=True)
 
     with default_args(workload="test_wl"):
         workload_variable(
@@ -75,6 +80,14 @@ class WhenVariants(ExecutableApplication):
             "fixed_n_nodes",
             predicate="{n_nodes} == 2",
             message="When validation is enabled, this test needs n_nodes=2",
+        )
+
+        conflict(
+            "zlib_type=preferred", msg="Validation requires non-preferred zlib"
+        )
+        conflict(
+            "application_version@2.0:",
+            msg="Validation does not support version 2.0 or higher",
         )
 
     with when("workload_name=test_wl"):
@@ -215,3 +228,32 @@ class WhenVariants(ExecutableApplication):
             default="sub_value3",
             description="Test variable",
         )
+
+    # Variant Expansion
+    variant(
+        "pkg_args",
+        values=[True, False],
+        default=False,
+        description="Use pkg_args",
+    )
+
+    with when("package_manager_family=spack"):
+        with when("+pkg_args"):
+            software_spec(
+                "when-variants-{application::variant::bool}-{application::variant::val}",
+                pkg_spec="when-variants@{application::when-variants::version} {application::variant::bool} {application::variant::val}",
+            )
+
+    variant(
+        "bool",
+        values=[True, False],
+        default=True,
+        description="Include bool in versions package spec",
+    )
+
+    variant(
+        "val",
+        values=["one", "two", "three"],
+        default="three",
+        description="Include val option in versions package spec",
+    )

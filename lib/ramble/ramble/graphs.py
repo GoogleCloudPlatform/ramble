@@ -366,9 +366,7 @@ class ExecutableGraph(AttributeGraph):
         # If `relative_to` is set, and the executable name is not found, raise a fatal error.
 
         exec_node = self.node_definitions[exec_name]
-        cur_exec_order = []
-        for node in self.walk():
-            cur_exec_order.append(node)
+        cur_exec_order = list(self.walk())
 
         exp_name = self._obj_inst.expander.experiment_namespace
         order = self.supported_injection_orders.after

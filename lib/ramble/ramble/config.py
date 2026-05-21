@@ -42,7 +42,7 @@ import sys
 from contextlib import contextmanager
 from typing import Any, Dict, List
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 from ruamel.yaml.error import MarkedYAMLError
 
 import llnl.util.lang
@@ -55,6 +55,8 @@ import ramble.schema.base_application_repos
 import ramble.schema.base_class_repos
 import ramble.schema.base_modifier_repos
 import ramble.schema.base_package_manager_repos
+import ramble.schema.base_platform_repos
+import ramble.schema.base_system_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
@@ -65,11 +67,13 @@ import ramble.schema.mirrors
 import ramble.schema.modifier_repos
 import ramble.schema.modifiers
 import ramble.schema.package_manager_repos
+import ramble.schema.platform_repos
 
 # Objects
 import ramble.schema.repos
 import ramble.schema.software
 import ramble.schema.success_criteria
+import ramble.schema.system_repos
 import ramble.schema.tables
 import ramble.schema.variables
 import ramble.schema.variants
@@ -104,12 +108,16 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "repos": ramble.schema.repos.schema,
     "modifier_repos": ramble.schema.modifier_repos.schema,
     "package_manager_repos": ramble.schema.package_manager_repos.schema,
+    "system_repos": ramble.schema.system_repos.schema,
+    "platform_repos": ramble.schema.platform_repos.schema,
     "workflow_manager_repos": ramble.schema.workflow_manager_repos.schema,
     "base_application_repos": ramble.schema.base_application_repos.schema,
     "base_class_repos": ramble.schema.base_class_repos.schema,
     "base_modifier_repos": ramble.schema.base_modifier_repos.schema,
     "base_package_manager_repos": ramble.schema.base_package_manager_repos.schema,
     "base_workflow_manager_repos": ramble.schema.base_workflow_manager_repos.schema,
+    "base_system_repos": ramble.schema.base_system_repos.schema,
+    "base_platform_repos": ramble.schema.base_platform_repos.schema,
 }
 
 # Same as above, but including keys for workspaces
@@ -154,7 +162,7 @@ config_defaults = {
         "spack": {"install": {"flags": "--fresh"}, "concretize": {"flags": "--fresh"}},
         "pip": {"install": {"flags": []}},
         "input_cache": "$ramble/var/ramble/cache",
-        "workspace_dirs": "$ramble/var/ramble/workspaces",
+        "workspace_dirs": ["$ramble/var/ramble/workspaces"],
         "upload": {"push_failed": True},
         "report_dirs": "~/.ramble/reports",
         "enable_strict_versions": True,
@@ -437,7 +445,8 @@ def _config_mutator(method):
 
     @functools.wraps(method)
     def _method(self, *args, **kwargs):
-        self._get_config_memoized.cache.clear()
+        if hasattr(self, "_get_config_cache"):
+            self._get_config_cache.clear()
         return method(self, *args, **kwargs)
 
     return _method
@@ -631,10 +640,16 @@ class Configuration:
            }
 
         """
-        return self._get_config_memoized(section, scope)
+        if not hasattr(self, "_get_config_cache"):
+            self._get_config_cache = {}
 
-    @llnl.util.lang.memoized
-    def _get_config_memoized(self, section, scope):
+        key = (section, scope)
+        if key not in self._get_config_cache:
+            self._get_config_cache[key] = self._get_config_no_memo(section, scope)
+
+        return self._get_config_cache[key]
+
+    def _get_config_no_memo(self, section, scope):
         _validate_section_name(section)
 
         if scope is None:
@@ -1230,7 +1245,7 @@ def default_list_scope():
 
     Commands that list configuration list *all* scopes (merged) by default.
     """
-    return None
+    return
 
 
 def _update_in_memory(data, section):

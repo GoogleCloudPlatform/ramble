@@ -21,6 +21,7 @@ import llnl.util.lang
 
 import ramble.language.language_helpers
 from ramble.error import DirectiveError
+from ramble.util import directives
 from ramble.util.logger import logger
 
 __all__ = ["DirectiveMeta", "DirectiveError"]
@@ -57,6 +58,10 @@ namespaces = [
     "ramble.package_manager",
     "ramble.wm",
     "ramble.workflow_manager",
+    "ramble.sys",
+    "ramble.system",
+    "ramble.plat",
+    "ramble.platform",
     "ramble.base_cls",
     "ramble.modifier",
 ]
@@ -111,13 +116,9 @@ class DirectiveMeta(abc.ABCMeta):
         # 2. following the MRO
         attr_dict["_directives_to_be_executed"] = []
         for base in reversed(bases):
-            try:
-                directive_from_base = base._directives_to_be_executed
+            directive_from_base = getattr(base, "_directives_to_be_executed", None)
+            if directive_from_base is not None:
                 attr_dict["_directives_to_be_executed"].extend(directive_from_base)
-            except AttributeError:
-                # The base class didn't have the required attribute.
-                # Continue searching
-                pass
 
         # De-duplicates directives from base classes
         attr_dict["_directives_to_be_executed"] = list(
@@ -155,12 +156,12 @@ class DirectiveMeta(abc.ABCMeta):
                 "_directive_names": DirectiveMeta._directive_names.copy(),
             }
 
-            for attr in directive_attrs:
+            for attr, val in directive_attrs.items():
                 if hasattr(DirectiveMeta, attr):
-                    directive_attrs[attr].update(getattr(DirectiveMeta, attr))
+                    val.update(getattr(DirectiveMeta, attr))
 
-            for attr in directive_attrs:
-                setattr(cls, attr, directive_attrs[attr])
+            for attr, val in directive_attrs.items():
+                setattr(cls, attr, val)
 
             # Lazily execute directives
             for directive in cls._directives_to_be_executed:
@@ -169,6 +170,8 @@ class DirectiveMeta(abc.ABCMeta):
             # Ignore any directives executed *within* top-level
             # directives by clearing out the queue they're appended to
             DirectiveMeta._directives_to_be_executed = []
+
+            directives.define_directive_methods_on_class(cls)
 
         super().__init__(name, bases, attr_dict)
 

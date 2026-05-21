@@ -37,8 +37,7 @@ responsible for configuring, executing, analyzing, and archiving.
 
     ramble:
       variants:
-          workflow_manager: user-managed
-          package_manager: user-managed
+        system: user-managed
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -77,8 +76,7 @@ string, and can take variables for expansion.
 
     ramble:
       variants:
-        workflow_manager: user-managed
-        package_manager: user-managed
+        system: user-managed
       applications:
         hostname:
           workloads:
@@ -116,6 +114,7 @@ individual experiments take precedence.
 
     ramble:
       variants:
+        system: user-managed
         workflow_manager: slurm
         package_manager: spack
       variables:
@@ -236,8 +235,9 @@ math and variable expansion syntax as defined above).
 
     ramble:
       variants:
-          workflow_manager: slurm
-          package_manager: spack
+        system: user-managed
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -271,6 +271,7 @@ to create a list. With this functionality, the example above could be re-written
 
     ramble:
       variants:
+        system: user-managed
         workflow_manager: slurm
         package_manager: spack
       variables:
@@ -308,6 +309,7 @@ consumes.
 
     ramble:
       variants:
+        system: user-managed
         workflow_manager: slurm
         package_manager: spack
       variables:
@@ -341,8 +343,9 @@ Multiple matrices are allowed to be defined:
 
     ramble:
       variants:
-          workflow_manager: slurm
-          package_manager: spack
+        system: user-managed
+        workflow_manager: slurm
+        package_manager: spack
       variables:
         mpi_command: 'mpirun -n {n_ranks}'
         batch_submit: '{execute_experiment}'
@@ -398,6 +401,7 @@ Below is an example showing how to define explicit zips:
 
     ramble:
       variants:
+        system: user-managed
         workflow_manager: slurm
         package_manager: spack
       variables:
@@ -473,22 +477,58 @@ Variant Control
 Within a workspace configuration file, experiments are able to define variants.
 Variants are able to manipulate specific aspects of experiments and
 applications. More information on these configuration options can be seen in
-the :ref:`Variants Configuration Section <variants-config>` documentation. To
-begin with, the only variant that can be specific is the ``package_manager``.
+the :ref:`Variants Configuration Section <variants-config>` documentation.
 
-The ``package_manager`` variant is used to define which package manager is used
-to configure and execute the experiments. To select ``spack`` as the package
-manager, the following block can be added to any scope that variables can be
-defined in.
+As an example, the ``package_manager`` variant is used to define which package
+manager is used to configure and execute the experiments. To select ``spack``
+as the package manager, the following block can be added to any scope that
+variables can be defined in.
 
 .. code-block:: yaml
 
   variants:
     package_manager: spack
 
-For more information about controlling package managers see the
-:ref:`package manager documentation <package-manager-control>`.
+For more information about controlling package managers, see the :ref:`package manager documentation <package-manager-control>`.
 
+Additional standard, Ramble level, variants include:
+
+ * :ref:`Workflow managers <workflow-manager-control>`
+ * :ref:`Systems <system-control>`
+ * :ref:`Platforms <platform-control>`
+
+-----------------
+Variant Expansion
+-----------------
+
+Variants can be expanded like variables into a Spack-like syntax by using the syntax ``{{object_type}::variant::{variant_name}``. For example, a boolean variant with a value of ``True`` formats to ``+bool``, whereas ``False`` formats to ``~bool``. A value-based variant formats to ``key=value``.
+
+Variant Expansion Example
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Suppose multiple applications in a workspace use the variant ``openmp`` (boolean) to parameterize their software specs for Spack. We can define it under the workspace ``variants:`` section:
+
+.. code-block:: yaml
+
+  ramble:
+    variants:
+      openmp: true
+
+An application can then use this variant in its software spec:
+
+.. code-block:: python
+  
+  with when("package_manager_family=spack"):
+    software_spec(
+        "my-pkg",
+        pkg_spec="my-pkg {application::variant::openmp}",
+    )
+
+During concretization, ``{application::variant::openmp}`` expands to ``+openmp``, resulting in the Spack package spec:
+
+.. code-block:: console
+
+  my-pkg +openmp
 
 .. _ramble-experiment-exclusion:
 
@@ -1015,6 +1055,10 @@ Ramble requires the following variables to be defined:
 * ``mpi_command`` - Template for generating an MPI command
 * ``batch_submit`` - Template for generating a batch system submit command
 
+Some of these variables can be automatically set within workspaces by applying
+some variants. For example, the use of a workflow manager variant often will
+define ``mpi_command`` and / or ``batch_submit``.
+
 
 Generated Variables
 ~~~~~~~~~~~~~~~~~~~
@@ -1109,7 +1153,8 @@ When the package manager is ``spack`` this is the equivalent to the output of
 ``spack location -i`` for each install spec.
 
 Any applications that have required packages require path variables to be
-defined when a package manager is not used.
+defined. Adding in a ``package_manager`` variant other than ``user-managed``
+can automatically define this within generated experiments.
 
 As an example:
 
@@ -1136,8 +1181,22 @@ the installation location for the ``gromacs`` package.
 
 **NOTE**: Package installation location variables are only generated when
 actually performing the setup of a workspace. When a ``--dry-run`` is
-performed, these paths are not populated.
+performed, these paths are not populated to ensure ``dry-run`` is fast.
 
+Variant Specific Defined / Required Variables
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+In addition to package managers, Ramble supports several other variant types.
+Some of these eitiher require or provide variable definitions to help
+experiments ensure they have a standardized interface for users. These variants
+include:
+
+ * :ref:`Platform <platform-control>`
+ * :ref:`System <system-control>`
+ * :ref:`Workflow manager <workflow-manager-control>`
+
+Users can refer to the documentation on these individual variants for more
+information on their requirements and functionality.
 
 -------------------
 Software Dictionary

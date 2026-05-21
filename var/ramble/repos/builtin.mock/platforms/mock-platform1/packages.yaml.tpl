@@ -1,0 +1,3 @@
+packages:
+  openmpi:
+    buildable: false

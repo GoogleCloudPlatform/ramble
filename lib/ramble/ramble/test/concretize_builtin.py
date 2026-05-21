@@ -115,6 +115,8 @@ def test_concretize_allows_invalid_experiment(
             "water_bare",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

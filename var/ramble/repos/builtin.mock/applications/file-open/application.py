@@ -8,7 +8,7 @@
 
 import os
 
-import ruamel.yaml as yaml
+from ruamel import yaml
 
 from ramble.appkit import *
 

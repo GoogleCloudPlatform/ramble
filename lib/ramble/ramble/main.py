@@ -28,8 +28,8 @@ import jsonschema
 import ruamel
 
 import llnl.util.lang
-import llnl.util.tty as tty
 import llnl.util.tty.colify
+from llnl.util import tty
 from llnl.util.tty.log import log_output
 
 import ramble.cmd
@@ -713,7 +713,7 @@ class RambleCommand:
         self.returncode = None
         self.error = None
 
-        prepend = kwargs["global_args"] if "global_args" in kwargs else []
+        prepend = kwargs.get("global_args", [])
 
         args, unknown = self.parser.parse_known_args(prepend + [self.command_name] + list(argv))
 
@@ -869,7 +869,7 @@ def _main(argv=None):
     # them, which reduces startup latency.
     parser = make_argument_parser()
     parser.add_argument("command", nargs=argparse.REMAINDER)
-    args, _ = parser.parse_known_args(argv)
+    args, unknown = parser.parse_known_args(argv)
 
     # Recover stored LD_LIBRARY_PATH variables from ramble shell function
     # This is necessary because MacOS System Integrity Protection clears
@@ -897,6 +897,8 @@ def _main(argv=None):
     elif args.help:
         sys.stdout.write(parser.format_help(level=args.help))
         return 0
+    elif unknown:
+        logger.die(f'unrecognized arguments: {" ".join(unknown)}')
 
     # ------------------------------------------------------------------------
     # This part of the `main()` sets up Ramble's configuration.
@@ -1005,7 +1007,7 @@ def finish_parse_and_run(parser, cmd_name, main_args, workspace_format_error):
     if main_args.ramble_profile or main_args.sorted_profile:
         _profile_wrapper(command, parser, args, unknown)
     elif main_args.pdb:
-        import pdb
+        import pdb  # noqa: T100
 
         pdb.runctx("_invoke_command(command, parser, args, unknown)", globals(), locals())
         return 0

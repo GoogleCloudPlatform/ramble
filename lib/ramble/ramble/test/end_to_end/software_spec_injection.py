@@ -52,6 +52,8 @@ def test_software_spec_injection_works(mock_modifiers, workspace_name):
             "n_ranks=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -114,6 +116,8 @@ def test_existing_software_spec_does_not_inject(mock_modifiers, workspace_name):
             "n_ranks=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -177,6 +181,8 @@ def test_software_spec_injection_missing_compiler_errors(mock_modifiers, workspa
             "n_ranks=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -233,6 +239,8 @@ def test_software_spec_compiler_injection_works(mock_applications, mock_modifier
             "n_ranks=1",
             "-p",
             "spack",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 

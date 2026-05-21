@@ -56,6 +56,8 @@ def test_executable_modifier_usage_filters(
             "n_nodes=1",
             "-v",
             "openfoam_path=/not/needed",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
@@ -138,6 +140,8 @@ def test_executable_modifier_usage_filters_broken_errors(
             "n_nodes=1",
             "-v",
             "openfoam_path=/not/needed",
+            "--default-variable-value",
+            "1",
             global_args=global_args,
         )
 
