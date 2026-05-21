@@ -239,6 +239,8 @@ This workflow details how to create a workspace, configure it for a single exper
 * Encourage users to provide their Ramble configuration files and any error messages for debugging.
 * When making Python code changes, consult `bin/ramble` to determine the officially supported Python versions.
 * Ensure all Python code is compatible with the full range of supported versions. Avoid using APIs that have been deprecated or removed in newer Python versions. When necessary, use feature detection (`hasattr`) or version checks (`sys.version_info`) to maintain broad compatibility.
+* **Implementing Directives & Mock Tests**: When adding new directives (which are processed by `DirectiveMeta` in `ramble.language`), keep in mind that directives are processed lazily based on the module namespace. If you create a mock class inside a unit test to test a directive, you **must** explicitly set its `__module__` attribute to a valid Ramble namespace (e.g. `__module__ = "ramble.app"` or `__module__ = "ramble.mod"`). Without this, `DirectiveMeta` will silently skip processing the directives for your test class.
+* **Mock Objects and Style Checks**: When creating mock applications or modifiers (e.g., in `var/ramble/repos/builtin.mock/`), ensure these files contain valid Python syntax and conform to Ramble's style guide (including copyright headers). The `ramble style` command runs on the entire repository, and poorly formatted or syntactically invalid mock files will cause the style checker to fail.
 
 
 ## Running Unit Tests
