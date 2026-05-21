@@ -65,12 +65,23 @@ fi
 #-----------------------------------------------------------
 
 if [[ "$LONG" == "true" ]]; then
-  ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose
-else
+  echo "Running fast unit tests..."
   ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose --fast
-fi
-if [ $? != 0 ]; then
+  if [ $? != 0 ]; then
     ERROR=1
+  else
+    echo "Running slow unit tests..."
+    ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose --slow
+    if [ $? != 0 ]; then
+      ERROR=1
+    fi
+  fi
+else
+  echo "Running fast unit tests..."
+  ${UNIT_TEST_COVERAGE_PREFIX} $(which ramble) unit-test ${PYTEST_ADDOPTS} -x --verbose --fast
+  if [ $? != 0 ]; then
+    ERROR=1
+  fi
 fi
 
 if [[ "$UNIT_TEST_COVERAGE" == "true" ]]; then
