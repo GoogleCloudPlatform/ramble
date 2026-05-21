@@ -94,3 +94,8 @@ def test_external_repo_valid(tmpdir):
 def test_flags_accepted(flag):
     output = ramble_test(flag, "--list")
     assert "ramble/test/cmd/unit_test.py" in output
+
+
+def test_slow_flag():
+    output = ramble_test("--slow", "--list")
+    assert "test_slow_flag" not in output
