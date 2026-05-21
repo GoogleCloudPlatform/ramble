@@ -53,6 +53,12 @@ def pytest_addoption(parser):
         help='runs only "fast" unit tests, instead of the whole suite',
     )
     group.addoption(
+        "--slow",
+        action="store_true",
+        default=False,
+        help='runs only "slow" unit tests, instead of the whole suite',
+    )
+    group.addoption(
         "--repo-path",
         default=None,
         help="runs only tests under the given Ramble object repo path",
@@ -120,15 +126,23 @@ def pytest_collection_modifyitems(config, items):
             if "perf" in item.keywords:
                 item.add_marker(skip_perf)
 
-    if not config.getoption("--fast"):
-        # --fast not given, run all the tests
-        return
-
     slow_tests = ["db", "network", "maybeslow", "long"]
-    skip_as_slow = pytest.mark.skip(reason="skipped slow test [--fast command line option given]")
-    for item in items:
-        if any(x in item.keywords for x in slow_tests):
-            item.add_marker(skip_as_slow)
+
+    if config.getoption("--fast"):
+        skip_as_slow = pytest.mark.skip(
+            reason="skipped slow test [--fast command line option given]"
+        )
+        for item in items:
+            if any(x in item.keywords for x in slow_tests):
+                item.add_marker(skip_as_slow)
+
+    if config.getoption("--slow"):
+        skip_as_fast = pytest.mark.skip(
+            reason="skipped fast test [--slow command line option given]"
+        )
+        for item in items:
+            if not any(x in item.keywords for x in slow_tests):
+                item.add_marker(skip_as_fast)
 
 
 #

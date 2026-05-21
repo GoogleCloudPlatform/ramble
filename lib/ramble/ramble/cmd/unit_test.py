@@ -62,11 +62,18 @@ def setup_parser(subparser):
         default=False,
         help="run only performance tests",
     )
-    subparser.add_argument(
+    speed = subparser.add_mutually_exclusive_group()
+    speed.add_argument(
         "--fast",
         action="store_true",
         default=False,
         help="run only fast tests (skip slow tests)",
+    )
+    speed.add_argument(
+        "--slow",
+        action="store_true",
+        default=False,
+        help="run only slow tests (skip fast tests)",
     )
 
     # extra ramble arguments to list tests
@@ -202,6 +209,8 @@ def add_back_pytest_args(args, unknown_args):
         result += ["--perf"]
     if args.fast:
         result += ["--fast"]
+    if args.slow:
+        result += ["--slow"]
     result += unknown_args or []
     result += args.pytest_args or []
     if args.expression:
