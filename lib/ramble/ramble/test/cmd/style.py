@@ -138,3 +138,19 @@ def test_style_tool_args_invalid_format():
     )
     assert style_cmd.returncode != 0
     assert "Invalid --tool-args format" in out
+
+
+def test_style_tool_args_multiple():
+    out = style_cmd(
+        "--fix",
+        "--tool",
+        "ruff",
+        "--tool-args",
+        "ruff:'--unsafe-fixes'",
+        "--tool-args",
+        "ruff:'--bad-arg'",
+        __file__,
+        fail_on_error=False,
+    )
+    assert style_cmd.returncode != 0
+    assert "unexpected argument '--bad-arg'" in out
