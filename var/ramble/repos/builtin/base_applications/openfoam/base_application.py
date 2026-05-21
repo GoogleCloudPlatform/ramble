@@ -491,9 +491,10 @@ class Openfoam(ExecutableApplication):
 
             # Drop first time, to avoid init time
             if len(exec_times) > 1:
-                timestep_times = []
-                for i in range(len(exec_times) - 1):
-                    timestep_times.append(exec_times[i + 1] - exec_times[i])
+                timestep_times = [
+                    exec_times[i + 1] - exec_times[i]
+                    for i in range(len(exec_times) - 1)
+                ]
 
                 # Compute statistics from other times
                 for stat in ramble.util.stats.all_stats:
@@ -512,9 +513,7 @@ class Openfoam(ExecutableApplication):
             ","
         )
 
-        export_args = []
-        for var in export_vars:
-            export_args.append(f"{export_prefix} {var}")
+        export_args = [f"{export_prefix} {var}" for var in export_vars]
 
         export_str = " ".join(export_args)
 

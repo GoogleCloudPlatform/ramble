@@ -437,6 +437,94 @@ def test_register_validator_when(workspace_name, validator_value, fails):
 
 
 @pytest.mark.parametrize(
+    "zlib_type,validation,fails",
+    [
+        ("preferred", True, True),
+        ("preferred", False, False),
+        ("testing", True, False),
+    ],
+)
+def test_conflicts_when(workspace_name, zlib_type, validation, fails):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=2",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:zlib_type:{zlib_type}", global_args=global_args)
+        config("add", f"variants:validation:{validation}", global_args=global_args)
+
+        ws._re_read()
+
+        failed = False
+        try:
+            workspace("setup", global_args=global_args)
+        except ObjectValidationError as e:
+            if "Conflict detected" in str(e):
+                failed = True
+
+        assert failed == fails
+
+
+@pytest.mark.parametrize(
+    "version,validation,fails",
+    [
+        ("2.0", True, True),
+        ("2.0", False, False),
+        ("1.0", True, False),
+    ],
+)
+def test_conflicts_version_when(workspace_name, version, validation, fails):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            f"when-variants@{version}",
+            "--wf",
+            "test_wl",
+            "-v",
+            "zlib_path=/not/a/path",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=2",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:zlib_type:testing", global_args=global_args)
+        config("add", f"variants:validation:{validation}", global_args=global_args)
+
+        ws._re_read()
+
+        failed = False
+        try:
+            workspace("setup", global_args=global_args)
+        except ObjectValidationError as e:
+            if "Conflict detected" in str(e):
+                failed = True
+
+        assert failed == fails
+
+
+@pytest.mark.parametrize(
     "inc_value,type_value",
     [
         (True, "preferred"),
@@ -1744,3 +1832,95 @@ def test_obj_required_key_when(
 
         for exp in data["experiments"]:
             assert f"test_{obj}_required_key" in exp
+
+
+@pytest.mark.parametrize(
+    "variant_name",
+    [
+        "bad_spec",
+        "bad_when",
+    ],
+)
+def test_object_conflicts_expander_errors(workspace_name, variant_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", f"variants:{variant_name}:True", global_args=global_args)
+
+        ws._re_read()
+        workspace("setup", global_args=global_args)
+
+
+def test_object_conflicts_no_msg(workspace_name):
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:nomsg:True", global_args=global_args)
+
+        ws._re_read()
+        with pytest.raises(
+            ObjectValidationError,
+            match=r"Conflict detected in 'object-conflicts': '\+nomsg' is active when \+nomsg",
+        ):
+            workspace("setup", global_args=global_args)
+
+
+def test_object_conflicts_warn_only(workspace_name):
+    from unittest.mock import patch
+
+    global_args = ["-w", workspace_name]
+
+    with ramble.workspace.create(workspace_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "object-conflicts",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            global_args=global_args,
+        )
+
+        config("add", "variants:nomsg:True", global_args=global_args)
+
+        ws._re_read()
+        with patch("ramble.util.logger.logger.warn") as mock_warn:
+            ws.build_experiment_set(die_on_validate_error=False)
+            mock_warn.assert_any_call(
+                "Conflict detected in 'object-conflicts': '+nomsg' is active when +nomsg"
+            )

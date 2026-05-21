@@ -53,19 +53,13 @@ class VariantSet:
         Returns:
             (str): Representation of this variant set
         """
-        to_print = []
-        for variant in self.default_variants.values():
-            to_print.append(variant)
+        to_print = list(self.default_variants.values())
 
         for variant_set in self.multi_value_variants.values():
-            for variant in variant_set:
-                to_print.append(variant)
+            to_print.extend(variant_set)
 
-        for variant in self.experiment_variants.values():
-            to_print.append(variant)
-
-        for variant in self.version_variants.values():
-            to_print.append(variant)
+        to_print.extend(self.experiment_variants.values())
+        to_print.extend(self.version_variants.values())
 
         if verbose:
             out_str = "\n".join(v.as_str(verbose=True) for v in to_print)

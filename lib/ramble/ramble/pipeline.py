@@ -164,7 +164,7 @@ class Pipeline:
             with logger.add_log_context(exp_log_path):
                 logger.msg(f"Experiment inventory:\n{sjson.dump(app_inst.hash_inventory)}")
                 phase_list = list(
-                    app_inst.get_pipeline_phases(self.name, self.workspace, self.filters.phases)
+                    app_inst.get_pipeline_phases(self.name, phase_filters=self.filters.phases)
                 )
 
                 disable_progress = (

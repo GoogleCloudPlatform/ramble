@@ -540,6 +540,7 @@ ramble:
 
     # Also test
     executable_application_instance.variables.clear()
+    executable_application_instance._template_paths_defined = False
     executable_application_instance.set_variables_and_variants(expansion_vars, {}, ws1, None)
     executable_application_instance._define_commands(exec_graph)
     executable_application_instance._define_formatted_executables()
@@ -664,14 +665,14 @@ def test_application_methods_with_default_workspace(mutable_mock_apps_repo, work
     # Test define_missing_variables
     executable_application_instance.define_missing_variables()
 
-    # Test set_modifiers with default workspace=None
+    # Test set_modifiers
     executable_application_instance.set_modifiers(None)
 
-    # Test get_pipeline_phases with default workspace=None
+    # Test get_pipeline_phases
     phases = executable_application_instance.get_pipeline_phases("analyze")
     assert isinstance(list(phases), list)
 
-    # Test build_used_variables with default workspace=None
+    # Test build_used_variables
     used_vars = executable_application_instance.build_used_variables()
     assert isinstance(used_vars, set)
 

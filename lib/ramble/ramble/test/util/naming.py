@@ -91,3 +91,25 @@ def test_validate_fully_qualified_module_name(mod_name, expect_error):
             naming.validate_fully_qualified_module_name(mod_name)
     else:
         naming.validate_fully_qualified_module_name(mod_name)
+
+
+@pytest.mark.parametrize(
+    "pattern,string,expected_match,expected_groups",
+    [
+        (None, "anything", True, {}),
+        ("Step *", "Step 123", True, {}),  # Glob
+        ("Step (?P<num>[0-9]+)", "Step 123", True, {"num": "123"}),  # Regex
+        ("foo.bar", "fooxbar", True, {}),  # Regex (. matches x)
+        ("foo.bar", "foo.bar", True, {}),  # Glob matches literally
+        ("^start.*", "start_here", True, {}),  # Regex with anchor
+        ("Step [0-9]+", "Step 123", True, {}),  # Regex with []
+        ("a|b", "a", True, {}),  # Regex with |
+        ("a|b", "c", False, {}),  # Regex mismatch
+        ("*.txt", "file.txt", True, {}),  # Glob
+        ("*.txt", "file.py", False, {}),  # Glob mismatch
+    ],
+)
+def test_match_pattern(pattern, string, expected_match, expected_groups):
+    match, groups = naming.match_pattern(pattern, string)
+    assert match == expected_match
+    assert groups == expected_groups

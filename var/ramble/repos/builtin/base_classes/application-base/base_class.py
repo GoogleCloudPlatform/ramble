@@ -207,6 +207,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self._software_lock = None
         # A dict storing fom values, currently it only stores inmem FOMs
         self._fom_map = {}
+        self._template_paths_defined = False
 
         # Ensure we always have the application name, and this is never empty
         self._file_path = file_path
@@ -803,8 +804,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for template_name, _ in workspace.all_templates():
             cleaned_variables.pop(template_name, None)
 
-        for _, tpl_config in self._object_templates():
-            cleaned_variables.pop(tpl_config["var_name"], None)
+        for _, tpl_configs in self._object_templates():
+            for tpl_config in tpl_configs:
+                cleaned_variables.pop(tpl_config["var_name"], None)
 
         return cleaned_variables
 
@@ -962,10 +964,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if chained_experiments:
             self.chained_experiments = chained_experiments.copy()
 
-    def set_modifiers(self, modifiers, workspace=None):
+    def set_modifiers(self, modifiers):
         """Set modifiers for this instance"""
-        if workspace is None:
-            workspace = self.workspace
         if modifiers:
             self.modifiers = modifiers.copy()
             self.build_modifier_instances()
@@ -1010,11 +1010,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             os.path.join(logs_dir, self.expander.experiment_namespace) + ".out"
         )
 
-    def get_pipeline_phases(
-        self, pipeline, workspace=None, phase_filters=None
-    ):
-        if workspace is None:
-            workspace = self.workspace
+    def get_pipeline_phases(self, pipeline, phase_filters=None):
         if phase_filters is None:
             phase_filters = ["*"]
 
@@ -1065,7 +1061,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             expanded = self.expander.expand_var(expansion_var)
             color.cprint(f"{indent}  {var} = {val} ==> {expanded}")
 
-    def build_used_variables(self, workspace=None):
+    def build_used_variables(self):
         """Build a set of all used variables
 
         By expanding all necessary portions of this experiment (required /
@@ -1075,14 +1071,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Variables can have list definitions. These are iterated over to ensure
         variables referenced by any of them are tracked properly.
 
-        Args:
-            workspace (ramble.workspace.Workspace): Workspace to extract templates from
-
         Returns:
             (set): All variable names used by this experiment.
         """
-        if workspace is None:
-            workspace = self.workspace
+        workspace = self.workspace
         self.build_modifier_instances()
         self.define_variables_for_template_path()
 
@@ -1122,7 +1114,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.evaluate_success()
 
         if self.package_manager is not None:
-            self.package_manager.build_used_variables(workspace)
+            self.package_manager.build_used_variables()
 
         for template_name, template_conf in workspace.all_templates():
             self.expander._used_variables.add(template_name)
@@ -1577,6 +1569,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             warn_validation=warn_validation,
             die_on_validate_error=die_on_validate_error,
         )
+        self._check_object_conflicts(
+            warn_validation=warn_validation,
+            die_on_validate_error=die_on_validate_error,
+        )
 
     def _check_object_validators(
         self, warn_validation=True, die_on_validate_error=True
@@ -1609,6 +1605,60 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             raise ObjectValidationError(err_msg)
                         elif warn_validation:
                             logger.warn(err_msg)
+
+    def _check_object_conflicts(
+        self, warn_validation=True, die_on_validate_error=True
+    ):
+        expander = self.expander
+        for _, obj in self.objects():
+            if not hasattr(obj, "conflicts") or not obj.conflicts:
+                continue
+
+            for when_set, conflict_list in obj.conflicts.items():
+                experiment_variants = obj.experiment_variants()
+                try:
+                    when_active = expander.satisfies(
+                        when_set, variant_set=experiment_variants
+                    )
+                except ramble.expander.ExpanderError:
+                    when_active = False
+
+                if not when_active:
+                    continue
+
+                for conflict in conflict_list:
+                    conflict_spec = conflict["conflict_spec"]
+                    msg = conflict["message"]
+
+                    try:
+                        conflict_active = expander.satisfies(
+                            conflict_spec, variant_set=experiment_variants
+                        )
+                    except ramble.expander.ExpanderError:
+                        conflict_active = False
+
+                    if not conflict_active:
+                        continue
+
+                    # If BOTH are satisfied, it is a conflict!
+                    if msg:
+                        err_msg = (
+                            f"Conflict detected in '{obj.name}': "
+                            f"{expander.expand_var(msg)}"
+                        )
+                    else:
+                        when_str = (
+                            f" when {', '.join(when_set)}" if when_set else ""
+                        )
+                        err_msg = (
+                            f"Conflict detected in '{obj.name}': "
+                            f"'{conflict_spec}' is active{when_str}"
+                        )
+
+                    if die_on_validate_error:
+                        raise ObjectValidationError(err_msg)
+                    elif warn_validation:
+                        logger.warn(err_msg)
 
     def _generate_cleanup_cmd(self, key):
         commands = []
@@ -2096,9 +2146,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         objs_to_extract = [self, self.workflow_manager, self.package_manager]
 
-        for obj in objs_to_extract + self._modifier_instances:
-            if obj and hasattr(obj, "formatted_executables"):
-                formatted_exec_groups.append(obj.formatted_executables)
+        formatted_exec_groups.extend(
+            obj.formatted_executables
+            for obj in objs_to_extract + self._modifier_instances
+            if obj and hasattr(obj, "formatted_executables")
+        )
 
         all_execs = {}
 
@@ -2159,13 +2211,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     command, replace_escaped_braces=False
                 )
 
-                for out_line in expanded.split("\n"):
-                    formatted_lines.append(indentation + prefix + out_line)
+                formatted_lines.extend(
+                    indentation + prefix + out_line
+                    for out_line in expanded.split("\n")
+                )
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
     def define_variables_for_template_path(self):
         """Define variables for all workspace and object template paths"""
+        if self._template_paths_defined:
+            return
+
         workspace = self.workspace
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
@@ -2178,20 +2235,23 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "type": ramble.keywords.key_type.reserved,
             "level": ramble.keywords.output_level.variable,
         }
-        for obj, tpl_config in self._object_templates():
-            var_name = tpl_config["var_name"]
-            if var_name is not None:
-                if var_name in self.variables:
-                    old_var = f"_old_{var_name}"
-                    self.variables[old_var] = self.variables[var_name]
-                    self.keywords.update_keys({old_var: var_attr})
-                self.variables[var_name] = tpl_config["dest_path"]
-                self.keywords.update_keys({var_name: var_attr})
+        for obj, tpl_configs in self._object_templates():
+            for tpl_config in tpl_configs:
+                var_name = tpl_config["var_name"]
+                if var_name is not None:
+                    if var_name in self.variables:
+                        old_var = f"_old_{var_name}"
+                        self.variables[old_var] = self.variables[var_name]
+                        self.keywords.update_keys({old_var: var_attr})
+                    self.variables[var_name] = tpl_config["dest_path"]
+                    self.keywords.update_keys({var_name: var_attr})
             if hasattr(obj, "template_render_vars"):
                 render_vars = obj.template_render_vars
                 self.variables.update(render_vars)
                 for name in render_vars:
                     self.keywords.update_keys({name: var_attr})
+
+        self._template_paths_defined = True
 
     def _inputs_and_fetchers(self, workload=None):
         """Extract all inputs for a given workload
@@ -2787,10 +2847,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     shutil.copy(src, archive_experiment_dir)
 
             # Copy all rendered templates generated by `register_template`
-            for _, tpl_config in self._object_templates(workspace):
-                src_path = tpl_config["dest_path"]
-                if os.path.exists(src_path):
-                    shutil.copy(src_path, archive_experiment_dir)
+            for _, tpl_configs in self._object_templates():
+                for tpl_config in tpl_configs:
+                    src_path = tpl_config["dest_path"]
+                    if os.path.exists(src_path):
+                        shutil.copy(src_path, archive_experiment_dir)
 
             # Copy all figure of merit files
             criteria_list = self.success_list
@@ -2838,11 +2899,24 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         application specific processing of the output.
         """
 
-    def extract_inmem_foms(self, inmem_fom_defs, fom_values):
+    def extract_inmem_foms(
+        self, inmem_fom_defs, fom_values, context_metadata=None
+    ):
         """Extract in-memory FOMs"""
         for context, foms in inmem_fom_defs.items():
-            if context not in fom_values:
-                fom_values[context] = {}
+            context_key = context
+            if context_metadata is not None:
+                if isinstance(context, str):
+                    context_key = (context, context, frozenset())
+                    if context_key not in context_metadata:
+                        context_metadata[context_key] = {
+                            "name": context,
+                            "def_name": context,
+                            "vars": {},
+                        }
+
+            if context_key not in fom_values:
+                fom_values[context_key] = {}
             foms = inmem_fom_defs[context]["foms"]
             for fom in foms:
                 fom_conf = inmem_fom_defs[context]["foms"][fom]
@@ -2858,7 +2932,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if fom_value is None:
                     continue
                 expanded_fom_value = self.expander.expand_var(fom_value)
-                fom_values[context][fom_name] = {
+                fom_values[context_key][fom_name] = {
                     "value": expanded_fom_value,
                     "units": fom_conf["units_expanded"],
                     "origin": fom_conf["origin"],
@@ -2928,6 +3002,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         exp_lock = self.experiment_lock
 
         fom_values = {}
+        context_metadata = {}
+        null_key = (_NULL_CONTEXT, _NULL_CONTEXT, frozenset())
+        context_metadata[null_key] = {
+            "name": _NULL_CONTEXT,
+            "def_name": _NULL_CONTEXT,
+            "vars": {},
+        }
+
         # Iterate over files. We already know they exist
         with lk.ReadTransaction(exp_lock):
             for file, file_conf in files.items():
@@ -2983,10 +3065,22 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         f" Context match {context} -- {context_name}"
                                     )
 
-                                    active_contexts[context] = context_name
+                                    context_vars = context_match.groupdict()
+                                    context_key = (
+                                        context_name,
+                                        context,
+                                        frozenset(context_vars.items()),
+                                    )
 
-                                    if context_name not in fom_values:
-                                        fom_values[context_name] = {}
+                                    active_contexts[context] = context_key
+
+                                    if context_key not in fom_values:
+                                        fom_values[context_key] = {}
+                                        context_metadata[context_key] = {
+                                            "name": context_name,
+                                            "def_name": context,
+                                            "vars": context_vars,
+                                        }
 
                             for fom in foms:
                                 fom_conf = f_defs[context]["foms"][fom]
@@ -2996,12 +3090,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     fom_match = fom_conf["regex"].match(line)
 
                                 if fom_match:
-                                    fom_vars = {}
-                                    for (
-                                        k,
-                                        v,
-                                    ) in fom_match.groupdict().items():
-                                        fom_vars[k] = v
+                                    fom_vars = fom_match.groupdict()
                                     if (
                                         fom_conf["fom_name_expanded"]
                                         is not None
@@ -3025,16 +3114,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                         # if a FOM has contexts, check if each is active
                                         if fom_conf["contexts"]:
                                             for _ in fom_conf["contexts"]:
-                                                context_name = (
-                                                    active_contexts.get(
-                                                        context, _NULL_CONTEXT
-                                                    )
+                                                context_key = (
+                                                    active_contexts[context]
+                                                    if context
+                                                    in active_contexts
+                                                    else null_key
                                                 )
                                                 fom_contexts.append(
-                                                    context_name
+                                                    context_key
                                                 )
                                         else:
-                                            fom_contexts.append(_NULL_CONTEXT)
+                                            fom_contexts.append(null_key)
 
                                         for fom_context in fom_contexts:
                                             if fom_context not in fom_values:
@@ -3069,7 +3159,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     "fom_type"
                                                 ],
                                             }
-        self.extract_inmem_foms(inmem_defs, fom_values)
+        self.extract_inmem_foms(inmem_defs, fom_values, context_metadata)
 
         # Test all non-file based success criteria
         for criteria_obj, _ in criteria_list.all_criteria():
@@ -3106,7 +3196,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 status = wm_status
 
         self.set_status(status)
-
         self.result.finalize(workspace)
 
         for criteria_obj, criteria_scope in criteria_list.all_criteria():
@@ -3123,11 +3212,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             else:
                 self.result.success_criteria[criteria_name] = "FAILED"
 
-        for context, fom_map in fom_values.items():
+        for context_key, fom_map in fom_values.items():
+            metadata = context_metadata[context_key]
             context_map = {
-                "name": context,
+                "name": metadata["name"],
                 "foms": [],
-                "display_name": _get_context_display_name(context),
+                "display_name": _get_context_display_name(metadata["name"]),
+                "context_def_name": metadata["def_name"],
+                "context_vars": metadata["vars"],
             }
 
             for fom_name, fom in fom_map.items():
@@ -3135,7 +3227,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_copy["name"] = fom_name
                 context_map["foms"].append(fom_copy)
 
-            if context == _NULL_CONTEXT:
+            if metadata["name"] == _NULL_CONTEXT:
                 self.result.contexts.insert(0, context_map)
             else:
                 self.result.contexts.append(context_map)
@@ -3359,10 +3451,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 fom_values = fom_contents["fom_values"]
 
                 if fom_contents["fom_is_numeric"]:
-                    calcs = []
 
-                    for statistic in ramble.util.stats.all_stats:
-                        calcs.append(statistic.report(fom_values, fom_units))
+                    calcs = (
+                        statistic.report(fom_values, fom_units)
+                        for statistic in ramble.util.stats.all_stats
+                    )
 
                     for calc in calcs:
                         if calc[0] == ramble.util.stats.NA:
@@ -3499,8 +3592,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Could push this into the language features in the future
         fom_sources = [self]
-        for mod in self._modifier_instances:
-            fom_sources.append(mod)
+        fom_sources.extend(self._modifier_instances)
         if self.workflow_manager is not None:
             fom_sources.append(self.workflow_manager)
 
@@ -3513,8 +3605,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 if self.expander.satisfies(
                     when_fs, variant_set=self.experiment_variants()
                 ):
-                    for context, context_def in source_context_defs.items():
-                        all_contexts[context] = context_def
+                    all_contexts.update(source_context_defs)
             extra_vars = (
                 source.modded_variables(self)
                 if source.origin_type == "modifier"
@@ -3853,9 +3944,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     conf, self.expander, set(), shell=shell
                 )
 
-                for cmd in env_cmds:
-                    if cmd:
-                        command.append(cmd)
+                command.extend(cmd for cmd in env_cmds if cmd)
 
         for mod_inst in self._modifier_instances:
             for env_var_mod in mod_inst.all_env_var_modifications():
@@ -3868,9 +3957,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             set(),
                             shell=shell,
                         )
-                        for cmd in env_cmds:
-                            if cmd:
-                                command.append(cmd)
+                        command.extend(cmd for cmd in env_cmds if cmd)
 
         return command
 
@@ -3883,8 +3970,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         return True
 
     def _object_templates(self):
-        workspace = self.workspace
         """Return templates defined from different objects associated with the app_inst"""
+        workspace = self.workspace
         run_dir = self.expander.experiment_run_dir
         replacements = workspace.workspace_paths()
         expander = self.expander
@@ -3940,43 +4027,46 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if not os.path.isabs(dest_path):
                 dest_path = os.path.join(run_dir, dest_path)
 
-            return (
-                obj,
-                {**tpl_config, "src_path": src_path, "dest_path": dest_path},
-            )
+            return {**tpl_config, "src_path": src_path, "dest_path": dest_path}
 
         for obj_type, obj in self.objects():
+            obj_tpls = []
             for when_set, tpl in obj.templates.items():
                 if not self.expander.satisfies(
                     when_set, variant_set=self.experiment_variants()
                 ):
                     continue
 
-                for tpl_conf in tpl.values():
-                    yield _get_template_config(
-                        obj, tpl_conf, obj_type=obj_type
-                    )
+                obj_tpls.extend(
+                    _get_template_config(obj, tpl_conf, obj_type=obj_type)
+                    for tpl_conf in tpl.values()
+                )
+            if obj_tpls:
+                yield obj, obj_tpls
 
     def _render_object_templates(self, extra_vars_origin):
         workspace = self.workspace
-        for obj, tpl_config in self._object_templates():
-            extra_vars = extra_vars_origin.copy()
-            src_path = tpl_config["src_path"]
-            content = workspace.read_file_content(src_path)
-            extra_vars_dict = tpl_config.get("extra_vars")
-            if extra_vars_dict is not None:
-                extra_vars.update(extra_vars_dict)
-            extra_vars_func_name = tpl_config.get("extra_vars_func_name")
-            if extra_vars_func_name is not None:
-                extra_vars_func = getattr(obj, extra_vars_func_name)
-                extra_vars.update(extra_vars_func())
-            rendered = self.expander.expand_var(content, extra_vars=extra_vars)
-            out_path = tpl_config["dest_path"]
-            perm = tpl_config.get("content_perm", _DEFAULT_CONTENT_PERM)
-            with open(out_path, "w+") as f_out:
-                f_out.write(rendered)
-                f_out.write("\n")
-            os.chmod(out_path, perm)
+        for obj, tpl_configs in self._object_templates():
+            for tpl_config in tpl_configs:
+                extra_vars = extra_vars_origin.copy()
+                src_path = tpl_config["src_path"]
+                content = workspace.read_file_content(src_path)
+                extra_vars_dict = tpl_config.get("extra_vars")
+                if extra_vars_dict is not None:
+                    extra_vars.update(extra_vars_dict)
+                extra_vars_func_name = tpl_config.get("extra_vars_func_name")
+                if extra_vars_func_name is not None:
+                    extra_vars_func = getattr(obj, extra_vars_func_name)
+                    extra_vars.update(extra_vars_func())
+                rendered = self.expander.expand_var(
+                    content, extra_vars=extra_vars
+                )
+                out_path = tpl_config["dest_path"]
+                perm = tpl_config.get("content_perm", _DEFAULT_CONTENT_PERM)
+                with open(out_path, "w+") as f_out:
+                    f_out.write(rendered)
+                    f_out.write("\n")
+                os.chmod(out_path, perm)
 
     def objects(self, exclude_types=None, yield_all=False):
         """Return a tuple for each object instance associated with the app_inst.

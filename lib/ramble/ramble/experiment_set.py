@@ -53,6 +53,7 @@ class ExperimentSet:
         self.chained_experiments = {}
         self.chained_order = []
         self._workspace = workspace
+        self.rendered_experiments = set()
         self._context = {}
         self._filtered_experiments_cache = {}
 
@@ -227,7 +228,7 @@ class ExperimentSet:
         app_inst.set_variables_and_variants(variables, context.variants, self._workspace, self)
         app_inst.validate_version()
         app_inst.set_active_workload()
-        app_inst.set_modifiers(context.modifiers, self._workspace)
+        app_inst.set_modifiers(context.modifiers)
         app_inst.set_required_variables()
         app_inst.set_internals(context.internals)
         app_inst.set_chained_experiments(context.chained_experiments)
@@ -354,7 +355,7 @@ class ExperimentSet:
             self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
         )
         app_inst.set_success_list(context.success_criteria)
-        return app_inst.build_used_variables(self._workspace)
+        return app_inst.build_used_variables()
 
     def _process_render_object(
         self,
@@ -601,7 +602,6 @@ class ExperimentSet:
         render_group.used_variables = used_variables.copy()
 
         workload_names = set()
-        rendered_experiments = set()
         rendered_instances = []
 
         render_list = renderer.render_objects(render_group, exclude_where=exclude_where)
@@ -634,7 +634,7 @@ class ExperimentSet:
         for app_inst, final_exp_namespace, is_base_experiment in all_processed_experiments:
             logger.debug(f"   Final name: {final_exp_namespace}")
 
-            if final_exp_namespace in rendered_experiments:
+            if final_exp_namespace in self.rendered_experiments:
                 left_vars = self.experiments[final_exp_namespace].variables
                 right_vars = app_inst.variables
                 lkeys = set(left_vars.keys())
@@ -690,7 +690,7 @@ class ExperimentSet:
                 len(self.experiments) + len(self.chained_experiments) + 1,
             )
             app_inst.set_success_list(final_context.success_criteria)
-            rendered_experiments.add(final_exp_namespace)
+            self.rendered_experiments.add(final_exp_namespace)
             rendered_instances.append(app_inst)
             if not chained:
                 self.experiments[final_exp_namespace] = app_inst

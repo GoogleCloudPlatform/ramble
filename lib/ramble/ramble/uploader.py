@@ -524,7 +524,7 @@ class BigQueryUploader(Uploader):
                 query_job = client.query(query)
                 results = query_job.result()
                 if results.total_rows > 0:
-                    upstream_version = list(results)[0].value
+                    upstream_version = next(iter(results)).value
                     if upstream_version != str(table_def["version"]):
                         logger.warn(
                             f"Upstream DB schema version for table {table_def['table']} "

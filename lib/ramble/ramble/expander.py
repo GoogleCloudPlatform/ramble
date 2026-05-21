@@ -471,8 +471,7 @@ class ExpansionGraph:
     def __str__(self):
         lines = []
         lines.append(f"Processing string: {self.str}")
-        for node in self.walk():
-            lines.append(f"{node}")
+        lines.extend(f"{node}" for node in self.walk())
         return "\n".join(lines)
 
 
@@ -1086,10 +1085,8 @@ class Expander:
     def _eval_function_call(self, node, expansion_vars=None):
         """Handle a subset of function call nodes in the ast"""
 
-        args = []
         kwargs = {}
-        for arg in node.args:
-            args.append(self.eval_math(arg, expansion_vars=expansion_vars))
+        args = [self.eval_math(arg, expansion_vars=expansion_vars) for arg in node.args]
         for kw in node.keywords:
             kwargs[self.eval_math(kw.arg, expansion_vars=expansion_vars)] = self.eval_math(
                 kw.value, expansion_vars=expansion_vars

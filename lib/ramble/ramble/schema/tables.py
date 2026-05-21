@@ -24,6 +24,24 @@ column = {
     "additionalProperties": False,
 }
 
+autocolumn = {
+    "type": "object",
+    "properties": {
+        "name": {"type": "string"},
+        "context_name": {"type": "string"},
+        "figure_of_merit": {"type": "string"},
+        "figure_of_merit_origin_type": {"type": "string", "default": None},
+        "where": where_clause,
+        "sort_by": {
+            "type": ["string", "array"],
+            "items": {"type": "string"},
+            "default": None,
+        },
+    },
+    "required": ["name", "figure_of_merit"],
+    "additionalProperties": False,
+}
+
 # TODO: Make key a table attribute that has to be an expression
 properties = {
     "tables": {
@@ -34,6 +52,7 @@ properties = {
             "properties": {
                 "name": {"type": "string"},
                 "columns": {"type": "array", "items": column},
+                "autocolumns": {"type": "array", "items": autocolumn},
                 "group_method": {"type": "string", "default": "max"},
                 "group_by": {
                     "type": ["string", "array"],
@@ -45,9 +64,10 @@ properties = {
                     "items": {"type": "string"},
                     "default": None,
                 },
+                "transpose": {"type": "boolean", "default": False},
                 "where": where_clause,
             },
-            "required": ["name", "columns"],
+            "required": ["name"],
             "additionalProperties": False,
         },
     }

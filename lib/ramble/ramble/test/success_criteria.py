@@ -89,3 +89,88 @@ def test_criteria_list(tmpdir):
     remark_all([criteria for criteria, _ in criteria_list.all_criteria()], log_path)
 
     assert not criteria_list.passed()
+
+
+def test_success_criteria_globbing():
+    from unittest.mock import MagicMock
+
+    # Mock application instance and its expander
+    app_inst = MagicMock()
+
+    def expand_var(var, extra_vars=None):
+        res = var
+        if extra_vars:
+            for k, v in extra_vars.items():
+                res = res.replace(f"{{{k}}}", str(v))
+        return res
+
+    app_inst.expander.expand_var.side_effect = expand_var
+
+    def evaluate_predicate(expr, extra_vars=None):
+        expanded = expand_var(expr, extra_vars)
+        # Handle simple > comparison for test
+        if " > " in expanded:
+            parts = expanded.split(" > ")
+            return float(parts[0]) > float(parts[1])
+        return True
+
+    app_inst.expander.evaluate_predicate.side_effect = evaluate_predicate
+
+    # Mock fom_values
+    fom_values = {
+        ("ctx-1", "null"): {
+            "Bandwidth": {"value": 150},
+            "Latency": {"value": 10},
+        },
+        ("ctx-2", "null"): {
+            "Bandwidth": {"value": 250},
+            "Latency": {"value": 5},
+        },
+        ("other-ctx", "null"): {
+            "Bandwidth": {"value": 50},
+        },
+    }
+
+    # Test globbing on context
+    crit1 = ramble.success_criteria.SuccessCriteria(
+        name="check_bw",
+        mode="fom_comparison",
+        fom_context="ctx-*",
+        fom_name="Bandwidth",
+        formula="{value} > 100",
+    )
+
+    # Both ctx-1 and ctx-2 have BW > 100
+    assert crit1.passed(app_inst=app_inst, fom_values=fom_values)
+
+    # Test globbing on FOM name
+    crit2 = ramble.success_criteria.SuccessCriteria(
+        name="check_all_ctx1",
+        mode="fom_comparison",
+        fom_context="ctx-1",
+        fom_name="*",
+        formula="{value} > 5",
+    )
+    # Both Bandwidth (150) and Latency (10) in ctx-1 are > 5
+    assert crit2.passed(app_inst=app_inst, fom_values=fom_values)
+
+    # Test failing globbing
+    crit3 = ramble.success_criteria.SuccessCriteria(
+        name="check_all_bw",
+        mode="fom_comparison",
+        fom_context="*",
+        fom_name="Bandwidth",
+        formula="{value} > 100",
+    )
+    # other-ctx has Bandwidth = 50, which is not > 100
+    assert not crit3.passed(app_inst=app_inst, fom_values=fom_values)
+
+    # Test no matches
+    crit4 = ramble.success_criteria.SuccessCriteria(
+        name="no_match",
+        mode="fom_comparison",
+        fom_context="non-existent",
+        fom_name="*",
+        formula="{value} > 0",
+    )
+    assert not crit4.passed(app_inst=app_inst, fom_values=fom_values)

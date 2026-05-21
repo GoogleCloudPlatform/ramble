@@ -162,7 +162,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         self.app_inst = app_inst
         self.keywords = app_inst.keywords
 
-    def build_used_variables(self, workspace):
+    def build_used_variables(self):
         """Build a set of all used variables
 
         By expanding all necessary portions of this experiment (required /
@@ -172,13 +172,10 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
         Variables can have list definitions. These are iterated over to ensure
         variables referenced by any of them are tracked properly.
 
-        Args:
-            workspace (ramble.workspace.Workspace): Workspace to extract
-                templates from
-
         Returns:
             (set): All variable names used by this experiment.
         """
+        workspace = self.app_inst.workspace
         app_context = self.app_inst.expander.expand_var_name(
             self.keywords.env_name
         )

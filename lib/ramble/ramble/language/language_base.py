@@ -116,13 +116,9 @@ class DirectiveMeta(abc.ABCMeta):
         # 2. following the MRO
         attr_dict["_directives_to_be_executed"] = []
         for base in reversed(bases):
-            try:
-                directive_from_base = base._directives_to_be_executed
+            directive_from_base = getattr(base, "_directives_to_be_executed", None)
+            if directive_from_base is not None:
                 attr_dict["_directives_to_be_executed"].extend(directive_from_base)
-            except AttributeError:
-                # The base class didn't have the required attribute.
-                # Continue searching
-                pass
 
         # De-duplicates directives from base classes
         attr_dict["_directives_to_be_executed"] = list(
