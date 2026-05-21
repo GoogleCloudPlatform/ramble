@@ -103,3 +103,38 @@ def test_changed_files_git_failure(tmpdir):
 
     assert "file1.py" in files
     assert "file2.py" in files
+
+
+@pytest.mark.parametrize(
+    "tool,expected_err",
+    [
+        ("ruff", "unexpected argument '--bogus-option'"),
+        ("black", "No such option: --bogus-option"),
+        ("flake8", "unrecognized arguments: --bogus-option"),
+        ("isort", "unrecognized arguments: --bogus-option"),
+        ("mypy", "unrecognized arguments: --bogus-option"),
+    ],
+)
+def test_style_tool_args(tool, expected_err):
+    # Test that invalid tool args cause failure (from the underlying tool itself)
+    out = style_cmd(
+        "--tool", tool, "--tool-args", f"{tool}:--bogus-option", __file__, fail_on_error=False
+    )
+    assert style_cmd.returncode != 0
+    assert expected_err in out
+
+
+def test_style_tool_args_invalid_tool():
+    out = style_cmd(
+        "--tool", "ruff", "--tool-args", "invalid_tool:--some-arg", __file__, fail_on_error=False
+    )
+    assert style_cmd.returncode != 0
+    assert "Invalid tool name in --tool-args" in out
+
+
+def test_style_tool_args_invalid_format():
+    out = style_cmd(
+        "--tool", "ruff", "--tool-args", "ruff--some-arg", __file__, fail_on_error=False
+    )
+    assert style_cmd.returncode != 0
+    assert "Invalid --tool-args format" in out
