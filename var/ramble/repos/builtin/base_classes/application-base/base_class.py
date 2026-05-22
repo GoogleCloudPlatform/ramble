@@ -1480,32 +1480,40 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.modifiers = []
 
         self._modifier_instances = []
-        _gathered_modifiers = set()
         checked_objects = set()
 
         mod_type = ramble.repository.ObjectTypes.modifiers
         mod_idx = 0
 
+        _existing_mod_base_names = {
+            m["name"].partition("@")[0] for m in self.modifiers
+        }
+
         while True:
+            # Get the latest variants once per iteration to handle modifiers adding variants
+            exp_variants = self.experiment_variants(allow_caching=False)
+
+            # Check global toggle once per iteration
+            try:
+                var_val = exp_variants.value(
+                    "inject_modifiers_from_directives"
+                )
+                include_mods_global = (
+                    (var_val.lower() == "true")
+                    if isinstance(var_val, str)
+                    else bool(var_val)
+                )
+            except KeyError:
+                include_mods_global = True
+
             # Gather object_modifiers from all available objects
             for _, obj in self.objects():
                 if id(obj) in checked_objects:
                     continue
                 checked_objects.add(id(obj))
 
-                try:
-                    var_val = obj.experiment_variants(
-                        allow_caching=False
-                    ).value("inject_modifiers_from_directives")
-                    if isinstance(var_val, str):
-                        include_mods = var_val.lower() == "true"
-                    else:
-                        include_mods = bool(var_val)
-                except KeyError:
-                    include_mods = True
-
                 if (
-                    include_mods
+                    include_mods_global
                     and hasattr(obj, "object_modifiers")
                     and obj.object_modifiers
                 ):
@@ -1514,23 +1522,14 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             when_set = frozenset(mod_def["when"])
                             if when_set and not self.expander.satisfies(
                                 when_set,
-                                variant_set=self.experiment_variants(
-                                    allow_caching=False
-                                ),
+                                variant_set=exp_variants,
                             ):
                                 continue
 
                             mod_name = mod_def["name"]
                             base_mod_name = mod_name.partition("@")[0]
                             # Add if not already explicitly in self.modifiers
-                            if (
-                                base_mod_name not in _gathered_modifiers
-                                and not any(
-                                    m["name"].partition("@")[0]
-                                    == base_mod_name
-                                    for m in self.modifiers
-                                )
-                            ):
+                            if base_mod_name not in _existing_mod_base_names:
                                 mod_dict = {"name": mod_name}
                                 mod_dict.update(
                                     {
@@ -1540,7 +1539,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                     }
                                 )
                                 self.modifiers.append(mod_dict)
-                                _gathered_modifiers.add(base_mod_name)
+                                _existing_mod_base_names.add(base_mod_name)
 
             if mod_idx >= len(self.modifiers):
                 break
