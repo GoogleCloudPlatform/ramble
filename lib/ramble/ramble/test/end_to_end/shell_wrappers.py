@@ -16,11 +16,11 @@ from ramble import paths
 
 pytestmark = pytest.mark.maybeslow
 
-# TODO: add tests for other supported shells
-_SHELLS_TO_TEST = ["bash", "fish", "tcsh"]
+_SHELLS_TO_TEST = ["bash", "zsh", "fish", "tcsh"]
 
 _SETUP_ENV_FILE = {
     "bash": "setup-env.sh",
+    "zsh": "setup-env.sh",
     "fish": "setup-env.fish",
     "tcsh": "setup-env.csh",
 }
@@ -63,6 +63,14 @@ def test_shell_wrapper_workspace_lifecycle(shell, tmpdir):
 
     script_templates = {
         "bash": f"""
+source "{setup_env}"
+ramble workspace create {ws_name} || exit 1
+ramble workspace activate {ws_name} || exit 2
+ramble workspace deactivate || exit 3
+ramble workspace create -a {ws_name} && exit 4
+exit 0
+""",
+        "zsh": f"""
 source "{setup_env}"
 ramble workspace create {ws_name} || exit 1
 ramble workspace activate {ws_name} || exit 2
