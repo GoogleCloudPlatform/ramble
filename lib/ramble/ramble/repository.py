@@ -831,6 +831,7 @@ class RepoPath:
             return default
         return self.by_namespace[full_namespace]
 
+    @property
     def first_repo(self):
         """Get the first repo in precedence order."""
         return self.repos[0] if self.repos else None
@@ -944,7 +945,7 @@ class RepoPath:
         # If the object isn't in any repo, return the one with
         # highest precedence.  This is for commands like `ramble edit`
         # that can operate on objects that don't exist yet.
-        return self.first_repo()
+        return self.first_repo
 
     @autospec
     def get(self, spec):
