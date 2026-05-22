@@ -325,7 +325,7 @@ def config_update(args) -> None:
     for scope in updates:
         cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
         with open(cfg_file) as f:
-            data = syaml.load_config(f) or {}
+            data = ramble.config.load_config(f) or {}
             data = data.pop(args.section, {})
         update_fn(data)
 

@@ -2729,7 +2729,7 @@ def _equiv_dict(first, second):
 
 def _read_yaml(str_or_file, schema):
     """Read YAML from a file for round-trip parsing."""
-    data = syaml.load_config(str_or_file)
+    data = ramble.config.load_config(str_or_file)
     filename = getattr(str_or_file, "name", None)
     default_data = ramble.config.validate(data, schema, filename)
     return (data, default_data)
