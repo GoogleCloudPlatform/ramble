@@ -11,6 +11,7 @@ import argparse
 import glob
 import os
 import re
+import shlex
 import shutil
 import sys
 import tempfile
@@ -285,6 +286,12 @@ def setup_parser(subparser):
         default=None,
         help="apply style checks and fixes to the given repository",
     )
+    subparser.add_argument(
+        "--tool-args",
+        action="append",
+        dest="tool_args",
+        help="specify extra arguments to pass to tools (e.g., --tool-args ruff:'--unsafe-fixes')",
+    )
     subparser.add_argument("files", nargs=argparse.REMAINDER, help="specific files to check")
 
 
@@ -407,10 +414,18 @@ def _split_file_list(file_list, args):
     return [f for f in file_list if not is_object(f)], [f for f in file_list if is_object(f)]
 
 
+def get_tool_args(args, tool_name):
+    """Helper to get tool-specific arguments from args."""
+    if hasattr(args, "parsed_tool_args") and tool_name in args.parsed_tool_args:
+        return args.parsed_tool_args[tool_name]
+    return []
+
+
 @tool("flake8")
 def run_flake8(flake8_cmd, file_list, args):
     temp = tempfile.mkdtemp()
     returncode = 1
+    extra_flake8_args = get_tool_args(args, "flake8")
     try:
         print_tool_header("flake8", file_list)
 
@@ -451,9 +466,10 @@ def run_flake8(flake8_cmd, file_list, args):
                     "--format",
                     "pylint",
                     f"--config={f_name}",
-                    ".",
+                    *(extra_flake8_args + ["."]),
                     fail_on_error=False,
                     output=str,
+                    error=str,
                 )
                 returncode |= flake8_cmd.returncode
 
@@ -467,9 +483,10 @@ def run_flake8(flake8_cmd, file_list, args):
                     "--format",
                     "pylint",
                     f"--config={f_name}",
-                    ".",
+                    *(extra_flake8_args + ["."]),
                     fail_on_error=False,
                     output=str,
+                    error=str,
                 )
                 returncode |= flake8_cmd.returncode
 
@@ -504,6 +521,7 @@ def run_black(black_cmd, file_list, args):
     common_args = ("--config", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         common_args += ("--check", "--diff")
+    common_args += tuple(get_tool_args(args, "black"))
     primary_files, obj_files = _split_file_list(file_list, args)
     output = ""
     returncode = 0
@@ -538,6 +556,7 @@ def run_isort(isort_cmd, file_list, args):
     isort_args = ("--sp", os.path.join(ramble.paths.prefix, "pyproject.toml"))
     if not args.fix:
         isort_args += ("--check", "--diff")
+    isort_args += tuple(get_tool_args(args, "isort"))
     output = ""
     returncode = 0
     primary_files, obj_files = _split_file_list(file_list, args)
@@ -569,6 +588,7 @@ def run_mypy(mypy_cmd, file_list, args):
 
     config_file = os.path.join(ramble.paths.prefix, "pyproject.toml")
     mypy_args = ("--config-file", config_file)
+    mypy_args += tuple(get_tool_args(args, "mypy"))
 
     output = mypy_cmd(*mypy_args, fail_on_error=False, output=str, error=str)
     returncode = mypy_cmd.returncode
@@ -594,6 +614,8 @@ def run_ruff(ruff_cmd, file_list, args):
 
     if args.fix:
         ruff_args.append("--fix")
+
+    ruff_args.extend(get_tool_args(args, "ruff"))
 
     print_tool_header("ruff", file_list)
     ruff_args.extend(file_list)
@@ -644,6 +666,27 @@ def style(parser, args):
         return
 
     tools_to_run = [t for t in tool_names if t in selected]
+
+    args.parsed_tool_args = {}
+    if args.tool_args:
+        for tool_arg_str in args.tool_args:
+            if ":" not in tool_arg_str:
+                logger.die(
+                    f"Invalid --tool-args format: '{tool_arg_str}'. "
+                    "Expected 'tool_name:arguments'"
+                )
+            tool_name, tool_args = tool_arg_str.split(":", 1)
+            tool_name = tool_name.strip()
+            if tool_name not in tool_names:
+                logger.die(
+                    f"Invalid tool name in --tool-args: '{tool_name}'. "
+                    f"Choose from: {', '.join(tool_names)}"
+                )
+            parsed_args = shlex.split(tool_args)
+            if tool_name in args.parsed_tool_args:
+                args.parsed_tool_args[tool_name].extend(parsed_args)
+            else:
+                args.parsed_tool_args[tool_name] = parsed_args
 
     returncode = 0
 
