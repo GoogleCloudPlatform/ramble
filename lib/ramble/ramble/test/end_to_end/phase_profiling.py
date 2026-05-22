@@ -62,9 +62,23 @@ ramble:
     with open(profile_output) as f:
         content = f.read()
 
-    assert "Function: ApplicationBase._make_experiments" in content
-    assert "Function: ApplicationBase._define_commands" in content
-    assert "Function: TestMod.test_builtin" in content
+    # These assertions try to be compatible with older versions of line-profiler,
+    # which don't prefix function names with class names in the output.
+    assert (
+        "Function: ApplicationBase._make_experiments" in content
+        or "Function: _make_experiments" in content
+    )
+    assert (
+        "Function: ApplicationBase._define_commands" in content
+        or "Function: _define_commands" in content
+    )
+    assert "Function: TestMod.test_builtin" in content or "Function: test_builtin" in content
 
-    assert "Function: ApplicationBase._mirror_inputs" not in content
-    assert "Function: ApplicationBase.validate_experiment" not in content
+    assert (
+        "Function: ApplicationBase._mirror_inputs" not in content
+        and "Function: _mirror_inputs" not in content
+    )
+    assert (
+        "Function: ApplicationBase.validate_experiment" not in content
+        and "Function: validate_experiment" not in content
+    )
