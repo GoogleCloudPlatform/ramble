@@ -126,11 +126,13 @@ all_schemas = copy.deepcopy(section_schemas)
 all_schemas.update(dict.fromkeys(ramble.schema.workspace.keys, ramble.schema.workspace.schema))
 
 
-class RambleLineLoader(syaml.OrderedLineLoader):
+class _RambleLineLoader(syaml.OrderedLineLoader):
     def construct_mapping(self, node, maptyp, deep=False):
-        import builtins
+        from builtins import set
 
-        seen_keys = builtins.set()
+        import llnl.util.tty as tty
+
+        seen_keys = set()
         for key_node, _ in node.value:
             key = self.construct_object(key_node, deep=True)
 
@@ -151,8 +153,6 @@ class RambleLineLoader(syaml.OrderedLineLoader):
 
             if is_hashable:
                 if key in seen_keys:
-                    import llnl.util.tty as tty
-
                     filename = node.start_mark.name
                     line = key_node.start_mark.line + 1
                     tty.warn(
@@ -166,7 +166,7 @@ class RambleLineLoader(syaml.OrderedLineLoader):
 
 def load_config(*args, **kwargs):
     """Load YAML using Ramble's custom Loader that warns on duplicate keys."""
-    kwargs["Loader"] = RambleLineLoader
+    kwargs["Loader"] = _RambleLineLoader
     return syaml.load(*args, **kwargs)
 
 
