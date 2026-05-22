@@ -494,14 +494,9 @@ def workspace_run_pipeline(args, pipeline):
             except ValueError as e:
                 logger.debug(f"Failed to disable line_profiler: {e}")
             if profile_phase_output:
-                try:
-                    with open(profile_phase_output, "w", encoding="utf-8") as f:
-                        profiler.print_stats(stream=f, stripzeros=True)
-                    logger.msg(f"Phase profile stats written to {profile_phase_output}")
-                except Exception as e:
-                    logger.error(
-                        f"Failed to write phase profile stats to {profile_phase_output}: {e}"
-                    )
+                with open(profile_phase_output, "w", encoding="utf-8") as f:
+                    profiler.print_stats(stream=f, stripzeros=True)
+                logger.msg(f"Phase profile stats written to {profile_phase_output}")
             else:
                 profiler.print_stats(stripzeros=True)
 
