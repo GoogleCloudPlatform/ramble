@@ -472,6 +472,7 @@ def workspace_concretize(args):
 
 def workspace_run_pipeline(args, pipeline):
     profile_phases = getattr(args, "profile_phases", None)
+    profile_phase_output = getattr(args, "profile_phase_output", None)
     if profile_phases:
         import line_profiler
 
@@ -488,8 +489,21 @@ def workspace_run_pipeline(args, pipeline):
             pipeline.run()
     finally:
         if profile_phases:
-            profiler.disable()
-            profiler.print_stats()
+            try:
+                profiler.disable()
+            except ValueError as e:
+                logger.debug(f"Failed to disable line_profiler: {e}")
+            if profile_phase_output:
+                try:
+                    with open(profile_phase_output, "w", encoding="utf-8") as f:
+                        profiler.print_stats(stream=f, stripzeros=True)
+                    logger.msg(f"Phase profile stats written to {profile_phase_output}")
+                except Exception as e:
+                    logger.error(
+                        f"Failed to write phase profile stats to {profile_phase_output}: {e}"
+                    )
+            else:
+                profiler.print_stats(stripzeros=True)
 
 
 def workspace_setup_setup_parser(subparser):
@@ -512,6 +526,7 @@ def workspace_setup_setup_parser(subparser):
             "exclude_where",
             "filter_tags",
             "profile_phases",
+            "profile_phase_output",
         ],
     )
 
@@ -595,6 +610,7 @@ def workspace_analyze_setup_parser(subparser):
             "exclude_where",
             "filter_tags",
             "profile_phases",
+            "profile_phase_output",
         ],
     )
 
@@ -670,7 +686,8 @@ def workspace_push_to_cache_setup_parser(subparser):
     )
 
     arguments.add_common_arguments(
-        subparser, ["where", "exclude_where", "filter_tags", "profile_phases"]
+        subparser,
+        ["where", "exclude_where", "filter_tags", "profile_phases", "profile_phase_output"],
     )
 
 
@@ -1233,7 +1250,14 @@ def workspace_archive_setup_parser(subparser):
 
     arguments.add_common_arguments(
         subparser,
-        ["phases", "include_phase_dependencies", "where", "exclude_where", "profile_phases"],
+        [
+            "phases",
+            "include_phase_dependencies",
+            "where",
+            "exclude_where",
+            "profile_phases",
+            "profile_phase_output",
+        ],
     )
 
 
@@ -1282,7 +1306,14 @@ def workspace_mirror_setup_parser(subparser):
 
     arguments.add_common_arguments(
         subparser,
-        ["phases", "include_phase_dependencies", "where", "exclude_where", "profile_phases"],
+        [
+            "phases",
+            "include_phase_dependencies",
+            "where",
+            "exclude_where",
+            "profile_phases",
+            "profile_phase_output",
+        ],
     )
 
 
