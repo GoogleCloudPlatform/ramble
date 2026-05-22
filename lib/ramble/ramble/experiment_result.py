@@ -147,7 +147,7 @@ class ExperimentResult:
 
         self.variants = sorted(app_inst.experiment_variants().as_set())
 
-        self.object_definitions = app_inst.object_inventory(workspace)
+        self.object_definitions = app_inst.object_inventory()
 
     def from_dict(self, in_dict: dict):
         """Convert a dict back into a results object

@@ -769,7 +769,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         if not var.expandable:
                             self.no_expand_vars.add(var.name)
 
-        self.define_missing_variables(workspace)
+        self.define_missing_variables()
 
         self.expander.set_no_expand_vars(self.no_expand_vars)
         if experiment_set and experiment_set._workspace:
@@ -778,7 +778,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
 
     def non_reserved_variables(
-        self, workspace, remove_keys: set = None
+        self, remove_keys: set = None
     ) -> Dict[str, str]:
         """Replicate this instances variables, and remove any reserved variables from the dict.
         Additionally, remove any variables in the remove_keys set.
@@ -789,6 +789,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Returns:
             (dict): A dictionary of variable, value pairs from this experiment.
         """
+        workspace = self.workspace
         if remove_keys is None:
             remove_keys = {"env_name", "workspace_tables"}
         cleaned_variables = self.variables.copy()
@@ -803,7 +804,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for template_name, _ in workspace.all_templates():
             cleaned_variables.pop(template_name, None)
 
-        for _, tpl_configs in self._object_templates(workspace):
+        for _, tpl_configs in self._object_templates():
             for tpl_config in tpl_configs:
                 cleaned_variables.pop(tpl_config["var_name"], None)
 
@@ -818,9 +819,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """
         self._missing_command_variables[var.name] = var
 
-    def define_missing_variables(self, workspace):
+    def define_missing_variables(self):
         """Iterate over missing variable definitions, and add them until there
         are no more to add."""
+        workspace = self.workspace
 
         # Track which precedence level defined each variable.
         # -1: YAML (highest)
@@ -962,11 +964,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if chained_experiments:
             self.chained_experiments = chained_experiments.copy()
 
-    def set_modifiers(self, modifiers, workspace):
+    def set_modifiers(self, modifiers):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
-            self.build_modifier_instances(workspace)
+            self.build_modifier_instances()
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -1008,11 +1010,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             os.path.join(logs_dir, self.expander.experiment_namespace) + ".out"
         )
 
-    def get_pipeline_phases(self, pipeline, workspace, phase_filters=None):
+    def get_pipeline_phases(self, pipeline, phase_filters=None):
         if phase_filters is None:
             phase_filters = ["*"]
 
-        self.build_modifier_instances(workspace)
+        self.build_modifier_instances()
         self.build_phase_order()
 
         if pipeline not in self.pipelines:
@@ -1059,7 +1061,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             expanded = self.expander.expand_var(expansion_var)
             color.cprint(f"{indent}  {var} = {val} ==> {expanded}")
 
-    def build_used_variables(self, workspace):
+    def build_used_variables(self):
         """Build a set of all used variables
 
         By expanding all necessary portions of this experiment (required /
@@ -1069,14 +1071,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         Variables can have list definitions. These are iterated over to ensure
         variables referenced by any of them are tracked properly.
 
-        Args:
-            workspace (ramble.workspace.Workspace): Workspace to extract templates from
-
         Returns:
             (set): All variable names used by this experiment.
         """
-        self.build_modifier_instances(workspace)
-        self.define_variables_for_template_path(workspace)
+        workspace = self.workspace
+        self.build_modifier_instances()
+        self.define_variables_for_template_path()
 
         backup_variables = self.variables.copy()
 
@@ -1086,7 +1086,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         ########################
         # Define extra variables
         ########################
-        self.define_missing_variables(workspace)
+        self.define_missing_variables()
 
         ##########################################
         # Expand used variables to track all usage
@@ -1114,7 +1114,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.evaluate_success()
 
         if self.package_manager is not None:
-            self.package_manager.build_used_variables(workspace)
+            self.package_manager.build_used_variables()
 
         for template_name, template_conf in workspace.all_templates():
             self.expander._used_variables.add(template_name)
@@ -1171,8 +1171,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             color.cprint(f"{indent}- {exp}")
 
     # Phase execution helpers
-    def run_phase(self, pipeline, phase, workspace):
+    def run_phase(self, pipeline, phase):
         """Run a phase, by getting its function pointer"""
+        workspace = self.workspace
         if self.is_template:
             logger.debug(f"{self.name} is a template. Skipping phases")
             return
@@ -1198,19 +1199,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         phase_func(workspace, app_inst=self)
         self._phase_times[phase] = time.time() - start_time
 
-    def print_phase_times(self, pipeline, workspace, phase_filters=None):
+    def print_phase_times(self, pipeline, phase_filters=None):
         """Print phase execution times by pipeline phase order
 
         Args:
             pipeline (str): Name of pipeline to print timing information for
-            workspace: Reference to workspace object
             phase_filters (list(str) | None): Filters to limit phases to print
         """
         logger.msg("Phase timing statistics:")
         if phase_filters is None:
             phase_filters = ["*"]
         for phase in self.get_pipeline_phases(
-            pipeline, workspace, phase_filters=phase_filters
+            pipeline, phase_filters=phase_filters
         ):
             # Set default time to 0.0 s, to prevent KeyError from skipped phases
             if phase not in self._phase_times:
@@ -1219,7 +1219,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 f"  {phase} time: {round(self._phase_times[phase], 5)} (s)"
             )
 
-    def create_experiment_chain(self, workspace):
+    def create_experiment_chain(self):
         """Create the necessary chained experiments for this instance
 
         This method determines which experiments need to be chained, grabs the
@@ -1227,7 +1227,6 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         unique name), injects the copy back into the experiment set,
         and builds an internal mapping from unique name to the chaining definition.
         """
-
         if not self.chained_experiments or self.is_template:
             return
 
@@ -1369,7 +1368,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             ]
 
                     # Expand the chained experiment vars, so we can build the execution command
-                    new_inst.define_variables_for_template_path(workspace)
+                    new_inst.define_variables_for_template_path()
                     chain_cmd = new_inst.expander.expand_var(
                         cur_exp_def[namespace.command]
                     )
@@ -1436,11 +1435,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for mod_inst in self._modifier_instances:
             mod_inst.define_variable(var_name, var_value)
 
-    def build_modifier_instances(self, workspace):
+    def build_modifier_instances(self):
         """Built a map of modifier names to modifier instances needed for this
         application instance
         """
-
         if not self.modifiers:
             return
 
@@ -1494,7 +1492,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 mod_inst.expander.add_no_expand_var(var)
 
         # Define any missing modifier variables
-        self.define_missing_variables(workspace)
+        self.define_missing_variables()
 
     @property
     def inventory_file(self):
@@ -1505,7 +1503,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for obj_type, obj in self.objects(yield_all=yield_all):
             yield obj_type, obj, ramble.util.hashing.hash_file(obj._file_path)
 
-    def object_inventory(self, workspace):
+    def object_inventory(self):
+        workspace = self.workspace
         object_definitions = []
         added_objects = {}
         for obj_type, obj, obj_hash in self.object_hashes():
@@ -2219,11 +2218,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
             self.variables[node.key] = join_separator.join(formatted_lines)
 
-    def define_variables_for_template_path(self, workspace):
+    def define_variables_for_template_path(self):
         """Define variables for all workspace and object template paths"""
         if self._template_paths_defined:
             return
 
+        workspace = self.workspace
         for template_name, _ in workspace.all_templates():
             expand_path = os.path.join(
                 self.expander.expand_var("{experiment_run_dir}"),
@@ -2235,7 +2235,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             "type": ramble.keywords.key_type.reserved,
             "level": ramble.keywords.output_level.variable,
         }
-        for obj, tpl_configs in self._object_templates(workspace):
+        for obj, tpl_configs in self._object_templates():
             for tpl_config in tpl_configs:
                 var_name = tpl_config["var_name"]
                 if var_name is not None:
@@ -2538,7 +2538,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     )
                 os.chmod(expand_path, _DEFAULT_CONTENT_PERM)
 
-            self._render_object_templates(exec_vars, workspace)
+            self._render_object_templates(exec_vars)
 
             experiment_script = workspace.experiments_script
             experiment_script.write(
@@ -2547,12 +2547,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         self.set_status(status=ExperimentStatus.SETUP)
 
-    def _clean_hash_variables(self, workspace, variables):
+    def _clean_hash_variables(self, variables):
         """Cleanup variables to hash before computing the hash
 
         Perform some general cleanup operations on variables
         before hashing, to help give useful hashes.
         """
+        workspace = self.workspace
 
         remove_variables = [
             "workspace_name",
@@ -2658,7 +2659,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Clean up variables before hashing
         vars_to_hash = self.variables.copy()
-        self._clean_hash_variables(workspace, vars_to_hash)
+        self._clean_hash_variables(vars_to_hash)
 
         # Build inventory of attributes
         attributes_to_hash = [
@@ -2846,7 +2847,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     shutil.copy(src, archive_experiment_dir)
 
             # Copy all rendered templates generated by `register_template`
-            for _, tpl_configs in self._object_templates(workspace):
+            for _, tpl_configs in self._object_templates():
                 for tpl_config in tpl_configs:
                     src_path = tpl_config["dest_path"]
                     if os.path.exists(src_path):
@@ -3968,8 +3969,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         return True
 
-    def _object_templates(self, workspace):
+    def _object_templates(self):
         """Return templates defined from different objects associated with the app_inst"""
+        workspace = self.workspace
         run_dir = self.expander.experiment_run_dir
         replacements = workspace.workspace_paths()
         expander = self.expander
@@ -4042,8 +4044,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             if obj_tpls:
                 yield obj, obj_tpls
 
-    def _render_object_templates(self, extra_vars_origin, workspace):
-        for obj, tpl_configs in self._object_templates(workspace):
+    def _render_object_templates(self, extra_vars_origin):
+        workspace = self.workspace
+        for obj, tpl_configs in self._object_templates():
             for tpl_config in tpl_configs:
                 extra_vars = extra_vars_origin.copy()
                 src_path = tpl_config["src_path"]

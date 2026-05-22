@@ -937,7 +937,7 @@ def workspace_info(args):
                     for pipeline in app_inst.pipelines:
                         if pipeline not in all_pipelines:
                             all_pipelines[pipeline] = set()
-                        for phase in app_inst.get_pipeline_phases(pipeline, ws):
+                        for phase in app_inst.get_pipeline_phases(pipeline):
                             all_pipelines[pipeline].add(phase)
 
                     experiment_index = app_inst.expander.expand_var_name(
@@ -969,7 +969,7 @@ def workspace_info(args):
 
                     if args.executables:
                         color.cprint(color.nested_4("        Executables: "))
-                        app_inst.define_variables_for_template_path(ws)
+                        app_inst.define_variables_for_template_path()
                         exec_graph = app_inst.get_executable_graph(app_inst.expander.workload_name)
                         for executable in exec_graph.walk():
                             color.cprint(f"          {executable.key}")

@@ -164,7 +164,7 @@ class Pipeline:
             with logger.add_log_context(exp_log_path):
                 logger.msg(f"Experiment inventory:\n{sjson.dump(app_inst.hash_inventory)}")
                 phase_list = list(
-                    app_inst.get_pipeline_phases(self.name, self.workspace, self.filters.phases)
+                    app_inst.get_pipeline_phases(self.name, phase_filters=self.filters.phases)
                 )
 
                 disable_progress = (
@@ -188,11 +188,11 @@ class Pipeline:
                         progress.set_description(
                             f"Processing phase {phase} ({phase_idx}/{len(phase_list)})"
                         )
-                    app_inst.run_phase(self.name, phase, self.workspace)
+                    app_inst.run_phase(self.name, phase)
                     phase_total += 1
                     if not disable_progress:
                         progress.update()
-                app_inst.print_phase_times(self.name, self.workspace, self.filters.phases)
+                app_inst.print_phase_times(self.name, phase_filters=self.filters.phases)
                 if not disable_progress:
                     progress.set_description("Experiment complete")
                     progress.close()
@@ -588,7 +588,7 @@ class ExecutePipeline(Pipeline):
                 logger.debug(f"{app_inst.name} is a repeat base. Skipping execution.")
                 continue
 
-            app_inst.define_variables_for_template_path(self.workspace)
+            app_inst.define_variables_for_template_path()
             exec_str = app_inst.expander.expand_var(self.executor)
             if resolve_env_vars:
                 exec_str = os.path.expandvars(exec_str)

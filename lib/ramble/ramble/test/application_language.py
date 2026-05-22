@@ -515,12 +515,13 @@ def test_non_reserved_variables(app_class):
             return [("template1", "path1")]
 
     workspace = MockWorkspace()
+    app_inst.workspace = workspace
 
     # Mock _object_templates
-    app_inst._object_templates = lambda ws: [("template2", [{"var_name": "tpl_var_name"}])]
+    app_inst._object_templates = lambda: [("template2", [{"var_name": "tpl_var_name"}])]
 
     # Test without remove_keys
-    non_reserved = app_inst.non_reserved_variables(workspace)
+    non_reserved = app_inst.non_reserved_variables()
     assert "user_var1" in non_reserved
     assert "user_var2" in non_reserved
     assert "workspace_name" not in non_reserved
@@ -529,7 +530,7 @@ def test_non_reserved_variables(app_class):
     assert len(non_reserved) == 3
 
     # Test with remove_keys
-    non_reserved = app_inst.non_reserved_variables(workspace, remove_keys={"user_var1"})
+    non_reserved = app_inst.non_reserved_variables(remove_keys={"user_var1"})
     assert "user_var1" not in non_reserved
     assert "user_var2" in non_reserved
     assert len(non_reserved) == 2

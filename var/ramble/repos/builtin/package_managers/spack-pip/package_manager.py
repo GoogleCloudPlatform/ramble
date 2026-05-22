@@ -45,9 +45,9 @@ class SpackPip(PackageManagerBase):
         self.spack_mgr.set_application(app_inst)
         self.pip_mgr.set_application(app_inst)
 
-    def build_used_variables(self, workspace):
-        self.spack_mgr.build_used_variables(workspace)
-        self.pip_mgr.build_used_variables(workspace)
+    def build_used_variables(self):
+        self.spack_mgr.build_used_variables()
+        self.pip_mgr.build_used_variables()
 
     def define_missing_packages(self, workspace):
         self.spack_mgr.define_missing_packages(workspace)

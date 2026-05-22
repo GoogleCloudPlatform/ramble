@@ -228,7 +228,7 @@ class ExperimentSet:
         app_inst.set_variables_and_variants(variables, context.variants, self._workspace, self)
         app_inst.validate_version()
         app_inst.set_active_workload()
-        app_inst.set_modifiers(context.modifiers, self._workspace)
+        app_inst.set_modifiers(context.modifiers)
         app_inst.set_required_variables()
         app_inst.set_internals(context.internals)
         app_inst.set_chained_experiments(context.chained_experiments)
@@ -328,7 +328,7 @@ class ExperimentSet:
         for name, value in self._workspace.workspace_paths().items():
             app_inst.define_variable(name, value)
 
-        app_inst.define_variables_for_template_path(self._workspace)
+        app_inst.define_variables_for_template_path()
 
         experiment_namespace = app_inst.expander.experiment_namespace
         app_inst.define_variable(self.keywords.experiment_namespace, experiment_namespace)
@@ -355,7 +355,7 @@ class ExperimentSet:
             self.keywords.log_file, os.path.join("{experiment_run_dir}", "{experiment_name}.out")
         )
         app_inst.set_success_list(context.success_criteria)
-        return app_inst.build_used_variables(self._workspace)
+        return app_inst.build_used_variables()
 
     def _process_render_object(
         self,
@@ -738,7 +738,7 @@ class ExperimentSet:
 
         for experiment in base_experiments:
             instance = self.experiments[experiment]
-            instance.create_experiment_chain(self._workspace)
+            instance.create_experiment_chain()
 
     def all_experiment_tags(self):
         """Aggregate all tags from experiments in this experiment set
