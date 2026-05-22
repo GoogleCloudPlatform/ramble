@@ -89,6 +89,37 @@ import spack.platforms
 import spack.util.spack_yaml as syaml
 from spack.util.cpus import cpus_available
 
+
+# Monkeypatch to detect duplicate keys in parsed YAML files
+def _patch_spack_yaml_duplicate_keys():
+    def custom_construct_mapping(self, node, maptyp, deep=False):
+        import builtins
+
+        seen_keys = builtins.set()
+        for key_node, _ in node.value:
+            key = self.construct_object(key_node, deep=True)
+            if not isinstance(key, collections.abc.Hashable):
+                if isinstance(key, list):
+                    key = tuple(key)
+
+            if key in seen_keys:
+                import llnl.util.tty as tty
+
+                filename = node.start_mark.name
+                line = key_node.start_mark.line + 1
+                tty.warn(
+                    f'Duplicate key "{key}" detected in {filename} at line {line}. '
+                    "This will overwrite the previous value."
+                )
+            seen_keys.add(key)
+
+        super(syaml.OrderedLineLoader, self).construct_mapping(node, maptyp, deep=deep)
+
+    syaml.OrderedLineLoader.construct_mapping = custom_construct_mapping
+
+
+_patch_spack_yaml_duplicate_keys()
+
 #: Dict from section names -> schema for that section
 section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,

@@ -46,3 +46,21 @@ def test_default_configs_no_conflict(default_config):
 def test_process_config_path_error(config, expected_error):
     with pytest.raises(ramble.config.ConfigError, match=expected_error):
         ramble.config.process_config_path(config)
+
+
+def test_duplicate_key_warning(capsys):
+    import spack.util.spack_yaml as syaml
+
+    yaml_content = """
+ramble:
+  config:
+    upload:
+      type: BigQuery
+      uri: hpc-workload-performance.h4d_OpenMPI
+  config:
+    n_repeats: 2
+"""
+    data = syaml.load_config(yaml_content)
+    captured = capsys.readouterr()
+    assert 'Duplicate key "config" detected' in captured.err
+    assert data["ramble"]["config"]["n_repeats"] == 2
