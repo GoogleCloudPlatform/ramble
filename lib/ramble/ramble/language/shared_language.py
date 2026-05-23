@@ -48,6 +48,7 @@ shared_directive = SharedMeta.directive
 def _add_specs(
     obj,
     target_dict_name,
+    directive_name,
     name,
     pkg_spec,
     compiler=None,
@@ -56,13 +57,11 @@ def _add_specs(
     inject_if_missing=False,
     when=None,
 ):
-    when_list = ramble.language.language_helpers.build_when_list(
-        when, obj, name, target_dict_name.rstrip("s")
-    )
+    when_list = ramble.language.language_helpers.build_when_list(when, obj, name, directive_name)
 
     if package_manager is not None:
         logger.warn(
-            f"The `package_manager` argument of the {target_dict_name.rstrip('s')} "
+            f"The `package_manager` argument of the {directive_name} "
             f"directive in object {obj.name} is deprecated. Please "
             "transition this to use the `when` argument instead."
         )
@@ -233,6 +232,7 @@ def define_compiler(
     return lambda obj: _add_specs(
         obj,
         "compilers",
+        "define_compiler",
         name,
         pkg_spec,
         compiler=compiler,
@@ -278,6 +278,7 @@ def software_spec(
     return lambda obj: _add_specs(
         obj,
         "software_specs",
+        "software_spec",
         name,
         pkg_spec,
         compiler=compiler,
