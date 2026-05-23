@@ -45,6 +45,49 @@ class SharedMeta(ramble.language.language_base.DirectiveMeta):
 shared_directive = SharedMeta.directive
 
 
+def _add_specs(
+    obj,
+    target_dict_name,
+    name,
+    pkg_spec,
+    compiler=None,
+    compiler_spec=None,
+    package_manager=None,
+    inject_if_missing=False,
+    when=None,
+):
+    when_list = ramble.language.language_helpers.build_when_list(
+        when, obj, name, target_dict_name.rstrip("s")
+    )
+
+    if package_manager is not None:
+        logger.warn(
+            f"The `package_manager` argument of the {target_dict_name.rstrip('s')} "
+            f"directive in object {obj.name} is deprecated. Please "
+            "transition this to use the `when` argument instead."
+        )
+
+    target_dict = getattr(obj, target_dict_name)
+    if name not in target_dict:
+        target_dict[name] = []
+
+    target_dict[name].append(
+        SoftwareSpec(
+            name,
+            pkg_spec,
+            compiler=compiler,
+            compiler_spec=compiler_spec,
+            inject_if_missing=inject_if_missing,
+            when=when_list,
+        )
+    )
+
+
+def _add_list_attributes(obj, attr_name, values):
+    base_list = getattr(obj, attr_name, [])
+    setattr(obj, attr_name, sorted(set(base_list + list(values))))
+
+
 @shared_directive("archive_patterns")
 def archive_pattern(pattern, **kwargs):
     """Adds a file pattern to be archived in addition to figure of merit logs
@@ -187,34 +230,17 @@ def define_compiler(
                                   matching package is not already defined
         when (list | None): List of when conditions to apply to directive
     """
-
-    def _execute_define_compiler(obj):
-        when_list = ramble.language.language_helpers.build_when_list(
-            when, obj, name, "define_compiler"
-        )
-
-        if package_manager is not None:
-            logger.warn(
-                "The `package_manager` argument of the define_compiler "
-                f"directive in object {obj.name} is depreacated. Please "
-                "transition this to use the `when` argument instead."
-            )
-
-        if name not in obj.compilers:
-            obj.compilers[name] = []
-
-        obj.compilers[name].append(
-            SoftwareSpec(
-                name,
-                pkg_spec,
-                compiler=compiler,
-                compiler_spec=compiler_spec,
-                inject_if_missing=inject_if_missing,
-                when=when_list,
-            )
-        )
-
-    return _execute_define_compiler
+    return lambda obj: _add_specs(
+        obj,
+        "compilers",
+        name,
+        pkg_spec,
+        compiler=compiler,
+        compiler_spec=compiler_spec,
+        package_manager=package_manager,
+        inject_if_missing=inject_if_missing,
+        when=when,
+    )
 
 
 @shared_directive("software_specs")
@@ -249,35 +275,17 @@ def software_spec(
                                   environments automatically or not.
         when (list | None): List of when conditions to apply to directive
     """
-
-    def _execute_software_spec(obj):
-        when_list = ramble.language.language_helpers.build_when_list(
-            when, obj, name, "software_spec"
-        )
-
-        if package_manager is not None:
-            logger.warn(
-                "The `package_manager` argument of the define_compiler "
-                f"directive in object {obj.name} is depreacated. Please "
-                "transition this to use the `when` argument instead."
-            )
-
-        if name not in obj.software_specs:
-            obj.software_specs[name] = []
-
-        # Define the spec
-        obj.software_specs[name].append(
-            SoftwareSpec(
-                name,
-                pkg_spec,
-                compiler=compiler,
-                compiler_spec=compiler_spec,
-                inject_if_missing=inject_if_missing,
-                when=when_list,
-            )
-        )
-
-    return _execute_software_spec
+    return lambda obj: _add_specs(
+        obj,
+        "software_specs",
+        name,
+        pkg_spec,
+        compiler=compiler,
+        compiler_spec=compiler_spec,
+        package_manager=package_manager,
+        inject_if_missing=inject_if_missing,
+        when=when,
+    )
 
 
 @shared_directive("package_manager_configs")
@@ -605,13 +613,7 @@ def maintainers(*names: str, **kwargs):
         names (str): GitHub username(s) for the maintainer. Can provide
                         multiple names as separate arguments.
     """
-
-    def _execute_maintainer(obj):
-        maintainers_from_base = getattr(obj, "maintainers", [])
-        # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        obj.maintainers = sorted(set(maintainers_from_base + list(names)))
-
-    return _execute_maintainer
+    return lambda obj: _add_list_attributes(obj, "maintainers", names)
 
 
 @shared_directive(dicts=())
@@ -622,13 +624,7 @@ def tags(*values: str, **kwargs):
         values (str): Values to mark as a tag. Can provide multiple values
                          as separate arguments.
     """
-
-    def _execute_tag(obj):
-        tags_from_base = getattr(obj, "tags", [])
-        # Here it is essential to copy, otherwise we might add to an empty list in the parent
-        obj.tags = sorted(set(tags_from_base + list(values)))
-
-    return _execute_tag
+    return lambda obj: _add_list_attributes(obj, "tags", values)
 
 
 @shared_directive(dicts=())
