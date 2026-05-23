@@ -229,18 +229,22 @@ def define_compiler(
                                   matching package is not already defined
         when (list | None): List of when conditions to apply to directive
     """
-    return lambda obj: _add_specs(
-        obj,
-        "compilers",
-        "define_compiler",
-        name,
-        pkg_spec,
-        compiler=compiler,
-        compiler_spec=compiler_spec,
-        package_manager=package_manager,
-        inject_if_missing=inject_if_missing,
-        when=when,
-    )
+
+    def _execute_define_compiler(obj):
+        _add_specs(
+            obj,
+            "compilers",
+            "define_compiler",
+            name,
+            pkg_spec,
+            compiler=compiler,
+            compiler_spec=compiler_spec,
+            package_manager=package_manager,
+            inject_if_missing=inject_if_missing,
+            when=when,
+        )
+
+    return _execute_define_compiler
 
 
 @shared_directive("software_specs")
@@ -275,18 +279,22 @@ def software_spec(
                                   environments automatically or not.
         when (list | None): List of when conditions to apply to directive
     """
-    return lambda obj: _add_specs(
-        obj,
-        "software_specs",
-        "software_spec",
-        name,
-        pkg_spec,
-        compiler=compiler,
-        compiler_spec=compiler_spec,
-        package_manager=package_manager,
-        inject_if_missing=inject_if_missing,
-        when=when,
-    )
+
+    def _execute_software_spec(obj):
+        _add_specs(
+            obj,
+            "software_specs",
+            "software_spec",
+            name,
+            pkg_spec,
+            compiler=compiler,
+            compiler_spec=compiler_spec,
+            package_manager=package_manager,
+            inject_if_missing=inject_if_missing,
+            when=when,
+        )
+
+    return _execute_software_spec
 
 
 @shared_directive("package_manager_configs")
@@ -614,7 +622,11 @@ def maintainers(*names: str, **kwargs):
         names (str): GitHub username(s) for the maintainer. Can provide
                         multiple names as separate arguments.
     """
-    return lambda obj: _add_list_attributes(obj, "maintainers", names)
+
+    def _execute_maintainers(obj):
+        _add_list_attributes(obj, "maintainers", names)
+
+    return _execute_maintainers
 
 
 @shared_directive(dicts=())
@@ -625,7 +637,11 @@ def tags(*values: str, **kwargs):
         values (str): Values to mark as a tag. Can provide multiple values
                          as separate arguments.
     """
-    return lambda obj: _add_list_attributes(obj, "tags", values)
+
+    def _execute_tags(obj):
+        _add_list_attributes(obj, "tags", values)
+
+    return _execute_tags
 
 
 @shared_directive(dicts=())
