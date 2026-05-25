@@ -644,6 +644,21 @@ def tags(*values: str, **kwargs):
     return _execute_tags
 
 
+@shared_directive("class_families")
+def class_family(*names: str, **kwargs):
+    """Add a new family to this object
+
+    Args:
+        names (str): Name of family to apply to this object
+    """
+
+    def _define_class_family(obj):
+        for name in names:
+            obj.class_families[name] = True
+
+    return _define_class_family
+
+
 @shared_directive(dicts=())
 def target_shells(shell_support_pattern=None, **kwargs):
     """Directive to specify supported shells.

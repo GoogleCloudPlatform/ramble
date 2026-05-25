@@ -131,16 +131,11 @@ def variable_defaults(variable_definitions, when=None, **kwargs):
     return _execute_variable_defaults
 
 
-@system_directive("class_families")
+@system_directive(dicts=())
 def system_family(*names: str, **kwargs):
     """Add a new family to this system
 
     Args:
         name (str): Name of family to apply to this system
     """
-
-    def _define_system_family(sys):
-        for name in names:
-            sys.class_families[name] = True
-
-    return _define_system_family
+    return ramble.language.shared_language.class_family(*names, **kwargs)
