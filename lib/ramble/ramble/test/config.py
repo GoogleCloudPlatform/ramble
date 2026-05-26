@@ -65,51 +65,57 @@ ramble:
 
 
 def test_unhashable_yaml_keys_coverage():
-    import ramble.config
     import io
+
     from ruamel.yaml.nodes import MappingNode
-    
+
+    import ramble.config
+
     loader = ramble.config._RambleLineLoader(io.StringIO())
-    
+
     # Mock construct_object to return custom keys dynamically with caching
     mock_keys = []
+
     def mock_construct_object(node, deep=False):
         if node not in loader.constructed_objects:
             loader.constructed_objects[node] = mock_keys.pop(0)
         return loader.constructed_objects[node]
+
     loader.construct_object = mock_construct_object
-    
+
     class MockMap(dict):
         def _yaml_set_kv_line_col(self, *args, **kwargs):
             pass
-            
+
         def __setitem__(self, key, value):
             pass
-            
+
     from ruamel.yaml.nodes import ScalarNode
-    
+
     # Mock node having a start_mark for constructor warnings
     class MockMark:
         name = "test"
         line = 0
         column = 0
-        
-    dummy = ScalarNode(tag='tag:yaml.org,2002:str', value='dummy')
+
+    dummy = ScalarNode(tag="tag:yaml.org,2002:str", value="dummy")
     dummy.start_mark = MockMark()
-    node = MappingNode(tag='tag:yaml.org,2002:map', value=[(dummy, dummy)])
+    node = MappingNode(tag="tag:yaml.org,2002:map", value=[(dummy, dummy)])
     node.start_mark = MockMark()
-    
-    # 1. Key is a list containing unhashable dicts (exercising the inner nested try-except TypeError block)
+
+    # 1. Key is a list containing unhashable dicts
+    # (exercising the inner nested try-except TypeError block)
     mock_keys.append([{"a": 1}])
     loader.construct_mapping(node, MockMap())
-    
+
     # 2. Key is a mapping (exercising the outer else block)
-    dummy2 = ScalarNode(tag='tag:yaml.org,2002:str', value='dummy2')
+    dummy2 = ScalarNode(tag="tag:yaml.org,2002:str", value="dummy2")
     dummy2.start_mark = MockMark()
-    node2 = MappingNode(tag='tag:yaml.org,2002:map', value=[(dummy2, dummy2)])
+    node2 = MappingNode(tag="tag:yaml.org,2002:map", value=[(dummy2, dummy2)])
     node2.start_mark = MockMark()
-    
+
     mock_keys.append({"a": 1})
     import ruamel.yaml.constructor
+
     with pytest.raises(ruamel.yaml.constructor.ConstructorError, match="found unhashable key"):
         loader.construct_mapping(node2, MockMap())
