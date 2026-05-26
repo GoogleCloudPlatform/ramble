@@ -65,10 +65,22 @@ def translate_group_to_predicate(group_def: dict) -> str:
     return " and ".join(parts)
 
 
-def expand_filter_groups(expression: str, filter_groups_defs: dict) -> str:
+def expand_filter_groups(expression: str, filter_groups_defs: Optional[dict]) -> str:
     """Expand logical expression of filter groups into a predicate string"""
     if not expression:
         return "True"
+
+    if filter_groups_defs is None:
+        filter_groups_defs = {}
+
+    # Validate expression only contains allowed characters to prevent injection or silent failures
+    invalid_chars = re.sub(r"[a-zA-Z0-9_\s\(\)-]", "", expression)
+    if invalid_chars:
+        from ramble.workspace import RambleWorkspaceError
+
+        raise RambleWorkspaceError(
+            f"Invalid characters {repr(invalid_chars)} in filter group expression '{expression}'"
+        )
 
     token_re = re.compile(r"([a-zA-Z0-9_-]+|\(|\))")
     tokens = token_re.findall(expression)
