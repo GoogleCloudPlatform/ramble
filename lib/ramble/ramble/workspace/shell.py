@@ -72,7 +72,7 @@ def deactivate_header(shell):
         cmds += "        unsetenv RAMBLE_OLD_PROMPT';\n"
     elif shell == "fish":
         cmds += f"set -e {ramble.workspace.RAMBLE_WORKSPACE_VAR};\n"
-        cmds += "set -e RAMBLE_ACTIVE_FILTER_GROUP;\n"
+        cmds += "if set -q RAMBLE_ACTIVE_FILTER_GROUP; set -e RAMBLE_ACTIVE_FILTER_GROUP; end;\n"
         #
         # NOTE: Not changing fish_prompt (above) => no need to restore it here.
         #
