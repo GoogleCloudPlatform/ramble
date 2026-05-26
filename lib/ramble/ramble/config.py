@@ -60,6 +60,7 @@ import ramble.schema.base_system_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
+import ramble.schema.filter_groups
 import ramble.schema.formatted_executables
 import ramble.schema.internals
 import ramble.schema.licenses
@@ -94,6 +95,7 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,
     "config": ramble.schema.config.schema,
     "env_vars": ramble.schema.env_vars.schema,
+    "filter_groups": ramble.schema.filter_groups.schema,
     "internals": ramble.schema.internals.schema,
     "licenses": ramble.schema.licenses.schema,
     "mirrors": ramble.schema.mirrors.schema,
