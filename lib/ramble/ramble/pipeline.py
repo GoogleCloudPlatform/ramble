@@ -14,8 +14,6 @@ import shutil
 import stat
 from enum import Enum
 
-
-
 import llnl.util.filesystem as fs
 from llnl.util import tty
 

@@ -102,3 +102,40 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path, workspace
             assert f"pkg_spec: {app_name}" in content
 
         check_deployment_files(ws.root, app_name)
+
+
+@pytest.mark.maybeslow
+def test_tar_deployment(mutable_config, mutable_mock_workspace_path, workspace_name):
+    app_name = "namd"
+
+    with ramble.workspace.create(workspace_name) as ws:
+        ws.write()
+
+        workspace(
+            "manage",
+            "experiments",
+            app_name,
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "--default-variable-value",
+            "1",
+            "-p",
+            "spack",
+            global_args=["-w", workspace_name],
+        )
+        workspace("concretize", global_args=["-w", workspace_name])
+
+        ws._re_read()
+
+        # Push with -t (tar option)
+        deployment(
+            "push",
+            "-t",
+            global_args=["-w", workspace_name],
+        )
+
+        deployment_dir = os.path.join(ws.root, "deployments")
+        tar_path = os.path.join(deployment_dir, f"{workspace_name}.tar.gz")
+        assert os.path.isfile(tar_path)
