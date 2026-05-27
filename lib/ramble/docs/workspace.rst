@@ -196,6 +196,15 @@ at the desired configuration granularity.
     $ ramble config add 'config:enable_workspace_prompt:true'
 
 
+A filter group can also be persistently activated for a workspace session by passing the ``-fg`` / ``--filter-group`` flag to the ``activate`` command:
+
+.. code-block:: console
+
+    $ ramble workspace activate <workspace_name> -fg small-scale
+
+This will export the ``RAMBLE_ACTIVE_FILTER_GROUP`` environment variable to the shell, which will be used by subsequent workspace commands as the default filter group. Deactivating the workspace will unset this variable.
+
+
 ------------------------------
 Printing Workspace Information
 ------------------------------
@@ -302,6 +311,18 @@ a workspace (``workspace``, ``application``, ``application:workload``, or
 
 Finally, ``ramble workspace manage includes`` can be used to quickly and easy
 add includes when using a hierarchical workspace.
+
+Filter groups can also be managed via the CLI using the ``ramble workspace manage filter-groups`` subcommand:
+
+.. code-block:: console
+
+  $ ramble workspace manage filter-groups add -n small-scale -w "{n_nodes} < 4"
+  $ ramble workspace manage filter-groups remove -n small-scale
+  $ ramble workspace manage filter-groups list
+  $ ramble workspace manage filter-groups blame
+
+These commands allow adding, removing, listing, and viewing the sources (blame) of filter groups within the active workspace.
+
 
 ---------------------
 Workspace Deployments
