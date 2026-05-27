@@ -32,9 +32,9 @@ def test_workspace_manage_filter_groups(workspace_name):
         "add",
         "-n",
         "small-scale",
-        "-w",
+        "--where",
         "{n_nodes} < 4",
-        "-ew",
+        "--exclude-where",
         "{mpi} == 'tcp'",
         global_args=global_args,
     )
@@ -69,7 +69,7 @@ def test_workspace_manage_filter_groups(workspace_name):
         "add",
         "-n",
         "large-scale",
-        "-w",
+        "--where",
         "{n_nodes} >= 8",
         global_args=global_args,
     )
@@ -108,7 +108,7 @@ def test_global_filter_groups(workspace_name):
         "add",
         "-n",
         "global-small",
-        "-w",
+        "--where",
         "{n_nodes} < 2",
     )
 
@@ -138,7 +138,7 @@ def test_global_filter_groups(workspace_name):
         "add",
         "-n",
         "ws-group",
-        "-w",
+        "--where",
         "{n_nodes} == 4",
         global_args=global_args,
     )

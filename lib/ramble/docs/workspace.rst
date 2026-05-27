@@ -316,7 +316,7 @@ Filter groups can also be managed via the CLI using the ``ramble workspace manag
 
 .. code-block:: console
 
-  $ ramble workspace manage filter-groups add -n small-scale -w "{n_nodes} < 4"
+  $ ramble workspace manage filter-groups add -n small-scale --where "{n_nodes} < 4"
   $ ramble workspace manage filter-groups remove -n small-scale
   $ ramble workspace manage filter-groups list
   $ ramble workspace manage filter-groups blame

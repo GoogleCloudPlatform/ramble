@@ -395,12 +395,14 @@ Global filter groups can be managed using the top-level ``ramble filter-groups``
 
 .. code-block:: console
 
-    $ ramble filter-groups add -n global-small -w "{n_nodes} < 2"
+    $ ramble filter-groups add -n global-small --where "{n_nodes} < 2"
     $ ramble filter-groups remove -n global-small
     $ ramble filter-groups list
     $ ramble filter-groups blame
 
 By default, these commands edit the global ``user`` scope. You can target a different scope (such as ``workspace``) using the ``--scope`` option.
+
+Alternatively, workspace-scoped filter groups can also be managed using the :ref:`workspace-manage` command.
 
 
 .. _formatted-execs-config:

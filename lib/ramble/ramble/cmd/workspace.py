@@ -1847,13 +1847,11 @@ def workspace_manage_filter_groups_setup_parser(subparser):
     add_parser = actions.add_parser("add", help="add a filter group")
     add_parser.add_argument("-n", "--name", required=True, help="name of filter group")
     add_parser.add_argument(
-        "-w",
         "--where",
         action="append",
         help="inclusive filter expression. Can be specified multiple times.",
     )
     add_parser.add_argument(
-        "-ew",
         "--exclude-where",
         dest="exclude_where",
         action="append",
