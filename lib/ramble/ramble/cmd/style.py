@@ -433,62 +433,40 @@ def run_flake8(flake8_cmd, file_list, args):
         root = args.repo_path if args.repo_path is not None else ramble.paths.prefix
         primary_file_list, object_file_list = _split_file_list(file_list, args)
 
-        # filter files into a temporary directory with exemptions added.
-        # TODO: DRY this duplication
-        primary_dest_dir = os.path.join(temp, "primary")
-        mkdirp(primary_dest_dir)
-        for filename in primary_file_list:
-            src_path = os.path.join(root, filename)
-            dest_path = os.path.join(primary_dest_dir, filename)
-            filter_file(src_path, dest_path, args.output)
-
-        object_dest_dir = os.path.join(temp, "object")
-        mkdirp(object_dest_dir)
-        for filename in object_file_list:
-            src_path = os.path.join(root, filename)
-            dest_path = os.path.join(object_dest_dir, filename)
-            filter_file(src_path, dest_path, args.output)
-
         returncode = 0
         output = ""
 
-        # TODO: make these repeated blocks a function?
-        if primary_file_list:
-            # Copy flake8 file so the paths will be relative to the new location
-            f_name = ".flake8"
-            f = os.path.join(ramble.paths.prefix, f_name)
-            shutil.copy(f, primary_dest_dir)
-            qa_dir = os.path.join(primary_dest_dir, "share", "ramble", "qa")
-            os.makedirs(qa_dir, exist_ok=True)
+        for group_name, files, f_name in (
+            ("primary", primary_file_list, ".flake8"),
+            ("object", object_file_list, ".flake8_objects"),
+        ):
+            if files:
+                # filter files into temporary directory with exemptions added.
+                dest_dir = os.path.join(temp, group_name)
+                mkdirp(dest_dir)
+                for filename in files:
+                    src_path = os.path.join(root, filename)
+                    dest_path = os.path.join(dest_dir, filename)
+                    filter_file(src_path, dest_path, args.output)
 
-            with working_dir(primary_dest_dir):
-                output += flake8_cmd(
-                    "--format",
-                    "pylint",
-                    f"--config={f_name}",
-                    *(extra_flake8_args + ["."]),
-                    fail_on_error=False,
-                    output=str,
-                    error=str,
-                )
-                returncode |= flake8_cmd.returncode
+                # Copy flake8 file so the paths will be relative to the new location
+                f_path = os.path.join(ramble.paths.prefix, f_name)
+                shutil.copy(f_path, dest_dir)
+                if group_name == "primary":
+                    qa_dir = os.path.join(dest_dir, "share", "ramble", "qa")
+                    mkdirp(qa_dir)
 
-        if object_file_list:
-            f_name = ".flake8_objects"
-            f = os.path.join(ramble.paths.prefix, f_name)
-            shutil.copy(f, object_dest_dir)
-
-            with working_dir(object_dest_dir):
-                output += flake8_cmd(
-                    "--format",
-                    "pylint",
-                    f"--config={f_name}",
-                    *(extra_flake8_args + ["."]),
-                    fail_on_error=False,
-                    output=str,
-                    error=str,
-                )
-                returncode |= flake8_cmd.returncode
+                with working_dir(dest_dir):
+                    output += flake8_cmd(
+                        "--format",
+                        "pylint",
+                        f"--config={f_name}",
+                        *(extra_flake8_args + ["."]),
+                        fail_on_error=False,
+                        output=str,
+                        error=str,
+                    )
+                    returncode |= flake8_cmd.returncode
 
         print_output(output, args)
 
