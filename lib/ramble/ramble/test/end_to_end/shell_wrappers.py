@@ -128,3 +128,79 @@ exit 0
             text=True,
             check=False,
         )
+
+
+@pytest.mark.parametrize("shell", _SHELLS_TO_TEST)
+def test_shell_wrapper_workspace_filter_group(shell, tmpdir):
+    """Test workspace activation with filter group and deactivation."""
+    if not shutil.which(shell):
+        pytest.skip(f"{shell} not found")
+
+    setup_env = os.path.join(paths.ramble_root, "share", "ramble", _SETUP_ENV_FILE[shell])
+    test_script_path = str(tmpdir.join(f"test_fg.{shell}"))
+    ws_name = f"test_ws_fg_{shell}"
+
+    script_templates = {
+        "bash": f"""
+source "{setup_env}"
+ramble workspace create {ws_name} || exit 1
+ramble -w {ws_name} workspace manage filter-groups add -n foo -w "n_nodes == 1" || exit 2
+ramble workspace activate {ws_name} -fg foo || exit 3
+if [ "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo" ]; then exit 4; fi
+ramble workspace deactivate || exit 5
+if [ ! -z ${{RAMBLE_ACTIVE_FILTER_GROUP+x}} ]; then exit 6; fi
+exit 0
+""",
+        "tcsh": f"""
+set prompt=""
+source "{setup_env}"
+ramble workspace create {ws_name}
+if ( $status != 0 ) exit 1
+ramble -w {ws_name} workspace manage filter-groups add -n foo -w "n_nodes == 1"
+if ( $status != 0 ) exit 2
+ramble workspace activate {ws_name} -fg foo
+if ( $status != 0 ) exit 3
+if ( "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo" ) exit 4
+ramble workspace deactivate
+if ( $status != 0 ) exit 5
+if ( $?RAMBLE_ACTIVE_FILTER_GROUP ) exit 6
+exit 0
+""",
+        "fish": f"""
+source "{setup_env}"
+ramble workspace create {ws_name}; or exit 1
+ramble -w {ws_name} workspace manage filter-groups add -n foo -w "n_nodes == 1"; or exit 2
+ramble workspace activate {ws_name} -fg foo; or exit 3
+if test "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo"; exit 4; end
+ramble workspace deactivate; or exit 5
+if set -q RAMBLE_ACTIVE_FILTER_GROUP; exit 6; end
+exit 0
+""",
+    }
+    script_content = script_templates[shell]
+
+    with open(test_script_path, "w") as f:
+        f.write(script_content)
+
+    try:
+        cmd = [shell, test_script_path]
+        process = subprocess.run(
+            cmd,
+            capture_output=True,
+            text=True,
+            cwd=str(tmpdir),
+            env=os.environ.copy(),
+            check=False,
+        )
+        if process.returncode != 0:
+            print(process.stdout)
+            print(process.stderr)
+        assert process.returncode == 0
+    finally:
+        ramble_exe = os.path.join(paths.ramble_root, "bin", "ramble")
+        subprocess.run(
+            [ramble_exe, "workspace", "rm", "-y", ws_name],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
