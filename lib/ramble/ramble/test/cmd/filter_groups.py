@@ -170,3 +170,79 @@ def test_global_filter_groups(workspace_name):
     with open(user_config_file) as f:
         content = f.read()
         assert "global-small:" not in content
+
+
+def test_workspace_manage_filter_groups_empty_list(workspace_name):
+    ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+    out = workspace_cmd("manage", "filter-groups", "list", global_args=global_args)
+    assert "No filter groups defined" in out
+
+
+def test_workspace_manage_filter_groups_errors(workspace_name):
+    ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+
+    workspace_cmd(
+        "manage", "filter-groups", "add", "-n", "foo", global_args=global_args, fail_on_error=False
+    )
+    assert workspace_cmd.returncode != 0
+
+    workspace_cmd(
+        "manage",
+        "filter-groups",
+        "remove",
+        "-n",
+        "foo",
+        global_args=global_args,
+        fail_on_error=False,
+    )
+    assert workspace_cmd.returncode != 0
+
+    workspace_cmd(
+        "manage", "filter-groups", "add", "-n", "foo", "--where", "x", global_args=global_args
+    )
+    workspace_cmd(
+        "manage", "filter-groups", "add", "-n", "foo", "--where", "y", global_args=global_args
+    )
+
+
+def test_global_filter_groups_empty_list():
+    out = filter_groups_cmd("list")
+    assert "No filter groups defined" in out
+
+
+def test_global_filter_groups_errors(workspace_name):
+    filter_groups_cmd("add", "-n", "foo", fail_on_error=False)
+    assert filter_groups_cmd.returncode != 0
+
+    filter_groups_cmd("remove", "-n", "foo", fail_on_error=False)
+    assert filter_groups_cmd.returncode != 0
+
+    filter_groups_cmd("add", "-n", "foo", "--where", "x")
+    filter_groups_cmd("add", "-n", "foo", "--where", "y")
+
+    filter_groups_cmd("add", "-n", "bar", "--exclude-where", "z")
+    out = filter_groups_cmd("list")
+    assert "exclude_where:" in out
+    assert "z" in out
+
+    out = filter_groups_cmd("blame")
+    assert "exclude_where:" in out
+
+    filter_groups_cmd("--scope", "workspace", "list", fail_on_error=False)
+    assert filter_groups_cmd.returncode != 0
+
+    ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+    filter_groups_cmd(
+        "--scope", "workspace", "add", "-n", "ws-foo", "--where", "x", global_args=global_args
+    )
+    filter_groups_cmd("--scope", "workspace", "remove", "-n", "ws-foo", global_args=global_args)
+
+
+def test_global_filter_groups_no_subcommand(capsys):
+    with pytest.raises(SystemExit):
+        filter_groups_cmd()
+    captured = capsys.readouterr()
+    assert "the following arguments are required: ACTION" in captured.err

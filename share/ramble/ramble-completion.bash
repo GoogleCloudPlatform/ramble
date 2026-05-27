@@ -436,7 +436,7 @@ _ramble_filter_groups() {
 }
 
 _ramble_filter_groups_add() {
-    RAMBLE_COMPREPLY="-h --help -n --name -w --where -ew --exclude-where"
+    RAMBLE_COMPREPLY="-h --help -n --name --where --exclude-where"
 }
 
 _ramble_filter_groups_remove() {
@@ -782,7 +782,7 @@ _ramble_workspace_manage_filter_groups() {
 }
 
 _ramble_workspace_manage_filter_groups_add() {
-    RAMBLE_COMPREPLY="-h --help -n --name -w --where -ew --exclude-where"
+    RAMBLE_COMPREPLY="-h --help -n --name --where --exclude-where"
 }
 
 _ramble_workspace_manage_filter_groups_remove() {
