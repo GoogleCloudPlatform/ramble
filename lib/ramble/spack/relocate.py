@@ -8,6 +8,8 @@ import os
 import re
 import shutil
 
+# FIXME: this should be imported later so we don't have to install the mac only
+# package on all systems
 import macholib.mach_o
 import macholib.MachO
 

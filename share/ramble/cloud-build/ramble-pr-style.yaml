@@ -70,14 +70,14 @@ steps:
         # Test removing a dependency
         pip uninstall -y pytest
 
-        ramble help
+        ramble -d help
         # $$ characters are required for cloud-build:
         # https://cloud.google.com/build/docs/configuring-builds/substitute-variable-values
         missing_req_err=$$?
 
         error=0
         if [ $$missing_req_err -gt 0 ]; then
-          echo " ***** Ramble failed to work when requirements.txt were not installed"
+          echo " ***** `ramble help` failed. Perhaps a requirements was not installed?"
           error=1
         fi
 
