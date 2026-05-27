@@ -82,3 +82,75 @@ def test_expand_filter_groups():
     assert ramble.filters.expand_filter_groups("", None) == "True"
     with pytest.raises(RambleWorkspaceError):
         ramble.filters.expand_filter_groups("small-scale", None)
+
+
+def test_translate_group_to_predicate_empty_lists():
+    # Test group with empty lists (should return "True" at line 54)
+    group_empty_lists = {"where": [], "exclude_where": []}
+    assert ramble.filters.translate_group_to_predicate(group_empty_lists) == "True"
+
+
+def test_resolve_and_apply_filter_groups(mutable_config):
+    class MockArgs:
+        def __init__(self, filter_group=None, exclude_filter_group=None):
+            self.filter_group = filter_group
+            self.exclude_filter_group = exclude_filter_group
+
+    # Mock filter groups in config
+    ramble.config.set(
+        "filter_groups",
+        {"small": {"where": ["{n_nodes} < 4"]}, "tcp": {"exclude_where": ["{mpi} != 'tcp'"]}},
+        scope="user",
+    )
+
+    # Case 1: Neither CLI nor Env
+    assert ramble.filters.resolve_and_apply_filter_groups(MockArgs(), None) is None
+    assert ramble.filters.resolve_and_apply_filter_groups(MockArgs(), [["existing"]]) == [
+        ["existing"]
+    ]
+
+    # Case 2: CLI --filter-group
+    args = MockArgs(filter_group="small")
+    res = ramble.filters.resolve_and_apply_filter_groups(args, None)
+    assert len(res) == 1
+    assert "small" in res[0][0] or "{n_nodes}" in res[0][0]
+
+    # Case 3: CLI --exclude-filter-group
+    args = MockArgs(exclude_filter_group="tcp")
+    res = ramble.filters.resolve_and_apply_filter_groups(args, None)
+    assert len(res) == 1
+    assert "not ( ( (not ({mpi} != 'tcp')) ) )" in res[0][0]
+
+    # Case 4: Both CLI
+    args = MockArgs(filter_group="small", exclude_filter_group="tcp")
+    res = ramble.filters.resolve_and_apply_filter_groups(args, None)
+    assert len(res) == 1
+    assert "( ( (({n_nodes} < 4)) ) ) and not ( ( (not ({mpi} != 'tcp')) ) )" in res[0][0]
+
+    # Case 5: Env var only
+    import os
+
+    os.environ["RAMBLE_ACTIVE_FILTER_GROUP"] = "small"
+    try:
+        args = MockArgs()
+        res = ramble.filters.resolve_and_apply_filter_groups(args, None)
+        assert len(res) == 1
+        assert "small" in res[0][0] or "{n_nodes}" in res[0][0]
+    finally:
+        del os.environ["RAMBLE_ACTIVE_FILTER_GROUP"]
+
+    # Case 6: CLI overrides Env var
+    os.environ["RAMBLE_ACTIVE_FILTER_GROUP"] = "small"
+    try:
+        args = MockArgs(filter_group="tcp")
+        res = ramble.filters.resolve_and_apply_filter_groups(args, None)
+        assert len(res) == 1
+        assert "tcp" in res[0][0] or "{mpi}" in res[0][0]
+        assert "small" not in res[0][0] and "{n_nodes}" not in res[0][0]
+    finally:
+        del os.environ["RAMBLE_ACTIVE_FILTER_GROUP"]
+
+    # Case 7: Failure path (invalid group)
+    args = MockArgs(filter_group="invalid")
+    with pytest.raises(SystemExit):
+        ramble.filters.resolve_and_apply_filter_groups(args, None)
