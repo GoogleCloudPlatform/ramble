@@ -77,7 +77,7 @@ steps:
 
         error=0
         if [ $$missing_req_err -gt 0 ]; then
-          echo " ***** `ramble help` failed. Perhaps a requirements was not installed?"
+          echo " ***** ramble help call failed. Perhaps a required package was not installed?"
           error=1
         fi
 
