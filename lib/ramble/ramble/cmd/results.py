@@ -122,6 +122,13 @@ def setup_parser(subparser):
     report_parser.add_argument(
         "--logy", dest="logy", action="store_true", help=("Plot Y axis as log"), required=False
     )
+    report_parser.add_argument(
+        "--simplify-names",
+        dest="simplify_names",
+        action="store_true",
+        help="Simplify experiment names on the x-axis by stripping common prefixes and suffixes",
+        required=False,
+    )
 
     # TODO: should this make it into the final cut? Only applies to multi line -- remove
     report_parser.add_argument(

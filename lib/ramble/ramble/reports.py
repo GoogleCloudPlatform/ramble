@@ -90,6 +90,145 @@ def to_numeric_if_possible(series):
         return series
 
 
+def simplify_names(names):
+    """Simplify a list of dot-separated names by stripping the longest common prefix
+    and suffix parts.
+    """
+    if not names or len(names) <= 1:
+        return names
+
+    names = [str(name) for name in names]
+    split_names = [name.split(".") for name in names]
+
+    # Find longest common prefix of parts
+    common_prefix = []
+    min_len = min(len(parts) for parts in split_names)
+    for i in range(min_len):
+        part = split_names[0][i]
+        if all(parts[i] == part for parts in split_names):
+            common_prefix.append(part)
+        else:
+            break
+
+    # Find longest common suffix of parts
+    common_suffix = []
+    remaining_min_len = min(len(parts) - len(common_prefix) for parts in split_names)
+    for i in range(1, remaining_min_len + 1):
+        part = split_names[0][-i]
+        if all(parts[-i] == part for parts in split_names):
+            common_suffix.insert(0, part)
+        else:
+            break
+
+    simplified = []
+    for parts in split_names:
+        end_idx = -len(common_suffix) if common_suffix else len(parts)
+        simplified_parts = parts[len(common_prefix) : end_idx]
+        if not simplified_parts:
+            return names
+        simplified.append(".".join(simplified_parts))
+
+    return simplified
+
+
+def clean_redundant_prefixes(name, application_name, workload_name):
+    """Strip application and workload names from a name string,
+    handling case, dots, underscores, and hyphens.
+    """
+    if not name:
+        return name
+
+    app_norm = application_name.replace("-", "_").replace(".", "_").lower()
+    wl_norm = workload_name.replace("-", "_").replace(".", "_").lower()
+
+    name_lower = name.lower().replace("-", "_").replace(".", "_")
+
+    for prefix_norm in [app_norm, wl_norm]:
+        if not prefix_norm:
+            continue
+        for sep in ["_", "."]:
+            full_prefix = prefix_norm + sep
+            if name_lower.startswith(full_prefix):
+                name = name[len(full_prefix) :]
+                name_lower = name_lower[len(full_prefix) :]
+                break
+            elif name_lower.startswith(prefix_norm):
+                name = name[len(prefix_norm) :]
+                name_lower = name_lower[len(prefix_norm) :]
+                break
+
+    return name
+
+
+def get_common_stripped_prefix(original_values, simplified_values):
+    """Find the longest common prefix stripped from original_values to get simplified_values."""
+    if not original_values or not simplified_values:
+        return ""
+
+    prefixes = []
+    for orig, simp in zip(original_values, simplified_values):
+        orig_str = str(orig)
+        simp_str = str(simp)
+        if simp_str in orig_str:
+            idx = orig_str.find(simp_str)
+            prefixes.append(orig_str[:idx])
+        else:
+            prefixes.append("")
+
+    if not prefixes:
+        return ""
+    common = prefixes[0]
+    for p in prefixes[1:]:
+        while not p.startswith(common):
+            common = common[:-1]
+            if not common:
+                return ""
+    return common
+
+
+def simplify_experiment_names(df, index_col=None):
+    """Simplify the index or a column of a dataframe by stripping redundant
+    application/workload names and common prefixes/suffixes.
+    """
+    # Extract values to simplify
+    if index_col is None:
+        original_values = df.index.tolist()
+    else:
+        original_values = df[index_col].tolist()
+
+    simplified_values = []
+
+    # 1. Row-by-row clean redundant prefixes
+    for idx, val in enumerate(original_values):
+        # Get the corresponding row application and workload name
+        row = df.iloc[idx]
+        app_name = row.get(ReportVars.APP_NAME.value, "")
+        wl_name = row.get(ReportVars.WL_NAME.value, "")
+
+        parts = str(val).split(".")
+        cleaned_parts = []
+        for part in parts:
+            cleaned_part = clean_redundant_prefixes(part, app_name, wl_name)
+            if cleaned_part:
+                cleaned_parts.append(cleaned_part)
+
+        simplified_val = ".".join(cleaned_parts) if cleaned_parts else str(val)
+        simplified_values.append(simplified_val)
+
+    # 2. Strip common prefix and suffix from the entire list of simplified values
+    final_values = simplify_names(simplified_values)
+
+    common_prefix = get_common_stripped_prefix(original_values, final_values)
+
+    # Update the dataframe
+    if index_col is None:
+        df.index = final_values
+    else:
+        df[index_col] = final_values
+
+    return df, common_prefix
+
+
 def get_direction_suffix(self):
     if self == BetterDirection.HIGHER:
         return " (Higher is Better)"
@@ -399,6 +538,8 @@ class PlotFactory:
         logx = args.logx
         logy = args.logy
         split_by = args.split_by
+        simplify_names = getattr(args, "simplify_names", False)
+        where = getattr(args, "where", None)
 
         spec, plot_class = self.determine_plot_type(args)
 
@@ -411,6 +552,8 @@ class PlotFactory:
                 logx,
                 logy,
                 split_by,
+                simplify_names=simplify_names,
+                where=where,
             )
             return plot
 
@@ -418,7 +561,18 @@ class PlotFactory:
 
 
 class PlotGenerator:
-    def __init__(self, spec, normalize, report_dir_path, exp_results, logx, logy, split_by):
+    def __init__(
+        self,
+        spec,
+        normalize,
+        report_dir_path,
+        exp_results,
+        logx,
+        logy,
+        split_by,
+        simplify_names=False,
+        where=None,
+    ):
         pd = import_pandas()
         self.normalize = normalize
         self.spec = spec
@@ -434,6 +588,8 @@ class PlotGenerator:
         self.logy = logy
 
         self.split_by = split_by
+        self.simplify_names = simplify_names
+        self.where = where
 
         self.have_statistics = False
         self.better_direction = BetterDirection.INDETERMINATE
@@ -626,7 +782,12 @@ class ScalingPlotGenerator(PlotGenerator):
         perf_measure, scale_var, *additional_vars = self.spec
 
         # FOMs are by row, so select only rows with the perf_measure FOM
-        results = extract_data(self.exp_results, [perf_measure], [scale_var] + additional_vars)
+        results = extract_data(
+            self.exp_results,
+            [perf_measure],
+            [scale_var] + additional_vars + [self.split_by],
+            where_query=self.where,
+        )
 
         # Determine which direction is 'better', or 'INDETERMINATE' if missing or ambiguous data
         if len(results.loc[:, ReportVars.BETTER_DIRECTION.value].unique()) == 1:
@@ -811,7 +972,7 @@ class FomPlot(PlotGenerator):
 
     def generate_plot_data(self, pdf_report):
         fom_list = get_all_foms(self.result_index)
-        results = extract_data(self.exp_results, fom_list, [])
+        results = extract_data(self.exp_results, fom_list, [], where_query=self.where)
 
         all_foms = results.loc[:, ReportVars.FOM_NAME.value].unique()
         for fom in all_foms:
@@ -846,6 +1007,10 @@ class FomPlot(PlotGenerator):
                 ).copy()
                 self.add_minmax_data(series_results, series_min, series_max, scale_var)
 
+            if self.simplify_names:
+                series_results, stripped_prefix = simplify_experiment_names(series_results)
+                self.stripped_prefix = stripped_prefix
+
             self.output_df = series_results
 
             unit = series_results.loc[:, ReportVars.FOM_UNITS.value].iloc[0]
@@ -879,6 +1044,11 @@ class FomPlot(PlotGenerator):
 
         # If all FOMs are either higher or lower is better, add it to chart title
         ax.set_title(f"{perf_measure} by experiment", wrap=True)
+
+        if self.simplify_names and getattr(self, "stripped_prefix", None):
+            ax.set_xlabel(f"experiment (prefix '{self.stripped_prefix}' stripped)")
+        else:
+            ax.set_xlabel("experiment")
 
         # FIXME: Rotate to prevent long x-axis labels overlapping. This can make the chart
         # very small but experiment names are readable (for smaller number of experiments)
@@ -925,7 +1095,7 @@ class ComparisonPlot(PlotGenerator):
         if not dimensions:
             dimensions.append("experiment_name")
 
-        raw_results = extract_data(self.exp_results, foms, dimensions)
+        raw_results = extract_data(self.exp_results, foms, dimensions, where_query=self.where)
 
         logger.debug(raw_results)
         raw_results.loc[:, "Figure of Merit"] = (
