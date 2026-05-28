@@ -371,6 +371,22 @@ def test_compare_plot(mutable_mock_workspace_path, tmpdir_factory):
     assert os.path.isfile(os.path.join(report_dir_path, "fom_1_by_n_nodes.png"))
 
 
+def test_compare_plot_with_simplify_names(mutable_mock_workspace_path, tmpdir_factory):
+    report_name = "unit_test_simplify_compare"
+    report_dir_path = tmpdir_factory.mktemp(report_name)
+    pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
+
+    spec = ["fom_1", "experiment_name"]
+    plot = ramble.reports.ComparisonPlot(
+        spec, False, report_dir_path, single_experiments, False, False, None, simplify_names=True
+    )
+    with PdfPages(pdf_path) as pdf_report:
+        plot.generate_plot_data(pdf_report)
+
+    assert os.path.isfile(pdf_path)
+    assert os.path.isfile(os.path.join(report_dir_path, "fom_1_by_experiment_name.png"))
+
+
 def test_multiline_plot(mutable_mock_workspace_path, mutable_config, tmpdir_factory):
     results_dir_path = tmpdir_factory.mktemp("unit_test")
     results_file = os.path.join(results_dir_path, "results.json")

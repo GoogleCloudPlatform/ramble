@@ -1073,6 +1073,9 @@ class ComparisonPlot(PlotGenerator):
             f'{" vs ".join(perf_measure)} by {" and ".join(series)} {title_suffix}', wrap=True
         )
 
+        if self.simplify_names and getattr(self, "stripped_prefix", None):
+            ax.set_xlabel(f'{" and ".join(series)} (prefix \'{self.stripped_prefix}\' stripped)')
+
         # FIXME: this has a hard time fitting well on screen
         fig.tight_layout()
 
@@ -1096,6 +1099,15 @@ class ComparisonPlot(PlotGenerator):
             dimensions.append("experiment_name")
 
         raw_results = extract_data(self.exp_results, foms, dimensions, where_query=self.where)
+
+        if self.simplify_names:
+            for col in ["experiment_name", "experiment_namespace"]:
+                if col in raw_results.columns:
+                    raw_results, stripped_prefix = simplify_experiment_names(
+                        raw_results, index_col=col
+                    )
+                    if stripped_prefix:
+                        self.stripped_prefix = stripped_prefix
 
         logger.debug(raw_results)
         raw_results.loc[:, "Figure of Merit"] = (
