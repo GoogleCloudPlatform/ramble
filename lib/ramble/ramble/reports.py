@@ -143,19 +143,31 @@ def clean_redundant_prefixes(name, application_name, workload_name):
 
     name_lower = name.lower().replace("-", "_").replace(".", "_")
 
-    for prefix_norm in [app_norm, wl_norm]:
-        if not prefix_norm:
-            continue
-        for sep in ["_", "."]:
-            full_prefix = prefix_norm + sep
-            if name_lower.startswith(full_prefix):
-                name = name[len(full_prefix) :]
-                name_lower = name_lower[len(full_prefix) :]
+    prefixes = sorted([app_norm, wl_norm], key=len, reverse=True)
+
+    modified = True
+    while modified:
+        modified = False
+        for prefix_norm in prefixes:
+            if not prefix_norm:
+                continue
+            matched = False
+            for sep in ["_", "."]:
+                full_prefix = prefix_norm + sep
+                if name_lower.startswith(full_prefix):
+                    name = name[len(full_prefix) :]
+                    name_lower = name_lower[len(full_prefix) :]
+                    matched = True
+                    break
+            if not matched:
+                if name_lower.startswith(prefix_norm):
+                    name = name[len(prefix_norm) :]
+                    name_lower = name_lower[len(prefix_norm) :]
+                    matched = True
+
+            if matched:
+                modified = True
                 break
-        else:
-            if name_lower.startswith(prefix_norm):
-                name = name[len(prefix_norm) :]
-                name_lower = name_lower[len(prefix_norm) :]
 
     return name
 
@@ -219,6 +231,12 @@ def simplify_experiment_names(df, index_col=None):
     final_values = simplify_names(simplified_values)
 
     common_prefix = get_common_stripped_prefix(original_values, final_values)
+
+    # Check if simplification introduced collisions/reduced uniqueness
+    if len(set(final_values)) < len(set(original_values)):
+        logger.debug("Simplification introduced name collisions. Falling back to original values.")
+        final_values = original_values
+        common_prefix = ""
 
     # Update the dataframe
     if index_col is None:

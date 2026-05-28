@@ -634,6 +634,16 @@ def test_simplify_names():
         == "test_mpi_2_2"
     )
 
+    # Redundant prefix substring test (workload_name contains application_name)
+    assert (
+        clean_redundant_prefixes(
+            "osu_osu_allreduce_test",
+            "osu",
+            "osu_allreduce",
+        )
+        == "test"
+    )
+
     # 8. DataFrame simplification (user scenario)
     df = pd.DataFrame(
         {
@@ -653,6 +663,18 @@ def test_simplify_names():
 
     assert get_common_stripped_prefix(["a.b.c_1", "a.b.c_2"], ["1", "2"]) == "a.b.c_"
     assert get_common_stripped_prefix(["a.b.c.x.y", "a.b.d.x.y"], ["c", "d"]) == "a.b."
+
+    # 10. Collision Fallback
+    df_collision = pd.DataFrame(
+        {
+            "application_name": ["b", "c"],
+            "workload_name": ["", ""],
+        },
+        index=["a.b.x", "a.c.x"],
+    )
+    df_collision, prefix = simplify_experiment_names(df_collision)
+    assert df_collision.index.tolist() == ["a.b.x", "a.c.x"]
+    assert prefix == ""
 
 
 def test_fom_plot_with_simplify_names(mutable_mock_workspace_path, tmpdir_factory):
