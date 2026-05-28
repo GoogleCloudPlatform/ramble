@@ -156,6 +156,7 @@ ramble:
         assert "batch_query" in files
         assert "batch_cancel" in files
         assert "batch_wait" in files
+        assert "slurm_experiment_sbatch" in files
         with open(os.path.join(path, "batch_submit"), encoding="utf-8") as f:
             content = f.read()
             # Assert the user-defined `batch_submit` is included
@@ -168,7 +169,6 @@ ramble:
         ) as f:
             content = f.read()
             assert "scontrol show hostnames" in content
-            assert "scontrol show config" in content
             assert "#SBATCH -N 1" in content
             assert "#SBATCH -J hostname_local_test_slurm" in content
             assert "#SBATCH --ntasks-per-node 1" in content
@@ -176,6 +176,10 @@ ramble:
             assert "#SBATCH --gpus-per-task=1" in content
             assert "#SBATCH -p" not in content
             assert "#SBATCH --time" not in content
+        with open(os.path.join(path, "execute_experiment"), encoding="utf-8") as f:
+            exec_content = f.read()
+            assert "scontrol show config" in exec_content
+            assert "#SBATCH" not in exec_content
         with open(os.path.join(path, "batch_query"), encoding="utf-8") as f:
             content = f.read()
             assert "squeue" in content
