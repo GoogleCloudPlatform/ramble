@@ -65,6 +65,8 @@ ObjectTypes = Enum(
         "base_workflow_managers",
         "base_systems",
         "base_platforms",
+        "utilities",
+        "base_utilities",
     ],
 )
 
@@ -179,6 +181,22 @@ type_definitions = {
         "accepted_configs": ["base_platform_repo.yaml", unified_config],
         "singular": "base platform",
     },
+    ObjectTypes.utilities: {
+        "file_name": "utility.py",
+        "dir_name": "utilities",
+        "abbrev": "utility",
+        "config_section": "utility_repos",
+        "accepted_configs": ["utility_repo.yaml", unified_config],
+        "singular": "external dependency",
+    },
+    ObjectTypes.base_utilities: {
+        "file_name": "base_utility.py",
+        "dir_name": "base_utilities",
+        "abbrev": "base_utility",
+        "config_section": "base_utility_repos",
+        "accepted_configs": ["base_utility_repo.yaml", unified_config],
+        "singular": "base external dependency",
+    },
 }
 
 
@@ -247,6 +265,16 @@ def _base_platforms(repo_dirs=None):
     return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_platforms)
 
 
+def _utilities(repo_dirs=None):
+    """Get the external dependencies singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.utilities)
+
+
+def _base_utilities(repo_dirs=None):
+    """Get the base external dependencies singleton RepoPath instance for Ramble."""
+    return _gen_path(repo_dirs=repo_dirs, obj_type=ObjectTypes.base_utilities)
+
+
 paths = {
     ObjectTypes.applications: llnl.util.lang.Singleton(_apps),
     ObjectTypes.modifiers: llnl.util.lang.Singleton(_mods),
@@ -261,6 +289,8 @@ paths = {
     ObjectTypes.base_workflow_managers: llnl.util.lang.Singleton(_base_workflow_managers),
     ObjectTypes.base_systems: llnl.util.lang.Singleton(_base_systems),
     ObjectTypes.base_platforms: llnl.util.lang.Singleton(_base_platforms),
+    ObjectTypes.utilities: llnl.util.lang.Singleton(_utilities),
+    ObjectTypes.base_utilities: llnl.util.lang.Singleton(_base_utilities),
 }
 
 

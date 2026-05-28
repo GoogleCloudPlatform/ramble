@@ -24,6 +24,7 @@ from spack.util.executable import ProcessError, which
 
 
 class SpackLightweight(PackageManagerBase):
+    requires_utility("spack")
     """Lightweight version of Spack package manager class definition
 
     This implements most of the logic for the spack package manager. The
@@ -59,7 +60,11 @@ class SpackLightweight(PackageManagerBase):
     @property
     def runner(self):
         if self._runner is None:
-            self._runner = SpackRunner()
+            env = None
+            app_inst = self._get_app_inst()
+            if hasattr(app_inst, "experiment_runner_env"):
+                env = app_inst.experiment_runner_env
+            self._runner = SpackRunner(env=env)
         return self._runner
 
     variant(
@@ -559,6 +564,12 @@ class SpackLightweight(PackageManagerBase):
     )
 
     def spack_source(self):
+        if (
+            hasattr(self.app_inst, "variables")
+            and "utility::spack::activation_command" in self.app_inst.variables
+        ):
+            if self.app_inst.variables["utility::spack::activation_command"]:
+                return ["{utility::spack::activation_command}"]
         return self.runner.generate_source_command()
 
     def spack_activate(self):
@@ -747,13 +758,17 @@ class SpackRunner(CommandRunner):
         "spack_includes.yaml",
     ]
 
-    def __init__(self, shell="bash", dry_run=False):
+    def __init__(self, shell="bash", dry_run=False, env=None):
         """
         Ensure spack is found in the path, and setup some default variables.
         """
 
         super().__init__(
-            name="spack", command="spack", shell=shell, dry_run=dry_run
+            name="spack",
+            command="spack",
+            shell=shell,
+            dry_run=dry_run,
+            env=env,
         )
         self.spack = self.command
 
@@ -778,7 +793,7 @@ class SpackRunner(CommandRunner):
         )
 
         self.bs_python = CommandRunner(
-            "python", command=sys.executable, dry_run=dry_run
+            "python", command=sys.executable, dry_run=dry_run, env=env
         )
         self.concretized = False
         self.hash = None

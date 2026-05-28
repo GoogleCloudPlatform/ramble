@@ -47,6 +47,7 @@ class namespace:
     # For software definitions
     software = "software"
     external_env = "external_env"
+    utilities = "utilities"
 
     # v2 configs
     pkg_spec = "pkg_spec"

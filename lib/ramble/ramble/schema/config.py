@@ -200,6 +200,8 @@ properties["config"]["overwrite_inventories"] = {"type": "boolean", "default": F
 
 properties["config"]["generate_file_editing_scripts"] = {"type": "boolean", "default": True}
 
+properties["config"]["bootstrap_utilities"] = {"type": "boolean", "default": True}
+
 properties["config"]["stage_method"] = {
     "type": "string",
     "enum": ["cp", "rsync", "symbolic_link", "hard_link"],

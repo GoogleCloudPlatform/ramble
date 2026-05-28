@@ -580,7 +580,7 @@ def mutable_mock_workspace_path(tmpdir_factory, mutable_config):
         yield mock_path
 
 
-@pytest.fixture()
+@pytest.fixture(autouse=True)
 def workspace_deactivate():
     """Deactivates any active workspace after a test."""
     ramble.workspace.deactivate()

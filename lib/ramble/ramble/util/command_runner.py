@@ -6,7 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 import time
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 from ramble.util.executable import which
 from ramble.util.logger import logger
@@ -30,6 +30,7 @@ class CommandRunner:
         shell: str = "bash",
         dry_run: bool = False,
         path: Optional[str] = None,
+        env: Optional[Dict[str, str]] = None,
     ):
         """
         Ensure required command is found in the path
@@ -37,6 +38,7 @@ class CommandRunner:
         self.name = name
         self.dry_run = dry_run
         self.shell = shell
+        self.env = env
         self.elapsed_time: float = 0.0
         required = not self.dry_run
         if command is None:
@@ -164,14 +166,14 @@ class CommandRunner:
         try:
             if active_stream is None:
                 if return_output:
-                    out_str = executable(*args, output=str)
+                    out_str = executable(*args, output=str, env=self.env)
                 else:
-                    executable(*args)
+                    executable(*args, env=self.env)
             else:
                 if return_output:
-                    out_str = executable(*args, output=str, error=active_stream)
+                    out_str = executable(*args, output=str, error=active_stream, env=self.env)
                 else:
-                    executable(*args, output=active_stream, error=active_stream)
+                    executable(*args, output=active_stream, error=active_stream, env=self.env)
         except ProcessError as e:
             if not allow_failure:
                 logger.error(e)

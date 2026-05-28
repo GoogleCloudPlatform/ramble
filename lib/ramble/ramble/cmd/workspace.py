@@ -56,6 +56,7 @@ def _deprecated_manage_experiments_arguments():
 subcommands = [
     "activate",
     "archive",
+    "bootstrap",
     "deactivate",
     "create",
     "concretize",
@@ -479,6 +480,35 @@ def workspace_concretize(args):
         ws.concretize(force=args.force_concretize, quiet=args.quiet)
 
 
+def workspace_bootstrap_setup_parser(subparser):
+    """Bootstrap external utilities for a workspace"""
+    arguments.add_common_arguments(
+        subparser,
+        [
+            "where",
+            "exclude_where",
+            "filter_tags",
+        ],
+    )
+
+
+def workspace_bootstrap(args):
+    current_pipeline = ramble.pipeline.pipelines.bootstrap
+    ws = ramble.cmd.require_active_workspace(cmd_name="workspace bootstrap")
+
+    filters = ramble.filters.Filters(
+        phase_filters=["bootstrap_utilities"],
+        include_where_filters=getattr(args, "where", None),
+        exclude_where_filters=getattr(args, "exclude_where", None),
+        tags=getattr(args, "filter_tags", None),
+    )
+
+    pipeline_cls = ramble.pipeline.pipeline_class(current_pipeline)
+    pipeline = pipeline_cls(ws, filters)
+    with ws.write_transaction():
+        workspace_run_pipeline(args, pipeline)
+
+
 def workspace_run_pipeline(args, pipeline):
     profile_phases = getattr(args, "profile_phases", None)
     profile_phase_output = getattr(args, "profile_phase_output", None)
@@ -796,6 +826,10 @@ def workspace_info_setup_parser(subparser):
         "--executables", action="store_true", help="If set, experiment executables will be printed"
     )
 
+    subparser.add_argument(
+        "--utilities", action="store_true", help="If set, bootstrapped utilities will be printed"
+    )
+
     arguments.add_common_arguments(
         subparser,
         ["where", "exclude_where", "filter_tags", "filter_group", "exclude_filter_group"],
@@ -829,6 +863,7 @@ def workspace_info(args):
         args.expansions = True
         args.phases = True
         args.executables = True
+        args.utilities = True
 
     color.cprint(f'{color.section_title("Workspace: ")}{ws.name}')
     color.cprint("")
@@ -1041,6 +1076,65 @@ def workspace_info(args):
                 verbosity=args.verbose, indent=4, color_level=1, only_used=only_used_software
             )
         )
+
+    if args.utilities:
+        color.cprint("")
+        color.cprint(color.section_title("Bootstrapped Utilities:"))
+
+        all_utilities = {}
+        for workloads, _application_context in ws.all_applications():
+            for experiments, _workload_context in ws.all_workloads(workloads):
+                for _exp_contents, _experiment_context in ws.all_experiments(experiments):
+                    app_ctx = _application_context.context_name
+                    wl_ctx = _workload_context.context_name
+                    exp_ctx = _experiment_context.context_name
+                    full_exp_name = f"{app_ctx}.{wl_ctx}.{exp_ctx}"
+                    app_inst = experiment_set.get_experiment(full_exp_name)
+
+                    objects_to_check = [app_inst]
+                    if hasattr(app_inst, "package_manager") and app_inst.package_manager:
+                        objects_to_check.append(app_inst.package_manager)
+                    if hasattr(app_inst, "system") and app_inst.system:
+                        objects_to_check.append(app_inst.system)
+                    if hasattr(app_inst, "platform") and app_inst.platform:
+                        objects_to_check.append(app_inst.platform)
+                    if hasattr(app_inst, "workflow_manager") and app_inst.workflow_manager:
+                        objects_to_check.append(app_inst.workflow_manager)
+                    if hasattr(app_inst, "_modifiers") and app_inst._modifiers:
+                        objects_to_check.extend(app_inst._modifiers)
+
+                    for obj in objects_to_check:
+                        if hasattr(obj, "required_utilities"):
+                            for when_key, utilities in obj.required_utilities.items():
+                                if obj.satisfy_when(when_key):
+                                    for utility_name, utility_conf in utilities.items():
+                                        if utility_name not in all_utilities:
+                                            all_utilities[utility_name] = set()
+                                        conf_tuple = tuple(
+                                            sorted(
+                                                (k, tuple(v) if isinstance(v, list) else v)
+                                                for k, v in utility_conf.items()
+                                                if k != "when"
+                                            )
+                                        )
+                                        all_utilities[utility_name].add(conf_tuple)
+
+        if not all_utilities:
+            color.cprint("    None")
+        else:
+            ws_utilities = ws.get_workspace_utilities() or {}
+            for utility_name, confs in sorted(all_utilities.items()):
+                color.cprint(color.nested_1(f"    {utility_name}:"))
+
+                # Check for workspace override
+                if utility_name in ws_utilities:
+                    override_conf = dict(ws_utilities[utility_name])
+                    color.cprint(f"      Configuration: {override_conf} (Workspace Override)")
+                    continue
+
+                for conf in sorted(confs):
+                    conf_dict = dict(conf)
+                    color.cprint(f"      Configuration: {conf_dict}")
 
 
 #
