@@ -10,9 +10,6 @@ import shutil
 
 # FIXME: this should be imported later so we don't have to install the mac only
 # package on all systems
-import macholib.mach_o
-import macholib.MachO
-
 import llnl.util.lang
 import llnl.util.tty as tty
 from llnl.util.symlink import symlink
@@ -337,6 +334,8 @@ def modify_object_macholib(cur_path, paths_to_paths):
     dictionary mapping paths in old install layout to new install layout
     """
 
+    import macholib.MachO
+
     dll = macholib.MachO.MachO(cur_path)
     dll.rewriteLoadCommands(paths_to_paths.get)
 
@@ -357,6 +356,9 @@ def modify_object_macholib(cur_path, paths_to_paths):
 def macholib_get_paths(cur_path):
     """Get rpaths, dependent libraries, and library id of mach-o objects.
     """
+    import macholib.MachO
+    import macholib.mach_o
+
     headers = macholib.MachO.MachO(cur_path).headers
     if not headers:
         tty.warn("Failed to read Mach-O headers: {0}".format(cur_path))

@@ -24,13 +24,6 @@ ctest_log_parser
 * Version: Unversioned
 * Note: This is a homemade port of Kitware's CTest build handler.
 
-distro
-------
-
-* Homepage: https://pypi.python.org/pypi/distro
-* Usage: Provides a more stable linux distribution detection.
-* Version: 1.0.4 (last version supporting Python 2.6)
-
 jinja2
 ------
 
@@ -67,19 +60,6 @@ ruamel.yaml
 * Note: This package has been slightly modified to improve Python 2.6
   compatibility -- some ``{}`` format strings were replaced, and the
   import for ``OrderedDict`` was tweaked.
-
-macholib
---------
-
-* Homepage: https://macholib.readthedocs.io/en/latest/index.html#
-* Usage: Manipulation of Mach-o binaries for relocating macOS buildcaches on Linux
-* Version: 1.12
-
-altgraph
---------
-
-* Homepage: https://altgraph.readthedocs.io/en/latest/index.html
-* Usage: dependency of macholib
-* Version: 0.16.1
-
 """
+
+
