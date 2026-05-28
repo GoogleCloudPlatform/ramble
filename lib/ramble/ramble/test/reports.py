@@ -371,6 +371,22 @@ def test_compare_plot(mutable_mock_workspace_path, tmpdir_factory):
     assert os.path.isfile(os.path.join(report_dir_path, "fom_1_by_n_nodes.png"))
 
 
+def test_compare_plot_with_simplify_names(mutable_mock_workspace_path, tmpdir_factory):
+    report_name = "unit_test_simplify_compare"
+    report_dir_path = tmpdir_factory.mktemp(report_name)
+    pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
+
+    spec = ["fom_1", "experiment_name"]
+    plot = ramble.reports.ComparisonPlot(
+        spec, False, report_dir_path, single_experiments, False, False, None, simplify_names=True
+    )
+    with PdfPages(pdf_path) as pdf_report:
+        plot.generate_plot_data(pdf_report)
+
+    assert os.path.isfile(pdf_path)
+    assert os.path.isfile(os.path.join(report_dir_path, "fom_1_by_experiment_name.png"))
+
+
 def test_multiline_plot(mutable_mock_workspace_path, mutable_config, tmpdir_factory):
     results_dir_path = tmpdir_factory.mktemp("unit_test")
     results_file = os.path.join(results_dir_path, "results.json")
@@ -567,3 +583,110 @@ def test_index_printing(mutable_mock_workspace_path, tmpdir_factory, format):
 
     for exclude_str in exclude:
         assert exclude_str not in result_index
+
+
+def test_simplify_names():
+    import pandas as pd
+
+    from ramble.reports import (
+        clean_redundant_prefixes,
+        simplify_experiment_names,
+        simplify_names,
+    )
+
+    # 1. Simple prefix stripping
+    assert simplify_names(["gromacs.water.exp1", "gromacs.water.exp2"]) == ["exp1", "exp2"]
+
+    # 2. Prefix and suffix stripping
+    assert simplify_names(["gromacs.water.exp1.ppn_8", "gromacs.water.exp2.ppn_8"]) == [
+        "exp1",
+        "exp2",
+    ]
+
+    # 3. No dots/common parts
+    assert simplify_names(["exp1", "exp2"]) == ["exp1", "exp2"]
+
+    # 4. Single element
+    assert simplify_names(["gromacs.water.exp1"]) == ["gromacs.water.exp1"]
+
+    # 5. Completely identical elements
+    assert simplify_names(["a.b.c", "a.b.c"]) == ["a.b.c", "a.b.c"]
+
+    # 6. Partial mismatch/empty parts fallback
+    assert simplify_names(["a.b", "a.b", "a.c"]) == ["b", "b", "c"]
+
+    # 7. Prefix/workload redundant part stripping
+    assert (
+        clean_redundant_prefixes(
+            "osu_micro_benchmarks_osu_allreduce_test_mpi_2_2",
+            "osu_micro_benchmarks",
+            "osu_allreduce",
+        )
+        == "test_mpi_2_2"
+    )
+
+    assert (
+        clean_redundant_prefixes(
+            "osu-micro-benchmarks_osu-allreduce_test_mpi_2_2",
+            "osu-micro-benchmarks",
+            "osu-allreduce",
+        )
+        == "test_mpi_2_2"
+    )
+
+    # Redundant prefix substring test (workload_name contains application_name)
+    assert (
+        clean_redundant_prefixes(
+            "osu_osu_allreduce_test",
+            "osu",
+            "osu_allreduce",
+        )
+        == "test"
+    )
+
+    # 8. DataFrame simplification (user scenario)
+    df = pd.DataFrame(
+        {
+            "application_name": ["osu_micro_benchmarks"],
+            "workload_name": ["osu_allreduce"],
+        },
+        index=[
+            "osu_micro_benchmarks.osu_allreduce.osu_micro_benchmarks_osu_allreduce_test_mpi_2_2"
+        ],
+    )
+    df, prefix = simplify_experiment_names(df)
+    assert df.index.tolist() == ["test_mpi_2_2"]
+    assert prefix == "osu_micro_benchmarks.osu_allreduce.osu_micro_benchmarks_osu_allreduce_"
+
+    # 9. get_common_stripped_prefix
+    from ramble.reports import get_common_stripped_prefix
+
+    assert get_common_stripped_prefix(["a.b.c_1", "a.b.c_2"], ["1", "2"]) == "a.b.c_"
+    assert get_common_stripped_prefix(["a.b.c.x.y", "a.b.d.x.y"], ["c", "d"]) == "a.b."
+
+    # 10. Collision Fallback
+    df_collision = pd.DataFrame(
+        {
+            "application_name": ["b", "c"],
+            "workload_name": ["", ""],
+        },
+        index=["a.b.x", "a.c.x"],
+    )
+    df_collision, prefix = simplify_experiment_names(df_collision)
+    assert df_collision.index.tolist() == ["a.b.x", "a.c.x"]
+    assert prefix == ""
+
+
+def test_fom_plot_with_simplify_names(mutable_mock_workspace_path, tmpdir_factory):
+    report_name = "unit_test_simplify"
+    report_dir_path = tmpdir_factory.mktemp(report_name)
+    pdf_path = os.path.join(report_dir_path, f"{report_name}.pdf")
+
+    plot = ramble.reports.FomPlot(
+        None, False, report_dir_path, single_experiments, False, False, None, simplify_names=True
+    )
+    with PdfPages(pdf_path) as pdf_report:
+        plot.generate_plot_data(pdf_report)
+
+    assert os.path.isfile(pdf_path)
+    assert os.path.isfile(os.path.join(report_dir_path, "foms_fom_1_by_experiments.png"))
