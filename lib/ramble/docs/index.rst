@@ -32,6 +32,7 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    configuration_files
    workspace
    workspace_config
+   utilities
    package_managers
    workflow_managers
    systems
@@ -54,10 +55,12 @@ If you're new to Ramble and want to start using it, see :doc:`getting_started`.
    application_list
    modifier_list
    package_manager_list
+   utility_list
    workflow_manager_list
    base_application_list
    base_modifier_list
    base_package_manager_list
+   base_utility_list
    base_workflow_manager_list
 
 .. toctree::
