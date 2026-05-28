@@ -125,6 +125,51 @@ section_schemas: Dict[str, Dict[str, Any]] = {
 all_schemas = copy.deepcopy(section_schemas)
 all_schemas.update(dict.fromkeys(ramble.schema.workspace.keys, ramble.schema.workspace.schema))
 
+
+class _RambleLineLoader(syaml.OrderedLineLoader):
+    def construct_mapping(self, node, maptyp, deep=False):
+        from builtins import set
+
+        import llnl.util.tty as tty
+
+        seen_keys = set()
+        for key_node, _ in node.value:
+            key = self.construct_object(key_node, deep=True)
+
+            # Check if key is hashable; convert lists to tuples
+            try:
+                hash(key)
+                is_hashable = True
+            except TypeError:
+                if isinstance(key, list):
+                    try:
+                        key = tuple(key)
+                        hash(key)
+                        is_hashable = True
+                    except TypeError:
+                        is_hashable = False
+                else:
+                    is_hashable = False
+
+            if is_hashable:
+                if key in seen_keys:
+                    filename = node.start_mark.name
+                    line = key_node.start_mark.line + 1
+                    tty.warn(
+                        f'Duplicate key "{key}" detected in {filename} at line {line}. '
+                        "This will overwrite the previous value."
+                    )
+                seen_keys.add(key)
+
+        super().construct_mapping(node, maptyp, deep=deep)
+
+
+def load_config(*args, **kwargs):
+    """Load YAML using Ramble's custom Loader that warns on duplicate keys."""
+    kwargs["Loader"] = _RambleLineLoader
+    return syaml.load(*args, **kwargs)
+
+
 #: Builtin paths to configuration files in ramble
 configuration_paths = (
     # Default configuration scope is the lowest-level scope. These are
@@ -933,14 +978,14 @@ def add(fullpath, scope=None):
             existing = get_valid_type(path)
 
             # construct value from this point down
-            value = syaml.load_config(components[-1])
+            value = load_config(components[-1])
             for component in reversed(components[idx + 1 : -1]):
                 value = {component: value}
             break
 
     if has_existing_value:
         path, _, value = fullpath.rpartition(":")
-        value = syaml.load_config(value)
+        value = load_config(value)
         existing = get(path, scope=scope)
 
     # append values to lists
@@ -1040,7 +1085,7 @@ def read_config_file(filename, schema=None):
     try:
         logger.debug(f"Reading config file {filename}")
         with open(filename) as f:
-            data = syaml.load_config(f)
+            data = load_config(f)
 
         if data:
             if not schema:
