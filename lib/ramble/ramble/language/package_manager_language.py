@@ -59,16 +59,11 @@ def package_manager_variable(
     return _define_package_manager_variable
 
 
-@package_manager_directive("class_families")
+@package_manager_directive(dicts=())
 def package_manager_family(*names: str, **kwargs):
     """Add a new family to this package manager
 
     Args:
         name (str): Name of family to apply to this package manager
     """
-
-    def _define_package_manager_family(pm):
-        for name in names:
-            pm.class_families[name] = True
-
-    return _define_package_manager_family
+    return ramble.language.shared_language.class_family(*names, **kwargs)

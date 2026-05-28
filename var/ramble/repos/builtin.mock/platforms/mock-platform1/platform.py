@@ -14,6 +14,8 @@ class MockPlatform1(PlatformBase):
 
     name = "mock-platform1"
 
+    platform_family("test")
+
     variable(
         "max_accelerators_per_node",
         default="0",

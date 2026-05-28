@@ -14,6 +14,8 @@ class SpackSlurmSys(SystemBase):
 
     name = "spack-slurm-sys"
 
+    system_family("test")
+
     default_workflow_manager("slurm")
     default_package_manager("spack")
     default_platform("mock-platform1")

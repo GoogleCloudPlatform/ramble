@@ -30,16 +30,11 @@ class PlatformMeta(ramble.language.shared_language.SharedMeta):
 platform_directive = PlatformMeta.directive
 
 
-@platform_directive("class_families")
+@platform_directive(dicts=())
 def platform_family(*names: str, **kwargs):
     """Add a new family to this platform
 
     Args:
         name (str): Name of family to apply to this platform
     """
-
-    def _define_platform_family(plat):
-        for name in names:
-            plat.class_families[name] = True
-
-    return _define_platform_family
+    return ramble.language.shared_language.class_family(*names, **kwargs)
