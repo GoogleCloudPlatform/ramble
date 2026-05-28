@@ -9,7 +9,7 @@
 import pytest
 
 import ramble.filters
-from ramble.workspace import RambleWorkspaceError
+from ramble.error import RambleError
 
 
 def test_translate_group_to_predicate():
@@ -71,16 +71,16 @@ def test_expand_filter_groups():
     )
 
     # Test invalid group
-    with pytest.raises(RambleWorkspaceError):
+    with pytest.raises(RambleError):
         ramble.filters.expand_filter_groups("invalid-group", filter_groups_defs)
 
     # Test invalid characters
-    with pytest.raises(RambleWorkspaceError):
+    with pytest.raises(RambleError):
         ramble.filters.expand_filter_groups("small-scale & tcp-only", filter_groups_defs)
 
     # Test None defs
     assert ramble.filters.expand_filter_groups("", None) == "True"
-    with pytest.raises(RambleWorkspaceError):
+    with pytest.raises(RambleError):
         ramble.filters.expand_filter_groups("small-scale", None)
 
 
@@ -154,3 +154,27 @@ def test_resolve_and_apply_filter_groups(mutable_config):
     args = MockArgs(filter_group="invalid")
     with pytest.raises(SystemExit):
         ramble.filters.resolve_and_apply_filter_groups(args, None)
+
+
+def test_validate_filter_group_name():
+    # Test valid names
+    ramble.filters.validate_filter_group_name("small")
+    ramble.filters.validate_filter_group_name("small-scale")
+    ramble.filters.validate_filter_group_name("small_scale")
+    ramble.filters.validate_filter_group_name("group-1")
+
+    # Test reserved keywords (should fail)
+    with pytest.raises(RambleError):
+        ramble.filters.validate_filter_group_name("and")
+    with pytest.raises(RambleError):
+        ramble.filters.validate_filter_group_name("OR")
+    with pytest.raises(RambleError):
+        ramble.filters.validate_filter_group_name("not")
+
+    # Test invalid characters (should fail)
+    with pytest.raises(RambleError):
+        ramble.filters.validate_filter_group_name("small scale")
+    with pytest.raises(RambleError):
+        ramble.filters.validate_filter_group_name("small.scale")
+    with pytest.raises(RambleError):
+        ramble.filters.validate_filter_group_name("small&scale")

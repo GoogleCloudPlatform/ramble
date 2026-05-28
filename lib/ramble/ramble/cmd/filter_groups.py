@@ -9,7 +9,9 @@
 import copy
 
 import ramble.config
+import ramble.filters
 import ramble.workspace
+from ramble.error import RambleError
 from ramble.util.logger import logger
 
 description = "manage global or workspace-scoped filter groups"
@@ -82,6 +84,11 @@ def filter_groups(parser, args):
 
 def filter_groups_add(scope, args):
     name = args.name
+
+    try:
+        ramble.filters.validate_filter_group_name(name)
+    except RambleError as e:
+        logger.die(str(e))
 
     if not args.where and not args.exclude_where:
         logger.die("At least one of --where or --exclude-where must be specified.")

@@ -40,7 +40,7 @@ def test_workspace_manage_filter_groups(workspace_name):
     )
 
     # Verify it was added to workspace config file
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "filter_groups:" in content
         assert "small-scale:" in content
@@ -96,7 +96,7 @@ def test_workspace_manage_filter_groups(workspace_name):
     )
 
     # Verify it was removed from file
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "small-scale:" not in content
         assert "large-scale:" in content
@@ -117,7 +117,7 @@ def test_global_filter_groups(workspace_name):
     user_config_file = user_scope.get_section_filename("filter_groups")
 
     assert os.path.exists(user_config_file)
-    with open(user_config_file) as f:
+    with open(user_config_file, encoding="utf-8") as f:
         content = f.read()
         assert "filter_groups:" in content
         assert "global-small:" in content
@@ -144,12 +144,12 @@ def test_global_filter_groups(workspace_name):
     )
 
     # Verify it went to workspace config, not user config
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         ws_content = f.read()
         assert "ws-group:" in ws_content
         assert "{n_nodes} == 4" in ws_content
 
-    with open(user_config_file) as f:
+    with open(user_config_file, encoding="utf-8") as f:
         user_content = f.read()
         assert "ws-group:" not in user_content
 
@@ -167,7 +167,7 @@ def test_global_filter_groups(workspace_name):
         "global-small",
     )
 
-    with open(user_config_file) as f:
+    with open(user_config_file, encoding="utf-8") as f:
         content = f.read()
         assert "global-small:" not in content
 
@@ -185,6 +185,34 @@ def test_workspace_manage_filter_groups_errors(workspace_name):
 
     workspace_cmd(
         "manage", "filter-groups", "add", "-n", "foo", global_args=global_args, fail_on_error=False
+    )
+    assert workspace_cmd.returncode != 0
+
+    # Reserved keyword
+    workspace_cmd(
+        "manage",
+        "filter-groups",
+        "add",
+        "-n",
+        "and",
+        "--where",
+        "x",
+        global_args=global_args,
+        fail_on_error=False,
+    )
+    assert workspace_cmd.returncode != 0
+
+    # Invalid characters
+    workspace_cmd(
+        "manage",
+        "filter-groups",
+        "add",
+        "-n",
+        "foo.bar",
+        "--where",
+        "x",
+        global_args=global_args,
+        fail_on_error=False,
     )
     assert workspace_cmd.returncode != 0
 
@@ -214,6 +242,14 @@ def test_global_filter_groups_empty_list():
 
 def test_global_filter_groups_errors(workspace_name):
     filter_groups_cmd("add", "-n", "foo", fail_on_error=False)
+    assert filter_groups_cmd.returncode != 0
+
+    # Reserved keyword
+    filter_groups_cmd("add", "-n", "and", "--where", "x", fail_on_error=False)
+    assert filter_groups_cmd.returncode != 0
+
+    # Invalid characters
+    filter_groups_cmd("add", "-n", "foo.bar", "--where", "x", fail_on_error=False)
     assert filter_groups_cmd.returncode != 0
 
     filter_groups_cmd("remove", "-n", "foo", fail_on_error=False)

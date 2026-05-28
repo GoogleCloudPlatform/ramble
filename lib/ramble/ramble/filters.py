@@ -76,9 +76,7 @@ def expand_filter_groups(expression: str, filter_groups_defs: Optional[dict]) ->
     # Validate expression only contains allowed characters to prevent injection or silent failures
     invalid_chars = re.sub(r"[a-zA-Z0-9_\s\(\)-]", "", expression)
     if invalid_chars:
-        from ramble.workspace import RambleWorkspaceError
-
-        raise RambleWorkspaceError(
+        raise RambleError(
             f"Invalid characters {repr(invalid_chars)} in filter group expression '{expression}'"
         )
 
@@ -95,11 +93,7 @@ def expand_filter_groups(expression: str, filter_groups_defs: Optional[dict]) ->
             group_expr = translate_group_to_predicate(group_def)
             expanded_tokens.append(f"( {group_expr} )")
         else:
-            from ramble.workspace import RambleWorkspaceError
-
-            raise RambleWorkspaceError(
-                f"Unknown filter group '{token}' in expression '{expression}'"
-            )
+            raise RambleError(f"Unknown filter group '{token}' in expression '{expression}'")
 
     return " ".join(expanded_tokens)
 
@@ -139,3 +133,15 @@ def resolve_and_apply_filter_groups(args, include_where_filters):
         logger.die(str(e))
 
     return include_where_filters
+
+
+def validate_filter_group_name(name: str):
+    """Validate filter group name to prevent reserved keywords and invalid characters."""
+    if name.lower() in ("and", "or", "not"):
+        raise RambleError(f"Filter group name '{name}' is a reserved keyword.")
+
+    if not re.match(r"^[a-zA-Z0-9_-]+$", name):
+        raise RambleError(
+            f"Filter group name '{name}' is invalid. "
+            "It can only contain alphanumeric characters, underscores, and hyphens."
+        )

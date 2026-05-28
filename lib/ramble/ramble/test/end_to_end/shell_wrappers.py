@@ -179,7 +179,7 @@ exit 0
     }
     script_content = script_templates[shell]
 
-    with open(test_script_path, "w") as f:
+    with open(test_script_path, "w", encoding="utf-8") as f:
         f.write(script_content)
 
     try:

@@ -30,6 +30,7 @@ import ramble.workspace
 import ramble.workspace.shell
 from ramble import ramble_version
 from ramble.cmd.common import arguments
+from ramble.error import RambleError
 from ramble.namespace import namespace
 from ramble.util.logger import logger
 
@@ -1882,6 +1883,11 @@ def workspace_manage_filter_groups(args):
 def workspace_manage_filter_groups_add(ws, args):
     scope = ws.ws_file_config_scope_name()
     name = args.name
+
+    try:
+        ramble.filters.validate_filter_group_name(name)
+    except RambleError as e:
+        logger.die(str(e))
 
     if not args.where and not args.exclude_where:
         logger.die("At least one of --where or --exclude-where must be specified.")
