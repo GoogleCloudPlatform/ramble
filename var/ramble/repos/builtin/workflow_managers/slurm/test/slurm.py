@@ -176,7 +176,9 @@ ramble:
             assert "#SBATCH --gpus-per-task=1" in content
             assert "#SBATCH -p" not in content
             assert "#SBATCH --time" not in content
-        with open(os.path.join(path, "execute_experiment"), encoding="utf-8") as f:
+        with open(
+            os.path.join(path, "execute_experiment"), encoding="utf-8"
+        ) as f:
             exec_content = f.read()
             assert "scontrol show config" in exec_content
             assert "#SBATCH" not in exec_content

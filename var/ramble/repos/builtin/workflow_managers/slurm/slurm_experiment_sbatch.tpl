@@ -7,4 +7,4 @@ cd {experiment_run_dir}
 
 {workflow_hostfile_cmd}
 
-. {execute_experiment}
+. "{execute_experiment}"
