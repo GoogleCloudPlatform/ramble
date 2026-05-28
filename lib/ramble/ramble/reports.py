@@ -138,8 +138,8 @@ def clean_redundant_prefixes(name, application_name, workload_name):
     if not name:
         return name
 
-    app_norm = application_name.replace("-", "_").replace(".", "_").lower()
-    wl_norm = workload_name.replace("-", "_").replace(".", "_").lower()
+    app_norm = (application_name or "").replace("-", "_").replace(".", "_").lower()
+    wl_norm = (workload_name or "").replace("-", "_").replace(".", "_").lower()
 
     name_lower = name.lower().replace("-", "_").replace(".", "_")
 
@@ -152,10 +152,10 @@ def clean_redundant_prefixes(name, application_name, workload_name):
                 name = name[len(full_prefix) :]
                 name_lower = name_lower[len(full_prefix) :]
                 break
-            elif name_lower.startswith(prefix_norm):
+        else:
+            if name_lower.startswith(prefix_norm):
                 name = name[len(prefix_norm) :]
                 name_lower = name_lower[len(prefix_norm) :]
-                break
 
     return name
 
@@ -199,12 +199,12 @@ def simplify_experiment_names(df, index_col=None):
     simplified_values = []
 
     # 1. Row-by-row clean redundant prefixes
-    for idx, val in enumerate(original_values):
-        # Get the corresponding row application and workload name
-        row = df.iloc[idx]
-        app_name = row.get(ReportVars.APP_NAME.value, "")
-        wl_name = row.get(ReportVars.WL_NAME.value, "")
+    app_col = ReportVars.APP_NAME.value
+    wl_col = ReportVars.WL_NAME.value
+    app_names = df[app_col].tolist() if app_col in df.columns else [""] * len(df)
+    wl_names = df[wl_col].tolist() if wl_col in df.columns else [""] * len(df)
 
+    for val, app_name, wl_name in zip(original_values, app_names, wl_names):
         parts = str(val).split(".")
         cleaned_parts = []
         for part in parts:
