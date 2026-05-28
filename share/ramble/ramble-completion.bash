@@ -638,7 +638,7 @@ _ramble_workspace_activate() {
 }
 
 _ramble_workspace_archive() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --archive-pattern --phases --include-phase-dependencies --where --exclude-where --profile-phase"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --archive-pattern --phases --include-phase-dependencies --where --exclude-where --profile-phase --profile-phase-output"
 }
 
 _ramble_workspace_deactivate() {
@@ -663,15 +663,15 @@ _ramble_workspace_config() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase"
+    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output"
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output"
 }
 
 _ramble_workspace_push_to_cache() {
-    RAMBLE_COMPREPLY="-h --help --dry-run -d --where --exclude-where --filter-tags --profile-phase"
+    RAMBLE_COMPREPLY="-h --help --dry-run -d --where --exclude-where --filter-tags --profile-phase --profile-phase-output"
 }
 
 _ramble_workspace_info() {
@@ -688,7 +688,7 @@ _ramble_workspace_edit() {
 }
 
 _ramble_workspace_mirror() {
-    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --include-phase-dependencies --where --exclude-where --profile-phase"
+    RAMBLE_COMPREPLY="-h --help -d --dry-run --phases --include-phase-dependencies --where --exclude-where --profile-phase --profile-phase-output"
 }
 
 _ramble_workspace_experiment_logs() {

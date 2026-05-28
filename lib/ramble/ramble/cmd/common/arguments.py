@@ -163,6 +163,17 @@ def profile_phases():
 
 
 @arg
+def profile_phase_output():
+    return Args(
+        "--profile-phase-output",
+        default=None,
+        dest="profile_phase_output",
+        help="file path to save the phase line_profiler output",
+        required=False,
+    )
+
+
+@arg
 def where():
     return Args(
         "--where",

@@ -125,6 +125,28 @@ def _get_phase_func_wrapper(workspace, phase_func, phase_name):
     profiler, profile_phases = workspace.profile_config
     if phase_name not in profile_phases:
         return phase_func
+
+    # In addition to the phase function, also instrument methods of all associated objects.
+    import inspect
+
+    obj = getattr(phase_func, "__self__", None)
+    if obj:
+        objects_to_register = [obj]
+        if getattr(obj, "origin_type", None) == "application" and hasattr(
+            obj, "objects"
+        ):
+            for _, assoc_obj in obj.objects(yield_all=False):
+                if assoc_obj and assoc_obj not in objects_to_register:
+                    objects_to_register.append(assoc_obj)
+
+        for target_obj in objects_to_register:
+            for _, member in inspect.getmembers(
+                target_obj, predicate=inspect.ismethod
+            ):
+                func_to_profile = getattr(member, "__func__", member)
+                if inspect.isfunction(func_to_profile):
+                    profiler.add_function(func_to_profile)
+
     return profiler(phase_func)
 
 
