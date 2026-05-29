@@ -26,7 +26,7 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
-def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
+def test_system_platform_works(workspace_name, mock_platforms, mock_systems, dry_run_env):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
@@ -47,9 +47,6 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         "system-variant1=bar",
         global_args=global_args,
     )
-
-    ws._re_read()
-    ws.dry_run = True
 
     try:
         workspace("concretize", global_args=global_args)
@@ -97,8 +94,10 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         pytest.skip(str(e))
 
 
-def test_platform_validator_threads_per_core(workspace_name, mock_platforms, mock_systems):
-    ws = ramble.workspace.create(workspace_name)
+def test_platform_validator_threads_per_core(
+    workspace_name, mock_platforms, mock_systems, dry_run_env
+):
+    ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
         "manage",
@@ -119,8 +118,6 @@ def test_platform_validator_threads_per_core(workspace_name, mock_platforms, moc
         global_args=global_args,
     )
 
-    ws._re_read()
-
     err_regex = re.escape(
         "Validator 'threads_per_node_platform_validation' (defined in 'mock-platform1') "
         "fails with message: 'Number of threads per node (2 * 3) exceeds max cores per node (4)'"
@@ -131,9 +128,9 @@ def test_platform_validator_threads_per_core(workspace_name, mock_platforms, moc
 
 
 def test_skipping_platform_validator_threads_per_core(
-    workspace_name, mock_platforms, mock_systems
+    workspace_name, mock_platforms, mock_systems, dry_run_env
 ):
-    ws = ramble.workspace.create(workspace_name)
+    ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
         "manage",
@@ -156,14 +153,14 @@ def test_skipping_platform_validator_threads_per_core(
         global_args=global_args,
     )
 
-    ws._re_read()
-
     workspace("concretize", global_args=global_args)
     workspace("info", global_args=global_args)
 
 
-def test_platform_validator_accelerators_per_node(workspace_name, mock_platforms, mock_systems):
-    ws = ramble.workspace.create(workspace_name)
+def test_platform_validator_accelerators_per_node(
+    workspace_name, mock_platforms, mock_systems, dry_run_env
+):
+    ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
         "manage",
@@ -186,8 +183,6 @@ def test_platform_validator_accelerators_per_node(workspace_name, mock_platforms
         global_args=global_args,
     )
 
-    ws._re_read()
-
     err_regex = re.escape(
         "Validator 'accelerators_per_node_platform_validation' (defined in 'mock-platform1') "
         "fails with message: 'Number of accelerators per node (2) exceeds max accelerators "
@@ -199,8 +194,8 @@ def test_platform_validator_accelerators_per_node(workspace_name, mock_platforms
         workspace("info", global_args=global_args)
 
 
-def test_system_validator_n_nodes(workspace_name, mock_platforms, mock_systems):
-    ws = ramble.workspace.create(workspace_name)
+def test_system_validator_n_nodes(workspace_name, mock_platforms, mock_systems, dry_run_env):
+    ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
         "manage",
@@ -219,8 +214,6 @@ def test_system_validator_n_nodes(workspace_name, mock_platforms, mock_systems):
         global_args=global_args,
     )
 
-    ws._re_read()
-
     err_regex = re.escape(
         "Validator 'n_nodes_system_validation' (defined in 'spack-slurm-sys') fails with message: "
         "'Number of nodes requested (10) exceeds max nodes (4)'"
@@ -230,8 +223,8 @@ def test_system_validator_n_nodes(workspace_name, mock_platforms, mock_systems):
         workspace("info", global_args=global_args)
 
 
-def test_system_validator_n_ranks(workspace_name, mock_platforms, mock_systems):
-    ws = ramble.workspace.create(workspace_name)
+def test_system_validator_n_ranks(workspace_name, mock_platforms, mock_systems, dry_run_env):
+    ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
         "manage",
@@ -249,8 +242,6 @@ def test_system_validator_n_ranks(workspace_name, mock_platforms, mock_systems):
         "system=spack-slurm-sys",
         global_args=global_args,
     )
-
-    ws._re_read()
 
     err_regex = re.escape(
         "Validator 'n_ranks_system_validation' (defined in 'spack-slurm-sys') fails with "

@@ -442,11 +442,11 @@ class Workspace:
     inventory_file_name = "ramble_inventory.json"
     hash_file_name = "workspace_hash.sha256"
 
-    def __init__(self, root, dry_run=False, read_default_template=True):
+    def __init__(self, root, dry_run=None, read_default_template=True):
         logger.debug(f"In workspace init. Root = {root}")
         self.root = ramble.util.path.canonicalize_path(root)
         self.txlock = lk.Lock(self._transaction_lock_path)
-        self.dry_run = dry_run
+        self._dry_run = dry_run
         self.repeat_success_strict = True
 
         self.read_default_template = read_default_template
@@ -2165,6 +2165,19 @@ ramble:
     def shared_license_dir(self):
         """Path to the shared license directory"""
         return os.path.join(self.shared_dir, WORKSPACE_SHARED_LICENSE_PATH)
+
+    @property
+    def dry_run(self):
+        if self._dry_run is not None:
+            return self._dry_run
+        dry_run_env = os.environ.get("RAMBLE_WORKSPACE_DRY_RUN")
+        if dry_run_env is not None:
+            return dry_run_env.lower() in ("true", "1")
+        return False
+
+    @dry_run.setter
+    def dry_run(self, val):
+        self._dry_run = val
 
     def template_path(self, name):
         if name in self._templates:

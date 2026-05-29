@@ -734,6 +734,13 @@ def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_work
     return _create
 
 
+@pytest.fixture
+def dry_run_env(working_env):
+    """Fixture to enable dry-run for workspace cmds"""
+    os.environ["RAMBLE_WORKSPACE_DRY_RUN"] = "1"
+    yield
+
+
 def pytest_generate_tests(metafunc):
     import re
 
