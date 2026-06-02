@@ -15,7 +15,6 @@ import os.path
 import pathlib
 import shutil
 
-import py
 import pytest
 
 from llnl.util.filesystem import remove_linked_tree
@@ -170,8 +169,8 @@ def no_chdir():
 
     This prevents Ramble tests (and therefore Ramble commands) from
     changing the working directory and causing other tests to fail
-    mysteriously. Tests should use ``working_dir`` or ``py.path``'s
-    ``.as_cwd()`` instead of ``os.chdir`` to avoid failing this check.
+    mysteriously. Tests should use ``working_dir`` instead of
+    ``os.chdir`` to avoid failing this check.
 
     We assert that the working directory hasn't changed, unless the
     original wd somehow ceased to exist.
@@ -351,21 +350,26 @@ def configuration_dir(tmpdir_factory, linux_os):
 
     # <test_path>/data/config has mock config yaml files in it
     # copy these to the site config.
-    test_config = py.path.local(ramble.paths.test_path).join("data", "config")
-    test_config.copy(tmpdir.join("site"))
+    test_config_path = os.path.join(ramble.paths.test_path, "data", "config")
+    site_path = os.path.join(str(tmpdir), "site")
+    shutil.copytree(test_config_path, site_path)
 
     # Create temporary 'defaults', 'site' and 'user' folders
-    tmpdir.ensure("user", dir=True)
+    os.makedirs(os.path.join(str(tmpdir), "user"), exist_ok=True)
 
     # Slightly modify config.yaml
     solver = os.environ.get("SPACK_TEST_SOLVER", "original")
-    config_yaml = test_config.join("config.yaml")
+    config_yaml_path = os.path.join(test_config_path, "config.yaml")
     modules_root = tmpdir_factory.mktemp("share")
-    tcl_root = modules_root.ensure("modules", dir=True)
-    lmod_root = modules_root.ensure("lmod", dir=True)
-    content = "".join(config_yaml.read()).format(solver, str(tcl_root), str(lmod_root))
-    t = tmpdir.join("site", "config.yaml")
-    t.write(content)
+    tcl_root = os.path.join(str(modules_root), "modules")
+    os.makedirs(tcl_root, exist_ok=True)
+    lmod_root = os.path.join(str(modules_root), "lmod")
+    os.makedirs(lmod_root, exist_ok=True)
+    with open(config_yaml_path, "r", encoding="utf-8") as f:
+        content = f.read().format(solver, str(tcl_root), str(lmod_root))
+    t_path = os.path.join(str(tmpdir), "site", "config.yaml")
+    with open(t_path, "w", encoding="utf-8") as f:
+        f.write(content)
     yield tmpdir
 
     # Once done, cleanup the directory
