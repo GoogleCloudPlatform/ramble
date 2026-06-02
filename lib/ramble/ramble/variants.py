@@ -361,22 +361,22 @@ class VariantSet:
                         f"   Valid values include: {self.default_variants[name].values}"
                     )
 
-                out_set.add(variant.as_definition())
+                out_set.update(variant.as_definitions())
                 defined_variants.add(name)
 
         for name, variant in self.default_variants.items():
             if name not in defined_variants:
-                out_set.add(variant.as_definition())
+                out_set.update(variant.as_definitions())
                 defined_variants.add(name)
 
         for variant_list in self.multi_value_variants.values():
             for variant in variant_list:
-                out_set.add(variant.as_definition())
+                out_set.update(variant.as_definitions())
 
         # Version variants are included as strings in the set for completeness, but should be
         # checked using the stored ObjectVersion class instead of a string comparison.
         for variant in self.version_variants.values():
-            out_set.add(variant.as_definition())
+            out_set.update(variant.as_definitions())
 
         self._set_cache = out_set
         return self._expanded_set(expander)
@@ -422,6 +422,22 @@ class Variant:
             str: String definition for this variant
         """
         return self._definition
+
+    def as_definitions(self) -> list:
+        """Build a list of definitions for this variant
+
+        Format the variant as all possible strings which can be used to test
+        against when clauses.
+
+        Returns:
+            list: String definitions for this variant
+        """
+        defs = [self._definition]
+        if isinstance(self.default, bool):
+            val_str = str(self.default)
+            defs.append(f"{self.name}={val_str}")
+            defs.append(f"{self.name}={val_str.lower()}")
+        return defs
 
     def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String documentation of this variant

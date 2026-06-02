@@ -51,6 +51,8 @@ def build_variant_set():
         "package_manager": "spack",
         "workflow_manager": "slurm",
         "compiler": "gcc@14.2.0",
+        "bool_true": True,
+        "bool_false": False,
     }
 
     multi_value_variants = [
@@ -283,6 +285,18 @@ def test_expansion_namespaces():
         (["test_variant=undefined", "package_manager=spack", "workflow_manager=slurm"], False),
         (["test_variant=defined", "package_manager=spack", "workflow_manager=slurm"], True),
         (["compiler=gcc@14.2.0"], True),
+        (["+bool_true"], True),
+        (["bool_true=True"], True),
+        (["bool_true=true"], True),
+        (["bool_true=False"], False),
+        (["bool_true=false"], False),
+        (["~bool_true"], False),
+        (["~bool_false"], True),
+        (["bool_false=False"], True),
+        (["bool_false=false"], True),
+        (["bool_false=True"], False),
+        (["bool_false=true"], False),
+        (["+bool_false"], False),
     ],
 )
 def test_satisfies_works(input_list, output):
