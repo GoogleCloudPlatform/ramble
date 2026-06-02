@@ -1556,8 +1556,6 @@ ramble:
     environments: {}
 """
 
-    import py
-
     def write_config(ws_path, config):
         with ramble.workspace.Workspace(ws_path) as ws:
             config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
@@ -1571,8 +1569,8 @@ ramble:
 
     workspace_flags = ["-D", ws_path]
 
-    config_path = py.path.local(os.path.join(ws_path, "configs"))
-    with config_path.as_cwd():
+    config_path = os.path.join(ws_path, "configs")
+    with fs.working_dir(config_path):
         write_config(ws_path, test_config)
 
         with ramble.workspace.Workspace(ws_path) as ws:
