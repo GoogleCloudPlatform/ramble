@@ -197,7 +197,13 @@ select = [
     "RUF015", # unnecessary-iterable-allocation
     "FURB192",# sorted-min-max
     "FURB118",# reimplemented-operator
+    "TID251", # banned imports
 ]
+
+[tool.ruff.lint.flake8-tidy-imports.banned-api]
+# Even though `py` is neither vendored nor listed in the deps, `pytest` has a dependency
+# on it. Use linter to ban its usage.
+"py" = { msg = "The legacy `py` library is deprecated and should not be used." }
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]
