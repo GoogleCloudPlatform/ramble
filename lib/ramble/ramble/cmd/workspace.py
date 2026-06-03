@@ -460,7 +460,7 @@ def workspace_concretize_setup_parser(subparser):
 
 
 def workspace_concretize(args):
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace concretize")
+    ws = ramble.cmd.require_active_workspace("workspace concretize", args.dry_run)
 
     if args.simplify:
         logger.debug("Simplifying workspace config")
@@ -528,10 +528,7 @@ def workspace_setup_setup_parser(subparser):
 
 def workspace_setup(args):
     current_pipeline = ramble.pipeline.pipelines.setup
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace setup")
-
-    if args.dry_run:
-        ws.dry_run = True
+    ws = ramble.cmd.require_active_workspace("workspace setup", args.dry_run)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
@@ -612,7 +609,7 @@ def workspace_analyze_setup_parser(subparser):
 
 def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace analyze")
+    ws = ramble.cmd.require_active_workspace("workspace analyze", args.dry_run)
     ws.repeat_success_strict = ramble.config.get("config:repeat_success_strict")
 
     filters = ramble.filters.Filters(
@@ -646,10 +643,7 @@ def workspace_analyze(args):
 
 def workspace_push_to_cache(args):
     current_pipeline = ramble.pipeline.pipelines.pushtocache
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace pushtocache")
-
-    if args.dry_run:
-        ws.dry_run = True
+    ws = ramble.cmd.require_active_workspace("workspace pushtocache", args.dry_run)
 
     filters = ramble.filters.Filters(
         phase_filters="*",
@@ -736,7 +730,7 @@ def workspace_config_setup_parser(subparser):
 
 
 def workspace_config(args):
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace squashed-config")
+    ws = ramble.cmd.require_active_workspace("workspace squashed-config", args.dry_run)
 
     if args.print_squash:
         ws.squash_and_print_config(args.included_section, args.excluded_section)
@@ -800,7 +794,7 @@ def workspace_info_setup_parser(subparser):
 
 
 def workspace_info(args):
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace info")
+    ws = ramble.cmd.require_active_workspace("workspace info", args.dry_run)
 
     # Enable verbose mode
     if args.verbose >= 1:
@@ -1258,7 +1252,7 @@ def workspace_archive_setup_parser(subparser):
 
 def workspace_archive(args):
     current_pipeline = ramble.pipeline.pipelines.archive
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace archive")
+    ws = ramble.cmd.require_active_workspace("workspace archive", args.dry_run)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
@@ -1314,10 +1308,7 @@ def workspace_mirror_setup_parser(subparser):
 
 def workspace_mirror(args):
     current_pipeline = ramble.pipeline.pipelines.mirror
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace archive")
-
-    if args.dry_run:
-        ws.dry_run = True
+    ws = ramble.cmd.require_active_workspace("workspace archive", args.dry_run)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
@@ -1867,7 +1858,7 @@ def workspace_experiment_logs_setup_parser(subparser):
 def workspace_experiment_logs(args):
     """Print log information for workspace"""
     current_pipeline = ramble.pipeline.pipelines.logs
-    ws = ramble.cmd.require_active_workspace(cmd_name="workspace concretize")
+    ws = ramble.cmd.require_active_workspace("workspace experiment-logs", args.dry_run)
 
     first_only = args.limit_one or args.first_failed
     where_filter = args.where.copy() if args.where else []
@@ -1926,6 +1917,15 @@ def setup_parser(subparser):
             description=setup_parser_cmd.__doc__,
         )
         setup_parser_cmd(subsubparser)
+
+        # inject --dry-run into subcommands
+        if "--dry-run" not in subsubparser._option_string_actions:
+            subsubparser.add_argument(
+                "--dry-run",
+                dest="dry_run",
+                action="store_true",
+                help=f"perform a dry run of the {name} command",
+            )
 
 
 def workspace(parser, args, unknown_args):

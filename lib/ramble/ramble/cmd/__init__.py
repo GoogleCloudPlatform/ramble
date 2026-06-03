@@ -155,7 +155,7 @@ class CommandNameError(ramble.error.RambleError):
         super().__init__(f"{name} is not a permissible Ramble command name.")
 
 
-def require_active_workspace(cmd_name):
+def require_active_workspace(cmd_name, dry_run: bool = False):
     """Used by commands to get the active workspace
 
     If a workspace is not found, print an error message that says the calling
@@ -163,6 +163,7 @@ def require_active_workspace(cmd_name):
 
     Arguments:
         cmd_name (str): name of calling command
+        dry_run (bool): whether this is a dry run
 
     Returns:
         (ramble.workspace.Workspace): the active workspace
@@ -170,6 +171,8 @@ def require_active_workspace(cmd_name):
     ws = ramble.workspace.active_workspace()
 
     if ws:
+        if dry_run:
+            ws.dry_run = True
         return ws
     else:
         logger.die(
