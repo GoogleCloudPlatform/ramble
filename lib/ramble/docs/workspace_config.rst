@@ -165,6 +165,7 @@ Supported math operators are:
 * ``<=`` (less or equal than)
 * ``and`` (logical and)
 * ``or`` (logical or)
+* ``not`` (logical not)
 * ``%`` (modulo)
 * ``&`` (bitwise and)
 * ``|`` (bitwise or)

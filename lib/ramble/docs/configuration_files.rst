@@ -366,6 +366,8 @@ scaling studies) without typing complex logical expressions on the CLI.
 Filter groups can be defined globally in ``~/.ramble/filter_groups.yaml`` (user scope)
 or per-workspace in ``$workspace/configs/ramble.yaml`` (workspace scope).
 
+If a filter group with the same name is defined in multiple configuration scopes (e.g., in both the user scope and a workspace scope), the definition in the higher-precedence scope completely overrides any definitions from lower-precedence scopes. The definitions (including the ``where`` and ``exclude_where`` lists) are not merged.
+
 The format of this config section is as follows:
 
 .. code-block:: yaml

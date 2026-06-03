@@ -55,6 +55,7 @@ def test_workspace_manage_filter_groups(workspace_name):
         "manage",
         "filter-groups",
         "list",
+        "-v",
         global_args=global_args,
     )
     assert "small-scale:" in out
@@ -81,7 +82,7 @@ def test_workspace_manage_filter_groups(workspace_name):
         "blame",
         global_args=global_args,
     )
-    assert "Scope: workspace:" in out
+    assert ws.config_file_path in out
     assert "small-scale:" in out
     assert "large-scale:" in out
 
@@ -124,7 +125,7 @@ def test_global_filter_groups(workspace_name):
         assert "{n_nodes} < 2" in content
 
     # 2. List global filter groups
-    out = filter_groups_cmd("list")
+    out = filter_groups_cmd("list", "-v")
     assert "global-small:" in out
     assert "{n_nodes} < 2" in out
 
@@ -155,10 +156,9 @@ def test_global_filter_groups(workspace_name):
 
     # 4. Blame from top-level command
     out = filter_groups_cmd("blame", global_args=global_args)
-    assert "Scope: user" in out
-    assert "global-small:" in out
-    assert "Scope: workspace:" in out
-    assert "ws-group:" in out
+    assert ws.config_file_path in out
+    assert "global-small" in out
+    assert "ws-group" in out
 
     # 5. Remove global group
     filter_groups_cmd(
@@ -259,7 +259,7 @@ def test_global_filter_groups_errors(workspace_name):
     filter_groups_cmd("add", "-n", "foo", "--where", "y")
 
     filter_groups_cmd("add", "-n", "bar", "--exclude-where", "z")
-    out = filter_groups_cmd("list")
+    out = filter_groups_cmd("list", "-v")
     assert "exclude_where:" in out
     assert "z" in out
 
@@ -282,3 +282,162 @@ def test_global_filter_groups_no_subcommand(capsys):
         filter_groups_cmd()
     captured = capsys.readouterr()
     assert "the following arguments are required: ACTION" in captured.err
+
+
+def test_workspace_manage_filter_groups_scopes(workspace_name):
+    ramble.workspace.create(workspace_name)
+    global_args = ["-w", workspace_name]
+
+    # Add global (user scope) filter group using workspace manage filter-groups
+    workspace_cmd(
+        "manage",
+        "filter-groups",
+        "--scope",
+        "user",
+        "add",
+        "-n",
+        "user-fg",
+        "--where",
+        "y",
+        global_args=global_args,
+    )
+
+    # Add workspace scope filter group
+    workspace_cmd(
+        "manage",
+        "filter-groups",
+        "--scope",
+        "workspace",
+        "add",
+        "-n",
+        "ws-fg",
+        "--where",
+        "x",
+        global_args=global_args,
+    )
+
+    # List all scopes (no scope specified)
+    out = workspace_cmd(
+        "manage",
+        "filter-groups",
+        "list",
+        global_args=global_args,
+    )
+    assert "user" in out
+    assert "user-fg" in out
+    assert "workspace" in out
+    assert "ws-fg" in out
+
+    # List only user scope
+    out_user = workspace_cmd(
+        "manage",
+        "filter-groups",
+        "--scope",
+        "user",
+        "list",
+        global_args=global_args,
+    )
+    assert "user-fg" in out_user
+    assert "ws-fg" not in out_user
+
+    # Remove user scope filter group
+    workspace_cmd(
+        "manage",
+        "filter-groups",
+        "--scope",
+        "user",
+        "remove",
+        "-n",
+        "user-fg",
+        global_args=global_args,
+    )
+
+    # Verify removed
+    out_user_after = workspace_cmd(
+        "manage",
+        "filter-groups",
+        "--scope",
+        "user",
+        "list",
+        global_args=global_args,
+    )
+    assert "No filter groups defined in scope 'user'" in out_user_after
+
+
+def test_filter_groups_precedence_overwrite(workspace_name):
+    # 1. Create workspace
+    ws = ramble.workspace.create(workspace_name)
+    ramble.workspace.activate(ws)
+
+    try:
+        # 2. Add a filter group to user scope
+        filter_groups_cmd(
+            "--scope",
+            "user",
+            "add",
+            "-n",
+            "test-precedence",
+            "--where",
+            "{n_nodes} == 16",
+        )
+
+        # 3. Add same filter group to workspace scope
+        filter_groups_cmd(
+            "--scope",
+            "workspace",
+            "add",
+            "-n",
+            "test-precedence",
+            "--where",
+            "{n_nodes} == 42",
+        )
+
+        # 4. Get the merged filter groups
+        fg = ramble.config.get("filter_groups")
+        assert "test-precedence" in fg
+        # The list in 'where' should only contain '{n_nodes} == 42',
+        # NOT ['{n_nodes} == 42', '{n_nodes} == 16']
+        assert fg["test-precedence"]["where"] == ["{n_nodes} == 42"]
+    finally:
+        ramble.workspace.deactivate()
+
+
+def test_empty_filter_group_behavior(workspace_name):
+    ws = ramble.workspace.create(workspace_name)
+    ramble.workspace.activate(ws)
+    global_args = ["-w", workspace_name]
+
+    try:
+        # Set an empty filter group directly in the workspace config
+        with ws.write_transaction():
+            ramble.config.set("filter_groups:empty-fg", {}, scope=ws.ws_file_config_scope_name())
+
+        # Verify that we can update it (add elements) and it logs "Updating existing filter group"
+        out = workspace_cmd(
+            "manage",
+            "filter-groups",
+            "add",
+            "-n",
+            "empty-fg",
+            "--where",
+            "{n_nodes} < 4",
+            global_args=global_args,
+        )
+        assert "Updating existing filter group 'empty-fg'" in out
+
+        # Reset it to empty
+        with ws.write_transaction():
+            ramble.config.set("filter_groups:empty-fg", {}, scope=ws.ws_file_config_scope_name())
+
+        # Try removing it. It should succeed and print "Removing filter group"
+        out = workspace_cmd(
+            "manage",
+            "filter-groups",
+            "remove",
+            "-n",
+            "empty-fg",
+            global_args=global_args,
+        )
+        assert "Removing filter group 'empty-fg'" in out
+    finally:
+        ramble.workspace.deactivate()

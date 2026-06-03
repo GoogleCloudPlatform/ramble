@@ -476,10 +476,12 @@ Filtering Experiments
 Several of the workspace commands support filtering the experiments they should
 act on. This can be performed using the ``--where`` argument for inclusive
 filtering, the ``--exclude-where`` argument for exclusive filtering, or the
-``--filter-tags`` argument to filter based on experiment tags.. These arguments
+``--filter-tags`` argument to filter based on experiment tags. These arguments
 take a string representing a logical expression, which can use variables the
-experiment would define. If the logical expression evaluates to true, the
-experiment will be included or excluded for action (respectively).
+experiment would define. The expression can use any of the logical and mathematical
+operators supported by Ramble variables (see :ref:`ramble-supported-functions`).
+If the logical expression evaluates to true, the experiment will be included or
+excluded for action (respectively).
 
 As an example:
 

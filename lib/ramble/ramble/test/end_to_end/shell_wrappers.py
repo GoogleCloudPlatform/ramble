@@ -145,7 +145,17 @@ def test_shell_wrapper_workspace_filter_group(shell, tmpdir):
 source "{setup_env}"
 ramble workspace create {ws_name} || exit 1
 ramble -w {ws_name} workspace manage filter-groups add -n foo --where "n_nodes == 1" || exit 2
-ramble workspace activate {ws_name} -fg foo || exit 3
+ramble workspace activate {ws_name} --fg foo || exit 3
+if [ "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo" ]; then exit 4; fi
+ramble workspace deactivate || exit 5
+if [ ! -z ${{RAMBLE_ACTIVE_FILTER_GROUP+x}} ]; then exit 6; fi
+exit 0
+""",
+        "zsh": f"""
+source "{setup_env}"
+ramble workspace create {ws_name} || exit 1
+ramble -w {ws_name} workspace manage filter-groups add -n foo --where "n_nodes == 1" || exit 2
+ramble workspace activate {ws_name} --fg foo || exit 3
 if [ "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo" ]; then exit 4; fi
 ramble workspace deactivate || exit 5
 if [ ! -z ${{RAMBLE_ACTIVE_FILTER_GROUP+x}} ]; then exit 6; fi
@@ -158,7 +168,7 @@ ramble workspace create {ws_name}
 if ( $status != 0 ) exit 1
 ramble -w {ws_name} workspace manage filter-groups add -n foo --where "n_nodes == 1"
 if ( $status != 0 ) exit 2
-ramble workspace activate {ws_name} -fg foo
+ramble workspace activate {ws_name} --fg foo
 if ( $status != 0 ) exit 3
 if ( "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo" ) exit 4
 ramble workspace deactivate
@@ -170,7 +180,7 @@ exit 0
 source "{setup_env}"
 ramble workspace create {ws_name}; or exit 1
 ramble -w {ws_name} workspace manage filter-groups add -n foo --where "n_nodes == 1"; or exit 2
-ramble workspace activate {ws_name} -fg foo; or exit 3
+ramble workspace activate {ws_name} --fg foo; or exit 3
 if test "$RAMBLE_ACTIVE_FILTER_GROUP" != "foo"; exit 4; end
 ramble workspace deactivate; or exit 5
 if set -q RAMBLE_ACTIVE_FILTER_GROUP; exit 6; end

@@ -162,6 +162,7 @@ supported_math_operators = {
     ast.Pow: operator.pow,
     ast.BitXor: operator.xor,
     ast.USub: operator.neg,
+    ast.Not: operator.not_,
     ast.Eq: operator.eq,
     ast.NotEq: operator.ne,
     ast.Gt: operator.gt,

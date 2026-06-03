@@ -297,7 +297,7 @@ _ramble_commands() {
 _ramble_config() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --scope"
+        RAMBLE_COMPREPLY="-h --help -s --scope"
     else
         RAMBLE_COMPREPLY="get blame edit list add remove update revert"
     fi
@@ -406,7 +406,7 @@ _ramble_deployment() {
 }
 
 _ramble_deployment_push() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --deployment-name -d --upload-url -u --phases --include-phase-dependencies --where --exclude-where --filter-tags -fg --filter-group -efg --exclude-filter-group"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --deployment-name -d --upload-url -u --phases --include-phase-dependencies --where --exclude-where --filter-tags --fg --filter-group --efg --exclude-filter-group"
 }
 
 _ramble_deployment_pull() {
@@ -444,7 +444,7 @@ _ramble_filter_groups_remove() {
 }
 
 _ramble_filter_groups_list() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help -v --verbose"
 }
 
 _ramble_filter_groups_blame() {
@@ -544,7 +544,7 @@ _ramble_mirror_list() {
 }
 
 _ramble_on() {
-    RAMBLE_COMPREPLY="-h --help --executor --enable-per-experiment-prints --suppress-run-header --where --exclude-where --filter-tags -fg --filter-group -efg --exclude-filter-group"
+    RAMBLE_COMPREPLY="-h --help --executor --enable-per-experiment-prints --suppress-run-header --where --exclude-where --filter-tags --fg --filter-group --efg --exclude-filter-group"
 }
 
 _ramble_python() {
@@ -656,7 +656,7 @@ _ramble_workspace() {
 _ramble_workspace_activate() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir --parent-dir --dry-run -fg --filter-group"
+        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir --parent-dir --fg --filter-group --dry-run"
     else
         _workspaces
     fi
@@ -688,11 +688,11 @@ _ramble_workspace_config() {
 }
 
 _ramble_workspace_setup() {
-    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output -fg --filter-group -efg --exclude-filter-group"
+    RAMBLE_COMPREPLY="-h --help --dry-run --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output --fg --filter-group --efg --exclude-filter-group"
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output --dry-run -fg --filter-group -efg --exclude-filter-group"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output --fg --filter-group --efg --exclude-filter-group --dry-run"
 }
 
 _ramble_workspace_push_to_cache() {
@@ -700,7 +700,7 @@ _ramble_workspace_push_to_cache() {
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --executables --where --exclude-where --filter-tags -v --verbose --dry-run"
+    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --executables --where --exclude-where --filter-tags --fg --filter-group --efg --exclude-filter-group -v --verbose --dry-run"
 }
 
 _ramble_workspace_edit() {
@@ -775,7 +775,7 @@ _ramble_workspace_manage_modifiers() {
 _ramble_workspace_manage_filter_groups() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help"
+        RAMBLE_COMPREPLY="-h --help --scope"
     else
         RAMBLE_COMPREPLY="add remove list blame"
     fi
@@ -790,7 +790,7 @@ _ramble_workspace_manage_filter_groups_remove() {
 }
 
 _ramble_workspace_manage_filter_groups_list() {
-    RAMBLE_COMPREPLY="-h --help"
+    RAMBLE_COMPREPLY="-h --help -v --verbose"
 }
 
 _ramble_workspace_manage_filter_groups_blame() {

@@ -415,6 +415,21 @@ def test_config_add_override(mutable_empty_config):
 """
     )
 
+
+def test_config_add_override_short_scope(mutable_empty_config):
+    config("-s", "site", "add", "config:template_dirs:test1")
+    config("add", "config:template_dirs:[test2]")
+    output = config("get", "config")
+
+    assert (
+        output
+        == """config:
+  template_dirs:
+  - test2
+  - test1
+"""
+    )
+
     config("add", "config::template_dirs:[test2]")
     output = config("get", "config")
 
