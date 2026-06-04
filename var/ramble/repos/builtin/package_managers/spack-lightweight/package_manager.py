@@ -728,6 +728,9 @@ class SpackRunner(CommandRunner):
 
     compiler_find_args = ["compiler", "find"]
 
+    # This cache is to avoid duplicate spack compiler calls for pkg_specs within an env
+    _compiler_cache = {}
+
     _allowed_config_files = [
         "compilers.yaml",
         "concretizer.yaml",
@@ -994,40 +997,52 @@ class SpackRunner(CommandRunner):
         if compiler_find_flags:
             for flag in shlex.split(compiler_find_flags):
                 compiler_find_args.append(flag)
-        if not self.dry_run:
-            self._run_command(self.spack, compiler_find_args)
 
-        try:
-            self._cmd_start(self.spack, comp_info_args)
-            self.spack(*comp_info_args, output=os.devnull, error=os.devnull)
-            self._cmd_end(self.spack, comp_info_args)
+        cache_key = (compiler_spec, self.compiler_config_dir, self.env_path)
+        if cache_key in self._compiler_cache:
+            has_compiler = self._compiler_cache[cache_key]
+        else:
+            if not self.dry_run:
+                self._run_command(self.spack, compiler_find_args)
+
+            try:
+                self._cmd_start(self.spack, comp_info_args)
+                self.spack(
+                    *comp_info_args, output=os.devnull, error=os.devnull
+                )
+                self._cmd_end(self.spack, comp_info_args)
+                has_compiler = True
+            except ProcessError:
+                has_compiler = False
+            self._compiler_cache[cache_key] = has_compiler
+
+        if has_compiler:
             logger.msg(f"{compiler_spec} is already an available compiler")
             return
-        except ProcessError:
 
-            args = []
+        args = []
 
-            install_flags = ramble.config.get(
-                f"{self.install_config_name}:flags"
-            )
-            if install_flags is not None:
-                args.extend(shlex.split(install_flags))
+        install_flags = ramble.config.get(f"{self.install_config_name}:flags")
+        if install_flags is not None:
+            args.extend(shlex.split(install_flags))
 
-            args.append(pkg_spec)
+        args.append(pkg_spec)
 
-            self.execute(self.installer, args)
+        self.execute(self.installer, args)
 
-            self.load_compiler(pkg_spec)
+        self.load_compiler(pkg_spec)
 
-            self.execute(self.spack, compiler_find_args)
+        self.execute(self.spack, compiler_find_args)
 
-            if not self.dry_run:
-                self.compilers.append(pkg_spec)
+        self._compiler_cache[cache_key] = True
 
-                if self.active:
-                    self.spack.add_default_env(self.env_key, active_env)
-                    self.installer.add_default_env(self.env_key, active_env)
-                    self.concretizer.add_default_env(self.env_key, active_env)
+        if not self.dry_run:
+            self.compilers.append(pkg_spec)
+
+            if self.active:
+                self.spack.add_default_env(self.env_key, active_env)
+                self.installer.add_default_env(self.env_key, active_env)
+                self.concretizer.add_default_env(self.env_key, active_env)
 
     def activate(self):
         """
