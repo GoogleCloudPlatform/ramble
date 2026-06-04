@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import decimal
+import enum
 import math
 import statistics
 from typing import List, Tuple, Union
@@ -28,6 +29,13 @@ def _decimal_places(value: float) -> int:
 def _max_decimal_places(values: List[float]) -> int:
     """Returns the max decimal places of a list of values"""
     return max(_decimal_places(v) for v in values)
+
+
+class ConfidenceLevel(enum.Enum):
+    CL_99 = 0.99
+    CL_95 = 0.95
+    CL_90 = 0.90
+    CL_50 = 0.50
 
 
 class StatsBase:
@@ -125,7 +133,7 @@ class StatsCoefficientOfVariation(StatsBase):
         return ""
 
 
-def _calculate_margin_of_error(values: List[float], confidence_level: float) -> float:
+def _calculate_margin_of_error(values: List[float], cl: ConfidenceLevel) -> float:
     """Calculates the margin of error for a given confidence interval."""
     n = len(values)
     stdev = statistics.stdev(values)
@@ -134,101 +142,81 @@ def _calculate_margin_of_error(values: List[float], confidence_level: float) -> 
     # For larger samples, the z-score is a good approximation.
     if n < 30:
         degrees_freedom = n - 1
-        t_score = float(t.ppf(1 - (1 - confidence_level) / 2, degrees_freedom))
+        t_score = float(t.ppf(1 - (1 - cl.value) / 2, degrees_freedom))
         return t_score * (stdev / math.sqrt(n))
     else:
         # Using z-score for confidence.
-        if confidence_level == 0.99:
+        if cl == ConfidenceLevel.CL_99:
             z_score = 2.576
-        elif confidence_level == 0.95:
+        elif cl == ConfidenceLevel.CL_95:
             z_score = 1.96
-        elif confidence_level == 0.90:
+        elif cl == ConfidenceLevel.CL_90:
             z_score = 1.645
-        elif confidence_level == 0.50:
+        elif cl == ConfidenceLevel.CL_50:
             z_score = 0.674
         else:
             raise ValueError("Unsupported confidence level")
         return z_score * (stdev / math.sqrt(n))
 
 
-class StatsConfidenceIntervalLower99(StatsBase):
+class StatsConfidenceIntervalBase(StatsBase):
+    min_count = 2
+    confidence_level: ConfidenceLevel
+    is_upper: bool
+
+    def compute(self, values: List[float]) -> float:
+        mean = statistics.mean(values)
+        margin_of_error = _calculate_margin_of_error(values, self.confidence_level)
+        res = mean + margin_of_error if self.is_upper else mean - margin_of_error
+        return round(res, _max_decimal_places(values))
+
+
+class StatsConfidenceIntervalLower99(StatsConfidenceIntervalBase):
     name = "ci_99_lower"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.99)
-        return round(mean - margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_99
+    is_upper = False
 
 
-class StatsConfidenceIntervalUpper99(StatsBase):
+class StatsConfidenceIntervalUpper99(StatsConfidenceIntervalBase):
     name = "ci_99_upper"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.99)
-        return round(mean + margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_99
+    is_upper = True
 
 
-class StatsConfidenceIntervalLower95(StatsBase):
+class StatsConfidenceIntervalLower95(StatsConfidenceIntervalBase):
     name = "ci_95_lower"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.95)
-        return round(mean - margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_95
+    is_upper = False
 
 
-class StatsConfidenceIntervalUpper95(StatsBase):
+class StatsConfidenceIntervalUpper95(StatsConfidenceIntervalBase):
     name = "ci_95_upper"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.95)
-        return round(mean + margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_95
+    is_upper = True
 
 
-class StatsConfidenceIntervalLower90(StatsBase):
+class StatsConfidenceIntervalLower90(StatsConfidenceIntervalBase):
     name = "ci_90_lower"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.90)
-        return round(mean - margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_90
+    is_upper = False
 
 
-class StatsConfidenceIntervalUpper90(StatsBase):
+class StatsConfidenceIntervalUpper90(StatsConfidenceIntervalBase):
     name = "ci_90_upper"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.90)
-        return round(mean + margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_90
+    is_upper = True
 
 
-class StatsConfidenceIntervalLower50(StatsBase):
+class StatsConfidenceIntervalLower50(StatsConfidenceIntervalBase):
     name = "ci_50_lower"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.50)
-        return round(mean - margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_50
+    is_upper = False
 
 
-class StatsConfidenceIntervalUpper50(StatsBase):
+class StatsConfidenceIntervalUpper50(StatsConfidenceIntervalBase):
     name = "ci_50_upper"
-    min_count = 2
-
-    def compute(self, values: List[float]) -> float:
-        mean = statistics.mean(values)
-        margin_of_error = _calculate_margin_of_error(values, 0.50)
-        return round(mean + margin_of_error, _max_decimal_places(values))
+    confidence_level = ConfidenceLevel.CL_50
+    is_upper = True
 
 
 all_stats = [
