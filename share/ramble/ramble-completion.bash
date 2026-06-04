@@ -631,35 +631,35 @@ _ramble_workspace() {
 _ramble_workspace_activate() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir --parent-dir"
+        RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat -p --prompt --temp -d --dir --parent-dir --dry-run"
     else
         _workspaces
     fi
 }
 
 _ramble_workspace_archive() {
-    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --archive-pattern --phases --include-phase-dependencies --where --exclude-where --profile-phase --profile-phase-output"
+    RAMBLE_COMPREPLY="-h --help --tar-archive -t --prefix -p --upload-url -u --include-secrets --archive-pattern --phases --include-phase-dependencies --where --exclude-where --profile-phase --profile-phase-output --dry-run"
 }
 
 _ramble_workspace_deactivate() {
-    RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat"
+    RAMBLE_COMPREPLY="-h --help --sh --csh --fish --bat --dry-run"
 }
 
 _ramble_workspace_create() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir --parent-dir -a --activate"
+        RAMBLE_COMPREPLY="-h --help -c --config -t --template_execute -d --dir --software-dir --inputs-dir --parent-dir -a --activate --dry-run"
     else
         RAMBLE_COMREPLY=""
     fi
 }
 
 _ramble_workspace_concretize() {
-    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify --quiet -q"
+    RAMBLE_COMPREPLY="-h --help -f --force-concretize --simplify --quiet -q --dry-run"
 }
 
 _ramble_workspace_config() {
-    RAMBLE_COMPREPLY="-h --help --print-squash -p --simplify-software --ss --simplify-variables --sv --include-section -i --exclude-section -e"
+    RAMBLE_COMPREPLY="-h --help --print-squash -p --simplify-software --ss --simplify-variables --sv --include-section -i --exclude-section -e --dry-run"
 }
 
 _ramble_workspace_setup() {
@@ -667,7 +667,7 @@ _ramble_workspace_setup() {
 }
 
 _ramble_workspace_analyze() {
-    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output"
+    RAMBLE_COMPREPLY="-h --help -f --formats -u --upload -p --print-results --fom-origin-types -s --summary-only --phases --include-phase-dependencies --where --exclude-where --filter-tags --profile-phase --profile-phase-output --dry-run"
 }
 
 _ramble_workspace_push_to_cache() {
@@ -675,13 +675,13 @@ _ramble_workspace_push_to_cache() {
 }
 
 _ramble_workspace_info() {
-    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --executables --where --exclude-where --filter-tags -v --verbose"
+    RAMBLE_COMPREPLY="-h --help --software --all-software --templates --expansions --tags --phases --variants --executables --where --exclude-where --filter-tags -v --verbose --dry-run"
 }
 
 _ramble_workspace_edit() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -f --file -c --config-only -t --template-only -l --license-only --all -p --print-file"
+        RAMBLE_COMPREPLY="-h --help -f --file -c --config-only -t --template-only -l --license-only --all -p --print-file --dry-run"
     else
         RAMBLE_COMREPLY=""
     fi
@@ -692,17 +692,17 @@ _ramble_workspace_mirror() {
 }
 
 _ramble_workspace_experiment_logs() {
-    RAMBLE_COMPREPLY="-h --help --limit-one --first-failed --failed --where --exclude-where --filter-tags"
+    RAMBLE_COMPREPLY="-h --help --limit-one --first-failed --failed --where --exclude-where --filter-tags --dry-run"
 }
 
 _ramble_workspace_list() {
-    RAMBLE_COMPREPLY="-h --help --parent-dir --merged"
+    RAMBLE_COMPREPLY="-h --help --parent-dir --merged --dry-run"
 }
 
 _ramble_workspace_remove() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
+        RAMBLE_COMPREPLY="-h --help -y --yes-to-all --dry-run"
     else
         _workspaces
     fi
@@ -720,7 +720,7 @@ _ramble_workspace_generate_config() {
 _ramble_workspace_manage() {
     if $list_options
     then
-        RAMBLE_COMPREPLY="-h --help"
+        RAMBLE_COMPREPLY="-h --help --dry-run"
     else
         RAMBLE_COMPREPLY="experiments software includes modifiers"
     fi
