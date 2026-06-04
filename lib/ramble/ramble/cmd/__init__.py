@@ -109,7 +109,9 @@ def get_module(cmd_name):
         module_name = f"{__name__}.{pname}"
         module = __import__(module_name, fromlist=[pname, SETUP_PARSER, DESCRIPTION], level=0)
         logger.debug(f"Imported {pname} from built-in commands")
-    except ImportError:
+    except ImportError as e:
+        if getattr(e, "name", None) != module_name:
+            raise
         try:
             module = spack.extensions.get_module(cmd_name)
         except AttributeError:
