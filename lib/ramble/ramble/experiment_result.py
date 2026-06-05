@@ -126,14 +126,15 @@ class ExperimentResult:
         app_inst = self._app_inst
         self.name = app_inst.expander.experiment_namespace
 
-        self.status = app_inst.get_ramble_status()
+        self.status = app_inst.get_status()
 
         self.n_repeats = app_inst.repeats.n_repeats
         self.experiment_chain = app_inst.chain_order.copy()
         self.tags = list(app_inst.experiment_tags)
 
         # Most libs can handle this str enum, but convert it to help out
-        self.status = self.status.value
+        if hasattr(self.status, "value"):
+            self.status = self.status.value
 
         for key in app_inst.keywords.keys:
             if app_inst.keywords.is_key_level(key):
