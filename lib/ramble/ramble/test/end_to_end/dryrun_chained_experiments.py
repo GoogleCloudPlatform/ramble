@@ -123,7 +123,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -140,7 +140,7 @@ ramble:
         assert os.path.exists(script)
 
         # Check all chained experiments are referenced
-        with open(script) as f:
+        with open(script, encoding="utf-8") as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
@@ -155,7 +155,7 @@ ramble:
 
             # Check that experiment 1 has n_ranks = 4 instead of 2
             if chain_idx == 3:
-                with open(chained_script) as f:
+                with open(chained_script, encoding="utf-8") as f:
                     assert "mpirun -n 4" in f.read()
 
         expected_order = [
@@ -168,7 +168,7 @@ ramble:
         ]
 
         # Check prepend / append order is correct
-        with open(script) as f:
+        with open(script, encoding="utf-8") as f:
 
             for line in f:
                 if expected_order[0].match(line):
@@ -183,7 +183,7 @@ ramble:
             f"gromacs.water_bare.parent_test.{chain_exp_name}.out",
         )
 
-        with open(output_path_3, "w+") as f:
+        with open(output_path_3, "w+", encoding="utf-8") as f:
             f.write(mock_output_data)
 
         analyze_pipeline = analyze_cls(ws, filters, output_formats=["json", "yaml"])
@@ -206,7 +206,7 @@ ramble:
         names = ["results.latest.json", "results.latest.yaml"]
         loaders = [sjson.load, syaml.load]
         for name, loader in zip(names, loaders):
-            with open(os.path.join(ws.root, name)) as f:
+            with open(os.path.join(ws.root, name), encoding="utf-8") as f:
                 data = loader(f)
 
                 assert "experiments" in data

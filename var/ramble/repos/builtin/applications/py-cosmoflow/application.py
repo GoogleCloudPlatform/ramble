@@ -269,10 +269,10 @@ class PyCosmoflow(ExecutableApplication):
         dockerfile_dir = os.path.dirname(new_dockerfile_path)
         mkdirp(dockerfile_dir)
 
-        with open(base_dockerfile) as f:
+        with open(base_dockerfile, encoding="utf-8") as f:
             dockerfile = f.read()
 
-        with open(new_dockerfile_path, "w+") as f:
+        with open(new_dockerfile_path, "w+", encoding="utf-8") as f:
             f.write(self.expander.expand_var(dockerfile))
 
     register_phase(
@@ -370,5 +370,5 @@ class PyCosmoflow(ExecutableApplication):
             self.expander.expand_var("{cosmoflow_config}"),
         )
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(config_str)

@@ -229,7 +229,7 @@ class GoogleBatch(WorkflowManagerBase):
             )
             return status
 
-        with open(job_file) as f:
+        with open(job_file, encoding="utf-8") as f:
             job_data = yaml.safe_load(f)
 
         job_name = job_data["name"]

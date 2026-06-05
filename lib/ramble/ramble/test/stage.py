@@ -119,7 +119,7 @@ def check_expand_archive(stage, stage_name, expected_file_list):
             raise AssertionError
 
         assert os.path.isfile(fn)
-        with open(fn) as _file:
+        with open(fn, encoding="utf-8") as _file:
             assert _file.read() == contents
 
 
@@ -585,7 +585,7 @@ class TestStage:
                 check_expand_archive(stage, self.stage_name, [_include_readme])
 
                 # Try to make a file in the old archive dir
-                with open("foobar", "w") as file:
+                with open("foobar", "w", encoding="utf-8") as file:
                     file.write("this file is to be destroyed.")
 
             assert "foobar" in os.listdir(stage.source_path)

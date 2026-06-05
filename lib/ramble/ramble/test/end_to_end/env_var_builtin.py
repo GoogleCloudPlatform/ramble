@@ -81,7 +81,7 @@ ramble:
     cmd3_regex = re.compile("foo >>")
 
     # Assert experiment 1 has exports before commands
-    with open(exp1_script) as f:
+    with open(exp1_script, encoding="utf-8") as f:
         cmd_found = False
         export_found = False
         for line in f:
@@ -93,7 +93,7 @@ ramble:
         assert cmd_found and export_found
 
     # Assert experiment 2 has commands before exports
-    with open(exp2_script) as f:
+    with open(exp2_script, encoding="utf-8") as f:
         cmd_found = False
         export_found = False
         for line in f:
@@ -105,7 +105,7 @@ ramble:
         assert cmd_found and export_found
 
     # Assert experiment 3 has exports before commands
-    with open(exp3_script) as f:
+    with open(exp3_script, encoding="utf-8") as f:
         cmd_found = False
         export_found = False
         for line in f:
@@ -145,7 +145,7 @@ ramble:
     experiment_root = ws.experiment_dir
     exp1_dir = os.path.join(experiment_root, "interleved-env-vars", "test_wl", "simple_test")
 
-    with open(os.path.join(exp1_dir, "execute_experiment")) as f:
+    with open(os.path.join(exp1_dir, "execute_experiment"), encoding="utf-8") as f:
         assert "FROM_DIRECTIVE" in f.read()
 
 
@@ -181,7 +181,7 @@ def test_object_env_var_definitions(
         )
 
         mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-        with open(mod_config_path, "w+") as f:
+        with open(mod_config_path, "w+", encoding="utf-8") as f:
             f.write("modifiers:\n")
             f.write(" - name: when-modifier\n")
 
@@ -208,7 +208,7 @@ def test_object_env_var_definitions(
             ws.experiment_dir, "when-directives", "test_wl", "generated", "execute_experiment"
         )
 
-        with open(rendered_script) as f:
+        with open(rendered_script, encoding="utf-8") as f:
             data = f.read()
             for idx, regex in enumerate(regex_defs):
                 if regex.search(data):
@@ -256,7 +256,7 @@ def test_object_env_var_methods(
             ws.experiment_dir, "basic", "test_wl", "generated", "execute_experiment"
         )
 
-        with open(rendered_script) as f:
+        with open(rendered_script, encoding="utf-8") as f:
             for line in f:
                 found_vars.extend(True for regex in env_var_regexes if regex.search(line))
 
@@ -299,7 +299,7 @@ ramble:
     script = os.path.join(
         ws.experiment_dir, "basic", "test_wl", "app_with_auto_env_var", "execute_experiment"
     )
-    with open(script) as f:
+    with open(script, encoding="utf-8") as f:
         data = f.read()
         assert 'export MY_AUTO_ENV_VAR="123";' in data
         assert 'export MY_AUTO_ENV_VAR_WL_DEFAULTS="test_wl"' in data
@@ -310,7 +310,7 @@ ramble:
     script = os.path.join(
         ws.experiment_dir, "basic", "test_wl", "app_with_obj_env_var", "execute_experiment"
     )
-    with open(script) as f:
+    with open(script, encoding="utf-8") as f:
         data = f.read()
         assert 'export OBJ_AUTO_ENV_VAR="abc";' in data
 
@@ -318,7 +318,7 @@ ramble:
     script = os.path.join(
         ws.experiment_dir, "basic", "test_wl2", "wl_no_match_auto_env_var", "execute_experiment"
     )
-    with open(script) as f:
+    with open(script, encoding="utf-8") as f:
         data = f.read()
         assert "MY_AUTO_ENV_VAR" not in data
         assert "MY_AUTO_ENV_VAR_WL_DEFAULTS" not in data

@@ -36,11 +36,11 @@ class TestPushDeploymentPipeline(unittest.TestCase):
         hash_file = os.path.join(self.workspace.root, self.workspace.hash_file_name)
         metadata_file = os.path.join(self.workspace.root, ramble.workspace.METADATA_FILE_NAME)
 
-        with open(inventory_file, "w") as f:
+        with open(inventory_file, "w", encoding="utf-8") as f:
             f.write("inventory")
-        with open(hash_file, "w") as f:
+        with open(hash_file, "w", encoding="utf-8") as f:
             f.write("hash")
-        with open(metadata_file, "w") as f:
+        with open(metadata_file, "w", encoding="utf-8") as f:
             f.write("metadata")
 
         pipeline = PushDeploymentPipeline(

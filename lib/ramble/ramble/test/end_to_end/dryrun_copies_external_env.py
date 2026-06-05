@@ -30,7 +30,7 @@ spack:
 """
 
     env_path = str(tmpdir)
-    with open(os.path.join(env_path, "spack.yaml"), "w+") as f:
+    with open(os.path.join(env_path, "spack.yaml"), "w+", encoding="utf-8") as f:
         f.write(test_spack_env)
 
     test_config = f"""
@@ -68,7 +68,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -81,5 +81,5 @@ ramble:
 
         assert os.path.exists(env_file)
 
-        with open(env_file) as f:
+        with open(env_file, encoding="utf-8") as f:
             assert "wrf" in f.read()

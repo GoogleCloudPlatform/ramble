@@ -2499,7 +2499,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         os.path.join(self.license_path, ".ramble-license")
                     )
                     with lk.WriteTransaction(lock):
-                        with open(self.license_file, "w+", encoding="utf-8") as f:
+                        with open(
+                            self.license_file, "w+", encoding="utf-8"
+                        ) as f:
                             for cmd in env_cmds:
                                 if cmd:
                                     f.write(

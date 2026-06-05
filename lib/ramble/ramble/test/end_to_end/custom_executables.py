@@ -103,7 +103,7 @@ ramble:
     ]
 
     # Assert command order is: lscpu -> export -> foo
-    with open(exp_script) as f:
+    with open(exp_script, encoding="utf-8") as f:
         custom_found = False
         cmd_found = False
         export_found = False
@@ -187,7 +187,7 @@ ramble:
     exp_dir = os.path.join(experiment_root, "hostname", "local", "test")
     exp_script = os.path.join(exp_dir, "execute_experiment")
 
-    with open(exp_script) as f:
+    with open(exp_script, encoding="utf-8") as f:
         content = f.read()
         assert "hostname-overridden >>" in content
         # The old executable should not be included

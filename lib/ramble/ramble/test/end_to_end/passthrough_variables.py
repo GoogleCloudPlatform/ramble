@@ -53,7 +53,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -66,7 +66,7 @@ ramble:
         undefined_regex = re.compile(r"{undefined_var}")
 
         # Assert undefined variable is found
-        with open(exp1_script) as f:
+        with open(exp1_script, encoding="utf-8") as f:
             undefined_found = False
             for line in f:
                 if undefined_regex.search(line):
@@ -98,7 +98,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 

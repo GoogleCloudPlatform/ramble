@@ -54,7 +54,7 @@ def test_manage_variable_multiple_equals(workspace_name, tmpdir):
 
     results = [False for _ in tests]
 
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         for line in f:
             for idx, test_str in enumerate(tests):
                 if test_str in line:
@@ -78,7 +78,7 @@ def test_manage_experiments_no_overwrite_wm_vars(workspace_name):
         "1",
         global_args=global_args,
     )
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "processes_per_node:" in content
         assert "batch_submit" not in content

@@ -28,6 +28,6 @@ class FileOpen(ExecutableApplication):
         config_path = get_file_path(
             os.path.join("file-open", "my", "config.yaml"), workspace
         )
-        with open(config_path) as conf:
+        with open(config_path, encoding="utf-8") as conf:
             yaml.safe_load(conf)
             logger.info(f"Config loaded from {config_path}")

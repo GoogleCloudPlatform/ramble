@@ -20,7 +20,7 @@ Success string
 Or maybe an exit code: 0
     """
 
-    with open(path, "w+") as f:
+    with open(path, "w+", encoding="utf-8") as f:
         f.write(file_contents)
 
 
@@ -28,7 +28,7 @@ def remark_all(crit_list, file_path):
     for c in crit_list:
         c.reset()
 
-    with open(file_path) as f:
+    with open(file_path, encoding="utf-8") as f:
         for line in f:
             for c in crit_list:
                 if c.passed(line):

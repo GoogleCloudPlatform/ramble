@@ -46,7 +46,7 @@ class MockFetcher:
 
     @staticmethod
     def archive(dst):
-        with open(dst, "w"):
+        with open(dst, "w", encoding="utf-8"):
             pass
 
 
@@ -90,7 +90,7 @@ def create_archive(archive_dir, app_class):
             archive_dir.ensure(input_name, dir=True)
             archive_name = os.path.basename(conf["fetcher"].url)
             test_file_path = str(archive_dir.join(input_name, "input-file"))
-            with open(test_file_path, "w+") as f:
+            with open(test_file_path, "w+", encoding="utf-8") as f:
                 f.write("Input File\n")
 
             with archive_dir.as_cwd():
@@ -100,7 +100,7 @@ def create_archive(archive_dir, app_class):
                     conf["fetcher"].digest = hashlib.sha256(bytes).hexdigest()
                     app_class.inputs[_FS][conf["input_name"]]["sha256"] = conf["fetcher"].digest
         else:
-            with open(input_name, "w+") as f:
+            with open(input_name, "w+", encoding="utf-8") as f:
                 f.write("Input file\n")
 
             with open(input_name, "rb") as f:
@@ -163,7 +163,7 @@ ramble:
         with ramble.workspace.create(ws_name) as workspace:
             workspace.write()
             config_path = os.path.join(workspace.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-            with open(config_path, "w+") as f:
+            with open(config_path, "w+", encoding="utf-8") as f:
                 f.write(test_config)
             workspace._re_read()
             mirror_pipeline = mirror_pipeline_cls(workspace, filters, mirror_path=str(mirror_dir))

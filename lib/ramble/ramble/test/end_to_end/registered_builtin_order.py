@@ -85,7 +85,7 @@ def test_registered_builtin_order(workspace_name):
         ws.experiment_dir, "register-builtin", "test_wl2", "generated", "execute_experiment"
     )
 
-    with open(rendered_script) as f:
+    with open(rendered_script, encoding="utf-8") as f:
         for line in f:
             print(f"Line = '{line}'")
             cur_regex = regex_order[found_idx]

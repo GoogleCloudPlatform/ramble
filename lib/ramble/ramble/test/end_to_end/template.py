@@ -44,7 +44,7 @@ ramble:
     run_dir = os.path.join(ws.experiment_dir, "template/test_template/test/")
     script_path = os.path.join(run_dir, "bar.sh")
     assert os.path.isfile(script_path)
-    with open(script_path) as f:
+    with open(script_path, encoding="utf-8") as f:
         content = f.read()
         assert "echo foobar" in content
         assert "echo hello santa" in content
@@ -53,7 +53,7 @@ ramble:
     script2_path = os.path.join(ws.shared_dir, "script.sh")
     script3_path = os.path.join(run_dir, "expansion_script.sh")
     script4_path = os.path.join(run_dir, "bar")
-    with open(execute_path) as f:
+    with open(execute_path, encoding="utf-8") as f:
         content = f.read()
         assert script_path in content
         # The workspace path should be expanded
@@ -95,11 +95,11 @@ ramble:
     run_dir = os.path.join(ws.experiment_dir, "template-inherited/test_template/test/")
     script_path = os.path.join(run_dir, "bar.sh")
     assert os.path.isfile(script_path)
-    with open(script_path) as f:
+    with open(script_path, encoding="utf-8") as f:
         content = f.read()
         assert "echo hello world-inherited" in content
     execute_path = os.path.join(run_dir, "execute_experiment")
-    with open(execute_path) as f:
+    with open(execute_path, encoding="utf-8") as f:
         content = f.read()
         assert script_path in content
 
@@ -134,7 +134,7 @@ ramble:
     run_dir = os.path.join(ws.experiment_dir, "basic/template_wl/test/")
     execute_path = os.path.join(run_dir, "execute_experiment")
 
-    with open(execute_path) as f:
+    with open(execute_path, encoding="utf-8") as f:
         content = f.read()
         assert "EOF" in content
         assert "EOF " not in content
@@ -161,7 +161,7 @@ ramble:
     ws, ws_name = make_workspace_from_config(test_config)
 
     # Create a template file without the correct extension
-    open(os.path.join(ws.config_dir, template_src_name), "w")
+    open(os.path.join(ws.config_dir, template_src_name), "w", encoding="utf-8")
 
     with pytest.raises(
         ApplicationError,
@@ -170,7 +170,7 @@ ramble:
         workspace("setup", "--dry-run", global_args=["-w", ws_name])
 
     # It should pick up the correctly named template
-    open(os.path.join(ws.config_dir, template_src_name + ext), "w")
+    open(os.path.join(ws.config_dir, template_src_name + ext), "w", encoding="utf-8")
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
     assert os.path.isfile(
         os.path.join(ws.experiment_dir, f"template/test_template/test/{template_src_name}")

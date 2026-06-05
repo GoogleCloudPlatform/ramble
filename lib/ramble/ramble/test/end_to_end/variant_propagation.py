@@ -28,7 +28,7 @@ def test_variant_propagation_in_new_workspace(
 
         config_path = ws1.config_file_path
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             data = f.read()
             assert "package_manager: spack" in data
             assert "workflow_manager: slurm" in data

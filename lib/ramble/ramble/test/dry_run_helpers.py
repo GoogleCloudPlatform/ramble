@@ -80,13 +80,13 @@ def dry_run_config(
 
         dict_to_mod[section_name].append(injection_dict.copy())
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         syaml.dump(ramble_dict, stream=f)
 
 
 def search_files_for_string(file_list, string):
     for file in file_list:
-        with open(file) as f:
+        with open(file, encoding="utf-8") as f:
             if string in f.read():
                 return True
     return False

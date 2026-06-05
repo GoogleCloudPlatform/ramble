@@ -82,7 +82,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws._re_read()
@@ -92,7 +92,7 @@ ramble:
         ws._re_read()
 
         req_test = True
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             for line in f:
                 if re.match(r"^[^#]*required", line):
                     req_test = False
@@ -136,7 +136,7 @@ def test_concretize_allows_invalid_experiment(
 
         workspace("concretize")
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "gromacs" in data

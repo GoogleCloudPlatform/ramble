@@ -58,7 +58,7 @@ def test_gromacs_dry_run_mock_mod_phase(
         make_experiments_regex = re.compile("Executing phase make_experiments")
         after_make_experiments_regex = re.compile("Executing phase after_make_experiments")
 
-        with open(out_file) as f:
+        with open(out_file, encoding="utf-8") as f:
             for line in f:
                 if mod_phase_regex.search(line):
                     found_mod_phase = True

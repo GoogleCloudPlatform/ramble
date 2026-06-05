@@ -404,7 +404,7 @@ class PipRunner(CommandRunner):
         out = self.execute(installer, freeze_args, return_output=True)
         if out is not None:
             lock_file = os.path.join(self.env_path, self._lock_file_name)
-            with open(lock_file, "w") as f:
+            with open(lock_file, "w", encoding="utf-8") as f:
                 f.write(out)
         self.installed = True
 
@@ -444,12 +444,12 @@ class PipRunner(CommandRunner):
             existing_req_mtime = os.path.getmtime(req_file)
             existing_lock_mtime = os.path.getmtime(lock_file)
             if existing_lock_mtime >= existing_req_mtime:
-                with open(req_file) as f:
+                with open(req_file, encoding="utf-8") as f:
                     if f.read() == contents:
                         self.installed = True
                         logger.debug("requirement file already up-to-date")
                         return
-        with open(req_file, "w") as f:
+        with open(req_file, "w", encoding="utf-8") as f:
             f.write(contents)
 
     def copy_from_external_env(self, external_env_path):
@@ -498,7 +498,7 @@ class PipRunner(CommandRunner):
             ext_python, ["-m", "pip", "freeze"], return_output=True
         )
         if out is not None:
-            with open(dest, "w") as f:
+            with open(dest, "w", encoding="utf-8") as f:
                 f.write(out)
 
     def define_path_vars(self, app_inst, cache):
@@ -510,7 +510,7 @@ class PipRunner(CommandRunner):
         if not lock_file:
             raise RunnerError(f"Lock file {lock_file} is missing")
         pkgs = []
-        with open(lock_file) as f:
+        with open(lock_file, encoding="utf-8") as f:
             for line in f:
                 # pip freeze generates such a comment, which serves as a divider
                 # for packages that are added as deps of the ones defined directly.
@@ -609,7 +609,10 @@ class PipRunner(CommandRunner):
                 if pkg_name:
                     pkgs.add(pkg_name)
         else:
-            with open(os.path.join(self.env_path, self._lock_file_name)) as f:
+            with open(
+                os.path.join(self.env_path, self._lock_file_name),
+                encoding="utf-8",
+            ) as f:
                 reqs = f
                 for req in reqs:
                     if "==" in req:
@@ -629,7 +632,7 @@ class PipRunner(CommandRunner):
         lock_file = os.path.join(self.env_path, self._lock_file_name)
 
         if os.path.exists(lock_file):
-            with open(lock_file) as f:
+            with open(lock_file, encoding="utf-8") as f:
                 for line in f:
                     software_info = PipSoftwareInfo()
                     software_info.parse_from_string(line.replace("\n", ""))

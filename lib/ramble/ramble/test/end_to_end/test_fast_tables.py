@@ -49,7 +49,7 @@ def test_tables_output(workspace_name):
                 n_nodes: 1
     """
 
-    with open(os.path.join(ws.config_dir, "ramble.yaml"), "w") as f:
+    with open(os.path.join(ws.config_dir, "ramble.yaml"), "w", encoding="utf-8") as f:
         f.write(_CONFIG)
 
     ws._re_read()
@@ -63,7 +63,7 @@ def test_tables_output(workspace_name):
     table_path = os.path.join(ws.tables_dir, "test_table.latest.csv")
     assert os.path.exists(table_path)
 
-    with open(table_path) as f:
+    with open(table_path, encoding="utf-8") as f:
         reader = csv.DictReader(f)
         rows = list(reader)
         assert len(rows) == 1

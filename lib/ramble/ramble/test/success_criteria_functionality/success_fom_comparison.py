@@ -91,11 +91,11 @@ def test_success_fom_comparison(
         result_path = os.path.join(
             ws.experiment_dir, "basic", "test_wl", "test_exp", "test_exp.out"
         )
-        with open(result_path, "w+") as f:
+        with open(result_path, "w+", encoding="utf-8") as f:
             f.write(value)
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             data = f.read()
             assert result in data

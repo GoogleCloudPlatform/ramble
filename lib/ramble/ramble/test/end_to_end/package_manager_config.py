@@ -50,7 +50,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -60,7 +60,7 @@ ramble:
 
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml) as f:
+        with open(spack_yaml, encoding="utf-8") as f:
             data = f.read()
             assert "config:" in data
             assert "debug: true" in data

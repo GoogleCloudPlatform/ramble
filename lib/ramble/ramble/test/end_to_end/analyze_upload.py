@@ -49,14 +49,14 @@ ramble:
 
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
     exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
-    with open(exp_out, "w") as f:
+    with open(exp_out, "w", encoding="utf-8") as f:
         f.write("test-user.c.googlers.com\n")
 
     workspace("analyze", "--upload", global_args=["-w", ws_name])
 
     analyze_log = os.path.join(ws.log_dir, "analyze.latest.out")
 
-    with open(analyze_log) as f:
+    with open(analyze_log, encoding="utf-8") as f:
         content = f.read()
         assert "Uploading results to fake-dataset" in content
         assert "The PrintOnly uploader only logs" in content

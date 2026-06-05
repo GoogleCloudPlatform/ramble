@@ -32,7 +32,7 @@ def test_style(tool):
 def test_style_with_error(tmpdir, content, expected_err):
     with tmpdir.as_cwd():
         new_file = "new_file.py"
-        with open(new_file, "w+") as f:
+        with open(new_file, "w+", encoding="utf-8") as f:
             f.write(content)
 
         out = style_cmd(new_file, fail_on_error=False)

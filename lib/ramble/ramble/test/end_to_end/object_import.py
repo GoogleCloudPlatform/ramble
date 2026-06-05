@@ -42,6 +42,6 @@ def test_object_import_separate_python_source(workspace_name):
     rendered_script = os.path.join(
         ws.experiment_dir, "import-test", "test", "generated", "execute_experiment"
     )
-    with open(rendered_script) as f:
+    with open(rendered_script, encoding="utf-8") as f:
         content = f.read()
         assert "echo 1" in content

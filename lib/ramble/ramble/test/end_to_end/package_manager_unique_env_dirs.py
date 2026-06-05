@@ -74,12 +74,12 @@ def test_env_dirs_do_not_collide(mutable_config, mutable_mock_workspace_path, wo
         spack_file = os.path.join(env_dir, "spack.yaml")
 
         if os.path.isfile(req_file):
-            with open(req_file) as f:
+            with open(req_file, encoding="utf-8") as f:
                 content = f.read()
                 assert "gromacs" not in content
                 assert "semver" in content
         elif os.path.isfile(spack_file):
-            with open(spack_file) as f:
+            with open(spack_file, encoding="utf-8") as f:
                 content = f.read()
                 assert "gromacs" in content
                 assert "semver" not in content

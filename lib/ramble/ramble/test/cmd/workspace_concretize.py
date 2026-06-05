@@ -34,7 +34,7 @@ def test_workspace_concretize_additive(workspace_name):
     )
     workspace("concretize", "-q", global_args=global_args)
 
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "gromacs" in content
         assert "gcc14" in content
@@ -50,7 +50,7 @@ def test_workspace_concretize_additive(workspace_name):
     )
     workspace("concretize", "-q", global_args=global_args)
 
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "gromacs" in content
         assert "gcc14" in content
@@ -59,7 +59,7 @@ def test_workspace_concretize_additive(workspace_name):
 
     modifiers_path = os.path.join(ws.config_dir, "modifiers.yaml")
 
-    with open(modifiers_path, "w+") as f:
+    with open(modifiers_path, "w+", encoding="utf-8") as f:
         f.write(
             """modifiers:
 - name: intel-aps"""
@@ -67,7 +67,7 @@ def test_workspace_concretize_additive(workspace_name):
 
     workspace("concretize", "-q", global_args=global_args)
 
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "gromacs" in content
         assert "gcc14" in content
@@ -109,7 +109,7 @@ def test_workspace_multispec_concretize(workspace_name):
     )
     workspace("concretize", "-q", global_args=global_args)
 
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         content = f.read()
         assert "gromacs" in content
         assert "spack_pkg_spec" in content

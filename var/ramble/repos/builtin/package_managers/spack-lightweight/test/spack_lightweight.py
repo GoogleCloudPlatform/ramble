@@ -66,7 +66,7 @@ def test_container_push_cache_script(request):
         )
         workspace("setup", global_args=["-w", ws_name])
     assert os.path.exists(script_path)
-    with open(script_path) as f:
+    with open(script_path, encoding="utf-8") as f:
         script = f.read()
         assert "spack/setup-env.sh" in script
         assert "spack env activate" in script
@@ -98,7 +98,9 @@ def test_spack_auxiliary_files(request):
 
     os.makedirs(ws.auxiliary_software_dir)
     with open(
-        os.path.join(ws.auxiliary_software_dir, "packages.yaml"), "w+"
+        os.path.join(ws.auxiliary_software_dir, "packages.yaml"),
+        "w+",
+        encoding="utf-8",
     ) as f:
         f.write(
             """packages:
@@ -115,7 +117,7 @@ def test_spack_auxiliary_files(request):
         ws.software_dir, "spack-lightweight", "gromacs", "spack.yaml"
     )
 
-    with open(spack_config) as f:
+    with open(spack_config, encoding="utf-8") as f:
         data = f.read()
         assert "opt_target" not in data
         assert "x86_64" in data

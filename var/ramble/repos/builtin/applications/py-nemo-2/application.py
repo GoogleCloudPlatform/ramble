@@ -117,8 +117,8 @@ class PyNemo2(BasePyNemo):
 
         self.expander.flush_used_variable_stage()
 
-        with open(source_path) as f:
+        with open(source_path, encoding="utf-8") as f:
             content = f.read()
 
-        with open(dest_path, "w+") as f:
+        with open(dest_path, "w+", encoding="utf-8") as f:
             f.write(app_inst.expander.expand_var(content))

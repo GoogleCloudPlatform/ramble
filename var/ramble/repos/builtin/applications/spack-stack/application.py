@@ -226,7 +226,7 @@ class SpackStack(ExecutableApplication):
         if not os.path.isfile(spack_file):
             return False
 
-        with open(spack_file) as f:
+        with open(spack_file, encoding="utf-8") as f:
             spack_data = syaml.load_config(f)
 
         logger.debug(f"Spack data: {spack_data}")

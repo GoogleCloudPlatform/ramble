@@ -63,7 +63,7 @@ ramble:
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -78,7 +78,7 @@ ramble:
     test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
     gromacs_log_line = _spack_loc_log_line("gromacs")
     impi_log_line = _spack_loc_log_line("intel-oneapi-mpi@2021.11.0")
-    with open(test1_log) as f:
+    with open(test1_log, encoding="utf-8") as f:
         content = f.read()
         assert "Executing phase define_package_paths" in content
         assert content.count(gromacs_log_line) == 1
@@ -86,7 +86,7 @@ ramble:
 
     # test2 should use cached paths without invoking spack.
     test2_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test2.out")
-    with open(test2_log) as f:
+    with open(test2_log, encoding="utf-8") as f:
         content = f.read()
         assert "Executing phase define_package_paths" in content
         assert gromacs_log_line not in content
@@ -131,7 +131,7 @@ ramble:
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -147,7 +147,7 @@ ramble:
     test1_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test1.out")
     gromacs_log_line = _spack_loc_log_line("gromacs")
     impi_log_line = _spack_loc_log_line("intel-oneapi-mpi@2021.11.0")
-    with open(test1_log) as f:
+    with open(test1_log, encoding="utf-8") as f:
         content = f.read()
         assert "Executing phase define_package_paths" in content
         assert content.count(gromacs_log_line) == 1
@@ -155,7 +155,7 @@ ramble:
 
     # test2 should not use a path, as test1 has a variable for the path defined
     test2_log = os.path.join(ws.log_dir, "setup.latest", "gromacs.water_bare.test2.out")
-    with open(test2_log) as f:
+    with open(test2_log, encoding="utf-8") as f:
         content = f.read()
         assert "Executing phase define_package_paths" in content
         assert gromacs_log_line in content

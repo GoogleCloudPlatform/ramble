@@ -84,7 +84,7 @@ def test_experiment_result_cache_invalidation_new_file(tmpdir, experiment_result
 
     # Create a new file
     new_file = os.path.join(str(experiment_dir), "new_file")
-    with open(new_file, "w") as f:
+    with open(new_file, "w", encoding="utf-8") as f:
         f.write("test")
 
     # Test that the cache is invalidated
@@ -117,15 +117,15 @@ def test_experiment_result_get_newest_experiment_file(tmpdir):
     file2 = os.path.join(sub_dir, "file2")
     ramble_file = os.path.join(str(experiment_dir), "ramble_file")
 
-    with open(file1, "w") as f:
+    with open(file1, "w", encoding="utf-8") as f:
         f.write("test")
     time.sleep(0.1)
 
-    with open(file2, "w") as f:
+    with open(file2, "w", encoding="utf-8") as f:
         f.write("test")
     time.sleep(0.1)
 
-    with open(ramble_file, "w") as f:
+    with open(ramble_file, "w", encoding="utf-8") as f:
         f.write("test")
 
     # Test that the newest file is found correctly
@@ -144,7 +144,7 @@ def test_get_newest_experiment_file_outer_file_not_found(tmpdir, monkeypatch):
     os.mkdir(sub_dir)
 
     file1 = os.path.join(str(experiment_dir), "file1")
-    with open(file1, "w") as f:
+    with open(file1, "w", encoding="utf-8") as f:
         f.write("test")
 
     orig_scandir = os.scandir

@@ -60,7 +60,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -91,7 +91,7 @@ ramble:
         glob_var_mod_regex = re.compile("var_mod_modified")
         glob_env_var_mod_regex = re.compile("env_var_mod=modded")
 
-        with open(exp1_script) as f:
+        with open(exp1_script, encoding="utf-8") as f:
             # Check for only 'test' executable command
             test_cmd_found = False
             glob_cmd_not_found = True
@@ -136,7 +136,7 @@ ramble:
             assert test_wl_var_found and glob_wl_var_found and baz_wl_var_not_found
             assert test_env_var_found and glob_env_var_found and baz_env_var_not_found
 
-        with open(exp2_script) as f:
+        with open(exp2_script, encoding="utf-8") as f:
             # Check for executables matching 'test*' glob pattern
             test_cmd_found = False
             glob_cmd_found = False

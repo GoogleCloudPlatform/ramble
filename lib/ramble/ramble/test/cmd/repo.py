@@ -172,7 +172,7 @@ def test_add_repo_missing_config_file(mutable_config, tmpdir):
     # where it's missing (or invalid)
     # Create a dummy repo.yaml and then remove it to simulate the missing file
     repo_config_file = os.path.join(str(repo_path), "repo.yaml")
-    with open(repo_config_file, "w") as f:
+    with open(repo_config_file, "w", encoding="utf-8") as f:
         syaml.dump({"repo": {"namespace": "test_namespace"}}, f)
     os.remove(repo_config_file)
 

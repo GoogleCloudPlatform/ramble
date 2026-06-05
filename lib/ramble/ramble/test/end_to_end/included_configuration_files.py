@@ -113,19 +113,21 @@ ramble:
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         test_configs_path = os.path.join(ws1.root, "test_configs")
         fs.mkdirp(test_configs_path)
 
-        with open(os.path.join(test_configs_path, "applications.yaml"), "w+") as f:
+        with open(
+            os.path.join(test_configs_path, "applications.yaml"), "w+", encoding="utf-8"
+        ) as f:
             f.write(test_applications)
 
-        with open(os.path.join(test_configs_path, "variables.yaml"), "w+") as f:
+        with open(os.path.join(test_configs_path, "variables.yaml"), "w+", encoding="utf-8") as f:
             f.write(test_variables)
 
-        with open(os.path.join(test_configs_path, "software.yaml"), "w+") as f:
+        with open(os.path.join(test_configs_path, "software.yaml"), "w+", encoding="utf-8") as f:
             f.write(test_software)
 
         ws1._re_read()

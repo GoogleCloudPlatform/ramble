@@ -60,7 +60,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -68,18 +68,18 @@ ramble:
 
         # Create fake figures of merit.
         exp_dir = os.path.join(ws.root, "experiments", "shared-context", "test_wl", "simple_test")
-        with open(os.path.join(exp_dir, "simple_test.out"), "w+") as f:
+        with open(os.path.join(exp_dir, "simple_test.out"), "w+", encoding="utf-8") as f:
             f.write("fom_context mod_context\n")
             f.write("123.4 seconds app_fom\n")
 
-        with open(os.path.join(exp_dir, "test_analysis.log"), "w+") as f:
+        with open(os.path.join(exp_dir, "test_analysis.log"), "w+", encoding="utf-8") as f:
             f.write("fom_contextFOM_GOES_HERE")
 
         workspace("analyze", "-f", "text", "json", global_args=["-w", workspace_name])
 
         results_files = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))
 
-        with open(results_files[0]) as f:
+        with open(results_files[0], encoding="utf-8") as f:
             data = f.read()
             assert "matched_shared_context" in data  # find the merged context
             assert "test_fom = 123.4" in data  # from the app

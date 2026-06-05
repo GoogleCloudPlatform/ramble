@@ -103,7 +103,7 @@ class EnvironmentModules(PackageManagerBase):
 
         loads_content = self._generate_loads_content(workspace)
 
-        with open(module_file_path, "w+") as f:
+        with open(module_file_path, "w+", encoding="utf-8") as f:
             f.write(loads_content)
 
     register_builtin("module_load", required=True)
@@ -132,7 +132,7 @@ class EnvironmentModules(PackageManagerBase):
 
         pkg_list = []
         pkg_regex = re.compile(r"\S+$")
-        with open(list_file) as f:
+        with open(list_file, encoding="utf-8") as f:
             packages = re.split(r"[0-9]*\)", f.read())
             for spec in packages:
                 cleaned = spec.strip()

@@ -153,7 +153,7 @@ class ExitCode(BasicModifier):
         final_found = False
 
         if os.path.exists(log_file):
-            with open(log_file) as f:
+            with open(log_file, encoding="utf-8") as f:
                 for line in f:
                     m = exit_regex.match(line)
 
@@ -164,7 +164,7 @@ class ExitCode(BasicModifier):
                         final_found = True
 
             if not final_found:
-                with open(log_file, "a") as f:
+                with open(log_file, "a", encoding="utf-8") as f:
                     f.write(f"Final exit code: {max_code}")
 
     success_criteria(

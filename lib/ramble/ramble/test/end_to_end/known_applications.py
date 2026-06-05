@@ -68,7 +68,7 @@ def test_known_applications(application, package_manager, mock_file_auto_create,
             ws._re_read()
 
             if package_manager != "user-managed":
-                with open(ws.config_file_path) as f:
+                with open(ws.config_file_path, encoding="utf-8") as f:
                     data = f.read()
                     assert package_manager in data
 
@@ -145,7 +145,7 @@ def test_known_workflow_managers(
         ws.concretize()
         ws._re_read()
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert workflow_manager in data
 

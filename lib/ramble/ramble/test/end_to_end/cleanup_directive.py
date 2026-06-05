@@ -52,9 +52,9 @@ def test_cleanup_directive(mock_applications, workspace_name):
 
     # Set up two files, with one going to be removed by the pre-cleanup
     pre_file_path = os.path.join(run_dir, "pre-myfile.txt")
-    open(pre_file_path, "w")
+    open(pre_file_path, "w", encoding="utf-8")
     post_file_path = os.path.join(run_dir, "post-myfile.txt")
-    open(post_file_path, "w")
+    open(post_file_path, "w", encoding="utf-8")
     assert os.path.exists(pre_file_path)
     assert os.path.exists(post_file_path)
 

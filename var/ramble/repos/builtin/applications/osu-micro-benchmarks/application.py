@@ -257,7 +257,7 @@ class OsuMicroBenchmarks(ExecutableApplication):
         fom_type = None
         log_file = self.expander.expand_var_name("log_file")
         if os.path.isfile(log_file):
-            with open(log_file) as f:
+            with open(log_file, encoding="utf-8") as f:
                 for line in f:
                     for test_fom_type in self.fom_types:
                         if self.fom_regex_headers[test_fom_type].match(line):

@@ -34,7 +34,7 @@ def test_layered_variable_modifications(
         config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
         template_path = os.path.join(ws1.config_dir, "test.tpl")
 
-        with open(template_path, "w+") as f:
+        with open(template_path, "w+", encoding="utf-8") as f:
             f.write(test_template)
 
         dry_run_config("modifiers", test_modifiers, config_path, "gromacs", "water_bare")
@@ -49,7 +49,7 @@ def test_layered_variable_modifications(
         )
         assert os.path.exists(rendered_template)
 
-        with open(rendered_template) as f:
+        with open(rendered_template, encoding="utf-8") as f:
             data = f.read()
             assert "test-mod-2-append" in data
             assert "test-mod-append" in data

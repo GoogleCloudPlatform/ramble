@@ -448,7 +448,7 @@ class Wrf(ExecutableApplication):
             max_time = float("-inf")
             sum_time = 0.0
             count = 0
-            with open(out_file) as f:
+            with open(out_file, encoding="utf-8") as f:
                 for line in f:
                     m = timing_regex.match(line)
                     if m:
@@ -464,7 +464,7 @@ class Wrf(ExecutableApplication):
                 self.expander.expand_var_name("experiment_run_dir"),
                 "stats.out",
             )
-            with open(stats_path, "w+") as f:
+            with open(stats_path, "w+", encoding="utf-8") as f:
                 f.write("Average time: %s s\n" % (avg_time))
                 f.write("Cumulative time: %s s\n" % (sum_time))
                 f.write("Min time: %s s\n" % (min_time))

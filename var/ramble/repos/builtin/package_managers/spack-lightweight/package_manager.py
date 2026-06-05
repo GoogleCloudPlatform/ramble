@@ -522,7 +522,9 @@ class SpackLightweight(PackageManagerBase):
                 workspace.deployment_repos_dir, "spack", "obj_repo"
             )
             fs.mkdirp(repo_root)
-            with open(os.path.join(repo_root, "repo.yaml"), "w+") as f:
+            with open(
+                os.path.join(repo_root, "repo.yaml"), "w+", encoding="utf-8"
+            ) as f:
                 f.write("repo:\n")
                 f.write("  namespace: obj_repo\n")
 
@@ -1250,7 +1252,7 @@ class SpackRunner(CommandRunner):
         self.create_env(tmp_path)
         tmp_env_file = os.path.join(tmp_path, "spack.yaml")
 
-        with open(tmp_env_file, "w+") as f:
+        with open(tmp_env_file, "w+", encoding="utf-8") as f:
             syaml.dump_config(env_file, default_flow_style=False, stream=f)
 
         return tmp_path
@@ -1300,7 +1302,11 @@ class SpackRunner(CommandRunner):
 
             spack_hash = self.inventory_hash()
 
-            with open(os.path.join(self.env_path, "ramble.hash"), "w+") as f:
+            with open(
+                os.path.join(self.env_path, "ramble.hash"),
+                "w+",
+                encoding="utf-8",
+            ) as f:
                 f.write(spack_hash)
         else:
             spack_lock_file = os.path.join(self.env_path, "spack.lock")

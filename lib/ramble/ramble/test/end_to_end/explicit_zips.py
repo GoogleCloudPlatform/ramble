@@ -126,19 +126,19 @@ licenses:
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
-        with open(license_path, "w+") as f:
+        with open(license_path, "w+", encoding="utf-8") as f:
             f.write(test_licenses)
 
         for file in aux_software_files:
             file_path = os.path.join(aux_software_path, file)
-            with open(file_path, "w+") as f:
+            with open(file_path, "w+", encoding="utf-8") as f:
                 f.write("")
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+", encoding="utf-8") as f:
             f.write("{command}")
 
         ws1._re_read()
@@ -197,7 +197,7 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
 
-            with open(os.path.join(exp_dir, "full_command")) as f:
+            with open(os.path.join(exp_dir, "full_command"), encoding="utf-8") as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -226,7 +226,7 @@ licenses:
                 # Test the run script has a reference to the experiment log file
                 assert os.path.join(exp_dir, f"{exp}.out") in data
 
-            with open(os.path.join(exp_dir, "execute_experiment")) as f:
+            with open(os.path.join(exp_dir, "execute_experiment"), encoding="utf-8") as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -259,7 +259,7 @@ licenses:
                 assert "spack env activate" in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+", encoding="utf-8") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
@@ -267,7 +267,7 @@ licenses:
             # Create files that match archive patterns
             new_file = os.path.join(exp_dir, "rsl.error.base")
 
-            f = open(new_file, "w+")
+            f = open(new_file, "w+", encoding="utf-8")
             f.close()
 
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
@@ -280,7 +280,7 @@ licenses:
         assert len(json_results_files) == 2
         assert len(yaml_results_files) == 2
 
-        with open(text_results_files[0]) as f:
+        with open(text_results_files[0], encoding="utf-8") as f:
             data = f.read()
             assert "Average Timestep Time = 33.3 s" in data
             assert "Cumulative Timestep Time = 166.5 s" in data

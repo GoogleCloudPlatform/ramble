@@ -52,7 +52,7 @@ ramble:
         config_path = os.path.join(
             ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
         )
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
@@ -73,36 +73,52 @@ ramble:
         assert "launcher_execute_script" in files
         assert "worker_execute_script" in files
         assert "batch_print_deployment" in files
-        with open(os.path.join(run_path, "batch_submit")) as f:
+        with open(
+            os.path.join(run_path, "batch_submit"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert f"kubectl apply --kustomize {run_path}" in content
-        with open(os.path.join(run_path, "batch_query")) as f:
+        with open(
+            os.path.join(run_path, "batch_query"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert (
                 "kubectl describe mpijobs hostname-parallel-generated"
                 in content
             )
-        with open(os.path.join(run_path, "batch_cancel")) as f:
+        with open(
+            os.path.join(run_path, "batch_cancel"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert (
                 "kubectl delete mpijobs hostname-parallel-generated" in content
             )
-        with open(os.path.join(run_path, "gke_mpi.yaml")) as f:
+        with open(
+            os.path.join(run_path, "gke_mpi.yaml"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "kind: MPIJob" in content
             assert "name: hostname-parallel-generated" in content
             assert "replicas: 2" in content
             assert "image: docker.pkg.dev/myproject/myimage" in content
-        with open(os.path.join(run_path, "kustomization.yaml")) as f:
+        with open(
+            os.path.join(run_path, "kustomization.yaml"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "files:" in content
             assert os.path.join(run_path, "app_config.txt") in content
-        with open(os.path.join(run_path, "launcher_execute_script")) as f:
+        with open(
+            os.path.join(run_path, "launcher_execute_script"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "hostname" in content
-        with open(os.path.join(run_path, "worker_execute_script")) as f:
+        with open(
+            os.path.join(run_path, "worker_execute_script"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "sshd" in content
-        with open(os.path.join(run_path, "batch_print_deployment")) as f:
+        with open(
+            os.path.join(run_path, "batch_print_deployment"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "kubectl kustomize" in content

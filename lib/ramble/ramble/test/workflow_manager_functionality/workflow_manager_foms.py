@@ -42,12 +42,12 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
         workspace("analyze", "-p", global_args=["-D", ws.root])
         result_file = os.path.join(ws.results_dir, "results.latest.txt")
-        with open(result_file) as f:
+        with open(result_file, encoding="utf-8") as f:
             assert "job-status = RUNNING" in f.read()

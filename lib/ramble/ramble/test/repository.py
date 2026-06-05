@@ -17,7 +17,7 @@ def extra_repo(tmpdir_factory, request):
     repo_dir = tmpdir_factory.mktemp(repo_namespace)
     repo_dir.ensure(request.param, dir=True)
 
-    with open(str(repo_dir.join("repo.yaml")), "w") as f:
+    with open(str(repo_dir.join("repo.yaml")), "w", encoding="utf-8") as f:
         f.write(
             """
 repo:

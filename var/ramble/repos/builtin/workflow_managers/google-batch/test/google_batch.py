@@ -39,7 +39,7 @@ variants:
 
     variants_path = os.path.join(ws.config_dir, "variants.yaml")
 
-    with open(variants_path, "w+") as f:
+    with open(variants_path, "w+", encoding="utf-8") as f:
         f.write(variants_conf)
 
     workspace(

@@ -121,19 +121,19 @@ licenses:
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
-        with open(license_path, "w+") as f:
+        with open(license_path, "w+", encoding="utf-8") as f:
             f.write(test_licenses)
 
         for file in aux_software_files:
             file_path = os.path.join(aux_software_path, file)
-            with open(file_path, "w+") as f:
+            with open(file_path, "w+", encoding="utf-8") as f:
                 f.write("")
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+", encoding="utf-8") as f:
             f.write("{command}")
 
         ws1._re_read()
@@ -161,7 +161,7 @@ licenses:
         for file in out_files:
             found = [False, False, False]
             cur_found = 0
-            with open(file) as f:
+            with open(file, encoding="utf-8") as f:
                 for line in f:
                     if expected_phase_order[cur_found] in line:
                         found[cur_found] = True

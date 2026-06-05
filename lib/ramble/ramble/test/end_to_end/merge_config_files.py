@@ -69,7 +69,7 @@ licenses:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws._re_read()
@@ -78,13 +78,13 @@ licenses:
         software_file = os.path.join(ws.root, "software_test.yaml")
         licenses_file = os.path.join(ws.root, "licenses.yaml")
 
-        with open(applications_file, "w+") as f:
+        with open(applications_file, "w+", encoding="utf-8") as f:
             f.write(test_applications)
 
-        with open(software_file, "w+") as f:
+        with open(software_file, "w+", encoding="utf-8") as f:
             f.write(test_software)
 
-        with open(licenses_file, "w") as f:
+        with open(licenses_file, "w", encoding="utf-8") as f:
             f.write(test_licenses)
 
         config("add", "-f", applications_file, global_args=["-w", workspace_name])
@@ -93,7 +93,7 @@ licenses:
 
         ws._re_read()
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "ensure_installed" in data
@@ -107,5 +107,5 @@ licenses:
         exec_file = os.path.join(
             ws.experiment_dir, "zlib", "ensure_installed", "test_experiment", "execute_experiment"
         )
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             assert "license.inc" in f.read()

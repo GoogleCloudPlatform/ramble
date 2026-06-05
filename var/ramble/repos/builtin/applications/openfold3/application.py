@@ -216,11 +216,11 @@ class Openfold3(ExecutableApplication):
 
         for timing_file in timing_files:
             try:
-                with open(timing_file) as f:
+                with open(timing_file, encoding="utf-8") as f:
                     data = json.load(f)
 
                 timing_out_path = os.path.join(run_dir, "timing.out")
-                with open(timing_out_path, "w") as f_out:
+                with open(timing_out_path, "w", encoding="utf-8") as f_out:
                     if "runtime_s" in data:
                         f_out.write(
                             f"Inference Time = {data.get('runtime_s', 0.0)} s\n"
@@ -248,7 +248,7 @@ class Openfold3(ExecutableApplication):
                     best_score = -1.0
                     for conf_file in conf_files:
                         try:
-                            with open(conf_file) as f_conf:
+                            with open(conf_file, encoding="utf-8") as f_conf:
                                 conf_data = json.load(f_conf)
                             score = conf_data.get("sample_ranking_score", 0.0)
                             if score > best_score:

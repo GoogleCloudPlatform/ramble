@@ -51,7 +51,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -59,7 +59,7 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             data = f.read()
             assert "FAILED" not in data
             assert f"summary::{SummaryFoms.N_TOTAL.value} = 2 repeats" in data
@@ -69,12 +69,12 @@ ramble:
         result_path = os.path.join(
             ws.experiment_dir, "basic", "working_wl", "test_exp.1", "test_exp.1.out"
         )
-        with open(result_path, "w+") as f:
+        with open(result_path, "w+", encoding="utf-8") as f:
             f.write("")
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             data = f.read()
             assert "SUCCESS" in data
             assert "FAILED" in data
@@ -85,12 +85,12 @@ ramble:
         result_path = os.path.join(
             ws.experiment_dir, "basic", "working_wl", "test_exp.2", "test_exp.2.out"
         )
-        with open(result_path, "w+") as f:
+        with open(result_path, "w+", encoding="utf-8") as f:
             f.write("")
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             data = f.read()
             assert "SUCCESS" not in data
             assert f"summary::{SummaryFoms.N_TOTAL.value}" not in data

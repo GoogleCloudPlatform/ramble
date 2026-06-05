@@ -61,7 +61,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -70,5 +70,5 @@ ramble:
         with pytest.raises(RambleCommandError):
             workspace("analyze", global_args=["-w", workspace_name])
         analyze_log = os.path.join(ws.log_dir, "analyze.latest.out")
-        with open(analyze_log) as f:
+        with open(analyze_log, encoding="utf-8") as f:
             assert "Make sure your workspace is setup" in f.read()

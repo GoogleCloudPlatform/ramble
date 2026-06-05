@@ -44,7 +44,7 @@ def test_workspace_add_includes(workspace_name):
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = f.read()
         assert "- $workspace_configs/auxiliary_software_files" in data
 
@@ -75,7 +75,7 @@ def test_workspace_remove_includes_index(workspace_name):
 
     assert "0: $workspace_configs/auxiliary_software_files" in output
 
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = f.read()
         assert "- $workspace_configs/auxiliary_software_files" in data
 
@@ -87,7 +87,7 @@ def test_workspace_remove_includes_index(workspace_name):
 
     assert "Workspace contains no includes." in output
 
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = f.read()
         assert "- $workspace_configs/auxiliary_software_files" not in data
 
@@ -118,7 +118,7 @@ def test_workspace_remove_includes_pattern(workspace_name):
 
     assert "0: $workspace_configs/auxiliary_software_files" in output
 
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = f.read()
         assert "- $workspace_configs/auxiliary_software_files" in data
 
@@ -130,6 +130,6 @@ def test_workspace_remove_includes_pattern(workspace_name):
 
     assert "Workspace contains no includes." in output
 
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         data = f.read()
         assert "- $workspace_configs/auxiliary_software_files" not in data

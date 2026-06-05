@@ -196,13 +196,13 @@ class PyxisEnroot(ContainerBase):
             )
 
             if os.path.exists(hash_file_path):
-                with open(hash_file_path) as f:
+                with open(hash_file_path, encoding="utf-8") as f:
                     container_hash = f.read()
 
             else:
                 container_hash = hash_file(container_path)
 
-                with open(hash_file_path, "w+") as f:
+                with open(hash_file_path, "w+", encoding="utf-8") as f:
                     f.write(container_hash)
 
             inventory.append(
