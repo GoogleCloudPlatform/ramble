@@ -25,8 +25,6 @@ from ramble.software_environments import (
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
 
-import spack.util.naming
-
 ObjectMixin = ramble.repository.get_base_class("object-mixin")
 
 
@@ -150,7 +148,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             (str): Prefix for this package manager's specs
         """
         prefix = self._spec_prefix or self.name
-        return spack.util.naming.spack_module_to_python_module(prefix)
+        return prefix.replace("-", "_")
 
     def set_application(self, app_inst):
         """Add an internal reference to the application instance this package

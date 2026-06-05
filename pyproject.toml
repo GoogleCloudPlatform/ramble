@@ -204,8 +204,10 @@ select = [
 # Even though `py` is neither vendored nor listed in the deps, `pytest` has a dependency
 # on it. Use linter to ban its usage.
 "py" = { msg = "The legacy `py` library is deprecated and should not be used." }
+# These are used to enforce the gradual moving away from vendored Spack dependencies
+"spack.util.naming" = { msg = "Core Ramble code should not rely on spack.util.naming." }
+"spack.util.cpus" = { msg = "Core Ramble code should not rely on spack.util.cpus." }
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]
 "var/ramble/repos/**/*.py" = ["F403", "F405"]
-

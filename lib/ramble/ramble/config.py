@@ -80,6 +80,7 @@ import ramble.schema.variants
 import ramble.schema.workflow_manager_repos
 import ramble.schema.workspace
 from ramble.error import RambleError
+from ramble.util import cpus
 from ramble.util.logger import logger
 
 import spack.compilers
@@ -87,7 +88,6 @@ import spack.platforms
 
 # Hacked yaml for configuration files preserves line numbers.
 import spack.util.spack_yaml as syaml
-from spack.util.cpus import cpus_available
 
 #: Dict from section names -> schema for that section
 section_schemas: Dict[str, Dict[str, Any]] = {
@@ -199,7 +199,7 @@ config_defaults = {
         "verify_ssl": True,
         "checksum": True,
         "dirty": False,
-        "build_jobs": min(16, cpus_available()),
+        "build_jobs": min(16, cpus.cpus_available()),
         "build_stage": "$tempdir/ramble-stage",
         "concretizer": "clingo",
         "license_dir": spack.paths.default_license_dir,

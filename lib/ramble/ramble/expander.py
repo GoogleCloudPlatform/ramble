@@ -23,10 +23,9 @@ from typing import Dict, FrozenSet, List, Optional, Union
 import ramble.config
 import ramble.error
 import ramble.keywords
+from ramble.util import naming
 from ramble.util.logger import logger
 from ramble.util.path import substitute_config_variables
-
-import spack.util.naming
 
 _ast_cache: Dict[str, str] = {}
 # Regex for detecting math operators or keywords
@@ -193,7 +192,7 @@ supported_scalar_function_pointers = {
     "sqrt": math.sqrt,
     "randrange": random.randrange,
     "randint": random.randint,
-    "simplify_str": spack.util.naming.simplify_name,
+    "simplify_str": naming.simplify_name,
     "join_str": _join_str,
     "re_search": _re_search,
     "replace": _str_replace,
