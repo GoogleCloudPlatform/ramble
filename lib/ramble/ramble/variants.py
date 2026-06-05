@@ -37,6 +37,11 @@ class VariantSet:
         self.experiment_variants = {}
         self.version_variants = {}
         self._set_cache = None
+        self._has_template_variants = False
+
+    def _invalidate_cache(self):
+        self._set_cache = None
+        self._has_template_variants = False
 
     def __str__(self):
         if not hasattr(self, "_str_indent"):
@@ -101,7 +106,7 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._set_cache = None
+        self._invalidate_cache()
         for name, variant in in_set.default_variants.items():
             if name not in self.default_variants:
                 self.default_variants[name] = variant.copy()
@@ -113,7 +118,7 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._set_cache = None
+        self._invalidate_cache()
         for name, variant in in_set.experiment_variants.items():
             if name not in self.experiment_variants:
                 self.experiment_variants[name] = variant.copy()
@@ -125,7 +130,7 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._set_cache = None
+        self._invalidate_cache()
         for name, variant_list in in_set.multi_value_variants.items():
             if name not in self.multi_value_variants:
                 self.multi_value_variants[name] = set()
@@ -139,7 +144,7 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._set_cache = None
+        self._invalidate_cache()
         for name, variant in in_set.version_variants.items():
             if name not in self.version_variants:
                 self.version_variants[name] = variant.copy()
@@ -213,7 +218,7 @@ class VariantSet:
             )
 
     def multi_value_variant(self, name: str, value: Any):
-        self._set_cache = None
+        self._invalidate_cache()
         if name not in self.multi_value_variants:
             self.multi_value_variants[name] = set()
 
@@ -261,7 +266,7 @@ class VariantSet:
             values: Set of valid values for the variant
         """
 
-        self._set_cache = None
+        self._invalidate_cache()
         variant_dict = None
         if variant_type == variant_types.experiment:
             variant_dict = self.experiment_variants
@@ -323,12 +328,15 @@ class VariantSet:
             (set): Set of exanded variant definitions
         """
 
-        if expander is None:
+        if expander is None or not self._has_template_variants:
             return self._set_cache
 
         expanded_set = set()
         for variant in self._set_cache:
-            expanded_set.add(expander.expand_var(variant))
+            if "{" in variant:
+                expanded_set.add(expander.expand_var(variant))
+            else:
+                expanded_set.add(variant)
         return expanded_set
 
     def as_set(self, expander: Optional[Expander] = None) -> set:
@@ -379,6 +387,7 @@ class VariantSet:
             out_set.update(variant.as_definitions())
 
         self._set_cache = out_set
+        self._has_template_variants = any("{" in v for v in out_set)
         return self._expanded_set(expander)
 
 
