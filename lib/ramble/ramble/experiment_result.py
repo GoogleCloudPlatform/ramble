@@ -89,7 +89,7 @@ class ExperimentResult:
             logger.all_msg("Invalidating experiment results cache: timestamp difference")
             return False
 
-        with open(cache_file) as f:
+        with open(cache_file, encoding="utf-8") as f:
             cache_dict = sjson.load(f)
 
         if (
@@ -119,7 +119,7 @@ class ExperimentResult:
         for key, pkg_list in software_packages.items():
             out_dict[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
 
-        with open(cache_file, "w+") as f:
+        with open(cache_file, "w+", encoding="utf-8") as f:
             sjson.dump(out_dict, f)
 
     def finalize(self, workspace):

@@ -135,7 +135,7 @@ def deployment_pull(args):
                 "`ramble deployment push` before pulling it."
             )
 
-        with open(local_index_path) as f:
+        with open(local_index_path, encoding="utf-8") as f:
             index_data = sjson.load(f)
 
         for file in index_data[push_cls.index_namespace]:

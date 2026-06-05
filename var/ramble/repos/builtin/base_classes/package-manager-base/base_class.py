@@ -419,7 +419,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
                         with tempfile.TemporaryDirectory() as tmpdir:
                             dest_name = os.path.basename(dest_path)
                             temp_path = os.path.join(str(tmpdir), dest_name)
-                            with open(temp_path, "w+") as f:
+                            with open(temp_path, "w+", encoding="utf-8") as f:
                                 f.write(rendered)
                             self.merge_software_file(dest_path, temp_path)
 
@@ -436,7 +436,7 @@ class PackageManagerBase(ObjectMixin, metaclass=PackageManagerMeta):
             with tempfile.TemporaryDirectory() as tmpdir:
                 dest_name = os.path.basename(aux_file_path)
                 temp_path = os.path.join(str(tmpdir), dest_name)
-                with open(temp_path, "w+") as f:
+                with open(temp_path, "w+", encoding="utf-8") as f:
                     f.write(rendered)
                 self.merge_software_file(aux_file_path, str(temp_path))
 

@@ -374,12 +374,12 @@ def _workspace_create(
     workspace.write(inputs_dir=inputs_dir, software_dir=software_dir)
 
     if config:
-        with open(config) as f:
+        with open(config, encoding="utf-8") as f:
             workspace.read_config("workspace", f)
             workspace.write_config("workspace", force=True)
 
     if template_execute:
-        with open(template_execute) as f:
+        with open(template_execute, encoding="utf-8") as f:
             _, file_name = os.path.split(template_execute)
             template_name = os.path.splitext(file_name)[0]
             workspace.read_template(template_name, f.read())

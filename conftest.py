@@ -98,7 +98,7 @@ def pytest_runtest_makereport(item, call):
 def pytest_sessionfinish(session, exitstatus):
     if session.perf_metrics:
         perf_file = os.path.join(ramble.paths.ramble_root, "perf_test_metrics.json")
-        with open(perf_file, "w") as f:
+        with open(perf_file, "w", encoding="utf-8") as f:
             json.dump(session.perf_metrics, f, indent=2)
 
 
@@ -504,7 +504,7 @@ class ConfigUpdate:
 
     def __call__(self, filename):
         file = os.path.join(self.root_for_conf, filename + ".yaml")
-        with open(file) as f:
+        with open(file, encoding="utf-8") as f:
             mock_config = MockConfig(syaml.load_config(f), self.writer_key)
 
         self.monkeypatch.setattr(ramble.modules.common, "configuration", mock_config.configuration)
@@ -621,7 +621,7 @@ def mock_archive(request, tmpdir_factory):
 
     # Create the configure script
     configure_path = str(tmpdir.join(ramble.stage._input_subdir, "configure"))
-    with open(configure_path, "w") as f:
+    with open(configure_path, "w", encoding="utf-8") as f:
         f.write(
             "#!/bin/sh\n"
             "prefix=$(echo $1 | sed 's/--prefix=//')\n"
@@ -729,7 +729,7 @@ def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_work
 
         if config_str:
             config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-            with open(config_path, "w+") as f:
+            with open(config_path, "w+", encoding="utf-8") as f:
                 f.write(config_str)
             ws._re_read()
 

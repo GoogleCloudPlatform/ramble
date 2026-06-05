@@ -157,7 +157,7 @@ def repo_add(args):
             raise ramble.repository.BadRepoError(f"No {repo_config_name} found in '{path}'")
 
         try:
-            with open(repo_config_file) as f:
+            with open(repo_config_file, encoding="utf-8") as f:
                 yaml_data = ramble.repository.yaml.safe_load(f)
                 if (
                     not yaml_data
