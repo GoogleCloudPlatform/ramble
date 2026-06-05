@@ -375,7 +375,7 @@ _ramble_create() {
     then
         RAMBLE_COMPREPLY="-h --help -r --repo -b --base -m --maintainers -t --tags -i --interactive"
     else
-        RAMBLE_COMREPLY=""
+        RAMBLE_COMPREPLY=""
     fi
 }
 

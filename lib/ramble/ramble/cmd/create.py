@@ -99,7 +99,10 @@ def prompt_for_choice(question, choices):
 
 def discover_base_classes(obj_type):
     """Discovers and filters matching base classes dynamically."""
-    all_bases = ramble.repository.all_object_names(ramble.repository.ObjectTypes.base_classes)
+    try:
+        all_bases = ramble.repository.all_object_names(ramble.repository.ObjectTypes.base_classes)
+    except ramble.repository.NoRepoConfiguredError:
+        all_bases = []
 
     # Define keyword filters to group base classes by object type
     filters = {
@@ -195,6 +198,13 @@ def create(parser, args):
 
     # Check if interactive wizard is requested or needed
     if args.interactive or not args.object_type or not args.name:
+        import sys
+
+        if not sys.stdin.isatty():
+            logger.die(
+                "Interactive wizard cannot be run in a non-interactive terminal. "
+                "Please provide 'object_type' and 'name' arguments."
+            )
         try:
             obj_type, name, repo, base, maintainers, tags = run_interactive_wizard()
         except KeyboardInterrupt:

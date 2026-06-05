@@ -28,7 +28,7 @@ def get_template(object_type):
     tpl_path = os.path.join(ramble.paths.share_path, "templates", tpl_name)
 
     if os.path.exists(tpl_path):
-        with open(tpl_path) as f:
+        with open(tpl_path, encoding="utf-8") as f:
             return f.read()
 
     # Fail-safe fallback if the template file is missing
@@ -42,7 +42,7 @@ def get_target_repo(repo_name_or_path, object_type):
     """Finds the target repository based on name or path."""
     repo_path = ramble.repository.paths[object_type]
 
-    if not repo_name_or_path:
+    if not repo_name_or_path or repo_name_or_path == "builtin":
         # Fallback to builtin or first registered
         for r in repo_path.repos:
             if r.namespace == "builtin":
@@ -106,7 +106,7 @@ def create_object(
 
     # Write stub contents
     fs.mkdirp(obj_dir)
-    with open(file_path, "w") as f:
+    with open(file_path, "w", encoding="utf-8") as f:
         f.write(
             template.format(
                 class_name=class_name,

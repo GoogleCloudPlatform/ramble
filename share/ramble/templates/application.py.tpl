@@ -25,7 +25,7 @@ class {class_name}({base_class}):
     # software_spec("example-pkg", pkg_spec="example-pkg@1.0")
 
     # Define executable command template
-    # executable("run_example", "example-bin {{options}}", redirect="{{log_file}}")
+    # executable("run_example", "example-bin {{{{options}}}}", redirect="{{{{log_file}}}}")
 
     # Define workload
     # workload("test_wl", executables=["run_example"])
@@ -33,7 +33,7 @@ class {class_name}({base_class}):
     # Define figure of merit (FOM) stubs
     # figure_of_merit(
     #     "FOM Name",
-    #     log_file="{{log_file}}",
+    #     log_file="{{{{log_file}}}}",
     #     regex=r"Result:\s+(?P<val>[0-9\.]+)",
     #     group="val",
     #     units="seconds",
