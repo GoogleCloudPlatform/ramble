@@ -198,6 +198,8 @@ properties["config"]["enable_strict_versions"] = {"type": "boolean", "default": 
 
 properties["config"]["overwrite_inventories"] = {"type": "boolean", "default": False}
 
+properties["config"]["generate_file_editing_scripts"] = {"type": "boolean", "default": True}
+
 properties["config"]["stage_method"] = {
     "type": "string",
     "enum": ["cp", "rsync", "symbolic_link", "hard_link"],

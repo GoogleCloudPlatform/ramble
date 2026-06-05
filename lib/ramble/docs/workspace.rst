@@ -107,6 +107,8 @@ Ramble creates workspaces using the following structure by default:
     |   | - ramble.yaml
     |   | - execute_experiment.tpl
     |   | - auxiliary_software_files/
+    | - shared/
+    |   | - utilities/
     | - experiments/
     | - inputs/
     | - logs/
@@ -116,6 +118,7 @@ Ramble creates workspaces using the following structure by default:
 This various parts of this directory structure are defined as:
   * ``configs/``: Contain configuration for the workspace
   * ``configs/auxiliary_software_files``: Contain files used by the package managers
+  * ``shared/utilities``: Contain ramble-generated workspace utilities
   * ``experiments/``: Contain experiments define by the workspace configuration
   * ``inputs``: Contain the inputs experiments in this workspace require
   * ``logs``: Contain some logging output from ramble

@@ -44,10 +44,11 @@ class Elk(ExecutableApplication):
         src="{input_path}/elk.in",
         dst="{experiment_run_dir}/.",
     )
-    executable(
+    edit_file(
         "update_input",
-        "sed -i 's|../../../species/|{examples}/species/|g' elk.in",
-        use_mpi=False,
+        file_path="elk.in",
+        match=r"\.\./\.\./\.\./species/",
+        replace="{examples}/species/",
     )
 
     workload(

@@ -45,18 +45,28 @@ class IntelHpcg(HpcgBase, IntelMklBenchmarksBase):
     executable(
         "move-log", "mv n[0-9]*-[0-9]*p-[0-9]*t*.txt {out_file}", use_mpi=False
     )
-    executable(
-        "reformat-output",  # Removes spaces to match OSS HPCG formatting
-        template=[
-            "sed -i 's/ Final Summary ::/Final Summary::/g' {out_file}",
-            "sed -i 's/    HPCG 2.4 Rating/HPCG 2.4 Rating/g' {out_file}",
-        ],
-        use_mpi=False,
+    edit_file(
+        "reformat-summary",
+        file_path="{out_file}",
+        match=" Final Summary ::",
+        replace="Final Summary::",
+    )
+    edit_file(
+        "reformat-rating",
+        file_path="{out_file}",
+        match="    HPCG 2.4 Rating",
+        replace="HPCG 2.4 Rating",
     )
 
     workload(
         "standard",
-        executables=["set_vars", "execute", "move-log", "reformat-output"],
+        executables=[
+            "set_vars",
+            "execute",
+            "move-log",
+            "reformat-summary",
+            "reformat-rating",
+        ],
     )
 
     workload_group("all_workloads", workloads=["standard"], mode="append")

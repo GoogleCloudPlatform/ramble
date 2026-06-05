@@ -53,10 +53,11 @@ class Orca(ExecutableApplication):
     # The only way to configure total ranks launched is by changing the PAL nprocs keyword
     # in the main input file.
     scratch_in_path = os.path.join("{scratch_dir}", "{main_input_file}")
-    executable(
+    edit_file(
         "configure_nprocs",
-        f"sed -i 's/nprocs.*/nprocs {{n_ranks}}/' {scratch_in_path}",
-        use_mpi=False,
+        file_path=scratch_in_path,
+        match=r"nprocs.*",
+        replace="nprocs {n_ranks}",
     )
 
     # orca requires the full path when running in parallel

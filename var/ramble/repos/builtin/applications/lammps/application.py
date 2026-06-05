@@ -141,42 +141,74 @@ class Lammps(ExecutableApplication):
         src="{input_path}",
         dst="{experiment_run_dir}/input.txt",
     )
-    executable(
-        "configure-reaxff",
-        template=[
-            "sed -i -e 's/x index .*/x index {x}/g' -i input.txt",
-            "sed -i -e 's/y index .*/y index {y}/g' -i input.txt",
-            "sed -i -e 's/z index .*/z index {z}/g' -i input.txt",
-            "sed -i -e 's/y index .*/y index {timesteps}/g' -i input.txt",
-        ],
-        use_mpi=False,
+    edit_file(
+        "configure-reaxff-x",
+        file_path="input.txt",
+        match=r"x index .*",
+        replace="x index {x}",
+    )
+    edit_file(
+        "configure-reaxff-y",
+        file_path="input.txt",
+        match=r"y index .*",
+        replace="y index {y}",
+    )
+    edit_file(
+        "configure-reaxff-z",
+        file_path="input.txt",
+        match=r"z index .*",
+        replace="z index {z}",
+    )
+    edit_file(
+        "configure-reaxff-timesteps",
+        file_path="input.txt",
+        match=r"y index .*",
+        replace="y index {timesteps}",
     )
 
-    executable(
-        "configure-size-scale",
-        template=[
-            "sed -i -e 's/xx equal .*/xx equal {xx}/g' -i input.txt",
-            "sed -i -e 's/yy equal .*/yy equal {yy}/g' -i input.txt",
-            "sed -i -e 's/zz equal .*/zz equal {zz}/g' -i input.txt",
-        ],
-        use_mpi=False,
+    edit_file(
+        "configure-size-scale-xx",
+        file_path="input.txt",
+        match=r"xx equal .*",
+        replace="xx equal {xx}",
     )
-    executable(
+    edit_file(
+        "configure-size-scale-yy",
+        file_path="input.txt",
+        match=r"yy equal .*",
+        replace="yy equal {yy}",
+    )
+    edit_file(
+        "configure-size-scale-zz",
+        file_path="input.txt",
+        match=r"zz equal .*",
+        replace="zz equal {zz}",
+    )
+
+    edit_file(
         "configure-run-timesteps",
-        template=[
-            "sed 's/run.*[0-9]+/run\t\t{timesteps}/g' -i input.txt",
-        ],
-        use_mpi=False,
+        file_path="input.txt",
+        match=r"run.*[0-9]+",
+        replace="run\t\t{timesteps}",
     )
 
-    executable(
-        "configure-timestep-variables",
-        template=[
-            "sed 's/t index .*[0-9]+/t index {main_timesteps}/g' -i input.txt",
-            "sed 's/w index .*[0-9]+/t index {warmup_timesteps}/g' -i input.txt",
-            "sed 's/m index .*[0-9]+/t index {timestep_multiplier}/g' -i input.txt",
-        ],
-        use_mpi=False,
+    edit_file(
+        "configure-timestep-variables-main",
+        file_path="input.txt",
+        match=r"t index .*[0-9]+",
+        replace="t index {main_timesteps}",
+    )
+    edit_file(
+        "configure-timestep-variables-warmup",
+        file_path="input.txt",
+        match=r"w index .*[0-9]+",
+        replace="t index {warmup_timesteps}",
+    )
+    edit_file(
+        "configure-timestep-variables-multiplier",
+        file_path="input.txt",
+        match=r"m index .*[0-9]+",
+        replace="t index {timestep_multiplier}",
     )
 
     exec_path = os.path.join("{lammps_path}", "bin", "lmp")
@@ -187,22 +219,18 @@ class Lammps(ExecutableApplication):
         use_mpi=True,
     )
 
-    executable(
+    edit_file(
         "set-data-path",
-        template=[
-            r"sed 's|data\.|"
-            + os.path.join("{lammps-stage}", "bench", "data.")
-            + "|g' -i input.txt"
-        ],
-        use_mpi=False,
+        file_path="input.txt",
+        match=r"data\.",
+        replace=os.path.join("{lammps-stage}", "bench", "data."),
     )
 
-    executable(
+    edit_file(
         "change-root",
-        template=[
-            "sed 's|${root}|{lammps-stage}" + os.path.sep + "|g' -i input.txt"
-        ],
-        use_mpi=False,
+        file_path="input.txt",
+        match=r"\$\{root\}",
+        replace="{lammps-stage}" + os.path.sep,
     )
 
     stage_files(
@@ -231,7 +259,9 @@ class Lammps(ExecutableApplication):
         "lj",
         executables=[
             "stage-input",
-            "configure-size-scale",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
             "configure-run-timesteps",
             "execute",
         ],
@@ -265,7 +295,9 @@ class Lammps(ExecutableApplication):
         "eam",
         executables=[
             "stage-input",
-            "configure-size-scale",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
             "configure-run-timesteps",
             "execute",
         ],
@@ -347,8 +379,12 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-size-scale",
-            "configure-timestep-variables",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -392,8 +428,12 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-size-scale",
-            "configure-timestep-variables",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -437,8 +477,12 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-size-scale",
-            "configure-timestep-variables",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -482,7 +526,9 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-timestep-variables",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -511,8 +557,12 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-size-scale",
-            "configure-timestep-variables",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -556,7 +606,9 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-timestep-variables",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -585,8 +637,12 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-size-scale",
-            "configure-timestep-variables",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -630,8 +686,12 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-size-scale",
-            "configure-timestep-variables",
+            "configure-size-scale-xx",
+            "configure-size-scale-yy",
+            "configure-size-scale-zz",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -675,7 +735,9 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-input",
             "change-root",
-            "configure-timestep-variables",
+            "configure-timestep-variables-main",
+            "configure-timestep-variables-warmup",
+            "configure-timestep-variables-multiplier",
             "execute",
         ],
         input="lammps-stage",
@@ -704,7 +766,10 @@ class Lammps(ExecutableApplication):
         executables=[
             "stage-contents",
             "stage-input-file",
-            "configure-reaxff",
+            "configure-reaxff-x",
+            "configure-reaxff-y",
+            "configure-reaxff-z",
+            "configure-reaxff-timesteps",
             "execute",
         ],
         inputs=["lammps-stage"],

@@ -40,6 +40,7 @@ inherit from the SharedMeta class.
 class SharedMeta(ramble.language.language_base.DirectiveMeta):
     _directive_names = set()
     _directives_to_be_executed = []
+    _directive_init_values = {"custom_edit_functions": {}}
 
 
 shared_directive = SharedMeta.directive
@@ -85,6 +86,202 @@ def _add_specs(
 def _add_list_attributes(obj, attr_name, values):
     base_list = getattr(obj, attr_name, [])
     setattr(obj, attr_name, sorted(set(base_list + list(values))))
+
+
+@shared_directive("executables")
+def edit_file(
+    name,
+    file_path,
+    match=None,
+    replace=None,
+    append=None,
+    prepend=None,
+    function=None,
+    fail_on_error=True,
+    when=None,
+    **kwargs,
+):
+    """Adds an edit_file executable to this object
+
+    Defines a new executable that uses Ramble's helper script to edit a file.
+
+    Required Args:
+        name (str): Name of the executable
+        file_path (str): Path to the file to edit
+
+    Optional Args:
+        match (str): Regex pattern to match
+        replace (str): Replacement string
+        append (str): String to append to the end of the file
+        prepend (str): String to prepend to the beginning of the file
+        function (callable): A Python function to be used for editing the file.
+                             The function must accept a single string argument
+                             (the file content) and return a string (the modified
+                             content). It must be a named top-level function.
+                             Note: any imports or global variables used by the
+                             function must be defined within the function body
+                             itself, as only the function's source code is
+                             serialized.
+        fail_on_error (bool): If true, the experiment fails if the edit fails.
+                              Defaults to True.
+        when (list | None): List of when conditions to apply to directive
+    """
+
+    def _execute_edit_file(obj):
+        import inspect
+        import shlex
+
+        from ramble.util.executable import CommandExecutable
+        from ramble.util.file_editor import get_file_editor_exec_path
+
+        origin_str = f"{getattr(obj, 'origin_type', 'object')} '{obj.name}'"
+
+        if bool(match) != (replace is not None):
+            raise ramble.language.language_helpers.DirectiveError(
+                f"Directive '{name}' in {origin_str} requires both 'match' and 'replace' "
+                "to be specified together."
+            )
+
+        if not any([match, append, prepend, function]):
+            raise ramble.language.language_helpers.DirectiveError(
+                f"Directive '{name}' in {origin_str} requires at least one action "
+                "(match/replace, append, prepend, or function) to be specified."
+            )
+
+        script_path = get_file_editor_exec_path()
+        template = [f'python "{script_path}" ' f"--mode regex --file {shlex.quote(file_path)}"]
+        if match:
+            template[0] += f" --match {shlex.quote(match)}"
+        if replace is not None:
+            template[0] += f" --replace {shlex.quote(replace)}"
+        if append:
+            template[0] += f" --append {shlex.quote(append)}"
+        if prepend:
+            template[0] += f" --prepend {shlex.quote(prepend)}"
+        if function:
+            import textwrap
+
+            if not inspect.isfunction(function) or function.__name__ == "<lambda>":
+                raise ramble.language.language_helpers.DirectiveError(
+                    f"Directive '{name}' in {origin_str} requires a named top-level "
+                    "function, not a lambda or a method."
+                )
+
+            sig = inspect.signature(function)
+            if len(sig.parameters) != 1 or "self" in sig.parameters:
+                raise ramble.language.language_helpers.DirectiveError(
+                    f"Directive '{name}' in {origin_str} requires a function that "
+                    "accepts exactly one argument (the file content), and does "
+                    "not have a 'self' parameter."
+                )
+
+            # Use a unique name for the function in the helper script to avoid collisions
+            unique_func_name = f"custom_edit_{name}_{function.__name__}"
+            template[0] += (
+                f" --function {unique_func_name} "
+                f"--import-module {{experiment_run_dir}}/utilities/"
+                f"{ramble.util.file_editor.CUSTOM_EDIT_FUNCTIONS_NAME}"
+            )
+
+            try:
+                import ast
+
+                raw_source = textwrap.dedent(inspect.getsource(function))
+                parsed_ast = ast.parse(raw_source)
+                has_value_return = any(
+                    isinstance(node, ast.Return) and node.value is not None
+                    for node in ast.walk(parsed_ast)
+                )
+                if not has_value_return:
+                    raise ramble.language.language_helpers.DirectiveError(
+                        f"Directive '{name}' in {origin_str} requires the function "
+                        f"'{function.__name__}' to return a value."
+                    )
+
+                # Wrap the original function to give it a unique name and avoid collisions
+                # while also ensuring it's defined in the script's scope.
+                # We use a nested definition to avoid name conflicts with the original name
+                # if multiple directives use different functions with same original name.
+                wrapper = [
+                    f"def {unique_func_name}(content):",
+                    textwrap.indent(raw_source, "    "),
+                    f"    return {function.__name__}(content)",
+                ]
+                obj.custom_edit_functions[name] = "\n".join(wrapper)
+            except (OSError, TypeError):
+                raise ramble.language.language_helpers.DirectiveError(
+                    f"Directive '{name}' in {origin_str} could not retrieve source "
+                    f"for function '{function.__name__}'."
+                ) from None
+
+        if not fail_on_error:
+            template[0] += " || true"
+
+        when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "edit_file")
+        when_set = frozenset(when_list)
+
+        if not hasattr(obj, "executables"):
+            obj.executables = {}
+
+        if when_set not in obj.executables:
+            obj.executables[when_set] = {}
+
+        obj.executables[when_set][name] = CommandExecutable(name=name, template=template, **kwargs)
+
+    return _execute_edit_file
+
+
+@shared_directive("executables")
+def patch_file(
+    name,
+    file_path,
+    patch_file,
+    fail_on_error=True,
+    when=None,
+    **kwargs,
+):
+    """Adds a patch_file executable to this object
+
+    Defines a new executable that uses Ramble's helper script to apply a patch.
+
+    Required Args:
+        name (str): Name of the executable
+        file_path (str): Path to the file to patch
+        patch_file (str): Path to the patch file
+
+    Optional Args:
+        fail_on_error (bool): If true, the experiment fails if the patch fails.
+                              Defaults to True.
+        when (list | None): List of when conditions to apply to directive
+    """
+
+    def _execute_patch_file(obj):
+        import shlex
+
+        from ramble.util.executable import CommandExecutable
+        from ramble.util.file_editor import get_file_editor_exec_path
+
+        script_path = get_file_editor_exec_path()
+        template = [
+            f'python "{script_path}" '
+            f"--mode patch --file {shlex.quote(file_path)} --patch-file {shlex.quote(patch_file)}"
+        ]
+
+        if not fail_on_error:
+            template[0] += " || true"
+
+        when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "patch_file")
+        when_set = frozenset(when_list)
+
+        if not hasattr(obj, "executables"):
+            obj.executables = {}
+
+        if when_set not in obj.executables:
+            obj.executables[when_set] = {}
+
+        obj.executables[when_set][name] = CommandExecutable(name=name, template=template, **kwargs)
+
+    return _execute_patch_file
 
 
 @shared_directive("archive_patterns")
