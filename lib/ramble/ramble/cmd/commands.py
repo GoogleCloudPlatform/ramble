@@ -181,7 +181,7 @@ class BashCompletionWriter(ArgparseCompletionWriter):
                     return value
 
         # If no matches found, return empty list
-        return 'RAMBLE_COMREPLY=""'
+        return 'RAMBLE_COMPREPLY=""'
 
     def optionals(self, optionals):
         return f"RAMBLE_COMPREPLY=\"{' '.join(optionals)}\""
