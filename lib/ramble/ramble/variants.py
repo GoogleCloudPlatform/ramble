@@ -407,6 +407,17 @@ class Variant:
         self.description = description
         self.values = values
         self._definition = self.format_value(self.default)
+        self._definitions = self._build_definitions()
+
+    def _build_definitions(self) -> tuple:
+        if isinstance(self.default, bool):
+            val_str = str(self.default)
+            return (
+                self._definition,
+                f"{self.name}={val_str}",
+                f"{self.name}={val_str.lower()}",
+            )
+        return (self._definition,)
 
     def copy(self):
         return Variant(
@@ -432,21 +443,16 @@ class Variant:
         """
         return self._definition
 
-    def as_definitions(self) -> list:
-        """Build a list of definitions for this variant
+    def as_definitions(self) -> tuple:
+        """Build a tuple of definitions for this variant
 
         Format the variant as all possible strings which can be used to test
         against when clauses.
 
         Returns:
-            list: String definitions for this variant
+            tuple: String definitions for this variant
         """
-        defs = [self._definition]
-        if isinstance(self.default, bool):
-            val_str = str(self.default)
-            defs.append(f"{self.name}={val_str}")
-            defs.append(f"{self.name}={val_str.lower()}")
-        return defs
+        return self._definitions
 
     def as_str(self, n_indent: int = 0, verbose: bool = False):
         """String documentation of this variant
