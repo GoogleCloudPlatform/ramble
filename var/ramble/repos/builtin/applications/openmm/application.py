@@ -29,7 +29,7 @@ class Openmm(ExecutableApplication):
             "openmm",
             pkg_spec="openmm",
         )
-        required_package("OpenMM")
+        required_package("openmm")
 
     # Define spack software requirement
     with when("package_manager_family=spack"):
@@ -74,10 +74,10 @@ class Openmm(ExecutableApplication):
         "ln -sf {5dfr_minimized} 5dfr_minimized.pdb && "
         "ln -sf {5dfr_solv_cube_equil} 5dfr_solv-cube_equil.pdb && "
         "ln -sf {apoa1} apoa1.pdb && "
-        "/usr/bin/python3 -E {benchmark_path} "
+        "python3 {benchmark_path} "
         "--platform {openmm_platform} "
         "--test {benchmark_test} "
-        "{extra_args} > {log_file} 2>&1",
+        "{extra_args}",
         use_mpi=False,
         output_capture=OUTPUT_CAPTURE.ALL,
     )
@@ -130,13 +130,6 @@ class Openmm(ExecutableApplication):
         "extra_args",
         default="--seconds 60",
         description="Additional arguments for benchmark.py (e.g., --seconds or --steps)",
-        workload="benchmark",
-    )
-
-    workload_variable(
-        "log_file",
-        default="openmm_benchmark.out",
-        description="Output log file for simulation benchmark results",
         workload="benchmark",
     )
 
