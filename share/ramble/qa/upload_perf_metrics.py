@@ -22,11 +22,12 @@ except ImportError:
 
 
 def get_commit_timestamp(commit_sha=None):
-    sha = commit_sha or ""
-
+    cmd = ["git", "show", "-s", "--format=%cI"]
+    if commit_sha:
+        cmd.append(commit_sha)
     try:
         result = subprocess.run(
-            ["git", "show", "-s", "--format=%cI", sha],
+            cmd,
             capture_output=True,
             text=True,
             check=True
@@ -34,7 +35,6 @@ def get_commit_timestamp(commit_sha=None):
         return result.stdout.strip()
     except Exception:
         pass
-
     return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
