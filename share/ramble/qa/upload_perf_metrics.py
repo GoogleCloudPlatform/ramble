@@ -11,6 +11,7 @@ import argparse
 import datetime
 import json
 import os
+import subprocess
 import sys
 
 try:
@@ -18,6 +19,23 @@ try:
     from google.cloud import bigquery
 except ImportError:
     bigquery = None
+
+
+def get_commit_timestamp(commit_sha=None):
+    sha = commit_sha or ""
+
+    try:
+        result = subprocess.run(
+            ["git", "show", "-s", "--format=%cI", sha],
+            capture_output=True,
+            text=True,
+            check=True
+        )
+        return result.stdout.strip()
+    except Exception:
+        pass
+
+    return datetime.datetime.now(datetime.timezone.utc).isoformat()
 
 
 def upload_metrics(metrics_file, project_id, dataset_id, table_id, commit_sha=None, dry_run=False):
@@ -33,7 +51,7 @@ def upload_metrics(metrics_file, project_id, dataset_id, table_id, commit_sha=No
         return
 
     rows = []
-    timestamp = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    timestamp = get_commit_timestamp(commit_sha)
     
     for m in metrics:
         row = {
