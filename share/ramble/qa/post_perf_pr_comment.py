@@ -28,9 +28,10 @@ def get_bq_historical_metrics(project_id, dataset_id, table_id):
         SELECT
             test_name,
             AVG(duration) as avg_duration,
-            MAX(CASE WHEN rn = 1 THEN duration END) as most_recent_duration
+            MAX(CASE WHEN rn = 1 THEN duration END) as most_recent_duration,
+            MAX(CASE WHEN rn = 1 THEN commit_sha END) as most_recent_commit_sha
         FROM (
-            SELECT test_name, duration,
+            SELECT test_name, duration, commit_sha,
                    ROW_NUMBER() OVER(PARTITION BY test_name ORDER BY timestamp DESC) as rn
             FROM `{project_id}.{dataset_id}.{table_id}`
             WHERE duration IS NOT NULL
@@ -44,7 +45,8 @@ def get_bq_historical_metrics(project_id, dataset_id, table_id):
         return {
             row.test_name: {
                 "avg_duration": row.avg_duration,
-                "most_recent_duration": row.most_recent_duration
+                "most_recent_duration": row.most_recent_duration,
+                "most_recent_commit_sha": row.most_recent_commit_sha
             }
             for row in results
         }
@@ -98,7 +100,7 @@ def get_installation_token(client_id, private_key, repo):
 
 
 
-def format_markdown(metrics, historical_data, commit_sha=None):
+def format_markdown(metrics, historical_data, commit_sha=None, repo="GoogleCloudPlatform/ramble"):
     lines = [
         "## Ramble Performance Test Metrics",
     ]
@@ -118,9 +120,18 @@ def format_markdown(metrics, historical_data, commit_sha=None):
         hist = historical_data.get(name, {})
         avg_dur = hist.get("avg_duration")
         most_recent_dur = hist.get("most_recent_duration")
+        most_recent_commit = hist.get("most_recent_commit_sha")
 
         avg_str = f"{avg_dur:.4f}" if avg_dur is not None else "N/A"
-        most_recent_str = f"{most_recent_dur:.4f}" if most_recent_dur is not None else "N/A"
+        
+        if most_recent_dur is not None:
+            most_recent_str = f"{most_recent_dur:.4f}"
+            if most_recent_commit:
+                short_sha = most_recent_commit[:7]
+                commit_url = f"https://github.com/{repo}/commit/{most_recent_commit}"
+                most_recent_str = f"{most_recent_str} ([{short_sha}]({commit_url}))"
+        else:
+            most_recent_str = "N/A"
         
         if isinstance(duration, float):
             duration = f"{duration:.4f}"
@@ -165,7 +176,7 @@ def main():
 
     historical_data = get_bq_historical_metrics(args.project_id, args.dataset_id, args.table_id)
     
-    body = format_markdown(metrics, historical_data, args.commit_sha)
+    body = format_markdown(metrics, historical_data, args.commit_sha, args.repo)
     
     if args.dry_run:
         print("[DRY RUN] Would post the following comment:")
