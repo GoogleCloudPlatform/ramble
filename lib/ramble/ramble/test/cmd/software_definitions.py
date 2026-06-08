@@ -6,8 +6,12 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import pytest
+
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
+
+pytestmark = pytest.mark.usefixtures("config")
 
 software_defs = RambleCommand("software-definitions")
 

@@ -206,8 +206,13 @@ def test_create_no_registered_repos(mutable_config, tmpdir, monkeypatch):
     import ramble.repository
 
     # Make sure repos list is empty
+    empty_repo_path = ramble.repository.RepoPath(
+        object_type=ramble.repository.ObjectTypes.applications
+    )
     monkeypatch.setattr(
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications], "repos", []
+        ramble.repository.paths[ramble.repository.ObjectTypes.applications],
+        "factory",
+        lambda: empty_repo_path,
     )
     ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
 
@@ -234,8 +239,17 @@ def test_create_fallback_first_repo(mutable_config, tmpdir, monkeypatch):
         ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
 
         instance = ramble.repository.paths[ramble.repository.ObjectTypes.applications].instance
-        filtered_repos = [r for r in instance.repos if r.namespace != "builtin"]
-        monkeypatch.setattr(instance, "repos", filtered_repos)
+        filtered_repo_path = ramble.repository.RepoPath(
+            *[r for r in instance.repos if r.namespace != "builtin"],
+            object_type=ramble.repository.ObjectTypes.applications,
+        )
+
+        monkeypatch.setattr(
+            ramble.repository.paths[ramble.repository.ObjectTypes.applications],
+            "factory",
+            lambda: filtered_repo_path,
+        )
+        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
 
         # Since notbuiltin is registered and builtin is not, this should fallback to notbuiltin
         create_cmd("application", "my-fallback-first-app")
@@ -282,3 +296,70 @@ def test_create_missing_template(mutable_config, tmpdir, monkeypatch):
         import ramble.repository
 
         ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
+
+
+def test_create_interactive_wizard(mutable_config, tmpdir, monkeypatch):
+    """Verify successful generation of stub using interactive wizard."""
+    repo_path = str(tmpdir.join("test_repo"))
+    repo_name = "mockrepo"
+
+    repo_cmd("create", repo_path, repo_name)
+    repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
+
+    import ramble.repository
+
+    ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
+
+    import sys
+
+    monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
+
+    inputs = ["1", "my-wizard-app", "1", "2", "charlie", "science"]
+    input_generator = iter(inputs)
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(input_generator))
+
+    create_cmd("-i")
+
+    app_file = os.path.join(repo_path, "applications", "my-wizard-app", "application.py")
+    assert os.path.exists(app_file)
+    with open(app_file) as f:
+        content = f.read()
+        assert "class MyWizardApp(ExecutableApplication):" in content
+        assert "maintainers = ['charlie']" in content
+        assert "tags = ['science']" in content
+
+
+def test_create_interactive_wizard_validation_and_abort(mutable_config, tmpdir, monkeypatch):
+    """Verify input validation and KeyboardInterrupt handling in interactive wizard."""
+    repo_path = str(tmpdir.join("test_repo"))
+    repo_name = "mockrepo"
+
+    repo_cmd("create", repo_path, repo_name)
+    repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
+
+    import ramble.repository
+
+    ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
+
+    import sys
+
+    monkeypatch.setattr(sys.stdin, "isatty", lambda: True)
+
+    inputs = ["", "invalid", "99", "1", "", "my wizard", "my-validation-app", "1", "2", "", ""]
+    input_generator = iter(inputs)
+    monkeypatch.setattr("builtins.input", lambda prompt="": next(input_generator))
+
+    create_cmd("-i")
+
+    app_file = os.path.join(repo_path, "applications", "my-validation-app", "application.py")
+    assert os.path.exists(app_file)
+
+    # Now test KeyboardInterrupt abort
+    def mock_wizard_abort():
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr("ramble.cmd.create.run_interactive_wizard", mock_wizard_abort)
+
+    # create_cmd should exit gracefully without raising exception
+    out = create_cmd("-i", fail_on_error=False)
+    assert "[ABORTED] Object creation cancelled" in out

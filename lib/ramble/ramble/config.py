@@ -1419,9 +1419,21 @@ def use_configuration(*scopes_or_paths):
 
     saved_config, config = config, configuration
 
+    import ramble.repository
+
+    saved_instances = {}
+    for obj_type, singleton in ramble.repository.paths.items():
+        saved_instances[obj_type] = singleton._instance
+        singleton._instance = None
+    saved_meta_path = list(sys.meta_path)
+
     try:
         yield configuration
     finally:
+        for obj_type, instance in saved_instances.items():
+            ramble.repository.paths[obj_type]._instance = instance
+        sys.meta_path = saved_meta_path
+
         # Restore previous config files
         spack.compilers._cache_config_file = saved_compiler_cache
         config = saved_config
