@@ -13,5 +13,4 @@ matplotlib
 setuptools
 scipy
 types-PyYAML
-macholib;sys_platform=="darwin"
 distro
