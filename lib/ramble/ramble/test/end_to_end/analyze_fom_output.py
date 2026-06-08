@@ -140,6 +140,47 @@ def test_analyze_fail_with_no_fom_detected(mock_applications, workspace_name):
         assert "Status = FAILED" in content
 
 
+def test_analyze_fail_with_workflow_manager(
+    monkeypatch, mock_applications, make_workspace_from_config
+):
+    test_config = """
+ramble:
+  variants:
+    workflow_manager: user-managed
+  variables:
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+    processes_per_node: '1'
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test:
+              variables:
+                n_nodes: '1'
+"""
+    ws, ws_name = make_workspace_from_config(test_config)
+    workspace_flags = ["-w", ws_name]
+
+    workspace("setup", "--dry-run", global_args=workspace_flags)
+
+    # Inject mock workflow manager status COMPLETE but provide no valid FOM output
+    import ramble.wmkit
+
+    monkeypatch.setattr(
+        ramble.wmkit.WorkflowManagerBase,
+        "get_status",
+        lambda self, workspace: ramble.experiment_result.ExperimentStatus.COMPLETE,
+    )
+
+    workspace("analyze", global_args=workspace_flags)
+    result_file = os.path.join(ws.results_dir, "results.latest.txt")
+    with open(result_file) as f:
+        content = f.read()
+        assert "Status = FAILED" in content
+
+
 def test_analyze_fom_origin_types_filter(mock_applications, make_workspace_from_config):
     test_config = """
 ramble:

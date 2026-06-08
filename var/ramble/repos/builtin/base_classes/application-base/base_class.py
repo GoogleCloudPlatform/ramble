@@ -3201,11 +3201,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     success = True
         success = success and criteria_list.passed()
 
-        status = self.get_status()
-        if status == ExperimentStatus.SUCCESS and not success:
-            status = ExperimentStatus.FAILED
-        elif success:
+        if success:
             status = ExperimentStatus.SUCCESS
+        else:
+            preserved_terminal = {
+                ExperimentStatus.CANCELLED,
+                ExperimentStatus.TIMEOUT,
+                ExperimentStatus.FAILED,
+            }
+            current_status = self.get_status()
+            if current_status in preserved_terminal:
+                status = current_status
+            else:
+                status = ExperimentStatus.FAILED
 
         # When workflow_manager is present, only use app_status when workflow is completed or
         # unresolved.

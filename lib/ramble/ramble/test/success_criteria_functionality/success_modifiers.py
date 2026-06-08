@@ -129,3 +129,70 @@ ramble:
         assert "default (null) context figures of merit" in content
         assert "test_fom = 0.25 s" in content
         assert "test_fom = 0.35 s" in content
+
+
+def test_success_criteria_preserves_terminal_failures(mock_applications, mock_modifiers):
+    test_config = """
+ramble:
+  variables:
+    mpi_command: ''
+    batch_submit: '{execute_experiment}'
+    processes_per_node: '1'
+  applications:
+    basic:
+      workloads:
+        working_wl:
+          experiments:
+            test_cancelled:
+              variables:
+                n_nodes: '1'
+            test_timeout:
+              variables:
+                n_nodes: '1'
+  modifiers:
+  - name: success-criteria
+"""
+    workspace_name = "test-preserved-terminal-failures"
+    ws = ramble.workspace.create(workspace_name)
+    ws.write()
+
+    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+
+    with open(config_path, "w+") as f:
+        f.write(test_config)
+
+    ws._re_read()
+    workspace("setup", "--dry-run", global_args=["-w", workspace_name])
+
+    import spack.util.spack_json as sjson
+
+    # Write mock output data that fails success criteria:
+    exp1_dir = os.path.join(ws.experiment_dir, "basic", "working_wl", "test_cancelled")
+    with open(os.path.join(exp1_dir, "test_cancelled.out"), "w+") as f:
+        f.write("0.25 seconds\n")
+    with open(os.path.join(exp1_dir, "ramble_status.json"), "w+") as f:
+        sjson.dump({"experiment_status": "CANCELLED"}, f)
+
+    exp2_dir = os.path.join(ws.experiment_dir, "basic", "working_wl", "test_timeout")
+    with open(os.path.join(exp2_dir, "test_timeout.out"), "w+") as f:
+        f.write("0.35 seconds\n")
+    with open(os.path.join(exp2_dir, "ramble_status.json"), "w+") as f:
+        sjson.dump({"experiment_status": "TIMEOUT"}, f)
+
+    workspace(
+        "analyze",
+        "--formats",
+        "json",
+        global_args=["-w", workspace_name],
+    )
+    result_file = os.path.join(ws.results_dir, "results.latest.json")
+
+    with open(result_file) as f:
+        cache_dict = sjson.load(f)
+        for exp in cache_dict["experiments"]:
+            if "cancelled" in exp["name"]:
+                assert exp["EXPERIMENT_STATUS"] == "CANCELLED"
+                assert exp["RAMBLE_STATUS"] == "FAILED"
+            if "timeout" in exp["name"]:
+                assert exp["EXPERIMENT_STATUS"] == "TIMEOUT"
+                assert exp["RAMBLE_STATUS"] == "FAILED"
