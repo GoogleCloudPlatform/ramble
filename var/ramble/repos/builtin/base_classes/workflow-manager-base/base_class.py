@@ -94,6 +94,7 @@ class WorkflowManagerBase(ObjectMixin, metaclass=WorkflowManagerMeta):
     def set_application(self, app_inst):
         """Set a reference to the associated app_inst"""
         self.app_inst = app_inst
+        self.clear_variant_cache()
 
     @abc.abstractmethod
     def get_status(self, workspace):

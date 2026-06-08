@@ -93,3 +93,4 @@ class SystemBase(ObjectMixin, metaclass=SystemMeta):
     def set_application(self, app_inst):
         """Set the application instance for this system"""
         self.app_inst = app_inst
+        self.clear_variant_cache()

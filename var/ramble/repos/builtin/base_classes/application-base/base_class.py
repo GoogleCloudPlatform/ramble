@@ -408,9 +408,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         all_workloads_names = set()
         found = False
         for when_set, workloads in self.workloads.items():
-            if self.expander.satisfies(
-                when_set, self.experiment_variants(allow_caching=False)
-            ):
+            if self.expander.satisfies(when_set, self.experiment_variants()):
                 for workload_name, workload in workloads.items():
                     if workload_name in all_workloads_names:
                         logger.die(
@@ -425,15 +423,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if not found:
             logger.die(
                 "No workloads satisfy the current `when` conditions: \n"
-                f"  {self.experiment_variants(allow_caching=False).as_set()}"
+                f"  {self.experiment_variants().as_set()}"
             )
 
     def _set_package_manager(self):
         pkgman = conversions.canonical_none(
             self.expander.expand_var(
-                self.experiment_variants(allow_caching=False).value(
-                    namespace.package_manager
-                )
+                self.experiment_variants().value(namespace.package_manager)
             )
         )
 
@@ -463,7 +459,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             for pkgname, config in self.required_packages.items():
                 if self.expander.satisfies(
                     config["when"],
-                    variant_set=self.experiment_variants(allow_caching=False),
+                    variant_set=self.experiment_variants(),
                 ):
                     self.keywords.update_keys(
                         {
@@ -476,9 +472,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
     def _set_system(self):
         sys_var = conversions.canonical_none(
-            self.experiment_variants(allow_caching=False).value(
-                namespace.system
-            )
+            self.experiment_variants().value(namespace.system)
         )
 
         if sys_var is None:
@@ -503,31 +497,26 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     "\tramble list --type systems"
                 )
 
+            added_defaults = False
             for variant in ["platform", "package_manager", "workflow_manager"]:
-                if (
-                    self.experiment_variants(allow_caching=False).value(
-                        variant
-                    )
-                    is None
-                ):
+                if self.experiment_variants().value(variant) is None:
                     default_value = getattr(
                         self.system, f"system_default_{variant}", None
                     )
                     if default_value:
-                        self.experiment_variants(
-                            allow_caching=False
-                        ).default_variant(
+                        self.object_variants.default_variant(
                             variant,
                             default=default_value,
                             description=f"{variant} selection variant",
                         )
+                        added_defaults = True
+            if added_defaults:
+                self.clear_variant_cache()
 
     def _set_platform(self):
         plat_var = conversions.canonical_none(
             self.expander.expand_var(
-                self.experiment_variants(allow_caching=False).value(
-                    namespace.platform
-                )
+                self.experiment_variants().value(namespace.platform)
             )
         )
 
@@ -571,9 +560,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if self.system:
             # Apply platform_variable_maps
             plat_name = conversions.canonical_none(
-                self.experiment_variants(allow_caching=False).value(
-                    namespace.platform
-                )
+                self.experiment_variants().value(namespace.platform)
             )
 
             if plat_name:
@@ -595,9 +582,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     def _set_workflow_manager(self):
         workflow = conversions.canonical_none(
             self.expander.expand_var(
-                self.experiment_variants(allow_caching=False).value(
-                    namespace.workflow_manager
-                )
+                self.experiment_variants().value(namespace.workflow_manager)
             )
         )
 
@@ -721,15 +706,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
 
         # Define experiment variants
-        for name, value in variants.items():
-            expanded_value = self.expander.expand_var(value, typed=True)
-            self.object_variants.experiment_variant(name, expanded_value)
+        if variants:
+            for name, value in variants.items():
+                expanded_value = self.expander.expand_var(value, typed=True)
+                self.object_variants.experiment_variant(name, expanded_value)
+            self.clear_variant_cache()
 
         # Set up remaining variants
         self._set_system()
 
         # Apply defaults from system and platform
         if self.system:
+            added_defaults = False
             if (
                 self.system.default_platform
                 and namespace.platform not in self.variants
@@ -737,6 +725,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self.object_variants.experiment_variant(
                     namespace.platform, self.system.system_default_platform
                 )
+                added_defaults = True
 
             if (
                 self.system.default_package_manager
@@ -746,6 +735,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     namespace.package_manager,
                     self.system.system_default_package_manager,
                 )
+                added_defaults = True
 
             if (
                 self.system.default_workflow_manager
@@ -755,6 +745,10 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     namespace.workflow_manager,
                     self.system.system_default_workflow_manager,
                 )
+                added_defaults = True
+
+            if added_defaults:
+                self.clear_variant_cache()
 
         self._set_platform()
         self._set_package_manager()
@@ -779,6 +773,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             default=self.expander.workload_name,
             description="Name of experiment workload",
         )
+        self.clear_variant_cache()
 
         self.no_expand_vars = set()
         workloads = self.get_workloads()
@@ -786,7 +781,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         for workload in workloads:
             for var_when_set, var_list in workload.variables.items():
                 if self.expander.satisfies(
-                    var_when_set, self.experiment_variants(allow_caching=False)
+                    var_when_set, self.experiment_variants()
                 ):
                     for var in var_list:
                         if not var.expandable:
@@ -1516,6 +1511,8 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         # Define any missing modifier variables
         self.define_missing_variables()
+        if self.modifiers:
+            self.clear_variant_cache()
 
     @property
     def inventory_file(self):
