@@ -22,10 +22,8 @@ import ramble.renderer
 import ramble.repository
 from ramble.expander import Expander
 from ramble.namespace import namespace
+from ramble.util import cpus, naming
 from ramble.util.logger import logger
-
-import spack.util.naming
-from spack.util import cpus
 
 
 class ExperimentSet:
@@ -308,20 +306,20 @@ class ExperimentSet:
         app_inst.define_variable(
             self.keywords.simplified_application_namespace,
             (
-                spack.util.naming.simplify_name(
+                naming.simplify_name(
                     app_inst.expander.expand_var_name(self.keywords.application_namespace)
                 )
             ),
         )
         app_inst.define_variable(
             self.keywords.simplified_workload_namespace,
-            spack.util.naming.simplify_name(
+            naming.simplify_name(
                 app_inst.expander.expand_var_name(self.keywords.workload_namespace)
             ),
         )
         app_inst.define_variable(
             self.keywords.simplified_experiment_namespace,
-            spack.util.naming.simplify_name(
+            naming.simplify_name(
                 app_inst.expander.expand_var_name(self.keywords.experiment_namespace)
             ),
         )
@@ -624,8 +622,12 @@ class ExperimentSet:
             max_workers = min(2, cpus.cpus_available())
         else:
             max_workers = 1
-        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-            results = list(executor.map(worker_func, render_list))
+
+        if max_workers == 1:
+            results = [worker_func(item) for item in render_list]
+        else:
+            with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+                results = list(executor.map(worker_func, render_list))
 
         for processed_experiments in results:
             all_processed_experiments.extend(processed_experiments)
