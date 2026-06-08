@@ -22,12 +22,16 @@ from google.cloud import bigquery
 _COMMENT_MARKER = "<!-- ramble-perf-test-metrics -->"
 _RECENT_RESULTS_COUNT = 5
 
-def get_bq_averages(project_id, dataset_id, table_id):
+def get_bq_historical_metrics(project_id, dataset_id, table_id):
     client = bigquery.Client(project=project_id)
     query = f"""
-        SELECT test_name, AVG(duration) as avg_duration
+        SELECT
+            test_name,
+            AVG(duration) as avg_duration,
+            MAX(CASE WHEN rn = 1 THEN duration END) as most_recent_duration,
+            MAX(CASE WHEN rn = 1 THEN commit_sha END) as most_recent_commit_sha
         FROM (
-            SELECT test_name, duration,
+            SELECT test_name, duration, commit_sha,
                    ROW_NUMBER() OVER(PARTITION BY test_name ORDER BY timestamp DESC) as rn
             FROM `{project_id}.{dataset_id}.{table_id}`
             WHERE duration IS NOT NULL
@@ -38,7 +42,14 @@ def get_bq_averages(project_id, dataset_id, table_id):
     try:
         query_job = client.query(query)
         results = query_job.result()
-        return {row.test_name: row.avg_duration for row in results}
+        return {
+            row.test_name: {
+                "avg_duration": row.avg_duration,
+                "most_recent_duration": row.most_recent_duration,
+                "most_recent_commit_sha": row.most_recent_commit_sha
+            }
+            for row in results
+        }
     except Exception as e:
         print(f"Error querying BigQuery: {e}")
         return {}
@@ -89,7 +100,7 @@ def get_installation_token(client_id, private_key, repo):
 
 
 
-def format_markdown(metrics, averages, commit_sha=None):
+def format_markdown(metrics, historical_data, commit_sha=None, repo="GoogleCloudPlatform/ramble"):
     lines = [
         "## Ramble Performance Test Metrics",
     ]
@@ -97,8 +108,8 @@ def format_markdown(metrics, averages, commit_sha=None):
         lines.append(f"Results produced with commit: {commit_sha}")
     lines.extend([
         "",
-        f"| Test Name | Outcome | Duration (s) | Last {_RECENT_RESULTS_COUNT} Avg (s) |",
-        "|---|---|---|---|"
+        f"| Test Name | Outcome | Duration (s) | Most Recent Run (s) | Last {_RECENT_RESULTS_COUNT} Avg (s) |",
+        "|---|---|---|---|---|"
     ])
     
     for m in metrics:
@@ -106,13 +117,26 @@ def format_markdown(metrics, averages, commit_sha=None):
         duration = m.get("duration", "N/A")
         outcome = m.get("outcome", "N/A")
         
-        avg_dur = averages.get(name)
+        hist = historical_data.get(name, {})
+        avg_dur = hist.get("avg_duration")
+        most_recent_dur = hist.get("most_recent_duration")
+        most_recent_commit = hist.get("most_recent_commit_sha")
+
         avg_str = f"{avg_dur:.4f}" if avg_dur is not None else "N/A"
+        
+        if most_recent_dur is not None:
+            most_recent_str = f"{most_recent_dur:.4f}"
+            if most_recent_commit:
+                short_sha = most_recent_commit[:7]
+                commit_url = f"https://github.com/{repo}/commit/{most_recent_commit}"
+                most_recent_str = f"{most_recent_str} ([{short_sha}]({commit_url}))"
+        else:
+            most_recent_str = "N/A"
         
         if isinstance(duration, float):
             duration = f"{duration:.4f}"
             
-        lines.append(f"| {name} | {outcome} | {duration} | {avg_str} |")
+        lines.append(f"| {name} | {outcome} | {duration} | {most_recent_str} | {avg_str} |")
         
     lines.append("")
     lines.append(_COMMENT_MARKER)
@@ -150,9 +174,9 @@ def main():
         print("No metrics to post.")
         sys.exit(0)
 
-    averages = get_bq_averages(args.project_id, args.dataset_id, args.table_id)
+    historical_data = get_bq_historical_metrics(args.project_id, args.dataset_id, args.table_id)
     
-    body = format_markdown(metrics, averages, args.commit_sha)
+    body = format_markdown(metrics, historical_data, args.commit_sha, args.repo)
     
     if args.dry_run:
         print("[DRY RUN] Would post the following comment:")
