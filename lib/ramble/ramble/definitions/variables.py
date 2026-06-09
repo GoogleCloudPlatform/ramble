@@ -6,7 +6,6 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import copy
 import shlex
 import subprocess
 from typing import Any, Dict, List, Optional, Set
@@ -93,7 +92,11 @@ class Variable:
         return out_str
 
     def copy(self):
-        return copy.deepcopy(self)
+        new_inst = type(self).__new__(type(self))
+        new_inst.__dict__.update(self.__dict__)
+        if getattr(new_inst, "when", None) is not None:
+            new_inst.when = new_inst.when.copy()
+        return new_inst
 
 
 class CommandVariable(Variable):
@@ -266,7 +269,11 @@ class VariableModification:
         return out_str
 
     def copy(self):
-        return copy.deepcopy(self)
+        new_inst = type(self).__new__(type(self))
+        new_inst.__dict__.update(self.__dict__)
+        if getattr(new_inst, "when", None) is not None:
+            new_inst.when = new_inst.when.copy()
+        return new_inst
 
 
 class EnvironmentVariable:
@@ -342,7 +349,11 @@ class EnvironmentVariable:
         return out_str
 
     def copy(self):
-        return copy.deepcopy(self)
+        new_inst = type(self).__new__(type(self))
+        new_inst.__dict__.update(self.__dict__)
+        if getattr(new_inst, "when", None) is not None:
+            new_inst.when = new_inst.when.copy()
+        return new_inst
 
 
 class EnvironmentVariableModifications:
@@ -442,7 +453,11 @@ class EnvironmentVariableModifications:
         return out_str
 
     def copy(self):
-        return copy.deepcopy(self)
+        new_inst = type(self).__new__(type(self))
+        new_inst.__dict__.update(self.__dict__)
+        if getattr(new_inst, "when", None) is not None:
+            new_inst.when = new_inst.when.copy()
+        return new_inst
 
     def add_modification(
         self,

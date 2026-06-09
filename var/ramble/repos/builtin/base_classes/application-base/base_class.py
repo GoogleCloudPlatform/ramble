@@ -7,7 +7,6 @@
 # except according to those terms.
 """Define base classes for application definitions"""
 
-import copy
 import fnmatch
 import importlib.util
 import operator
@@ -299,7 +298,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 self._formatted_executables.copy()
             )
 
-        new_clone.workloads = copy.deepcopy(self.workloads)
+        new_clone.workloads = {k: v.copy() for k, v in self.workloads.items()}
         new_clone.keywords = ramble.keywords.keywords.copy()
         new_clone.set_template(False)
         new_clone.repeats.set_repeats(False, 0)

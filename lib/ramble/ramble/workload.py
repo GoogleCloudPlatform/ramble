@@ -61,6 +61,19 @@ class Workload:
                     attr_val.append(vals)
                 setattr(self, attr, attr_val)
 
+    def copy(self):
+        new_inst = type(self).__new__(type(self))
+        new_inst.__dict__.update(self.__dict__)
+        new_inst.executables = self.executables.copy()
+        new_inst.inputs = self.inputs.copy()
+        new_inst.tags = self.tags.copy()
+        new_inst.when = self.when.copy()
+        new_inst.variables = {k: [v.copy() for v in val] for k, val in self.variables.items()}
+        new_inst.environment_variables = {
+            k: [v.copy() for v in val] for k, val in self.environment_variables.items()
+        }
+        return new_inst
+
     def __str__(self):
         if not hasattr(self, "_str_indent"):
             self._str_indent = 0

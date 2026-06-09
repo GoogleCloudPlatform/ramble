@@ -89,6 +89,33 @@ import spack.platforms
 import spack.util.spack_yaml as syaml
 from spack.util.cpus import cpus_available
 
+
+def _config_deepcopy(obj):
+    """A faster deepcopy specifically tailored for configuration dictionaries."""
+    if isinstance(obj, dict):
+        res = type(obj)()
+        if hasattr(obj, "__dict__"):
+            res.__dict__.update({k: copy.copy(v) for k, v in obj.__dict__.items()})
+        for k, v in obj.items():
+            res[k] = _config_deepcopy(v)
+        return res
+    elif isinstance(obj, list):
+        res = type(obj)()
+        if hasattr(obj, "__dict__"):
+            res.__dict__.update({k: copy.copy(v) for k, v in obj.__dict__.items()})
+        for v in obj:
+            res.append(_config_deepcopy(v))
+        return res
+    elif isinstance(obj, (int, float, str, bool, type(None))):
+        if hasattr(obj, "override"):
+            res = type(obj)(obj)
+            res.override = obj.override
+            return res
+        return obj
+    else:
+        return copy.deepcopy(obj)
+
+
 #: Dict from section names -> schema for that section
 section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,
@@ -264,7 +291,7 @@ class ConfigScope:
         data = self.get_section(section)
 
         # We copy data here to avoid adding defaults at write time
-        validate_data = copy.deepcopy(data)
+        validate_data = _config_deepcopy(data)
         validate(validate_data, section_schemas[section])
 
         try:
@@ -1038,7 +1065,7 @@ def validate(data, schema, filename=None):
 
     # validate a copy to avoid adding defaults
     # This allows us to round-trip data without adding to it.
-    test_data = copy.deepcopy(data)
+    test_data = _config_deepcopy(data)
 
     if isinstance(test_data, yaml.comments.CommentedMap):
         # HACK to fully copy ruamel CommentedMap that doesn't provide copy
@@ -1052,7 +1079,7 @@ def validate(data, schema, filename=None):
     try:
         ramble.schema.Validator(schema).validate(test_data)
     except jsonschema.ValidationError as e:
-        if hasattr(e.instance, "lc"):
+        if hasattr(e.instance, "lc") and getattr(e.instance.lc, "line", None) is not None:
             line_number = e.instance.lc.line + 1
         else:
             line_number = None
@@ -1227,7 +1254,7 @@ def merge_yaml(dest, source):
                 dest[sk] = merge_yaml(old_dest_value, sv)
             else:
                 # if sk ended with ::, or if it's new, completely override
-                dest[sk] = copy.deepcopy(sv)
+                dest[sk] = _config_deepcopy(sv)
 
         # reinsert dest keys so they are last in the result
         for dk in dest_keys:
