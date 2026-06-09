@@ -871,3 +871,32 @@ def pytest_generate_tests(metafunc):
                             test_ids.append(f"{prefix}_{test_case_path.name}_{id}")
                             id += 1
         metafunc.parametrize("test_case_path", test_case_paths, ids=test_ids)
+
+
+@pytest.fixture()
+def default_showwarning():
+    """Fixture to restore original warnings.showwarning handler.
+
+    The main Ramble process overrides warnings.showwarning, which can cause
+    assertions (such as `pytest.deprecated_call`) to fail if they assume the
+    warnings are written to stderr.
+    """
+    import warnings
+
+    prev_showwarning = warnings.showwarning
+    orig_showwarning = getattr(warnings, "_showwarning_orig", None)
+    if orig_showwarning is not None:
+        warnings.showwarning = orig_showwarning
+    try:
+        yield
+    finally:
+        warnings.showwarning = prev_showwarning
+
+
+@pytest.fixture()
+def deprecated_call(default_showwarning):
+    """Fixture that provides a context manager to assert deprecation warnings.
+
+    Relies on default_showwarning fixture to ensure standard warnings propagation.
+    """
+    return pytest.deprecated_call

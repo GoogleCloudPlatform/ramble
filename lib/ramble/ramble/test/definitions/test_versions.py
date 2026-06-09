@@ -55,7 +55,7 @@ class TestObjectVersion:
         assert str(obj_ver) == "1.2.3"
 
     @deprecation.fail_if_not_removed
-    def test_version_properties(self):
+    def test_version_properties(self, deprecated_call):
         """Test that properties and deprecated getter methods work correctly."""
         obj_ver = ObjectVersion(version_number="1.2.3")
 
@@ -70,11 +70,11 @@ class TestObjectVersion:
         assert obj_ver_lazy.version_num == "1.2.3"
 
         # Test deprecated get_version method triggers warning
-        with pytest.deprecated_call():
+        with deprecated_call():
             assert str(obj_ver.get_version()) == "1.2.3"
 
         # Test deprecated get_version_num method triggers warning
-        with pytest.deprecated_call():
+        with deprecated_call():
             assert obj_ver.get_version_num() == "1.2.3"
 
     @pytest.mark.parametrize(
