@@ -52,8 +52,10 @@ class UserManaged(PackageManagerBase):
         for _, obj in app_inst.objects():
             for pkgname, config in obj.required_packages.items():
                 if app_inst.expander.satisfies(
-                    config["when"],
-                    variant_set=app_inst.experiment_variants(allow_caching=False),
+                    config.get("when"),
+                    variant_set=app_inst.experiment_variants(
+                        allow_caching=False
+                    ),
                 ):
                     app_inst.keywords.update_keys(
                         {
