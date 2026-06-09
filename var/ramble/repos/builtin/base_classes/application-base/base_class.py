@@ -1517,29 +1517,28 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     and hasattr(obj, "object_modifiers")
                     and obj.object_modifiers
                 ):
-                    for mod_def_list in obj.object_modifiers.values():
-                        for mod_def in mod_def_list:
-                            when_set = frozenset(mod_def["when"])
-                            if when_set and not self.expander.satisfies(
-                                when_set,
-                                variant_set=exp_variants,
-                            ):
-                                continue
-
-                            mod_name = mod_def["name"]
-                            base_mod_name = mod_name.partition("@")[0]
-                            # Add if not already explicitly in self.modifiers
-                            if base_mod_name not in _existing_mod_base_names:
-                                mod_dict = {"name": mod_name}
-                                mod_dict.update(
-                                    {
-                                        k: v
-                                        for k, v in mod_def.items()
-                                        if k not in ["name", "when"]
-                                    }
-                                )
-                                self.modifiers.append(mod_dict)
-                                _existing_mod_base_names.add(base_mod_name)
+                    for when_key, mod_def_list in obj.object_modifiers.items():
+                        if self.expander.satisfies(
+                            when_key, variant_set=exp_variants
+                        ):
+                            for mod_def in mod_def_list:
+                                mod_name = mod_def["name"]
+                                base_mod_name = mod_name.partition("@")[0]
+                                # Add if not already explicitly in self.modifiers
+                                if (
+                                    base_mod_name
+                                    not in _existing_mod_base_names
+                                ):
+                                    mod_dict = {"name": mod_name}
+                                    mod_dict.update(
+                                        {
+                                            k: v
+                                            for k, v in mod_def.items()
+                                            if k not in ["name", "when"]
+                                        }
+                                    )
+                                    self.modifiers.append(mod_dict)
+                                    _existing_mod_base_names.add(base_mod_name)
 
             if mod_idx >= len(self.modifiers):
                 break

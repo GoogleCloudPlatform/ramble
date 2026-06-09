@@ -1517,14 +1517,15 @@ def modifier(
 
     def _execute_modifier(obj):
         when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "modifier")
-        mod_dict = {"name": name, "when": when_list}
+        mod_dict = {"name": name}
         if mode is not None:
             mod_dict["mode"] = mode
         if on_executable is not None:
             mod_dict["on_executable"] = on_executable
         mod_dict.update(kwargs)
-        if name not in obj.object_modifiers:
-            obj.object_modifiers[name] = []
-        obj.object_modifiers[name].append(mod_dict)
+        when_key = frozenset(when_list)
+        if when_key not in obj.object_modifiers:
+            obj.object_modifiers[when_key] = []
+        obj.object_modifiers[when_key].append(mod_dict)
 
     return _execute_modifier

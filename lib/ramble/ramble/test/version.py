@@ -357,7 +357,7 @@ def test_version_variable_expansion_info(workspace_name):
         assert os.path.exists(exp2_path)
 
 
-def test_repeat_modifier_versions_error(workspace_name):
+def test_repeat_modifier_versions_error(workspace_name, workspace_deactivate):
     global_args = ["-w", workspace_name]
 
     ramble.workspace.create(workspace_name)
@@ -473,7 +473,7 @@ def test_multi_modifier_versions(workspace_name):
             assert "info version: 2.0" in data
 
 
-def test_define_version_variables_errors(workspace_name):
+def test_define_version_variables_errors(workspace_name, workspace_deactivate):
     global_args = ["-w", workspace_name, "--overwrite-inventories"]
 
     ramble.workspace.create(workspace_name)

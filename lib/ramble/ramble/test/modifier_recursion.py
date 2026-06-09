@@ -25,12 +25,18 @@ def test_modifier_directive_registration():
     app = TestApp("/tmp/path.py")
     assert hasattr(app, "object_modifiers")
     assert len(app.object_modifiers) == 2
-    assert "mod1" in app.object_modifiers
-    assert app.object_modifiers["mod1"][0]["name"] == "mod1"
-    assert app.object_modifiers["mod1"][0]["mode"] == "test"
-    assert "mod2" in app.object_modifiers
-    assert app.object_modifiers["mod2"][0]["name"] == "mod2"
-    assert app.object_modifiers["mod2"][0]["when"] == ["workload=test"]
+
+    found = 0
+    for when_key, mod_definitions in app.object_modifiers.items():
+        for mod_def in mod_definitions:
+            if mod_def["name"] == "mod1":
+                assert when_key == frozenset()
+                assert mod_def["mode"] == "test"
+                found += 1
+            elif mod_def["name"] == "mod2":
+                assert when_key == frozenset(["workload=test"])
+                found += 1
+    assert found == 2
 
 
 def test_modifier_recursion(
