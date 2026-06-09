@@ -176,7 +176,7 @@ ramble:
 
     workspace("analyze", global_args=workspace_flags)
     result_file = os.path.join(ws.results_dir, "results.latest.txt")
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         content = f.read()
         assert "Status = FAILED" in content
 
