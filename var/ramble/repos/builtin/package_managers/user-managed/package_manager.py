@@ -50,15 +50,19 @@ class UserManaged(PackageManagerBase):
         Ramble.
         """
         for _, obj in app_inst.objects():
-            for pkgname in obj.required_packages:
-                app_inst.keywords.update_keys(
-                    {
-                        f"{pkgname}_path": {
-                            "type": ramble.keywords.key_type.required,
-                            "level": ramble.keywords.output_level.variable,
+            for pkgname, config in obj.required_packages.items():
+                if app_inst.expander.satisfies(
+                    config["when"],
+                    variant_set=app_inst.experiment_variants(allow_caching=False),
+                ):
+                    app_inst.keywords.update_keys(
+                        {
+                            f"{pkgname}_path": {
+                                "type": ramble.keywords.key_type.required,
+                                "level": ramble.keywords.output_level.variable,
+                            }
                         }
-                    }
-                )
+                    )
 
     def get_package_list(self, workspace):
         """Augment the owning experiment's results with software stack information
