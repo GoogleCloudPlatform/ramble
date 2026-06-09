@@ -8,6 +8,7 @@
 
 
 import argparse
+import fnmatch
 import glob
 import os
 import re
@@ -39,8 +40,13 @@ def is_object(f):
     return f.startswith("var/ramble/repos/") or "docs/tutorial/examples" in f
 
 
-# List of directories to exclude from checks.
-exclude_directories = [ramble.paths.external_path]
+# List of patterns to include in checks.
+include_patterns = [
+    "bin/**",
+    "lib/ramble/ramble/**",
+    "var/ramble/repos/**",
+    "conftest.py",
+]
 
 # max line length we're enforcing (note: this duplicates what's in .flake8)
 max_line_length = 99
@@ -181,17 +187,17 @@ def changed_files(base=None, untracked=True, all_files=False, root=ramble.paths.
     # add everything if the user asked for it
     if all_files:
         git_args.append(["ls-files", "--exclude-standard"])
-    excludes = [os.path.realpath(f) for f in exclude_directories]
     changed = set()
 
     with working_dir(root):
         try:
             git("rev-parse", "--is-inside-work-tree", output=str, error=str)
         except ProcessError:
-            # if not a git repo, return all python files
+            # if not a git repo, return all python files matching include patterns
             for f in glob.glob(os.path.join(root, "**", "*.py"), recursive=True):
-                if not any(os.path.realpath(f).startswith(e) for e in excludes):
-                    changed.add(os.path.relpath(f, root))
+                rel_f = os.path.relpath(f, root)
+                if any(fnmatch.fnmatch(rel_f, p) for p in include_patterns):
+                    changed.add(rel_f)
             return sorted(changed)
 
         for arg_list in git_args:
@@ -205,8 +211,8 @@ def changed_files(base=None, untracked=True, all_files=False, root=ramble.paths.
                 if not (f.endswith(".py") or f == "bin/ramble"):
                     continue
 
-                # Ignore files in the exclude locations if in Ramble repo
-                if any(os.path.realpath(f).startswith(e) for e in excludes):
+                # Only include files matching the include patterns
+                if not any(fnmatch.fnmatch(f, p) for p in include_patterns):
                     continue
 
                 # Exclude non-existent files
