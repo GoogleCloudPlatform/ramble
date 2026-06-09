@@ -333,62 +333,14 @@ def modify_object_macholib(cur_path, paths_to_paths):
     mach-o binary to be modified
     dictionary mapping paths in old install layout to new install layout
     """
-
-    import macholib.MachO
-
-    dll = macholib.MachO.MachO(cur_path)
-    dll.rewriteLoadCommands(paths_to_paths.get)
-
-    try:
-        f = open(dll.filename, 'rb+')
-        for header in dll.headers:
-            f.seek(0)
-            dll.write(f)
-        f.seek(0, 2)
-        f.flush()
-        f.close()
-    except Exception:
-        pass
-
-    return
+    raise ImportError("macholib is not available in Ramble's vendored Spack")
 
 
 def macholib_get_paths(cur_path):
     """Get rpaths, dependent libraries, and library id of mach-o objects.
     """
-    import macholib.MachO
-    import macholib.mach_o
+    raise ImportError("macholib is not available in Ramble's vendored Spack")
 
-    headers = macholib.MachO.MachO(cur_path).headers
-    if not headers:
-        tty.warn("Failed to read Mach-O headers: {0}".format(cur_path))
-        commands = []
-    else:
-        if len(headers) > 1:
-            # Reproduce original behavior of only returning the last mach-O
-            # header section
-            tty.warn("Encountered fat binary: {0}".format(cur_path))
-        if headers[-1].filetype == 'dylib_stub':
-            tty.warn("File is a stub, not a full library: {0}".format(cur_path))
-        commands = headers[-1].commands
-
-    LC_ID_DYLIB = macholib.mach_o.LC_ID_DYLIB
-    LC_LOAD_DYLIB = macholib.mach_o.LC_LOAD_DYLIB
-    LC_RPATH = macholib.mach_o.LC_RPATH
-
-    ident = None
-    rpaths = []
-    deps = []
-    for load_command, dylib_command, data in commands:
-        cmd = load_command.cmd
-        if cmd == LC_RPATH:
-            rpaths.append(_decode_macho_data(data))
-        elif cmd == LC_LOAD_DYLIB:
-            deps.append(_decode_macho_data(data))
-        elif cmd == LC_ID_DYLIB:
-            ident = _decode_macho_data(data)
-
-    return (rpaths, deps, ident)
 
 
 def _set_elf_rpaths(target, rpaths):

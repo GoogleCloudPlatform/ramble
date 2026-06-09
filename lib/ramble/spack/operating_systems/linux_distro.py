@@ -38,8 +38,8 @@ class LinuxDistro(OperatingSystem):
     def __init__(self):
         try:
             # This will throw an error if imported on a non-Linux platform.
-            import external.distro
-            distname, version = external.distro.id(), external.distro.version()
+            import distro
+            distname, version = distro.id(), distro.version()
         except ImportError:
             distname, version = 'unknown', ''
 
