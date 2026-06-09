@@ -26,11 +26,11 @@ def test_large_template_expansion(
 ):
     # Define a mock template app in a temporary repo
     repo_dir = tmpdir.mkdir("mock_repo")
-    with open(os.path.join(str(repo_dir), "repo.yaml"), "w") as f:
+    with open(os.path.join(str(repo_dir), "repo.yaml"), "w", encoding="utf-8") as f:
         f.write("repo:\n  namespace: mock_repo\n")
 
     app_dir = repo_dir.mkdir("applications").mkdir("template")
-    with open(os.path.join(str(app_dir), "application.py"), "w") as f:
+    with open(os.path.join(str(app_dir), "application.py"), "w", encoding="utf-8") as f:
         f.write(
             """
 from ramble.appkit import *
@@ -91,7 +91,7 @@ ramble:
 
     template_path = os.path.join(ws.config_dir, template_filename)
 
-    with open(template_path, "w+") as f:
+    with open(template_path, "w+", encoding="utf-8") as f:
         f.write(template_content)
 
     # Run workspace setup to trigger template expansion
@@ -104,7 +104,7 @@ ramble:
     assert os.path.isfile(expanded_path)
 
     # Check a few lines to ensure expansion worked
-    with open(expanded_path) as f:
+    with open(expanded_path, encoding="utf-8") as f:
         lines = f.read().splitlines()
         assert len(lines) == n_lines
         assert "Math statement 0: 0" == lines[0]

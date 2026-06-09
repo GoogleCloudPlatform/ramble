@@ -56,7 +56,7 @@ def test_default_arg_works(request):
         workspace("concretize", global_args=global_args)
         workspace("setup", "--dry-run", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "zlib@1.2.11" not in data
@@ -66,7 +66,7 @@ def test_default_arg_works(request):
             ws.experiment_dir, "when-variants", "test_wl", "generated", "execute_experiment"
         )
 
-        with open(script_path) as f:
+        with open(script_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "echo 'Test'" in data
@@ -100,7 +100,7 @@ def test_default_variant_value_works_with_when(request):
         ws._re_read()
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "zlib@1.2.11" not in data
@@ -137,7 +137,7 @@ def test_changed_variant_value_works_with_when(request):
         ws._re_read()
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "zlib@1.2.11" in data
@@ -207,7 +207,7 @@ def test_boolean_variants(request):
         ws._re_read()
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "zlib@1.2.11" not in data
@@ -242,7 +242,7 @@ def test_non_matched_variants_are_ignored(request):
         ws._re_read()
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             assert "zlib" not in data
@@ -297,13 +297,13 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws._re_read()
         workspace("concretize", "-f", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert expected_spec in data
 
@@ -348,7 +348,7 @@ def test_variant_nesting_works(workspace_name, test_value):
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
 
-        with open(os.path.join(ws.config_dir, "variants.yaml"), "w+") as f:
+        with open(os.path.join(ws.config_dir, "variants.yaml"), "w+", encoding="utf-8") as f:
             f.write(
                 f"""variants:
   iterative_variant: {test_value}
@@ -419,7 +419,7 @@ def test_variant_expansion(workspace_name, variant_scope, expected_bool, expecte
         config("add", f"variants:val:{expected_val}", global_args=global_args)
 
         if variant_scope == "mod_pkg_args":
-            with open(os.path.join(ws.config_dir, "modifiers.yaml"), "w+") as f:
+            with open(os.path.join(ws.config_dir, "modifiers.yaml"), "w+", encoding="utf-8") as f:
                 f.write(
                     """modifiers:
 - name: spack-mod"""
@@ -428,7 +428,7 @@ def test_variant_expansion(workspace_name, variant_scope, expected_bool, expecte
         ws._re_read()
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             if variant_scope == "pkg_args":

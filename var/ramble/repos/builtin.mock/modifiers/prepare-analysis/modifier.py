@@ -36,6 +36,8 @@ class PrepareAnalysis(BasicModifier):
     )
 
     def _prepare_analysis(self, workspace):
-        with open(self.expander.expand_var(self._log_file), "w+") as f:
+        with open(
+            self.expander.expand_var(self._log_file), "w+", encoding="utf-8"
+        ) as f:
             to_write = self.expander.expand_var("{test-var}")
             f.write(f"Test fom = {to_write}")

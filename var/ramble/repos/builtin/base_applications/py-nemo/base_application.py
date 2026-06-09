@@ -334,14 +334,14 @@ class PyNemo(ExecutableApplication):
                 "{experiment_run_dir}/processed_{experiment_name}.out"
             )
 
-            with open(processed_log, "w+") as f:
+            with open(processed_log, "w+", encoding="utf-8") as f:
                 f.write(
                     data.replace("\x13", "\n")
                     .replace("\x96\x88", "")
                     .replace("â", "")
                 )
 
-            with open(processed_log) as f:
+            with open(processed_log, encoding="utf-8") as f:
                 for line in f:
                     m = final_regex.match(line)
 
@@ -360,5 +360,5 @@ class PyNemo(ExecutableApplication):
             sec_file_path = self.expander.expand_var(
                 "{experiment_run_dir}/elapsed_seconds"
             )
-            with open(sec_file_path, "w+") as f:
+            with open(sec_file_path, "w+", encoding="utf-8") as f:
                 f.write(f"Elapsed seconds: {elapsed_s}")

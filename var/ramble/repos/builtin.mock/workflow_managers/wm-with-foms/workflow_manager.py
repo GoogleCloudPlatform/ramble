@@ -22,7 +22,7 @@ class WmWithFoms(WorkflowManagerBase):
         del workspace
         expander = self.app_inst.expander
         path = expander.expand_var(self._fom_file)
-        with open(path, "w+") as f:
+        with open(path, "w+", encoding="utf-8") as f:
             f.write("job_status: RUNNING")
 
     figure_of_merit(

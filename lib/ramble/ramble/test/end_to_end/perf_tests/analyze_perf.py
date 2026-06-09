@@ -45,7 +45,7 @@ def test_analyze_large_file(workspace_name, ramble_benchmark):
     ws._re_read()
     workspace("setup", "--dry-run", global_args=global_args)
     out_file = os.path.join(ws.experiment_dir, "sleep", "rand_sleep", "generated", "generated.out")
-    with open(out_file, "w") as f:
+    with open(out_file, "w", encoding="utf-8") as f:
         # Write 1 million lines to simulate a large output file
         for _ in range(1_000):
             f.write("no match\n" * 1_000)

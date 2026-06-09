@@ -51,7 +51,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
     aux_dir = os.path.join(ws.config_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME)
     mkdirp(aux_dir)
 
-    with open(os.path.join(aux_dir, "config.yaml"), "w") as f:
+    with open(os.path.join(aux_dir, "config.yaml"), "w", encoding="utf-8") as f:
         f.write(spack_config)
 
     with patch.object(spack_lightweight, "SpackRunner", return_value=MockSpackRunner()):
@@ -64,13 +64,13 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
 
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml) as f:
+        with open(spack_yaml, encoding="utf-8") as f:
             data = f.read()
             assert "- zlib" in data
 
         assert os.path.isfile(spack_lock)
 
-        with open(spack_lock) as f:
+        with open(spack_lock, encoding="utf-8") as f:
             data = f.read()
             assert '"spec":"zlib"' in data
 
@@ -78,7 +78,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
             ws.experiment_dir, "zlib", "ensure_installed", "generated", "generated.out"
         )
 
-        with open(out_log, "w+") as f:
+        with open(out_log, "w+", encoding="utf-8") as f:
             f.write("libz.so.2\n")
 
         workspace("analyze", global_args=global_args)
@@ -86,7 +86,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
         results_file = os.path.join(ws.results_dir, "results.latest.txt")
         assert os.path.isfile(results_file)
 
-        with open(results_file) as f:
+        with open(results_file, encoding="utf-8") as f:
             data = f.read()
             assert "Software definitions" in data
             assert "spack packages:" in data
@@ -97,7 +97,7 @@ def test_spack_package_manager_provenance_zlib(mock_applications, workspace_name
         results_file = os.path.join(ws.results_dir, "results.latest.json")
         assert os.path.isfile(results_file)
 
-        with open(results_file) as f:
+        with open(results_file, encoding="utf-8") as f:
             import json
 
             data = json.load(f)
@@ -154,7 +154,7 @@ def test_usermanged_package_manager_provenance_zlib(mock_applications, workspace
 
     assert os.path.isfile(results_file)
 
-    with open(results_file) as f:
+    with open(results_file, encoding="utf-8") as f:
         data = f.read()
         assert "Software definitions" in data
         assert "user-managed packages:" in data

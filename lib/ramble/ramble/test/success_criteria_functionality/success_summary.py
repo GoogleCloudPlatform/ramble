@@ -56,7 +56,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -65,7 +65,7 @@ ramble:
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
         for _ in ["txt", "json", "yaml"]:
-            with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+            with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
                 data = f.read()
                 assert "Success criteria summary:" in data
                 assert "application::basic::_application_function = PASSED" in data

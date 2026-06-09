@@ -87,16 +87,16 @@ ramble:
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         for file in aux_software_files:
             file_path = os.path.join(aux_software_path, file)
-            with open(file_path, "w+") as f:
+            with open(file_path, "w+", encoding="utf-8") as f:
                 f.write("")
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+", encoding="utf-8") as f:
             f.write("{command}")
 
         ws1._re_read()
@@ -146,7 +146,7 @@ ramble:
                 assert os.path.exists(os.path.join(repeat_exp_dir, "execute_experiment"))
 
                 # TODO: Create fake experiment figures of merit.
-                with open(os.path.join(repeat_exp_dir, "md.log"), "w+") as f:
+                with open(os.path.join(repeat_exp_dir, "md.log"), "w+", encoding="utf-8") as f:
                     f.write("               Core t (s)   Wall t (s)        (%)\n")
                     f.write(f"       Time:       {r}{r}.{r}{r}{r}       {r}.{r}{r}{r}    1000.1\n")
                     f.write("                 (ns/day)    (hour/ns)\n")
@@ -168,7 +168,7 @@ ramble:
         assert len(yaml_results_files) == 2
 
         for text_result in text_results_files:
-            with open(text_result) as f:
+            with open(text_result, encoding="utf-8") as f:
                 data = f.read()
                 assert "Core Time = 11.111 s" in data
                 assert "Core Time = 22.222 s" in data
@@ -182,7 +182,7 @@ ramble:
         # When --summary-only, only the base experiments are included
         workspace("analyze", "-s", global_args=["-w", workspace_name])
         result_file = glob.glob(os.path.join(ws1.results_dir, "results.latest.txt"))[0]
-        with open(result_file) as f:
+        with open(result_file, encoding="utf-8") as f:
             data = f.read()
             assert "gromacs.water_bare.pme_single_rank" in data
             assert "gromacs.water_bare.pme_single_rank.1" not in data
@@ -193,7 +193,7 @@ ramble:
         workspace(
             "analyze", "-s", "--where", "'{type}' == 'rf'", global_args=["-w", workspace_name]
         )
-        with open(result_file) as f:
+        with open(result_file, encoding="utf-8") as f:
             data = f.read()
             assert f"summary::{SummaryFoms.N_TOTAL.value} = 1 repeats" in data
             assert "summary::mean = 11.111 s" in data
@@ -220,7 +220,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -230,7 +230,7 @@ ramble:
         for r in range(1, 4):
             dir = f"{base_exp_dir}.{r}"
             log_path = os.path.join(dir, f"{os.path.basename(dir)}.out")
-            with open(log_path, "w+") as f:
+            with open(log_path, "w+", encoding="utf-8") as f:
                 f.write(f"{r}:0.0elapsed\n")
                 # Purposely fail the last experiment
                 if r != 3:
@@ -238,7 +238,7 @@ ramble:
 
         workspace("analyze", "-s", global_args=["-w", workspace_name])
         result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
-        with open(result_file) as f:
+        with open(result_file, encoding="utf-8") as f:
             data = f.read()
             assert f"summary::{SummaryFoms.N_TOTAL.value} = 3 repeats" in data
             assert f"summary::{SummaryFoms.N_SUCCESS.value} = 2 repeats" in data
@@ -269,7 +269,7 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 

@@ -92,7 +92,7 @@ class Tunables(BasicModifier):
         if not os.path.isfile(log_path):
             return
         summary = defaultdict(dict)
-        with open(log_path) as f:
+        with open(log_path, encoding="utf-8") as f:
             for line in f:
                 tuples = [v.strip() for v in line.split(":")]
                 if len(tuples) < 2 or tuples[1] != _FOM_ID:

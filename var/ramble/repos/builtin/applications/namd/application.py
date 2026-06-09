@@ -402,7 +402,7 @@ class Namd(ExecutableApplication):
         dpns = None
 
         if os.path.isfile(log_path):
-            with open(log_path) as f:
+            with open(log_path, encoding="utf-8") as f:
                 for line in f:
                     match = ns_regex.match(line)
                     if match:
@@ -416,7 +416,7 @@ class Namd(ExecutableApplication):
                 ),
                 "namd_nspd_stat.out",
             )
-            with open(nspd_file_path, "w+") as f:
+            with open(nspd_file_path, "w+", encoding="utf-8") as f:
                 f.write(f"{nspd} ns/day\n")
 
         super()._analyze_experiments(workspace)

@@ -224,9 +224,9 @@ class Slurm(WorkflowManagerBase):
             job_id_file
         ):
             return
-        with open(end_time_file) as f:
+        with open(end_time_file, encoding="utf-8") as f:
             script_end_time = float(f.read().strip())
-        with open(job_id_file) as f:
+        with open(job_id_file, encoding="utf-8") as f:
             job_id = f.read().strip()
         sacct_cmd = Executable("sacct")
         try:
@@ -269,7 +269,7 @@ class Slurm(WorkflowManagerBase):
         if not os.path.isfile(job_id_file):
             logger.warn("job_id file is missing")
             return status
-        with open(job_id_file) as f:
+        with open(job_id_file, encoding="utf-8") as f:
             job_id = f.read().strip()
         self.runner.set_dry_run(workspace.dry_run)
         wm_status_raw = self.runner.get_status(job_id)

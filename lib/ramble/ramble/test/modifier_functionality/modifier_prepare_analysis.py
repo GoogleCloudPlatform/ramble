@@ -55,7 +55,7 @@ def test_basic_dry_run_mock_prepare_analysis_mod(
 
         expected_regex = re.compile(".*This test worked")
         found_str = False
-        with open(os.path.join(ws1.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws1.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             for line in f:
                 if expected_regex.match(line):
                     found_str = True

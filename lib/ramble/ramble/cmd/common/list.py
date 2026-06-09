@@ -181,7 +181,7 @@ def perform_list(args):
                 return
 
         logger.msg(f"Updating file: {args.update}")
-        with open(args.update, "w") as f:
+        with open(args.update, "w", encoding="utf-8") as f:
             formatter(sorted_objects, f, object_type)
 
     else:

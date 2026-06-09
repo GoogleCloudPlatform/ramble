@@ -155,7 +155,7 @@ class GcpMetadata(BasicModifier):
         exp_run_dir = self.expander.expand_var_name("experiment_run_dir")
         file_name = os.path.join(exp_run_dir, "gcp-metadata.id.log")
         if os.path.isfile(file_name):
-            with open(file_name) as f:
+            with open(file_name, encoding="utf-8") as f:
                 for cur_id in f:
                     cur_id = cur_id.split(":")[-1].strip()
                     if cur_id.isnumeric():
@@ -177,7 +177,7 @@ class GcpMetadata(BasicModifier):
         )
         if not os.path.isfile(id_log):
             return
-        with open(id_log) as f:
+        with open(id_log, encoding="utf-8") as f:
             content = f.read()
         if ":" not in content:
             return
@@ -201,7 +201,7 @@ class GcpMetadata(BasicModifier):
         level2_groups = set()
         all_hosts = set()
 
-        with open(log_path) as f:
+        with open(log_path, encoding="utf-8") as f:
             for raw_host in f:
                 physical_host = raw_host[1:].strip()
                 logger.debug(f"  Host line: {physical_host}")

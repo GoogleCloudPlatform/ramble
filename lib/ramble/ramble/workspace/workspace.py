@@ -557,7 +557,7 @@ class Workspace:
             if read_default:
                 self.read_config(CONFIG_SECTION, self._default_config_yaml())
             else:
-                with open(self.config_file_path) as f:
+                with open(self.config_file_path, encoding="utf-8") as f:
                     self.read_config(CONFIG_SECTION, f)
 
             read_default_script = self.read_default_template
@@ -581,13 +581,13 @@ class Workspace:
                                     + " which is reserved by ramble."
                                 )
 
-                            with open(template_path) as f:
+                            with open(template_path, encoding="utf-8") as f:
                                 self.read_template(template_name, f.read())
 
                 if os.path.exists(self.auxiliary_software_dir):
                     for filename in os.listdir(self.auxiliary_software_dir):
                         aux_file_path = os.path.join(self.auxiliary_software_dir, filename)
-                        with open(aux_file_path) as f:
+                        with open(aux_file_path, encoding="utf-8") as f:
                             self._read_auxiliary_software_file(filename, f.read())
 
             if read_default_script:
@@ -703,7 +703,7 @@ ramble:
         metadata_file_path = os.path.join(self.root, METADATA_FILE_NAME)
 
         if os.path.exists(metadata_file_path):
-            with open(metadata_file_path) as f:
+            with open(metadata_file_path, encoding="utf-8") as f:
                 self.metadata = syaml.load(f)
         else:
             self.metadata = syaml.syaml_dict()
@@ -717,7 +717,7 @@ ramble:
         """
         metadata_file_path = os.path.join(self.root, METADATA_FILE_NAME)
 
-        with open(metadata_file_path, "w+") as f:
+        with open(metadata_file_path, "w+", encoding="utf-8") as f:
             syaml.dump(self.metadata, stream=f)
 
     def _check_deprecated(self, config):
@@ -1608,7 +1608,7 @@ ramble:
             res["workspace_hash"] = self.workspace_hash
         else:
             try:
-                with open(os.path.join(self.root, self.hash_file_name)) as f:
+                with open(os.path.join(self.root, self.hash_file_name), encoding="utf-8") as f:
                     res["workspace_hash"] = f.readline().rstrip()
             except OSError:
                 res["workspace_hash"] = "Unknown.."
@@ -1735,7 +1735,7 @@ ramble:
 
             results_written.append(out_file)
 
-            with open(out_file, "w+") as f:
+            with open(out_file, "w+", encoding="utf-8") as f:
                 f.write(f"From Workspace: {self.name} (hash: {results['workspace_hash']})\n")
                 if namespace.experiment in results:
                     for exp in results[namespace.experiment]:
@@ -1810,7 +1810,7 @@ ramble:
             file_extension = ".json"
             out_file = os.path.join(self.results_dir, filename_base + file_extension)
             results_written.append(out_file)
-            with open(out_file, "w+") as f:
+            with open(out_file, "w+", encoding="utf-8") as f:
                 sjson.dump(results, f)
             self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
 
@@ -1831,7 +1831,7 @@ ramble:
 
             RambleSafeDumper.add_representer(ramble.experiment_result.ExperimentStatus, call_value)
 
-            with open(out_file, "w+") as f:
+            with open(out_file, "w+", encoding="utf-8") as f:
                 syaml.dump(results, stream=f, Dumper=RambleSafeDumper)
 
             self._create_result_symlinks(out_file, latest_base, file_extension, symlinks_updated)
@@ -1847,7 +1847,7 @@ ramble:
             logger.all_msg(f"  {symlink_path}")
 
         if print_results:
-            with open(results_written[0]) as f:
+            with open(results_written[0], encoding="utf-8") as f:
                 # Use tty directly to avoid cluttering the analyze log
                 tty.msg(f"Results from the analysis pipeline:\n{f.read()}")
 
@@ -2086,7 +2086,7 @@ ramble:
         """
         if file_path in self._inmem_file_cache:
             return self._inmem_file_cache[file_path]
-        with open(file_path) as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
         self._inmem_file_cache[file_path] = content
         return content

@@ -44,7 +44,7 @@ ramble:
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws1._re_read()
@@ -64,7 +64,7 @@ ramble:
 
             assert os.path.exists(exp_script)
 
-            with open(exp_script) as f:
+            with open(exp_script, encoding="utf-8") as f:
                 data = f.read()
                 assert "gmx_mpi --version" in data
                 assert f"mpirun -n {n_ranks}" in data

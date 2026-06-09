@@ -67,7 +67,7 @@ ramble:
         ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
     )
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -77,7 +77,7 @@ ramble:
     setup_out = os.path.join(
         ws.log_dir, "setup.latest", "pip-test.import.test_import.out"
     )
-    with open(setup_out) as f:
+    with open(setup_out, encoding="utf-8") as f:
         content = f.read()
         assert "Executing phase software_create_env" in content
         assert "Executing phase software_install" in content
@@ -92,7 +92,7 @@ ramble:
         "test_import",
         "execute_experiment",
     )
-    with open(execute_script) as f:
+    with open(execute_script, encoding="utf-8") as f:
         content = f.read()
         assert (
             re.search(r'echo "purelib_path:.*site-packages"', content)

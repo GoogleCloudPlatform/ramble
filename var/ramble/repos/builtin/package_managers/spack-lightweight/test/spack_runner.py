@@ -95,7 +95,9 @@ def test_env_concretize_skips_already_concretized_envs(
         time.sleep(0.5)
 
         # Create a spack.lock file in the env
-        with open(os.path.join(env_path, "spack.lock"), "w+") as f:
+        with open(
+            os.path.join(env_path, "spack.lock"), "w+", encoding="utf-8"
+        ) as f:
             f.write("")
 
         # Mock regenerating an env file, after the lock was created.
@@ -135,7 +137,7 @@ def test_env_install(tmpdir, capsys, request):
 
         assert os.path.exists(env_file)
 
-        with open(env_file) as f:
+        with open(env_file, encoding="utf-8") as f:
             assert "zlib" in f.read()
 
     except RunnerError as e:
@@ -168,7 +170,7 @@ def test_env_configs_apply(tmpdir, capsys, request):
 
         assert os.path.exists(env_file)
 
-        with open(env_file) as f:
+        with open(env_file, encoding="utf-8") as f:
             data = f.read()
             assert "zlib" in data
             assert "debug: true" in data
@@ -199,7 +201,7 @@ def test_env_view_link_types(tmpdir, request, link_type, mutable_config):
 
             assert os.path.exists(env_file)
 
-            with open(env_file) as f:
+            with open(env_file, encoding="utf-8") as f:
                 data = f.read()
                 assert f"link_type: {link_type}" in data
 
@@ -318,7 +320,7 @@ def test_env_include(tmpdir, capsys, request):
 
         sr.concretize()
 
-        with open(os.path.join(env_path, "spack.yaml")) as f:
+        with open(os.path.join(env_path, "spack.yaml"), encoding="utf-8") as f:
             data = f.read()
             assert good_include_path in data
             assert bad_include_path not in data
@@ -371,10 +373,10 @@ packages:
         packages_path = os.path.join(tmpdir, "packages.yaml")
         compilers_path = os.path.join(tmpdir, "compilers.yaml")
         # Write spack_configs
-        with open(packages_path, "w+") as f:
+        with open(packages_path, "w+", encoding="utf-8") as f:
             f.write(packages_config)
 
-        with open(compilers_path, "w+") as f:
+        with open(compilers_path, "w+", encoding="utf-8") as f:
             f.write(compilers_config)
 
         config_path = tmpdir
@@ -467,10 +469,14 @@ spack:
 """
 
     with tmpdir.as_cwd():
-        with open(os.path.join(os.getcwd(), "spack.yaml"), "w+") as f:
+        with open(
+            os.path.join(os.getcwd(), "spack.yaml"), "w+", encoding="utf-8"
+        ) as f:
             f.write(src_spack_yaml)
 
-        with open(os.path.join(os.getcwd(), "spack.lock"), "w+") as f:
+        with open(
+            os.path.join(os.getcwd(), "spack.lock"), "w+", encoding="utf-8"
+        ) as f:
             f.write(src_spack_lock)
 
         try:
@@ -482,7 +488,9 @@ spack:
 
             assert os.path.exists(os.path.join(generated_env, "spack.yaml"))
 
-            with open(os.path.join(generated_env, "spack.yaml")) as f:
+            with open(
+                os.path.join(generated_env, "spack.yaml"), encoding="utf-8"
+            ) as f:
                 assert "zlib" in f.read()
         except RunnerError as e:
             pytest.skip("%s" % e)
@@ -494,7 +502,9 @@ spack:
   specs: [ 'zlib' ]
 """
     with tmpdir.as_cwd():
-        with open(os.path.join(os.getcwd(), "spack.yaml"), "w+") as f:
+        with open(
+            os.path.join(os.getcwd(), "spack.yaml"), "w+", encoding="utf-8"
+        ) as f:
             f.write(src_spack_yaml)
 
         try:
@@ -510,7 +520,9 @@ spack:
 
             assert os.path.exists(os.path.join(generated_env, "spack.yaml"))
 
-            with open(os.path.join(generated_env, "spack.yaml")) as f:
+            with open(
+                os.path.join(generated_env, "spack.yaml"), encoding="utf-8"
+            ) as f:
                 data = f.read()
                 assert "zlib" in data
                 assert "config:" in data
@@ -564,7 +576,7 @@ compilers::
     with tmpdir.as_cwd():
         compilers_path = os.path.join(os.getcwd(), "compilers.yaml")
         # Write spack_configs
-        with open(compilers_path, "w+") as f:
+        with open(compilers_path, "w+", encoding="utf-8") as f:
             f.write(compilers_config)
 
         config_path = os.getcwd()

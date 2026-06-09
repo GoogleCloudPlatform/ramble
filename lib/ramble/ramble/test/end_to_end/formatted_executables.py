@@ -68,7 +68,7 @@ ramble:
 """
     ws, ws_name = make_workspace_from_config(test_config)
 
-    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+", encoding="utf-8") as f:
         f.write("{ws_exec_def}\n")
         f.write("{app_exec_def}\n")
         f.write("{wl_exec_def}\n")
@@ -82,7 +82,7 @@ ramble:
     exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
     exp_script = os.path.join(exp_dir, "execute_experiment")
 
-    with open(exp_script) as f:
+    with open(exp_script, encoding="utf-8") as f:
         data = f.read()
         assert "from_app echo" in data
         assert ";" + " " * 9 + "from_ws echo" in data
@@ -139,10 +139,10 @@ modifiers:
     modifier_path = os.path.join(ws.config_dir, "modifiers.yaml")
     exec_path = os.path.join(ws.config_dir, "execute_experiment.tpl")
 
-    with open(modifier_path, "w+") as f:
+    with open(modifier_path, "w+", encoding="utf-8") as f:
         f.write(mod_config)
 
-    with open(exec_path, "a") as f:
+    with open(exec_path, "a", encoding="utf-8") as f:
         f.write(template_suffix)
 
     ws._re_read()
@@ -170,7 +170,7 @@ modifiers:
         ws.experiment_dir, "basic", "working_wl", "generated", "execute_experiment"
     )
 
-    with open(exec_path) as f:
+    with open(exec_path, encoding="utf-8") as f:
         data = f.read()
         assert '    FROM_MOD echo "Test formatted exec"' in data
 
@@ -221,7 +221,7 @@ ramble:
 """
     ws, ws_name = make_workspace_from_config(test_config)
 
-    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+", encoding="utf-8") as f:
         f.write("{level_three}\n")
         f.write("\n\n    {level_three}\n")
 
@@ -245,7 +245,7 @@ ramble:
         False,
     ]
 
-    with open(exp_script) as f:
+    with open(exp_script, encoding="utf-8") as f:
         for line in f:
             for idx, regex in enumerate(test_regexes):
                 if regex.search(line):
@@ -302,7 +302,7 @@ ramble:
 """
     ws, ws_name = make_workspace_from_config(test_config)
 
-    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+") as f:
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "w+", encoding="utf-8") as f:
         f.write("{level_three}\n")
         f.write("\n\n    {level_three}\n")
 
@@ -326,7 +326,7 @@ ramble:
         False,
     ]
 
-    with open(exp_script) as f:
+    with open(exp_script, encoding="utf-8") as f:
         for line in f:
             for idx, regex in enumerate(test_regexes):
                 if regex.search(line):
@@ -375,7 +375,7 @@ ramble:
     exp_dir = os.path.join(experiment_root, "basic", "working_wl", "simple_test")
     exp_script = os.path.join(exp_dir, "execute_experiment")
 
-    with open(exp_script) as f:
+    with open(exp_script, encoding="utf-8") as f:
         data = f.read()
         assert r'echo "{experiment_index}"' in data
         assert r'echo "{experiment_namespace}"' in data

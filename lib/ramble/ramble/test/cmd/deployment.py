@@ -96,7 +96,7 @@ def test_local_deployment(mutable_config, mutable_mock_workspace_path, workspace
         )
         config_path = ws.config_file_path
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
             # Check that the app has a package, and the package is in an environment
             assert f"pkg_spec: {app_name}" in content

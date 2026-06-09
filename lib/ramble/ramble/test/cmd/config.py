@@ -28,7 +28,7 @@ def _create_config(scope=None, data=None, section="repos"):
         data = {}
     scope = scope or ramble.config.default_modify_scope()
     cfg_file = ramble.config.config.get_config_filename(scope, section)
-    with open(cfg_file, "w") as f:
+    with open(cfg_file, "w", encoding="utf-8") as f:
         syaml.dump(data, stream=f)
     return cfg_file
 
@@ -56,7 +56,7 @@ def test_get_config_scope_merged(mock_low_high_config):
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, "repos.yaml"), "w") as f:
+    with open(os.path.join(low_path, "repos.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 repos:
@@ -64,7 +64,7 @@ repos:
 """
         )
 
-    with open(os.path.join(high_path, "repos.yaml"), "w") as f:
+    with open(os.path.join(high_path, "repos.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 repos:
@@ -89,7 +89,7 @@ def test_merged_variables_section(mock_low_high_config):
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, "variables.yaml"), "w") as f:
+    with open(os.path.join(low_path, "variables.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 variables:
@@ -97,7 +97,7 @@ variables:
 """
         )
 
-    with open(os.path.join(high_path, "variables.yaml"), "w") as f:
+    with open(os.path.join(high_path, "variables.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 variables:
@@ -120,7 +120,7 @@ def test_merged_env_vars_section(mock_low_high_config):
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, "env_vars.yaml"), "w") as f:
+    with open(os.path.join(low_path, "env_vars.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 env_vars:
@@ -129,7 +129,7 @@ env_vars:
 """
         )
 
-    with open(os.path.join(high_path, "env_vars.yaml"), "w") as f:
+    with open(os.path.join(high_path, "env_vars.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 env_vars:
@@ -158,7 +158,7 @@ def test_merged_software_section(mock_low_high_config, section_key):
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, f"{section_key}.yaml"), "w") as f:
+    with open(os.path.join(low_path, f"{section_key}.yaml"), "w", encoding="utf-8") as f:
         f.write(
             f"""\
 {section_key}:
@@ -168,7 +168,7 @@ def test_merged_software_section(mock_low_high_config, section_key):
 """
         )
 
-    with open(os.path.join(high_path, f"{section_key}.yaml"), "w") as f:
+    with open(os.path.join(high_path, f"{section_key}.yaml"), "w", encoding="utf-8") as f:
         f.write(
             f"""\
 {section_key}:
@@ -198,7 +198,7 @@ def test_merged_success_criteria_section(mock_low_high_config):
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, "success_criteria.yaml"), "w") as f:
+    with open(os.path.join(low_path, "success_criteria.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 success_criteria:
@@ -209,7 +209,7 @@ success_criteria:
 """
         )
 
-    with open(os.path.join(high_path, "success_criteria.yaml"), "w") as f:
+    with open(os.path.join(high_path, "success_criteria.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 success_criteria:
@@ -241,7 +241,7 @@ def test_merged_applications_section(mock_low_high_config):
     fs.mkdirp(low_path)
     fs.mkdirp(high_path)
 
-    with open(os.path.join(low_path, "applications.yaml"), "w") as f:
+    with open(os.path.join(low_path, "applications.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 applications:
@@ -255,7 +255,7 @@ applications:
 """
         )
 
-    with open(os.path.join(high_path, "applications.yaml"), "w") as f:
+    with open(os.path.join(high_path, "applications.yaml"), "w", encoding="utf-8") as f:
         f.write(
             """\
 applications:
@@ -495,7 +495,7 @@ def test_config_add_from_file(mutable_empty_config, tmpdir):
 """
 
     file = str(tmpdir.join("my_conf.yaml"))
-    with open(file, "w") as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(contents)
     config("add", "-f", file)
     output = config("get", "config")
@@ -515,7 +515,7 @@ def test_config_add_from_file_multiple(mutable_empty_config, tmpdir):
 """
 
     file = str(tmpdir.join("my_conf.yaml"))
-    with open(file, "w") as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(contents)
     config("add", "-f", file)
     output = config("get", "config")
@@ -536,7 +536,7 @@ def test_config_add_override_from_file(mutable_empty_config, tmpdir):
 """
 
     file = str(tmpdir.join("my_conf.yaml"))
-    with open(file, "w") as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(contents)
     config("add", "-f", file)
     output = config("get", "config")
@@ -556,7 +556,7 @@ def test_config_add_override_leaf_from_file(mutable_empty_config, tmpdir):
 """
 
     file = str(tmpdir.join("my_conf.yaml"))
-    with open(file, "w") as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(contents)
     config("add", "-f", file)
     output = config("get", "config")
@@ -578,7 +578,7 @@ def test_config_add_invalid_file_fails(tmpdir):
 
     # create temp file and add it to config
     file = str(tmpdir.join("my_conf.yaml"))
-    with open(file, "w") as f:
+    with open(file, "w", encoding="utf-8") as f:
         f.write(contents)
 
     with pytest.raises(ramble.config.ConfigFormatError):
@@ -687,7 +687,7 @@ ramble:  # comment
                 n_nodes: '1'
                 processes_per_node: '1'
 """
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(contents)
 
     with workspace:
@@ -727,7 +727,7 @@ ramble:  # comment
                 n_nodes: '1'
                 processes_per_node: '1'
 """
-    with open(filepath, "w") as f:
+    with open(filepath, "w", encoding="utf-8") as f:
         f.write(contents)
 
     with workspace:

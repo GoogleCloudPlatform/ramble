@@ -52,14 +52,16 @@ ramble:
     config_path = os.path.join(
         ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
     )
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
     ws._re_read()
     workspace("setup", "--dry-run", global_args=["-D", ws.root])
     run_dir = os.path.join(
         ws.experiment_dir, "hostname", "parallel", "test-impi"
     )
-    with open(os.path.join(run_dir, "execute_experiment")) as f:
+    with open(
+        os.path.join(run_dir, "execute_experiment"), encoding="utf-8"
+    ) as f:
         content = f.read()
         assert 'export DARSHAN_LOG_DIR_PATH="darshan-log-dir"' in content
         assert (
@@ -72,7 +74,9 @@ ramble:
     run_dir2 = os.path.join(
         ws.experiment_dir, "hostname", "parallel", "test-ompi"
     )
-    with open(os.path.join(run_dir2, "execute_experiment")) as f:
+    with open(
+        os.path.join(run_dir2, "execute_experiment"), encoding="utf-8"
+    ) as f:
         content = f.read()
         assert (
             '_EXTRA_DARSHAN_MOD_MPI_COMMAND="-x LD_PRELOAD fake-darshan-rt/lib/libdarshan.so"'

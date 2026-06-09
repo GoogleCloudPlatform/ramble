@@ -210,7 +210,7 @@ def verify(args):
         path = os.path.join(args.root, relpath)
         if not os.path.exists(path):
             continue
-        with open(path) as f:
+        with open(path, encoding="utf-8") as f:
             lines = list(f)[:license_lines]
 
         error = _check_license(lines, path)
@@ -227,20 +227,20 @@ def update_copyright_year(args):
     """update copyright header for the current year (utc-based) in all licensed files"""
     patt = re.compile(r"Copyright \d{4}-\d{4}")
     for filename in _licensed_files():
-        with open(filename) as lic_f:
+        with open(filename, encoding="utf-8") as lic_f:
             lines = lic_f.readlines()
             for i, license_line in enumerate(lines[:license_lines]):
                 if patt.search(license_line):
                     lines[i] = patt.sub(strict_copyright_date, license_line)
                     break
-        with open(filename, "w") as lic_f:
+        with open(filename, "w", encoding="utf-8") as lic_f:
             lic_f.writelines(lines)
 
     def replace_text(file, regex, new_text):
-        with open(file) as f:
+        with open(file, encoding="utf-8") as f:
             content = f.read()
             content = re.sub(regex, new_text, content)
-        with open(file, "w") as f:
+        with open(file, "w", encoding="utf-8") as f:
             f.write(content)
 
     # Update also the licenses and sphinx config file

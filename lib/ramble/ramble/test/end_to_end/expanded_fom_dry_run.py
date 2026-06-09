@@ -49,11 +49,11 @@ ramble:
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+", encoding="utf-8") as f:
             f.write("{command}")
 
         ws1._re_read()
@@ -68,7 +68,7 @@ ramble:
         fom_out_file = os.path.join(exp_dir, "single_exp.out")
 
         unit = "seconds"
-        with open(fom_out_file, "w+") as f:
+        with open(fom_out_file, "w+", encoding="utf-8") as f:
             for expected in expected_expansions:
                 f.write(f"Collect FOM {expected} = 567.8 {unit}\n")
 
@@ -77,7 +77,7 @@ ramble:
         print(output)
 
         text_results_files = glob.glob(os.path.join(ws1.results_dir, "results*.txt"))
-        with open(text_results_files[0]) as f:
+        with open(text_results_files[0], encoding="utf-8") as f:
             data = f.read()
             assert "Status = SUCCESS" in data
             for expected in expected_expansions:

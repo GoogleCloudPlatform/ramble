@@ -68,7 +68,7 @@ ramble:
 
         config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws1._re_read()
@@ -76,13 +76,13 @@ ramble:
         workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
         software_path = os.path.join(ws1.software_dir, "spack", "wrfv4", "spack.yaml")
-        with open(software_path) as f:
+        with open(software_path, encoding="utf-8") as f:
             assert "intel-oneapi-vtune" in f.read()
 
         execute_script = os.path.join(
             ws1.experiment_dir, "wrfv4", "CONUS_12km", "modifier_test", "execute_experiment"
         )
-        with open(execute_script) as f:
+        with open(execute_script, encoding="utf-8") as f:
             data = f.read()
             assert "aps -c mpi" in data
             assert "aps-report" in data

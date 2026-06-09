@@ -41,7 +41,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
 
         ws1._re_read()
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
             # Check that wrf has a package, and the package is in an environment
             assert "pkg_spec: wrf" in content
@@ -68,7 +68,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
             global_args=["-w", workspace_name],
         )
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
             assert "gcc@14.3.0" in content
 
@@ -104,7 +104,7 @@ def test_manage_software(mutable_config, mutable_mock_workspace_path, workspace_
             global_args=["-w", workspace_name],
         )
 
-        with open(config_path) as f:
+        with open(config_path, encoding="utf-8") as f:
             content = f.read()
 
             # Check that new env definitions are found

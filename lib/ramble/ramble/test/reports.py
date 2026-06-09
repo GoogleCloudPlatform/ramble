@@ -393,7 +393,7 @@ def test_multiline_plot(mutable_mock_workspace_path, mutable_config, tmpdir_fact
 
     test_exp_results = {"experiments": all_experiments}
 
-    with open(results_file, "w+") as f:
+    with open(results_file, "w+", encoding="utf-8") as f:
         sjson.dump(test_exp_results, f)
 
     with ramble.config.override("config:report_dirs", results_dir_path):
@@ -420,7 +420,7 @@ def test_multiline_plot(mutable_mock_workspace_path, mutable_config, tmpdir_fact
     inventory_path = os.path.join(out_path, "inventory.yaml")
     assert os.path.isfile(inventory_path)
 
-    with open(inventory_path) as f:
+    with open(inventory_path, encoding="utf-8") as f:
         inventory = syaml.load(f)
 
     for file in inventory["files"]:
@@ -557,7 +557,7 @@ def test_index_printing(mutable_mock_workspace_path, tmpdir_factory, format):
     results_dir_path = tmpdir_factory.mktemp("unit_test")
     results_file = os.path.join(results_dir_path, f"results.{format}")
 
-    with open(results_file, "w+") as f:
+    with open(results_file, "w+", encoding="utf-8") as f:
         if format == "json":
             sjson.dump(test_exp_results, f)
         elif format == "yaml":

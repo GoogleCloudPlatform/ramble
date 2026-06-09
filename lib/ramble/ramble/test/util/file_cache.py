@@ -31,7 +31,7 @@ def test_init(tmpdir):
 def test_destroy(cache):
     """Test that destroy removes all cache contents."""
     test_file = cache.cache_path("test_file")
-    with open(test_file, "w") as f:
+    with open(test_file, "w", encoding="utf-8") as f:
         f.write("test")
     test_dir = os.path.join(cache.root, "test_dir")
     os.makedirs(test_dir)
@@ -67,7 +67,7 @@ def test_init_entry_existing_file(cache):
     """Test init_entry for an existing file."""
     key = "existing_key"
     path = cache.cache_path(key)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("data")
 
     assert cache.init_entry(key)
@@ -94,7 +94,7 @@ def test_init_entry_is_dir_error(cache):
 def test_init_entry_file_no_access(cache, monkeypatch):
     key = "no_access_file"
     path = cache.cache_path(key)
-    with open(path, "w") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write("data")
 
     orig_access = os.access
@@ -140,7 +140,7 @@ def test_write_and_read_transaction(cache):
 
     path = cache.cache_path(key)
     assert os.path.exists(path)
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         assert f.read() == content
 
     with cache.read_transaction(key) as cache_file:

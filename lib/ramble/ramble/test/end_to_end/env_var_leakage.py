@@ -57,7 +57,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
 
@@ -69,10 +69,10 @@ ramble:
         exp2_dir = os.path.join(experiment_root, "nccl-tests", "all-reduce", "test")
         exp2_script = os.path.join(exp2_dir, "execute_experiment")
 
-        with open(exp1_script) as f:
+        with open(exp1_script, encoding="utf-8") as f:
             content = f.read()
             assert "HPL_" in content
 
-        with open(exp2_script) as f:
+        with open(exp2_script, encoding="utf-8") as f:
             content = f.read()
             assert "HPL_" not in content

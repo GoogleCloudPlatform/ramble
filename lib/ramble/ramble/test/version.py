@@ -79,7 +79,7 @@ def test_application_version_variant_when(workspace_name, version, expected_zlib
 
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             for zlib_name, zlib_version in zlib_versions:
@@ -121,7 +121,7 @@ def test_strict_versions_config(workspace_name, capsys):
 
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "versions@0.1" in data
 
@@ -152,7 +152,7 @@ def test_strict_versions_directive(workspace_name):
 
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "versions-strict-disabled@0.1" in data
 
@@ -203,7 +203,7 @@ def test_versions_inherited_from_base_app(workspace_name):
 
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "versions@0.8" in data
             assert "versions@1.0" in data
@@ -234,7 +234,7 @@ def test_non_pep440_version_number(workspace_name):
 
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "versions-nonstandard@1_01" in data
             assert "zlib@1.2.14" in data
@@ -288,7 +288,7 @@ def test_non_pep440_application_version_variant_when(workspace_name, version, ex
 
         workspace("concretize", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
 
             for zlib_name, zlib_version in zlib_versions:
@@ -333,7 +333,7 @@ def test_version_variable_expansion_info(workspace_name):
         assert "versions@2.0a1.test_wl.generated" in output
 
         # Verify expansion in the ramble.yaml file
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             config_content = f.read()
             assert "versions@{version}" in config_content
             assert "val_{version}" in config_content
@@ -457,7 +457,7 @@ def test_multi_modifier_versions(workspace_name):
         )
 
         exec_tpl = os.path.join(ws.config_dir, "execute_experiment.tpl")
-        with open(exec_tpl, "a+") as f:
+        with open(exec_tpl, "a+", encoding="utf-8") as f:
             f.write("versions-mod version: {modifier::versions-mod::version}\n")
             f.write("info version: {modifier::info::version}\n")
 
@@ -467,7 +467,7 @@ def test_multi_modifier_versions(workspace_name):
             ws.experiment_dir, "versions@0.9", "test_wl", "generated", "execute_experiment"
         )
 
-        with open(exec_script) as f:
+        with open(exec_script, encoding="utf-8") as f:
             data = f.read()
             assert "versions-mod version: 1.0" in data
             assert "info version: 2.0" in data

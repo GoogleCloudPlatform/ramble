@@ -62,14 +62,14 @@ def test_modifier_repeat_env_var(
 
         template_path = os.path.join(ws.config_dir, "test.tpl")
 
-        with open(template_path, "w+") as f:
+        with open(template_path, "w+", encoding="utf-8") as f:
             f.write("{command}\n{modeless_variable}")
 
         workspace("setup", "--dry-run", global_args=global_args)
 
         rendered_path = os.path.join(ws.experiment_dir, "basic", "test_wl", "generated", "test")
 
-        with open(rendered_path) as f:
+        with open(rendered_path, encoding="utf-8") as f:
             data = f.read()
             assert "MODELESS_ENV_VAR" in data
             assert "is_defined" not in data

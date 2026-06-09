@@ -98,7 +98,7 @@ ramble:
         assert os.path.isdir(exp_dir)
         assert os.path.exists(os.path.join(exp_dir, "execute_experiment"))
 
-        with open(os.path.join(exp_dir, "execute_experiment")) as f:
+        with open(os.path.join(exp_dir, "execute_experiment"), encoding="utf-8") as f:
             data = f.read()
             # Test the license exists
             assert f"export {var_name2}{i}={var_val}" in data

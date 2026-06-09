@@ -162,7 +162,7 @@ def import_results_file(filename):
     logger.debug("File to import:")
     logger.debug(filename)
 
-    with open(filename) as imported_file:
+    with open(filename, encoding="utf-8") as imported_file:
         logger.msg(f"Importing results file: {filename}")
 
         ext = os.path.splitext(filename)[1]

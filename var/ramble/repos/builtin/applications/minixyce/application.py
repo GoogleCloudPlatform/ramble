@@ -232,7 +232,7 @@ class Minixyce(ExecutableApplication):
 
         settings = ["t_start", "t_step", "t_stop", "tol", "k"]
 
-        with open(input_path, "w+") as f:
+        with open(input_path, "w+", encoding="utf-8") as f:
             for setting in settings:
                 f.write(
                     setting
@@ -256,12 +256,12 @@ class Minixyce(ExecutableApplication):
 
         if os.path.isfile(output_file):
             names = []
-            with open(output_file) as f:
+            with open(output_file, encoding="utf-8") as f:
                 names = f.readline().split()
                 for line in f.readlines()[-1:]:
                     values = line.split()
 
-            with open(processed_output_path, "w+") as f:
+            with open(processed_output_path, "w+", encoding="utf-8") as f:
                 for i, (name, value) in enumerate(
                     zip(names[1:-2], values[1:-2])
                 ):

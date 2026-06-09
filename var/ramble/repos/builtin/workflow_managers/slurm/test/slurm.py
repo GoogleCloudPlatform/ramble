@@ -43,7 +43,7 @@ ramble:
         config_path = os.path.join(
             ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
         )
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
@@ -60,7 +60,7 @@ ramble:
         assert "batch_query" in files
         assert "batch_cancel" in files
         assert "batch_wait" in files
-        with open(os.path.join(path, "batch_submit")) as f:
+        with open(os.path.join(path, "batch_submit"), encoding="utf-8") as f:
             content = f.read()
             assert "slurm_experiment_sbatch" in content
             assert "execute_experiment" not in content
@@ -108,14 +108,14 @@ ramble:
         config_path = os.path.join(
             ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
         )
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
         # Assert on the all_experiments script
         all_exec_file = os.path.join(ws.root, "all_experiments")
-        with open(all_exec_file) as f:
+        with open(all_exec_file, encoding="utf-8") as f:
             content = f.read()
             batch_submit_path = os.path.join(
                 ws.experiment_dir,
@@ -156,14 +156,16 @@ ramble:
         assert "batch_query" in files
         assert "batch_cancel" in files
         assert "batch_wait" in files
-        with open(os.path.join(path, "batch_submit")) as f:
+        with open(os.path.join(path, "batch_submit"), encoding="utf-8") as f:
             content = f.read()
             # Assert the user-defined `batch_submit` is included
             assert "slurm_experiment_sbatch" not in content
             assert "execute_experiment" in content
             assert ".slurm_job" in content
             assert "sbatch" in content
-        with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
+        with open(
+            os.path.join(path, "slurm_experiment_sbatch"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "scontrol show hostnames" in content
             assert "scontrol show config" in content
@@ -174,10 +176,10 @@ ramble:
             assert "#SBATCH --gpus-per-task=1" in content
             assert "#SBATCH -p" not in content
             assert "#SBATCH --time" not in content
-        with open(os.path.join(path, "batch_query")) as f:
+        with open(os.path.join(path, "batch_query"), encoding="utf-8") as f:
             content = f.read()
             assert "squeue" in content
-        with open(os.path.join(path, "batch_cancel")) as f:
+        with open(os.path.join(path, "batch_cancel"), encoding="utf-8") as f:
             content = f.read()
             assert "scancel" in content
 
@@ -185,7 +187,9 @@ ramble:
         path = os.path.join(
             ws.experiment_dir, "hostname", "local", "test_slurm_2"
         )
-        with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
+        with open(
+            os.path.join(path, "slurm_experiment_sbatch"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert "#SBATCH -p h3" in content
             # Assert on the de-duplication of headers
@@ -198,7 +202,9 @@ ramble:
         assert not os.path.exists(
             os.path.join(path, "slurm_experiment_sbatch")
         )
-        with open(os.path.join(path, "execute_experiment")) as f:
+        with open(
+            os.path.join(path, "execute_experiment"), encoding="utf-8"
+        ) as f:
             content = f.read()
             # Since it uses the default execute_experiment tpl, no slurm content is present
             assert "#SBATCH" not in content
@@ -227,12 +233,14 @@ ramble:
     config_path = os.path.join(
         ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
     )
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
     ws._re_read()
     workspace("setup", "--dry-run", global_args=["-D", ws.root])
     path = os.path.join(ws.experiment_dir, "hostname", "local", "test_variant")
-    with open(os.path.join(path, "slurm_experiment_sbatch")) as f:
+    with open(
+        os.path.join(path, "slurm_experiment_sbatch"), encoding="utf-8"
+    ) as f:
         content = f.read()
         assert "#SBATCH --ntasks-per-node" not in content
         assert "#SBATCH --exclusive" not in content

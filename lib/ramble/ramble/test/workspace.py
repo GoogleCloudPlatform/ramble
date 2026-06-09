@@ -35,10 +35,10 @@ def test_read_file_content(tmpdir):
     with tmpdir.as_cwd():
         test_workspace = workspace.Workspace(os.getcwd(), True)
         fname = "test.tpl"
-        with open(fname, "w+") as f:
+        with open(fname, "w+", encoding="utf-8") as f:
             f.write("test content read")
         assert test_workspace.read_file_content(fname) == "test content read"
-        with open(fname, "w") as f:
+        with open(fname, "w", encoding="utf-8") as f:
             f.write("test content read modified")
         # The read is cached and does not reflect the latest content
         assert test_workspace.read_file_content(fname) == "test content read"
@@ -55,12 +55,12 @@ def test_all_config_files():
 
         # Create another yaml file
         extra_yaml_path = os.path.join(config_dir, "extra.yaml")
-        with open(extra_yaml_path, "w") as f:
+        with open(extra_yaml_path, "w", encoding="utf-8") as f:
             f.write("key: value")
 
         # Create a non-yaml file
         not_yaml_path = os.path.join(config_dir, "not.txt")
-        with open(not_yaml_path, "w") as f:
+        with open(not_yaml_path, "w", encoding="utf-8") as f:
             f.write("hello")
 
         config_files = workspace.all_config_files(ws_root)

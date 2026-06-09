@@ -33,13 +33,13 @@ def test_verify_with_error(tmpdir):
         # Mimic the bin/
         os.mkdir("bin")
         file_with_lic = tmpdir / "bin" / "ramble"
-        with open(file_with_lic, "w") as f:
+        with open(file_with_lic, "w", encoding="utf-8") as f:
             f.write(wrong_lic_header)
         out = license_cmd("verify", "--root", str(tmpdir), fail_on_error=False)
         assert "the license does not match the expected format" in out
 
         new_header = wrong_lic_header.replace("2020-2023", license.strict_date_range)
-        with open(file_with_lic, "w") as f:
+        with open(file_with_lic, "w", encoding="utf-8") as f:
             f.write(new_header)
         out = license_cmd("verify", "--root", str(tmpdir))
         assert "No license issues found" in out

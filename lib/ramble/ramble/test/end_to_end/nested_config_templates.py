@@ -41,11 +41,11 @@ ramble:
     ws = ramble.workspace.create(workspace_name)
     ws.write()
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
     new_template_path = os.path.join(ws.config_dir, "templates", "test_template.tpl")
     fs.mkdirp(os.path.dirname(new_template_path))
-    with open(new_template_path, "w+") as f:
+    with open(new_template_path, "w+", encoding="utf-8") as f:
         f.write("{templates/test_template}")
     ws._re_read()
 
@@ -53,7 +53,7 @@ ramble:
     run_dir = os.path.join(ws.experiment_dir, "basic/test_wl/test/")
     script_path = os.path.join(run_dir, "templates", "test_template")
     assert os.path.isfile(script_path)
-    with open(script_path) as f:
+    with open(script_path, encoding="utf-8") as f:
         data = f.read()
         assert "basic/test_wl/test/templates/test_template" in data
 

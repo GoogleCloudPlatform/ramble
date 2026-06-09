@@ -134,22 +134,22 @@ compilers:
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
-        with open(license_path, "w+") as f:
+        with open(license_path, "w+", encoding="utf-8") as f:
             f.write(test_licenses)
 
-        with open(compilers_path, "w+") as f:
+        with open(compilers_path, "w+", encoding="utf-8") as f:
             f.write(test_compilers)
 
         for file in aux_software_files:
             file_path = os.path.join(aux_software_path, file)
-            with open(file_path, "w+") as f:
+            with open(file_path, "w+", encoding="utf-8") as f:
                 f.write("")
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+", encoding="utf-8") as f:
             f.write("{command}")
 
         ws1._re_read()
@@ -209,7 +209,7 @@ compilers:
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
 
             license_inc_path = os.path.join(ws1.root, "shared", "licenses", "wrfv4", "license.inc")
-            with open(os.path.join(exp_dir, "full_command")) as f:
+            with open(os.path.join(exp_dir, "full_command"), encoding="utf-8") as f:
                 data = f.read()
                 # Test the license exists
                 assert f". {license_inc_path}" in data
@@ -245,13 +245,13 @@ compilers:
             assert os.path.isdir(os.path.join(ws1.root, "shared", "licenses", "wrfv4"))
             assert os.path.exists(license_inc_path)
 
-            with open(license_inc_path) as f:
+            with open(license_inc_path, encoding="utf-8") as f:
                 data = f.read()
                 # Test the license is added to the include file
                 assert "export WRF_LICENSE=port@server" in data
                 assert 'export WRF_CERTIFICATE_PATH="/fake/lic/path"' in data
 
-            with open(os.path.join(exp_dir, "execute_experiment")) as f:
+            with open(os.path.join(exp_dir, "execute_experiment"), encoding="utf-8") as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -284,7 +284,7 @@ compilers:
                 assert "spack env activate" in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+", encoding="utf-8") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
@@ -292,7 +292,7 @@ compilers:
             # Create files that match archive patterns
             new_file = os.path.join(exp_dir, "rsl.error.base")
 
-            f = open(new_file, "w+")
+            f = open(new_file, "w+", encoding="utf-8")
             f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
@@ -301,7 +301,7 @@ compilers:
         symlink_results_file = os.path.join(ws1.results_dir, "results.latest.txt")
         # Temporarily store some temp data in the "latest" result and check it
         # gets updated
-        with open(tmp_results_file, "w+") as f:
+        with open(tmp_results_file, "w+", encoding="utf-8") as f:
             f.write("Dummy data...")
         os.symlink(tmp_results_file, symlink_results_file)
 
@@ -317,7 +317,7 @@ compilers:
         assert len(yaml_results_files) == 2
 
         for text_result in text_results_files:
-            with open(text_result) as f:
+            with open(text_result, encoding="utf-8") as f:
                 data = f.read()
                 assert "Tags =" in data
                 assert "Average Timestep Time = 33.3 s" in data
@@ -410,19 +410,19 @@ licenses:
         )
         aux_software_files = ["packages.yaml", "my_test.sh"]
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
-        with open(license_path, "w+") as f:
+        with open(license_path, "w+", encoding="utf-8") as f:
             f.write(test_licenses)
 
         for file in aux_software_files:
             file_path = os.path.join(aux_software_path, file)
-            with open(file_path, "w+") as f:
+            with open(file_path, "w+", encoding="utf-8") as f:
                 f.write("")
 
         # Write a command template
-        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+") as f:
+        with open(os.path.join(ws1.config_dir, "full_command.tpl"), "w+", encoding="utf-8") as f:
             f.write("{command}")
 
         ws1._re_read()
@@ -467,7 +467,7 @@ licenses:
             assert os.path.exists(os.path.join(exp_dir, "full_command"))
 
             license_inc_path = os.path.join(ws1.root, "shared", "licenses", "wrfv4", "license.inc")
-            with open(os.path.join(exp_dir, "full_command")) as f:
+            with open(os.path.join(exp_dir, "full_command"), encoding="utf-8") as f:
                 data = f.read()
                 # Test the license exists
                 assert f". {license_inc_path}" in data
@@ -503,12 +503,12 @@ licenses:
             assert os.path.isdir(os.path.join(ws1.root, "shared", "licenses", "wrfv4"))
             assert os.path.exists(license_inc_path)
 
-            with open(license_inc_path) as f:
+            with open(license_inc_path, encoding="utf-8") as f:
                 data = f.read()
                 # Test the license is added to the include file
                 assert "export WRF_LICENSE=port@server" in data
 
-            with open(os.path.join(exp_dir, "execute_experiment")) as f:
+            with open(os.path.join(exp_dir, "execute_experiment"), encoding="utf-8") as f:
                 data = f.read()
 
                 # Test the required environment variables exist
@@ -538,7 +538,7 @@ licenses:
                 assert os.path.join(exp_dir, f"{exp}.out") in data
 
             # Create fake figures of merit.
-            with open(os.path.join(exp_dir, "rsl.out.base"), "w+") as f:
+            with open(os.path.join(exp_dir, "rsl.out.base"), "w+", encoding="utf-8") as f:
                 for i in range(1, 6):
                     f.write(f"Timing for main: time 2019-11-27_00:00:00 on domain 1: {i}{i}.{i}\n")
                 f.write("wrf: SUCCESS COMPLETE WRF\n")
@@ -546,7 +546,7 @@ licenses:
             # Create files that match archive patterns
             new_file = os.path.join(exp_dir, "rsl.error.base")
 
-            f = open(new_file, "w+")
+            f = open(new_file, "w+", encoding="utf-8")
             f.close()
 
         tmp_results_file = os.path.join(ws1.root, "temp.results.txt")
@@ -555,7 +555,7 @@ licenses:
         symlink_results_file = os.path.join(ws1.results_dir, "results.latest.txt")
         # Temporarily store some temp data in the "latest" result and check it
         # gets updated
-        with open(tmp_results_file, "w+") as f:
+        with open(tmp_results_file, "w+", encoding="utf-8") as f:
             f.write("Dummy data...")
         os.symlink(tmp_results_file, symlink_results_file)
 
@@ -571,7 +571,7 @@ licenses:
         assert len(yaml_results_files) == 2
 
         for text_result in text_results_files:
-            with open(text_result) as f:
+            with open(text_result, encoding="utf-8") as f:
                 data = f.read()
                 assert "Tags =" in data
                 assert "Average Timestep Time = 33.3 s" in data

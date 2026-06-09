@@ -124,7 +124,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
 
         ws.dry_run = True
@@ -141,7 +141,7 @@ ramble:
         assert os.path.exists(script)
 
         # Check all chained experiments have the correct arguments
-        with open(script) as f:
+        with open(script, encoding="utf-8") as f:
             parent_script_data = f.read()
 
         for chain_idx in [1, 3, 5]:
@@ -154,5 +154,5 @@ ramble:
             assert os.path.exists(chained_script)
             assert chained_script in parent_script_data
 
-            with open(chained_script) as f:
+            with open(chained_script, encoding="utf-8") as f:
                 assert "mpirun -n 20 -ppn 10" in f.read()

@@ -234,7 +234,7 @@ def rst(args, out):
     # extract cross-refs of the form `_cmd-ramble-<cmd>:` from rst files
     documented_commands = set()
     for filename in args.rst_files:
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             for line in f:
                 match = re.match(r"\.\. _cmd-(ramble-.*):", line)
                 if match:
@@ -274,7 +274,7 @@ def prepend_header(args, out):
     if not args.header:
         return
 
-    with open(args.header) as header:
+    with open(args.header, encoding="utf-8") as header:
         out.write(header.read())
 
 
@@ -293,7 +293,7 @@ def _commands(parser, args):
     # or the header is newer than the file.
     if args.update:
         logger.msg(f"Generating file: {args.update}")
-        with open(args.update, "w+") as f:
+        with open(args.update, "w+", encoding="utf-8") as f:
             prepend_header(args, f)
             formatter(args, f)
 

@@ -42,7 +42,7 @@ def test_print_aggregated_warnings(logger):
     logger.aggregate_warnings(on=True)
     with patch("ramble.util.logger.tty.warn") as mock_warn:
         logger.warn("This is a global warning")
-        with open("test.log", "w") as f:
+        with open("test.log", "w", encoding="utf-8") as f:
             logger.warn("This is a file warning", stream=f)
 
         logger.all_warnings()

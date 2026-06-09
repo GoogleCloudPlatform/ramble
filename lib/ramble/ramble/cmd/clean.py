@@ -107,7 +107,7 @@ def remove_reports_files():
             inventory_file = os.path.join(root, ramble.reports.INVENTORY_FILENAME)
 
             try:
-                with open(inventory_file) as f:
+                with open(inventory_file, encoding="utf-8") as f:
                     inventory = syaml.load(f)
             except FileNotFoundError:
                 continue

@@ -122,7 +122,7 @@ def test_on_executor_in_run_dir(workspace_name):
 
     # Now set up the executor template
     tpl_path = os.path.join(ws.config_dir, "my_exit.tpl")
-    with open(tpl_path, "w") as f:
+    with open(tpl_path, "w", encoding="utf-8") as f:
         f.write("#!/bin/bash\n\nexit {my_var}")
     ws._re_read()
     workspace("setup", global_args=global_args)

@@ -51,11 +51,11 @@ class MockSpackRunner:
 
         # write dummy spack.yaml and spack.lock
         spack_yaml = os.path.join(self.env_path, "spack.yaml")
-        with open(spack_yaml, "w") as f:
+        with open(spack_yaml, "w", encoding="utf-8") as f:
             f.write("specs:\n  - zlib\n")
 
         spack_lock = os.path.join(self.env_path, "spack.lock")
-        with open(spack_lock, "w") as f:
+        with open(spack_lock, "w", encoding="utf-8") as f:
             f.write('{"roots": [{"spec":"zlib"}]}')
 
         self.concretized = True

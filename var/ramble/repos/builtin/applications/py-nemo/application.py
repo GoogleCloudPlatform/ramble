@@ -370,5 +370,5 @@ class PyNemo(BasePyNemo):
             "${data_dir}",
             self.expander.expand_var("{workload_input_dir}/data"),
         )
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(config_str)

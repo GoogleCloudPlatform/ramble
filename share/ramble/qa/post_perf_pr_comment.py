@@ -167,7 +167,7 @@ def main():
         print(f"Metrics file {args.metrics_file} not found.")
         sys.exit(0)
         
-    with open(args.metrics_file, "r") as f:
+    with open(args.metrics_file, "r", encoding="utf-8") as f:
         metrics = json.load(f)
 
     if not metrics:

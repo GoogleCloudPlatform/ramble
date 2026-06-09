@@ -40,7 +40,7 @@ def test_repeated_variable_modifications(
         )
         assert os.path.exists(rendered_template)
 
-        with open(rendered_template) as f:
+        with open(rendered_template, encoding="utf-8") as f:
             data = f.read()
             assert "prefix_mpi_command" in data
             assert "suffix_mpi_command" in data

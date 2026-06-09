@@ -424,7 +424,7 @@ class Fio(ExecutableApplication):
             workspace,
         )
 
-        with open(jobfile_path, "w+") as f:
+        with open(jobfile_path, "w+", encoding="utf-8") as f:
             f.write(
                 "[" + self.expander.expand_var_name("experiment_name") + "]\n"
             )
@@ -485,7 +485,7 @@ class Fio(ExecutableApplication):
 
         formatted_metrics = []
 
-        with open(fio_outfile) as f:
+        with open(fio_outfile, encoding="utf-8") as f:
             file = ""
             # ignore client/server output headers that begin with <server-hostname>
             for line in f:
@@ -564,6 +564,8 @@ class Fio(ExecutableApplication):
                 app_inst.expander.experiment_run_dir, "metrics.out"
             )
 
-            with open(metrics_outfile_path, "w") as metrics_out:
+            with open(
+                metrics_outfile_path, "w", encoding="utf-8"
+            ) as metrics_out:
                 for line in formatted_metrics:
                     metrics_out.write(line + "\n")

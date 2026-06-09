@@ -269,7 +269,7 @@ class ConfigScope:
 
         try:
             mkdirp(self.path)
-            with open(filename, "w") as f:
+            with open(filename, "w", encoding="utf-8") as f:
                 syaml.dump_config(data, stream=f, default_flow_style=False)
         except (yaml.YAMLError, OSError) as e:
             raise ConfigFileError("Error writing to config file") from e
@@ -397,7 +397,7 @@ class SingleFileScope(ConfigScope):
             mkdirp(parent)
 
             tmp = os.path.join(parent, f".{os.path.basename(self.path)}.tmp")
-            with open(tmp, "w") as f:
+            with open(tmp, "w", encoding="utf-8") as f:
                 syaml.dump_config(data_to_write, stream=f, default_flow_style=False)
             rename(tmp, self.path)
 
@@ -1084,7 +1084,7 @@ def read_config_file(filename, schema=None):
 
     try:
         logger.debug(f"Reading config file {filename}")
-        with open(filename) as f:
+        with open(filename, encoding="utf-8") as f:
             data = load_config(f)
 
         if data:
@@ -1410,7 +1410,7 @@ class ConfigFormatError(ConfigError):
             location = f"{filename}"
         if line is not None:
             location += f":{line}"
-            with open(filename) as file:
+            with open(filename, encoding="utf-8") as file:
                 lines = file.readlines()
                 location += f"\n{lines[mark.line]}"
 

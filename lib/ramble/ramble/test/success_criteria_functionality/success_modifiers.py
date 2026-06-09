@@ -66,12 +66,12 @@ def test_success_modifier(
         result_path = os.path.join(
             ws.experiment_dir, "basic", "test_wl", "test_exp", "test_exp.out"
         )
-        with open(result_path, "w+") as f:
+        with open(result_path, "w+", encoding="utf-8") as f:
             f.write(value)
 
         workspace("analyze", global_args=["-w", workspace_name])
 
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             data = f.read()
             assert result in data
 
@@ -106,7 +106,7 @@ ramble:
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -114,16 +114,16 @@ ramble:
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
     exp1_out = os.path.join(ws.experiment_dir, "basic", "working_wl", "test1", "test1.out")
-    with open(exp1_out, "w+") as f:
+    with open(exp1_out, "w+", encoding="utf-8") as f:
         f.write("0.25 seconds\nExperiment status: SUCCESS\n")
     exp2_out = os.path.join(ws.experiment_dir, "basic", "working_wl", "test2", "test2.out")
-    with open(exp2_out, "w+") as f:
+    with open(exp2_out, "w+", encoding="utf-8") as f:
         f.write("0.35 seconds\nExperiment status: SUCCESS\n")
 
     workspace("analyze", global_args=["-w", workspace_name])
     result_file = os.path.join(ws.results_dir, "results.latest.txt")
 
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         content = f.read()
         assert "FAILED" not in content
         assert "default (null) context figures of merit" in content

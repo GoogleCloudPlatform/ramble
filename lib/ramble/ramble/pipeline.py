@@ -96,7 +96,7 @@ class Pipeline:
         files_exist = os.path.exists(workspace_inventory) and os.path.exists(workspace_hash_file)
 
         if not self.force_inventory and files_exist:
-            with open(workspace_inventory) as f:
+            with open(workspace_inventory, encoding="utf-8") as f:
                 self.workspace.hash_inventory = sjson.load(f)
 
             self.workspace.workspace_hash = ramble.util.hashing.hash_json(
@@ -117,11 +117,17 @@ class Pipeline:
                 self.workspace.hash_inventory
             )
             with open(
-                os.path.join(self.workspace.root, self.workspace.inventory_file_name), "w+"
+                os.path.join(self.workspace.root, self.workspace.inventory_file_name),
+                "w+",
+                encoding="utf-8",
             ) as f:
                 sjson.dump(self.workspace.hash_inventory, f)
 
-            with open(os.path.join(self.workspace.root, self.workspace.hash_file_name), "w+") as f:
+            with open(
+                os.path.join(self.workspace.root, self.workspace.hash_file_name),
+                "w+",
+                encoding="utf-8",
+            ) as f:
                 f.write(self.workspace.workspace_hash + "\n")
 
             self.workspace.update_metadata("workspace_digest", self.workspace.workspace_hash)
@@ -783,7 +789,7 @@ class PushDeploymentPipeline(Pipeline):
                 file.replace(self.workspace.named_deployment + os.path.sep, "")
             )
         index_file = os.path.join(self.workspace.named_deployment, self.index_filename)
-        with open(index_file, "w+") as f:
+        with open(index_file, "w+", encoding="utf-8") as f:
             f.write(sjson.dump(deployment_index))
 
         tar_path = os.path.join(

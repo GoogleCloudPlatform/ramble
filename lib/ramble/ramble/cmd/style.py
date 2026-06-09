@@ -374,11 +374,11 @@ def filter_file(source, dest, output=False):
     if not os.path.isfile(source):
         return
 
-    with open(source) as infile:
+    with open(source, encoding="utf-8") as infile:
         parent = os.path.dirname(dest)
         mkdirp(parent)
 
-        with open(dest, "w") as outfile:
+        with open(dest, "w", encoding="utf-8") as outfile:
             for line in infile:
                 line_errors = []
 

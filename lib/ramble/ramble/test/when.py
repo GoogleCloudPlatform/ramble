@@ -102,12 +102,12 @@ test inheritance 12.0
         workspace("setup", global_args=global_args)
 
         ws._re_read()
-        with open(output_path, "w+") as f:
+        with open(output_path, "w+", encoding="utf-8") as f:
             f.write(test_output)
 
         workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -120,7 +120,7 @@ test inheritance 12.0
         with ramble.config.override("config:overwrite_inventories", True):
             workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -165,12 +165,12 @@ test inheritance 12.0
 
         workspace("setup", global_args=global_args)
 
-        with open(output_path, "w+") as f:
+        with open(output_path, "w+", encoding="utf-8") as f:
             f.write(test_output)
 
         workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -185,7 +185,7 @@ test inheritance 12.0
         with ramble.config.override("config:overwrite_inventories", True):
             workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -230,12 +230,12 @@ test inheritance 12.0
 
         workspace("setup", global_args=global_args)
 
-        with open(output_path, "w+") as f:
+        with open(output_path, "w+", encoding="utf-8") as f:
             f.write(test_output)
 
         workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -290,12 +290,12 @@ test inheritance 12.0
         ws._re_read()
         workspace("setup", global_args=global_args)
 
-        with open(output_path, "w+") as f:
+        with open(output_path, "w+", encoding="utf-8") as f:
             f.write(test_output)
 
         workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -309,7 +309,7 @@ test inheritance 12.0
         with ramble.config.override("config:overwrite_inventories", True):
             workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -356,12 +356,12 @@ test inheritance 12.0
         ws._re_read()
         workspace("setup", global_args=global_args)
 
-        with open(output_path, "w+") as f:
+        with open(output_path, "w+", encoding="utf-8") as f:
             f.write(test_output)
 
         workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" in results
@@ -378,7 +378,7 @@ test inheritance 12.0
 
         assert "Overwriting with new definition from when-directives-inherited" in output
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "test always context" not in results
@@ -576,7 +576,7 @@ def test_formatted_exec_when(workspace_name, inc_value, type_value):
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert test_str in data
@@ -626,7 +626,7 @@ def test_variable_when_workload_constraint(workspace_name, workload_name):
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert test_str in data
@@ -683,7 +683,7 @@ def test_variable_when(workspace_name, inc_value, type_value):
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert test_str in data
@@ -736,7 +736,7 @@ def test_package_manager_variable_when(workspace_name, inc_value, mutable_mock_p
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert test_str in data
@@ -789,7 +789,7 @@ def test_workflow_manager_variable_when(workspace_name, inc_value, mutable_mock_
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert test_str in data
@@ -824,7 +824,7 @@ def test_modifier_variable_when(workspace_name, inc_value, mutable_mock_mods_rep
         )
 
         config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write("modifiers:\n")
             f.write(" - name: when-modifier\n")
 
@@ -846,7 +846,7 @@ def test_modifier_variable_when(workspace_name, inc_value, mutable_mock_mods_rep
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert test_str in data
@@ -888,12 +888,12 @@ test inheritance 12.0
 
         workspace("setup", global_args=global_args)
 
-        with open(output_path, "w+") as f:
+        with open(output_path, "w+", encoding="utf-8") as f:
             f.write(test_output)
 
         workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "FAILED" not in results
@@ -905,7 +905,7 @@ test inheritance 12.0
         with ramble.config.override("config:overwrite_inventories", True):
             workspace("analyze", global_args=global_args)
 
-        with open(results_path) as f:
+        with open(results_path, encoding="utf-8") as f:
             results = f.read()
 
             assert "FAILED" in results
@@ -946,7 +946,7 @@ echo "test template for {experiment_name}"
 
         workspace("setup", global_args=global_args)
 
-        with open(template_src_path, "w+") as f:
+        with open(template_src_path, "w+", encoding="utf-8") as f:
             f.write(test_template)
 
         workspace("setup", global_args=global_args)
@@ -960,7 +960,7 @@ echo "test template for {experiment_name}"
 
         assert os.path.exists(template_dest_path)
 
-        with open(template_dest_path) as f:
+        with open(template_dest_path, encoding="utf-8") as f:
             generated_template = f.read()
 
             assert "test template for generated" in generated_template
@@ -1009,7 +1009,7 @@ def test_register_builtin_when(workspace_name, include_builtin, builtin_found):
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert (test_str in data) == builtin_found
@@ -1064,7 +1064,7 @@ def test_executable_when(workspace_name, exec_variant_on, exec_ver2_found, skipp
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             print(data)
@@ -1145,7 +1145,7 @@ def test_input_when(workspace_name, input_when, expected_input_file):
             "setup.latest.out",
         )
 
-        with open(log_file) as f:
+        with open(log_file, encoding="utf-8") as f:
             data = f.read()
 
             assert expected_input_file in data
@@ -1198,7 +1198,7 @@ def test_workload_definition_when(workspace_name, wl_def_when, expected_exec):
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert exec_test_str[expected_exec] in data
@@ -1252,7 +1252,7 @@ def test_workload_errors_when_not_enabled(workspace_name):
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert "echo '{test_variable}'" in data
@@ -1381,7 +1381,7 @@ def test_workload_group_when(
             "execute_experiment",
         )
 
-        with open(base_wl_exec_file) as f:
+        with open(base_wl_exec_file, encoding="utf-8") as f:
             base_script = f.read()
 
             for cmd in expected_commands[f"{active_variant}_test_wl"]:
@@ -1392,7 +1392,7 @@ def test_workload_group_when(
             for cmd in expected_commands[f"{disabled_variant}_{disabled_workload}"]:
                 assert cmd not in base_script
 
-        with open(active_wl_exec_file) as f:
+        with open(active_wl_exec_file, encoding="utf-8") as f:
             active_script = f.read()
 
             for cmd in expected_commands[f"{active_variant}_{active_workload}"]:
@@ -1439,7 +1439,7 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
             config("add", "variants:app_env_var_included:true", global_args=global_args)
         elif obj == "mod":
             mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-            with open(mod_config_path, "w+") as f:
+            with open(mod_config_path, "w+", encoding="utf-8") as f:
                 f.write("modifiers:\n")
                 f.write(" - name: when-modifier\n")
             config("add", "variants:mod_env_var_included:true", global_args=global_args)
@@ -1469,7 +1469,7 @@ def test_obj_env_var_when(workspace_name, obj, mutable_mock_wms_repo, mutable_mo
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             for obj_under_test, test_str in exec_test_str.items():
@@ -1507,7 +1507,7 @@ def test_env_var_modification_when(workspace_name, env_var_mod_when, expected_ex
         )
 
         mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-        with open(mod_config_path, "w+") as f:
+        with open(mod_config_path, "w+", encoding="utf-8") as f:
             f.write("modifiers:\n")
             f.write(" - name: when-modifier\n")
 
@@ -1528,7 +1528,7 @@ def test_env_var_modification_when(workspace_name, env_var_mod_when, expected_ex
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert (exec_test_str in data) == expected_exec
@@ -1565,7 +1565,7 @@ def test_executable_modification_when(workspace_name, exec_mod_when, expected_ex
         )
 
         mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-        with open(mod_config_path, "w+") as f:
+        with open(mod_config_path, "w+", encoding="utf-8") as f:
             f.write("modifiers:\n")
             f.write(" - name: when-modifier\n")
 
@@ -1586,7 +1586,7 @@ def test_executable_modification_when(workspace_name, exec_mod_when, expected_ex
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert (exec_test_str in data) == expected_exec
@@ -1626,7 +1626,7 @@ def test_variable_modification_when(workspace_name, var_mod_when, modifier_mode,
         )
 
         mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-        with open(mod_config_path, "w+") as f:
+        with open(mod_config_path, "w+", encoding="utf-8") as f:
             f.write("modifiers:\n")
             f.write(" - name: when-modifier\n")
             f.write(f"   mode: {modifier_mode}\n")
@@ -1648,7 +1648,7 @@ def test_variable_modification_when(workspace_name, var_mod_when, modifier_mode,
             "execute_experiment",
         )
 
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
 
             assert (exec_original_str in data) != expected_exec
@@ -1680,7 +1680,7 @@ def test_package_manager_requirement_when(workspace_name):
         )
 
         mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-        with open(mod_config_path, "w+") as f:
+        with open(mod_config_path, "w+", encoding="utf-8") as f:
             f.write("modifiers:\n")
             f.write(" - name: when-modifier\n")
 
@@ -1728,7 +1728,7 @@ def test_obj_required_var_when(
 
         if obj == "mod":
             mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-            with open(mod_config_path, "w+") as f:
+            with open(mod_config_path, "w+", encoding="utf-8") as f:
                 f.write("modifiers:\n")
                 f.write(" - name: when-modifier\n")
                 f.write("   mode: test")
@@ -1789,7 +1789,7 @@ def test_obj_required_key_when(
 
         if obj == "mod":
             mod_config_path = os.path.join(ws.config_dir, "modifiers.yaml")
-            with open(mod_config_path, "w+") as f:
+            with open(mod_config_path, "w+", encoding="utf-8") as f:
                 f.write("modifiers:\n")
                 f.write(" - name: when-modifier\n")
                 f.write("   mode: test")
@@ -1827,7 +1827,7 @@ def test_obj_required_key_when(
 
         assert os.path.exists(results_file)
 
-        with open(results_file) as f:
+        with open(results_file, encoding="utf-8") as f:
             data = json.load(f)
 
         for exp in data["experiments"]:

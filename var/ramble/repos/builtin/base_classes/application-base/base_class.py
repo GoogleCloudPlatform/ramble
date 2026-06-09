@@ -2496,7 +2496,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                         os.path.join(self.license_path, ".ramble-license")
                     )
                     with lk.WriteTransaction(lock):
-                        with open(self.license_file, "w+") as f:
+                        with open(
+                            self.license_file, "w+", encoding="utf-8"
+                        ) as f:
                             for cmd in env_cmds:
                                 if cmd:
                                     f.write(
@@ -2550,7 +2552,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 fs.mkdirp(os.path.dirname(expand_path))
 
-                with open(expand_path, "w+") as f:
+                with open(expand_path, "w+", encoding="utf-8") as f:
                     f.write(
                         self.expander.expand_var(
                             template_conf["contents"], extra_vars=exec_vars
@@ -2673,7 +2675,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         existing_hash = None
         if os.path.exists(inventory_file) and not force:
-            with open(inventory_file) as f:
+            with open(inventory_file, encoding="utf-8") as f:
                 existing_inventory = spack.util.spack_json.load(f)
             existing_hash = ramble.util.hashing.hash_json(existing_inventory)
 
@@ -2806,7 +2808,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
 
         if changed and writable:
             with lk.WriteTransaction(self.experiment_lock):
-                with open(inventory_file, "w+") as f:
+                with open(inventory_file, "w+", encoding="utf-8") as f:
                     spack.util.spack_json.dump(self.hash_inventory, f)
 
         return changed
@@ -3793,7 +3795,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if os.path.isfile(status_path):
             exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
-                with open(status_path) as f:
+                with open(status_path, encoding="utf-8") as f:
                     status_data = spack.util.spack_json.load(f)
                     self.set_status(
                         ExperimentStatus(
@@ -3852,7 +3854,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         if os.path.exists(exp_dir):
             exp_lock = self.experiment_lock
             with lk.ReadTransaction(exp_lock):
-                with open(status_path, "w+") as f:
+                with open(status_path, "w+", encoding="utf-8") as f:
                     spack.util.spack_json.dump(status_data, f)
 
     register_phase(
@@ -3924,7 +3926,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     repo_root, ramble.repository.unified_config
                 )
                 if not os.path.exists(config_path):
-                    with open(config_path, "w+") as f:
+                    with open(config_path, "w+", encoding="utf-8") as f:
                         f.write("repo:\n")
                         f.write(f"  namespace: {repo_namespace}\n")
 
@@ -4091,7 +4093,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 out_path = tpl_config["dest_path"]
                 perm = tpl_config.get("content_perm", _DEFAULT_CONTENT_PERM)
-                with open(out_path, "w+") as f_out:
+                with open(out_path, "w+", encoding="utf-8") as f_out:
                     f_out.write(rendered)
                     f_out.write("\n")
                 os.chmod(out_path, perm)

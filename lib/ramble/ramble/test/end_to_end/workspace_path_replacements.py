@@ -45,7 +45,7 @@ def test_workspace_dollar_paths(workspace_name):
         global_args=global_args,
     )
 
-    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "a") as f:
+    with open(os.path.join(ws.config_dir, "execute_experiment.tpl"), "a", encoding="utf-8") as f:
         for name in replacement_paths:
             f.write(f"{{test_{name}}}\n")
 
@@ -60,7 +60,7 @@ def test_workspace_dollar_paths(workspace_name):
     exec_path = os.path.join(
         ws.experiment_dir, "hostname", "local", "generated", "execute_experiment"
     )
-    with open(exec_path) as f:
+    with open(exec_path, encoding="utf-8") as f:
         data = f.read()
         for path in replacement_paths.values():
             assert path in data

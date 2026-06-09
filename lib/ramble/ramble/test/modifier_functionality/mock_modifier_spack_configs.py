@@ -55,7 +55,7 @@ def test_gromacs_mock_spack_config_mod(
         spack_yaml = os.path.join(ws1.software_dir, "spack", "gromacs", "spack.yaml")
         assert os.path.isfile(spack_yaml)
 
-        with open(spack_yaml) as f:
+        with open(spack_yaml, encoding="utf-8") as f:
             data = f.read()
 
             assert "debug: true" in data

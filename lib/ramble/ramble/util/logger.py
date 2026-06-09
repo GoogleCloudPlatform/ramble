@@ -54,7 +54,7 @@ class Logger:
         """
         if isinstance(path, str) and self.enabled:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
-            stream = llnl.util.tty.log.Unbuffered(open(path, "a+"))
+            stream = llnl.util.tty.log.Unbuffered(open(path, "a+", encoding="utf-8"))
             self.log_stack.append((path, stream))
 
     def remove_log(self):

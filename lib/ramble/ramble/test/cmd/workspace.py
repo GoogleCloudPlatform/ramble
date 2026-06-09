@@ -299,7 +299,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -360,10 +360,10 @@ config:
     ramble_config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     config_scope_path = os.path.join(ws1.config_dir, "config.yaml")
 
-    with open(ramble_config_path, "w+") as f:
+    with open(ramble_config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
-    with open(config_scope_path, "w+") as f:
+    with open(config_scope_path, "w+", encoding="utf-8") as f:
         f.write(config_file)
 
     ws1._re_read()
@@ -417,7 +417,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -471,7 +471,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -633,7 +633,7 @@ cmake -DTEST=1 -h
 {command}
         """
         tpl_path = os.path.join(tmpdir, "tmp_test.tpl")
-        with open(tpl_path, "w+") as f:
+        with open(tpl_path, "w+", encoding="utf-8") as f:
             f.write(tpl_in)
 
         assert os.path.exists(tpl_path)
@@ -845,7 +845,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -922,7 +922,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -979,7 +979,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1244,7 +1244,7 @@ ramble # Missing colon!
         ws.write()
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-        with open(config_path, "w") as f:
+        with open(config_path, "w", encoding="utf-8") as f:
             f.write(bad_config)
 
         argv = ["-w", workspace_name, "workspace", "edit", "-c", "-p"]
@@ -1283,7 +1283,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1348,7 +1348,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1400,7 +1400,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1451,7 +1451,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1492,7 +1492,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1532,7 +1532,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1573,7 +1573,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -1615,7 +1615,7 @@ ramble:
     def write_config(ws_path, config):
         with ramble.workspace.Workspace(ws_path) as ws:
             config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-            with open(config_path, "w+") as f:
+            with open(config_path, "w+", encoding="utf-8") as f:
                 f.write(config)
             ws._re_read()
 
@@ -1681,10 +1681,10 @@ licenses:
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     lic_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
-    with open(lic_path, "w+") as f:
+    with open(lic_path, "w+", encoding="utf-8") as f:
         f.write(test_licenses)
 
     # Create more templates, and test files to archive
@@ -1692,11 +1692,11 @@ licenses:
     for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
-        f = open(new_template, "w+")
+        f = open(new_template, "w+", encoding="utf-8")
         f.close()
 
         new_archive_file = os.path.join(ws1.root, f"test_pattern.{i}")
-        with open(new_archive_file, "w+") as f:
+        with open(new_archive_file, "w+", encoding="utf-8") as f:
             f.write("Test archive file")
 
     ws1._re_read()
@@ -1715,7 +1715,7 @@ licenses:
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
-        f = open(new_file, "w+")
+        f = open(new_file, "w+", encoding="utf-8")
         f.close()
 
     workspace("archive", "--archive-pattern", "test_pattern*", global_args=["-w", workspace_name])
@@ -1736,7 +1736,7 @@ licenses:
     for i in range(5):
         archived_path = os.path.join(ws1.latest_archive_path, f"test_pattern.{i}")
         assert os.path.isfile(archived_path)
-        with open(archived_path) as f:
+        with open(archived_path, encoding="utf-8") as f:
             assert "Test archive file" in f.read()
 
     assert not os.path.exists(
@@ -1784,10 +1784,10 @@ licenses:
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     lic_path = os.path.join(ws1.config_dir, "licenses.yaml")
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
-    with open(lic_path, "w+") as f:
+    with open(lic_path, "w+", encoding="utf-8") as f:
         f.write(test_licenses)
 
     # Create more templates
@@ -1795,7 +1795,7 @@ licenses:
     for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
-        f = open(new_template, "w+")
+        f = open(new_template, "w+", encoding="utf-8")
         f.close()
 
     ws1._re_read()
@@ -1841,7 +1841,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     # Create more temlates
@@ -1849,7 +1849,7 @@ ramble:
     for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
-        f = open(new_template, "w+")
+        f = open(new_template, "w+", encoding="utf-8")
         f.close()
 
     ws1._re_read()
@@ -1868,7 +1868,7 @@ ramble:
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
-        f = open(new_file, "w+")
+        f = open(new_file, "w+", encoding="utf-8")
         f.close()
 
     workspace("archive", "-t", global_args=["-w", workspace_name])
@@ -1914,7 +1914,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     # Create more templates
@@ -1922,7 +1922,7 @@ ramble:
     for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
-        f = open(new_template, "w+")
+        f = open(new_template, "w+", encoding="utf-8")
         f.close()
 
     ws1._re_read()
@@ -1941,7 +1941,7 @@ ramble:
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
-        f = open(new_file, "w+")
+        f = open(new_file, "w+", encoding="utf-8")
         f.close()
 
     remote_archive_path = os.path.join(ws1.root, "archive_backup")
@@ -1993,7 +1993,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     # Create more templates
@@ -2001,7 +2001,7 @@ ramble:
     for i in range(5):
         new_template = os.path.join(ws1.config_dir, f"test_template.{i}")
         new_templates.append(new_template)
-        f = open(new_template, "w+")
+        f = open(new_template, "w+", encoding="utf-8")
         f.close()
 
     ws1._re_read()
@@ -2020,7 +2020,7 @@ ramble:
         new_file = os.path.join(experiment_dir, new_name)
 
         new_files.append(new_file)
-        f = open(new_file, "w+")
+        f = open(new_file, "w+", encoding="utf-8")
         f.close()
 
     remote_archive_path = os.path.join(ws1.root, "archive_backup")
@@ -2072,7 +2072,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -2120,7 +2120,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -2181,10 +2181,10 @@ ramble:
         % inc_file
     )
 
-    with open(inc_file, "w+") as f:
+    with open(inc_file, "w+", encoding="utf-8") as f:
         f.write(test_include)
 
-    with open(config_file, "w+") as f:
+    with open(config_file, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -2220,10 +2220,10 @@ ramble:
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
     template_path = os.path.join(ws1.config_dir, f"{tpl_name}.tpl")
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
-    with open(template_path, "w+") as f:
+    with open(template_path, "w+", encoding="utf-8") as f:
         f.write("{command}")
 
     err_str = (
@@ -2280,7 +2280,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -2341,7 +2341,7 @@ ramble:
 
     config_path = os.path.join(ws1.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws1._re_read()
@@ -2421,11 +2421,11 @@ software:
     app_config_path = os.path.join(ws1.config_dir, "applications.yaml")
     software_config_path = os.path.join(ws1.config_dir, "software.yaml")
 
-    with open(ws_config_path, "w+") as f:
+    with open(ws_config_path, "w+", encoding="utf-8") as f:
         f.write(test_ws_config)
-    with open(app_config_path, "w+") as f:
+    with open(app_config_path, "w+", encoding="utf-8") as f:
         f.write(test_app_config)
-    with open(software_config_path, "w+") as f:
+    with open(software_config_path, "w+", encoding="utf-8") as f:
         f.write(test_software_config)
 
     ws1._re_read()
@@ -2452,7 +2452,7 @@ software:
 
 
 def write_variables_config_file(file_path, levels, value):
-    with open(file_path, "w+") as f:
+    with open(file_path, "w+", encoding="utf-8") as f:
         f.write("variables:\n")
         for i in range(levels):
             f.write(f"  scope{i}: {value}\n")
@@ -2485,7 +2485,7 @@ def test_workspace_config_precedence(workspace_name, tmpdir):
 
     # 2nd highest precedence, included (in an included path)
     included_path = os.path.join(ws.root, "variables.yaml")
-    with open(ws.config_file_path, "a") as f:
+    with open(ws.config_file_path, "a", encoding="utf-8") as f:
         f.write("  include:\n")
         f.write(f"  - {included_path}\n")
 
@@ -2677,7 +2677,7 @@ def test_workspace_no_empty_workloads(workspace_name):
                 global_args=global_args,
             )
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "basic:" not in data
 
@@ -2695,7 +2695,7 @@ def test_no_inherit_active_workspace_variants(request):
     workspace("create", workspace2_name, global_args=global_args)
 
     with ramble.workspace.read(workspace2_name) as ws2:
-        with open(ws2.config_file_path) as f:
+        with open(ws2.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "spack" not in data
             assert "slurm" not in data
@@ -2734,7 +2734,7 @@ def test_manage_single_modifiers(workspace_name, mod_scope, mod_conf):
 
         assert "Workspace contains 0 modifiers" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" not in data
             assert mod_conf["name"] not in data
@@ -2762,7 +2762,7 @@ def test_manage_single_modifiers(workspace_name, mod_scope, mod_conf):
         if "mode" in mod_conf:
             assert f"Mode: {mod_conf['mode']}" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" in data
             assert f"- name: {mod_conf['name']}" in data
@@ -2777,7 +2777,7 @@ def test_manage_single_modifiers(workspace_name, mod_scope, mod_conf):
 
         assert "Workspace contains 0 modifiers" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" not in data
             assert mod_conf["name"] not in data
@@ -2899,7 +2899,7 @@ def test_manage_modifier_remove_scope_globs(workspace_name):
 
         assert "Workspace contains 0 modifiers" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" not in data
             assert "intel-aps" not in data
@@ -2943,7 +2943,7 @@ def test_manage_modifier_remove_scope_globs(workspace_name):
         assert "Name: intel-aps" in list_output
         assert "Name: intel-vtune" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" in data
             assert "- name: intel-aps" in data
@@ -2957,7 +2957,7 @@ def test_manage_modifier_remove_scope_globs(workspace_name):
 
         assert "Workspace contains 0 modifiers" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" not in data
             assert "intel-aps" not in data
@@ -2989,7 +2989,7 @@ def test_manage_modifier_name_globs(workspace_name):
 
         assert "Workspace contains 0 modifiers" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" not in data
             assert "intel" not in data
@@ -3005,7 +3005,7 @@ def test_manage_modifier_name_globs(workspace_name):
         assert f"Modifier scope: {mod_scope}" in list_output
         assert "Name: intel" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" in data
             assert "- name: intel" in data
@@ -3016,7 +3016,7 @@ def test_manage_modifier_name_globs(workspace_name):
 
         assert "Workspace contains 0 modifiers" in list_output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "modifiers" not in data
             assert "intel" not in data
@@ -3140,10 +3140,10 @@ def test_workspace_config_squash(workspace_name, capsys):
     global_args = ["-w", workspace_name]
 
     with ramble.workspace.create(workspace_name) as ws:
-        with open(f"{os.path.join(ws.root, 'variables.yaml')}", "w+") as f:
+        with open(f"{os.path.join(ws.root, 'variables.yaml')}", "w+", encoding="utf-8") as f:
             f.write(test_vars_include)
 
-        with open(f"{os.path.join(ws.root, 'software.yaml')}", "w+") as f:
+        with open(f"{os.path.join(ws.root, 'software.yaml')}", "w+", encoding="utf-8") as f:
             f.write(test_software_include)
 
         ws.write()
@@ -3222,21 +3222,21 @@ def test_workspace_config_squash(workspace_name, capsys):
         assert "pkg_spec: gcc@9.3.0" in config_output
         assert "test_multiline_str: |-" in config_output
 
-        with open(ws.config_file_path, "w+") as f:
+        with open(ws.config_file_path, "w+", encoding="utf-8") as f:
             f.write(config_output)
 
         ws._re_read()
 
         workspace("config", "--simplify-software", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "pkg_spec: gcc@9.3.0" not in data
             assert "gcc" not in data
 
         workspace("config", "--simplify-variables", global_args=global_args)
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "foo: bar" not in data
             assert "test_var: test_value" not in data
@@ -3264,10 +3264,10 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
     include_root = str(tmpdir)
 
     with ramble.workspace.create(workspace_name) as ws:
-        with open(f"{os.path.join(include_root, 'variables.yaml')}", "w+") as f:
+        with open(f"{os.path.join(include_root, 'variables.yaml')}", "w+", encoding="utf-8") as f:
             f.write(test_vars_include)
 
-        with open(f"{os.path.join(include_root, 'software.yaml')}", "w+") as f:
+        with open(f"{os.path.join(include_root, 'software.yaml')}", "w+", encoding="utf-8") as f:
             f.write(test_software_include)
 
         ws.write()
@@ -3328,7 +3328,7 @@ def test_workspace_config_simplify_includes(workspace_name, tmpdir, capsys):
 
         assert "No changes were made to software configuration sections" in output
 
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "pkg_spec: gcc@9.3.0" not in data
             assert "gcc" not in data

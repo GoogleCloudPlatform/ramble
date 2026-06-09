@@ -1201,7 +1201,7 @@ class Repo:
     def _read_config(self):
         """Check for a YAML config file in this db's root directory."""
         try:
-            with open(self.config_file) as reponame_file:
+            with open(self.config_file, encoding="utf-8") as reponame_file:
                 yaml_data = yaml.safe_load(reponame_file)
 
                 if (
@@ -1498,7 +1498,7 @@ def create_repo(
             fs.mkdirp(objects_path)
 
         config_path = os.path.join(root, config_name)
-        with open(config_path, "w") as config:
+        with open(config_path, "w", encoding="utf-8") as config:
             config.write("repo:\n")
             config.write(f"  namespace: '{namespace}'\n")
             if subdir is not None:

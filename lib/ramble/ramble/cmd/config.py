@@ -146,7 +146,7 @@ def config_get(args):
     elif scope and scope.startswith("workspace:"):
         config_file = ramble.config.config.get_config_filename(scope, section)
         if os.path.exists(config_file):
-            with open(config_file) as f:
+            with open(config_file, encoding="utf-8") as f:
                 print(f.read())
         else:
             logger.die(f"workspace has no {ramble.workspace.CONFIG_FILE_NAME} file")
@@ -324,7 +324,7 @@ def config_update(args) -> None:
     update_fn = ramble.config.ensure_latest_format_fn(args.section)
     for scope in updates:
         cfg_file = ramble.config.config.get_config_filename(scope.name, args.section)
-        with open(cfg_file) as f:
+        with open(cfg_file, encoding="utf-8") as f:
             data = ramble.config.load_config(f) or {}
             data = data.pop(args.section, {})
         update_fn(data)

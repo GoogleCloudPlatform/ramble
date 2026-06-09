@@ -58,7 +58,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
 
     # Test experiment inventory
     assert os.path.isfile(experiment_inventory)
-    with open(experiment_inventory) as f:
+    with open(experiment_inventory, encoding="utf-8") as f:
         data = sjson.load(f)
 
     assert "object_configuration" in data
@@ -122,7 +122,7 @@ def test_experiment_hashes(mutable_config, mutable_mock_workspace_path, workspac
 
     # Test workspace inventory
     assert os.path.isfile(workspace_inventory)
-    with open(workspace_inventory) as f:
+    with open(workspace_inventory, encoding="utf-8") as f:
         data = sjson.load(f)
 
     # Test experiments

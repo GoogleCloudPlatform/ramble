@@ -46,11 +46,11 @@ ramble:
     ws.write()
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     license_path = os.path.join(ws.config_dir, "licenses.yaml")
-    with open(license_path, "w+") as f:
+    with open(license_path, "w+", encoding="utf-8") as f:
         f.write(test_licenses)
 
     ws._re_read()
@@ -58,7 +58,7 @@ ramble:
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
     license_inc_path = os.path.join(ws.root, "shared", "licenses", app_name, "license.inc")
-    with open(license_inc_path) as f:
+    with open(license_inc_path, encoding="utf-8") as f:
         data = f.read()
         # Test the license is added to the include file
         assert expected_val in data

@@ -57,7 +57,7 @@ class TunedAdm(BasicModifier):
             return
 
         profiles = set()
-        with open(read_profile_path) as f:
+        with open(read_profile_path, encoding="utf-8") as f:
 
             for line in f:
                 if "active profile:" in line:
@@ -67,7 +67,7 @@ class TunedAdm(BasicModifier):
         if profiles:
             expected_profile = self.expander.expand_var("{tuned-profile}")
             write_profile_path = os.path.join(run_dir, "all_tuning_profiles")
-            with open(write_profile_path, "w+") as f:
+            with open(write_profile_path, "w+", encoding="utf-8") as f:
                 profiles_str = ",".join(profiles)
                 f.write(f"Applied profiles: {profiles_str}\n")
                 if len(profiles) == 1 and profiles_str == expected_profile:

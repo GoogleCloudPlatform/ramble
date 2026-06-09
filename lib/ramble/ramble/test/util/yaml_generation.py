@@ -33,7 +33,7 @@ def yaml_config(tmpdir_factory):
     test_data["baz"]["baz2"] = "baz"
 
     path = str(tmpdir_factory.mktemp("config.yaml").join("config"))
-    with open(path, "w+") as f:
+    with open(path, "w+", encoding="utf-8") as f:
         yaml.dump(
             test_data,
             default_flow_style=False,

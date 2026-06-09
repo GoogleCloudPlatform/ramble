@@ -45,12 +45,14 @@ ramble:
         config_path = os.path.join(
             ws.config_dir, ramble.workspace.CONFIG_FILE_NAME
         )
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
         run_dir = os.path.join(ws.experiment_dir, "hostname", "local", "test")
-        with open(os.path.join(run_dir, "execute_experiment")) as f:
+        with open(
+            os.path.join(run_dir, "execute_experiment"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert content.count("pdsh -R ssh -w nodeset-[0-1]") == 7
             assert "cat /proc/sys/kernel/randomize_va_space" in content
@@ -61,7 +63,9 @@ ramble:
             assert "grep -i Hugepagesize /proc/meminfo" in content
             assert "grep -i HugePages_Total /proc/meminfo" in content
 
-        with open(os.path.join(run_dir, "tunables.log"), "w+") as f:
+        with open(
+            os.path.join(run_dir, "tunables.log"), "w+", encoding="utf-8"
+        ) as f:
             f.write(
                 """
 nodeset-1: fom:address-space-randomization:2
@@ -75,7 +79,9 @@ nodeset-0: fom:hugepage-size:    2048 kB
 """
             )
         workspace("analyze", global_args=["-w", ws_name])
-        with open(os.path.join(ws.root, "results.latest.txt")) as f:
+        with open(
+            os.path.join(ws.root, "results.latest.txt"), encoding="utf-8"
+        ) as f:
             content = f.read()
             assert (
                 "modifier::tunables::address-space-randomization = 2"

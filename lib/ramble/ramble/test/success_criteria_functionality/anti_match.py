@@ -44,17 +44,17 @@ def test_anti_match_criteria(mutable_config, mutable_mock_workspace_path, mock_a
             ws.experiment_dir, "basic", "test_wl", "test_exp", "test_exp.out"
         )
 
-        with open(result_path, "w") as f:
+        with open(result_path, "w", encoding="utf-8") as f:
             f.write("1.2seconds\n")
         workspace("analyze", global_args=["-w", ws_name])
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             content = f.read()
             assert "Status = SUCCESS" in content
             assert "1.2" in content
 
-        with open(result_path, "a") as f:
+        with open(result_path, "a", encoding="utf-8") as f:
             f.write("Error: invalid result\n")
         workspace("analyze", global_args=["-w", ws_name])
-        with open(os.path.join(ws.results_dir, "results.latest.txt")) as f:
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
             content = f.read()
             assert "Status = FAILED" in content

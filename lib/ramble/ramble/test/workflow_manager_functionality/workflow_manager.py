@@ -39,13 +39,13 @@ ramble:
     with ramble.workspace.create(workspace_name) as ws:
         ws.write()
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
         path = os.path.join(ws.experiment_dir, "hostname", "local", "test_default")
-        with open(os.path.join(path, "execute_experiment")) as f:
+        with open(os.path.join(path, "execute_experiment"), encoding="utf-8") as f:
             content = f.read()
             assert "{workflow_banner}" not in content
             assert (

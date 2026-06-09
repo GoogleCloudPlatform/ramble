@@ -675,7 +675,7 @@ class PlotGenerator:
         self.inventory["files"].append(filename)
 
     def write_inventory(self):
-        with open(self.get_inventory_path(), "w+") as f:
+        with open(self.get_inventory_path(), "w+", encoding="utf-8") as f:
             syaml.dump(self.inventory, stream=f)
 
     def draw(self, perf_measure, scale_var, series, pdf_report, y_label=None):

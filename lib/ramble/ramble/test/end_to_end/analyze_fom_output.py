@@ -48,7 +48,7 @@ ramble:
 
     workspace("setup", "--dry-run", global_args=["-w", ws_name])
     exp_out = os.path.join(ws.experiment_dir, "hostname", "local", "test", "test.out")
-    with open(exp_out, "w+") as f:
+    with open(exp_out, "w+", encoding="utf-8") as f:
         f.write("test-user.c.googlers.com\n")
     return ws, ws_name
 
@@ -59,7 +59,7 @@ def test_analyze_fom_output(make_workspace_from_config):
     workspace("analyze", "-p", global_args=["-w", ws_name])
     result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
 
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         content = f.read()
         assert "default (null) context figures of merit" in content
         assert "possible hostname = test-user.c.googlers.com" in content
@@ -106,7 +106,7 @@ def test_analyze_success_with_no_fom_defined(mock_applications, workspace_name):
     workspace("setup", "--dry-run", global_args=global_args)
     workspace("analyze", global_args=["-w", workspace_name])
     result_file = os.path.join(ws.results_dir, "results.latest.txt")
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         content = f.read()
         assert "Status = SUCCESS" in content
 
@@ -135,7 +135,7 @@ def test_analyze_fail_with_no_fom_detected(mock_applications, workspace_name):
     workspace("setup", "--dry-run", global_args=global_args)
     workspace("analyze", global_args=["-w", workspace_name])
     result_file = os.path.join(ws.results_dir, "results.latest.txt")
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         content = f.read()
         assert "Status = FAILED" in content
 
@@ -208,7 +208,7 @@ ramble:
     workspace("setup", "--dry-run", global_args=workspace_flags)
 
     exp_dir = os.path.join(ws.root, "experiments", "basic", "test_wl", "test")
-    with open(os.path.join(exp_dir, "test.out"), "w+") as f:
+    with open(os.path.join(exp_dir, "test.out"), "w+", encoding="utf-8") as f:
         f.write("12.3 seconds\n")
 
     output = workspace("analyze", "-p", global_args=workspace_flags)
@@ -263,6 +263,6 @@ def test_analyze_garbage_output(make_workspace_from_config):
     workspace("analyze", "-p", global_args=["-w", ws_name])
     result_file = glob.glob(os.path.join(ws.results_dir, "results.latest.txt"))[0]
 
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         content = f.read()
         assert "possible hostname = test-user.c.googlers.com" in content

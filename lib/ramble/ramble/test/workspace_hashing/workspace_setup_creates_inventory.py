@@ -55,7 +55,7 @@ ramble:
 
         config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-        with open(config_path, "w+") as f:
+        with open(config_path, "w+", encoding="utf-8") as f:
             f.write(test_config)
         ws._re_read()
         workspace("setup", "--dry-run", global_args=["-w", workspace_name])
@@ -93,10 +93,10 @@ def test_deterministic_workspace_hash(workspace_name):
         ws._re_read()
         workspace("setup", "--dry-run", global_args=global_args)
         hash_file = os.path.join(ws.root, ramble.workspace.Workspace.hash_file_name)
-        with open(hash_file) as f:
+        with open(hash_file, encoding="utf-8") as f:
             hash = f.read().strip()
         workspace("setup", "--dry-run", global_args=global_args)
-        with open(hash_file) as f:
+        with open(hash_file, encoding="utf-8") as f:
             new_hash = f.read().strip()
 
         assert hash == new_hash

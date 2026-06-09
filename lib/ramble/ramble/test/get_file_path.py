@@ -48,7 +48,7 @@ ramble:
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -56,7 +56,7 @@ ramble:
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
     test_out = os.path.join(ws.log_dir, "setup.latest", "file-open.test_wl.test.out")
-    with open(test_out) as f:
+    with open(test_out, encoding="utf-8") as f:
         content = f.read()
         # When in dry-run, the test mock pretends the file exists
         assert "Config loaded from dry-run/path/to/file-open/my/config.yaml" in content

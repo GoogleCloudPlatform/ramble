@@ -479,7 +479,7 @@ class Openfoam(ExecutableApplication):
         if os.path.isfile(sf_log):
             exec_times = []
             exec_regex = re.compile(self.simple_foam_exec_regex)
-            with open(sf_log) as f:
+            with open(sf_log, encoding="utf-8") as f:
                 for line in f:
                     m = exec_regex.match(line)
                     if m:

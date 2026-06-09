@@ -186,6 +186,7 @@ select = [
     # Enable some useful preview rules
     "B043",   # del-attr-with-constant
     "PLW1510",# subprocess-run-without-check
+    "PLW1514",# unspecified-encoding
     "PIE794", # duplicate-class-field-definition
     "PIE796", # non-unique-enums
     "PT014",  # pytest-duplicate-parametrize-test-cases

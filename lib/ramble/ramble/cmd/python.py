@@ -97,7 +97,7 @@ def ipython_interpreter(args):
     if "PYTHONSTARTUP" in os.environ:
         startup_file = os.environ["PYTHONSTARTUP"]
         if os.path.isfile(startup_file):
-            with open(startup_file) as startup:
+            with open(startup_file, encoding="utf-8") as startup:
                 exec(startup.read())
 
     # IPython can also support running a script OR command, not both
@@ -124,7 +124,7 @@ def python_interpreter(args):
     if "PYTHONSTARTUP" in os.environ:
         startup_file = os.environ["PYTHONSTARTUP"]
         if os.path.isfile(startup_file):
-            with open(startup_file) as startup:
+            with open(startup_file, encoding="utf-8") as startup:
                 console.runsource(startup.read(), startup_file, "exec")
 
     if args.python_command:
@@ -133,7 +133,7 @@ def python_interpreter(args):
     elif args.python_args:
         propagate_exceptions_from(console)
         sys.argv = args.python_args
-        with open(args.python_args[0]) as file:
+        with open(args.python_args[0], encoding="utf-8") as file:
             console.runsource(file.read(), args.python_args[0], "exec")
     else:
         # Provides readline support, allowing user to use arrow keys

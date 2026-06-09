@@ -59,7 +59,7 @@ ramble:
     )
 
     assert os.path.exists(profile_output)
-    with open(profile_output) as f:
+    with open(profile_output, encoding="utf-8") as f:
         content = f.read()
 
     # These assertions try to be compatible with older versions of line-profiler,

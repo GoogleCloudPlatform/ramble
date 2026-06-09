@@ -64,7 +64,7 @@ def test_object_precedence_variables(
         global_args=global_args,
     )
 
-    with open(os.path.join(ws.config_dir, "test.tpl"), "w+") as f:
+    with open(os.path.join(ws.config_dir, "test.tpl"), "w+", encoding="utf-8") as f:
         f.write("{object_precedence_var}")
 
     variants_file = os.path.join(ws.config_dir, "variants.yaml")
@@ -72,10 +72,10 @@ def test_object_precedence_variables(
 
     workspace("setup", "--dry-run", global_args=global_args)
 
-    with open(test_file) as f:
+    with open(test_file, encoding="utf-8") as f:
         assert disabled_value in f.read()
 
-    with open(variants_file, "w+") as f:
+    with open(variants_file, "w+", encoding="utf-8") as f:
         f.write(
             """variants:
   set_precedence_var: True"""
@@ -83,7 +83,7 @@ def test_object_precedence_variables(
 
     workspace("setup", "--dry-run", global_args=global_args)
 
-    with open(test_file) as f:
+    with open(test_file, encoding="utf-8") as f:
         assert enabled_value in f.read()
 
 
@@ -118,7 +118,7 @@ def test_object_precedence_ordering(
         ws.experiment_dir, "basic", "test_wl2", "generated", "slurm_experiment_sbatch"
     )
     assert os.path.isfile(exec_file)
-    with open(exec_file) as f:
+    with open(exec_file, encoding="utf-8") as f:
         data = f.read()
         # Verify mpi_command from workflow manager is not set
         assert "srun" not in data

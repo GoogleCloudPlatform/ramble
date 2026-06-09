@@ -35,7 +35,7 @@ def test_shell_wrapper_workspace_activate_missing(shell, tmpdir):
     setup_env = os.path.join(paths.ramble_root, "share", "ramble", _SETUP_ENV_FILE[shell])
     test_script_path = str(tmpdir.join("test_missing.sh"))
 
-    with open(test_script_path, "w") as f:
+    with open(test_script_path, "w", encoding="utf-8") as f:
         f.write(
             f"""
 source "{setup_env}"
@@ -103,7 +103,7 @@ exit 0
     }
     script_content = script_templates[shell]
 
-    with open(test_script_path, "w") as f:
+    with open(test_script_path, "w", encoding="utf-8") as f:
         f.write(script_content)
 
     try:

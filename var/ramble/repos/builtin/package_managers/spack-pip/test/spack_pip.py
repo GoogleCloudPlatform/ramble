@@ -38,7 +38,7 @@ def test_spack_pip_multi_prefix(request, mock_applications):
     )
     ws._re_read()
     workspace("concretize", global_args=global_args)
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         data = f.read()
         assert "spack_pkg_spec: zlib" in data
         assert "pip_pkg_spec: requests" in data
@@ -47,7 +47,9 @@ def test_spack_pip_multi_prefix(request, mock_applications):
 
     workspace("analyze", global_args=global_args)
 
-    with open(os.path.join(ws.root, "results.latest.txt")) as f:
+    with open(
+        os.path.join(ws.root, "results.latest.txt"), encoding="utf-8"
+    ) as f:
         data = f.read()
         assert "SUCCESS" in data
         assert "FAILED" not in data
@@ -115,7 +117,7 @@ def test_spack_pip_ignores_unprefixed_spec(request, mock_applications):
     )
 
     ws._re_read()
-    with open(ws.config_file_path) as f:
+    with open(ws.config_file_path, encoding="utf-8") as f:
         data = f.read()
         assert "spack_pkg_spec: zlib" in data
         assert "pip_pkg_spec: requests" in data
@@ -126,13 +128,15 @@ def test_spack_pip_ignores_unprefixed_spec(request, mock_applications):
     env_path = os.path.join(
         ws.software_dir, "spack-pip", "multi-package-manager-specs"
     )
-    with open(os.path.join(env_path, "spack.yaml")) as f:
+    with open(os.path.join(env_path, "spack.yaml"), encoding="utf-8") as f:
         data = f.read()
         assert "zlib" in data
         assert "requests" not in data
         assert "gcc" not in data
 
-    with open(os.path.join(env_path, "requirements.txt")) as f:
+    with open(
+        os.path.join(env_path, "requirements.txt"), encoding="utf-8"
+    ) as f:
         data = f.read()
         assert "zlib" not in data
         assert "requests" in data
@@ -140,7 +144,9 @@ def test_spack_pip_ignores_unprefixed_spec(request, mock_applications):
 
     workspace("analyze", global_args=global_args)
 
-    with open(os.path.join(ws.root, "results.latest.txt")) as f:
+    with open(
+        os.path.join(ws.root, "results.latest.txt"), encoding="utf-8"
+    ) as f:
         data = f.read()
         assert "SUCCESS" in data
         assert "FAILED" not in data

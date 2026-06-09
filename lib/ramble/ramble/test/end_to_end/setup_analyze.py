@@ -80,7 +80,7 @@ def test_setup_analyze(test_case_path, workspace_name):
     # ```
     src_setup_config = test_case_path / "setup.yaml"
     if src_setup_config.is_file():
-        with open(src_setup_config) as f:
+        with open(src_setup_config, encoding="utf-8") as f:
             setup_config = syaml.load(f).get("setup")
             if setup_config is not None:
                 cmds = setup_config.get("commands", [])
@@ -107,9 +107,9 @@ def test_setup_analyze(test_case_path, workspace_name):
     assert os.path.isfile(actual_analyze)
     expected_analyze = test_case_path / "expected_analyze.out"
     assert expected_analyze.is_file()
-    with open(actual_analyze) as f:
+    with open(actual_analyze, encoding="utf-8") as f:
         actual_content = f.read().strip()
-    with open(str(expected_analyze)) as f:
+    with open(str(expected_analyze), encoding="utf-8") as f:
         expected_content = f.read().strip()
     assert expected_content
     # The actual_content can contain some extra executor output, so only assert

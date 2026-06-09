@@ -108,7 +108,9 @@ class FileCache:
                cache_file.read()
 
         """
-        return ReadTransaction(self._get_lock(key), acquire=lambda: open(self.cache_path(key)))
+        return ReadTransaction(
+            self._get_lock(key), acquire=lambda: open(self.cache_path(key), encoding="utf-8")
+        )
 
     def write_transaction(self, key):
         """Get a write transaction on a file cache item.
@@ -129,10 +131,10 @@ class FileCache:
                 cm.orig_filename = self.cache_path(key)
                 cm.orig_file = None
                 if os.path.exists(cm.orig_filename):
-                    cm.orig_file = open(cm.orig_filename)
+                    cm.orig_file = open(cm.orig_filename, encoding="utf-8")
 
                 cm.tmp_filename = self.cache_path(key) + ".tmp"
-                cm.tmp_file = open(cm.tmp_filename, "w")
+                cm.tmp_file = open(cm.tmp_filename, "w", encoding="utf-8")
 
                 return cm.orig_file, cm.tmp_file
 

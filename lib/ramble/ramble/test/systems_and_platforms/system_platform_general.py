@@ -52,7 +52,7 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         workspace("concretize", "--dry-run", global_args=global_args)
 
         # Verify there is spack info in the workspace
-        with open(ws.config_file_path) as f:
+        with open(ws.config_file_path, encoding="utf-8") as f:
             data = f.read()
             assert "gromacs@{application::gromacs::version}" in data
             assert "intel-mpi" in data
@@ -62,7 +62,7 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
         # Verify the packages.yaml files were merged
-        with open(env_file) as f:
+        with open(env_file, encoding="utf-8") as f:
             spack_config = syaml.load(stream=f)
 
         assert "spack" in spack_config
@@ -76,7 +76,7 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
             ws.experiment_dir, "gromacs", "lignocellulose", "generated", "slurm_experiment_sbatch"
         )
         assert os.path.isfile(exec_file)
-        with open(exec_file) as f:
+        with open(exec_file, encoding="utf-8") as f:
             data = f.read()
             assert "SBATCH" in data
             # Ensure cores_per_node=4 propagated, and srun is used from slurm
@@ -86,7 +86,7 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         expected = (
             "max_nodes = 4 (dry-run) from 'sinfo -p " "mock-partition -O 'Nodes' | tail -n 1'"
         )
-        with open(log_file) as f:
+        with open(log_file, encoding="utf-8") as f:
             data = f.read()
             assert expected in data
 

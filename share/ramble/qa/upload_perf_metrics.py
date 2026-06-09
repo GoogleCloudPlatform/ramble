@@ -43,7 +43,7 @@ def upload_metrics(metrics_file, project_id, dataset_id, table_id, commit_sha=No
         print(f"Metrics file {metrics_file} not found.")
         return
 
-    with open(metrics_file, "r") as f:
+    with open(metrics_file, "r", encoding="utf-8") as f:
         metrics = json.load(f)
 
     if not metrics:
