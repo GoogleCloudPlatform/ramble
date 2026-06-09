@@ -94,15 +94,20 @@ def test_style_valid_repo():
 
 
 def test_changed_files_git_failure(tmpdir):
-    file1 = tmpdir.join("file1.py")
+    lib_dir = tmpdir.join("lib", "ramble", "ramble")
+    lib_dir.ensure(dir=True)
+    file1 = lib_dir.join("file1.py")
     file1.write("import os")
-    file2 = tmpdir.join("file2.py")
+    file2 = tmpdir.join("conftest.py")
     file2.write("import sys")
+    file3 = tmpdir.join("file3.py")
+    file3.write("# file3")
 
     files = style.changed_files(root=str(tmpdir))
 
-    assert "file1.py" in files
-    assert "file2.py" in files
+    assert "lib/ramble/ramble/file1.py" in files
+    assert "conftest.py" in files
+    assert "file3.py" not in files
 
 
 @pytest.mark.parametrize(
