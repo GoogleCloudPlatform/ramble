@@ -10,18 +10,15 @@ filter_groups:
   success:
     where:
     - '"{experiment_status}" == "SUCCESS"'
-  notsuccess:
-    where:
-    - '"{experiment_status}" != "SUCCESS"'
   failed:
     where:
     - '"{experiment_status}" == "FAILED"'
-  notfailed:
-    where:
-    - '"{experiment_status}" != "FAILED"'
   repeat_base:
     where:
-    - "{repeat_index} == 0"
+    - "{is_repeat_parent} == True"
   repeats_only:
     where:
-    - "{repeat_index} != 0"
+    - "{is_repeat_child} == True"
+  first_repeat:
+    where:
+    - "{repeat_index} == 1"
