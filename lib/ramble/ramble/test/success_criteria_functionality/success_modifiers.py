@@ -158,7 +158,7 @@ ramble:
 
     config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
 
-    with open(config_path, "w+") as f:
+    with open(config_path, "w+", encoding="utf-8") as f:
         f.write(test_config)
 
     ws._re_read()
@@ -168,15 +168,15 @@ ramble:
 
     # Write mock output data that fails success criteria:
     exp1_dir = os.path.join(ws.experiment_dir, "basic", "working_wl", "test_cancelled")
-    with open(os.path.join(exp1_dir, "test_cancelled.out"), "w+") as f:
+    with open(os.path.join(exp1_dir, "test_cancelled.out"), "w+", encoding="utf-8") as f:
         f.write("0.25 seconds\n")
-    with open(os.path.join(exp1_dir, "ramble_status.json"), "w+") as f:
+    with open(os.path.join(exp1_dir, "ramble_status.json"), "w+", encoding="utf-8") as f:
         sjson.dump({"experiment_status": "CANCELLED"}, f)
 
     exp2_dir = os.path.join(ws.experiment_dir, "basic", "working_wl", "test_timeout")
-    with open(os.path.join(exp2_dir, "test_timeout.out"), "w+") as f:
+    with open(os.path.join(exp2_dir, "test_timeout.out"), "w+", encoding="utf-8") as f:
         f.write("0.35 seconds\n")
-    with open(os.path.join(exp2_dir, "ramble_status.json"), "w+") as f:
+    with open(os.path.join(exp2_dir, "ramble_status.json"), "w+", encoding="utf-8") as f:
         sjson.dump({"experiment_status": "TIMEOUT"}, f)
 
     workspace(
@@ -187,7 +187,7 @@ ramble:
     )
     result_file = os.path.join(ws.results_dir, "results.latest.json")
 
-    with open(result_file) as f:
+    with open(result_file, encoding="utf-8") as f:
         cache_dict = sjson.load(f)
         for exp in cache_dict["experiments"]:
             if "cancelled" in exp["name"]:
