@@ -36,21 +36,13 @@ includes the sbang tool directly in bin/sbang. These packages are covered
 by various permissive licenses. A summary listing follows. See the
 license included with each package for full details.
 
-PackageName: argparse
-PackageHomePage: https://pypi.python.org/pypi/argparse
-PackageLicenseDeclared: Python-2.0
+PackageName: archspec
+PackageHomePage: https://github.com/archspec/archspec
+PackageLicenseDeclared: Apache-2.0 OR MIT
 
 PackageName: ctest_log_parser
 PackageHomePage: https://github.com/Kitware/CMake
 PackageLicenseDeclared: BSD-3-Clause
-
-PackageName: distro
-PackageHomePage: https://pypi.python.org/pypi/distro
-PackageLicenseDeclared: Apache-2.0
-
-PackageName: functools
-PackageHomePage: https://github.com/python/cpython/blob/2.7/Lib/functools.py
-PackageLicenseDeclared: Python-2.0
 
 PackageName: jinja2
 PackageHomePage: https://pypi.python.org/pypi/Jinja2
@@ -64,18 +56,6 @@ PackageName: markupsafe
 PackageHomePage: https://pypi.python.org/pypi/MarkupSafe
 PackageLicenseDeclared: BSD-3-Clause
 
-PackageName: orderddict
-Homepage: https://pypi.org/project/ordereddict/
-PackageLicenseDeclared: MIT
-
-PackageName: py
-PackageHomePage: https://pypi.python.org/pypi/py
-PackageLicenseDeclared: MIT
-
-PackageName: pytest
-PackageHomePage: https://pypi.python.org/pypi/pytest
-PackageLicenseDeclared: MIT
-
 PackageName: ruamel.yaml
 PackageHomePage: https://yaml.readthedocs.io/
 PackageLicenseDeclared: MIT
@@ -84,14 +64,4 @@ PackageName: sbang
 PackageHomePage: https://github.com/spack/sbang
 PackageLicenseDeclared: Apache-2.0 OR MIT
 
-PackageName: six
-PackageHomePage: https://pypi.python.org/pypi/six
-PackageLicenseDeclared: MIT
 
-PackageName: macholib
-PackageHomePage: https://macholib.readthedocs.io/en/latest/index.html
-PackageLicenseDeclared: MIT
-
-PackageName: altgraph
-PackageHomePage: https://altgraph.readthedocs.io/en/latest/index.html
-PackageLicenseDeclared: MIT
