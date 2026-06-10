@@ -852,6 +852,8 @@ class Expander:
             (bool): True or False, based if the experiment's variants satisfy
                      the input requirement.
         """
+        if reqs is None:
+            return True
 
         variant_definitions = set()
 
@@ -860,26 +862,25 @@ class Expander:
                 variant_definitions.add(variant)
 
         satisfied = True
-        if reqs is not None:
-            if isinstance(reqs, str):
-                reqs = [reqs]
-            elif isinstance(reqs, frozenset):
-                reqs = list(reqs)
+        if isinstance(reqs, str):
+            reqs = [reqs]
+        elif isinstance(reqs, frozenset):
+            reqs = list(reqs)
 
-            for req in reqs:
-                if "@" in req and "=" not in req and "+" not in req and "~" not in req:
-                    variant_name, _ = req.split("@")
-                    version = variant_set.version(variant_name)
-                    if hasattr(version, "satisfies"):
-                        satisfied = satisfied and version.satisfies(req)
-                    else:
-                        satisfied = False
+        for req in reqs:
+            if "@" in req and "=" not in req and "+" not in req and "~" not in req:
+                variant_name, _ = req.split("@")
+                version = variant_set.version(variant_name)
+                if hasattr(version, "satisfies"):
+                    satisfied = satisfied and version.satisfies(req)
                 else:
-                    exp_req = self.expand_var(
-                        req, extra_vars=extra_vars, merge_used_stage=merge_used_stage
-                    )
+                    satisfied = False
+            else:
+                exp_req = self.expand_var(
+                    req, extra_vars=extra_vars, merge_used_stage=merge_used_stage
+                )
 
-                    satisfied = satisfied and exp_req in variant_definitions
+                satisfied = satisfied and exp_req in variant_definitions
         return satisfied
 
     @staticmethod
