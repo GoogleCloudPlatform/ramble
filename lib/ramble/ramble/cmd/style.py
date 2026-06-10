@@ -161,7 +161,9 @@ class tool:
         return fun
 
 
-def changed_files(base=None, untracked=True, all_files=False, root=ramble.paths.prefix):
+def changed_files(
+    base=None, untracked=True, all_files=False, root=ramble.paths.prefix, is_external_repo=False
+):
     """Get list of changed files in the Ramble repository."""
 
     git = which("git", required=True)
@@ -196,7 +198,7 @@ def changed_files(base=None, untracked=True, all_files=False, root=ramble.paths.
             # if not a git repo, return all python files matching include patterns
             for f in glob.glob(os.path.join(root, "**", "*.py"), recursive=True):
                 rel_f = os.path.relpath(f, root)
-                if any(fnmatch.fnmatch(rel_f, p) for p in include_patterns):
+                if is_external_repo or any(fnmatch.fnmatch(rel_f, p) for p in include_patterns):
                     changed.add(rel_f)
             return sorted(changed)
 
@@ -211,8 +213,10 @@ def changed_files(base=None, untracked=True, all_files=False, root=ramble.paths.
                 if not (f.endswith(".py") or f == "bin/ramble"):
                     continue
 
-                # Only include files matching the include patterns
-                if not any(fnmatch.fnmatch(f, p) for p in include_patterns):
+                # Only include files matching the include patterns for the core codebase
+                if not is_external_repo and not any(
+                    fnmatch.fnmatch(f, p) for p in include_patterns
+                ):
                     continue
 
                 # Exclude non-existent files
@@ -684,10 +688,13 @@ def style(parser, args):
         arg_flags.append(["origin/main", args.untracked, args.all])
         # Next, force listing all files
         arg_flags.append(["HEAD", args.untracked, True])
+        is_external_repo = args.repo_path is not None
         while not file_list:
             try:
                 base, untracked, list_all = arg_flags.pop(0)
-                file_list = changed_files(base, untracked, list_all, root=root)
+                file_list = changed_files(
+                    base, untracked, list_all, root=root, is_external_repo=is_external_repo
+                )
                 break
             except ProcessError as e:
                 file_list = None

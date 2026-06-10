@@ -159,3 +159,17 @@ def test_style_tool_args_multiple():
     )
     assert style_cmd.returncode != 0
     assert "unexpected argument '--bad-arg'" in out
+
+
+def test_style_external_repo(tmpdir):
+    repo_config = tmpdir.join("repo.yaml")
+    repo_config.write("repo:\n  namespace: test_external\n")
+
+    app_dir = tmpdir.join("applications", "test_app")
+    app_dir.ensure(dir=True)
+    app_file = app_dir.join("application.py")
+    app_file.write("# mock application file\n")
+
+    out = style_cmd("--repo-path", str(tmpdir), "-a", "-t", "flake8")
+    assert "style checks were clean" in out
+    assert "applications/test_app/application.py" in out
