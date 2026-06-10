@@ -6,12 +6,10 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 
 import pytest
 
-import ramble.paths
-from ramble import main
+from ramble import main, paths
 from ramble.cmd import style
 
 style_cmd = main.RambleCommand("style")
@@ -88,7 +86,7 @@ def test_style_invalid_repo(tmpdir):
 
 
 def test_style_valid_repo():
-    builtin_mock_repo = os.path.join(ramble.paths.prefix, "var", "ramble", "repos", "builtin.mock")
+    builtin_mock_repo = paths.mock_builtin_path
     out = style_cmd("--repo-path", builtin_mock_repo)
     assert "style checks were clean" in out
 

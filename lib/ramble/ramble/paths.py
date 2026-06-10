@@ -29,18 +29,12 @@ bin_path: str = os.path.join(prefix, "bin")
 #: The ramble script itself
 ramble_script: str = os.path.join(bin_path, "ramble")
 
-#: The sbang script in the ramble installation
-sbang_script: str = os.path.join(bin_path, "sbang")
-
 # ramble directory hierarchy
 lib_path: str = os.path.join(prefix, "lib", "ramble")
-external_path: str = os.path.join(lib_path, "external")
-build_env_path: str = os.path.join(lib_path, "env")
 module_path: str = os.path.join(lib_path, "ramble")
 command_path: str = os.path.join(module_path, "cmd")
 test_path: str = os.path.join(module_path, "test")
 var_path: str = os.path.join(prefix, "var", "ramble")
-tests_path: str = os.path.join(var_path, "tests")
 share_path: str = os.path.join(prefix, "share", "ramble")
 repos_path: str = os.path.join(var_path, "repos")
 
@@ -51,6 +45,5 @@ mock_builtin_path: str = os.path.join(repos_path, "builtin.mock")
 #: User configuration location
 user_config_path: str = os.path.expanduser("~/.ramble")
 
-opt_path: str = os.path.join(prefix, "opt")
 etc_path: str = os.path.join(prefix, "etc")
 system_etc_path: str = "/etc"
