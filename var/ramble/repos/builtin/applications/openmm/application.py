@@ -55,7 +55,8 @@ class Openmm(ExecutableApplication):
     )
 
     input_file(
-        "5dfr_solv_cube_equil",
+        "5dfr_solv_cube_equil",  # spellchecker:disable-line
+        # spellchecker:ignore-next-line
         url="https://raw.githubusercontent.com/openmm/openmm/master/examples/benchmarks/5dfr_solv-cube_equil.pdb",
         description="5dfr solvated structure for PME benchmarks",
         expand=False,
@@ -72,7 +73,7 @@ class Openmm(ExecutableApplication):
     executable(
         "run_benchmark",
         "ln -sf {5dfr_minimized} 5dfr_minimized.pdb && "
-        "ln -sf {5dfr_solv_cube_equil} 5dfr_solv-cube_equil.pdb && "
+        "ln -sf {5dfr_solv_cube_equil} 5dfr_solv-cube_equil.pdb && "  # spellchecker:disable-line
         "ln -sf {apoa1} apoa1.pdb && "
         "python3 {benchmark_path} "
         "--platform {openmm_platform} "
@@ -89,7 +90,7 @@ class Openmm(ExecutableApplication):
         inputs=[
             "benchmark_script",
             "5dfr_minimized",
-            "5dfr_solv_cube_equil",
+            "5dfr_solv_cube_equil",  # spellchecker:disable-line
             "apoa1",
         ],
     )
