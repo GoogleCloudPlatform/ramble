@@ -40,6 +40,12 @@ if [ $? != 0 ]; then
   ERROR=1
 fi
 
+# verify that external packages in COPYRIGHT match actual external packages
+python3 "$(dirname $0)/check_external_copyright.py"
+if [ $? != 0 ]; then
+  ERROR=1
+fi
+
 if [ $ERROR == 1 ]; then
     exit 1
 fi
