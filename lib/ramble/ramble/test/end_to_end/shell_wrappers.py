@@ -32,7 +32,7 @@ def test_shell_wrapper_workspace_activate_missing(shell, tmpdir):
     if not shutil.which(shell):
         pytest.skip(f"{shell} not found")
 
-    setup_env = os.path.join(paths.ramble_root, "share", "ramble", _SETUP_ENV_FILE[shell])
+    setup_env = os.path.join(paths.share_path, _SETUP_ENV_FILE[shell])
     test_script_path = str(tmpdir.join("test_missing.sh"))
 
     with open(test_script_path, "w", encoding="utf-8") as f:
@@ -57,7 +57,7 @@ def test_shell_wrapper_workspace_lifecycle(shell, tmpdir):
     if not shutil.which(shell):
         pytest.skip(f"{shell} not found")
 
-    setup_env = os.path.join(paths.ramble_root, "share", "ramble", _SETUP_ENV_FILE[shell])
+    setup_env = os.path.join(paths.share_path, _SETUP_ENV_FILE[shell])
     test_script_path = str(tmpdir.join(f"test_lifecycle.{shell}"))
     ws_name = f"test_ws_lifecycle_{shell}"
 
@@ -121,7 +121,7 @@ exit 0
             print(process.stderr)
         assert process.returncode == 0
     finally:
-        ramble_exe = os.path.join(paths.ramble_root, "bin", "ramble")
+        ramble_exe = paths.ramble_script
         subprocess.run(
             [ramble_exe, "workspace", "rm", "-y", ws_name],
             capture_output=True,

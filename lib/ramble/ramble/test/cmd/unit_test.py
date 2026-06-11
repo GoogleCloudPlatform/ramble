@@ -6,13 +6,11 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import os
 import subprocess
 
 import pytest
 
-import ramble.paths
-from ramble import main
+from ramble import main, paths
 
 pytestmark = pytest.mark.maybeslow
 
@@ -79,7 +77,7 @@ def test_external_repo_valid(tmpdir):
 
     # Need to launch a new process due to how setup_analyze.py is handled differently
     # for Ramble repo and external repos.
-    ramble_bin = os.path.join(ramble.paths.ramble_root, "bin", "ramble")
+    ramble_bin = paths.ramble_script
     result = subprocess.run(
         [ramble_bin, "unit-test", "--repo-path", str(tmpdir), "-k", "test_dummy"],
         capture_output=True,
