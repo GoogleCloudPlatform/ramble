@@ -45,7 +45,13 @@ ramble workspace activate non_existent_workspace
 
     cmd = [shell, test_script_path]
     process = subprocess.run(
-        cmd, capture_output=True, text=True, cwd=str(tmpdir), env=os.environ.copy(), check=False
+        cmd,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
+        cwd=str(tmpdir),
+        env=os.environ.copy(),
+        check=False,
     )
 
     assert process.returncode == 1
@@ -110,8 +116,9 @@ exit 0
         cmd = [shell, test_script_path]
         process = subprocess.run(
             cmd,
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
             cwd=str(tmpdir),
             env=os.environ.copy(),
             check=False,
@@ -124,7 +131,8 @@ exit 0
         ramble_exe = paths.ramble_script
         subprocess.run(
             [ramble_exe, "workspace", "rm", "-y", ws_name],
-            capture_output=True,
-            text=True,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
             check=False,
         )

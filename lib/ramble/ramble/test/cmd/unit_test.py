@@ -80,8 +80,9 @@ def test_external_repo_valid(tmpdir):
     ramble_bin = paths.ramble_script
     result = subprocess.run(
         [ramble_bin, "unit-test", "--repo-path", str(tmpdir), "-k", "test_dummy"],
-        capture_output=True,
-        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        universal_newlines=True,
         check=False,
     )
     assert result.returncode == 0
