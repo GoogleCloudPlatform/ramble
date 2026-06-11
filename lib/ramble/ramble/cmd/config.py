@@ -28,15 +28,16 @@ level = "long"
 
 
 def setup_parser(subparser):
-    scopes = ramble.config.scopes()
     scopes_metavar = ramble.config.scopes_metavar
 
     # User can only choose one
     subparser.add_argument(
+        "-s",
         "--scope",
-        choices=scopes,
+        choices=ramble.config.scopes_choices(include_workspace=True),
         metavar=scopes_metavar,
-        help="configuration scope to read/modify",
+        help="configuration scope to read/modify (default: user if no workspace, "
+        "workspace if active)",
     )
 
     sp = subparser.add_subparsers(metavar="SUBCOMMAND", dest="config_command")
@@ -113,21 +114,21 @@ def _get_scope_and_section(args):
     section = getattr(args, "section", None)
     path = getattr(args, "path", None)
 
-    # w/no args and an active workspace, point to workspace config
-    if not scope and not section:
-        ws = ramble.workspace.active_workspace()
-        if ws:
-            scope = ws.ws_file_config_scope_name()
-
-    # set scope defaults
-    elif not scope:
-        scope = ramble.config.default_modify_scope(section)
-
     # special handling for commands that take value instead of section
     if path:
         section = path[: path.find(":")] if ":" in path else path
-        if not scope:
-            scope = ramble.config.default_modify_scope(section)
+
+    if scope:
+        try:
+            scope = ramble.config.resolve_scope(scope)
+        except ValueError as e:
+            logger.die(str(e))
+    else:
+        ws = ramble.workspace.active_workspace()
+        if ws:
+            scope = ws.ws_file_config_scope_name()
+        else:
+            scope = "user"
 
     return scope, section
 
@@ -174,7 +175,7 @@ def config_edit(args):
     else:
         # If we aren't editing a ramble.yaml file, get config path from scope.
         scope, section = _get_scope_and_section(args)
-        if not scope and not section:
+        if not section and (not scope or not scope.startswith("workspace:")):
             logger.die(
                 "`ramble config edit` requires a section argument " "or an active workspace."
             )

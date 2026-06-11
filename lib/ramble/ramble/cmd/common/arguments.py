@@ -217,3 +217,25 @@ def no_checksum():
         default=False,
         help="do not use checksums to verify downloaded files (unsafe)",
     )
+
+
+@arg
+def filter_group():
+    return Args(
+        "--fg",
+        "--filter-group",
+        dest="filter_group",
+        help="Filter experiments using a logical expression of filter groups",
+        required=False,
+    )
+
+
+@arg
+def exclude_filter_group():
+    return Args(
+        "--efg",
+        "--exclude-filter-group",
+        dest="exclude_filter_group",
+        help="Exclude experiments matching a logical expression of filter groups",
+        required=False,
+    )

@@ -29,7 +29,7 @@ end
 
 # h and V flags don't require further output parsing.
 if ( "$_rmb_flags" =~ *h* || "$_rmb_flags" =~ *V* ) then
-    \ramble $_rmb_flags $_rmb_args
+    \ramble $_rmb_flags $_rmb_args:q
     set _rmb_rs = $status
     goto _rmb_end
 endif
@@ -72,12 +72,12 @@ case workspace:
                      "$_rmb_args" =~ "* -h*" || \
                      "$_rmb_args" =~ "* --help*" ) then
                     # No args or args contain --sh, --csh, or -h/--help: just execute.
-                    \ramble $_rmb_flags workspace $_rmb_args
+                    \ramble $_rmb_flags workspace $_rmb_args:q
                     set _rmb_rs = $status
                 else
                     shift _rmb_args  # consume 'activate' or 'deactivate'
                     # Actual call to activate: source the output.
-                    set _activate_cmd = `\ramble $_rmb_flags workspace activate --csh $_rmb_args`
+                    set _activate_cmd = `\ramble $_rmb_flags workspace activate --csh $_rmb_args:q`
                     set _rmb_rs = $status
                     eval "$_activate_cmd"
                 endif
@@ -93,7 +93,7 @@ case workspace:
                 if ( "$_rmb_args" =~ "* --sh*" || \
                      "$_rmb_args" =~ "* --csh*" ) then
                     # Args contain --sh or --csh: just execute.
-                    \ramble $_rmb_flags workspace $_rmb_args
+                    \ramble $_rmb_flags workspace $_rmb_args:q
                     set _rmb_rs = $status
                 else if ( "$_rmb_env_arg" != "" ) then
                     # Any other arguments are an error or -h/--help: just run help.
@@ -110,7 +110,7 @@ case workspace:
                 if ( "$_rmb_args" =~ *" -a"* || \
                      "$_rmb_args" =~ *" --activate"* ) then
                     # Args contain activate flag
-                    set _create_activate_cmd = `\ramble $_rmb_flags workspace $_rmb_args`
+                    set _create_activate_cmd = `\ramble $_rmb_flags workspace $_rmb_args:q`
                     set _rmb_rs = $status
                     if ( $_rmb_rs == 0 ) then
                         eval "$_create_activate_cmd"
@@ -118,12 +118,12 @@ case workspace:
                         echo "==> Created and activated workspace in $_ws"
                     endif
                 else
-                    \ramble $_rmb_flags workspace $_rmb_args
+                    \ramble $_rmb_flags workspace $_rmb_args:q
                     set _rmb_rs = $status
                 endif
                 breaksw
             default:
-                \ramble $_rmb_flags workspace $_rmb_args
+                \ramble $_rmb_flags workspace $_rmb_args:q
                 set _rmb_rs = $status
                 breaksw
         endsw
@@ -131,7 +131,7 @@ case workspace:
     breaksw
 
 default:
-    \ramble $_rmb_flags $_rmb_args
+    \ramble $_rmb_flags $_rmb_args:q
     set _rmb_rs = $status
     breaksw
 endsw

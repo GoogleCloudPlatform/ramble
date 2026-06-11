@@ -24,6 +24,7 @@ import ramble.schema.base_system_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
+import ramble.schema.filter_groups
 import ramble.schema.formatted_executables
 import ramble.schema.internals
 import ramble.schema.licenses
@@ -67,6 +68,7 @@ properties = union_dicts(
     ramble.schema.variables.properties,
     ramble.schema.variants.properties,
     ramble.schema.env_vars.properties,
+    ramble.schema.filter_groups.properties,
     ramble.schema.internals.properties,
     ramble.schema.modifiers.properties,
     ramble.schema.workflow_manager_repos.properties,

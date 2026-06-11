@@ -60,6 +60,7 @@ import ramble.schema.base_system_repos
 import ramble.schema.base_workflow_manager_repos
 import ramble.schema.config
 import ramble.schema.env_vars
+import ramble.schema.filter_groups
 import ramble.schema.formatted_executables
 import ramble.schema.internals
 import ramble.schema.licenses
@@ -94,6 +95,7 @@ section_schemas: Dict[str, Dict[str, Any]] = {
     "formatted_executables": ramble.schema.formatted_executables.schema,
     "config": ramble.schema.config.schema,
     "env_vars": ramble.schema.env_vars.schema,
+    "filter_groups": ramble.schema.filter_groups.schema,
     "internals": ramble.schema.internals.schema,
     "licenses": ramble.schema.licenses.schema,
     "mirrors": ramble.schema.mirrors.schema,
@@ -214,9 +216,51 @@ config_defaults = {
     }
 }
 
+
+class ScopesMetavar:
+    def __str__(self):
+        import ramble.workspace
+
+        if ramble.workspace.active_workspace():
+            return "{defaults,system,site,user,workspace}"
+        return "{defaults,system,site,user}"
+
+    def __repr__(self):
+        return self.__str__()
+
+
+class ScopesChoices:
+    def __init__(self, include_workspace=True):
+        self.include_workspace = include_workspace
+
+    def __contains__(self, item):
+        import ramble.config
+        import ramble.workspace
+
+        scopes = list(ramble.config.scopes())
+        scopes = [s for s in scopes if not s.startswith("workspace:")]
+        if self.include_workspace and ramble.workspace.active_workspace():
+            scopes.append("workspace")
+        return item in scopes
+
+    def __iter__(self):
+        import ramble.config
+        import ramble.workspace
+
+        scopes = list(ramble.config.scopes())
+        scopes = [s for s in scopes if not s.startswith("workspace:")]
+        if self.include_workspace and ramble.workspace.active_workspace():
+            scopes.append("workspace")
+        return iter(scopes)
+
+
+def scopes_choices(include_workspace=True):
+    return ScopesChoices(include_workspace)
+
+
 #: metavar to use for commands that accept scopes
 #: this is shorter and more readable than listing all choices
-scopes_metavar = "{defaults,system,site,user}"
+scopes_metavar = ScopesMetavar()
 
 #: Base name for the (internal) overrides scope.
 overrides_base_name = "overrides-"
@@ -943,7 +987,7 @@ def add_from_file(filename, scope=None):
 
             value = data[section]
             existing = get(section, scope=scope)
-            new = merge_yaml(existing, value)
+            new = merge_yaml(existing, value, path=[section])
 
             # We cannot call config.set directly (set is a type)
             config.set(section, new, scope)
@@ -993,7 +1037,7 @@ def add(fullpath, scope=None):
         value = [value]
 
     # merge value into existing
-    new = merge_yaml(existing, value)
+    new = merge_yaml(existing, value, path=process_config_path(path))
     config.set(path, new, scope)
 
 
@@ -1013,6 +1057,22 @@ def set(path, value, scope=None):
 def scopes():
     """Convenience function to get list of configuration scopes."""
     return config.scopes
+
+
+def resolve_scope(scope):
+    """Resolve a scope name to its canonical name.
+
+    If scope is 'workspace', resolve it to the active workspace's scope name.
+    """
+    if scope == "workspace":
+        import ramble.workspace
+
+        ws = ramble.workspace.active_workspace()
+        if ws:
+            return ws.ws_file_config_scope_name()
+        else:
+            raise ValueError("Workspace scope requires an active workspace")
+    return scope
 
 
 def _validate_section_name(section):
@@ -1179,7 +1239,7 @@ def get_valid_type(path):
     raise ConfigError(f"Cannot determine valid type for path '{path}'.")
 
 
-def merge_yaml(dest, source):
+def merge_yaml(dest, source, path=None):
     """Merges source into dest; entries in source take precedence over dest.
 
     This routine may modify dest and should be assigned to dest, in
@@ -1196,6 +1256,8 @@ def merge_yaml(dest, source):
     with `::` instead of `:`, and the key will override that of the
     parent instead of merging.
     """
+    if path is None:
+        path = []
 
     def they_are(t):
         return isinstance(dest, t) and isinstance(source, t)
@@ -1223,8 +1285,14 @@ def merge_yaml(dest, source):
             merge = sk in dest
             old_dest_value = dest.pop(sk, None)
 
-            if merge and not _override(sk):
-                dest[sk] = merge_yaml(old_dest_value, sv)
+            current_path = path + [sk]
+            should_override = _override(sk)
+            if not should_override:
+                if len(current_path) == 2 and current_path[0] == "filter_groups":
+                    should_override = True
+
+            if merge and not should_override:
+                dest[sk] = merge_yaml(old_dest_value, sv, current_path)
             else:
                 # if sk ended with ::, or if it's new, completely override
                 dest[sk] = copy.deepcopy(sv)

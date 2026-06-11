@@ -63,13 +63,23 @@ def deployment_push_setup_parser(subparser):
 
     arguments.add_common_arguments(
         subparser,
-        ["phases", "include_phase_dependencies", "where", "exclude_where", "filter_tags"],
+        [
+            "phases",
+            "include_phase_dependencies",
+            "where",
+            "exclude_where",
+            "filter_tags",
+            "filter_group",
+            "exclude_filter_group",
+        ],
     )
 
 
 def deployment_push(args):
     current_pipeline = ramble.pipeline.pipelines.pushdeployment
     ws = ramble.cmd.require_active_workspace(cmd_name="deployment push")
+
+    args.where = ramble.filters.resolve_and_apply_filter_groups(args, args.where)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,

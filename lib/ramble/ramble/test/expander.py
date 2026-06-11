@@ -169,6 +169,11 @@ def build_variant_set():
         ("1_01", "1_01", set(), 1),
         ("0x10", "0x10", set(), 1),
         ("{application_name}-1_01", "foo-1_01", set(), 1),
+        ('not ("a" == "a")', "False", set(), 1),
+        ('not ("a" == "b")', "True", set(), 1),
+        ('not ("SETUP" == "SUCCESS")', "True", set(), 1),
+        ('("SETUP" == "FAILED") and not ("SETUP" == "SUCCESS")', "False", set(), 1),
+        ('("SETUP" == "SETUP") and not ("SETUP" == "SUCCESS")', "True", set(), 1),
     ],
 )
 def test_expansions(input, output, no_expand_vars, passes):
@@ -231,6 +236,11 @@ def test_expansions(input, output, no_expand_vars, passes):
         ("randint(3, 3)", 3, set(), 1),
         ("~0", -1, set(), 1),
         ("~2", -3, set(), 1),
+        ('not ("a" == "a")', False, set(), 1),
+        ('not ("a" == "b")', True, set(), 1),
+        ('not ("SETUP" == "SUCCESS")', True, set(), 1),
+        ('("SETUP" == "FAILED") and not ("SETUP" == "SUCCESS")', False, set(), 1),
+        ('("SETUP" == "SETUP") and not ("SETUP" == "SUCCESS")', True, set(), 1),
     ],
 )
 def test_typed_expansions(input, output, no_expand_vars, passes):

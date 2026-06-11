@@ -20,6 +20,7 @@ from llnl.util import tty
 from llnl.util.tty.colify import colified, colify
 
 import ramble.cmd
+import ramble.cmd.filter_groups
 import ramble.config
 import ramble.expander
 import ramble.filters
@@ -72,7 +73,7 @@ subcommands = [
     "manage",
 ]
 
-manage_commands = ["experiments", "software", "includes", "modifiers"]
+manage_commands = ["experiments", "software", "includes", "modifiers", "filter-groups"]
 
 
 def workspace_activate_setup_parser(subparser):
@@ -137,6 +138,13 @@ def workspace_activate_setup_parser(subparser):
         metavar="dir",
         help="parent directory for the named workspace to activate",
     )
+    subparser.add_argument(
+        "--fg",
+        "--filter-group",
+        dest="filter_group",
+        default=None,
+        help="filter group to activate persistently",
+    )
 
 
 def create_temp_workspace_directory():
@@ -198,6 +206,7 @@ def workspace_activate(args):
         ws=active_workspace,
         shell=args.shell,
         prompt=workspace_prompt if enable_prompt else None,
+        filter_group=args.filter_group,
     )
     env_mods.extend(ramble.workspace.shell.activate(ws=active_workspace))
     cmds += env_mods.shell_modifications(args.shell)
@@ -522,6 +531,8 @@ def workspace_setup_setup_parser(subparser):
             "filter_tags",
             "profile_phases",
             "profile_phase_output",
+            "filter_group",
+            "exclude_filter_group",
         ],
     )
 
@@ -529,6 +540,8 @@ def workspace_setup_setup_parser(subparser):
 def workspace_setup(args):
     current_pipeline = ramble.pipeline.pipelines.setup
     ws = ramble.cmd.require_active_workspace("workspace setup", args.dry_run)
+
+    args.where = ramble.filters.resolve_and_apply_filter_groups(args, args.where)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
@@ -603,6 +616,8 @@ def workspace_analyze_setup_parser(subparser):
             "filter_tags",
             "profile_phases",
             "profile_phase_output",
+            "filter_group",
+            "exclude_filter_group",
         ],
     )
 
@@ -611,6 +626,8 @@ def workspace_analyze(args):
     current_pipeline = ramble.pipeline.pipelines.analyze
     ws = ramble.cmd.require_active_workspace("workspace analyze", args.dry_run)
     ws.repeat_success_strict = ramble.config.get("config:repeat_success_strict")
+
+    args.where = ramble.filters.resolve_and_apply_filter_groups(args, args.where)
 
     filters = ramble.filters.Filters(
         phase_filters=args.phases,
@@ -779,7 +796,10 @@ def workspace_info_setup_parser(subparser):
         "--executables", action="store_true", help="If set, experiment executables will be printed"
     )
 
-    arguments.add_common_arguments(subparser, ["where", "exclude_where", "filter_tags"])
+    arguments.add_common_arguments(
+        subparser,
+        ["where", "exclude_where", "filter_tags", "filter_group", "exclude_filter_group"],
+    )
 
     subparser.add_argument(
         "-v",
@@ -795,6 +815,8 @@ def workspace_info_setup_parser(subparser):
 
 def workspace_info(args):
     ws = ramble.cmd.require_active_workspace("workspace info", args.dry_run)
+
+    args.where = ramble.filters.resolve_and_apply_filter_groups(args, args.where)
 
     # Enable verbose mode
     if args.verbose >= 1:
@@ -1822,6 +1844,98 @@ def workspace_manage_modifiers(args):
     elif args.list:
         with ws.read_transaction():
             ws.print_modifiers()
+
+
+def workspace_manage_filter_groups_setup_parser(subparser):
+    """manage workspace filter groups"""
+    scopes_metavar = ramble.config.scopes_metavar
+
+    subparser.add_argument(
+        "--scope",
+        choices=ramble.config.scopes_choices(include_workspace=True),
+        metavar=scopes_metavar,
+        default=None,
+        help="configuration scope to modify/list",
+    )
+
+    actions = subparser.add_subparsers(metavar="ACTION", dest="action")
+
+    add_parser = actions.add_parser("add", help="add a filter group")
+    add_parser.add_argument("-n", "--name", required=True, help="name of filter group")
+    add_parser.add_argument(
+        "--where",
+        action="append",
+        help="inclusive filter expression. Can be specified multiple times.",
+    )
+    add_parser.add_argument(
+        "--exclude-where",
+        dest="exclude_where",
+        action="append",
+        help="exclusive filter expression. Can be specified multiple times.",
+    )
+
+    remove_parser = actions.add_parser("remove", aliases=["rm"], help="remove a filter group")
+    remove_parser.add_argument("-n", "--name", required=True, help="name of filter group")
+
+    list_parser = actions.add_parser("list", help="list defined filter groups")
+    list_parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="show the filter group definition for each",
+    )
+    actions.add_parser("blame", help="show defined filter groups with sources")
+
+
+def workspace_manage_filter_groups(args):
+    """Execute workspace manage filter-groups command"""
+    ws = ramble.cmd.require_active_workspace(cmd_name="workspace manage filter-groups")
+
+    if args.action == "add":
+        workspace_manage_filter_groups_add(ws, args)
+    elif args.action in ("remove", "rm"):
+        workspace_manage_filter_groups_remove(ws, args)
+    elif args.action == "list":
+        workspace_manage_filter_groups_list(ws, args)
+    elif args.action == "blame":
+        workspace_manage_filter_groups_blame(ws, args)
+
+
+def _resolve_workspace_manage_scope(ws, args, default_scope):
+    scope = args.scope if args.scope else default_scope
+    if scope:
+        try:
+            scope = ramble.config.resolve_scope(scope)
+        except ValueError as e:
+            logger.die(str(e))
+    return scope
+
+
+def workspace_manage_filter_groups_add(ws, args):
+    scope = _resolve_workspace_manage_scope(ws, args, ws.ws_file_config_scope_name())
+    ramble.cmd.filter_groups.filter_groups_add(scope, args)
+
+
+def workspace_manage_filter_groups_remove(ws, args):
+    scope = _resolve_workspace_manage_scope(ws, args, ws.ws_file_config_scope_name())
+    ramble.cmd.filter_groups.filter_groups_remove(scope, args)
+
+
+def workspace_manage_filter_groups_list(ws, args):
+    verbose = getattr(args, "verbose", False)
+    resolved_scope_name = None
+    if args.scope:
+        resolved_scope_name = _resolve_workspace_manage_scope(ws, args, None)
+
+    ramble.cmd.filter_groups.print_filter_groups(
+        resolved_scope_name=resolved_scope_name,
+        original_scope_name=args.scope,
+        verbose=verbose,
+    )
+
+
+def workspace_manage_filter_groups_blame(ws, args):
+    ramble.config.config.print_section("filter_groups", blame=True)
 
 
 def workspace_generate_config_setup_parser(subparser):

@@ -352,6 +352,61 @@ actions is available. These actions are:
   definition. Only supports paths, delimiter is ``:``
 * ``unset`` - Remove a variable definition, if it is set.
 
+.. _filter-groups-config:
+
+----------------------
+Filter Groups Section:
+----------------------
+
+The filter groups config section is named ``filter_groups`` and allows users to
+define persistent, named groups of filters. These groups can be referenced in
+commands to easily select subsets of experiments (e.g., specific workloads,
+scaling studies) without typing complex logical expressions on the CLI.
+
+Filter groups can be defined globally in ``~/.ramble/filter_groups.yaml`` (user scope)
+or per-workspace in ``$workspace/configs/ramble.yaml`` (workspace scope).
+
+If a filter group with the same name is defined in multiple configuration scopes (e.g., in both the user scope and a workspace scope), the definition in the higher-precedence scope completely overrides any definitions from lower-precedence scopes. The definitions (including the ``where`` and ``exclude_where`` lists) are not merged.
+
+The format of this config section is as follows:
+
+.. code-block:: yaml
+
+    filter_groups:
+      small-scale:
+        where:
+        - "{n_nodes} < 4"
+        exclude_where:
+        - "'{mpi_provider}' == 'tcp'"
+      large-scale:
+        where:
+        - "{n_nodes} >= 8"
+
+Each filter group maps to an object containing lists of filter expressions:
+
+* ``where``: A list of inclusive filter expressions. All expressions must evaluate to ``True`` for an experiment to be included.
+* ``exclude_where``: A list of exclusive filter expressions. If any expression evaluates to ``True``, the experiment is excluded.
+
+These groups can then be used on the CLI using the ``-fg`` / ``--filter-group`` (inclusive) and ``-efg`` / ``--exclude-filter-group`` (exclusive) flags on commands like ``ramble on`` or ``ramble workspace setup``. Multiple filter groups can be combined in a single flag using logical expressions (supporting ``and``, ``or``, ``not``, and parentheses):
+
+.. code-block:: console
+
+    $ ramble on -fg "small-scale and not single-node"
+
+Global filter groups can be managed using the top-level ``ramble filter-groups`` command:
+
+.. code-block:: console
+
+    $ ramble filter-groups add -n global-small --where "{n_nodes} < 2"
+    $ ramble filter-groups remove -n global-small
+    $ ramble filter-groups list
+    $ ramble filter-groups blame
+
+By default, these commands edit the global ``user`` scope. You can target a different scope (such as ``workspace``) using the ``--scope`` option.
+
+Alternatively, workspace-scoped filter groups can also be managed using the :ref:`workspace-manage` command.
+
+
 .. _formatted-execs-config:
 
 ------------------------------
