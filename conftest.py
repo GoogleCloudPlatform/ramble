@@ -553,12 +553,10 @@ def mock_executable(tmpdir):
     """Factory to create a mock executable in a temporary directory that
     output a custom string when run.
     """
-    import jinja2
 
     def _factory(name, output, subdir=("bin",)):
         f = tmpdir.ensure(*subdir, dir=True).join(name)
-        t = jinja2.Template("#!/bin/bash\n{{ output }}\n")
-        f.write(t.render(output=output))
+        f.write(f"#!/bin/bash\n{output}\n")
         f.chmod(0o755)
         return str(f)
 
