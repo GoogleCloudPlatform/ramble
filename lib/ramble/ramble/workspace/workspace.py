@@ -14,6 +14,7 @@ import os
 import re
 import shutil
 from collections import defaultdict
+from pathlib import Path
 from typing import Optional, Set
 
 from ruamel import yaml
@@ -210,14 +211,13 @@ def all_workspace_names(parent_dir=None):
 
     names = set()
     for wspath in wspaths:
-        if not os.path.exists(wspath):
+        path = Path(wspath)
+        if not path.exists():
             continue
 
-        candidates = os.listdir(wspath)
-        for candidate in candidates:
-            cand_root = os.path.join(wspath, candidate)
-            if valid_workspace_name(candidate) and is_workspace_dir(cand_root):
-                names.add(candidate)
+        for candidate_path in path.iterdir():
+            if valid_workspace_name(candidate_path.name) and is_workspace_dir(candidate_path):
+                names.add(candidate_path.name)
     return sorted(names)
 
 
@@ -298,12 +298,8 @@ def licenses_file(path):
 def all_config_files(path):
     """Returns path to all yaml files in workspace config directory"""
 
-    config_path = os.path.join(path, WORKSPACE_CONFIG_PATH)
-    config_files = [
-        os.path.join(config_path, f) for f in os.listdir(config_path) if f.endswith(".yaml")
-    ]
-
-    return config_files
+    config_path = Path(path) / WORKSPACE_CONFIG_PATH
+    return [str(f) for f in config_path.glob("*.yaml")]
 
 
 def template_path(ws_path, requested_template_name):
@@ -316,23 +312,14 @@ def template_path(ws_path, requested_template_name):
 
 def all_template_paths(path):
     """Returns (abs) path to available template files in the workspace"""
-    templates = []
-
-    config_path = os.path.join(path, WORKSPACE_CONFIG_PATH)
-    for root, _, files in os.walk(config_path):
-        templates.extend(os.path.join(root, f) for f in files if f.endswith(TEMPLATE_EXTENSION))
-
-    return templates
+    config_path = Path(path) / WORKSPACE_CONFIG_PATH
+    return [str(f) for f in config_path.rglob(f"*{TEMPLATE_EXTENSION}")]
 
 
 def is_workspace_dir(path):
     """Whether a directory contains a ramble workspace."""
-    ret_val = os.path.isdir(path)
-    if ret_val:
-        ret_val = ret_val and os.path.exists(
-            os.path.join(path, WORKSPACE_CONFIG_PATH, CONFIG_FILE_NAME)
-        )
-    return ret_val
+    p = Path(path)
+    return p.is_dir() and (p / WORKSPACE_CONFIG_PATH / CONFIG_FILE_NAME).exists()
 
 
 def create(name, read_default_template=True, parent_dir=None):

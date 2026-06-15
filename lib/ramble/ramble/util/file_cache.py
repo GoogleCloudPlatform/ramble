@@ -8,6 +8,7 @@
 
 import os
 import shutil
+from pathlib import Path
 
 from llnl.util.filesystem import mkdirp
 
@@ -38,8 +39,8 @@ class FileCache:
                 for cache files, this specifies how long Ramble should wait
                 before assuming that there is a deadlock.
         """
-        self.root = root.rstrip(os.path.sep)
-        if not os.path.exists(self.root):
+        self.root = Path(root)
+        if not self.root.exists():
             mkdirp(self.root)
 
         self._locks = {}
@@ -47,23 +48,20 @@ class FileCache:
 
     def destroy(self):
         """Remove all files under the cache root."""
-        for f in os.listdir(self.root):
-            path = os.path.join(self.root, f)
-            if os.path.isdir(path):
-                shutil.rmtree(path, True)
+        for path in self.root.iterdir():
+            if path.is_dir() and not path.is_symlink():
+                shutil.rmtree(path, ignore_errors=True)
             else:
-                os.remove(path)
+                path.unlink()
 
     def cache_path(self, key):
         """Path to the file in the cache for a particular key."""
-        return os.path.join(self.root, key)
+        return str(self.root / key)
 
     def _lock_path(self, key):
         """Path to the file in the cache for a particular key."""
-        keyfile = os.path.basename(key)
-        keydir = os.path.dirname(key)
-
-        return os.path.join(self.root, keydir, "." + keyfile + ".lock")
+        key_path = Path(key)
+        return str(self.root / key_path.parent / f".{key_path.name}.lock")
 
     def _get_lock(self, key):
         """Create a lock for a key, if necessary, and return a lock object."""
@@ -76,22 +74,22 @@ class FileCache:
 
         Return whether the cache file exists yet or not.
         """
-        cache_path = self.cache_path(key)
+        cache_path = Path(self.cache_path(key))
 
-        exists = os.path.exists(cache_path)
+        exists = cache_path.exists()
         if exists:
-            if not os.path.isfile(cache_path):
+            if not cache_path.is_file():
                 raise CacheError(f"Cache file is not a file: {cache_path}")
 
-            if not os.access(cache_path, os.R_OK | os.W_OK):
+            if not os.access(str(cache_path), os.R_OK | os.W_OK):
                 raise CacheError(f"Cannot access cache file: {cache_path}")
         else:
             # if the file is hierarchical, make parent directories
-            parent = os.path.dirname(cache_path)
-            if parent.rstrip(os.path.sep) != self.root:
+            parent = cache_path.parent
+            if parent != self.root:
                 mkdirp(parent)
 
-            if not os.access(parent, os.R_OK | os.W_OK):
+            if not os.access(str(parent), os.R_OK | os.W_OK):
                 raise CacheError(f"Cannot access cache directory: {parent}")
 
             # ensure lock is created for this key

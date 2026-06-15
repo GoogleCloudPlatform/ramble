@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import os
+from pathlib import Path
 
 _DRY_RUN_PATH_PREFIX = os.path.join("dry-run", "path", "to")
 
@@ -35,10 +36,11 @@ def create_symlink(base, link):
     """
     Create symlink of a file to give a known and predictable path
     """
-    if os.path.islink(link):
-        os.unlink(link)
+    link_path = Path(link)
+    if link_path.is_symlink():
+        link_path.unlink()
 
-    os.symlink(base, link)
+    link_path.symlink_to(base)
 
 
 def get_newest_experiment_file(base_directory):
@@ -54,30 +56,23 @@ def get_newest_experiment_file(base_directory):
     """
     newest_file = None
     max_mtime = -1.0
+    path = Path(base_directory)
 
-    stack = [base_directory]
-
-    while stack:
-        current_dir = stack.pop()
-        try:
-            with os.scandir(current_dir) as entries:
-                for entry in entries:
-                    try:
-                        if entry.is_file():
-                            if not entry.name.startswith("ramble_"):
-                                mtime = entry.stat().st_mtime
-                                if mtime > max_mtime:
-                                    max_mtime = mtime
-                                    newest_file = entry.path
-                        elif entry.is_dir(follow_symlinks=False):
-                            stack.append(entry.path)
-                    except FileNotFoundError:
-                        # File was deleted concurrently
-                        continue
-        except FileNotFoundError:
-            continue
+    try:
+        for entry in path.rglob("*"):
+            if entry.is_file() and not entry.name.startswith("ramble_"):
+                try:
+                    mtime = entry.stat().st_mtime
+                    if mtime > max_mtime:
+                        max_mtime = mtime
+                        newest_file = entry
+                except FileNotFoundError:
+                    # File was deleted concurrently
+                    continue
+    except FileNotFoundError:
+        pass
 
     if newest_file is None:
         return None, None
 
-    return newest_file, max_mtime
+    return str(newest_file), max_mtime

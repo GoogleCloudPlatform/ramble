@@ -22,6 +22,7 @@ import sys
 import traceback
 import types
 from enum import Enum
+from pathlib import Path
 from typing import Mapping
 
 from ruamel import yaml
@@ -481,11 +482,15 @@ class FastObjectChecker(Mapping):
         # Create a dictionary that will store the mapping between a
         # object name and its stat info
         cache = {}
-        if not os.path.isdir(self.objects_path):
+        objects_path = Path(self.objects_path)
+        if not objects_path.is_dir():
             return cache
-        for obj_name in os.listdir(self.objects_path):
-            # Skip non-directories in the object root.
-            obj_dir = os.path.join(self.objects_path, obj_name)
+
+        for obj_dir in objects_path.iterdir():
+            if not obj_dir.is_dir():
+                continue
+
+            obj_name = obj_dir.name
 
             # Warn about invalid names that look like objects.
             if not nm.valid_module_name(obj_name):
@@ -501,11 +506,11 @@ class FastObjectChecker(Mapping):
                 continue
 
             # Construct the file name from the directory
-            obj_file = os.path.join(self.objects_path, obj_name, self.object_file_name)
+            obj_file = obj_dir / self.object_file_name
 
             # Use stat here to avoid lots of calls to the filesystem.
             try:
-                sinfo = os.stat(obj_file)
+                sinfo = obj_file.stat()
             except OSError as e:
                 if e.errno == errno.ENOENT:
                     # No application.py file here.
@@ -1452,26 +1457,26 @@ def create_repo(
     If the namespace is not provided, use basename of root.
     Return the canonicalized path and namespace of the created repository.
     """
-    root = ramble.util.path.canonicalize_path(root)
+    root_path = Path(ramble.util.path.canonicalize_path(root))
     if not namespace:
-        namespace = os.path.basename(root)
+        namespace = root_path.name
 
     if not re.match(r"\w[\.\w-]*", namespace):
         raise InvalidNamespaceError(f"'{namespace}' is not a valid namespace.")
 
     existed = False
-    if os.path.exists(root):
-        if os.path.isfile(root):
+    if root_path.exists():
+        if root_path.is_file():
             raise BadRepoError(f"File {root} already exists and is not a directory")
-        elif os.path.isdir(root):
-            if not os.access(root, os.R_OK | os.W_OK):
+        elif root_path.is_dir():
+            if not os.access(root_path, os.R_OK | os.W_OK):
                 raise BadRepoError(f"Cannot create new repo in {root}: cannot access directory.")
-            if os.listdir(root):
+            if any(root_path.iterdir()):
                 raise BadRepoError(f"Cannot create new repo in {root}: directory is not empty.")
         existed = True
 
-    full_path = os.path.realpath(root)
-    parent = os.path.dirname(full_path)
+    full_path = str(root_path.resolve())
+    parent = root_path.parent
     if not os.access(parent, os.R_OK | os.W_OK):
         raise BadRepoError(f"Cannot create repository in {root}: can't access parent!")
 
@@ -1484,20 +1489,20 @@ def create_repo(
             # If not unified and subdir, create subdir
             config_name = unified_config
             for obj_type in type_definitions.values():
-                objects_path = os.path.join(root, obj_type["dir_name"])
+                objects_path = root_path / obj_type["dir_name"]
                 object_dirs.append(objects_path)
         else:
             config_name = type_definitions[object_type]["accepted_configs"][0]
-            objects_path = os.path.join(root, type_definitions[object_type]["dir_name"])
+            objects_path = root_path / type_definitions[object_type]["dir_name"]
             object_dirs.append(objects_path)
 
         if subdir is not None:
-            object_dirs = [os.path.join(root, subdir)]
+            object_dirs = [root_path / subdir]
 
         for objects_path in object_dirs:
             fs.mkdirp(objects_path)
 
-        config_path = os.path.join(root, config_name)
+        config_path = root_path / config_name
         with open(config_path, "w", encoding="utf-8") as config:
             config.write("repo:\n")
             config.write(f"  namespace: '{namespace}'\n")
@@ -1510,12 +1515,12 @@ def create_repo(
             shutil.rmtree(config_path, ignore_errors=True)
             if unified_repo:
                 for obj_type in type_definitions.values():
-                    objects_path = os.path.join(root, obj_type["dir_name"])
+                    objects_path = root_path / obj_type["dir_name"]
                     shutil.rmtree(objects_path, ignore_errors=True)
             else:
                 shutil.rmtree(objects_path, ignore_errors=True)
         else:
-            shutil.rmtree(root, ignore_errors=True)
+            shutil.rmtree(root_path, ignore_errors=True)
 
         raise BadRepoError(f"Failed to create new repository in {root}.") from e
 
@@ -1524,10 +1529,11 @@ def create_repo(
 
 def create_or_construct(path, namespace=None):
     """Create a repository, or just return a Repo if it already exists."""
-    if not os.path.exists(path):
-        fs.mkdirp(path)
-        create_repo(path, namespace)
-    return Repo(path)
+    path_obj = Path(path)
+    if not path_obj.exists():
+        fs.mkdirp(path_obj)
+        create_repo(path_obj, namespace)
+    return Repo(path_obj)
 
 
 def create(configuration, object_type=default_type):
