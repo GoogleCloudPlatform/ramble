@@ -820,6 +820,7 @@ ramble:
 
     def write_utilities(self):
         """Write workspace utilities out to the shared directory"""
+        import ramble.util.cleaner
         import ramble.util.file_editor
 
         if ramble.config.get("config:generate_file_editing_scripts", True):
@@ -832,6 +833,16 @@ ramble:
             )
             with open(base_script_path, "w+", encoding="utf-8") as f:
                 f.write(base_script_content)
+
+            # Write cleaner utility script
+            # TODO: Currently this is guarded by the generate_file_editing_scripts
+            # config. Should it use its own config setting?
+            cleaner_script_content = ramble.util.cleaner.get_cleaner_script()
+            cleaner_script_path = os.path.join(
+                self.shared_utilities_dir, ramble.util.cleaner.HELPER_SCRIPT_NAME
+            )
+            with open(cleaner_script_path, "w+", encoding="utf-8") as f:
+                f.write(cleaner_script_content)
 
     def write_auxiliary_software_files(self):
         """Write all auxiliary software files out to workspace"""
