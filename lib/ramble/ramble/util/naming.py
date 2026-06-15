@@ -17,10 +17,7 @@ import ramble.error
 
 __all__ = [
     "mod_to_class",
-    "ramble_module_to_python_module",
     "valid_module_name",
-    "valid_fully_qualified_module_name",
-    "validate_fully_qualified_module_name",
     "validate_module_name",
     "possible_ramble_module_names",
     "simplify_name",
@@ -33,9 +30,6 @@ NS_SEPARATOR = "::"
 
 # Valid module names can contain '-' but can't start with it.
 _valid_module_re = r"^\w[\w-]*$"
-
-# Valid module names can contain '-' but can't start with it.
-_valid_fully_qualified_module_re = r"^(\w[\w-]*)(\.\w[\w-]*)*$"
 
 
 def mod_to_class(mod_name):
@@ -69,16 +63,6 @@ def mod_to_class(mod_name):
         class_name = f"_{class_name}"
 
     return class_name
-
-
-def ramble_module_to_python_module(mod_name):
-    """Given a Ramble module name, returns the name by which it can be
-    imported in Python.
-    """
-    if re.match(r"[0-9]", mod_name):
-        mod_name = "num" + mod_name
-
-    return mod_name.replace("-", "_")
 
 
 def possible_ramble_module_names(python_mod_name):
@@ -151,21 +135,10 @@ def valid_module_name(mod_name):
     return bool(re.match(_valid_module_re, mod_name))
 
 
-def valid_fully_qualified_module_name(mod_name):
-    """Return whether mod_name is a valid namespaced module name."""
-    return bool(re.match(_valid_fully_qualified_module_re, mod_name))
-
-
 def validate_module_name(mod_name):
     """Raise an exception if mod_name is not valid."""
     if not valid_module_name(mod_name):
         raise InvalidModuleNameError(mod_name)
-
-
-def validate_fully_qualified_module_name(mod_name):
-    """Raise an exception if mod_name is not a valid namespaced module name."""
-    if not valid_fully_qualified_module_name(mod_name):
-        raise InvalidFullyQualifiedModuleNameError(mod_name)
 
 
 class InvalidModuleNameError(ramble.error.RambleError):
@@ -173,14 +146,6 @@ class InvalidModuleNameError(ramble.error.RambleError):
 
     def __init__(self, name):
         super().__init__("Invalid module name: " + name)
-        self.name = name
-
-
-class InvalidFullyQualifiedModuleNameError(ramble.error.RambleError):
-    """Raised when we encounter a bad full package name."""
-
-    def __init__(self, name):
-        super().__init__("Invalid fully qualified package name: " + name)
         self.name = name
 
 
