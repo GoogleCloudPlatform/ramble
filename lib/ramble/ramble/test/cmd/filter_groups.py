@@ -131,34 +131,38 @@ def test_global_filter_groups(workspace_name):
 
     # 3. Add a group with --scope workspace (requires active workspace)
     ws = ramble.workspace.create(workspace_name)
+    ramble.workspace.activate(ws)
     global_args = ["-w", workspace_name]
 
-    filter_groups_cmd(
-        "--scope",
-        "workspace",
-        "add",
-        "-n",
-        "ws-group",
-        "--where",
-        "{n_nodes} == 4",
-        global_args=global_args,
-    )
+    try:
+        filter_groups_cmd(
+            "--scope",
+            "workspace",
+            "add",
+            "-n",
+            "ws-group",
+            "--where",
+            "{n_nodes} == 4",
+            global_args=global_args,
+        )
 
-    # Verify it went to workspace config, not user config
-    with open(ws.config_file_path, encoding="utf-8") as f:
-        ws_content = f.read()
-        assert "ws-group:" in ws_content
-        assert "{n_nodes} == 4" in ws_content
+        # Verify it went to workspace config, not user config
+        with open(ws.config_file_path, encoding="utf-8") as f:
+            ws_content = f.read()
+            assert "ws-group:" in ws_content
+            assert "{n_nodes} == 4" in ws_content
 
-    with open(user_config_file, encoding="utf-8") as f:
-        user_content = f.read()
-        assert "ws-group:" not in user_content
+        with open(user_config_file, encoding="utf-8") as f:
+            user_content = f.read()
+            assert "ws-group:" not in user_content
 
-    # 4. Blame from top-level command
-    out = filter_groups_cmd("blame", global_args=global_args)
-    assert ws.config_file_path in out
-    assert "global-small" in out
-    assert "ws-group" in out
+        # 4. Blame from top-level command
+        out = filter_groups_cmd("blame", global_args=global_args)
+        assert ws.config_file_path in out
+        assert "global-small" in out
+        assert "ws-group" in out
+    finally:
+        ramble.workspace.deactivate()
 
     # 5. Remove global group
     filter_groups_cmd(
@@ -266,15 +270,21 @@ def test_global_filter_groups_errors(workspace_name):
     out = filter_groups_cmd("blame")
     assert "exclude_where:" in out
 
-    filter_groups_cmd("--scope", "workspace", "list", fail_on_error=False)
-    assert filter_groups_cmd.returncode != 0
+    with pytest.raises(SystemExit):
+        filter_groups_cmd("--scope", "workspace", "list", fail_on_error=False)
 
-    ramble.workspace.create(workspace_name)
+    ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
-    filter_groups_cmd(
-        "--scope", "workspace", "add", "-n", "ws-foo", "--where", "x", global_args=global_args
-    )
-    filter_groups_cmd("--scope", "workspace", "remove", "-n", "ws-foo", global_args=global_args)
+    ramble.workspace.activate(ws)
+    try:
+        filter_groups_cmd(
+            "--scope", "workspace", "add", "-n", "ws-foo", "--where", "x", global_args=global_args
+        )
+        filter_groups_cmd(
+            "--scope", "workspace", "remove", "-n", "ws-foo", global_args=global_args
+        )
+    finally:
+        ramble.workspace.deactivate()
 
 
 def test_global_filter_groups_no_subcommand(capsys):
