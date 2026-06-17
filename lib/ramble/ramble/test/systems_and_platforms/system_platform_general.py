@@ -14,7 +14,6 @@ import pytest
 import ramble.software_info
 import ramble.workspace
 from ramble.main import RambleCommand
-from ramble.util.command_runner import RunnerError
 
 import spack.util.spack_yaml as syaml
 
@@ -26,7 +25,7 @@ pytestmark = pytest.mark.usefixtures(
 )
 
 
-def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
+def test_system_platform_works(workspace_name, mock_platforms, mock_systems, ensure_spack_runner):
     ws = ramble.workspace.create(workspace_name)
     global_args = ["-w", workspace_name]
     workspace(
@@ -48,50 +47,44 @@ def test_system_platform_works(workspace_name, mock_platforms, mock_systems):
         global_args=global_args,
     )
 
-    try:
-        workspace("concretize", "--dry-run", global_args=global_args)
+    workspace("concretize", "--dry-run", global_args=global_args)
 
-        # Verify there is spack info in the workspace
-        with open(ws.config_file_path, encoding="utf-8") as f:
-            data = f.read()
-            assert "gromacs@{application::gromacs::version}" in data
-            assert "intel-mpi" in data
-            assert "intel-oneapi-mpi" in data
+    # Verify there is spack info in the workspace
+    with open(ws.config_file_path, encoding="utf-8") as f:
+        data = f.read()
+        assert "gromacs@{application::gromacs::version}" in data
+        assert "intel-mpi" in data
+        assert "intel-oneapi-mpi" in data
 
-        env_file = os.path.join(ws.software_dir, "spack", "gromacs", "spack.yaml")
-        workspace("setup", "--dry-run", global_args=["-D", ws.root])
+    env_file = os.path.join(ws.software_dir, "spack", "gromacs", "spack.yaml")
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
 
-        # Verify the packages.yaml files were merged
-        with open(env_file, encoding="utf-8") as f:
-            spack_config = syaml.load(stream=f)
+    # Verify the packages.yaml files were merged
+    with open(env_file, encoding="utf-8") as f:
+        spack_config = syaml.load(stream=f)
 
-        assert "spack" in spack_config
-        assert "packages" in spack_config["spack"]
-        assert "openmpi" in spack_config["spack"]["packages"]
-        assert "buildable" in spack_config["spack"]["packages"]["openmpi"]
-        assert "externals" in spack_config["spack"]["packages"]["openmpi"]
+    assert "spack" in spack_config
+    assert "packages" in spack_config["spack"]
+    assert "openmpi" in spack_config["spack"]["packages"]
+    assert "buildable" in spack_config["spack"]["packages"]["openmpi"]
+    assert "externals" in spack_config["spack"]["packages"]["openmpi"]
 
-        # Verify slurm portions of execute script (to show workflow was applied)
-        exec_file = os.path.join(
-            ws.experiment_dir, "gromacs", "lignocellulose", "generated", "slurm_experiment_sbatch"
-        )
-        assert os.path.isfile(exec_file)
-        with open(exec_file, encoding="utf-8") as f:
-            data = f.read()
-            assert "SBATCH" in data
-            # Ensure cores_per_node=4 propagated, and srun is used from slurm
-            assert "srun -n 4" in data
-        # Verify command variables were "defined"
-        log_file = os.path.join(ws.log_dir, "setup.latest", "gromacs.lignocellulose.generated.out")
-        expected = (
-            "max_nodes = 4 (dry-run) from 'sinfo -p " "mock-partition -O 'Nodes' | tail -n 1'"
-        )
-        with open(log_file, encoding="utf-8") as f:
-            data = f.read()
-            assert expected in data
-
-    except RunnerError as e:
-        pytest.skip(str(e))
+    # Verify slurm portions of execute script (to show workflow was applied)
+    exec_file = os.path.join(
+        ws.experiment_dir, "gromacs", "lignocellulose", "generated", "slurm_experiment_sbatch"
+    )
+    assert os.path.isfile(exec_file)
+    with open(exec_file, encoding="utf-8") as f:
+        data = f.read()
+        assert "SBATCH" in data
+        # Ensure cores_per_node=4 propagated, and srun is used from slurm
+        assert "srun -n 4" in data
+    # Verify command variables were "defined"
+    log_file = os.path.join(ws.log_dir, "setup.latest", "gromacs.lignocellulose.generated.out")
+    expected = "max_nodes = 4 (dry-run) from 'sinfo -p " "mock-partition -O 'Nodes' | tail -n 1'"
+    with open(log_file, encoding="utf-8") as f:
+        data = f.read()
+        assert expected in data
 
 
 def test_platform_validator_threads_per_core(workspace_name, mock_platforms, mock_systems):
