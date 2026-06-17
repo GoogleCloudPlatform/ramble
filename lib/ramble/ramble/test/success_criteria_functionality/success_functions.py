@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.main import RambleCommand
 
 # everything here uses the mock_workspace_path
@@ -20,9 +19,7 @@ workspace = RambleCommand("workspace")
 ramble_on = RambleCommand("on")
 
 
-def test_success_function(
-    mutable_config, mutable_mock_workspace_path, mock_applications, workspace_name
-):
+def test_success_function(mock_applications, make_workspace_from_config):
     test_config = """
 ramble:
   variables:
@@ -42,20 +39,13 @@ ramble:
     packages: {}
     environments: {}
 """
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    workspace("setup", global_args=["-w", ws_name])
+    ramble_on(global_args=["-w", ws_name])
+    workspace("analyze", global_args=["-w", ws_name])
 
-        with open(config_path, "w+", encoding="utf-8") as f:
-            f.write(test_config)
-        ws._re_read()
-
-        workspace("setup", global_args=["-w", workspace_name])
-        ramble_on(global_args=["-w", workspace_name])
-        workspace("analyze", global_args=["-w", workspace_name])
-
-        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-            data = f.read()
-            assert "FAILED" in data
-            assert "0.9 s" in data
+    with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+        data = f.read()
+        assert "FAILED" in data
+        assert "0.9 s" in data

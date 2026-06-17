@@ -10,7 +10,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.pkg_man.builtin.spack_lightweight import ValidationFailedError
 
@@ -21,7 +20,10 @@ workspace = RambleCommand("workspace")
 
 @pytest.mark.long
 def test_package_manager_requirements_zlib(
-    mock_applications, mock_modifiers, workspace_name, ensure_spack_runner
+    mock_applications,
+    mock_modifiers,
+    ensure_spack_runner,
+    make_workspace_from_config,
 ):
     test_config = """
 ramble:
@@ -48,29 +50,25 @@ ramble:
         packages: []
 """
 
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
+    workspace("setup", global_args=["-w", ws_name])
 
-        with open(config_path, "w+", encoding="utf-8") as f:
-            f.write(test_config)
-        ws._re_read()
+    spack_yaml = os.path.join(ws.software_dir, "spack", "zlib-configs", "spack.yaml")
 
-        workspace("setup", global_args=["-w", workspace_name])
+    assert os.path.isfile(spack_yaml)
 
-        spack_yaml = os.path.join(ws.software_dir, "spack", "zlib-configs", "spack.yaml")
-
-        assert os.path.isfile(spack_yaml)
-
-        with open(spack_yaml, encoding="utf-8") as f:
-            data = f.read()
-            assert "config:" in data
-            assert "debug: true" in data
+    with open(spack_yaml, encoding="utf-8") as f:
+        data = f.read()
+        assert "config:" in data
+        assert "debug: true" in data
 
 
 def test_package_manager_requirements_error(
-    mock_applications, mock_modifiers, workspace_name, ensure_spack_runner
+    mock_applications,
+    mock_modifiers,
+    ensure_spack_runner,
+    make_workspace_from_config,
 ):
     test_config = """
 ramble:
@@ -97,16 +95,9 @@ ramble:
         packages: []
 """
 
-    with ramble.workspace.create(workspace_name) as ws:
-        ws.write()
+    ws, ws_name = make_workspace_from_config(test_config)
 
-        config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-
-        with open(config_path, "w+", encoding="utf-8") as f:
-            f.write(test_config)
-        ws._re_read()
-
-        with pytest.raises(
-            ValidationFailedError, match='Validation of: "spack list not-a-package" failed'
-        ):
-            workspace("setup", global_args=["-w", workspace_name])
+    with pytest.raises(
+        ValidationFailedError, match='Validation of: "spack list not-a-package" failed'
+    ):
+        workspace("setup", global_args=["-w", ws_name])
