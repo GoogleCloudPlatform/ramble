@@ -379,7 +379,6 @@ class Renderer:
                 vector_vars[var] = val.copy()
                 max_vector_size = max(len(val), max_vector_size)
 
-        new_objects = []
         if vector_vars:
             # Check that sizes are the same
             length_mismatch = False
@@ -402,29 +401,28 @@ class Renderer:
 
             # Iterate over the vector length, and set the value in the
             # object dict to the index value.
-            for i in range(max_vector_size):
-                obj_vars = {}
-                for var, val in vector_vars.items():
-                    if len(val) > i:
-                        obj_vars[var] = val[i]
+            def _generator():
+                for i in range(max_vector_size):
+                    obj_vars = {}
+                    for var, val in vector_vars.items():
+                        if len(val) > i:
+                            obj_vars[var] = val[i]
 
-                if matrix_objects:
-                    for matrix_object in matrix_objects:
-                        # Combine vector vars with matrix object
-                        # Matrix object overrides vector vars if collision
-                        # (though collision shouldn't happen)
-                        combined = obj_vars.copy()
-                        combined.update(matrix_object)
-                        new_objects.append(combined)
-                else:
-                    new_objects.append(obj_vars.copy())
+                    if matrix_objects:
+                        for matrix_object in matrix_objects:
+                            # Combine vector vars with matrix object
+                            # Matrix object overrides vector vars if collision
+                            # (though collision shouldn't happen)
+                            yield {**obj_vars, **matrix_object}
+                    else:
+                        yield obj_vars
+
+            return _generator()
 
         elif matrix_generator:
-            new_objects = matrix_generator
+            return matrix_generator
         else:
-            new_objects = [{}]
-
-        return new_objects
+            return [{}]
 
     def _filter_and_yield_objects(
         self, render_group, object_variables, new_objects, exclude_where, n_repeats
