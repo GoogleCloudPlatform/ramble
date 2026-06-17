@@ -7,8 +7,6 @@
 # except according to those terms.
 
 import os
-import shutil
-import sys
 
 import pytest
 
@@ -21,8 +19,6 @@ workspace = ramble.main.RambleCommand("workspace")
 on = ramble.main.RambleCommand("on")
 
 
-@pytest.mark.skipif(sys.platform != "linux", reason="linux only given the find command usage")
-@pytest.mark.skipif(shutil.which("find") is None, reason="skip if `find` is not in the path")
 @pytest.mark.maybeslow
 def test_cleanup_directive(mock_applications, workspace_name):
     global_args = ["-w", workspace_name]

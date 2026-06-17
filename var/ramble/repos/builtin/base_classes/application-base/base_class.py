@@ -13,6 +13,7 @@ import importlib.util
 import operator
 import os
 import re
+import shlex
 import shutil
 import stat
 import string
@@ -59,7 +60,7 @@ from ramble.language.shared_language import (
     register_builtin,
     register_phase,
 )
-from ramble.util import conversions
+from ramble.util import cleaner, conversions
 from ramble.util.foms import FomType, SummaryFoms, get_literal_from_regex
 from ramble.util.logger import logger
 from ramble.util.naming import NS_SEPARATOR
@@ -1696,16 +1697,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             else:
                 dir = self.expander.experiment_run_dir
             regex = self.expander.expand_var(cleanup_props["regex"])
-            if cleanup_props["recurse"]:
-                recurse_opt = ""
-            else:
-                recurse_opt = "-maxdepth 1"
-            regex_opts = f"-regextype posix-extended -regex '{regex}'"
-            delete_opts = "-exec rm -rf {} +"
-            find_cmd = f"find '{dir}' -mindepth 1 {recurse_opt} {regex_opts} {delete_opts}"
+            cleaner_script = cleaner.get_cleaner_exec_path()
+            recurse_flag = " --recurse" if cleanup_props["recurse"] else ""
+            cleaner_cmd = (
+                f'python3 "{cleaner_script}" '
+                f"--directory {shlex.quote(dir)} "
+                f"--regex {shlex.quote(regex)}"
+                f"{recurse_flag}"
+            )
 
             commands.append(f"# {key}-cleanup: {name}")
-            commands.append(find_cmd)
+            commands.append(cleaner_cmd)
 
         return commands
 
