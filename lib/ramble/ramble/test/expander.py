@@ -368,3 +368,15 @@ def test_extra_vars_propagation():
     assert expander.expand_var(in_str_bool) == "True"
     assert expander.expand_var(in_str_bool, extra_vars={"my_val": 4}) == "False"
     assert expander.expand_var(in_str_bool, extra_vars={"my_bool": 0}) == "0"
+
+
+def test_expander_copy_preserves_no_expand_vars():
+    expansion_vars = {
+        "var1": "{var2}",
+        "var2": "3",
+    }
+    expander = ramble.expander.Expander(expansion_vars, None, no_expand_vars={"var1"})
+    assert expander.expand_var("{var1}") == "{var2}"
+
+    copied = expander.copy()
+    assert copied.expand_var("{var1}") == "{var2}"

@@ -544,7 +544,11 @@ class Expander:
         self.flush_used_variable_stage()
 
     def copy(self):
-        return Expander(self._variables.copy(), self._experiment_set)
+        return Expander(
+            self._variables.copy(),
+            self._experiment_set,
+            self._no_expand_vars.copy(),
+        )
 
     @property
     def application_name(self):
