@@ -13,21 +13,14 @@ import pytest
 import ramble.workspace
 from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
-from ramble.pkg_man.builtin.spack_lightweight import SpackRunner
 from ramble.software_environments import RambleSoftwareEnvironmentError
-from ramble.util.command_runner import RunnerError
 
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
 
 workspace = RambleCommand("workspace")
 
 
-def test_software_spec_injection_works(mock_modifiers, workspace_name):
-
-    try:
-        SpackRunner()
-    except RunnerError as e:
-        pytest.skip(e)
+def test_software_spec_injection_works(mock_modifiers, workspace_name, ensure_spack_runner):
 
     global_args = ["-w", workspace_name]
 
@@ -86,12 +79,9 @@ def test_software_spec_injection_works(mock_modifiers, workspace_name):
         assert "injected by ramble" in info_output
 
 
-def test_existing_software_spec_does_not_inject(mock_modifiers, workspace_name):
-
-    try:
-        SpackRunner()
-    except RunnerError as e:
-        pytest.skip(e)
+def test_existing_software_spec_does_not_inject(
+    mock_modifiers, workspace_name, ensure_spack_runner
+):
 
     global_args = ["-w", workspace_name]
 
@@ -151,12 +141,9 @@ def test_existing_software_spec_does_not_inject(mock_modifiers, workspace_name):
         assert "injected by ramble" not in info_output
 
 
-def test_software_spec_injection_missing_compiler_errors(mock_modifiers, workspace_name):
-
-    try:
-        SpackRunner()
-    except RunnerError as e:
-        pytest.skip(e)
+def test_software_spec_injection_missing_compiler_errors(
+    mock_modifiers, workspace_name, ensure_spack_runner
+):
 
     global_args = ["-w", workspace_name]
 
@@ -209,12 +196,9 @@ def test_software_spec_injection_missing_compiler_errors(mock_modifiers, workspa
             workspace("info", "--software", global_args=global_args)
 
 
-def test_software_spec_compiler_injection_works(mock_applications, mock_modifiers, workspace_name):
-
-    try:
-        SpackRunner()
-    except RunnerError as e:
-        pytest.skip(e)
+def test_software_spec_compiler_injection_works(
+    mock_applications, mock_modifiers, workspace_name, ensure_spack_runner
+):
 
     global_args = ["-w", workspace_name]
 
