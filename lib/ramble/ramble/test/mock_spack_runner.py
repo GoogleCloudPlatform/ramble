@@ -29,6 +29,7 @@ class MockSpackRunner:
         self.env_path = None
         self.concretized = False
         self.dry_run = False
+        self.env_contents = []
 
     def set_env(self, env_path, require_exists=True):
         self.env_path = env_path
@@ -50,6 +51,7 @@ class MockSpackRunner:
             return
 
         # write dummy spack.yaml and spack.lock
+        os.makedirs(self.env_path, exist_ok=True)
         spack_yaml = os.path.join(self.env_path, "spack.yaml")
         with open(spack_yaml, "w", encoding="utf-8") as f:
             f.write("specs:\n  - zlib\n")
@@ -80,14 +82,11 @@ class MockSpackRunner:
     def generate_source_command(self):
         return ["echo 'source spack'"]
 
-    def generate_activate_command(self):
-        return ["echo 'activate spack'"]
-
-    def generate_deactivate_command(self):
-        return ["echo 'deactivate spack'"]
+    def generate_activate_command(self, shell="bash"):
+        return ["spack env activate %s" % self.env_path]
 
     def configure_env(self, env_path):
-        pass
+        self.env_path = env_path
 
     def add_config_file(self, config_file):
         pass
@@ -103,14 +102,22 @@ class MockSpackRunner:
         return tmp_path
 
     def migrate_stage_env(self, stage_env_path: str, ws_env_path: str):
-        pass
+        import shutil
+
+        if stage_env_path and os.path.exists(stage_env_path):
+            os.makedirs(ws_env_path, exist_ok=True)
+            for item in os.listdir(stage_env_path):
+                s = os.path.join(stage_env_path, item)
+                d = os.path.join(ws_env_path, item)
+                if os.path.isdir(s):
+                    self.migrate_stage_env(s, d)
+                else:
+                    shutil.copy2(s, d)
 
     def create_env(self, env_path):
         if not os.path.exists(env_path):
             os.makedirs(env_path)
-
-    def add_config(self, config):
-        pass
+        self.env_path = env_path
 
     def apply_configs(self, stage_path=None):
         pass
@@ -122,16 +129,34 @@ class MockSpackRunner:
         pass
 
     def add_spec(self, spec):
-        pass
+        if spec not in self.env_contents:
+            self.env_contents.append(spec)
 
     def generate_env_file(self):
         pass
 
     def added_packages(self):
-        return []
+        import re
+
+        package_name_regex = re.compile(r"[\s-]*(?P<package_name>[\w][\w-]+).*")
+        pkg_names = []
+        for pkg in self.env_contents:
+            match = package_name_regex.match(pkg)
+            if match:
+                pkg_names.append(match.group("package_name"))
+        return pkg_names
 
     def install(self):
         pass
 
     def get_package_path(self, spec):
         return "zlib", "/path/to/zlib"
+
+    def push_to_spack_cache(self, spack_cache_path, compiler_specs):
+        pass
+
+    def install_compiler(self, pkg_spec, compiler_spec):
+        pass
+
+    def get_spack_python(self):
+        return None

@@ -6,11 +6,14 @@
 
 import os
 import sys
+from unittest.mock import patch
 
 import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.pkg_man.builtin import spack_lightweight
+from ramble.test.mock_spack_runner import MockSpackRunner
 
 pytestmark = pytest.mark.usefixtures(
     "mutable_config",
@@ -185,16 +188,23 @@ def test_spack_push_to_cache(workspace_name, mock_applications):
         global_args=global_args,
     )
 
-    workspace(
-        "setup",
-        "--phases",
-        "software_create_env",
-        "software_configure",
-        global_args=global_args,
-    )
+    with patch.object(
+        spack_lightweight, "SpackRunner", return_value=MockSpackRunner()
+    ):
+        workspace(
+            "setup",
+            "--phases",
+            "software_create_env",
+            "software_configure",
+            global_args=global_args,
+        )
 
-    cache_path = os.path.join(ws.root, "test_cache")
+        cache_path = os.path.join(ws.root, "test_cache")
 
-    workspace(
-        "push-to-cache", "-d", cache_path, "--dry-run", global_args=global_args
-    )
+        workspace(
+            "push-to-cache",
+            "-d",
+            cache_path,
+            "--dry-run",
+            global_args=global_args,
+        )

@@ -9,12 +9,15 @@
 import glob
 import os
 import re
+from unittest.mock import patch
 
 import pytest
 
 import ramble.workspace
 from ramble.main import RambleCommand
+from ramble.pkg_man.builtin import spack_lightweight
 from ramble.test.dry_run_helpers import search_files_for_string
+from ramble.test.mock_spack_runner import MockSpackRunner
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -23,7 +26,10 @@ workspace = RambleCommand("workspace")
 
 
 @pytest.mark.long
-def test_wrfv4_spack_dry_run(mutable_config, mutable_mock_workspace_path, workspace_name):
+@patch.object(spack_lightweight, "SpackRunner", side_effect=MockSpackRunner)
+def test_wrfv4_spack_dry_run(
+    mock_spack_runner, mutable_config, mutable_mock_workspace_path, workspace_name
+):
     test_config = """
 ramble:
   variants:
