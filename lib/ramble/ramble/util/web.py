@@ -6,22 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-import codecs
 import errno
-import multiprocessing.pool
 import os
 import os.path
 import re
 import shutil
 import ssl
 import sys
-import traceback
-from html.parser import HTMLParser
-from typing import Any, Dict, List, Set, Tuple
+from typing import Any, Dict, List
 from urllib.error import URLError
 from urllib.request import Request, urlopen
 
-import llnl.util.lang
 from llnl.util.filesystem import mkdirp, rename
 
 import ramble
@@ -32,31 +27,10 @@ import spack.error
 import spack.util.gcs as gcs_util
 import spack.util.s3 as s3_util
 import spack.util.url as url_util
-from spack.util.compression import ALLOWED_ARCHIVE_TYPES
 from spack.util.path import convert_to_posix_path
 
 #: User-Agent used in Request objects
 RAMBLE_USER_AGENT = f"Ramblebot/{ramble.ramble_version}"
-
-
-# Also, HTMLParseError is deprecated and never raised.
-class HTMLParseError(Exception):
-    pass
-
-
-class LinkParser(HTMLParser):
-    """This parser just takes an HTML page and strips out the hrefs on the
-    links.  Good enough for a really simple spider."""
-
-    def __init__(self):
-        HTMLParser.__init__(self)
-        self.links = []
-
-    def handle_starttag(self, tag, attrs):
-        if tag == "a":
-            for attr, val in attrs:
-                if attr == "href":
-                    self.links.append(val)
 
 
 def uses_ssl(parsed_url):
@@ -287,218 +261,6 @@ def remove_url(url, recursive=False):
         return
 
     # Don't even try for other URL schemes.
-
-
-def _iter_s3_contents(contents, prefix):
-    for entry in contents:
-        key = entry["Key"]
-
-        if not key.startswith("/"):
-            key = "/" + key
-
-        key = os.path.relpath(key, prefix)
-
-        if key == ".":
-            continue
-
-        yield key
-
-
-def _list_s3_objects(client, bucket, prefix, num_entries, start_after=None):
-    list_args = {"Bucket": bucket, "Prefix": prefix[1:], "MaxKeys": num_entries}
-
-    if start_after is not None:
-        list_args["StartAfter"] = start_after
-
-    result = client.list_objects_v2(**list_args)
-
-    last_key = None
-    if result["IsTruncated"]:
-        last_key = result["Contents"][-1]["Key"]
-
-    iter = _iter_s3_contents(result["Contents"], prefix)
-
-    return iter, last_key
-
-
-def _iter_s3_prefix(client, url, num_entries=1024):
-    key = None
-    bucket = url.netloc
-    prefix = re.sub(r"^/*", "/", url.path)
-
-    while True:
-        contents, key = _list_s3_objects(client, bucket, prefix, num_entries, start_after=key)
-
-        yield from contents
-
-        if not key:
-            break
-
-
-def _iter_local_prefix(path):
-    for root, _, files in os.walk(path):
-        for f in files:
-            yield os.path.relpath(os.path.join(root, f), path)
-
-
-def list_url(url, recursive=False):
-    url = url_util.parse(url)
-
-    local_path = url_util.local_file_path(url)
-    if local_path:
-        if recursive:
-            return list(_iter_local_prefix(local_path))
-        return [
-            subpath
-            for subpath in os.listdir(local_path)
-            if os.path.isfile(os.path.join(local_path, subpath))
-        ]
-
-    if url.scheme == "s3":
-        s3 = s3_util.create_s3_session(url)
-        if recursive:
-            return list(_iter_s3_prefix(s3, url))
-
-        return list({key.split("/", 1)[0] for key in _iter_s3_prefix(s3, url)})
-
-    elif url.scheme == "gs":
-        gcs = gcs_util.GCSBucket(url)
-        return gcs.get_all_blobs(recursive=recursive)
-
-
-def spider(root_urls, depth=0, concurrency=32):
-    """Get web pages from root URLs.
-
-    If depth is specified (e.g., depth=2), then this will also follow
-    up to <depth> levels of links from each root.
-
-    Args:
-        root_urls (str | list): root urls used as a starting point
-            for spidering
-        depth (int): level of recursion into links
-        concurrency (int): number of simultaneous requests that can be sent
-
-    Returns:
-        A dict of pages visited (URL) mapped to their full text and the
-        set of visited links.
-    """
-    # Cache of visited links, meant to be captured by the closure below
-    _visited = set()
-
-    def _spider(url, collect_nested):
-        """Fetches URL and any pages it links to.
-
-        Prints out a warning only if the root can't be fetched; it ignores
-        errors with pages that the root links to.
-
-        Args:
-            url (str): url being fetched and searched for links
-            collect_nested (bool): whether we want to collect arguments
-                for nested spidering on the links found in this url
-
-        Returns:
-            A tuple of:
-            - pages: dict of pages visited (URL) mapped to their full text.
-            - links: set of links encountered while visiting the pages.
-            - spider_args: argument for subsequent call to spider
-        """
-        pages: Dict[str, str] = {}  # dict from page URL -> text content.
-        links: Set[str] = set()  # set of all links seen on visited pages.
-        subcalls: List[Tuple] = []
-
-        try:
-            response_url, _, response = read_from_url(url, "text/html")
-            if not response_url or not response:
-                return pages, links, subcalls
-
-            page = codecs.getreader("utf-8")(response).read()
-            pages[response_url] = page
-
-            # Parse out the links in the page
-            link_parser = LinkParser()
-            link_parser.feed(page)
-
-            while link_parser.links:
-                raw_link = link_parser.links.pop()
-                abs_link = url_util.join(response_url, raw_link.strip(), resolve_href=True)
-                links.add(abs_link)
-
-                # Skip stuff that looks like an archive
-                if any(raw_link.endswith(s) for s in ALLOWED_ARCHIVE_TYPES):
-                    continue
-
-                # Skip already-visited links
-                if abs_link in _visited:
-                    continue
-
-                # If we're not at max depth, follow links.
-                if collect_nested:
-                    subcalls.append((abs_link,))
-                    _visited.add(abs_link)
-
-        except URLError as e:
-            logger.debug(str(e))
-
-            if hasattr(e, "reason") and isinstance(e.reason, ssl.SSLError):
-                logger.warn(
-                    "Ramble was unable to fetch url list due to a "
-                    "certificate verification problem. You can try "
-                    "running ramble -k, which will not check SSL "
-                    "certificates. Use this at your own risk."
-                )
-
-        except HTMLParseError as e:
-            # This error indicates that Python's HTML parser sucks.
-            msg = "Got an error parsing HTML."
-            logger.warn(msg, url, "HTMLParseError: " + str(e))
-
-        except Exception as e:
-            # Other types of errors are completely ignored,
-            # except in debug mode
-            logger.debug(f"Error in _spider: {type(e)}:{str(e)}", traceback.format_exc())
-
-        finally:
-            logger.debug(f"SPIDER: [url={url}]")
-
-        return pages, links, subcalls
-
-    if isinstance(root_urls, str):
-        root_urls = [root_urls]
-
-    # Clear the local cache of visited pages before starting the search
-    _visited.clear()
-
-    current_depth = 0
-    pages, links, spider_args = {}, set(), []
-
-    collect = current_depth < depth
-    for root in root_urls:
-        root = url_util.parse(root)
-        spider_args.append((root, collect))
-
-    tp = multiprocessing.pool.ThreadPool(processes=concurrency)
-    try:
-        while current_depth <= depth:
-            logger.debug(
-                "SPIDER: [depth={}, max_depth={}, urls={}]".format(
-                    current_depth, depth, len(spider_args)
-                )
-            )
-            results = tp.map(llnl.util.lang.star(_spider), spider_args)
-            spider_args = []
-            collect = current_depth < depth
-            for sub_pages, sub_links, sub_spider_args in results:
-                sub_spider_args = [x + (collect,) for x in sub_spider_args]
-                pages.update(sub_pages)
-                links.update(sub_links)
-                spider_args.extend(sub_spider_args)
-
-            current_depth += 1
-    finally:
-        tp.terminate()
-        tp.join()
-
-    return pages, links
 
 
 def _urlopen(req, *args, **kwargs):

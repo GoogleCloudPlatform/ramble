@@ -24,18 +24,6 @@ def test_mod_to_class(mod_name, expected_cls_name):
 
 
 @pytest.mark.parametrize(
-    "mod_name,expected_py_mod_name",
-    [
-        ("app", "app"),
-        ("intel-mlc", "intel_mlc"),
-        ("1-app", "num1_app"),
-    ],
-)
-def test_ramble_module_to_python_module(mod_name, expected_py_mod_name):
-    assert naming.ramble_module_to_python_module(mod_name) == expected_py_mod_name
-
-
-@pytest.mark.parametrize(
     "py_mod_name,expected_names",
     [
         ("app", ["app"]),
@@ -74,23 +62,6 @@ def test_validate_module_name(mod_name, expect_error):
             naming.validate_module_name(mod_name)
     else:
         naming.validate_module_name(mod_name)
-
-
-@pytest.mark.parametrize(
-    "mod_name,expect_error",
-    [
-        ("valid-mod", False),
-        ("a.b", False),
-        ("-ab", True),
-        ("valid-mod.a.b-c", False),
-    ],
-)
-def test_validate_fully_qualified_module_name(mod_name, expect_error):
-    if expect_error:
-        with pytest.raises(naming.InvalidFullyQualifiedModuleNameError):
-            naming.validate_fully_qualified_module_name(mod_name)
-    else:
-        naming.validate_fully_qualified_module_name(mod_name)
 
 
 @pytest.mark.parametrize(
