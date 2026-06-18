@@ -19,7 +19,6 @@ from ramble.language.shared_language import *
 from ramble.spec import Spec
 from ramble.util.command_runner import (
     CommandRunner,
-    NoPathRunnerError,
     RunnerError,
     ValidationFailedError,
 )

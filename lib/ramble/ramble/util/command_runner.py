@@ -197,9 +197,5 @@ class RunnerError(Exception):
     """Raised when a problem occurs with a spack environment"""
 
 
-class NoPathRunnerError(RunnerError):
-    """Raised when a runner is used that does not have a path set"""
-
-
 class ValidationFailedError(RunnerError):
     """Raised when a package manager requirement was not met"""

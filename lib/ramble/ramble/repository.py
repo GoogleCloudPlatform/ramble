@@ -369,18 +369,6 @@ def set_path(repo, object_type=default_type):
 
 
 @contextlib.contextmanager
-def additional_repository(repository, object_type=default_type):
-    """Adds temporarily a repository to the default one.
-
-    Args:
-        repository: repository to be added
-    """
-    paths[object_type].put_first(repository)
-    yield
-    paths[object_type].remove(repository)
-
-
-@contextlib.contextmanager
 def use_repositories(*paths_and_repos, object_type=default_type):
     """Use the repositories passed as arguments within the context manager.
 
@@ -464,11 +452,6 @@ class FastObjectChecker(Mapping):
 
         #: Reference to the appropriate entry in the global cache
         self._objects_to_stats = self._paths_cache[objects_path]
-
-    def invalidate(self):
-        """Regenerate cache for this checker."""
-        self._paths_cache[self.objects_path] = self._create_new_cache()
-        self._objects_to_stats = self._paths_cache[self.objects_path]
 
     def _create_new_cache(self):
         """Create a new cache for objects in a repo.
@@ -597,9 +580,6 @@ class Indexer(metaclass=abc.ABCMeta):
 
     def create(self):
         self.index = self._create()
-
-    def set_object_type(self, object_type):
-        self.object_type = object_type
 
     @abc.abstractmethod
     def _create(self):
@@ -855,10 +835,6 @@ class RepoPath:
     def all_objects(self):
         for name in self.all_object_names():
             yield self.get(name)
-
-    def all_object_classes(self):
-        for name in self.all_object_names():
-            yield self.get_obj_class(name)
 
     def find_module(self, fullname, path=None):
         """Implements precedence for overlaid namespaces.
@@ -1261,10 +1237,6 @@ class Repo:
         # Install the object's .py file itself.
         fs.install(self.filename_for_object_name(spec.name), path)
 
-    def purge(self):
-        """Clear entire object instance cache."""
-        self._instances.clear()
-
     @property
     def index(self):
         """Construct the index for this repo lazily."""
@@ -1342,14 +1314,6 @@ class Repo:
         """
         for name in self.all_object_names():
             yield self.get(name)
-
-    def all_object_classes(self):
-        """Iterator over all object *classes* in the repository.
-
-        Use this with care, because loading objects is slow.
-        """
-        for name in self.all_object_names():
-            yield self.get_obj_class(name)
 
     def exists(self, obj_name):
         """Whether a object with the supplied name exists."""
@@ -1520,14 +1484,6 @@ def create_repo(
         raise BadRepoError(f"Failed to create new repository in {root}.") from e
 
     return full_path, namespace
-
-
-def create_or_construct(path, namespace=None):
-    """Create a repository, or just return a Repo if it already exists."""
-    if not os.path.exists(path):
-        fs.mkdirp(path)
-        create_repo(path, namespace)
-    return Repo(path)
 
 
 def create(configuration, object_type=default_type):
