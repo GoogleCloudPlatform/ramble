@@ -22,6 +22,9 @@ reserved_variants = {
     "platform",
     "version",
     "workflow_manager",
+    "is_repeat_child",
+    "is_repeat_parent",
+    "repeat_index",
 }
 
 variant_types = Enum("variant_types", ["default", "experiment", "version"])
