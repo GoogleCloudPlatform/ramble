@@ -51,8 +51,3 @@ class Families:
             out_str += f"{indentation}{self.family_type}={family}\n"
 
         return out_str
-
-    def add_families(self, families: List[str]):
-        """Add new families to this object"""
-        updated_families = sorted(set(self.families + families))
-        self.families = updated_families

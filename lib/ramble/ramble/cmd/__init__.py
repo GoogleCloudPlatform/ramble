@@ -35,14 +35,6 @@ def python_name(cmd_name):
     return cmd_name.replace("-", "_")
 
 
-def require_python_name(pname):
-    """Require that the provided name is a valid python name (per
-    python_name()). Useful for checking parameters for function
-    prerequisites."""
-    if python_name(pname) != pname:
-        raise PythonNameError(pname)
-
-
 def cmd_name(python_name):
     """Convert module name (with ``_``) to command name (with ``-``)."""
     return python_name.replace("_", "-")
@@ -81,15 +73,6 @@ def all_commands():
         _all_commands.sort()
 
     return _all_commands
-
-
-def remove_options(parser, *options):
-    """Remove some options from a parser."""
-    for option in options:
-        for action in parser._actions:
-            if vars(action)["option_strings"][0] == option:
-                parser._handle_conflict_resolve(None, [(option, action)])
-                break
 
 
 def get_module(cmd_name):
@@ -139,14 +122,6 @@ def get_command(cmd_name):
     require_cmd_name(cmd_name)
     pname = python_name(cmd_name)
     return getattr(get_module(cmd_name), pname)
-
-
-class PythonNameError(ramble.error.RambleError):
-    """Exception class thrown for impermissible python names"""
-
-    def __init__(self, name):
-        self.name = name
-        super().__init__(f"{name} is not a permissible Python name.")
 
 
 class CommandNameError(ramble.error.RambleError):
