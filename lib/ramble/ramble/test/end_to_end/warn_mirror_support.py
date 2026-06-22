@@ -11,7 +11,6 @@ import os
 
 import pytest
 
-import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import search_files_for_string
 
@@ -29,7 +28,7 @@ def assert_text_in_mirror_logs(ws, text):
     assert search_files_for_string(mirror_logs, text)
 
 
-def test_warn_mirror_support(tmpdir):
+def test_warn_mirror_support(tmpdir, make_workspace_from_config):
     test_config = """
 ramble:
   variants:
@@ -50,16 +49,7 @@ ramble:
     environments: {}
 """
     ws_name = "test_pip_mirror_support"
-    ws = ramble.workspace.create(ws_name)
-    ramble.workspace.activate(ws)
-    ws.write()
-
-    config_path = os.path.join(ws.config_dir, ramble.workspace.CONFIG_FILE_NAME)
-
-    with open(config_path, "w+", encoding="utf-8") as f:
-        f.write(test_config)
-
-    ws._re_read()
+    ws, ws_name = make_workspace_from_config(test_config, name=ws_name, activate=True)
 
     mirror_path = os.path.join(tmpdir, ws_name)
     workspace("mirror", "--dry-run", "-d", mirror_path)
