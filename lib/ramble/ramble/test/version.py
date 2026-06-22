@@ -360,55 +360,56 @@ def test_version_variable_expansion_info(workspace_name):
 def test_repeat_modifier_versions_error(workspace_name):
     global_args = ["-w", workspace_name]
 
-    ramble.workspace.create(workspace_name)
-    workspace(
-        "manage",
-        "experiments",
-        "versions@0.9",
-        "--wf",
-        "test_wl",
-        "-v",
-        "n_ranks=1",
-        "-v",
-        "n_nodes=1",
-        "-v",
-        "processes_per_node=1",
-        "--default-variable-value",
-        "1",
-        global_args=global_args,
-    )
+    with ramble.workspace.create(workspace_name):
+        workspace(
+            "manage",
+            "experiments",
+            "versions@0.9",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
 
-    workspace(
-        "manage",
-        "modifiers",
-        "--add",
-        "--scope",
-        "workspace",
-        "--name",
-        "versions-mod@1.0",
-        "--on-executable",
-        "foo",
-        global_args=global_args,
-    )
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "--scope",
+            "workspace",
+            "--name",
+            "versions-mod@1.0",
+            "--on-executable",
+            "foo",
+            global_args=global_args,
+        )
 
-    workspace(
-        "manage",
-        "modifiers",
-        "--add",
-        "--scope",
-        "workspace",
-        "--name",
-        "versions-mod@2.0",
-        "--on-executable",
-        "bar",
-        global_args=global_args,
-    )
+        workspace(
+            "manage",
+            "modifiers",
+            "--add",
+            "--scope",
+            "workspace",
+            "--name",
+            "versions-mod@2.0",
+            "--on-executable",
+            "bar",
+            global_args=global_args,
+        )
 
-    err_str = (
-        "Two modifier definitions conflict by having the same name and different version numbers."
-    )
-    with pytest.raises(ramble.error.ConflictingModifiersError, match=err_str):
-        workspace("info", global_args=global_args)
+        err_str = (
+            "Two modifier definitions conflict by having the "
+            "same name and different version numbers."
+        )
+        with pytest.raises(ramble.error.ConflictingModifiersError, match=err_str):
+            workspace("info", global_args=global_args)
 
 
 def test_multi_modifier_versions(workspace_name):
@@ -476,28 +477,27 @@ def test_multi_modifier_versions(workspace_name):
 def test_define_version_variables_errors(workspace_name):
     global_args = ["-w", workspace_name, "--overwrite-inventories"]
 
-    ramble.workspace.create(workspace_name)
-
-    err_str = (
-        'Keyword "application::versions::version" has been defined, but is reserved by ramble'
-    )
-
-    with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError, match=err_str):
-        workspace(
-            "manage",
-            "experiments",
-            "versions@0.9",
-            "--wf",
-            "test_wl",
-            "-v",
-            "n_ranks=1",
-            "-v",
-            "n_nodes=1",
-            "-v",
-            "processes_per_node=1",
-            "-v",
-            "application::versions::version=foo",
-            "--default-variable-value",
-            "1",
-            global_args=global_args,
+    with ramble.workspace.create(workspace_name):
+        err_str = (
+            'Keyword "application::versions::version" has been defined, but is reserved by ramble'
         )
+
+        with pytest.raises(ramble.experiment_set.RambleVariableDefinitionError, match=err_str):
+            workspace(
+                "manage",
+                "experiments",
+                "versions@0.9",
+                "--wf",
+                "test_wl",
+                "-v",
+                "n_ranks=1",
+                "-v",
+                "n_nodes=1",
+                "-v",
+                "processes_per_node=1",
+                "-v",
+                "application::versions::version=foo",
+                "--default-variable-value",
+                "1",
+                global_args=global_args,
+            )
