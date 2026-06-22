@@ -141,9 +141,9 @@ omit = [
 directory = "htmlcov"
 
 [tool.mypy]
-# Use a common version (3.10 is the lowest supported version)
+# Use a common version (3.12 since it starts supporting type aliases)
 # Otherwise mypy uses the running python's version
-python_version = "3.10"
+python_version = "3.12"
 # TODO: Add in more files for type-checking
 # For now, only type-check the util directory
 files = [
