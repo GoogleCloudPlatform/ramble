@@ -176,24 +176,11 @@ class ExperimentResult:
         import copy
 
         output = {}
-        obj_keys = {}
-
-        # Remove app_inst to prevent pickle issues
-        app_inst = self._app_inst
-        del self._app_inst
-
-        obj_dict = copy.deepcopy(self.__dict__)
-
-        if "keys" in obj_dict:
-            obj_keys = obj_dict["keys"]
 
         for lookup_key, output_val in _OUTPUT_MAPPING.items():
             if lookup_key == "keys":
-                output.update(obj_keys)
+                output.update(copy.deepcopy(self.keys or {}))
             else:
-                output[output_val] = obj_dict[lookup_key]
-
-        # Add app_inst back into object
-        self._app_inst = app_inst
+                output[output_val] = copy.deepcopy(getattr(self, lookup_key, None))
 
         return output
