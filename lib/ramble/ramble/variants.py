@@ -223,7 +223,10 @@ class VariantSet:
             default_var = self.default_variants[name]
 
         # If the default value is a boolean, convert the experiment value to a boolean
-        if default_var and isinstance(default_var.default, bool):
+        if default_var and (
+            isinstance(default_var.default, bool)
+            or type(default_var.default).__name__ == "syaml_bool"
+        ):
             if isinstance(value, str):
                 value = value.lower() == "true"
 
@@ -461,7 +464,7 @@ class Variant:
         self._definitions = self._build_definitions()
 
     def _build_definitions(self) -> tuple:
-        if isinstance(self.default, bool):
+        if isinstance(self.default, bool) or type(self.default).__name__ == "syaml_bool":
             val_str = str(self.default)
             return (
                 self._definition,
@@ -477,7 +480,7 @@ class Variant:
 
     def format_value(self, value: Any) -> str:
         """Format a value for this variant into Spack-like syntax"""
-        if isinstance(self.default, bool):
+        if isinstance(self.default, bool) or type(self.default).__name__ == "syaml_bool":
             prefix = "+" if value else "~"
             return f"{prefix}{self.name}"
         else:
