@@ -1493,3 +1493,39 @@ def default_args(**kwargs):
     ramble.language.language_base.DirectiveMeta.push_default_args(kwargs)
     yield
     ramble.language.language_base.DirectiveMeta.pop_default_args()
+
+
+@shared_directive("object_modifiers")
+def modifier(
+    name: str,
+    mode: Optional[str] = None,
+    on_executable: Optional[List[str]] = None,
+    when=None,
+    **kwargs,
+):
+    """Automatically include a modifier when this object is used
+
+    Adds a modifier to be included in experiments that use this object.
+
+    Args:
+        name: Name of the modifier to include
+        mode: Mode to apply for the modifier
+        on_executable: List of executables the modifier should be applied to
+        when: Condition or conditions when this modifier should be included
+        **kwargs: Additional configuration parameters for the modifier
+    """
+
+    def _execute_modifier(obj):
+        when_list = ramble.language.language_helpers.build_when_list(when, obj, name, "modifier")
+        mod_dict = {"name": name}
+        if mode is not None:
+            mod_dict["mode"] = mode
+        if on_executable is not None:
+            mod_dict["on_executable"] = on_executable
+        mod_dict.update(kwargs)
+        when_key = frozenset(when_list)
+        if when_key not in obj.object_modifiers:
+            obj.object_modifiers[when_key] = []
+        obj.object_modifiers[when_key].append(mod_dict)
+
+    return _execute_modifier

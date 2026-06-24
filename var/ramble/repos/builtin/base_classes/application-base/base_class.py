@@ -59,6 +59,7 @@ from ramble.language.shared_language import (
     archive_pattern,
     register_builtin,
     register_phase,
+    variant,
 )
 from ramble.util import cleaner, conversions
 from ramble.util.foms import FomType, SummaryFoms, get_literal_from_regex
@@ -170,6 +171,12 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         "logs",
     ]
     _language_classes = [ApplicationMeta, SharedMeta]
+
+    variant(
+        "inject_modifiers_from_directives",
+        default=True,
+        description="Whether to include automatically injected modifiers",
+    )
 
     license_names: List[str] = []
 
@@ -499,16 +506,27 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
 
             added_defaults = False
-            for variant in ["platform", "package_manager", "workflow_manager"]:
-                if self.experiment_variants().value(variant) is None:
+            for var_name in [
+                "platform",
+                "package_manager",
+                "workflow_manager",
+            ]:
+                if (
+                    self.experiment_variants(allow_caching=False).value(
+                        var_name
+                    )
+                    is None
+                ):
                     default_value = getattr(
-                        self.system, f"system_default_{variant}", None
+                        self.system, f"system_default_{var_name}", None
                     )
                     if default_value:
-                        self.object_variants.default_variant(
-                            variant,
+                        self.experiment_variants(
+                            allow_caching=False
+                        ).default_variant(
+                            var_name,
                             default=default_value,
-                            description=f"{variant} selection variant",
+                            description=f"{var_name} selection variant",
                         )
                         added_defaults = True
             if added_defaults:
@@ -884,19 +902,19 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             # Define variant variables for Spack-like syntax expansion
             for (
                 name,
-                variant,
+                var_val,
             ) in obj.object_variants.experiment_variants.items():
                 self.define_variable(
                     f"{obj.origin_type}::variant::{name}",
-                    variant.as_definition(),
+                    var_val.as_definition(),
                 )
                 var_precedence[f"{obj.origin_type}::variant::{name}"] = prec
 
-            for name, variant in obj.object_variants.default_variants.items():
+            for name, _var_val in obj.object_variants.default_variants.items():
                 if name not in obj.object_variants.experiment_variants:
                     self.define_variable(
                         f"{obj.origin_type}::variant::{name}",
-                        variant.as_definition(),
+                        _var_val.as_definition(),
                     )
                     var_precedence[f"{obj.origin_type}::variant::{name}"] = (
                         prec
@@ -987,7 +1005,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
-            self.build_modifier_instances()
+        self.build_modifier_instances()
 
     def set_tags(self, tags):
         """Set experiment tags for this instance"""
@@ -1459,15 +1477,76 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         application instance
         """
         if not self.modifiers:
-            return
+            self.modifiers = []
 
         self._modifier_instances = []
+        checked_objects = set()
 
         mod_type = ramble.repository.ObjectTypes.modifiers
+        mod_idx = 0
 
-        for mod in self.modifiers:
+        _existing_mod_base_names = {
+            m["name"].partition("@")[0] for m in self.modifiers
+        }
+
+        while True:
+            # Get the latest variants once per iteration to handle modifiers adding variants
+            exp_variants = self.experiment_variants(allow_caching=False)
+
+            # Check global toggle once per iteration
+            try:
+                var_val = exp_variants.value(
+                    "inject_modifiers_from_directives"
+                )
+                include_mods_global = (
+                    (var_val.lower() == "true")
+                    if isinstance(var_val, str)
+                    else bool(var_val)
+                )
+            except KeyError:
+                include_mods_global = True
+
+            # Gather object_modifiers from all available objects
+            for _, obj in self.objects():
+                if id(obj) in checked_objects:
+                    continue
+                checked_objects.add(id(obj))
+
+                if (
+                    include_mods_global
+                    and hasattr(obj, "object_modifiers")
+                    and obj.object_modifiers
+                ):
+                    for when_key, mod_def_list in obj.object_modifiers.items():
+                        if self.expander.satisfies(
+                            when_key, variant_set=exp_variants
+                        ):
+                            for mod_def in mod_def_list:
+                                mod_name = mod_def["name"]
+                                base_mod_name = mod_name.partition("@")[0]
+                                # Add if not already explicitly in self.modifiers
+                                if (
+                                    base_mod_name
+                                    not in _existing_mod_base_names
+                                ):
+                                    mod_dict = {"name": mod_name}
+                                    mod_dict.update(
+                                        {
+                                            k: v
+                                            for k, v in mod_def.items()
+                                            if k not in ["name", "when"]
+                                        }
+                                    )
+                                    self.modifiers.append(mod_dict)
+                                    _existing_mod_base_names.add(base_mod_name)
+
+            if mod_idx >= len(self.modifiers):
+                break
+
+            mod = self.modifiers[mod_idx]
+            mod_idx += 1
+
             mod_name, _, maybe_mod_ver = mod["name"].partition("@")
-
             mod_inst = ramble.repository.get(mod_name, mod_type).copy()
 
             if "on_executable" in mod:
