@@ -484,3 +484,57 @@ def test_repeat_variants_in_analyze(request):
             assert "is_repeat_parent" in data
             assert "is_repeat_child" in data
             assert "repeat_index" in data
+
+
+@pytest.mark.parametrize(
+    "var_value,should_fail",
+    [
+        (None, False),
+        ("valid_val", False),
+        ("invalid_val", True),
+    ],
+)
+def test_templated_variant_validation(workspace_name, var_value, should_fail):
+    ws_name = workspace_name
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        config(
+            "add",
+            "variants:templated_validation:'{templated_validation_var}'",
+            global_args=global_args,
+        )
+
+        if var_value is not None:
+            config(
+                "add",
+                f"variables:templated_validation_var:{var_value}",
+                global_args=global_args,
+            )
+
+        ws._re_read()
+
+        if should_fail:
+            with pytest.raises(ramble.variants.RambleVariantError):
+                workspace("concretize", global_args=global_args)
+        else:
+            workspace("concretize", global_args=global_args)
