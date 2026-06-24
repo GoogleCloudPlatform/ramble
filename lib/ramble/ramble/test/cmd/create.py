@@ -10,6 +10,7 @@ import os
 
 import pytest
 
+from ramble.error import RambleCommandError
 from ramble.main import RambleCommand
 
 repo_cmd = RambleCommand("repo")
@@ -23,87 +24,170 @@ def test_create_help():
     assert create_cmd.returncode in (None, 0)
 
 
-def test_create_application_and_modifier(mutable_config, tmpdir):
-    """Verify successful generation of new stubs inside a mock repo."""
-    repo_path = str(tmpdir.join("test_repo"))
-    repo_name = "mockrepo"
-
-    try:
-        # 1. Setup temporary repository
-        repo_cmd("create", repo_path, repo_name)
-        repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
-        repo_cmd("add", "-t", "modifiers", "--scope=site", repo_path)
-
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-        ramble.repository.paths[ramble.repository.ObjectTypes.modifiers]._instance = None
-
-        # 2. Create Application definition
-        create_cmd(
+@pytest.mark.parametrize(
+    "obj_type, obj_name, repo_namespace, repo_add_type, extra_args, expected_subpath, expected_contents, expected_exception, create_duplicate",
+    [
+        (
             "application",
             "my-test-app",
-            "--repo",
-            repo_path,
-            "--maintainers",
-            "alice,bob",
-            "--tags",
-            "bio,gpu",
-        )
-
-        app_file = os.path.join(repo_path, "applications", "my-test-app", "application.py")
-        assert os.path.exists(app_file)
-
-        with open(app_file) as f:
-            content = f.read()
-            assert "class MyTestApp(ExecutableApplication):" in content
-            assert 'name = "my-test-app"' in content
-            assert "maintainers = ['alice', 'bob']" in content
-            assert "tags = ['bio', 'gpu']" in content
-
-        # 3. Create Modifier definition with custom base class
-        create_cmd("modifier", "my-custom-mod", "--repo", repo_path, "--base", "BasicModifier")
-
-        mod_file = os.path.join(repo_path, "modifiers", "my-custom-mod", "modifier.py")
-        assert os.path.exists(mod_file)
-
-        with open(mod_file) as f:
-            content = f.read()
-            assert "class MyCustomMod(BasicModifier):" in content
-            assert 'name = "my-custom-mod"' in content
-
-        # 4. Create Application definition using repository namespace
-        create_cmd(
+            "mockrepo",
+            "applications",
+            ["--repo", "{repo_path}", "--maintainers", "alice,bob", "--tags", "bio,gpu"],
+            "applications/my-test-app/application.py",
+            [
+                "class MyTestApp(ExecutableApplication):",
+                'name = "my-test-app"',
+                "maintainers = ['alice', 'bob']",
+                "tags = ['bio', 'gpu']",
+            ],
+            None,
+            False,
+        ),
+        (
+            "modifier",
+            "my-custom-mod",
+            "mockrepo",
+            "modifiers",
+            ["--repo", "{repo_path}", "--base", "BasicModifier"],
+            "modifiers/my-custom-mod/modifier.py",
+            [
+                "class MyCustomMod(BasicModifier):",
+                'name = "my-custom-mod"',
+            ],
+            None,
+            False,
+        ),
+        (
             "application",
             "my-ns-app",
-            "--repo",
             "mockrepo",
-        )
-        ns_app_file = os.path.join(repo_path, "applications", "my-ns-app", "application.py")
-        assert os.path.exists(ns_app_file)
+            "applications",
+            ["--repo", "mockrepo"],
+            "applications/my-ns-app/application.py",
+            [
+                "class MyNsApp(ExecutableApplication):",
+                'name = "my-ns-app"',
+            ],
+            None,
+            False,
+        ),
+        (
+            "application",
+            "my-fallback-app",
+            "builtin",
+            "applications",
+            [],
+            "applications/my-fallback-app/application.py",
+            [
+                "class MyFallbackApp(ExecutableApplication):",
+                'name = "my-fallback-app"',
+            ],
+            None,
+            False,
+        ),
+        (
+            "system",
+            "my-test-system",
+            "mockrepo",
+            "systems",
+            ["--repo", "{repo_path}"],
+            "systems/my-test-system/system.py",
+            [
+                "class MyTestSystem:",
+                'name = "my-test-system"',
+            ],
+            None,
+            False,
+        ),
+        (
+            "application",
+            "test-app",
+            "mockrepo",
+            "applications",
+            ["--repo", "nonexistent_repo"],
+            None,
+            [],
+            RambleCommandError,
+            False,
+        ),
+        (
+            "application",
+            "duplicate-app",
+            "mockrepo",
+            "applications",
+            ["--repo", "{repo_path}"],
+            None,
+            [],
+            RambleCommandError,
+            True,
+        ),
+    ],
+)
+def test_create_parameterized(
+    mutable_config,
+    tmpdir,
+    obj_type,
+    obj_name,
+    repo_namespace,
+    repo_add_type,
+    extra_args,
+    expected_subpath,
+    expected_contents,
+    expected_exception,
+    create_duplicate,
+):
+
+    repo_path = str(tmpdir.join("test_repo"))
+    try:
+        import ramble.repository
+
+        for t in ramble.repository.ObjectTypes:
+            try:
+                ramble.repository.paths[t]._instance = None
+            except Exception:
+                pass
+
+        repo_cmd("create", repo_path, repo_namespace)
+        repo_cmd("add", "-t", repo_add_type, "--scope=site", repo_path)
+
+        for t in ramble.repository.ObjectTypes:
+            try:
+                ramble.repository.paths[t]._instance = None
+            except Exception:
+                pass
+
+        parsed_args = [obj_type, obj_name]
+        for arg in extra_args:
+            if arg == "{repo_path}":
+                parsed_args.append(repo_path)
+            else:
+                parsed_args.append(arg)
+
+        if create_duplicate:
+            create_cmd(*parsed_args)
+            with pytest.raises(expected_exception):
+                create_cmd(*parsed_args)
+        elif expected_exception:
+            with pytest.raises(expected_exception):
+                create_cmd(*parsed_args)
+        else:
+            create_cmd(*parsed_args)
+
+            full_path = os.path.join(repo_path, expected_subpath)
+            assert os.path.exists(full_path)
+
+            with open(full_path) as f:
+                content = f.read()
+                for stub in expected_contents:
+                    assert stub in content
     finally:
         import ramble.repository
 
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-        ramble.repository.paths[ramble.repository.ObjectTypes.modifiers]._instance = None
-
-
-def test_create_duplicate_raises_error(mutable_config, tmpdir):
-    """Verify error is thrown if creating a duplicate object."""
-    repo_path = str(tmpdir.join("test_repo"))
-    repo_name = "mockrepo"
-
-    repo_cmd("create", repo_path, repo_name)
-    repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
-
-    # Create first app
-    create_cmd("application", "duplicate-app", "--repo", repo_path)
-
-    from ramble.error import RambleCommandError
-
-    # Second creation of same name should fail
-    with pytest.raises(RambleCommandError):
-        create_cmd("application", "duplicate-app", "--repo", repo_path)
+        for t in ramble.repository.ObjectTypes:
+            try:
+                ramble.repository.paths[t]._instance = None
+            except Exception:
+                pass
 
 
 def test_create_interactive_non_tty(mutable_config):
@@ -112,71 +196,6 @@ def test_create_interactive_non_tty(mutable_config):
 
     with pytest.raises(RambleCommandError):
         create_cmd()
-
-
-def test_create_invalid_repo(mutable_config, tmpdir):
-    """Verify error when repository namespace or path is invalid."""
-    repo_path = str(tmpdir.join("test_repo"))
-    repo_name = "mockrepo"
-    try:
-        repo_cmd("create", repo_path, repo_name)
-        repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
-
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-        from ramble.error import RambleCommandError
-
-        with pytest.raises(RambleCommandError):
-            create_cmd("application", "test-app", "--repo", "nonexistent_repo")
-    finally:
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-
-def test_create_fallback_repo(mutable_config, tmpdir):
-    """Verify fallback to builtin repository namespace when no repo specified."""
-    repo_path = str(tmpdir.join("test_repo"))
-    try:
-        repo_cmd("create", repo_path, "builtin")
-        repo_cmd("add", "-t", "applications", "--scope=site", repo_path)
-
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-        create_cmd("application", "my-fallback-app")
-
-        app_file = os.path.join(repo_path, "applications", "my-fallback-app", "application.py")
-        assert os.path.exists(app_file)
-    finally:
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.applications]._instance = None
-
-
-def test_create_system(mutable_config, tmpdir):
-    """Verify creation of system definition stub using generic template."""
-    repo_path = str(tmpdir.join("test_repo"))
-    repo_name = "mockrepo"
-    try:
-        repo_cmd("create", repo_path, repo_name)
-        repo_cmd("add", "-t", "systems", "--scope=site", repo_path)
-
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.systems]._instance = None
-
-        create_cmd("system", "my-test-system", "--repo", repo_path)
-
-        sys_file = os.path.join(repo_path, "systems", "my-test-system", "system.py")
-        assert os.path.exists(sys_file)
-    finally:
-        import ramble.repository
-
-        ramble.repository.paths[ramble.repository.ObjectTypes.systems]._instance = None
 
 
 def test_create_unregistered_dir_repo(mutable_config, tmpdir):
