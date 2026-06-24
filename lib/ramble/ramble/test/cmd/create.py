@@ -25,15 +25,12 @@ def test_create_help():
 
 
 @pytest.mark.parametrize(
-    "obj_type, obj_name, repo_namespace, repo_add_type, extra_args, expected_subpath, expected_contents, expected_exception, create_duplicate",
+    "obj_type, obj_name, extra_args, expected_contents, expected_exception",
     [
         (
             "application",
             "my-test-app",
-            "mockrepo",
-            "applications",
-            ["--repo", "{repo_path}", "--maintainers", "alice,bob", "--tags", "bio,gpu"],
-            "applications/my-test-app/application.py",
+            ["--maintainers", "alice,bob", "--tags", "bio,gpu"],
             [
                 "class MyTestApp(ExecutableApplication):",
                 'name = "my-test-app"',
@@ -41,85 +38,48 @@ def test_create_help():
                 "tags = ['bio', 'gpu']",
             ],
             None,
-            False,
         ),
         (
             "modifier",
             "my-custom-mod",
-            "mockrepo",
-            "modifiers",
-            ["--repo", "{repo_path}", "--base", "BasicModifier"],
-            "modifiers/my-custom-mod/modifier.py",
-            [
-                "class MyCustomMod(BasicModifier):",
-                'name = "my-custom-mod"',
-            ],
+            ["--base", "BasicModifier"],
+            ["class MyCustomMod(BasicModifier):", 'name = "my-custom-mod"'],
             None,
-            False,
         ),
         (
             "application",
             "my-ns-app",
-            "mockrepo",
-            "applications",
             ["--repo", "mockrepo"],
-            "applications/my-ns-app/application.py",
-            [
-                "class MyNsApp(ExecutableApplication):",
-                'name = "my-ns-app"',
-            ],
+            ["class MyNsApp(ExecutableApplication):", 'name = "my-ns-app"'],
             None,
-            False,
         ),
         (
             "application",
             "my-fallback-app",
-            "builtin",
-            "applications",
-            [],
-            "applications/my-fallback-app/application.py",
-            [
-                "class MyFallbackApp(ExecutableApplication):",
-                'name = "my-fallback-app"',
-            ],
+            ["--fallback"],
+            ["class MyFallbackApp(ExecutableApplication):", 'name = "my-fallback-app"'],
             None,
-            False,
         ),
         (
             "system",
             "my-test-system",
-            "mockrepo",
-            "systems",
-            ["--repo", "{repo_path}"],
-            "systems/my-test-system/system.py",
-            [
-                "class MyTestSystem:",
-                'name = "my-test-system"',
-            ],
+            [],
+            ["class MyTestSystem:", 'name = "my-test-system"'],
             None,
-            False,
         ),
         (
             "application",
             "test-app",
-            "mockrepo",
-            "applications",
             ["--repo", "nonexistent_repo"],
-            None,
             [],
             RambleCommandError,
-            False,
         ),
         (
             "application",
             "duplicate-app",
-            "mockrepo",
-            "applications",
-            ["--repo", "{repo_path}"],
-            None,
+            ["--duplicate"],
             [],
             RambleCommandError,
-            True,
         ),
     ],
 )
@@ -128,16 +88,17 @@ def test_create_parameterized(
     tmpdir,
     obj_type,
     obj_name,
-    repo_namespace,
-    repo_add_type,
     extra_args,
-    expected_subpath,
     expected_contents,
     expected_exception,
-    create_duplicate,
 ):
+    fallback = "--fallback" in extra_args
+    duplicate = "--duplicate" in extra_args
+    actual_args = [a for a in extra_args if a not in ("--fallback", "--duplicate")]
 
     repo_path = str(tmpdir.join("test_repo"))
+    repo_ns = "builtin" if fallback else "mockrepo"
+
     try:
         import ramble.repository
 
@@ -147,8 +108,8 @@ def test_create_parameterized(
             except Exception:
                 pass
 
-        repo_cmd("create", repo_path, repo_namespace)
-        repo_cmd("add", "-t", repo_add_type, "--scope=site", repo_path)
+        repo_cmd("create", repo_path, repo_ns)
+        repo_cmd("add", "-t", f"{obj_type}s", "--scope=site", repo_path)
 
         for t in ramble.repository.ObjectTypes:
             try:
@@ -156,14 +117,11 @@ def test_create_parameterized(
             except Exception:
                 pass
 
-        parsed_args = [obj_type, obj_name]
-        for arg in extra_args:
-            if arg == "{repo_path}":
-                parsed_args.append(repo_path)
-            else:
-                parsed_args.append(arg)
+        parsed_args = [obj_type, obj_name] + actual_args
+        if "--repo" not in actual_args and not fallback:
+            parsed_args += ["--repo", repo_path]
 
-        if create_duplicate:
+        if duplicate:
             create_cmd(*parsed_args)
             with pytest.raises(expected_exception):
                 create_cmd(*parsed_args)
@@ -173,10 +131,11 @@ def test_create_parameterized(
         else:
             create_cmd(*parsed_args)
 
-            full_path = os.path.join(repo_path, expected_subpath)
+            fn = f"{obj_type.replace('-', '_')}.py"
+            full_path = os.path.join(repo_path, f"{obj_type}s", obj_name, fn)
             assert os.path.exists(full_path)
 
-            with open(full_path) as f:
+            with open(full_path, encoding="utf-8") as f:
                 content = f.read()
                 for stub in expected_contents:
                     assert stub in content
@@ -202,7 +161,7 @@ def test_create_unregistered_dir_repo(mutable_config, tmpdir):
     """Verify creation when --repo is a directory not registered in configuration."""
     unreg_path = str(tmpdir.join("unregistered_repo"))
     os.makedirs(os.path.join(unreg_path, "applications"))
-    with open(os.path.join(unreg_path, "repo.yaml"), "w") as f:
+    with open(os.path.join(unreg_path, "repo.yaml"), "w", encoding="utf-8") as f:
         f.write("repo:\n  namespace: unreg\n")
 
     create_cmd("application", "test-unreg-app", "--repo", unreg_path)
@@ -215,7 +174,7 @@ def test_create_no_registered_repos(mutable_config, tmpdir, monkeypatch):
     """Verify fallback to builtin when no repositories are registered in configuration."""
     temp_builtin = str(tmpdir.join("builtin_temp"))
     os.makedirs(os.path.join(temp_builtin, "applications"))
-    with open(os.path.join(temp_builtin, "repo.yaml"), "w") as f:
+    with open(os.path.join(temp_builtin, "repo.yaml"), "w", encoding="utf-8") as f:
         f.write("repo:\n  namespace: builtin\n")
 
     import ramble.paths
@@ -308,7 +267,7 @@ def test_create_missing_template(mutable_config, tmpdir, monkeypatch):
         create_cmd("application", "my-missing-tpl-app", "--repo", repo_path)
         app_file = os.path.join(repo_path, "applications", "my-missing-tpl-app", "application.py")
         assert os.path.exists(app_file)
-        with open(app_file) as f:
+        with open(app_file, encoding="utf-8") as f:
             content = f.read()
             assert "class MyMissingTplApp:" in content
     finally:
@@ -341,7 +300,7 @@ def test_create_interactive_wizard(mutable_config, tmpdir, monkeypatch):
 
     app_file = os.path.join(repo_path, "applications", "my-wizard-app", "application.py")
     assert os.path.exists(app_file)
-    with open(app_file) as f:
+    with open(app_file, encoding="utf-8") as f:
         content = f.read()
         assert "class MyWizardApp(ExecutableApplication):" in content
         assert "maintainers = ['charlie']" in content
