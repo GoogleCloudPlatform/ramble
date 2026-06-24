@@ -538,3 +538,25 @@ def test_templated_variant_validation(workspace_name, var_value, should_fail):
                 workspace("concretize", global_args=global_args)
         else:
             workspace("concretize", global_args=global_args)
+
+
+def test_variant_set_callable_validation():
+    v_set = ramble.variants.VariantSet()
+
+    def my_validator(val):
+        return val in [1, 3, 5]
+
+    v_set.default_variant("my_var", default=1, description="odd numbers", values=my_validator)
+
+    # Check that it validates valid values
+    v_set.experiment_variant("my_var", 3)
+    defs = v_set.as_set()
+    assert "my_var=3" in defs
+
+    # Check invalid value raises error
+    v_set2 = ramble.variants.VariantSet()
+    v_set2.default_variant("my_var", default=1, description="odd numbers", values=my_validator)
+    v_set2.experiment_variant("my_var", 2)
+
+    with pytest.raises(ramble.variants.RambleVariantError):
+        v_set2.as_set()
