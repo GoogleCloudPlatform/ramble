@@ -231,6 +231,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # A dict storing fom values, currently it only stores inmem FOMs
         self._fom_map = {}
         self._template_paths_defined = False
+        self._modifiers_built = False
 
         # Ensure we always have the application name, and this is never empty
         self._file_path = file_path
@@ -987,6 +988,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Set modifiers for this instance"""
         if modifiers:
             self.modifiers = modifiers.copy()
+            self._modifiers_built = False
             self.build_modifier_instances()
 
     def set_tags(self, tags):
@@ -1458,7 +1460,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         """Built a map of modifier names to modifier instances needed for this
         application instance
         """
+        if self._modifiers_built:
+            return
+
         if not self.modifiers:
+            self._modifiers_built = True
             return
 
         self._modifier_instances = []
@@ -1514,6 +1520,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         self.define_missing_variables()
         if self.modifiers:
             self.clear_variant_cache()
+        self._modifiers_built = True
 
     @property
     def inventory_file(self):

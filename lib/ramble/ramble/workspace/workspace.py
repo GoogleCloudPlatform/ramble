@@ -1517,8 +1517,6 @@ ramble:
         force_prefix = force_prefix or len(pkgman_prefixes) > 1
 
         for _, app_inst, _ in experiment_set.all_experiments():
-            app_inst.build_modifier_instances()
-            app_inst.define_variables_for_template_path()
             env_name_str = app_inst.expander.expansion_str(ramble.keywords.keywords.env_name)
             env_name = app_inst.expander.expand_var(env_name_str)
 
