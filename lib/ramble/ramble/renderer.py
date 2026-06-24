@@ -114,13 +114,11 @@ class RenderGroup:
 class Renderer:
     def _expand_variables(self, variables, expander):
         object_variables = {}
-        for var, val in variables.items():
-            if isinstance(val, dict):
-                variables[var] = dict(val)
-
         for name, unexpanded in variables.items():
-            value = expander.expand_lists(unexpanded)
-            object_variables[name] = value
+            if isinstance(unexpanded, dict):
+                unexpanded = dict(unexpanded)
+                variables[name] = unexpanded
+            object_variables[name] = expander.expand_lists(unexpanded)
         return object_variables
 
     def _expand_zip_and_matrix_members(self, matrices, zips, expander):
@@ -146,15 +144,9 @@ class Renderer:
         # If a zip contains no used variables, ignore the entire zip.
         if zips:
             remove_zips = set()
-            for zip_group in zips:
-                keep_zip = zip_group in used_variables
-                for var_name in zips[zip_group]:
-                    if var_name in used_variables:
-                        keep_zip = True
-
-                if keep_zip:
-                    for var_name in zips[zip_group]:
-                        used_variables.add(var_name)
+            for zip_group, vars_list in zips.items():
+                if zip_group in used_variables or any(v in used_variables for v in vars_list):
+                    used_variables.update(vars_list)
                 else:
                     remove_zips.add(zip_group)
 
@@ -167,7 +159,6 @@ class Renderer:
             defined_zips[zip_group] = {"vars": {}, "length": 0}
             cur_zip = defined_zips[zip_group]
 
-            # Validate variable definitions
             for var_name in group_def:
                 if var_name not in object_variables:
                     logger.die(
@@ -181,25 +172,21 @@ class Renderer:
                         "Ensure it is only used in a single zip"
                     )
 
-                if not isinstance(object_variables[var_name], list):
+                val = object_variables[var_name]
+                if not isinstance(val, list):
                     logger.die(
                         f"Variable {var_name} in zip {zip_group} " "does not refer to a vector."
                     )
 
-                if not object_variables[var_name]:
+                if not val:
                     logger.die(
                         f"Variable {var_name} in zip {zip_group} " "has an invalid length of 0"
                     )
 
-            # Validate variable lengths:
-            length_mismatch = False
-            for var_name in group_def:
-                # Validate the length of the variables is the same
-                cur_len = len(object_variables[var_name])
+                cur_len = len(val)
                 if cur_zip["length"] == 0:
                     cur_zip["length"] = cur_len
                 elif cur_len != cur_zip["length"]:
-                    length_mismatch = True
                     logger.die(
                         f"Variable {var_name} in zip {zip_group}\n"
                         f"has a length of {cur_len} which differs "
@@ -207,25 +194,8 @@ class Renderer:
                         f'{cur_zip["length"]}'
                     )
 
-            # Print length information in error case
-            if length_mismatch:
-                err_context = object_variables[render_group.context]
-                err_str = (
-                    f"Length mismatch in zip {zip_group} in {render_group.object} "
-                    f"{err_context}\n"
-                )
-                for var_name in group_def:
-                    err_str += (
-                        f"\tVariable {var_name} has length "
-                        f"of {len(object_variables[var_name])}\n"
-                    )
-                logger.die(err_str)
-
-            # Extract variables for zip
-            for var_name in group_def:
-                # Add variable to the zip, and remove from the definition
                 zipped_vars.add(var_name)
-                cur_zip["vars"][var_name] = object_variables[var_name]
+                cur_zip["vars"][var_name] = val
                 del object_variables[var_name]
         return defined_zips
 
