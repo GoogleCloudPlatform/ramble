@@ -27,6 +27,8 @@ class Workload:
         executables: List[str],
         inputs: Optional[List[str]] = None,
         tags: Optional[List[str]] = None,
+        where: Optional[List[str]] = None,
+        exclude_where: Optional[List[str]] = None,
         when: Optional[List[str]] = None,
     ):
         """Constructor for a workload
@@ -41,6 +43,10 @@ class Workload:
             inputs = []
         if tags is None:
             tags = []
+        if where is None:
+            where = []
+        if exclude_where is None:
+            exclude_where = []
         if when is None:
             when = []
 
@@ -49,8 +55,8 @@ class Workload:
         self.environment_variables: Dict[FrozenSet[str], List[EnvironmentVariable]] = {}
         self.when = when
 
-        attr_names = ["executables", "inputs", "tags"]
-        attr_vals = [executables, inputs, tags]
+        attr_names = ["executables", "inputs", "tags", "where", "exclude_where"]
+        attr_vals = [executables, inputs, tags, where, exclude_where]
 
         for attr, vals in zip(attr_names, attr_vals):
             if isinstance(vals, list):
@@ -79,6 +85,8 @@ class Workload:
             ("Executables", "executables"),
             ("Inputs", "inputs"),
             ("Tags", "tags"),
+            ("Where", "where"),
+            ("Exclude Where", "exclude_where"),
             ("When", "when"),
         ]
 
