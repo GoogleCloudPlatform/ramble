@@ -322,6 +322,8 @@ def build_when_list(
 def _parse_when(w_set):
     from ramble.util.format import when_order
 
+    from spack import version
+
     variants = {}
     versions = {}
     for w_entry in sorted(w_set, key=when_order):
@@ -347,13 +349,25 @@ def _parse_when(w_set):
                 variants[name] = val
             elif "@" in w:
                 name, ver = w.split("@", 1)
-                if name in versions and versions[name] != ver:
+                try:
+                    ver_obj = version.ver(ver)
+                except Exception as e:
                     return (
                         None,
                         None,
-                        f"version '{name}' has conflicting values: '{versions[name]}' and '{ver}'",
+                        f"version '{name}' has invalid spec '{ver}': {e}",
                     )
-                versions[name] = ver
+                if name in versions:
+                    intersection = versions[name].intersection(ver_obj)
+                    if not intersection:
+                        msg = (
+                            f"version '{name}' has conflicting values: "
+                            f"'{versions[name]}' and '{ver}'"
+                        )
+                        return (None, None, msg)
+                    versions[name] = intersection
+                else:
+                    versions[name] = ver_obj
     return variants, versions, None
 
 
@@ -386,7 +400,7 @@ def are_when_compatible(when_set1, when_set2):
 
     for name in ver1:
         if name in ver2:
-            if ver1[name] != ver2[name]:
+            if not ver1[name].intersection(ver2[name]):
                 return False
     return True
 
