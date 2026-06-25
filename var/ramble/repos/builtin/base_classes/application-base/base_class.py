@@ -975,17 +975,27 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 for obj, when_keys in when_map.items():
                     to_remove = set()
                     obj_prec = obj_precedence[obj]
-                    for when_key in when_keys:
+                    for when_idx, when_key in enumerate(reversed(when_keys)):
                         if obj.satisfy_when(when_key):
                             to_remove.add(when_key)
                             variable_dict = getattr(obj, variable_set_attr, {})
                             if when_key in variable_dict:
                                 for var in reversed(variable_dict[when_key]):
                                     if var.name not in original_variables:
+                                        # Use a tuple for precedence: (obj_prec, when_idx)
+                                        # Lower tuple means higher precedence.
+                                        current_prec = (obj_prec, when_idx)
+                                        best_prec = var_precedence.get(
+                                            var.name, (999, 999)
+                                        )
+
+                                        # Convert existing scalar precedence to tuple if necessary
+                                        if not isinstance(best_prec, tuple):
+                                            best_prec = (best_prec, 999)
+
                                         if (
                                             var.name not in to_define
-                                            and obj_prec
-                                            < var_precedence.get(var.name, 999)
+                                            and current_prec < best_prec
                                         ):
                                             if isinstance(
                                                 var, CommandVariable
@@ -1000,7 +1010,9 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                                                     var.default
                                                 )
 
-                                            var_precedence[var.name] = obj_prec
+                                            var_precedence[var.name] = (
+                                                current_prec
+                                            )
                                             changed_definitions = True
 
                     # Remove any satisfied when_keys, as we won't need to check
