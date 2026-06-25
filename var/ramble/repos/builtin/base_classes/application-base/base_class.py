@@ -740,6 +740,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             )
 
         # Define variants from repeats
+        added_variants = False
         for keyword in [
             self.keywords.is_repeat_parent,
             self.keywords.is_repeat_child,
@@ -750,14 +751,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     keyword,
                     self.expander.expand_var(variables[keyword], typed=True),
                 )
+                added_variants = True
 
         # Define experiment variants
         if variants:
             for name, value in variants.items():
                 expanded_value = self.expander.expand_var(value, typed=True)
                 self.object_variants.experiment_variant(name, expanded_value)
+                added_variants = True
 
-        self.clear_variant_cache()
+        if added_variants:
+            self.clear_variant_cache()
 
         # Set up remaining variants
         self._set_system()
