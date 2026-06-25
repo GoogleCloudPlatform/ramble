@@ -83,3 +83,9 @@ def test_info_nested_compatible_when(mock_applications):
     assert "Default: val1" in out
     assert "When: application_version@1.0: AND application_version@2.0" in out
     assert "Default: val2" in out
+
+
+def test_info_nested_version_conflict(mock_applications):
+    out = info("-v", "nested-version-conflict")
+    assert "has an impossible when condition" in out
+    assert "version 'application_version' has conflicting values: '1.0' and '1.1:'" in out
