@@ -198,6 +198,21 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
             self.object_variants.default_variant(**var_args)
 
         self.keywords = ramble.keywords.keywords.copy()
+        self.object_variants.default_variant(
+            name=self.keywords.is_repeat_parent,
+            default=False,
+            description="Whether this is the parent of a set of repeats or not",
+        )
+        self.object_variants.default_variant(
+            name=self.keywords.is_repeat_child,
+            default=False,
+            description="Whether this is a child in a set of repeats or not",
+        )
+        self.object_variants.default_variant(
+            name=self.keywords.repeat_index,
+            default=0,
+            description="Index of this experiment, in repeat space",
+        )
 
         self._vars_are_expanded = False
         self.expander = None
@@ -724,12 +739,25 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 description=self.expander.application_spec,
             )
 
+        # Define variants from repeats
+        for keyword in [
+            self.keywords.is_repeat_parent,
+            self.keywords.is_repeat_child,
+            self.keywords.repeat_index,
+        ]:
+            if keyword in variables:
+                self.object_variants.experiment_variant(
+                    keyword,
+                    self.expander.expand_var(variables[keyword], typed=True),
+                )
+
         # Define experiment variants
         if variants:
             for name, value in variants.items():
                 expanded_value = self.expander.expand_var(value, typed=True)
                 self.object_variants.experiment_variant(name, expanded_value)
-            self.clear_variant_cache()
+
+        self.clear_variant_cache()
 
         # Set up remaining variants
         self._set_system()

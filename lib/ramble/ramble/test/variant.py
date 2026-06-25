@@ -446,3 +446,41 @@ def test_variant_expansion(workspace_name, variant_scope, expected_bool, expecte
         captured = workspace("info", "-v", global_args=global_args)
 
         assert spack_spec in captured
+
+
+def test_repeat_variants_in_analyze(request):
+    ws_name = request.node.name
+
+    global_args = ["-w", ws_name]
+
+    with ramble.workspace.create(ws_name) as ws:
+        workspace(
+            "manage",
+            "experiments",
+            "when-variants",
+            "--wf",
+            "test_wl",
+            "-v",
+            "n_ranks=1",
+            "-v",
+            "n_nodes=1",
+            "-v",
+            "processes_per_node=1",
+            "-p",
+            "spack",
+            "--default-variable-value",
+            "1",
+            global_args=global_args,
+        )
+
+        ws._re_read()
+        workspace("concretize", global_args=global_args)
+        workspace("setup", "--dry-run", global_args=global_args)
+        workspace("analyze", global_args=global_args)
+
+        with open(os.path.join(ws.root, "results.latest.txt"), encoding="utf-8") as f:
+            data = f.read()
+
+            assert "is_repeat_parent" in data
+            assert "is_repeat_child" in data
+            assert "repeat_index" in data
