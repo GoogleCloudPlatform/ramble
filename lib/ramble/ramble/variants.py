@@ -358,12 +358,26 @@ class VariantSet:
                     name in self.default_variants
                     and name not in reserved_variants
                     and self.default_variants[name].values
-                    and variant.default not in self.default_variants[name].values
                 ):
-                    raise RambleVariantError(
-                        f"When defining variant {name} the value {variant.default} is not valid.\n"
-                        f"   Valid values include: {self.default_variants[name].values}"
-                    )
+                    val = variant.default
+                    if expander and isinstance(val, str) and "{" in val:
+                        try:
+                            val = expander.expand_var(val)
+                        except Exception:
+                            pass
+                    if isinstance(val, str) and "{" in val:
+                        pass
+                    else:
+                        values = self.default_variants[name].values
+                        if callable(values):
+                            is_valid = values(val)
+                        else:
+                            is_valid = str(val) in [str(v) for v in values]
+                        if not is_valid:
+                            raise RambleVariantError(
+                                f"When defining variant {name} the value {val} is not valid.\n"
+                                f"   Valid values include: {values}"
+                            )
 
                 out_set.update(variant.as_definitions())
                 defined_variants.add(name)

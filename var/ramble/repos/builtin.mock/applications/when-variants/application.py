@@ -75,6 +75,20 @@ class WhenVariants(ExecutableApplication):
         workloads=["*"],
     )
 
+    variant(
+        "templated_validation",
+        default="{templated_validation_var}",
+        values=["valid_val", "other_valid_val"],
+        description="Test template variant validation",
+    )
+
+    workload_variable(
+        "templated_validation_var",
+        default="valid_val",
+        description="Variable for templated_validation",
+        workloads=["*"],
+    )
+
     with when("+validation"):
         register_validator(
             "fixed_n_nodes",

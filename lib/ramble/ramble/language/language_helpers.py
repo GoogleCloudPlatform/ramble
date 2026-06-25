@@ -246,7 +246,8 @@ def add_variable_validator(obj, var_name, var_values, when_list, wl_name=None):
     """Adds a validator to an object to ensure a variable's value is in a list of values."""
     validator_name = f"validate_values_for_{var_name}_obj_{obj.name}"
 
-    predicate = f"'{{{var_name}}}' in {var_values!r}"
+    str_values = [str(v) for v in var_values]
+    predicate = f"'{{{var_name}}}' in {str_values!r}"
     message = (
         f"Value of variable '{var_name}' ('{{{var_name}}}') is not one of the allowed values: "
         f"{var_values}"
