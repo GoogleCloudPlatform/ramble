@@ -628,8 +628,15 @@ class nixlog(object):
             os.dup2(self._saved_stderr, sys.stderr.fileno())
             os.close(self._saved_stderr)
         else:
-            sys.stdout = self._saved_stdout
-            sys.stderr = self._saved_stderr
+            try:
+                for stream in (sys.stdout, sys.stderr):
+                    try:
+                        stream.close()
+                    except Exception:
+                        pass
+            finally:
+                sys.stdout = self._saved_stdout
+                sys.stderr = self._saved_stderr
 
         # print log contents in parent if needed.
         if self.log_file.write_in_parent:
