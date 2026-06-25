@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import ramble.cmd
 import ramble.config
 import ramble.filters
 import ramble.pipeline
