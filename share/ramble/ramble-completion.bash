@@ -268,7 +268,7 @@ _ramble() {
     then
         RAMBLE_COMPREPLY="-h --help -H --all-help --color -c --config -C --config-scope -d --debug --disable-passthrough -N --disable-logger -A --aggregate-warnings -S --suppress-warnings -P --disable-progress-bar --timestamp --pdb -w --workspace -D --workspace-dir -W --no-workspace --use-workspace-repo --resolve-variables-in-subprocesses -k --insecure -l --enable-locks -L --disable-locks -m --mock --overwrite-inventories --mock-applications --mock-modifiers --mock-package-managers --mock-workflow-managers --mock-systems --mock-platforms --mock-base-classes --mock-base-applications --mock-base-modifiers --mock-base-package-managers --mock-base-workflow-managers --mock-base-systems --mock-base-platforms -p --profile --sorted-profile --lines --profile-restrictions -v --verbose --stacktrace -V --version"
     else
-        RAMBLE_COMPREPLY="attributes clean commands config data debug deployment docs edit filter-groups help info license list mirror on python repo results software-definitions style unit-test workspace"
+        RAMBLE_COMPREPLY="attributes clean commands config create data debug deployment docs edit filter-groups help info license list mirror on python repo results software-definitions style unit-test workspace"
     fi
 }
 
@@ -367,6 +367,15 @@ _ramble_config_revert() {
         RAMBLE_COMPREPLY="-h --help -y --yes-to-all"
     else
         _config_sections
+    fi
+}
+
+_ramble_create() {
+    if $list_options
+    then
+        RAMBLE_COMPREPLY="-h --help -r --repo -b --base -m --maintainers -t --tags -i --interactive"
+    else
+        RAMBLE_COMPREPLY=""
     fi
 }
 

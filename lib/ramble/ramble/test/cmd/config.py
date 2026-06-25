@@ -900,7 +900,7 @@ def test_config_edit_file(mutable_config, config_section, mock_editor):
     assert ramble.cmd.config.config_edit(args)
 
 
-def test_command_alias(mutable_empty_config):
+def test_command_alias(mutable_config):
     import io
     from contextlib import redirect_stdout
 

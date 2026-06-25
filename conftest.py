@@ -739,6 +739,12 @@ def make_workspace_from_config(workspace_name, mutable_config, mutable_mock_work
 
 
 def pytest_generate_tests(metafunc):
+    defaults_path = os.path.join(ramble.paths.etc_path, "ramble", "defaults")
+    with ramble.config.use_configuration(defaults_path):
+        _pytest_generate_tests_impl(metafunc)
+
+
+def _pytest_generate_tests_impl(metafunc):
     import re
 
     name_regex = re.compile(r"\s*(?P<name>[a-z0-9\-\_]+)\s*$")
