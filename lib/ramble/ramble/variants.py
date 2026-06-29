@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import functools
 from collections.abc import Sequence
 from enum import Enum
 from typing import Any, Callable, Optional, Union
@@ -28,6 +29,22 @@ reserved_variants = {
 }
 
 variant_types = Enum("variant_types", ["default", "experiment", "version"])
+
+
+def invalidates_cache(func):
+    """Decorator to invalidate the variant set cache if the method mutates the set.
+
+    The decorated method should return True if a mutation occurred, and False otherwise.
+    """
+
+    @functools.wraps(func)
+    def wrapper(self, *args, **kwargs):
+        mutated = func(self, *args, **kwargs)
+        if mutated:
+            self._invalidate_cache()
+        return mutated
+
+    return wrapper
 
 
 class VariantSet:
@@ -95,6 +112,7 @@ class VariantSet:
         self.merge_multi_value_variants(in_set)
         self.merge_version_variants(in_set)
 
+    @invalidates_cache
     def merge_default_variants(self, in_set):
         """Merge another variant set's default variants into this variant set.
 
@@ -102,11 +120,14 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._invalidate_cache()
+        mutated = False
         for name, variant in in_set.default_variants.items():
             if name not in self.default_variants:
                 self.default_variants[name] = variant.copy()
+                mutated = True
+        return mutated
 
+    @invalidates_cache
     def merge_experiment_variants(self, in_set):
         """Merge another variant set's experiment variants into this variant set.
 
@@ -114,11 +135,14 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._invalidate_cache()
+        mutated = False
         for name, variant in in_set.experiment_variants.items():
             if name not in self.experiment_variants:
                 self.experiment_variants[name] = variant.copy()
+                mutated = True
+        return mutated
 
+    @invalidates_cache
     def merge_multi_value_variants(self, in_set):
         """Merge another variant set's multi value variants into this variant set.
 
@@ -126,13 +150,17 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._invalidate_cache()
+        if not in_set.multi_value_variants:
+            return False
+
         for name, variant_list in in_set.multi_value_variants.items():
             if name not in self.multi_value_variants:
                 self.multi_value_variants[name] = set()
             for variant in variant_list:
                 self.multi_value_variants[name].add(variant)
+        return True
 
+    @invalidates_cache
     def merge_version_variants(self, in_set):
         """Merge another variant set's version variants into this variant set.
 
@@ -140,10 +168,12 @@ class VariantSet:
             in_set: VariantSet to merge into self
         """
 
-        self._invalidate_cache()
+        mutated = False
         for name, variant in in_set.version_variants.items():
             if name not in self.version_variants:
                 self.version_variants[name] = variant.copy()
+                mutated = True
+        return mutated
 
     def default_variant(
         self,
@@ -213,12 +243,13 @@ class VariantSet:
                 values=None,
             )
 
+    @invalidates_cache
     def multi_value_variant(self, name: str, value: Any):
-        self._invalidate_cache()
         if name not in self.multi_value_variants:
             self.multi_value_variants[name] = set()
 
         self.multi_value_variants[name].add(Variant(name, default=value))
+        return True
 
     def version_variant(self, name: str, value: Any):
         """Define a new version variant within this set.
@@ -241,6 +272,7 @@ class VariantSet:
             values=None,
         )
 
+    @invalidates_cache
     def _define_variant(
         self,
         name: str,
@@ -262,7 +294,6 @@ class VariantSet:
             values: Set of valid values for the variant
         """
 
-        self._invalidate_cache()
         variant_dict = None
         if variant_type == variant_types.experiment:
             variant_dict = self.experiment_variants
@@ -278,9 +309,18 @@ class VariantSet:
                 f"Cannot define variant {name} with unknown variant type of {variant_type}"
             )
 
-        variant_dict[name] = Variant(
-            name=name, default=default, description=description, values=values
-        )
+        old_var = variant_dict.get(name)
+        if (
+            old_var is None
+            or old_var.default != default
+            or old_var.description != description
+            or old_var.values != values
+        ):
+            variant_dict[name] = Variant(
+                name=name, default=default, description=description, values=values
+            )
+            return True
+        return False
 
     def value(self, name: str):
         """Extract the value of a variant by name

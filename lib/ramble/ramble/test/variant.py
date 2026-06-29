@@ -560,3 +560,32 @@ def test_variant_set_callable_validation():
 
     with pytest.raises(ramble.variants.RambleVariantError):
         v_set2.as_set()
+
+
+def test_variant_set_conditional_invalidation():
+    """Test that the variant set cache is invalidated only when modified."""
+    v_set = ramble.variants.VariantSet()
+    v_set.default_variant("my_var", default=1)
+    v_set.as_set()
+    assert v_set._set_cache is not None
+
+    v_set.default_variant("my_var", default=1)
+    assert v_set._set_cache is not None
+
+    v_set.default_variant("my_var", default=2)
+    assert v_set._set_cache is None
+
+    v_set.as_set()
+    assert v_set._set_cache is not None
+
+    v_set2 = ramble.variants.VariantSet()
+    v_set2.default_variant("my_var", default=2)
+
+    v_set.merge_default_variants(v_set2)
+    assert v_set._set_cache is not None
+
+    v_set3 = ramble.variants.VariantSet()
+    v_set3.default_variant("other_var", default=3)
+
+    v_set.merge_default_variants(v_set3)
+    assert v_set._set_cache is None
