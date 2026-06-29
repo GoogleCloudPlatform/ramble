@@ -88,4 +88,4 @@ def test_info_nested_compatible_when(mock_applications):
 def test_info_nested_version_conflict(mock_applications):
     out = info("-v", "nested-version-conflict")
     assert "has an impossible when condition" in out
-    assert "version 'application_version' has conflicting values: '1.0' and '1.1:'" in out
+    assert "version 'application_version' has conflicting values: '==1.0' and '1.1:'" in out
