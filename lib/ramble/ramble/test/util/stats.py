@@ -170,5 +170,3 @@ def test_calculate_margin_of_error():
     assert math.isclose(
         stats._calculate_margin_of_error(data, stats.ConfidenceLevel.CL_50), 0.139, abs_tol=1e-3
     )
-    with pytest.raises(ValueError, match="Unsupported confidence level"):
-        stats._calculate_margin_of_error(data, 0.1)

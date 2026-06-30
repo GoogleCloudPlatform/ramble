@@ -135,9 +135,6 @@ class StatsCoefficientOfVariation(StatsBase):
 
 def _calculate_margin_of_error(values: List[float], cl: ConfidenceLevel) -> float:
     """Calculates the margin of error for a given confidence interval."""
-    if not isinstance(cl, ConfidenceLevel):
-        raise ValueError("Unsupported confidence level")
-
     n = len(values)
     stdev = statistics.stdev(values)
 
