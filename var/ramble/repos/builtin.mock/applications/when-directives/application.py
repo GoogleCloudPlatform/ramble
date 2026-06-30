@@ -169,6 +169,20 @@ class WhenDirectives(ExecutableApplication):
     def test_builtin_when(self):
         return ['echo "when-builtin"']
 
+    # For archive_pattern()
+    variant(
+        "archive_pattern_when",
+        default=False,
+        values=[True, False],
+        description="Register archive pattern using when",
+    )
+
+    with when("+archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_true.txt")
+
+    with when("~archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_false.txt")
+
     # For executable()
     variant(
         "executable_when",

@@ -706,17 +706,26 @@ class LogsPipeline(Pipeline):
         self.suppress_run_header = suppress_run_header
 
     def _execute(self):
-        def print_archive_files(app_inst, pattern_title, patterns):
+        def print_archive_files(app_inst, pattern_title, archive_patterns):
             print_header = True
-            if patterns:
-                for pattern in patterns:
-                    exp_pattern = app_inst.expander.expand_var(pattern)
-                    for file in glob.glob(exp_pattern):
-                        # Only print the header if a file matched the glob
-                        if print_header:
-                            logger.all_msg(f"    Archive files from {pattern_title}:")
-                            print_header = False
-                        logger.all_msg(f"    - {file}")
+            if archive_patterns:
+                for when_set, patterns in archive_patterns.items():
+                    if not app_inst.expander.satisfies(
+                        reqs=when_set, variant_set=app_inst.experiment_variants()
+                    ):
+                        continue
+                    for pattern in patterns.values():
+                        exp_pattern = app_inst.expander.expand_var(pattern)
+                        if not os.path.isabs(exp_pattern):
+                            exp_pattern = os.path.join(
+                                app_inst.expander.experiment_run_dir, exp_pattern
+                            )
+                        for file in glob.glob(exp_pattern):
+                            # Only print the header if a file matched the glob
+                            if print_header:
+                                logger.all_msg(f"    Archive files from {pattern_title}:")
+                                print_header = False
+                            logger.all_msg(f"    - {file}")
 
         super()._execute()
 
@@ -749,7 +758,7 @@ class LogsPipeline(Pipeline):
                 )
 
             for mod in app_inst.modifier_instances:
-                print_archive_files(app_inst, f"modifier {mod.name}", mod.archive_patterns.keys())
+                print_archive_files(app_inst, f"modifier {mod.name}", mod.archive_patterns)
 
             if self.first_only:
                 break

@@ -140,3 +140,16 @@ class WhenModifier(BasicModifier):
             results_level="key",
             description="Test modifier required key",
         )
+
+    variant(
+        "archive_pattern_when",
+        default=False,
+        values=[True, False],
+        description="Test archive pattern with when",
+    )
+
+    with when("+archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_mod_true.txt")
+
+    with when("~archive_pattern_when"):
+        archive_pattern("archive_test_pattern_when_mod_false.txt")

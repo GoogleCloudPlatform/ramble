@@ -379,8 +379,8 @@ def test_archive_pattern_directive(mod_class):
     for test_def in test_defs:
         pattern = test_def
 
-        assert pattern in mod_inst.archive_patterns
-        assert pattern == mod_inst.archive_patterns[pattern]
+        assert pattern in mod_inst.archive_patterns[frozenset()]
+        assert pattern == mod_inst.archive_patterns[frozenset()][pattern]
 
 
 def add_executable_modifier(mod_inst, exec_mod_num=1):
