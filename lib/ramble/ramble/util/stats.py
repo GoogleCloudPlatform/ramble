@@ -12,7 +12,7 @@ import math
 import statistics
 from typing import List, Tuple, Union
 
-from scipy.stats import t
+from scipy.stats import norm, t
 
 NA = "NA"
 
@@ -146,16 +146,7 @@ def _calculate_margin_of_error(values: List[float], cl: ConfidenceLevel) -> floa
         return t_score * (stdev / math.sqrt(n))
     else:
         # Using z-score for confidence.
-        if cl == ConfidenceLevel.CL_99:
-            z_score = 2.576
-        elif cl == ConfidenceLevel.CL_95:
-            z_score = 1.96
-        elif cl == ConfidenceLevel.CL_90:
-            z_score = 1.645
-        elif cl == ConfidenceLevel.CL_50:
-            z_score = 0.674
-        else:
-            raise ValueError("Unsupported confidence level")
+        z_score = float(norm.ppf(1 - (1 - cl.value) / 2))
         return z_score * (stdev / math.sqrt(n))
 
 
