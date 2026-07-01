@@ -29,9 +29,8 @@ from matplotlib.backends.backend_pdf import PdfPages
 
 import ramble.reports
 from ramble.main import RambleCommand
-from ramble.util import foms
+from ramble.util import foms, json_util
 
-import spack.util.spack_json as sjson
 import spack.util.spack_yaml as syaml
 
 config = RambleCommand("config")
@@ -394,7 +393,7 @@ def test_multiline_plot(mutable_mock_workspace_path, mutable_config, tmpdir_fact
     test_exp_results = {"experiments": all_experiments}
 
     with open(results_file, "w+", encoding="utf-8") as f:
-        sjson.dump(test_exp_results, f)
+        json_util.dump(test_exp_results, f)
 
     with ramble.config.override("config:report_dirs", results_dir_path):
         output = results(
@@ -559,7 +558,7 @@ def test_index_printing(mutable_mock_workspace_path, tmpdir_factory, format):
 
     with open(results_file, "w+", encoding="utf-8") as f:
         if format == "json":
-            sjson.dump(test_exp_results, f)
+            json_util.dump(test_exp_results, f)
         elif format == "yaml":
             syaml.dump(test_exp_results, stream=f)
 

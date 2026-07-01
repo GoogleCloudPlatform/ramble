@@ -11,10 +11,9 @@ from enum import Enum
 
 from ramble.namespace import namespace
 from ramble.software_info import SoftwareInfo
+from ramble.util import json_util
 from ramble.util.file_util import get_newest_experiment_file
 from ramble.util.logger import logger
-
-import spack.util.spack_json as sjson
 
 
 # Can use auto() once we're at >= python 3.11
@@ -90,7 +89,7 @@ class ExperimentResult:
             return False
 
         with open(cache_file, encoding="utf-8") as f:
-            cache_dict = sjson.load(f)
+            cache_dict = json_util.load(f)
 
         if (
             "experiment_hash" not in cache_dict
@@ -120,7 +119,7 @@ class ExperimentResult:
             out_dict[software_key][key] = [pkg.to_dict() for pkg in pkg_list]
 
         with open(cache_file, "w+", encoding="utf-8") as f:
-            sjson.dump(out_dict, f)
+            json_util.dump(out_dict, f)
 
     def finalize(self, workspace):
         app_inst = self._app_inst

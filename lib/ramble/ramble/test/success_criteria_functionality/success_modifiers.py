@@ -13,6 +13,7 @@ import pytest
 import ramble.workspace
 from ramble.main import RambleCommand
 from ramble.test.dry_run_helpers import SCOPES, dry_run_config
+from ramble.util import json_util
 
 # everything here uses the mock_workspace_path
 pytestmark = pytest.mark.usefixtures("mutable_config", "mutable_mock_workspace_path")
@@ -164,20 +165,18 @@ ramble:
     ws._re_read()
     workspace("setup", "--dry-run", global_args=["-w", workspace_name])
 
-    import spack.util.spack_json as sjson
-
     # Write mock output data that fails success criteria:
     exp1_dir = os.path.join(ws.experiment_dir, "basic", "working_wl", "test_cancelled")
     with open(os.path.join(exp1_dir, "test_cancelled.out"), "w+", encoding="utf-8") as f:
         f.write("0.25 seconds\n")
     with open(os.path.join(exp1_dir, "ramble_status.json"), "w+", encoding="utf-8") as f:
-        sjson.dump({"experiment_status": "CANCELLED"}, f)
+        json_util.dump({"experiment_status": "CANCELLED"}, f)
 
     exp2_dir = os.path.join(ws.experiment_dir, "basic", "working_wl", "test_timeout")
     with open(os.path.join(exp2_dir, "test_timeout.out"), "w+", encoding="utf-8") as f:
         f.write("0.35 seconds\n")
     with open(os.path.join(exp2_dir, "ramble_status.json"), "w+", encoding="utf-8") as f:
-        sjson.dump({"experiment_status": "TIMEOUT"}, f)
+        json_util.dump({"experiment_status": "TIMEOUT"}, f)
 
     workspace(
         "analyze",
@@ -188,7 +187,7 @@ ramble:
     result_file = os.path.join(ws.results_dir, "results.latest.json")
 
     with open(result_file, encoding="utf-8") as f:
-        cache_dict = sjson.load(f)
+        cache_dict = json_util.load(f)
         for exp in cache_dict["experiments"]:
             if "cancelled" in exp["name"]:
                 assert exp["EXPERIMENT_STATUS"] == "CANCELLED"

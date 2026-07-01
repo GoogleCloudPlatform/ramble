@@ -208,6 +208,7 @@ select = [
 # These are used to enforce the gradual moving away from vendored Spack dependencies
 "spack.util.naming" = { msg = "Core Ramble code should not rely on spack.util.naming." }
 "spack.util.cpus" = { msg = "Core Ramble code should not rely on spack.util.cpus." }
+"spack.util.spack_json" = { msg = "Core Ramble code should not rely on spack.util.spack_json." }
 
 [tool.ruff.lint.per-file-ignores]
 "lib/ramble/ramble/*kit.py" = ["F403"]

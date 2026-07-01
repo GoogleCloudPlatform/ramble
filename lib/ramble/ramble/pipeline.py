@@ -27,11 +27,11 @@ import ramble.uploader
 import ramble.util.hashing
 import ramble.util.path
 import ramble.workspace
+from ramble.util import json_util
 from ramble.util.colors import cprint
 from ramble.util.file_util import create_symlink
 from ramble.util.logger import logger
 
-import spack.util.spack_json as sjson
 from spack.util.executable import Executable, which
 
 if not ramble.config.get("config:disable_progress_bar", False):
@@ -97,7 +97,7 @@ class Pipeline:
 
         if not self.force_inventory and files_exist:
             with open(workspace_inventory, encoding="utf-8") as f:
-                self.workspace.hash_inventory = sjson.load(f)
+                self.workspace.hash_inventory = json_util.load(f)
 
             self.workspace.workspace_hash = ramble.util.hashing.hash_json(
                 self.workspace.hash_inventory
@@ -121,7 +121,7 @@ class Pipeline:
                 "w+",
                 encoding="utf-8",
             ) as f:
-                sjson.dump(self.workspace.hash_inventory, f)
+                json_util.dump(self.workspace.hash_inventory, f)
 
             with open(
                 os.path.join(self.workspace.root, self.workspace.hash_file_name),
@@ -166,7 +166,8 @@ class Pipeline:
                 logger.all_msg(f"    log file: {exp_log_path}")
 
             with logger.add_log_context(exp_log_path):
-                logger.msg(f"Experiment inventory:\n{sjson.dump(app_inst.hash_inventory)}")
+                inv_str = json_util.dumps(app_inst.hash_inventory)
+                logger.msg(f"Experiment inventory:\n{inv_str}")
                 phase_list = list(
                     app_inst.get_pipeline_phases(self.name, phase_filters=self.filters.phases)
                 )
@@ -790,7 +791,7 @@ class PushDeploymentPipeline(Pipeline):
             )
         index_file = os.path.join(self.workspace.named_deployment, self.index_filename)
         with open(index_file, "w+", encoding="utf-8") as f:
-            f.write(sjson.dump(deployment_index))
+            f.write(json_util.dumps(deployment_index))
 
         tar_path = os.path.join(
             self.workspace.deployments_dir, self.deployment_name + self.tar_extension
