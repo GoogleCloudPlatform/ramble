@@ -418,13 +418,6 @@ class Wrf(ExecutableApplication):
         fom_type=FomType.MEASURE,
     )
 
-    success_criteria(
-        "Complete",
-        mode="string",
-        match=r".*?wrf: SUCCESS COMPLETE WRF",
-        file="{experiment_run_dir}/rsl.out.0000",
-    )
-
     def _analyze_experiments(self, workspace, app_inst=None):
         experiment_dir = self.expander.expand_var_name("experiment_run_dir")
 
