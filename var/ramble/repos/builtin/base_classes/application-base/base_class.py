@@ -3635,15 +3635,34 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Add the object defined criteria
         criteria_list.flush_scope("object_definitions")
 
-        for _, obj_inst in self.objects():
+        resolved_criteria = {crit.name: -1 for crit, _ in criteria_list.all_criteria()}
+
+        for prec, (_, obj_inst) in enumerate(self.objects()):
             if obj_inst.success_criteria:
-                for criteria, conf in obj_inst.success_criteria.items():
+                obj_satisfied_criteria = {}
+                for when_set, criteria_dict in obj_inst.success_criteria.items():
                     if not self.expander.satisfies(
-                        conf["when"],
+                        when_set,
                         variant_set=obj_inst.experiment_variants(),
                     ):
                         continue
 
+                    for name, conf in criteria_dict.items():
+                        if name in obj_satisfied_criteria:
+                            existing_when_set = obj_satisfied_criteria[name][0]
+                            logger.die(
+                                f"Success criteria '{name}' in object '{obj_inst.name}' is defined multiple times "
+                                f"under conflicting satisfied 'when' conditions:\n"
+                                f"  1) {sorted(existing_when_set)}\n"
+                                f"  2) {sorted(when_set)}"
+                            )
+                        obj_satisfied_criteria[name] = (when_set, conf)
+
+                for criteria, (_, conf) in obj_satisfied_criteria.items():
+                    if criteria in resolved_criteria:
+                        continue
+
+                    resolved_criteria[criteria] = prec
                     if conf["mode"] == "string":
                         match = (
                             self.expander.expand_var(conf["match"])
@@ -3675,12 +3694,13 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                             owning_object=obj_inst,
                         )
 
-        criteria_list.add_criteria(
-            scope="object_definitions",
-            name="_application_function",
-            mode="application_function",
-            owning_object=self,
-        )
+        if "_application_function" not in resolved_criteria:
+            criteria_list.add_criteria(
+                scope="object_definitions",
+                name="_application_function",
+                mode="application_function",
+                owning_object=self,
+            )
 
         # Extract file paths for all criteria
         for criteria, _ in criteria_list.all_criteria():
