@@ -59,12 +59,18 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        for _ in ["txt", "json", "yaml"]:
-            with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-                data = f.read()
-                assert "Success criteria summary:" in data
-                assert "application::success-criteria-conflicts::_application_function = PASSED" in data
-                assert "config::experiment::test_success = PASSED" in data
+        for ext in ["txt", "json", "yaml"]:
+            assert os.path.exists(os.path.join(ws.results_dir, f"results.latest.{ext}"))
+
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+            data = f.read()
+            assert "Success criteria summary:" in data
+            assert (
+                "application::success-criteria-conflicts::_application_function = PASSED"
+                in data
+            )
+            assert "config::experiment::test_success = PASSED" in data
+
 
 def test_success_criteria_mutex_versions(mock_applications, workspace_name):
     """
@@ -101,12 +107,18 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        for _ in ["txt", "json", "yaml"]:
-            with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-                data = f.read()
-                assert "Success criteria summary:" in data
-                assert "application::success-criteria-conflicts::_application_function = PASSED" in data
-                assert "application::success-criteria-conflicts::test_version = PASSED" in data
+        for ext in ["txt", "json", "yaml"]:
+            assert os.path.exists(os.path.join(ws.results_dir, f"results.latest.{ext}"))
+
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+            data = f.read()
+            assert "Success criteria summary:" in data
+            assert (
+                "application::success-criteria-conflicts::_application_function = PASSED"
+                in data
+            )
+            assert "application::success-criteria-conflicts::test_version = PASSED" in data
+
 
 def test_success_criteria_multiple_satisfies(mock_applications, workspace_name):
     """
@@ -142,11 +154,12 @@ ramble:
         ws._re_read()
 
         from ramble.error import RambleCommandError
-        
+
         expected_err = r"Success criteria '.*' in object '.*' is defined multiple times under conflicting satisfied 'when' conditions"
-        
+
         with pytest.raises(RambleCommandError, match=expected_err):
             workspace("setup", global_args=["-w", workspace_name])
+
 
 def test_success_criteria_inheritance(mock_applications, workspace_name):
     """
@@ -183,9 +196,13 @@ ramble:
         ramble_on(global_args=["-w", workspace_name])
         workspace("analyze", "-f", "text", "json", "yaml", global_args=["-w", workspace_name])
 
-        for _ in ["txt", "json", "yaml"]:
-            with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
-                data = f.read()
-                assert "Success criteria summary:" in data
-                assert "application::success-criteria-conflicts::_application_function = PASSED" in data
-                assert "application::success-criteria-conflicts::test_inheritance = PASSED" in data
+        for ext in ["txt", "json", "yaml"]:
+            assert os.path.exists(os.path.join(ws.results_dir, f"results.latest.{ext}"))
+
+        with open(os.path.join(ws.results_dir, "results.latest.txt"), encoding="utf-8") as f:
+            data = f.read()
+            assert "Success criteria summary:" in data
+            assert (
+                "application::success-criteria-conflicts::_application_function = PASSED" in data
+            )
+            assert "application::success-criteria-conflicts::test_inheritance = PASSED" in data
