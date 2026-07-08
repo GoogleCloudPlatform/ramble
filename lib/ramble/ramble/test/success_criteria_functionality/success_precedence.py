@@ -66,8 +66,7 @@ ramble:
             data = f.read()
             assert "Success criteria summary:" in data
             assert (
-                "application::success-criteria-conflicts::_application_function = PASSED"
-                in data
+                "application::success-criteria-conflicts::_application_function = PASSED" in data
             )
             assert "config::experiment::test_success = PASSED" in data
 
@@ -114,8 +113,7 @@ ramble:
             data = f.read()
             assert "Success criteria summary:" in data
             assert (
-                "application::success-criteria-conflicts::_application_function = PASSED"
-                in data
+                "application::success-criteria-conflicts::_application_function = PASSED" in data
             )
             assert "application::success-criteria-conflicts::test_version = PASSED" in data
 
@@ -155,7 +153,10 @@ ramble:
 
         from ramble.error import RambleCommandError
 
-        expected_err = r"Success criteria '.*' in object '.*' is defined multiple times under conflicting satisfied 'when' conditions"
+        expected_err = (
+            r"Success criteria '.*' in object '.*' is defined "
+            r"multiple times under conflicting satisfied 'when' conditions"
+        )
 
         with pytest.raises(RambleCommandError, match=expected_err):
             workspace("setup", global_args=["-w", workspace_name])
