@@ -3679,7 +3679,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Add the object defined criteria
         criteria_list.flush_scope("object_definitions")
 
-        resolved_criteria = {crit.name: -1 for crit, _ in criteria_list.all_criteria()}
+        resolved_criteria = {crit.name for crit, _ in criteria_list.all_criteria()}
 
         for prec, (_, obj_inst) in enumerate(self.objects()):
             if obj_inst.success_criteria:
@@ -3706,7 +3706,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                     if criteria in resolved_criteria:
                         continue
 
-                    resolved_criteria[criteria] = prec
+                    resolved_criteria.add(criteria)
                     if conf["mode"] == "string":
                         match = (
                             self.expander.expand_var(conf["match"])
