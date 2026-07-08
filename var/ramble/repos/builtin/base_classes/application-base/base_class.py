@@ -3679,12 +3679,17 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
         # Add the object defined criteria
         criteria_list.flush_scope("object_definitions")
 
-        resolved_criteria = {crit.name for crit, _ in criteria_list.all_criteria()}
+        resolved_criteria = {
+            crit.name for crit, _ in criteria_list.all_criteria()
+        }
 
-        for prec, (_, obj_inst) in enumerate(self.objects()):
+        for _, obj_inst in self.objects():
             if obj_inst.success_criteria:
                 obj_satisfied_criteria = {}
-                for when_set, criteria_dict in obj_inst.success_criteria.items():
+                for (
+                    when_set,
+                    criteria_dict,
+                ) in obj_inst.success_criteria.items():
                     if not self.expander.satisfies(
                         when_set,
                         variant_set=obj_inst.experiment_variants(),
