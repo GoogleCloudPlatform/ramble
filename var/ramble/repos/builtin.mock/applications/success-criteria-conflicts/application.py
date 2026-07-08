@@ -8,6 +8,7 @@
 
 from ramble.appkit import *
 
+
 class SuccessCriteriaConflictsParent(ExecutableApplication):
     name = "success-criteria-conflicts-parent"
 
@@ -22,6 +23,7 @@ class SuccessCriteriaConflictsParent(ExecutableApplication):
             mode="string",
             anti_match="PARENT",
         )
+
 
 class SuccessCriteriaConflicts(SuccessCriteriaConflictsParent):
     name = "success-criteria-conflicts"
