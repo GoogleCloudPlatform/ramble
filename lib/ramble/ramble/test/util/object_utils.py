@@ -27,6 +27,7 @@ from ramble.util import object_utils
                 "conflict-test",
                 "import-test",
                 "input-test",
+                "nested-when-test",
                 "unused-compiler-test",
             ],
         ),

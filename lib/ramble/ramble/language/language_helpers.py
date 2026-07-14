@@ -11,6 +11,9 @@ import functools
 from collections import OrderedDict
 from typing import Any, List, Optional, Union
 
+from packaging.specifiers import SpecifierSet
+from packaging.version import InvalidVersion, Version
+
 from ramble.error import DirectiveError
 
 
@@ -318,6 +321,99 @@ def build_when_list(
     return when_list
 
 
+def _parse_version_spec(value):
+    if not value:
+        return SpecifierSet()
+
+    # Fallback translation: replace underscores with dots for PEP 440 compatibility
+    value = value.replace("_", ".")
+
+    sep_index = value.find(":")
+    if sep_index == -1:
+        return SpecifierSet(f"=={value}", prereleases=True)
+    elif sep_index == 0:
+        return SpecifierSet(f"<={value.lstrip(':')}", prereleases=True)
+    elif sep_index == len(value) - 1:
+        return SpecifierSet(f">={value.rstrip(':')}", prereleases=True)
+    else:
+        start = value[:sep_index]
+        end = value[sep_index + 1 :]
+        return SpecifierSet(f">={start},<={end}", prereleases=True)
+
+
+def is_specifier_set_compatible(spec_set):
+    if not spec_set:
+        return True
+
+    eq_versions = []
+    lower_bounds = []
+    upper_bounds = []
+    for spec in spec_set:
+        try:
+            val = Version(spec.version)
+        except InvalidVersion:
+            return False
+        if spec.operator == "==":
+            eq_versions.append(val)
+        elif spec.operator == ">=":
+            lower_bounds.append((val, True))
+        elif spec.operator == ">":
+            lower_bounds.append((val, False))
+        elif spec.operator == "<=":
+            upper_bounds.append((val, True))
+        elif spec.operator == "<":
+            upper_bounds.append((val, False))
+
+    if eq_versions:
+        target = eq_versions[0]
+        for eq_val in eq_versions[1:]:
+            if eq_val != target:
+                return False
+        for lb, inclusive in lower_bounds:
+            if inclusive:
+                if not (target >= lb):
+                    return False
+            else:
+                if not (target > lb):
+                    return False
+        for ub, inclusive in upper_bounds:
+            if inclusive:
+                if not (target <= ub):
+                    return False
+            else:
+                if not (target < ub):
+                    return False
+        return True
+
+    max_lb = None
+    max_lb_inclusive = True
+    for lb, inclusive in lower_bounds:
+        if max_lb is None or lb > max_lb:
+            max_lb = lb
+            max_lb_inclusive = inclusive
+        elif lb == max_lb:
+            if not inclusive:
+                max_lb_inclusive = False
+
+    min_ub = None
+    min_ub_inclusive = True
+    for ub, inclusive in upper_bounds:
+        if min_ub is None or ub < min_ub:
+            min_ub = ub
+            min_ub_inclusive = inclusive
+        elif ub == min_ub:
+            if not inclusive:
+                min_ub_inclusive = False
+
+    if max_lb is not None and min_ub is not None:
+        if max_lb > min_ub:
+            return False
+        if max_lb == min_ub:
+            return max_lb_inclusive and min_ub_inclusive
+
+    return True
+
+
 @functools.lru_cache(maxsize=None)
 def _parse_when(w_set):
     from ramble.util.format import when_order
@@ -347,13 +443,25 @@ def _parse_when(w_set):
                 variants[name] = val
             elif "@" in w:
                 name, ver = w.split("@", 1)
-                if name in versions and versions[name] != ver:
+                try:
+                    spec_set = _parse_version_spec(ver)
+                except Exception as e:
                     return (
                         None,
                         None,
-                        f"version '{name}' has conflicting values: '{versions[name]}' and '{ver}'",
+                        f"version '{name}' has invalid spec '{ver}': {e}",
                     )
-                versions[name] = ver
+                if name in versions:
+                    combined = versions[name] & spec_set
+                    if not is_specifier_set_compatible(combined):
+                        msg = (
+                            f"version '{name}' has conflicting values: "
+                            f"'{versions[name]}' and '{ver}'"
+                        )
+                        return (None, None, msg)
+                    versions[name] = combined
+                else:
+                    versions[name] = spec_set
     return variants, versions, None
 
 
@@ -386,7 +494,8 @@ def are_when_compatible(when_set1, when_set2):
 
     for name in ver1:
         if name in ver2:
-            if ver1[name] != ver2[name]:
+            combined = ver1[name] & ver2[name]
+            if not is_specifier_set_compatible(combined):
                 return False
     return True
 
