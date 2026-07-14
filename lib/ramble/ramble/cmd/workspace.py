@@ -1998,7 +1998,7 @@ def workspace_experiment_logs(args):
 
 
 #: Dictionary mapping subcommand names and aliases to functions
-subcommand_functions = {}
+subcommand_functions: Dict[str, Callable] = {}
 
 
 def sanitize_arg_name(base_name):

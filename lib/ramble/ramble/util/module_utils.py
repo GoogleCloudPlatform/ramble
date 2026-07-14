@@ -9,10 +9,12 @@
 """A utility for dynamically importing modules."""
 
 import importlib
+import types
+from typing import Dict
 
 from ramble.util.logger import logger
 
-_modules = {}
+_modules: Dict[str, types.ModuleType] = {}
 
 
 def import_module(module_name):

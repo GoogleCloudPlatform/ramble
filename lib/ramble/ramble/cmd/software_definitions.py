@@ -7,7 +7,7 @@
 # except according to those terms.
 
 import sys
-from typing import Dict, List
+from typing import Any, Dict, List
 
 from llnl.util.tty.colify import colify
 
@@ -19,10 +19,10 @@ description = "inspect software definitions in object definitions"
 section = "developer"
 level = "long"
 
-unused_compilers = {}
-definitions = {}
-conflicts = {}
-used_by = {}
+unused_compilers: Dict[str, List[str]] = {}
+definitions: Dict[str, Any] = {}
+conflicts: Dict[str, List[str]] = {}
+used_by: Dict[str, List[str]] = {}
 specs: Dict[str, Dict[str, List[str]]] = {"pkg_spec": {}, "compiler_spec": {}}
 spec_headers = {
     "pkg_spec": "Software Packages",
