@@ -136,6 +136,28 @@ class OsuMicroBenchmarks(ExecutableApplication):
         workloads=all_workloads,
     )
 
+    two_rank_workloads = [
+        "osu_bibw",
+        "osu_bw",
+        "osu_latency",
+        "osu_get_acc_latency",
+        "osu_get_bw",
+        "osu_get_latency",
+        "osu_put_bibw",
+        "osu_put_bw",
+        "osu_put_latency",
+    ]
+
+    for two_rank_workload in two_rank_workloads:
+        with when(f"workload={two_rank_workload}"):
+            register_validator(
+                name = "two-rank-workloads",
+                predicate = "{n_ranks} != 2",
+                message = ("This workload requires 2 ranks."),
+                fail_on_invalid = True,
+                when=[f"workload={two_rank_workload}"]
+            )
+
     data_type_regex = r"# Datatype: (?P<type>\S+)\."
     figure_of_merit(
         "OMB Datatype", fom_regex=data_type_regex, group_name="type", units=""
