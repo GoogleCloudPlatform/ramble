@@ -48,7 +48,7 @@ def test_variable_cross_pass_precedence(workspace_name):
 
         # Edit workspace config directly
         with open(ws.config_file_path, encoding="utf-8") as f:
-            import yaml
+            import yaml  # type: ignore
 
             data = yaml.safe_load(f)
 

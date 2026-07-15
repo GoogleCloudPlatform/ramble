@@ -25,7 +25,7 @@ class MockPackageInfo:
 
 
 class MockSpackRunner:
-    def __init__(self):
+    def __init__(self, **kwargs):
         self.env_path = None
         self.concretized = False
         self.dry_run = False
