@@ -1091,19 +1091,10 @@ def workspace_info(args):
                     full_exp_name = f"{app_ctx}.{wl_ctx}.{exp_ctx}"
                     app_inst = experiment_set.get_experiment(full_exp_name)
 
-                    objects_to_check = [app_inst]
-                    if hasattr(app_inst, "package_manager") and app_inst.package_manager:
-                        objects_to_check.append(app_inst.package_manager)
-                    if hasattr(app_inst, "system") and app_inst.system:
-                        objects_to_check.append(app_inst.system)
-                    if hasattr(app_inst, "platform") and app_inst.platform:
-                        objects_to_check.append(app_inst.platform)
-                    if hasattr(app_inst, "workflow_manager") and app_inst.workflow_manager:
-                        objects_to_check.append(app_inst.workflow_manager)
-                    if hasattr(app_inst, "_modifiers") and app_inst._modifiers:
-                        objects_to_check.extend(app_inst._modifiers)
+                    if not app_inst:
+                        continue
 
-                    for obj in objects_to_check:
+                    for _, obj in app_inst.objects():
                         if hasattr(obj, "required_utilities"):
                             for when_key, utilities in obj.required_utilities.items():
                                 if obj.satisfy_when(when_key):

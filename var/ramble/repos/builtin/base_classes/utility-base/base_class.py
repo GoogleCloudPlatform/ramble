@@ -71,12 +71,11 @@ class UtilityBase(ObjectMixin, metaclass=UtilityMeta):
         """Check if the provided executables are available and satisfy version constraints.
         Uses the provided environment or the system environment if None.
         """
-        import os
         import re
         import shutil
         import subprocess
 
-        from spack.version import Version
+        from ramble.definitions.versions import Version
 
         self.availability_error = None
         check_env = env if env is not None else os.environ.copy()
