@@ -127,13 +127,13 @@ class Turbostat(BasicModifier):
                     template=[
                         r"""
 if ps -p "$turbostat_pid" > /dev/null; then
-    child_pid=$(pgrep -P "$turbostat_pid")
-    if [ ! -z "$child_pid" ]; then
-        {sudo_prefix}kill -INT "$child_pid" 2>/dev/null
+    child_pids=$(pgrep -P "$turbostat_pid")
+    if [ -n "$child_pids" ]; then
+        {sudo_prefix}kill -INT $child_pids 2>/dev/null
     fi
     {sudo_prefix}kill -INT "$turbostat_pid" 2>/dev/null
 fi
-{sudo_prefix}pkill -INT -f "{turbostat_path} -S" 2>/dev/null
+{sudo_prefix}pkill -INT -f "{turbostat_path} -S.*{turbostat_log}" 2>/dev/null
                         """.strip(),
                     ],
                     mpi=False,
