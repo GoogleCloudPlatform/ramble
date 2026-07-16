@@ -8,6 +8,7 @@
 
 import enum
 import fnmatch
+import textwrap
 
 from llnl.util.tty.colify import colified
 
@@ -147,11 +148,7 @@ def print_object_header(obj_type, obj):
 
     color.cprint(color.section_title("Description:"))
     if obj.__doc__:
-        doc_str = ""
-        for part in obj.__doc__.split("\n"):
-            doc_str += f"    {part}\n"
-
-        color.cprint(f"{doc_str}")
+        color.cprint(textwrap.indent(obj.__doc__, "    "))
 
 
 def print_object_overview(obj):

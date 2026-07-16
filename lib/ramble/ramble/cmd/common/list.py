@@ -108,9 +108,7 @@ def html(obj_names, out, object_type):
         for name in row:
             out.write("<td>\n")
             if name is not None:
-                out.write(f'<a class="reference internal" href="#{name}">{name}</a></td>\n')
-            else:
-                out.write("</td>\n")
+                out.write(f'<a class="reference internal" href="#{name}">{name}</a>')
             out.write("</td>\n")
         out.write("</tr>\n")
     out.write("</tbody>\n")

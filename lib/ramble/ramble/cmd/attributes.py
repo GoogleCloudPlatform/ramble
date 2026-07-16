@@ -103,11 +103,11 @@ def attributes_to_objects(
     users=None, attr_name=default_attr, object_type=ramble.repository.default_type
 ):
     user_to_apps = defaultdict(list)
+    lower_users = {u.lower() for u in users} if users else set()
     object_names = ramble.repository.paths[object_type].all_object_names()
     for name in object_names:
         cls = ramble.repository.paths[object_type].get_obj_class(name)
         for user in getattr(cls, attr_name):
-            lower_users = [u.lower() for u in users]
             if not users or user.lower() in lower_users:
                 user_to_apps[user].append(cls.name)
 

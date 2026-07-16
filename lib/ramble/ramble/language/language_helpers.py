@@ -487,16 +487,13 @@ def are_when_compatible(when_set1, when_set2):
     if v1 is None or v2 is None:
         return False
 
-    for name in v1:
-        if name in v2:
-            if v1[name] != v2[name]:
-                return False
+    for name in v1.keys() & v2.keys():
+        if v1[name] != v2[name]:
+            return False
 
-    for name in ver1:
-        if name in ver2:
-            combined = ver1[name] & ver2[name]
-            if not is_specifier_set_compatible(combined):
-                return False
+    for name in ver1.keys() & ver2.keys():
+        if not is_specifier_set_compatible(ver1[name] & ver2[name]):
+            return False
     return True
 
 

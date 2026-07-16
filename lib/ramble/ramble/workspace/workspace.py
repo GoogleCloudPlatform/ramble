@@ -564,11 +564,8 @@ class Workspace:
             ext_len = len(TEMPLATE_EXTENSION)
             if os.path.exists(self.config_dir):
                 for root, _, files in os.walk(self.config_dir):
-                    processed_root = root.replace(self.config_dir, "")
-                    if len(processed_root) > 1 and processed_root[0] == os.sep:
-                        processed_root = processed_root[1:]
-                    if len(processed_root) > 1:
-                        processed_root += os.sep
+                    rel_root = os.path.relpath(root, self.config_dir)
+                    processed_root = "" if rel_root == "." else rel_root + os.sep
                     for filename in files:
                         if filename.endswith(TEMPLATE_EXTENSION):
                             read_default_script = False
