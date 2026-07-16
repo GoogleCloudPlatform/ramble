@@ -32,9 +32,7 @@ def strip_quotes(in_str: str) -> str:
     # Strip whitespace
     in_str = in_str.strip()
     if len(in_str) >= 2:
-        if (in_str.startswith("'") and in_str.endswith("'")) or (
-            in_str.startswith('"') and in_str.endswith('"')
-        ):
+        if in_str.startswith(("'", '"')) and in_str.endswith(in_str[0]):
             return in_str[1:-1]
     return in_str
 
