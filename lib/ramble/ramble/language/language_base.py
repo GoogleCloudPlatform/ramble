@@ -64,6 +64,8 @@ namespaces = [
     "ramble.platform",
     "ramble.base_cls",
     "ramble.modifier",
+    "ramble.ext_dep",
+    "ramble.utility",
 ]
 
 

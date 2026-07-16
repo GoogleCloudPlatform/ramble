@@ -70,6 +70,7 @@ from ramble.util.shell_utils import source_str
 from ramble.workspace import LICENSE_INC_NAME, TEMPLATE_EXTENSION, namespace
 
 import spack.util.compression
+import spack.util.environment
 import spack.util.executable
 import spack.util.spack_json
 
@@ -163,6 +164,7 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     pipelines = [
         "analyze",
         "archive",
+        "bootstrap",
         "mirror",
         "setup",
         "pushdeployment",
@@ -2512,6 +2514,333 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 stage.cache_mirror(
                     workspace.input_mirror_cache, workspace.input_mirror_stats
                 )
+
+    register_phase("bootstrap_utilities", pipeline="bootstrap")
+    register_phase(
+        "bootstrap_utilities",
+        pipeline="setup",
+        run_before=["get_inputs"],
+    )
+
+    def _bootstrap_utilities(self, workspace, app_inst=None):
+        """Bootstrap external dependencies for this experiment"""
+        if not ramble.config.get("config:bootstrap_utilities", True):
+            logger.debug(
+                "Bootstrapping external dependencies is disabled by config."
+            )
+            return
+
+        ext_dep_paths = {}
+        ext_dep_instances = {}
+        ext_dep_versions = {}
+        objects_to_check = [self]
+        if hasattr(self, "package_manager") and self.package_manager:
+            objects_to_check.append(self.package_manager)
+        if hasattr(self, "system") and self.system:
+            objects_to_check.append(self.system)
+        if hasattr(self, "platform") and self.platform:
+            objects_to_check.append(self.platform)
+        if hasattr(self, "workflow_manager") and self.workflow_manager:
+            objects_to_check.append(self.workflow_manager)
+        if hasattr(self, "_modifiers") and self._modifiers:
+            objects_to_check.extend(self._modifiers)
+
+        ws_ext_deps = (
+            workspace._get_workspace_dict()
+            .get("ramble", {})
+            .get("utilities", {})
+        )
+
+        for obj in objects_to_check:
+            if not hasattr(obj, "required_utilities"):
+                continue
+
+            for (
+                when_key,
+                ext_deps,
+            ) in obj.required_utilities.items():
+                if obj.satisfy_when(when_key):
+                    for ext_dep_name, ext_dep_conf in ext_deps.items():
+                        try:
+                            # Instantiate the external dependency
+                            ext_dep_inst = ramble.repository.paths[
+                                ramble.repository.ObjectTypes.utilities
+                            ].get(ext_dep_name)
+                            ext_dep_instances[ext_dep_name] = ext_dep_inst
+                        except Exception as e:
+                            logger.warn(
+                                f"Failed to find external dependency {ext_dep_name}: {e}"
+                            )
+                            continue
+
+                        # Variables merging logic: object -> workspace
+                        fetch_kwargs = {}
+
+                        for (
+                            when_cond,
+                            vars_list,
+                        ) in ext_dep_inst.object_variables.items():
+                            if obj.satisfy_when(when_cond):
+                                for var_info in vars_list:
+                                    var_name = var_info.name
+                                    if hasattr(self, "expander"):
+                                        expanded_val = (
+                                            self.expander.expand_var(
+                                                f"{{{var_name}}}"
+                                            )
+                                        )
+                                        if expanded_val != f"{{{var_name}}}":
+                                            fetch_kwargs[var_name] = (
+                                                expanded_val
+                                            )
+                                            continue
+
+                                    fetch_kwargs[var_name] = var_info.default
+
+                        if ext_dep_name in ws_ext_deps:
+                            fetch_kwargs.update(ws_ext_deps[ext_dep_name])
+                        else:
+                            fetch_kwargs.update(ext_dep_conf)
+
+                        if hasattr(ext_dep_inst, "map_fetch_kwargs"):
+                            fetch_kwargs = ext_dep_inst.map_fetch_kwargs(
+                                fetch_kwargs
+                            )
+
+                        if "when" in fetch_kwargs:
+                            del fetch_kwargs["when"]
+
+                        min_version = fetch_kwargs.pop("min_version", None)
+                        max_version = fetch_kwargs.pop("max_version", None)
+
+                        origin_name = obj.name
+                        origin_type = getattr(obj, "origin_type", "object")
+
+                        ext_dep_versions[ext_dep_name] = {
+                            "min_version": min_version,
+                            "max_version": max_version,
+                            "origin_name": origin_name,
+                            "origin_type": origin_type,
+                        }
+
+                        for k, v in fetch_kwargs.items():
+                            if isinstance(v, str):
+                                fetch_kwargs[k] = self.expander.expand_var(v)
+
+                        version_str = (
+                            fetch_kwargs.get("commit")
+                            or fetch_kwargs.get("version")
+                            or fetch_kwargs.get("tag")
+                            or fetch_kwargs.get("branch")
+                            or fetch_kwargs.get("revision")
+                            or "latest"
+                        )
+                        ext_dep_dir = os.path.join(
+                            workspace.shared_dir,
+                            "bootstrapped_utilities",
+                            ext_dep_name,
+                            version_str,
+                        )
+                        ext_dep_paths[ext_dep_name] = os.path.join(
+                            ext_dep_dir, "source"
+                        )
+
+                        sorted_kwargs_str = str(sorted(fetch_kwargs.items()))
+                        cache_tuple = (
+                            f"utility-bootstrap-{ext_dep_name}",
+                            sorted_kwargs_str,
+                        )
+
+                        if not hasattr(obj, "variables"):
+                            obj.variables = {}
+                        obj.variables[f"utility::{ext_dep_name}::path"] = (
+                            ext_dep_paths[ext_dep_name]
+                        )
+
+                        if not ramble.config.get(
+                            "config:bootstrap_utilities",
+                            True,
+                        ):
+                            logger.debug(
+                                f"External dependency bootstrapping is disabled globally. Using system {ext_dep_name}."
+                            )
+                            ext_dep_paths[ext_dep_name] = "system"
+                            continue
+
+                        if hasattr(
+                            ext_dep_inst, "is_available"
+                        ) and ext_dep_inst.is_available(
+                            workspace,
+                            min_version=min_version,
+                            max_version=max_version,
+                        ):
+                            logger.debug(
+                                f"External dependency {ext_dep_name} is already available in the environment, skipping fetch."
+                            )
+                            ext_dep_paths[ext_dep_name] = "system"
+                            continue
+
+                        is_bootstrappable = True
+                        if hasattr(ext_dep_inst, "bootstrappable"):
+                            for (
+                                when_cond,
+                                b_list,
+                            ) in ext_dep_inst.bootstrappable.items():
+                                if obj.satisfy_when(when_cond):
+                                    for b_info in b_list:
+                                        is_bootstrappable = b_info[
+                                            "is_bootstrappable"
+                                        ]
+
+                        if not is_bootstrappable:
+                            error_message = f"External dependency '{ext_dep_name}' is not available on the system and is marked as non-bootstrappable."
+                            custom_message = None
+                            if hasattr(ext_dep_inst, "missing_error_messages"):
+                                for (
+                                    when_cond,
+                                    m_list,
+                                ) in (
+                                    ext_dep_inst.missing_error_messages.items()
+                                ):
+                                    if obj.satisfy_when(when_cond):
+                                        for m_info in m_list:
+                                            custom_message = m_info["message"]
+
+                            if custom_message:
+                                error_message = custom_message
+                            elif (
+                                hasattr(ext_dep_inst, "availability_error")
+                                and ext_dep_inst.availability_error
+                            ):
+                                error_message += f"\nReason: {ext_dep_inst.availability_error}"
+                            logger.die(error_message)
+
+                        if not workspace.check_cache(cache_tuple):
+                            if not workspace.dry_run:
+                                try:
+                                    if hasattr(ext_dep_inst, "install"):
+                                        ext_dep_inst.install(workspace)
+
+                                    fetcher_kwargs = {
+                                        k: v
+                                        for k, v in fetch_kwargs.items()
+                                        if k
+                                        in [
+                                            "git",
+                                            "url",
+                                            "commit",
+                                            "tag",
+                                            "branch",
+                                            "revision",
+                                            "version",
+                                            "checksum",
+                                            "sha256",
+                                            "svn",
+                                            "hg",
+                                        ]
+                                    }
+                                    fetcher = (
+                                        ramble.fetch_strategy.from_kwargs(
+                                            **fetcher_kwargs
+                                        )
+                                    )
+                                    stage = ramble.stage.InputStage(
+                                        fetcher,
+                                        name=ext_dep_name,
+                                        path=ext_dep_dir,
+                                    )
+                                    with stage:
+                                        stage.set_subdir("source")
+                                        stage.fetch()
+                                        stage.expand_archive()
+
+                                    if hasattr(
+                                        ext_dep_inst, "modify_bootstrap"
+                                    ):
+                                        ext_dep_inst.modify_bootstrap(
+                                            workspace,
+                                            obj,
+                                        )
+                                except Exception as e:
+                                    logger.die(
+                                        f"Failed to bootstrap external dependency {ext_dep_name}: {e}"
+                                    )
+
+                            workspace.add_to_cache(cache_tuple)
+
+        self._bootstrapped_utility_paths = ext_dep_paths
+
+        for obj in objects_to_check:
+            exp_env_mod = spack.util.environment.EnvironmentModifications()
+            source_scripts_commands = []
+
+            if hasattr(obj, "scripts_to_source"):
+                for script_info in obj.scripts_to_source:
+                    when_cond = script_info.get("when", [])
+                    if obj.satisfy_when(when_cond):
+                        script_path = script_info["path"]
+                        source_scripts_commands.append(f"source {script_path}")
+                        exp_env_mod.extend(
+                            spack.util.environment.EnvironmentModifications.from_sourcing_file(
+                                script_path
+                            )
+                        )
+
+            if not hasattr(obj, "variables"):
+                obj.variables = {}
+            if source_scripts_commands:
+                obj.variables["source_scripts_command"] = "\n".join(
+                    source_scripts_commands
+                )
+            else:
+                obj.variables["source_scripts_command"] = ""
+
+            for ext_dep_name, ext_dep_path in ext_dep_paths.items():
+                ext_dep_inst = ext_dep_instances[ext_dep_name]
+
+                obj.variables[f"utility::{ext_dep_name}::path"] = ext_dep_path
+
+                if hasattr(ext_dep_inst, "get_experiment_activation_command"):
+                    act_cmd = ext_dep_inst.get_experiment_activation_command(
+                        workspace, obj
+                    )
+                    obj.variables[
+                        f"utility::{ext_dep_name}::activation_command"
+                    ] = act_cmd
+
+                if hasattr(ext_dep_inst, "setup_runner_environment"):
+                    env_mod = ext_dep_inst.setup_runner_environment(
+                        workspace, obj
+                    )
+                    if env_mod:
+                        exp_env_mod.extend(env_mod)
+
+            exp_env = os.environ.copy()
+            exp_env_mod.apply_modifications(exp_env)
+            obj.experiment_runner_env = exp_env
+
+            for ext_dep_name, ext_dep_inst in ext_dep_instances.items():
+                if hasattr(ext_dep_inst, "validate_versions"):
+                    versions = ext_dep_versions.get(ext_dep_name, {})
+                    min_v = versions.get("min_version")
+                    max_v = versions.get("max_version")
+                    origin_name = versions.get("origin_name")
+                    origin_type = versions.get("origin_type")
+
+                    if not workspace.dry_run:
+                        if not ext_dep_inst.validate_versions(
+                            min_version=min_v,
+                            max_version=max_v,
+                            env=exp_env,
+                            origin_name=origin_name,
+                            origin_type=origin_type,
+                        ):
+                            logger.die(
+                                f"Version validation failed for {ext_dep_name} after bootstrap:\n{ext_dep_inst.availability_error}"
+                            )
+
+            if hasattr(obj, "bootstrap_utility"):
+                obj.bootstrap_utility(workspace, ext_dep_paths)
 
     register_phase("get_inputs", pipeline="setup")
 

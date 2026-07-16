@@ -398,7 +398,9 @@ class ArchivePipeline(Pipeline):
             excluded_secrets.add(ramble.workspace.LICENSE_INC_NAME)
 
         fs.mkdirp(archive_shared)
-        for root, _, files in os.walk(self.workspace.shared_dir):
+        for root, dirs, files in os.walk(self.workspace.shared_dir):
+            if "bootstrapped_utilities" in dirs:
+                dirs.remove("bootstrapped_utilities")
             for name in files:
                 if name not in excluded_secrets:
                     src_dir = os.path.join(self.workspace.shared_dir, root)
@@ -420,6 +422,16 @@ class ArchivePipeline(Pipeline):
                     dest = src.replace(self.workspace.log_dir, archive_logs)
                     fs.mkdirp(os.path.dirname(dest))
                     shutil.copyfile(src, dest)
+
+        # Copy tools directory
+        tools_dir = os.path.join(self.workspace.shared_dir, "bootstrapped_utilities")
+        if os.path.exists(tools_dir):
+            archive_tools = os.path.join(
+                self.workspace.latest_archive_path,
+                ramble.workspace.WORKSPACE_SHARED_PATH,
+                "bootstrapped_utilities",
+            )
+            _copy_tree(tools_dir, archive_tools)
 
         for pattern in itertools.chain(
             self.archive_patterns,
@@ -509,6 +521,16 @@ class MirrorPipeline(Pipeline):
                 output=logger.active_stream(),
             )
             logger.die("Mirroring has errors.")
+
+
+class BootstrapPipeline(Pipeline):
+    """Class for the bootstrap pipeline"""
+
+    name = "bootstrap"
+
+    def __init__(self, workspace, filters):
+        super().__init__(workspace, filters)
+        self.action_string = "Bootstrapping"
 
 
 class SetupPipeline(Pipeline):
@@ -768,6 +790,15 @@ class PushDeploymentPipeline(Pipeline):
         aux_software_dir = os.path.join(configs_dir, ramble.workspace.AUXILIARY_SOFTWARE_DIR_NAME)
         fs.mkdirp(aux_software_dir)
 
+        tools_dir = os.path.join(self.workspace.shared_dir, "bootstrapped_utilities")
+        if os.path.exists(tools_dir):
+            deployment_tools = os.path.join(
+                self.workspace.named_deployment,
+                ramble.workspace.WORKSPACE_SHARED_PATH,
+                "bootstrapped_utilities",
+            )
+            _copy_tree(tools_dir, deployment_tools)
+
         super()._execute()
 
     def _deployment_files(self):
@@ -844,6 +875,7 @@ pipelines = Enum(
     [
         "analyze",
         "archive",
+        "bootstrap",
         "mirror",
         "setup",
         "pushtocache",
@@ -856,6 +888,7 @@ pipelines = Enum(
 _pipeline_map = {
     pipelines.analyze: AnalyzePipeline,
     pipelines.archive: ArchivePipeline,
+    pipelines.bootstrap: BootstrapPipeline,
     pipelines.mirror: MirrorPipeline,
     pipelines.setup: SetupPipeline,
     pipelines.pushtocache: PushToCachePipeline,

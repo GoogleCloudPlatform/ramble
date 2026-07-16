@@ -19,6 +19,7 @@ config:
   verify_ssl: true
   connect_timeout: 10
   checksum: true
+  bootstrap_utilities: true
   shell: bash
   input_cache: $ramble/var/ramble/cache
   workspace_dirs:

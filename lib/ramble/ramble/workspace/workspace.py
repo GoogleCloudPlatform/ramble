@@ -2702,6 +2702,10 @@ ramble:
         """Return a dict of workspace tables"""
         return ramble.config.config.get_config(namespace.tables)
 
+    def get_workspace_utilities(self):
+        """Return a dict of workspace utilities"""
+        return ramble.config.config.get_config(namespace.utilities)
+
     def get_applications(self):
         """Get the dictionary of applications"""
         logger.debug("Getting app dict.")
