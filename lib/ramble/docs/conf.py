@@ -212,7 +212,6 @@ nitpick_ignore = [
     ("py:class", "func"),
     ("py:class", "module"),
     ("py:class", "_io.BufferedReader"),
-    ("py:class", "ramble.repository._PrependFileLoader"),
     ("py:class", "unittest.case.TestCase"),
     ("py:class", "_frozen_importlib_external.SourceFileLoader"),
     ("py:class", "clingo.Control"),

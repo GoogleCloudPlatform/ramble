@@ -1553,37 +1553,15 @@ class RepositoryNamespace(types.ModuleType):
         return getattr(self, name)
 
 
-class _PrependFileLoader(importlib.machinery.SourceFileLoader):
-    def __init__(self, fullname, path, prepend=None):
-        super().__init__(fullname, path)
-        self.prepend = prepend
-
-    def path_stats(self, path):
-        stats = super().path_stats(path)
-        if self.prepend:
-            stats["size"] += len(self.prepend) + 1
-        return stats
-
-    def get_data(self, path):
-        data = super().get_data(path)
-        if path != self.path or self.prepend is None:
-            return data
-        else:
-            return self.prepend.encode() + b"\n" + data
-
-
-class RepoLoader(_PrependFileLoader):
+class RepoLoader(importlib.machinery.SourceFileLoader):
     """Loads a Python module associated with a object in specific repository"""
-
-    #: Code in ``_object_prepend`` is prepended to imported objects.
-    _object_prepend = "from __future__ import absolute_import;"
 
     def __init__(self, fullname, repo, object_name):
         self.repo = repo
         self.object_name = object_name
         self.object_py = repo.filename_for_object_name(object_name)
         self.fullname = fullname
-        super().__init__(self.fullname, self.object_py, prepend=self._object_prepend)
+        super().__init__(self.fullname, self.object_py)
 
     def is_package(self, fullname):
         # Since every Ramble object already has a containing directory,
