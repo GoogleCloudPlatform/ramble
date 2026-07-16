@@ -637,7 +637,7 @@ class ExperimentSet:
             logger.debug(f"   Final name: {final_exp_namespace}")
 
             if final_exp_namespace in self.rendered_experiments:
-                left_inst = self.experiments[final_exp_namespace]
+                left_inst = self.get_experiment(final_exp_namespace)
                 left_vars = left_inst.variables
                 right_vars = app_inst.variables
                 lkeys = set(left_vars.keys())
@@ -649,15 +649,14 @@ class ExperimentSet:
                 common_vars = lkeys & rkeys
 
                 independent_vars = set()
-                if "render_group" in locals():
-                    for matrix in render_group.matrices:
-                        for var_or_zip in matrix:
-                            if var_or_zip in render_group.zips:
-                                independent_vars.update(render_group.zips[var_or_zip])
-                            else:
-                                independent_vars.add(var_or_zip)
-                    for zip_vars in render_group.zips.values():
-                        independent_vars.update(zip_vars)
+                for matrix in render_group.matrices:
+                    for var_or_zip in matrix:
+                        if var_or_zip in render_group.zips:
+                            independent_vars.update(render_group.zips[var_or_zip])
+                        else:
+                            independent_vars.add(var_or_zip)
+                for zip_vars in render_group.zips.values():
+                    independent_vars.update(zip_vars)
 
                 for var, val in final_context.variables.items():
                     if isinstance(val, list):
