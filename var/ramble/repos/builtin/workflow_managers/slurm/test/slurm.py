@@ -314,3 +314,82 @@ ramble:
             filename,
         )
         assert os.path.isfile(archived_path)
+
+
+def test_slurm_workflow_licenses(
+    mutable_mock_apps_repo, make_workspace_from_config
+):
+    test_config = """
+ramble:
+  variants:
+    workflow_manager: slurm
+  variables:
+    processes_per_node: 5
+    n_nodes: 2
+  applications:
+    basic:
+      workloads:
+        test_wl:
+          experiments:
+            test_no_lic_file: {}
+            test_with_lic_file: {}
+            test_lic_override:
+              variables:
+                slurm_licenses: 'custom_lic:99'
+            test_lic_disable:
+              variables:
+                slurm_licenses: ''
+"""
+
+    ws, _ = make_workspace_from_config(test_config)
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+    path_no_lic = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "test_no_lic_file"
+    )
+    with open(
+        os.path.join(path_no_lic, "slurm_experiment_sbatch"), encoding="utf-8"
+    ) as f:
+        content = f.read()
+        assert "--licenses" not in content
+
+    test_licenses = """
+licenses:
+  basic:
+    set:
+      TEST_VAR: test_val
+"""
+    license_path = os.path.join(ws.config_dir, "licenses.yaml")
+    with open(license_path, "w+", encoding="utf-8") as f:
+        f.write(test_licenses)
+
+    workspace("setup", "--dry-run", global_args=["-D", ws.root])
+
+    path_with_lic = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "test_with_lic_file"
+    )
+    with open(
+        os.path.join(path_with_lic, "slurm_experiment_sbatch"),
+        encoding="utf-8",
+    ) as f:
+        content = f.read()
+        assert "#SBATCH --licenses=basic:10" in content
+
+    path_override = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "test_lic_override"
+    )
+    with open(
+        os.path.join(path_override, "slurm_experiment_sbatch"),
+        encoding="utf-8",
+    ) as f:
+        content = f.read()
+        assert "#SBATCH --licenses=custom_lic:99" in content
+
+    path_disable = os.path.join(
+        ws.experiment_dir, "basic", "test_wl", "test_lic_disable"
+    )
+    with open(
+        os.path.join(path_disable, "slurm_experiment_sbatch"), encoding="utf-8"
+    ) as f:
+        content = f.read()
+        assert "--licenses" not in content

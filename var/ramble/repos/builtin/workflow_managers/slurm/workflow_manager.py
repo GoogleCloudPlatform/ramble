@@ -9,6 +9,7 @@
 import datetime
 import os
 
+from ramble import config
 from ramble.experiment_result import ExperimentStatus
 from ramble.util import shell_utils
 from ramble.wmkit import *
@@ -96,6 +97,12 @@ class Slurm(WorkflowManagerBase):
         name="slurm_partition",
         default="",
         description="partition to submit job to, if unspecified, it uses the default partition",
+    )
+
+    workflow_manager_variable(
+        name="slurm_licenses",
+        default=None,
+        description="Slurm licenses required by the job, e.g. fluent:64",
     )
 
     workflow_manager_variable(
@@ -204,6 +211,26 @@ class Slurm(WorkflowManagerBase):
         partition = expander.expand_var_name("slurm_partition")
         if partition:
             pragmas.append("#SBATCH -p {slurm_partition}")
+
+        slurm_licenses = expander.expand_var_name("slurm_licenses", typed=True)
+        if slurm_licenses is None:
+            license_conf = config.get("licenses")
+            if license_conf:
+                matched_license = next(
+                    (
+                        lic
+                        for lic in app_inst.license_names
+                        if lic in license_conf
+                    ),
+                    None,
+                )
+                if matched_license:
+                    n_ranks = expander.expand_var("{n_ranks}")
+                    slurm_licenses = f"{matched_license}:{n_ranks}"
+
+        if slurm_licenses:
+            pragmas.append(f"#SBATCH --licenses={slurm_licenses}")
+
         extra_headers = (
             expander.expand_var_name("extra_sbatch_headers")
             .strip()
