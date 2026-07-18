@@ -316,7 +316,7 @@ def config_update(args) -> None:
             'be retrieved with "ramble config revert"'
         )
         logger.msg(msg)
-        proceed = tty.get_yes_or_no("Do you want to proceed?", default=False)
+        proceed = bool(tty.get_yes_or_no("Do you want to proceed?", default=False))
 
     if not proceed:
         logger.die("Operation aborted.")
@@ -387,7 +387,7 @@ def config_revert(args):
             msg += "\t[scope={0.scope}, bkp={0.bkp}]\n".format(entry)
         msg += "This operation cannot be undone."
         logger.msg(msg)
-        proceed = tty.get_yes_or_no("Do you want to proceed?", default=False)
+        proceed = bool(tty.get_yes_or_no("Do you want to proceed?", default=False))
 
     if not proceed:
         logger.die("Operation aborted.")

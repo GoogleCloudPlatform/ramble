@@ -6,13 +6,14 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import contextlib
 import os
 import shutil
 
 from llnl.util.filesystem import mkdirp
 
 from ramble.error import RambleError
-from ramble.util.lock import Lock, ReadTransaction, WriteTransaction
+from ramble.util.lock import Lock
 
 
 class FileCache:
@@ -98,6 +99,7 @@ class FileCache:
             self._get_lock(key)
         return exists
 
+    @contextlib.contextmanager
     def read_transaction(self, key):
         """Get a read transaction on a file cache item.
 
@@ -108,10 +110,15 @@ class FileCache:
                cache_file.read()
 
         """
-        return ReadTransaction(
-            self._get_lock(key), acquire=lambda: open(self.cache_path(key), encoding="utf-8")
-        )
+        lock = self._get_lock(key)
+        lock.acquire_read()
+        try:
+            with open(self.cache_path(key), encoding="utf-8") as f:
+                yield f
+        finally:
+            lock.release_read()
 
+    @contextlib.contextmanager
     def write_transaction(self, key):
         """Get a write transaction on a file cache item.
 
@@ -120,37 +127,32 @@ class FileCache:
         moves the file into place on top of the old file atomically.
 
         """
+        lock = self._get_lock(key)
+        lock.acquire_write()
+        try:
+            orig_filename = self.cache_path(key)
+            orig_file = None
+            if os.path.exists(orig_filename):
+                orig_file = open(orig_filename, encoding="utf-8")
 
-        # TODO: this nested context manager adds a lot of complexity and
-        # TODO: is pretty hard to reason about in llnl.util.lock. At some
-        # TODO: point we should just replace it with functions and simplify
-        # TODO: the locking code.
-        class WriteContextManager:
+            tmp_filename = self.cache_path(key) + ".tmp"
+            tmp_file = open(tmp_filename, "w", encoding="utf-8")
 
-            def __enter__(cm):
-                cm.orig_filename = self.cache_path(key)
-                cm.orig_file = None
-                if os.path.exists(cm.orig_filename):
-                    cm.orig_file = open(cm.orig_filename, encoding="utf-8")
-
-                cm.tmp_filename = self.cache_path(key) + ".tmp"
-                cm.tmp_file = open(cm.tmp_filename, "w", encoding="utf-8")
-
-                return cm.orig_file, cm.tmp_file
-
-            def __exit__(cm, type, value, traceback):
-                if cm.orig_file:
-                    cm.orig_file.close()
-                cm.tmp_file.close()
-
-                if value:
-                    # remove tmp on exception & raise it
-                    os.remove(cm.tmp_filename)
-
-                else:
-                    os.rename(cm.tmp_filename, cm.orig_filename)
-
-        return WriteTransaction(self._get_lock(key), acquire=WriteContextManager)
+            try:
+                yield orig_file, tmp_file
+            except Exception:
+                if orig_file:
+                    orig_file.close()
+                tmp_file.close()
+                os.remove(tmp_filename)
+                raise
+            else:
+                if orig_file:
+                    orig_file.close()
+                tmp_file.close()
+                os.rename(tmp_filename, orig_filename)
+        finally:
+            lock.release_write()
 
     def mtime(self, key):
         """Return modification time of cache file, or 0 if it does not exist.

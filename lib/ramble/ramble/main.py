@@ -13,7 +13,7 @@ after the system path is set up.
 """
 
 import argparse
-import io
+import contextlib
 import operator
 import os
 import pstats
@@ -30,7 +30,6 @@ import ruamel
 import llnl.util.lang
 import llnl.util.tty.colify
 from llnl.util import tty
-from llnl.util.tty.log import log_output
 
 import ramble.cmd
 import ramble.cmd.common.arguments
@@ -712,6 +711,8 @@ class RambleCommand:
         # set these before every call to clear them out
         self.returncode = None
         self.error = None
+        self.binary_output = b""
+        self.output = ""
 
         prepend = kwargs.get("global_args", [])
 
@@ -728,9 +729,8 @@ class RambleCommand:
         else:
             ramble.workspace.shell.deactivate()
 
-        out = io.StringIO()
         try:
-            with log_output(out):
+            with self.capture_output(enable=True):
                 self.returncode = _invoke_command(self.command, self.parser, args, unknown)
 
         except SystemExit as e:
@@ -740,29 +740,81 @@ class RambleCommand:
             logger.debug(e)
             self.error = e
             if fail_on_error:
-                self._log_command_output(out)
                 raise
+        finally:
+            self.output = self.binary_output.decode("utf-8", errors="replace")
 
         if fail_on_error and self.returncode not in (None, 0):
-            self._log_command_output(out)
             raise RambleCommandError(
                 "Command exited with code %d: %s(%s).\nCommand output:\n\n%s"
                 % (
                     self.returncode,
                     self.command_name,
                     ", ".join("'%s'" % a for a in argv),
-                    out.getvalue(),
+                    self.output,
                 )
             )
 
-        return out.getvalue()
+        return self.output
 
     def _log_command_output(self, out):
-        if tty.is_verbose():
-            fmt = self.command_name + ": {0}"
-            for ln in out.getvalue().split("\n"):
-                if ln:
-                    logger.verbose(fmt.format(ln.replace("==> ", "")))
+        logger.debug("Command output:\n%s" % self.output)
+
+    @contextlib.contextmanager
+    def capture_output(self, enable: bool = True):
+        import io
+        import os
+        import sys
+        import tempfile
+
+        if not enable:
+            yield self
+            return
+
+        with tempfile.TemporaryFile(mode="w+b") as tmp_file:
+            fds = set()
+            for stream in (sys.stdout, sys.stderr):
+                try:
+                    fds.add(stream.fileno())
+                except (io.UnsupportedOperation, AttributeError):
+                    pass
+            fds.update((1, 2))
+            saved_fds = {fd: os.dup(fd) for fd in fds}
+
+            sys.stdout.flush()
+            sys.stderr.flush()
+
+            for fd in fds:
+                os.dup2(tmp_file.fileno(), fd)
+
+            saved_stdout = sys.stdout
+            saved_stderr = sys.stderr
+
+            new_out = io.TextIOWrapper(
+                os.fdopen(os.dup(tmp_file.fileno()), "wb"), encoding="utf-8"
+            )
+            new_err = io.TextIOWrapper(
+                os.fdopen(os.dup(tmp_file.fileno()), "wb"), encoding="utf-8"
+            )
+            sys.stdout = new_out
+            sys.stderr = new_err
+
+            try:
+                yield self
+            finally:
+                sys.stdout.flush()
+                sys.stderr.flush()
+                new_out.close()
+                new_err.close()
+
+                sys.stdout = saved_stdout
+                sys.stderr = saved_stderr
+
+                for fd, saved_fd in saved_fds.items():
+                    os.dup2(saved_fd, fd)
+                    os.close(saved_fd)
+                tmp_file.seek(0)
+                self.binary_output = tmp_file.read()
 
 
 def _profile_wrapper(command, parser, args, unknown_args):

@@ -97,7 +97,7 @@ def get_module(cmd_name):
             raise
         try:
             module = spack.extensions.get_module(cmd_name)
-        except AttributeError:
+        except (AttributeError, spack.extensions.CommandNotFoundError):
             raise RambleCommandError(f"Command {cmd_name} does not exist.") from None
 
     attr_setdefault(module, SETUP_PARSER, lambda *args: None)  # null-op

@@ -32,24 +32,46 @@ class Lock(llnl.util.lock.Lock):
     the actual locking mechanism can be disabled via ``_enable_locks``.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        path,
+        start=0,
+        length=0,
+        default_timeout=None,
+        debug=False,
+        desc="",
+        enable=None,
+        **kwargs,
+    ):
         self._enable = ramble.config.get("config:locks", True)
+        if enable is None:
+            enable = self._enable
 
-    def _lock(self, op, timeout=0):
-        if self._enable:
-            return super()._lock(op, timeout)
-        else:
-            return 0, 0
+        super().__init__(
+            path,
+            start=start,
+            length=length,
+            default_timeout=default_timeout,
+            debug=debug,
+            desc=desc,
+            enable=enable,
+            **kwargs,
+        )
 
-    def _unlock(self):
-        """Unlock call that always succeeds."""
-        if self._enable:
-            super()._unlock()
+    def __del__(self):
+        # Clean up file descriptor leaks in llnl.util.lock.Lock by releasing
+        # the file tracker reference when the lock is garbage collected.
+        try:
+            if hasattr(self, "backend"):
+                backend = self.backend
+                file_ref = getattr(backend, "_file_ref", None)
+                if file_ref is not None:
+                    import llnl.util.lock
 
-    def cleanup(self, *args):
-        if self._enable:
-            super().cleanup(*args)
+                    llnl.util.lock.FILE_TRACKER.release(file_ref)
+                    backend._file_ref = None  # type: ignore[union-attr]
+        except Exception:
+            pass
 
 
 def check_lock_safety(path):

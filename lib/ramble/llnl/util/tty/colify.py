@@ -9,40 +9,41 @@
 """
 Routines for printing columnar output.  See ``colify()`` for more information.
 """
-from __future__ import division, unicode_literals
 
 import io
 import os
+import shutil
 import sys
+from typing import IO, Any, List, Optional
 
-from llnl.util.tty import terminal_size
 from llnl.util.tty.color import cextra, clen
 
 
 class ColumnConfig:
-
-    def __init__(self, cols):
+    def __init__(self, cols: int) -> None:
         self.cols = cols
         self.line_length = 0
         self.valid = True
-        self.widths = [0] * cols   # does not include ansi colors
+        self.widths = [0] * cols  # does not include ansi colors
 
-    def __repr__(self):
-        attrs = [(a, getattr(self, a))
-                 for a in dir(self) if not a.startswith("__")]
-        return "<Config: %s>" % ", ".join("%s: %r" % a for a in attrs)
+    def __repr__(self) -> str:
+        attrs = [(a, getattr(self, a)) for a in dir(self) if not a.startswith("__")]
+        return f"<Config: {', '.join('%s: %r' % a for a in attrs)}>"
 
 
-def config_variable_cols(elts, console_width, padding, cols=0):
+def config_variable_cols(
+    elts: List[str], console_width: int, padding: int, cols: int = 0
+) -> ColumnConfig:
     """Variable-width column fitting algorithm.
 
-       This function determines the most columns that can fit in the
-       screen width.  Unlike uniform fitting, where all columns take
-       the width of the longest element in the list, each column takes
-       the width of its own longest element. This packs elements more
-       efficiently on screen.
+    This function determines the most columns that can fit in the
+    screen width.  Unlike uniform fitting, where all columns take
+    the width of the longest element in the list, each column takes
+    the width of its own longest element. This packs elements more
+    efficiently on screen.
 
-       If cols is nonzero, force
+    If cols is nonzero, force the table to use that many columns and
+    just add minimal padding between the columns.
     """
     if cols < 0:
         raise ValueError("cols must be non-negative.")
@@ -61,31 +62,44 @@ def config_variable_cols(elts, console_width, padding, cols=0):
     for i, length in enumerate(lengths):
         for conf in configs:
             if conf.valid:
-                col = i // ((len(elts) + conf.cols - 1) // conf.cols)
+                rows = (len(elts) + conf.cols - 1) // conf.cols
+                col = i // rows
                 p = padding if col < (conf.cols - 1) else 0
 
                 if conf.widths[col] < (length + p):
                     conf.line_length += length + p - conf.widths[col]
-                    conf.widths[col]  = length + p
-                    conf.valid = (conf.line_length < console_width)
+                    conf.widths[col] = length + p
+                    conf.valid = conf.line_length < console_width
 
     try:
+        # take the last valid config in the list (the one with most columns)
         config = next(conf for conf in reversed(configs) if conf.valid)
     except StopIteration:
-        # If nothing was valid the screen was too narrow -- just use 1 col.
+        # If nothing was valid, the screen was too narrow -- use 1 col if cols was not
+        # specified, otherwise, use the requested columns and overflow.
         config = configs[0]
+        if cols:
+            rows = (len(lengths) + cols - 1) // cols
+            config.widths = [
+                max(length for i, length in enumerate(lengths) if i // rows == c)
+                + (padding if c < cols - 1 else 0)
+                for c in range(cols)
+            ]
 
+    # trim off any columns with nothing in them
     config.widths = [w for w in config.widths if w != 0]
     config.cols = len(config.widths)
     return config
 
 
-def config_uniform_cols(elts, console_width, padding, cols=0):
+def config_uniform_cols(
+    elts: List[str], console_width: int, padding: int, cols: int = 0
+) -> ColumnConfig:
     """Uniform-width column fitting algorithm.
 
-       Determines the longest element in the list, and determines how
-       many columns of that width will fit on screen.  Returns a
-       corresponding column config.
+    Determines the longest element in the list, and determines how
+    many columns of that width will fit on screen.  Returns a
+    corresponding column config.
     """
     if cols < 0:
         raise ValueError("cols must be non-negative.")
@@ -102,40 +116,40 @@ def config_uniform_cols(elts, console_width, padding, cols=0):
     return config
 
 
-def colify(elts, **options):
+def colify(
+    elts: List[Any],
+    *,
+    cols: int = 0,
+    output: Optional[IO] = None,
+    indent: int = 0,
+    padding: int = 2,
+    tty: Optional[bool] = None,
+    method: str = "variable",
+    console_cols: Optional[int] = None,
+):
     """Takes a list of elements as input and finds a good columnization
     of them, similar to how gnu ls does. This supports both
     uniform-width and variable-width (tighter) columns.
 
-    If elts is not a list of strings, each element is first conveted
-    using ``str()``.
+    If elts is not a list of strings, each element is first converted
+    using :class:`str`.
 
     Keyword Arguments:
-        output (typing.IO): A file object to write to. Default is ``sys.stdout``
-        indent (int): Optionally indent all columns by some number of spaces
-        padding (int): Spaces between columns. Default is 2
-        width (int): Width of the output. Default is 80 if tty not detected
-        cols (int): Force number of columns. Default is to size to terminal, or
+        output: A file object to write to. Default is ``sys.stdout``
+        indent: Optionally indent all columns by some number of spaces
+        padding: Spaces between columns. Default is 2
+        width: Width of the output. Default is 80 if tty not detected
+        cols: Force number of columns. Default is to size to terminal, or
             single-column if no tty
-        tty (bool): Whether to attempt to write to a tty. Default is to autodetect a
+        tty: Whether to attempt to write to a tty. Default is to autodetect a
             tty. Set to False to force single-column output
-        method (str): Method to use to fit columns. Options are variable or uniform.
+        method: Method to use to fit columns. Options are variable or uniform.
             Variable-width columns are tighter, uniform columns are all the same width
             and fit less data on the screen
+        console_cols: number of columns on this console (default: autodetect)
     """
-    # Get keyword arguments or set defaults
-    cols         = options.pop("cols", 0)
-    output       = options.pop("output", sys.stdout)
-    indent       = options.pop("indent", 0)
-    padding      = options.pop("padding", 2)
-    tty          = options.pop('tty', None)
-    method       = options.pop("method", "variable")
-    console_cols = options.pop("width", None)
-
-    if options:
-        raise TypeError(
-            "'%s' is an invalid keyword argument for this function."
-            % next(options.iterkeys()))
+    if output is None:
+        output = sys.stdout
 
     # elts needs to be an array of strings so we can count the elements
     elts = [str(elt) for elt in elts]
@@ -143,28 +157,28 @@ def colify(elts, **options):
         return (0, ())
 
     # environment size is of the form "<rows>x<cols>"
-    env_size = os.environ.get('COLIFY_SIZE')
+    env_size = os.environ.get("COLIFY_SIZE")
     if env_size:
         try:
-            r, c = env_size.split('x')
-            console_rows, console_cols = int(r), int(c)
+            console_cols = int(env_size.partition("x")[2])
             tty = True
-        except BaseException:
+        except ValueError:
             pass
 
-    # Use only one column if not a tty.
-    if not tty:
+    # Use only one column if not a tty, unless cols specified explicitly
+    if not cols and not tty:
         if tty is False or not output.isatty():
             cols = 1
 
     # Specify the number of character columns to use.
-    if not console_cols:
-        console_rows, console_cols = terminal_size()
-    elif type(console_cols) != int:
+    if console_cols is None:
+        console_cols = shutil.get_terminal_size().columns
+    elif not isinstance(console_cols, int):
         raise ValueError("Number of columns must be an int")
+
     console_cols = max(1, console_cols - indent)
 
-    # Choose a method.  Variable-width colums vs uniform-width.
+    # Choose a method.  Variable-width columns vs uniform-width.
     if method == "variable":
         config = config_variable_cols(elts, console_cols, padding, cols)
     elif method == "uniform":
@@ -182,10 +196,10 @@ def colify(elts, **options):
             elt = col * rows + row
             width = config.widths[col] + cextra(elts[elt])
             if col < cols - 1:
-                fmt = '%%-%ds' % width
+                fmt = "%%-%ds" % width
                 output.write(fmt % elts[elt])
             else:
-                # Don't pad the rightmost column (sapces can wrap on
+                # Don't pad the rightmost column (spaces can wrap on
                 # small teriminals if one line is overlong)
                 output.write(elts[elt])
 
@@ -197,18 +211,25 @@ def colify(elts, **options):
     return (config.cols, tuple(config.widths))
 
 
-def colify_table(table, **options):
+def colify_table(
+    table: List[List[Any]],
+    *,
+    output: Optional[IO] = None,
+    indent: int = 0,
+    padding: int = 2,
+    console_cols: Optional[int] = None,
+):
     """Version of ``colify()`` for data expressed in rows, (list of lists).
 
-       Same as regular colify but:
+    Same as regular colify but:
 
-       1. This takes a list of lists, where each sub-list must be the
-          same length, and each is interpreted as a row in a table.
-          Regular colify displays a sequential list of values in columns.
+    1. This takes a list of lists, where each sub-list must be the
+       same length, and each is interpreted as a row in a table.
+       Regular colify displays a sequential list of values in columns.
 
-       2. Regular colify will always print with 1 column when the output
-          is not a tty.  This will always print with same dimensions of
-          the table argument.
+    2. Regular colify will always print with 1 column when the output
+       is not a tty.  This will always print with same dimensions of
+       the table argument.
 
     """
     if table is None:
@@ -223,20 +244,38 @@ def colify_table(table, **options):
             for row in table:
                 yield row[i]
 
-    if 'cols' in options:
-        raise ValueError("Cannot override columsn in colify_table.")
-    options['cols'] = columns
+    colify(
+        transpose(),
+        cols=columns,  # this is always the number of cols in the table
+        tty=True,  # don't reduce to 1 column for non-tty
+        output=output,
+        indent=indent,
+        padding=padding,
+        console_cols=console_cols,
+    )
 
-    # don't reduce to 1 column for non-tty
-    options['tty'] = True
 
-    colify(transpose(), **options)
-
-
-def colified(elts, **options):
+def colified(
+    elts: List[Any],
+    *,
+    cols: int = 0,
+    indent: int = 0,
+    padding: int = 2,
+    tty: Optional[bool] = None,
+    method: str = "variable",
+    console_cols: Optional[int] = None,
+):
     """Invokes the ``colify()`` function but returns the result as a string
-       instead of writing it to an output string."""
+    instead of writing it to an output string."""
     sio = io.StringIO()
-    options['output'] = sio
-    colify(elts, **options)
+    colify(
+        elts,
+        cols=cols,
+        output=sio,
+        indent=indent,
+        padding=padding,
+        tty=tty,
+        method=method,
+        console_cols=console_cols,
+    )
     return sio.getvalue()

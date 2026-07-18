@@ -284,15 +284,11 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
     @property
     def experiment_lock(self):
         """Create a lock for the experiment directory, and return it"""
-        if self._exp_lock is None:
-            lock_path = os.path.join(
-                self.expander.expand_var("{experiment_run_dir}"),
-                ".ramble-experiment",
-            )
-
-            self._exp_lock = lk.Lock(lock_path)
-
-        return self._exp_lock
+        lock_path = os.path.join(
+            self.expander.expand_var("{experiment_run_dir}"),
+            ".ramble-experiment",
+        )
+        return lk.Lock(lock_path)
 
     @property
     def modifier_instances(self):
