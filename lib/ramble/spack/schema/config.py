@@ -68,6 +68,7 @@ properties = {
             'dirty': {'type': 'boolean'},
             'build_language': {'type': 'string'},
             'build_jobs': {'type': 'integer', 'minimum': 1},
+            'upload_threads': {'type': 'integer', 'minimum': 1},
             'ccache': {'type': 'boolean'},
             'concretizer': {
                 'type': 'string',

@@ -1327,7 +1327,10 @@ def workspace_archive_setup_parser(subparser):
         "-u",
         dest="upload_url",
         default=None,
-        help="URL to upload tar archive into. Does nothing if `-t` is not specified.",
+        help=(
+            "URL to upload workspace archive into "
+            "(uploads tarball if -t is set, or uncompressed folder if omitted)."
+        ),
     )
 
     subparser.add_argument(

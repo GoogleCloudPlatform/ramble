@@ -6,6 +6,7 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
+import concurrent.futures
 import errno
 import os
 import os.path
@@ -165,6 +166,65 @@ def push_to_url(local_file_path, remote_path, keep_original=True, extra_args=Non
 
     else:
         raise NotImplementedError(f"Unrecognized URL scheme: {remote_url.scheme}")
+
+
+def push_dir_to_url(local_dir_path, remote_dir_path, max_workers=None):
+    """Upload an entire directory tree recursively to a remote URL in parallel."""
+    if max_workers is None:
+        max_workers = ramble.config.get("config:upload_threads")
+
+    remote_url = url_util.parse(remote_dir_path)
+
+    if remote_url.scheme == "gs":
+        from google.cloud.storage import transfer_manager
+
+        gcs_bucket = gcs_util.GCSBucket(remote_url)
+        if not gcs_bucket.exists():
+            gcs_bucket.create()
+
+        rel_files = []
+        for root, _, files in os.walk(local_dir_path):
+            for file in files:
+                src_file = os.path.join(root, file)
+                rel_path = os.path.relpath(src_file, local_dir_path)
+                rel_files.append(rel_path)
+
+        if not rel_files:
+            return
+
+        prefix = remote_url.path.lstrip("/")
+        if prefix and not prefix.endswith("/"):
+            prefix += "/"
+
+        transfer_manager.upload_many_from_filenames(
+            gcs_bucket.bucket,
+            rel_files,
+            source_directory=local_dir_path,
+            blob_name_prefix=prefix,
+            worker_type="thread",
+            max_workers=max_workers,
+            raise_exception=True,
+        )
+        return
+
+    files_to_upload = []
+    for root, _, files in os.walk(local_dir_path):
+        for file in files:
+            src_file = os.path.join(root, file)
+            rel_path = os.path.relpath(src_file, local_dir_path)
+            dest_file = os.path.join(remote_dir_path, rel_path).replace("\\", "/")
+            files_to_upload.append((src_file, dest_file))
+
+    if not files_to_upload:
+        return
+
+    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [
+            executor.submit(push_to_url, src, dest, keep_original=True)
+            for src, dest in files_to_upload
+        ]
+        for future in concurrent.futures.as_completed(futures):
+            future.result()
 
 
 def url_exists(url):
