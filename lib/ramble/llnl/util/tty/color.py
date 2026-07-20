@@ -263,6 +263,8 @@ def colorize(
         elif dot:
             return _escape(0, color, enclose, zsh)
         elif not (style or color_code):
+            if text:
+                return match.group(0)
             raise ColorParseError(
                 f"Incomplete color format: '{match.group(0)}' in '{match.string}'"
             )
