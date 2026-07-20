@@ -6,23 +6,17 @@
 # option. This file may not be copied, modified, or distributed
 # except according to those terms.
 
-from __future__ import unicode_literals
-
 import contextlib
 import io
 import os
-import struct
+import shutil
 import sys
 import textwrap
 import traceback
 from datetime import datetime
-from sys import platform as _platform
+from typing import Any, NoReturn
 
-if _platform != "win32":
-    import fcntl
-    import termios
-
-from llnl.util.tty.color import cescape, clen, cprint, cwrite
+from .color import cescape, clen, cprint, cwrite
 
 # Globals
 _debug = 0
@@ -48,13 +42,9 @@ def is_debug(level=1):
     return _debug >= level
 
 
-def is_stacktrace():
-    return _stacktrace
-
-
 def set_debug(level=0):
     global _debug
-    assert level >= 0, 'Debug level must be a positive value'
+    assert level >= 0, "Debug level must be a positive value"
     _debug = level
 
 
@@ -110,11 +100,7 @@ def output_filter(filter_fn):
 class SuppressOutput:
     """Class for disabling output in a scope using 'with' keyword"""
 
-    def __init__(self,
-                 msg_enabled=True,
-                 warn_enabled=True,
-                 error_enabled=True):
-
+    def __init__(self, msg_enabled=True, warn_enabled=True, error_enabled=True):
         self._msg_enabled_initial = _msg_enabled
         self._warn_enabled_initial = _warn_enabled
         self._error_enabled_initial = _error_enabled
@@ -164,65 +150,51 @@ def get_timestamp(force=False):
     """Get a string timestamp"""
     if _debug or _timestamp or force:
         # Note inclusion of the PID is useful for parallel builds.
-        pid = ', {0}'.format(os.getpid()) if show_pid() else ''
-        return '[{0}{1}] '.format(
-            datetime.now().strftime("%Y-%m-%d-%H:%M:%S.%f"), pid)
+        pid = ", {0}".format(os.getpid()) if show_pid() else ""
+        return "[{0}{1}] ".format(datetime.now().strftime("%Y-%m-%d-%H:%M:%S.%f"), pid)
     else:
-        return ''
+        return ""
 
 
-def msg(message, *args, **kwargs):
+def msg(message: Any, *args: Any, newline: bool = True) -> None:
+    """Print a message to the console."""
     if not msg_enabled():
         return
 
     if isinstance(message, Exception):
-        message = "%s: %s" % (message.__class__.__name__, str(message))
+        message = f"{message.__class__.__name__}: {message}"
+    else:
+        message = str(message)
 
-    newline = kwargs.get('newline', True)
     st_text = ""
     if _stacktrace:
         st_text = process_stacktrace(2)
-    if newline:
-        cprint(
-            "@*b{%s==>} %s%s" % (
-                st_text,
-                get_timestamp(),
-                cescape(_output_filter(message))
-            )
-        )
-    else:
-        cwrite(
-            "@*b{%s==>} %s%s" % (
-                st_text,
-                get_timestamp(),
-                cescape(_output_filter(message))
-            )
-        )
+
+    nl = "\n" if newline else ""
+    cwrite(f"@*b{{{st_text}==>}} {get_timestamp()}{cescape(_output_filter(message))}{nl}")
+
     for arg in args:
         print(indent + _output_filter(str(arg)))
 
 
 def info(message, *args, **kwargs):
+    """Print an informational message."""
     if isinstance(message, Exception):
         message = "%s: %s" % (message.__class__.__name__, str(message))
 
-    format = kwargs.get('format', '*b')
-    stream = kwargs.get('stream', sys.stdout)
-    wrap = kwargs.get('wrap', False)
-    break_long_words = kwargs.get('break_long_words', False)
-    st_countback = kwargs.get('countback', 3)
+    format = kwargs.get("format", "*b")
+    stream = kwargs.get("stream", sys.stdout)
+    wrap = kwargs.get("wrap", False)
+    break_long_words = kwargs.get("break_long_words", False)
+    st_countback = kwargs.get("countback", 3)
 
     st_text = ""
     if _stacktrace:
         st_text = process_stacktrace(st_countback)
     cprint(
-        "@%s{%s==>} %s%s" % (
-            format,
-            st_text,
-            get_timestamp(),
-            cescape(_output_filter(str(message)))
-        ),
-        stream=stream
+        "@%s{%s==>} %s%s"
+        % (format, st_text, get_timestamp(), cescape(_output_filter(str(message)))),
+        stream=stream,
     )
     for arg in args:
         if wrap:
@@ -230,97 +202,68 @@ def info(message, *args, **kwargs):
                 _output_filter(str(arg)),
                 initial_indent=indent,
                 subsequent_indent=indent,
-                break_long_words=break_long_words
+                break_long_words=break_long_words,
             )
             for line in lines:
-                stream.write(line + '\n')
+                stream.write(line + "\n")
         else:
-            stream.write(
-                indent + _output_filter(str(arg)) + '\n'
-            )
+            stream.write(indent + _output_filter(str(arg)) + "\n")
+    stream.flush()
 
 
 def verbose(message, *args, **kwargs):
+    """Print a verbose message if the verbose flag is set."""
     if _verbose:
-        kwargs.setdefault('format', 'c')
+        kwargs.setdefault("format", "c")
         info(message, *args, **kwargs)
 
 
 def debug(message, *args, **kwargs):
-    level = kwargs.get('level', 1)
+    """Print a debug message if the debug level is set."""
+    level = kwargs.get("level", 1)
     if is_debug(level):
-        kwargs.setdefault('format', 'g')
-        kwargs.setdefault('stream', sys.stderr)
+        kwargs.setdefault("format", "g")
+        kwargs.setdefault("stream", sys.stderr)
         info(message, *args, **kwargs)
 
 
 def error(message, *args, **kwargs):
+    """Print an error message."""
     if not error_enabled():
         return
 
-    kwargs.setdefault('format', '*r')
-    kwargs.setdefault('stream', sys.stderr)
+    kwargs.setdefault("format", "*r")
+    kwargs.setdefault("stream", sys.stderr)
     info("Error: " + str(message), *args, **kwargs)
 
 
 def warn(message, *args, **kwargs):
+    """Print a warning message."""
     if not warn_enabled():
         return
 
-    kwargs.setdefault('format', '*Y')
-    kwargs.setdefault('stream', sys.stderr)
+    kwargs.setdefault("format", "*Y")
+    kwargs.setdefault("stream", sys.stderr)
     info("Warning: " + str(message), *args, **kwargs)
 
 
-def die(message, *args, **kwargs):
-    kwargs.setdefault('countback', 4)
+def die(message, *args, **kwargs) -> NoReturn:
+    kwargs.setdefault("countback", 4)
     error(message, *args, **kwargs)
     sys.exit(1)
 
 
-def get_number(prompt, **kwargs):
-    default = kwargs.get('default', None)
-    abort = kwargs.get('abort', None)
-
-    if default is not None and abort is not None:
-        prompt += ' (default is %s, %s to abort) ' % (default, abort)
-    elif default is not None:
-        prompt += ' (default is %s) ' % default
-    elif abort is not None:
-        prompt += ' (%s to abort) ' % abort
-
-    number = None
-    while number is None:
-        msg(prompt, newline=False)
-        ans = input()
-        if ans == str(abort):
-            return None
-
-        if ans:
-            try:
-                number = int(ans)
-                if number < 1:
-                    msg("Please enter a valid number.")
-                    number = None
-            except ValueError:
-                msg("Please enter a valid number.")
-        elif default is not None:
-            number = default
-    return number
-
-
 def get_yes_or_no(prompt, **kwargs):
-    default_value = kwargs.get('default', None)
+    default_value = kwargs.get("default", None)
 
     if default_value is None:
-        prompt += ' [y/n] '
+        prompt += " [y/n] "
     elif default_value is True:
-        prompt += ' [Y/n] '
+        prompt += " [Y/n] "
     elif default_value is False:
-        prompt += ' [y/N] '
+        prompt += " [y/N] "
     else:
-        raise ValueError(
-            "default for get_yes_no() must be True, False, or None.")
+        raise ValueError("default for get_yes_no() must be True, False, or None.")
 
     result = None
     while result is None:
@@ -331,9 +274,9 @@ def get_yes_or_no(prompt, **kwargs):
             if result is None:
                 print("Please enter yes or no.")
         else:
-            if ans == 'y' or ans == 'yes':
+            if ans == "y" or ans == "yes":
                 result = True
-            elif ans == 'n' or ans == 'no':
+            elif ans == "n" or ans == "no":
                 result = False
     return result
 
@@ -345,14 +288,14 @@ def hline(label=None, **kwargs):
         char (str): Char to draw the line with.  Default '-'
         max_width (int): Maximum width of the line.  Default is 64 chars.
     """
-    char = kwargs.pop('char', '-')
-    max_width = kwargs.pop('max_width', 64)
+    char = kwargs.pop("char", "-")
+    max_width = kwargs.pop("max_width", 64)
     if kwargs:
         raise TypeError(
-            "'%s' is an invalid keyword argument for this function."
-            % next(kwargs.iterkeys()))
+            "'%s' is an invalid keyword argument for this function." % next(kwargs.iterkeys())
+        )
 
-    rows, cols = terminal_size()
+    cols = shutil.get_terminal_size().columns
     if not cols:
         cols = max_width
     else:
@@ -369,33 +312,3 @@ def hline(label=None, **kwargs):
     out.write(suffix)
 
     print(out.getvalue())
-
-
-def terminal_size():
-    """Gets the dimensions of the console: (rows, cols)."""
-    if _platform != "win32":
-        def ioctl_gwinsz(fd):
-            try:
-                rc = struct.unpack('hh', fcntl.ioctl(
-                    fd, termios.TIOCGWINSZ, '1234'))
-            except BaseException:
-                return
-            return rc
-        rc = ioctl_gwinsz(0) or ioctl_gwinsz(1) or ioctl_gwinsz(2)
-        if not rc:
-            try:
-                fd = os.open(os.ctermid(), os.O_RDONLY)
-                rc = ioctl_gwinsz(fd)
-                os.close(fd)
-            except BaseException:
-                pass
-        if not rc:
-            rc = (os.environ.get('LINES', 25), os.environ.get('COLUMNS', 80))
-
-        return int(rc[0]), int(rc[1])
-    else:
-        if sys.version_info[0] < 3:
-            raise RuntimeError("Terminal size not obtainable on Windows with a\
-Python version older than 3")
-        rc = (os.environ.get('LINES', 25), os.environ.get('COLUMNS', 80))
-        return int(rc[0]), int(rc[1])

@@ -7,6 +7,7 @@
 # except according to those terms.
 
 import functools
+import hashlib
 import os
 
 import pytest
@@ -17,6 +18,7 @@ import ramble.config
 import ramble.main
 import ramble.workspace
 
+import spack.util.crypto
 import spack.util.spack_yaml as syaml
 
 config = ramble.main.RambleCommand("config")
@@ -814,11 +816,11 @@ def test_config_revert(config_yaml_v015):
     fs.copy(cfg_file, bkp_file)
 
     config("add", "config:dirty:true")
-    md5cfg = fs.md5sum(cfg_file)
+    md5cfg = spack.util.crypto.checksum(hashlib.md5, cfg_file)
 
     # Check that the backup file exists, compute its md5 sum
     assert os.path.exists(bkp_file)
-    md5bkp = fs.md5sum(bkp_file)
+    md5bkp = spack.util.crypto.checksum(hashlib.md5, bkp_file)
 
     config("revert", "-y", "config")
 
@@ -826,7 +828,7 @@ def test_config_revert(config_yaml_v015):
     # that the md5 sum of the configuration file is the same
     # as that of the old backup file
     assert not os.path.exists(bkp_file)
-    assert md5bkp == fs.md5sum(cfg_file)
+    assert md5bkp == spack.util.crypto.checksum(hashlib.md5, cfg_file)
     assert md5bkp != md5cfg
 
 

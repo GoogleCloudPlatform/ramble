@@ -32,8 +32,26 @@ class Lock(llnl.util.lock.Lock):
     the actual locking mechanism can be disabled via ``_enable_locks``.
     """
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(
+        self,
+        path,
+        start=0,
+        length=0,
+        default_timeout=None,
+        debug=False,
+        desc="",
+        *args,
+        **kwargs,
+    ):
+        super().__init__(
+            path,
+            start=start,
+            length=length,
+            default_timeout=default_timeout,
+            debug=debug,
+            desc=desc,
+            **kwargs,
+        )
         self._enable = ramble.config.get("config:locks", True)
 
     def _lock(self, op, timeout=0):
