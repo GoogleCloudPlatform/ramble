@@ -93,19 +93,14 @@ cd "{experiment_run_dir}"
         ws._re_read()
 
         with patch("ramble.util.logger.logger.warn") as mock_warn:
-            res = workspace("setup", "--dry-run", global_args=["-D", ws.root])
-            try:
-                # Assert logger.warn was called with the specific message
-                assert mock_warn.called
-                expected_msg = (
-                    "In experiment hostname.local.test_default:\n"
-                    "  `execute_experiment` contains `#SBATCH` directives, "
-                    "which will be ignored.\n"
-                    "  Custom headers should be added to `extra_sbatch_headers` "
-                    "in the workspace configuration instead."
-                )
-                mock_warn.assert_any_call(expected_msg)
-            except AssertionError as e:
-                print("WORKSPACE SETUP OUTPUT:")
-                print(res)
-                raise e
+            workspace("setup", "--dry-run", global_args=["-D", ws.root])
+            # Assert logger.warn was called with the specific message
+            assert mock_warn.called
+            expected_msg = (
+                "In experiment hostname.local.test_default:\n"
+                "  `execute_experiment` contains `#SBATCH` directives, "
+                "which will be ignored.\n"
+                "  Custom headers should be added to `extra_sbatch_headers` "
+                "in the workspace configuration instead."
+            )
+            mock_warn.assert_any_call(expected_msg)

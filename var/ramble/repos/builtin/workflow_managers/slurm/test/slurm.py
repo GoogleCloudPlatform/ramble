@@ -60,6 +60,7 @@ ramble:
         assert "batch_query" in files
         assert "batch_cancel" in files
         assert "batch_wait" in files
+        assert "slurm_experiment_sbatch" in files
         with open(os.path.join(path, "batch_submit"), encoding="utf-8") as f:
             content = f.read()
             assert "slurm_experiment_sbatch" in content
@@ -67,6 +68,11 @@ ramble:
             assert ".slurm_job" in content
             assert "sbatch" in content
             assert "batch_submit" not in content
+        with open(
+            os.path.join(path, "slurm_experiment_sbatch"), encoding="utf-8"
+        ) as f:
+            content = f.read()
+            assert "execute_experiment" in content
 
 
 def test_slurm_workflow():
@@ -176,6 +182,7 @@ ramble:
             assert "#SBATCH --gpus-per-task=1" in content
             assert "#SBATCH -p" not in content
             assert "#SBATCH --time" not in content
+            assert "execute_experiment" in content
         with open(
             os.path.join(path, "execute_experiment"), encoding="utf-8"
         ) as f:
