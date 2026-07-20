@@ -8,11 +8,12 @@
 
 import os
 import sys
+
 import pytest
 
-from ramble.main import RambleCommand
-import ramble.repository
 import ramble.error
+import ramble.repository
+from ramble.main import RambleCommand
 
 pytestmark = pytest.mark.usefixtures("config")
 
@@ -56,12 +57,6 @@ class Testapp(ExecutableApplication):
 
     # Need to clean the cached instance for applications in paths mapping
     obj_type = ramble.repository.ObjectTypes.applications
-def _reset_repo_cache(object_type):
-    """Clear the repository path instance to force re-initialization."""
-    try:
-        ramble.repository.paths[object_type]._instance = None
-    except AttributeError:
-        pass
 
     test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
     # Overlay the test repo on top of applications repositories
@@ -76,7 +71,7 @@ def _reset_repo_cache(object_type):
         assert "-    workload_variable('my_var', default='1.0', workload='test_wl')" in out_diff
 
         # Verify file is still unmodified
-        with open(app_file, "r", encoding="utf-8") as f:
+        with open(app_file, encoding="utf-8") as f:
             assert "workload_variable('my_var'" in f.read()
 
         # 3. Test running simplify with --apply flag
@@ -84,7 +79,7 @@ def _reset_repo_cache(object_type):
         assert "Successfully simplified" in out_apply
 
         # Verify file is now simplified
-        with open(app_file, "r", encoding="utf-8") as f:
+        with open(app_file, encoding="utf-8") as f:
             content = f.read()
             assert "workload_variable('my_var'" not in content
             assert 'name = "testapp"' in content
@@ -161,11 +156,12 @@ class Testapp2(ExecutableApplication):
         assert "Successfully simplified" in out_apply
 
         # Verify clang15 and var2 were deleted from file
-        with open(app_file, "r", encoding="utf-8") as f:
+        with open(app_file, encoding="utf-8") as f:
             content = f.read()
             assert "define_compiler('clang15'" not in content
             assert "workload_variable('var2'" not in content
-            # gcc14 and var1 should be untouched (since var1 is used and define_compiler('gcc14') is used!)
+            # gcc14 and var1 should be untouched (since var1 is used and
+            # define_compiler('gcc14') is used!)
             assert "define_compiler('gcc14'" in content
             assert "workload_variable('var1'" in content
             # workload group is untouched (not auto-deleted)
@@ -190,7 +186,11 @@ class Testapp3(ExecutableApplication):
     required_package('wrf')
     software_spec('orca-{application::orca::version}', pkg_spec='orca@5.0.4')
     input_file('my_input', url='https://host.com/file.tar.gz', description='my input file')
-    executable('foo', 'bar {my_var} {my_input} {nonexistent_var_typo} {wrf_path} {orca_path}', use_mpi=False)
+    executable(
+        'foo',
+        'bar {my_var} {my_input} {nonexistent_var_typo} {wrf_path} {orca_path}',
+        use_mpi=False,
+    )
     workload('test_wl', executable='foo')
     workload_variable('my_var', default='1.0', workload='test_wl')
 """
@@ -290,4 +290,30 @@ class Testapp5(ExecutableApplication):
         # Assert nonexistent_var is detected as broken because 'other*' matches zero workloads
         assert "Variables with Broken Workload/Group Refs: ['nonexistent_var']" in out
         # dict_delim should NOT be detected as broken because 'motorbike*' matches 'motorbike_20m'
-        assert "dict_delim" not in out or "Variables with Broken Workload" not in out.split("dict_delim")[0]
+        assert (
+            "dict_delim" not in out
+            or "Variables with Broken Workload" not in out.split("dict_delim")[0]
+        )
+
+
+def test_get_node_end_lineno_fallback():
+    import ast
+
+    from ramble.cmd.simplify import get_node_end_lineno
+
+    content = """executable(
+    'foo',
+    'bar',
+    use_mpi=False
+)
+"""
+    tree = ast.parse(content)
+    node = tree.body[0]
+
+    # Force fallback by deleting end_lineno if it exists
+    if hasattr(node, "end_lineno"):
+        del node.end_lineno
+
+    file_lines = content.splitlines()
+    end_line = get_node_end_lineno(node, file_lines)
+    assert end_line == 5

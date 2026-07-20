@@ -14,8 +14,8 @@ import os
 import re
 import sys
 
-import ramble.repository
 import ramble.keywords
+import ramble.repository
 import ramble.util.colors as color
 from ramble.util.logger import logger
 
@@ -32,17 +32,17 @@ def extract_referenced_names(template_str):
     brace_contents = []
     stack = []
     for i, char in enumerate(template_str):
-        if char == '{':
+        if char == "{":
             stack.append(i)
-        elif char == '}' and stack:
+        elif char == "}" and stack:
             start = stack.pop()
-            brace_contents.append(template_str[start + 1:i])
+            brace_contents.append(template_str[start + 1 : i])
 
     for content in brace_contents:
-        words = re.findall(r'[a-zA-Z0-9_:-]+', content)
+        words = re.findall(r"[a-zA-Z0-9_:-]+", content)
         for word in words:
-            if '::' in word:
-                referenced.add(word.split('::')[-1])
+            if "::" in word:
+                referenced.add(word.split("::")[-1])
             else:
                 referenced.add(word)
     return referenced
@@ -57,7 +57,7 @@ def find_template_file(cls, src_path_config):
     # Get MRO to find where the class/parents are defined
     for parent_cls in inspect.getmro(cls):
         module = sys.modules.get(parent_cls.__module__)
-        if module and hasattr(module, '__file__') and module.__file__:
+        if module and hasattr(module, "__file__") and module.__file__:
             candidate = os.path.join(os.path.dirname(module.__file__), src_path_config)
             if os.path.isfile(candidate):
                 return candidate
@@ -67,19 +67,88 @@ def find_template_file(cls, src_path_config):
 def get_arg_value(arg_node):
     if isinstance(arg_node, ast.Constant):
         return arg_node.value
-    if hasattr(ast, 'Str') and isinstance(arg_node, ast.Str):
+    if hasattr(ast, "Str") and isinstance(arg_node, ast.Str):
         return arg_node.s
     return None
 
 
-def locate_directive_lines(file_path, unused_vars, unused_inputs, unused_execs, unused_compilers, broken_vars):
+def get_node_end_lineno(node, file_lines):
+    if hasattr(node, "end_lineno") and node.end_lineno is not None:
+        return node.end_lineno
+
+    # Fallback for Python < 3.8 which lacks end_lineno
+    start_idx = node.lineno - 1
+    if start_idx >= len(file_lines):
+        return node.lineno
+
+    open_parens = 0
+    has_parens = False
+    in_single_quote = False
+    in_double_quote = False
+    in_triple_single = False
+    in_triple_double = False
+
+    curr_line_idx = start_idx
+    while curr_line_idx < len(file_lines):
+        line = file_lines[curr_line_idx]
+        i = 0
+        while i < len(line):
+            char = line[i]
+            # Handle comments: if we see '#' outside a string, ignore rest of line
+            if char == "#" and not (
+                in_single_quote or in_double_quote or in_triple_single or in_triple_double
+            ):
+                break
+
+            # Triple quotes
+            if not (in_single_quote or in_double_quote):
+                if line[i : i + 3] == "'''":
+                    in_triple_single = not in_triple_single
+                    i += 3
+                    continue
+                elif line[i : i + 3] == '"""':
+                    in_triple_double = not in_triple_double
+                    i += 3
+                    continue
+
+            # Single/double quotes
+            if not (in_triple_single or in_triple_double):
+                if char == "'" and (i == 0 or line[i - 1] != "\\"):
+                    in_single_quote = not in_single_quote
+                elif char == '"' and (i == 0 or line[i - 1] != "\\"):
+                    in_double_quote = not in_double_quote
+
+            # Parentheses counting
+            if not (in_single_quote or in_double_quote or in_triple_single or in_triple_double):
+                if char in "([{":
+                    open_parens += 1
+                    has_parens = True
+                elif char in ")]}":
+                    open_parens -= 1
+                    if has_parens and open_parens <= 0:
+                        return curr_line_idx + 1
+            i += 1
+
+        if not has_parens and curr_line_idx == start_idx:
+            # If no parens on the first line, assume single line statement
+            return node.lineno
+        curr_line_idx += 1
+
+    return len(file_lines)
+
+
+def locate_directive_lines(
+    file_path, unused_vars, unused_inputs, unused_execs, unused_compilers, broken_vars
+):
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             content = f.read()
         tree = ast.parse(content)
     except (OSError, SyntaxError) as e:
         logger.warn(f"Could not parse {file_path}: {e}")
         return []
+
+    file_lines = content.splitlines()
 
     # Find the first class definition in the file
     class_node = None
@@ -98,32 +167,40 @@ def locate_directive_lines(file_path, unused_vars, unused_inputs, unused_execs, 
             call = node.value
             if isinstance(call.func, ast.Name):
                 func_name = call.func.id
-                if func_name in ('workload_variable', 'variable'):
+                if func_name in ("workload_variable", "variable"):
                     if call.args:
                         val = get_arg_value(call.args[0])
                         if val in unused_vars or val in broken_vars:
-                            ranges_to_remove.append((node.lineno, node.end_lineno))
-                elif func_name == 'input_file' and unused_inputs:
+                            ranges_to_remove.append(
+                                (node.lineno, get_node_end_lineno(node, file_lines))
+                            )
+                elif func_name == "input_file" and unused_inputs:
                     if call.args:
                         val = get_arg_value(call.args[0])
                         if val in unused_inputs:
-                            ranges_to_remove.append((node.lineno, node.end_lineno))
-                elif func_name in ('executable', 'formatted_executable') and unused_execs:
+                            ranges_to_remove.append(
+                                (node.lineno, get_node_end_lineno(node, file_lines))
+                            )
+                elif func_name in ("executable", "formatted_executable") and unused_execs:
                     if call.args:
                         val = get_arg_value(call.args[0])
                         if val in unused_execs:
-                            ranges_to_remove.append((node.lineno, node.end_lineno))
-                elif func_name == 'define_compiler' and unused_compilers:
+                            ranges_to_remove.append(
+                                (node.lineno, get_node_end_lineno(node, file_lines))
+                            )
+                elif func_name == "define_compiler" and unused_compilers:
                     if call.args:
                         val = get_arg_value(call.args[0])
                         if val in unused_compilers:
-                            ranges_to_remove.append((node.lineno, node.end_lineno))
+                            ranges_to_remove.append(
+                                (node.lineno, get_node_end_lineno(node, file_lines))
+                            )
 
     return ranges_to_remove
 
 
 def apply_simplifications(file_path, ranges):
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, encoding="utf-8") as f:
         original_content = f.read()
 
     original_lines = original_content.splitlines(keepends=True)
@@ -131,16 +208,23 @@ def apply_simplifications(file_path, ranges):
 
     # Sort ranges in descending order of start line
     for start, end in sorted(ranges, reverse=True):
-        del new_lines[start - 1:end]
+        del new_lines[start - 1 : end]
 
     new_content = "".join(new_lines)
     return original_lines, new_lines, new_content
 
 
-def is_valid_reference(var_name, all_defined_variables, defined_inputs, defined_software_specs, source_code, fom_captures=None):
+def is_valid_reference(
+    var_name,
+    all_defined_variables,
+    defined_inputs,
+    defined_software_specs,
+    source_code,
+    fom_captures=None,
+):
     if var_name in all_defined_variables or var_name in defined_inputs:
         return True
-    if var_name.endswith('_path') and var_name[:-5] in defined_software_specs:
+    if var_name.endswith("_path") and var_name[:-5] in defined_software_specs:
         return True
     if var_name in ramble.keywords.default_keys:
         return True
@@ -150,7 +234,7 @@ def is_valid_reference(var_name, all_defined_variables, defined_inputs, defined_
     if fom_captures and var_name in fom_captures:
         return True
     # Strip quotes or match as literal token in source code (fallback for python references)
-    if re.search(r'\b' + re.escape(var_name) + r'\b', source_code):
+    if re.search(r"\b" + re.escape(var_name) + r"\b", source_code):
         return True
     return False
 
@@ -164,23 +248,23 @@ def analyze_object(name, obj_type):
     file_path = obj_path.filename_for_object_name(name)
     for parent_cls in inspect.getmro(cls):
         module = sys.modules.get(parent_cls.__module__)
-        if module and hasattr(module, '__file__') and module.__file__:
-            if 'ramble' in module.__file__:
+        if module and hasattr(module, "__file__") and module.__file__:
+            if "ramble" in module.__file__:
                 try:
-                    with open(module.__file__, 'r', encoding='utf-8') as f:
+                    with open(module.__file__, encoding="utf-8") as f:
                         source_codes.append(f.read())
                 except OSError as e:
                     logger.warn(f"Could not read source file {module.__file__}: {e}")
     source_code = "\n".join(source_codes)
 
     # Clean the source code (strip comments/strings) for fallback scan
-    cleaned_code = re.sub(r'#.*', '', source_code)
-    cleaned_code = re.sub(r'""".*?"""', '', cleaned_code, flags=re.DOTALL)
-    cleaned_code = re.sub(r"'''.*?'''", '', cleaned_code, flags=re.DOTALL)
+    cleaned_code = re.sub(r"#.*", "", source_code)
+    cleaned_code = re.sub(r'""".*?"""', "", cleaned_code, flags=re.DOTALL)
+    cleaned_code = re.sub(r"'''.*?'''", "", cleaned_code, flags=re.DOTALL)
 
     # Parse AST of the target file
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, encoding="utf-8") as f:
             file_content = f.read()
         tree = ast.parse(file_content)
     except Exception:
@@ -188,39 +272,39 @@ def analyze_object(name, obj_type):
 
     # Collect all workloads and workload groups (including inherited ones)
     all_defined_workloads = set()
-    if hasattr(cls, 'workloads') and cls.workloads:
+    if hasattr(cls, "workloads") and cls.workloads:
         for app_workloads in cls.workloads.values():
             for wl_name in app_workloads:
                 all_defined_workloads.add(wl_name)
 
     all_defined_workload_groups = set()
-    if hasattr(cls, 'workload_groups') and cls.workload_groups:
+    if hasattr(cls, "workload_groups") and cls.workload_groups:
         for group_name in cls.workload_groups:
             all_defined_workload_groups.add(group_name)
 
     # Collect compilers and software specs (including inherited ones)
     all_defined_compilers = set()
-    if hasattr(cls, 'compilers') and cls.compilers:
+    if hasattr(cls, "compilers") and cls.compilers:
         for compiler_name in cls.compilers:
             all_defined_compilers.add(compiler_name)
 
     all_referenced_compilers = set()
-    if hasattr(cls, 'software_specs') and cls.software_specs:
+    if hasattr(cls, "software_specs") and cls.software_specs:
         for specs_list in cls.software_specs.values():
             for spec_obj in specs_list:
-                if hasattr(spec_obj, 'compiler') and spec_obj.compiler:
+                if hasattr(spec_obj, "compiler") and spec_obj.compiler:
                     all_referenced_compilers.add(spec_obj.compiler)
 
     # 1. Collect all defined inputs (only for applications)
     defined_inputs = set()
-    if hasattr(cls, 'inputs') and cls.inputs:
+    if hasattr(cls, "inputs") and cls.inputs:
         for inputs_dict in cls.inputs.values():
             for input_name in inputs_dict:
                 defined_inputs.add(input_name)
 
     # 2. Collect all defined executables (only for applications)
     defined_executables = set()
-    if hasattr(cls, 'executables') and cls.executables:
+    if hasattr(cls, "executables") and cls.executables:
         for execs_dict in cls.executables.values():
             for exec_name in execs_dict:
                 defined_executables.add(exec_name)
@@ -229,7 +313,7 @@ def analyze_object(name, obj_type):
     defined_variables = set()
 
     # Workload variables (for applications)
-    if hasattr(cls, 'workloads') and cls.workloads:
+    if hasattr(cls, "workloads") and cls.workloads:
         for app_workloads in cls.workloads.values():
             for wl_obj in app_workloads.values():
                 for var_list in wl_obj.variables.values():
@@ -237,39 +321,41 @@ def analyze_object(name, obj_type):
                         defined_variables.add(var.name)
 
     # Object variables (for modifiers, base classes, etc.)
-    if hasattr(cls, 'object_variables') and cls.object_variables:
+    if hasattr(cls, "object_variables") and cls.object_variables:
         for var_list in cls.object_variables.values():
             for var in var_list:
                 defined_variables.add(var.name)
 
-    # Collect all software spec names (including inherited ones), package names, and required packages
+    # Collect all software spec names (including inherited ones), package names,
+    # and required packages
     defined_software_specs = set()
-    if hasattr(cls, 'software_specs') and cls.software_specs:
+    if hasattr(cls, "software_specs") and cls.software_specs:
         for specs_list in cls.software_specs.values():
             for spec_obj in specs_list:
                 defined_software_specs.add(spec_obj.name)
                 # If spec name has braces/template parts, add prefix up to the first brace/hyphen
                 # E.g. 'orca-{version}' -> add 'orca'
-                prefix = spec_obj.name.split('{')[0].rstrip('-')
+                prefix = spec_obj.name.split("{")[0].rstrip("-")
                 if prefix:
                     defined_software_specs.add(prefix)
 
                 # Extract package name from pkg_spec (e.g. 'orca@5.0.4' -> 'orca')
                 if spec_obj.pkg_spec:
-                    pkg_match = re.match(r'\s*([\w-]+)', spec_obj.pkg_spec)
+                    pkg_match = re.match(r"\s*([\w-]+)", spec_obj.pkg_spec)
                     if pkg_match:
                         defined_software_specs.add(pkg_match.group(1))
 
-    if hasattr(cls, 'required_packages') and cls.required_packages:
+    if hasattr(cls, "required_packages") and cls.required_packages:
         for pkgname in cls.required_packages:
             defined_software_specs.add(pkgname)
 
-    # 4. Gather all templates/strings to extract referenced names and check broken template references
+    # 4. Gather all templates/strings to extract referenced names and check
+    # broken template references
     all_referenced_names = set()
     broken_template_refs = set()
 
     # Extract from executables templates
-    if hasattr(cls, 'executables') and cls.executables:
+    if hasattr(cls, "executables") and cls.executables:
         for execs_dict in cls.executables.values():
             for exec_obj in execs_dict.values():
                 templates = (
@@ -281,11 +367,17 @@ def analyze_object(name, obj_type):
                     refs = extract_referenced_names(t)
                     all_referenced_names.update(refs)
                     for r in refs:
-                        if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                        if not is_valid_reference(
+                            r,
+                            defined_variables,
+                            defined_inputs,
+                            defined_software_specs,
+                            cleaned_code,
+                        ):
                             broken_template_refs.add(r)
 
     # Extract from variables default values
-    if hasattr(cls, 'workloads') and cls.workloads:
+    if hasattr(cls, "workloads") and cls.workloads:
         for app_workloads in cls.workloads.values():
             for wl_obj in app_workloads.values():
                 for var_list in wl_obj.variables.values():
@@ -293,72 +385,108 @@ def analyze_object(name, obj_type):
                         refs = extract_referenced_names(str(var.default))
                         all_referenced_names.update(refs)
                         for r in refs:
-                            if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                            if not is_valid_reference(
+                                r,
+                                defined_variables,
+                                defined_inputs,
+                                defined_software_specs,
+                                cleaned_code,
+                            ):
                                 broken_template_refs.add(r)
 
-    if hasattr(cls, 'object_variables') and cls.object_variables:
+    if hasattr(cls, "object_variables") and cls.object_variables:
         for var_list in cls.object_variables.values():
             for var in var_list:
                 refs = extract_referenced_names(str(var.default))
                 all_referenced_names.update(refs)
                 for r in refs:
-                    if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                    if not is_valid_reference(
+                        r, defined_variables, defined_inputs, defined_software_specs, cleaned_code
+                    ):
                         broken_template_refs.add(r)
 
     # Extract from inputs url/description
-    if hasattr(cls, 'inputs') and cls.inputs:
+    if hasattr(cls, "inputs") and cls.inputs:
         for inputs_dict in cls.inputs.values():
             for input_obj in inputs_dict.values():
                 url = None
-                if hasattr(input_obj, 'url'):
+                if hasattr(input_obj, "url"):
                     url = input_obj.url
-                elif isinstance(input_obj, dict) and 'url' in input_obj:
-                    url = input_obj['url']
+                elif isinstance(input_obj, dict) and "url" in input_obj:
+                    url = input_obj["url"]
                 if url:
                     refs = extract_referenced_names(url)
                     all_referenced_names.update(refs)
                     for r in refs:
-                        if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                        if not is_valid_reference(
+                            r,
+                            defined_variables,
+                            defined_inputs,
+                            defined_software_specs,
+                            cleaned_code,
+                        ):
                             broken_template_refs.add(r)
 
     # Extract from figures of merit log_file
-    if hasattr(cls, 'figures_of_merit') and cls.figures_of_merit:
+    if hasattr(cls, "figures_of_merit") and cls.figures_of_merit:
         for contexts_dict in cls.figures_of_merit.values():
             for foms_dict in contexts_dict.values():
                 for fom_val in foms_dict.values():
                     fom_captures = set()
-                    if isinstance(fom_val, dict) and 'fom_regex' in fom_val:
+                    if isinstance(fom_val, dict) and "fom_regex" in fom_val:
                         try:
-                            fom_captures.update(re.compile(fom_val['fom_regex']).groupindex.keys())
+                            fom_captures.update(re.compile(fom_val["fom_regex"]).groupindex.keys())
                         except re.error as e:
-                            logger.warn(f"Invalid regex for figure of merit: {fom_val['fom_regex']}. Error: {e}")
+                            logger.warn(
+                                "Invalid regex for figure of merit: "
+                                f"{fom_val['fom_regex']}. Error: {e}"
+                            )
                     if isinstance(fom_val, dict):
-                        if 'log_file' in fom_val:
-                            refs = extract_referenced_names(fom_val['log_file'])
+                        if "log_file" in fom_val:
+                            refs = extract_referenced_names(fom_val["log_file"])
                             all_referenced_names.update(refs)
                             for r in refs:
-                                if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code, fom_captures):
+                                if not is_valid_reference(
+                                    r,
+                                    defined_variables,
+                                    defined_inputs,
+                                    defined_software_specs,
+                                    cleaned_code,
+                                    fom_captures,
+                                ):
                                     broken_template_refs.add(r)
 
     # Extract from success criteria files/formulas
-    if hasattr(cls, 'success_criteria') and cls.success_criteria:
+    if hasattr(cls, "success_criteria") and cls.success_criteria:
         for criteria_dict in cls.success_criteria.values():
             if isinstance(criteria_dict, dict):
-                if 'file' in criteria_dict:
-                    refs = extract_referenced_names(criteria_dict['file'])
+                if "file" in criteria_dict:
+                    refs = extract_referenced_names(criteria_dict["file"])
                     all_referenced_names.update(refs)
                     for r in refs:
-                        if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                        if not is_valid_reference(
+                            r,
+                            defined_variables,
+                            defined_inputs,
+                            defined_software_specs,
+                            cleaned_code,
+                        ):
                             broken_template_refs.add(r)
-                if 'formula' in criteria_dict:
-                    refs = extract_referenced_names(criteria_dict['formula'])
+                if "formula" in criteria_dict:
+                    refs = extract_referenced_names(criteria_dict["formula"])
                     all_referenced_names.update(refs)
                     for r in refs:
-                        if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                        if not is_valid_reference(
+                            r,
+                            defined_variables,
+                            defined_inputs,
+                            defined_software_specs,
+                            cleaned_code,
+                        ):
                             broken_template_refs.add(r)
 
     # Extract from registered templates
-    if hasattr(cls, 'templates') and cls.templates:
+    if hasattr(cls, "templates") and cls.templates:
         for templates_dict in cls.templates.values():
             for tpl_config in templates_dict.values():
                 src_path_config = tpl_config.get("src_path")
@@ -366,12 +494,18 @@ def analyze_object(name, obj_type):
                     tpl_file = find_template_file(cls, src_path_config)
                     if tpl_file:
                         try:
-                            with open(tpl_file, 'r', encoding='utf-8') as f_tpl:
+                            with open(tpl_file, encoding="utf-8") as f_tpl:
                                 tpl_content = f_tpl.read()
                             refs = extract_referenced_names(tpl_content)
                             all_referenced_names.update(refs)
                             for r in refs:
-                                if not is_valid_reference(r, defined_variables, defined_inputs, defined_software_specs, cleaned_code):
+                                if not is_valid_reference(
+                                    r,
+                                    defined_variables,
+                                    defined_inputs,
+                                    defined_software_specs,
+                                    cleaned_code,
+                                ):
                                     broken_template_refs.add(r)
                         except Exception:
                             pass
@@ -379,12 +513,12 @@ def analyze_object(name, obj_type):
     # 5. Extract workload relationships (executables and inputs used directly in workloads)
     used_executables = set()
     used_inputs = set()
-    if hasattr(cls, 'workloads') and cls.workloads:
+    if hasattr(cls, "workloads") and cls.workloads:
         for app_workloads in cls.workloads.values():
             for wl_obj in app_workloads.values():
-                if hasattr(wl_obj, 'executables'):
+                if hasattr(wl_obj, "executables"):
                     used_executables.update(wl_obj.executables)
-                if hasattr(wl_obj, 'inputs'):
+                if hasattr(wl_obj, "inputs"):
                     used_inputs.update(wl_obj.inputs)
 
     # Also extract inputs referenced in other inputs/url or variables
@@ -396,8 +530,12 @@ def analyze_object(name, obj_type):
     for var in sorted(defined_variables):
         if var in all_referenced_names:
             continue
-        occurrences = len(re.findall(rf'\b{re.escape(var)}\b', cleaned_code))
-        defs = len(re.findall(rf'(?:workload_variable|variable)\s*\(\s*[\'"]{re.escape(var)}[\'"]', cleaned_code))
+        occurrences = len(re.findall(rf"\b{re.escape(var)}\b", cleaned_code))
+        defs = len(
+            re.findall(
+                rf'(?:workload_variable|variable)\s*\(\s*[\'"]{re.escape(var)}[\'"]', cleaned_code
+            )
+        )
         if occurrences <= defs:
             unused_variables.append(var)
 
@@ -406,7 +544,7 @@ def analyze_object(name, obj_type):
     for inp in sorted(defined_inputs):
         if inp in used_inputs:
             continue
-        occurrences = len(re.findall(rf'\b{re.escape(inp)}\b', cleaned_code))
+        occurrences = len(re.findall(rf"\b{re.escape(inp)}\b", cleaned_code))
         defs = len(re.findall(rf'input_file\s*\(\s*[\'"]{re.escape(inp)}[\'"]', cleaned_code))
         if occurrences <= defs:
             unused_inputs.append(inp)
@@ -416,7 +554,7 @@ def analyze_object(name, obj_type):
     for exe in sorted(defined_executables):
         if exe in used_executables:
             continue
-        occurrences = len(re.findall(rf'\b{re.escape(exe)}\b', cleaned_code))
+        occurrences = len(re.findall(rf"\b{re.escape(exe)}\b", cleaned_code))
         defs = (
             len(re.findall(rf'executable\s*\(\s*[\'"]{re.escape(exe)}[\'"]', cleaned_code))
             + len(re.findall(rf'edit_file\s*\(\s*[\'"]{re.escape(exe)}[\'"]', cleaned_code))
@@ -450,48 +588,90 @@ def analyze_object(name, obj_type):
                         func_name = call.func.id
 
                         # Compiler check
-                        if func_name == 'define_compiler' and call.args:
+                        if func_name == "define_compiler" and call.args:
                             compiler_name = get_arg_value(call.args[0])
                             if compiler_name and compiler_name not in all_referenced_compilers:
-                                occurrences = len(re.findall(rf'\b{re.escape(compiler_name)}\b', cleaned_code))
-                                defs = len(re.findall(rf'define_compiler\s*\(\s*[\'"]{re.escape(compiler_name)}[\'"]', cleaned_code))
+                                occurrences = len(
+                                    re.findall(rf"\b{re.escape(compiler_name)}\b", cleaned_code)
+                                )
+                                pattern = (
+                                    rf"define_compiler\s*\(\s*[\'\"]"
+                                    rf"{re.escape(compiler_name)}[\'\"]"
+                                )
+                                defs = len(re.findall(pattern, cleaned_code))
                                 if occurrences <= defs:
                                     unused_compilers.append(compiler_name)
 
                         # Variable broken workload/group reference check
-                        elif func_name in ('workload_variable', 'variable'):
+                        elif func_name in ("workload_variable", "variable"):
                             is_broken = False
                             var_name = get_arg_value(call.args[0]) if call.args else None
                             for kw in call.keywords:
-                                if kw.arg == 'workload':
+                                if kw.arg == "workload":
                                     wl_val = get_arg_value(kw.value)
-                                    if wl_val and wl_val != '*' and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads):
+                                    if (
+                                        wl_val
+                                        and wl_val != "*"
+                                        and not any(
+                                            fnmatch.fnmatch(w, wl_val)
+                                            for w in all_defined_workloads
+                                        )
+                                    ):
                                         is_broken = True
-                                elif kw.arg == 'workload_group':
+                                elif kw.arg == "workload_group":
                                     wg_val = get_arg_value(kw.value)
-                                    if wg_val and wg_val != '*' and not any(fnmatch.fnmatch(g, wg_val) for g in all_defined_workload_groups):
+                                    if (
+                                        wg_val
+                                        and wg_val != "*"
+                                        and not any(
+                                            fnmatch.fnmatch(g, wg_val)
+                                            for g in all_defined_workload_groups
+                                        )
+                                    ):
                                         is_broken = True
-                                elif kw.arg == 'workloads':
+                                elif kw.arg == "workloads":
                                     if isinstance(kw.value, ast.List):
                                         for elt in kw.value.elts:
                                             wl_val = get_arg_value(elt)
-                                            if wl_val and wl_val != '*' and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads):
+                                            if (
+                                                wl_val
+                                                and wl_val != "*"
+                                                and not any(
+                                                    fnmatch.fnmatch(w, wl_val)
+                                                    for w in all_defined_workloads
+                                                )
+                                            ):
                                                 is_broken = True
                             if is_broken and var_name:
                                 broken_vars.append(var_name)
 
                         # Workload group broken workload reference check
-                        elif func_name == 'workload_group':
+                        elif func_name == "workload_group":
                             group_name = get_arg_value(call.args[0]) if call.args else None
                             for kw in call.keywords:
-                                if kw.arg == 'workloads':
+                                if kw.arg == "workloads":
                                     if isinstance(kw.value, ast.List):
                                         for elt in kw.value.elts:
                                             wl_val = get_arg_value(elt)
-                                            if wl_val and wl_val != '*' and not any(fnmatch.fnmatch(w, wl_val) for w in all_defined_workloads):
+                                            if (
+                                                wl_val
+                                                and wl_val != "*"
+                                                and not any(
+                                                    fnmatch.fnmatch(w, wl_val)
+                                                    for w in all_defined_workloads
+                                                )
+                                            ):
                                                 broken_groups.append(f"{group_name} -> {wl_val}")
 
-    return unused_variables, unused_inputs, unused_executables, unused_compilers, broken_vars, broken_groups, sorted(broken_template_refs)
+    return (
+        unused_variables,
+        unused_inputs,
+        unused_executables,
+        unused_compilers,
+        broken_vars,
+        broken_groups,
+        sorted(broken_template_refs),
+    )
 
 
 def setup_parser(subparser):
@@ -558,9 +738,25 @@ def simplify(parser, args):
     for name in sorted(names):
         try:
             res = analyze_object(name, obj_type)
-            unused_vars, unused_inputs, unused_execs, unused_compilers, broken_vars, broken_groups, broken_templates = res
+            (
+                unused_vars,
+                unused_inputs,
+                unused_execs,
+                unused_compilers,
+                broken_vars,
+                broken_groups,
+                broken_templates,
+            ) = res
 
-            if unused_vars or unused_inputs or unused_execs or unused_compilers or broken_vars or broken_groups or broken_templates:
+            if (
+                unused_vars
+                or unused_inputs
+                or unused_execs
+                or unused_compilers
+                or broken_vars
+                or broken_groups
+                or broken_templates
+            ):
                 file_path = obj_path.filename_for_object_name(name)
                 color.cprint(f"@c{{=== {args.type.capitalize().rstrip('s')}: {name} ===}}")
                 if unused_vars:
@@ -585,7 +781,12 @@ def simplify(parser, args):
 
                 # Locate line ranges to remove (including compilers and broken variables)
                 ranges = locate_directive_lines(
-                    file_path, unused_vars, unused_inputs, unused_execs, unused_compilers, broken_vars
+                    file_path,
+                    unused_vars,
+                    unused_inputs,
+                    unused_execs,
+                    unused_compilers,
+                    broken_vars,
                 )
 
                 if ranges:
@@ -615,8 +816,10 @@ def simplify(parser, args):
 
     color.cprint(
         f"@g{{Summary: Found {total_unused_vars} unused variables, "
-        f"{total_unused_inputs} unused inputs, {total_unused_execs} unused executables, "
-        f"{total_unused_compilers} unused compilers, and {total_broken_vars} variables with broken references.}}"
+        f"{total_unused_inputs} unused inputs, "
+        f"{total_unused_execs} unused executables, "
+        f"{total_unused_compilers} unused compilers, "
+        f"and {total_broken_vars} variables with broken references.}}"
     )
 
     return 0
