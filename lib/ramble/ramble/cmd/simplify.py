@@ -77,7 +77,8 @@ def locate_directive_lines(file_path, unused_vars, unused_inputs, unused_execs, 
         with open(file_path, 'r', encoding='utf-8') as f:
             content = f.read()
         tree = ast.parse(content)
-    except Exception:
+    except (OSError, SyntaxError) as e:
+        logger.warn(f"Could not parse {file_path}: {e}")
         return []
 
     # Find the first class definition in the file
@@ -168,8 +169,8 @@ def analyze_object(name, obj_type):
                 try:
                     with open(module.__file__, 'r', encoding='utf-8') as f:
                         source_codes.append(f.read())
-                except Exception:
-                    pass
+                except OSError as e:
+                    logger.warn(f"Could not read source file {module.__file__}: {e}")
     source_code = "\n".join(source_codes)
 
     # Clean the source code (strip comments/strings) for fallback scan
@@ -329,8 +330,8 @@ def analyze_object(name, obj_type):
                     if isinstance(fom_val, dict) and 'fom_regex' in fom_val:
                         try:
                             fom_captures.update(re.compile(fom_val['fom_regex']).groupindex.keys())
-                        except Exception:
-                            pass
+                        except re.error as e:
+                            logger.warn(f"Invalid regex for figure of merit: {fom_val['fom_regex']}. Error: {e}")
                     if isinstance(fom_val, dict):
                         if 'log_file' in fom_val:
                             refs = extract_referenced_names(fom_val['log_file'])

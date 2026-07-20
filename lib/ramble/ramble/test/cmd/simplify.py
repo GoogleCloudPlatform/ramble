@@ -56,9 +56,11 @@ class Testapp(ExecutableApplication):
 
     # Need to clean the cached instance for applications in paths mapping
     obj_type = ramble.repository.ObjectTypes.applications
+def _reset_repo_cache(object_type):
+    """Clear the repository path instance to force re-initialization."""
     try:
-        ramble.repository.paths[obj_type]._instance = None
-    except Exception:
+        ramble.repository.paths[object_type]._instance = None
+    except AttributeError:
         pass
 
     test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
