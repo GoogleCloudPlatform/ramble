@@ -48,7 +48,32 @@ def extract_referenced_names(template_str):
     return referenced
 
 
-def find_template_file(cls, src_path_config):
+def find_class_file(parent_cls, obj_path=None):
+    module = sys.modules.get(parent_cls.__module__)
+    if module and hasattr(module, "__file__") and module.__file__:
+        return module.__file__
+
+    if not obj_path:
+        return None
+
+    parts = parent_cls.__module__.split(".")
+    if len(parts) >= 4 and parts[0] == "ramble":
+        obj_abbrev = parts[1]
+        obj_name = parts[3]
+        for o_type in ramble.repository.ObjectTypes:
+            if o_type == ramble.repository.ObjectTypes.base_classes:
+                continue
+            abbrev = ramble.repository.type_definitions[o_type]["abbrev"]
+            if abbrev == obj_abbrev:
+                try:
+                    path_inst = ramble.repository.paths[o_type]
+                    return path_inst.filename_for_object_name(obj_name)
+                except Exception:
+                    pass
+    return None
+
+
+def find_template_file(cls, src_path_config, obj_path=None):
     if os.path.isabs(src_path_config):
         if os.path.isfile(src_path_config):
             return src_path_config
@@ -56,9 +81,9 @@ def find_template_file(cls, src_path_config):
 
     # Get MRO to find where the class/parents are defined
     for parent_cls in inspect.getmro(cls):
-        module = sys.modules.get(parent_cls.__module__)
-        if module and hasattr(module, "__file__") and module.__file__:
-            candidate = os.path.join(os.path.dirname(module.__file__), src_path_config)
+        p_file_path = find_class_file(parent_cls, obj_path)
+        if p_file_path and (parent_cls.__module__.startswith("ramble") or "ramble" in p_file_path):
+            candidate = os.path.join(os.path.dirname(p_file_path), src_path_config)
             if os.path.isfile(candidate):
                 return candidate
     return None
@@ -243,28 +268,30 @@ def analyze_object(name, obj_type):
     obj_path = ramble.repository.paths[obj_type]
     cls = obj_path.get_obj_class(name)
 
+    target_file_path = obj_path.filename_for_object_name(name)
+
     # Collect source codes from the class and all its parent classes in ramble/
     source_codes = []
-    file_path = obj_path.filename_for_object_name(name)
     for parent_cls in inspect.getmro(cls):
-        module = sys.modules.get(parent_cls.__module__)
-        if module and hasattr(module, "__file__") and module.__file__:
-            if "ramble" in module.__file__:
-                try:
-                    with open(module.__file__, encoding="utf-8") as f:
-                        source_codes.append(f.read())
-                except OSError as e:
-                    logger.warn(f"Could not read source file {module.__file__}: {e}")
+        p_file_path = find_class_file(parent_cls, obj_path)
+        if p_file_path and (parent_cls.__module__.startswith("ramble") or "ramble" in p_file_path):
+            try:
+                with open(p_file_path, encoding="utf-8") as f:
+                    source_codes.append(f.read())
+            except OSError as e:
+                logger.warn(f"Could not read source file {p_file_path}: {e}")
     source_code = "\n".join(source_codes)
 
     # Clean the source code (strip comments/strings) for fallback scan
     cleaned_code = re.sub(r"#.*", "", source_code)
     cleaned_code = re.sub(r'""".*?"""', "", cleaned_code, flags=re.DOTALL)
     cleaned_code = re.sub(r"'''.*?'''", "", cleaned_code, flags=re.DOTALL)
+    # Strip variable reference templates in braces (e.g. {var})
+    cleaned_code = re.sub(r"\{[a-zA-Z0-9_:-]+\}", "", cleaned_code)
 
     # Parse AST of the target file
     try:
-        with open(file_path, encoding="utf-8") as f:
+        with open(target_file_path, encoding="utf-8") as f:
             file_content = f.read()
         tree = ast.parse(file_content)
     except Exception:
@@ -432,7 +459,7 @@ def analyze_object(name, obj_type):
         for contexts_dict in cls.figures_of_merit.values():
             for foms_dict in contexts_dict.values():
                 for fom_val in foms_dict.values():
-                    fom_captures = set()
+                    fom_captures: set[str] = set()
                     if isinstance(fom_val, dict) and "fom_regex" in fom_val:
                         try:
                             fom_captures.update(re.compile(fom_val["fom_regex"]).groupindex.keys())
@@ -491,7 +518,7 @@ def analyze_object(name, obj_type):
             for tpl_config in templates_dict.values():
                 src_path_config = tpl_config.get("src_path")
                 if src_path_config:
-                    tpl_file = find_template_file(cls, src_path_config)
+                    tpl_file = find_template_file(cls, src_path_config, obj_path)
                     if tpl_file:
                         try:
                             with open(tpl_file, encoding="utf-8") as f_tpl:

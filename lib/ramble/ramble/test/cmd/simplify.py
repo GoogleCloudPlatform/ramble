@@ -317,3 +317,437 @@ def test_get_node_end_lineno_fallback():
     file_lines = content.splitlines()
     end_line = get_node_end_lineno(node, file_lines)
     assert end_line == 5
+
+
+def test_extract_referenced_names():
+    from ramble.cmd.simplify import extract_referenced_names
+
+    assert extract_referenced_names("foo {application::orca::version}") == {"version"}
+    assert extract_referenced_names("foo {simple_var}") == {"simple_var"}
+    assert extract_referenced_names(123) == set()
+
+
+def test_find_template_file_direct(tmpdir):
+    from ramble.cmd.simplify import find_template_file
+
+    class DummyClass:
+        __module__ = "ramble.app.dummy"
+
+    # Create dummy module in sys.modules
+    import types
+
+    dummy_module = types.ModuleType("ramble.app.dummy")
+    dummy_module.__file__ = os.path.join(str(tmpdir), "application.py")
+    sys.modules["ramble.app.dummy"] = dummy_module
+
+    # Test absolute path
+    abs_path = os.path.join(str(tmpdir), "absolute_template.in")
+    with open(abs_path, "w", encoding="utf-8") as f:
+        f.write("test")
+    assert find_template_file(DummyClass, abs_path) == abs_path
+    assert find_template_file(DummyClass, "/nonexistent/abs/path") is None
+
+    # Test relative path
+    rel_path = "relative_template.in"
+    full_rel_path = os.path.join(str(tmpdir), rel_path)
+    with open(full_rel_path, "w", encoding="utf-8") as f:
+        f.write("test")
+    assert find_template_file(DummyClass, rel_path) == full_rel_path
+    assert find_template_file(DummyClass, "nonexistent_rel.in") is None
+
+    # Clean up sys.modules
+    sys.modules.pop("ramble.app.dummy", None)
+
+
+def test_get_arg_value_direct():
+    import ast
+
+    from ramble.cmd.simplify import get_arg_value
+
+    tree = ast.parse("foo(bar)")
+    stmt = tree.body[0]
+    assert isinstance(stmt, ast.Expr)
+    call = stmt.value
+    assert isinstance(call, ast.Call)
+    # call.args[0] is ast.Name (bar)
+    assert get_arg_value(call.args[0]) is None
+
+
+def test_get_node_end_lineno_fallback_detailed():
+    import ast
+
+    from ramble.cmd.simplify import get_node_end_lineno
+
+    # 1. Comment outside strings
+    content1 = """executable(
+        'foo', # this is a comment
+        'bar'
+    )"""
+    tree1 = ast.parse(content1)
+    node1 = tree1.body[0]
+    if hasattr(node1, "end_lineno"):
+        del node1.end_lineno
+    assert get_node_end_lineno(node1, content1.splitlines()) == 4
+
+    # 2. Escaped quotes and different quote types
+    content2 = """executable('foo', "bar \\' baz", 'qux')"""
+    tree2 = ast.parse(content2)
+    node2 = tree2.body[0]
+    if hasattr(node2, "end_lineno"):
+        del node2.end_lineno
+    assert get_node_end_lineno(node2, content2.splitlines()) == 1
+
+    # 3. Triple quotes
+    content3 = """executable(
+        'foo',
+        \"""triple
+        double
+        quote\""",
+        '''triple
+        single
+        quote''',
+        'bar'
+    )"""
+    tree3 = ast.parse(content3)
+    node3 = tree3.body[0]
+    if hasattr(node3, "end_lineno"):
+        del node3.end_lineno
+    assert get_node_end_lineno(node3, content3.splitlines()) == 10
+
+    # 4. No parens first line fallback
+    content4 = "x = 1"
+    tree4 = ast.parse(content4)
+    node4 = tree4.body[0]
+    if hasattr(node4, "end_lineno"):
+        del node4.end_lineno
+    assert get_node_end_lineno(node4, content4.splitlines()) == 1
+
+
+def test_locate_directive_lines_errors(tmpdir, monkeypatch):
+    import ramble.util.logger
+    from ramble.cmd.simplify import locate_directive_lines
+
+    # Mock logger.warn to verify it was called
+    warn_calls = []
+    monkeypatch.setattr(ramble.util.logger.logger, "warn", lambda msg: warn_calls.append(msg))
+
+    # Test file that does not exist (OSError)
+    res = locate_directive_lines("/nonexistent/file/path", set(), set(), set(), set(), [])
+    assert res == []
+    assert any("Could not parse" in c for c in warn_calls)
+
+    # Test file with syntax error
+    bad_file = os.path.join(str(tmpdir), "bad_syntax.py")
+    with open(bad_file, "w", encoding="utf-8") as f:
+        f.write("class BadClass:\n   def foo(:\n")
+
+    warn_calls.clear()
+    res = locate_directive_lines(bad_file, set(), set(), set(), set(), [])
+    assert res == []
+    assert any("Could not parse" in c for c in warn_calls)
+
+
+def test_locate_directive_lines_no_class(tmpdir):
+    from ramble.cmd.simplify import locate_directive_lines
+
+    empty_file = os.path.join(str(tmpdir), "empty.py")
+    with open(empty_file, "w", encoding="utf-8") as f:
+        f.write("# just comment, no class\n")
+
+    assert locate_directive_lines(empty_file, set(), set(), set(), set(), []) == []
+
+
+def test_simplify_comprehensive(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("ramble_repo_comprehensive"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testcomp\n")
+
+    app_dir = os.path.join(repo_path, "applications", "compapp")
+    os.makedirs(app_dir)
+    app_file = os.path.join(app_dir, "application.py")
+
+    # Write registered template
+    tpl_file = os.path.join(app_dir, "my_template.in")
+    with open(tpl_file, "w", encoding="utf-8") as f:
+        f.write(
+            "template referencing {var1} and {broken_tpl_ref} and {application::orca::version}\n"
+        )
+
+    code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+
+class Compapp(ExecutableApplication):
+    name = "compapp"
+
+    # Compilers
+    define_compiler('gcc14', pkg_spec='gcc@14')
+    define_compiler('unused_compiler', pkg_spec='gcc@13')
+
+    # Software specs
+    software_spec('orca-{version}', pkg_spec='orca@5.0.4')
+    software_spec('my_pkg', pkg_spec='zlib', compiler='gcc14')
+
+    # Inputs
+    input_file('my_input', url='https://host.com/file-{var1}.tar.gz', description='my input')
+    input_file('unused_input', url='https://host.com/unused-{broken_input_ref}.tar.gz', description='unused input')
+
+    # Executables
+    executable('foo', 'bar {var1} {my_input} {application_version}', use_mpi=False)
+    executable('unused_exec', 'baz', use_mpi=False)
+
+    # Workloads
+    workload('test_wl', executable='foo')
+
+    # Workload groups
+    workload_group('group1', workloads=['test_wl'])
+
+    # Variables
+    workload_variable('var1', default='1.0', workload='test_wl')
+    workload_variable('var2', default='{var1}', workload='nonexistent_wl')
+    workload_variable('version', default='5.0', workload='test_wl')
+
+    # Non-constant variable definition
+    local_name = 'some_local_name'
+    workload_variable(local_name, default='2.0', workload='test_wl')
+
+    # Figure of Merit
+    figure_of_merit('my_fom', fom_regex=r'Result: (?P<fom_val>\\d+)', group_name='fom_val', log_file='{var1}.log')
+    figure_of_merit('fom_with_refs', fom_regex=r'Result: (?P<fom_val>\\d+)', group_name='fom_val', log_file='{fom_val} {broken_fom_ref}.log')
+
+    # Success Criteria
+    success_criteria('my_crit', 'fom_comparison', file='{var1}.log', formula='{var1} > 0')
+    success_criteria('broken_crit', 'fom_comparison', file='{broken_crit_ref}.log', formula='{broken_formula_ref}')
+
+    # Templates
+    register_template('tpl1', src_path='my_template.in', dest_path='my_template.out')
+
+    # Fallback check for python reference
+    def some_method(self):
+        x = 'referenced_in_python_code'
+
+    workload_variable('referenced_in_python_code', default='val', workload='test_wl')
+"""
+    with open(app_file, "w", encoding="utf-8") as f:
+        f.write(code)
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        # 1. Run simplify without flags, verify all outputs
+        out = simplify_cmd("-t", "applications", "compapp")
+
+        # Verify unused compilers, inputs, executables
+        assert "Unused Compilers: ['unused_compiler']" in out
+        assert "Unused Inputs: ['unused_input']" in out
+        assert "Unused Executables: ['unused_exec']" in out
+        assert "Unused Variables" not in out or "referenced_in_python_code" not in out
+
+        # Verify variables with broken workload group references
+        assert "Variables with Broken Workload/Group Refs: ['var2']" in out
+
+        # Verify broken variable references in templates
+        assert "broken_crit_ref" in out
+        assert "broken_fom_ref" in out
+        assert "broken_formula_ref" in out
+        assert "broken_tpl_ref" in out
+        assert "broken_input_ref" in out
+
+        # 2. Run simplify --apply, verify file changes
+        out_apply = simplify_cmd("-t", "applications", "-a", "compapp")
+        assert "Successfully simplified" in out_apply
+
+        with open(app_file, encoding="utf-8") as f:
+            content = f.read()
+            # Verify unused/broken entities are deleted
+            assert "define_compiler('unused_compiler'" not in content
+            assert "input_file('unused_input'" not in content
+            assert "executable('unused_exec'" not in content
+            assert "workload_variable('var2'" not in content
+
+            # Verify valid entities remain
+            assert "define_compiler('gcc14'" in content
+            assert "input_file('my_input'" in content
+            assert "executable('foo'" in content
+            assert "workload_variable('var1'" in content
+            assert "workload_variable('referenced_in_python_code'" in content
+
+
+def test_simplify_modifier(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("ramble_mod_repo"))
+    os.makedirs(os.path.join(repo_path, "modifiers"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: testmodns\n")
+
+    mod_dir = os.path.join(repo_path, "modifiers", "testmod")
+    os.makedirs(mod_dir)
+    mod_file = os.path.join(mod_dir, "modifier.py")
+
+    code = """# Copyright 2022-2026 The Ramble Authors
+from ramble.modkit import *
+
+class Testmod(BasicModifier):
+    name = "testmod"
+
+    # Modifiers use 'variable' instead of 'workload_variable'
+    # We define a variable that is unused, and one that is used in a template
+    variable('used_var', default='1.0', description='used variable')
+    variable('unused_var', default='{broken_mod_ref}', description='unused variable')
+
+    def some_method(self):
+        self.used_var
+"""
+    with open(mod_file, "w", encoding="utf-8") as f:
+        f.write(code)
+
+    obj_type = ramble.repository.ObjectTypes.modifiers
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        out = simplify_cmd("-t", "modifiers", "testmod")
+        assert "=== Modifier: testmod ===" in out
+        assert "Unused Variables: ['unused_var']" in out
+        assert "Broken Variable References in Templates: ['broken_mod_ref']" in out
+
+        # Test apply
+        out_apply = simplify_cmd("-t", "modifiers", "-a", "testmod")
+        assert "Successfully simplified" in out_apply
+
+        with open(mod_file, encoding="utf-8") as f:
+            content = f.read()
+            assert "variable('unused_var'" not in content
+            assert "variable('used_var'" in content
+
+
+def test_simplify_repo_filter_with_names_and_all_names(tmpdir, mutable_config):
+    repo_path = str(tmpdir.join("test_repo_names"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: repotests\n")
+
+    app_dir = os.path.join(repo_path, "applications", "app1")
+    os.makedirs(app_dir)
+    with open(os.path.join(app_dir, "application.py"), "w", encoding="utf-8") as f:
+        f.write(
+            """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+class App1(ExecutableApplication):
+    name = "app1"
+"""
+        )
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        # Scan with repository filter and specific names (covers line 720)
+        out1 = simplify_cmd("-t", "applications", "-r", "repotests", "app1")
+        assert "Found 0 unused variables" in out1
+
+        # Scan without specifying any names (covers line 730)
+        out2 = simplify_cmd("-t", "applications")
+        assert "Summary:" in out2
+
+
+def test_simplify_analysis_error(tmpdir, mutable_config, monkeypatch):
+    import ramble.cmd.simplify
+    import ramble.util.logger
+
+    warn_calls = []
+    monkeypatch.setattr(ramble.util.logger.logger, "warn", lambda msg: warn_calls.append(msg))
+
+    def mock_analyze(name, obj_type):
+        raise RuntimeError("Simulated analysis error")
+
+    monkeypatch.setattr(ramble.cmd.simplify, "analyze_object", mock_analyze)
+
+    # Let's run simplify on some application. Since it's mocked to
+    # raise error, it should log it as warning
+    repo_path = str(tmpdir.join("test_repo_err"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: errns\n")
+
+    app_dir = os.path.join(repo_path, "applications", "errapp")
+    os.makedirs(app_dir)
+    with open(os.path.join(app_dir, "application.py"), "w", encoding="utf-8") as f:
+        f.write(
+            """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+class Errapp(ExecutableApplication):
+    name = "errapp"
+"""
+        )
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        simplify_cmd("-t", "applications", "errapp")
+        assert any("Error analyzing errapp: Simulated analysis error" in c for c in warn_calls)
+
+
+def test_simplify_open_source_oserror(tmpdir, mutable_config, monkeypatch):
+    import builtins
+
+    import ramble.util.logger
+
+    repo_path = str(tmpdir.join("ramble_repo_oserror"))
+    os.makedirs(os.path.join(repo_path, "applications"))
+    with open(os.path.join(repo_path, "repo.yaml"), "w", encoding="utf-8") as f:
+        f.write("repo:\n  namespace: oserrns\n")
+
+    app_dir = os.path.join(repo_path, "applications", "oserrapp")
+    os.makedirs(app_dir)
+    app_file = os.path.join(app_dir, "application.py")
+    with open(app_file, "w", encoding="utf-8") as f:
+        f.write(
+            """# Copyright 2022-2026 The Ramble Authors
+from ramble.appkit import *
+class Oserrapp(ExecutableApplication):
+    name = "oserrapp"
+"""
+        )
+
+    obj_type = ramble.repository.ObjectTypes.applications
+    try:
+        ramble.repository.paths[obj_type]._instance = None
+    except Exception:
+        pass
+
+    test_repo = ramble.repository.Repo(repo_path, object_type=obj_type)
+
+    original_open = builtins.open
+
+    warn_calls = []
+    monkeypatch.setattr(ramble.util.logger.logger, "warn", lambda msg: warn_calls.append(msg))
+
+    def mock_open(file, *args, **kwargs):
+        if isinstance(file, (str, bytes, os.PathLike)) and os.path.realpath(
+            file
+        ) == os.path.realpath(app_file):
+            raise OSError("Simulated read failure")
+        return original_open(file, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "open", mock_open)
+
+    with ramble.repository.use_repositories(test_repo, object_type=obj_type):
+        simplify_cmd("-t", "applications", "oserrapp")
+        assert any("Could not read source file" in c for c in warn_calls)
