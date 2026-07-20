@@ -368,7 +368,7 @@ class nixlog:
 
     def __init__(
         self,
-        filename: str,
+        filename=None,
         echo=False,
         debug=0,
         buffer=False,
@@ -379,7 +379,7 @@ class nixlog:
         """Create a new output log context manager.
 
         Args:
-            filename (str): path to file where output should be logged
+            filename (str or stream): path to file where output should be logged or open stream
             echo (bool): whether to echo output in addition to logging it
             debug (int): positive to enable tty debug mode during logging
             buffer (bool): pass buffer=True to skip unbuffering output; note
@@ -400,6 +400,15 @@ class nixlog:
 
         """
         self.filename = filename
+        if isinstance(filename, str):
+            self.write_in_parent = False
+            self.filename_for_daemon = filename
+            self.filename_object = None
+        else:
+            self.write_in_parent = True
+            self.filename_for_daemon = None
+            self.filename_object = filename
+
         self.echo = echo
         self.debug = debug
         self.buffer = buffer
@@ -453,7 +462,7 @@ class nixlog:
                     read_fd,
                     self.write_fd,
                     self.echo,
-                    self.filename,
+                    self.filename_for_daemon,
                     self.append,
                     child_pipe,
                     self.filter_fn,
@@ -515,6 +524,14 @@ class nixlog:
             os.close(saved_fd)
 
         # recover and store echo settings from the child before it dies
+        if self.write_in_parent:
+            try:
+                string = self.parent_pipe.recv()
+                if self.filename_object:
+                    self.filename_object.write(string)
+            except EOFError:
+                pass
+
         try:
             self.echo = self.parent_pipe.recv()
         except EOFError:
@@ -756,7 +773,7 @@ def _writer_daemon(
     read_fd: Connection,
     write_fd: Connection,
     echo: bool,
-    log_filename: str,
+    log_filename: Optional[str],
     append: bool,
     control_fd: Connection,
     filter_fn: Optional[Callable[[str], str]],
@@ -828,7 +845,10 @@ def _writer_daemon(
     # list of streams to select from
     istreams = [read_file, stdin_file] if stdin_file else [read_file]
     force_echo = False  # parent can force echo for certain output
-    log_file = open(log_filename, mode="a" if append else "w", encoding="utf-8")
+    if log_filename is None:
+        log_file = io.StringIO()
+    else:
+        log_file = open(log_filename, mode="a" if append else "w", encoding="utf-8")
 
     try:
         with keyboard_input(stdin_file) as kb:
@@ -906,7 +926,10 @@ def _writer_daemon(
         traceback.print_exc()
 
     finally:
-        log_file.close()
+        if log_filename is None:
+            control_fd.send(log_file.getvalue())
+        else:
+            log_file.close()
         read_fd.close()
         if stdin_fd:
             stdin_fd.close()
