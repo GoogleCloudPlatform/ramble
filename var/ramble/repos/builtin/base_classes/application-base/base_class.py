@@ -3006,15 +3006,18 @@ class ApplicationBase(ObjectMixin, metaclass=ApplicationMeta):
                 )
                 fs.mkdirp(os.path.dirname(expand_path))
 
+                rendered_content = self.expander.expand_var(
+                    template_conf["contents"], extra_vars=exec_vars
+                )
+
                 with open(expand_path, "w+", encoding="utf-8") as f:
-                    f.write(
-                        self.expander.expand_var(
-                            template_conf["contents"], extra_vars=exec_vars
-                        )
-                    )
+                    f.write(rendered_content)
                 os.chmod(expand_path, _DEFAULT_CONTENT_PERM)
 
             self._render_object_templates(exec_vars)
+
+            if self.workflow_manager:
+                self.workflow_manager.validate_experiment()
 
             experiment_script = workspace.experiments_script
             experiment_script.write(

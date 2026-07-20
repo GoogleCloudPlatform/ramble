@@ -181,7 +181,8 @@ ramble:
         ) as f:
             exec_content = f.read()
             assert "scontrol show config" in exec_content
-            assert "#SBATCH" not in exec_content
+            for line in exec_content.splitlines():
+                assert not line.strip().startswith("#SBATCH")
         with open(os.path.join(path, "batch_query"), encoding="utf-8") as f:
             content = f.read()
             assert "squeue" in content
@@ -213,7 +214,8 @@ ramble:
         ) as f:
             content = f.read()
             # Since it uses the default execute_experiment tpl, no slurm content is present
-            assert "#SBATCH" not in content
+            for line in content.splitlines():
+                assert not line.strip().startswith("#SBATCH")
             assert "scontrol show hostnames" not in content
 
 

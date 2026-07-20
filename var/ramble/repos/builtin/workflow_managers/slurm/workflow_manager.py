@@ -55,8 +55,8 @@ class Slurm(WorkflowManagerBase):
         default="""# ****************************************************
 # * Workflow manager: slurm
 # * Execution script is: {slurm_experiment_sbatch}
-# * If this file is not the same as the above path, it is unlikely that this script
-# * is used when `ramble on` executes experiments.
+# * Note: `execute_experiment` is sourced by the execution script.
+# * Do not add `#SBATCH` headers to `execute_experiment`, as they will be ignored.
 # ****************************************************
 """,
         description="Banner to describe the workflow within execution templates",
@@ -343,6 +343,24 @@ class Slurm(WorkflowManagerBase):
         fom_name="job-status",
         formula="'{value}' == 'COMPLETE'",
     )
+
+    def validate_experiment(self):
+        super().validate_experiment()
+        exp_run_dir = self.app_inst.expander.experiment_run_dir
+        exec_path = os.path.join(exp_run_dir, "execute_experiment")
+        if os.path.isfile(exec_path):
+            with open(exec_path, encoding="utf-8") as f:
+                content = f.read()
+                for line in content.splitlines():
+                    if line.strip().startswith("#SBATCH"):
+                        logger.warn(
+                            f"In experiment {self.app_inst.expander.experiment_namespace}:\n"
+                            f"  `execute_experiment` contains `#SBATCH` directives, "
+                            f"which will be ignored.\n"
+                            f"  Custom headers should be added to `extra_sbatch_headers` "
+                            f"in the workspace configuration instead."
+                        )
+                        break
 
 
 class SlurmRunner:
